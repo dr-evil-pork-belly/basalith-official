@@ -105,7 +105,7 @@ function Reveal({
   margin?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: margin as Parameters<typeof useInView>[1]['margin'] });
+  const inView = useInView(ref, { once: true, margin: "0px" });
   return (
     <motion.div ref={ref} variants={variants} initial="hidden"
       animate={inView ? 'visible' : 'hidden'} custom={delay} className={className}>
@@ -675,6 +675,7 @@ export default function CirclePage() {
             className="font-mono text-[clamp(0.68rem,1.3vw,0.85rem)] leading-[1.85]
                        max-w-[580px] mb-14 tracking-wide"
             style={{ color: C.mist }}
+            
           >
             The Basalith Circle is an invitation-only network of Guardians —
             researchers, parents, and trust leaders — who believe the loss of
