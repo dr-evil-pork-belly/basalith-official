@@ -4,7 +4,20 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Basalith | Sovereign Legacy Vault",
-  description: "Secure your essence. Build your Digital Double.",
+  description: "The world’s first sovereign vault designed to turn raw memories into a functional digital double that lives for generations.",
+  openGraph: {
+    title: "Basalith | Sovereign Legacy Vault",
+    description: "Secure your human legacy. Bridge the gap between raw data and digital continuity.",
+    type: "website",
+    locale: "en_US",
+    url: "https://basalith.xyz",
+    siteName: "Basalith",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Basalith | Sovereign Legacy Vault",
+    description: "Turning memories into a living legacy through Sovereign Persona Architecture.",
+  },
 };
 
 export default function RootLayout({
@@ -22,7 +35,7 @@ export default function RootLayout({
               BASALITH
             </Link>
             
-            <div className="flex gap-8 text-sm uppercase tracking-widest text-basalt font-sans">
+            <div className="flex flex-wrap justify-center gap-4 md:gap-8 text-[10px] md:text-sm tracking-widest">
               <Link href="/vision" className="hover:text-amber transition">Vision</Link>
               <Link href="/hearth" className="hover:text-amber transition">The Hearth</Link>
               <Link href="/vault" className="hover:text-amber transition">The Vault</Link>
