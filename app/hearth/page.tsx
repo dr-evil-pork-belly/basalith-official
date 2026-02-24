@@ -974,7 +974,7 @@ export default function HearthPage() {
           <Reveal delay={0.24}>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <motion.a
-                href="mailto:hearth@basalith.com"
+                href="mailto:hearth@basalith.xyz"
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
                 className="group relative inline-flex items-center justify-center gap-3

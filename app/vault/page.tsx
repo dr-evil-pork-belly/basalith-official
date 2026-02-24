@@ -1002,7 +1002,7 @@ export default function VaultPage() {
 
           <Reveal delay={0.22}>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <motion.a href="mailto:vault@basalith.com"
+              <motion.a href="mailto:vault@basalith.xyz"
                 whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                 className="group relative inline-flex items-center justify-center gap-3
                            font-mono text-[0.63rem] tracking-[0.4em] uppercase
