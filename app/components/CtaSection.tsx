@@ -44,7 +44,7 @@ export default function CtaSection() {
         <p className="font-sans text-[0.75rem] text-text-muted tracking-[0.04em] mt-10 reveal reveal-delay-4">
           Consultations are private and carry no obligation.{' '}
           <a
-            href="mailto:legacy@basalith.com"
+            href="mailto:legacy@basalith.xyz"
             className="text-amber-dim hover:text-amber transition-colors duration-200"
           >
             legacy@basalith.com
