@@ -7,7 +7,7 @@ const links = [
   { href: '#comparison', label: 'The Method'  },
   { href: '#asset',      label: 'The Asset'   },
   { href: '#continuity', label: 'Continuity'  },
-  { href: '#journal',    label: 'Journal'     },
+  { href: '/about',      label: 'About'       },
 ]
 
 export default function Nav() {
