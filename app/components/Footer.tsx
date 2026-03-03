@@ -1,15 +1,28 @@
 const COLS = [
   {
     heading: 'Product',
-    links: ['Essence Mapping', 'Golden Dataset', 'Digital Clone', 'Legacy Plan'],
+    links: [
+      { label: 'Essence Mapping', href: '#' },
+      { label: 'Golden Dataset', href: '#' },
+      { label: 'Digital Clone', href: '#' },
+      { label: 'Legacy Plan', href: '#' },
+    ],
   },
   {
     heading: 'Legal',
-    links: ['Estate Integration', 'Trust Compatibility', 'Data Ownership', 'Privacy Policy'],
+    links: [
+      { label: 'Estate Integration', href: '#' },
+      { label: 'Trust Compatibility', href: '#' },
+      { label: 'Data Ownership', href: '#' },
+      { label: 'Privacy Policy', href: '#' },
+    ],
   },
   {
     heading: 'Company',
-    links: ['About Basalith', 'Journal', 'Careers', 'Contact'],
+    links: [
+      { label: 'About Basalith', href: '/about' },
+      { label: 'Contact', href: '/contact' },
+    ],
   },
 ]
 
@@ -33,14 +46,9 @@ export default function Footer() {
               {heading}
             </h4>
             <ul className="flex flex-col gap-2.5 list-none p-0 m-0">
-              {links.map((link) => (
-                <li key={link}>
-                  <a
-                    href="#"
-                    className="font-sans text-[0.8rem] text-text-muted no-underline transition-colors duration-200 hover:text-text-secondary"
-                  >
-                    {link}
-                  </a>
+              {links.map(({ label, href }) => (
+                <li key={label}>
+                  <a href={href} className="font-sans text-[0.8rem] text-text-muted no-underline transition-colors duration-200 hover:text-text-secondary">{label}</a>
                 </li>
               ))}
             </ul>
