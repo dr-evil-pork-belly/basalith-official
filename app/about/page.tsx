@@ -1,64 +1,56 @@
 import Nav    from '../components/Nav'
 import Footer from '../components/Footer'
 
-// ── Silhouette SVG placeholders ───────────────────────────────────────────
-function SilhouetteAdult() {
-  return (
-    <svg viewBox="0 0 200 260" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-      <circle cx="100" cy="72" r="40" fill="rgba(255,179,71,0.08)" />
-      <ellipse cx="100" cy="200" rx="68" ry="60" fill="rgba(255,179,71,0.06)" />
-      <circle cx="100" cy="72" r="34" fill="rgba(255,179,71,0.10)" />
-      <ellipse cx="100" cy="196" rx="58" ry="52" fill="rgba(255,179,71,0.08)" />
-    </svg>
-  )
-}
-
-function SilhouetteChild() {
-  return (
-    <svg viewBox="0 0 200 260" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-      <circle cx="100" cy="78" r="34" fill="rgba(255,179,71,0.08)" />
-      <ellipse cx="100" cy="196" rx="56" ry="50" fill="rgba(255,179,71,0.06)" />
-      <circle cx="100" cy="78" r="28" fill="rgba(255,179,71,0.10)" />
-      <ellipse cx="100" cy="192" rx="48" ry="44" fill="rgba(255,179,71,0.08)" />
-    </svg>
-  )
-}
-
-// ── Values ────────────────────────────────────────────────────────────────
 const VALUES = [
   {
-    num: '01',
+    num:   '01',
     title: 'Memory Is Wealth',
-    body: 'Every civilisation has sought to preserve its most valuable people. We are the first to build the infrastructure to do it properly — with legal standing, emotional accuracy, and generational permanence.',
+    body:  'Every civilisation has sought to preserve its most valuable people. We are the first generation with the tools to do it properly — with legal standing, emotional accuracy, and permanence measured in centuries, not server uptime.',
   },
   {
-    num: '02',
+    num:   '02',
     title: 'Family Over Algorithm',
-    body: 'The people who love you are the most accurate interpreters of your life. No amount of compute power replicates what your family simply knows. We built our entire model around this truth.',
+    body:  'The people who love you are the only accurate interpreters of your life. No amount of compute power replicates what your family simply knows. We built our entire model around this truth — and refused to compromise it.',
   },
   {
-    num: '03',
+    num:   '03',
     title: 'Permanence By Design',
-    body: 'We do not build for engagement metrics or monthly active users. We build for centuries. Every architectural decision — legal, technical, organisational — is made with that timeframe in mind.',
+    body:  'We do not build for engagement metrics. We do not optimise for retention. Every architectural decision — legal, technical, organisational — is made with a single question: will this still work in a hundred years?',
   },
   {
-    num: '04',
+    num:   '04',
     title: 'Ownership Without Compromise',
-    body: 'Your data is yours. Not a licensing arrangement. Not a terms-of-service clause. Yours — structured as a legal asset from day one, portable on demand, and transferable to your heirs on your terms.',
+    body:  'Your data is yours. Not a licensing arrangement. Not subject to a terms-of-service revision. Structured as a legal asset from day one, portable on demand, and transferable to your heirs on your terms alone.',
   },
 ]
 
-// ── Page ──────────────────────────────────────────────────────────────────
+const VISION_ITEMS = [
+  {
+    horizon: 'Near Term',
+    title:   'The Golden Standard',
+    body:    'Establish Basalith as the definitive infrastructure for personal legacy preservation — the institution families turn to when they decide to take their memory as seriously as their estate.',
+  },
+  {
+    horizon: 'Medium Term',
+    title:   'The Legal Framework',
+    body:    'Drive the recognition of Golden Datasets as formal estate assets across major legal jurisdictions. Build the case law, the precedent, and the institutional partnerships that make digital legacy inheritance as routine as a property transfer.',
+  },
+  {
+    horizon: 'Long Term',
+    title:   'The Living Archive',
+    body:    'A world in which every family maintains a governed, evolving record of who they were — accessible to future generations not as static photographs or faded letters, but as an intelligent presence that continues to think, reason, and respond.',
+  },
+]
+
 export default function AboutPage() {
   return (
     <>
       <Nav />
-
       <main>
 
         {/* ── HERO ── */}
         <section
-          className="relative min-h-[70vh] flex flex-col items-center justify-center text-center px-8 md:px-16 pt-40 pb-24 overflow-hidden bg-obsidian-void"
+          className="relative min-h-[75vh] flex flex-col items-center justify-center text-center px-8 md:px-16 pt-40 pb-28 overflow-hidden bg-obsidian-void"
           aria-label="About hero"
         >
           {/* Grid */}
@@ -76,212 +68,253 @@ export default function AboutPage() {
           {/* Amber radiance */}
           <div
             className="absolute inset-0 pointer-events-none"
-            style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 60%,rgba(255,179,71,0.07) 0%,transparent 65%)' }}
+            style={{ background: 'radial-gradient(ellipse 55% 55% at 50% 60%,rgba(255,179,71,0.07) 0%,transparent 65%)' }}
             aria-hidden="true"
           />
 
-          <div className="relative z-10 max-w-3xl mx-auto">
-            <p className="eyebrow mb-6">Our Story</p>
+          <div className="relative z-10 max-w-4xl mx-auto">
+            <p className="eyebrow mb-7">Why We Exist</p>
             <h1
-              className="font-serif font-semibold text-text-primary leading-[0.92] tracking-[-0.038em] mb-8"
-              style={{ fontSize: 'clamp(3rem,7vw,6rem)' }}
+              className="font-serif font-semibold text-text-primary leading-[0.9] tracking-[-0.04em] mb-10"
+              style={{ fontSize: 'clamp(3rem,7.5vw,6.75rem)' }}
             >
-              Built By a Father.<br />
+              The Most Valuable Thing
+              <br />
+              You Own Is Not
+              <br />
               <em className="italic font-medium text-amber" style={{ fontStyle: 'italic' }}>
-                Coded By His Son.
+                On Your Balance Sheet.
               </em>
             </h1>
-            <p className="font-sans font-light text-body-lg text-text-secondary leading-[1.82] max-w-2xl mx-auto">
-              Basalith began with a simple question: if the people we love are the only ones
-              who truly understand our lives, why are we letting strangers label our memories?
+            <p className="font-sans font-light text-body-lg text-text-secondary leading-[1.85] max-w-2xl mx-auto">
+              It is the particular way you think. The reasoning behind your decisions.
+              The things only your family knows about you — and what happens to all of
+              that when you are no longer here to explain it.
             </p>
           </div>
         </section>
 
-        {/* ── ORIGIN STORY ── */}
+        {/* ── THE PROBLEM ── */}
         <section
           className="relative bg-obsidian-deep px-8 md:px-16 lg:px-24 py-36 overflow-hidden"
-          aria-label="Origin story"
+          aria-label="The problem"
         >
           <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-border-amber to-transparent" />
 
-          <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+          <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_1.4fr] gap-20 items-start">
 
-            {/* Copy */}
-            <div>
-              <p className="eyebrow mb-6">The Origin</p>
-              <h2
-                className="font-serif font-semibold text-text-primary leading-[1.0] tracking-[-0.03em] mb-8"
-                style={{ fontSize: 'clamp(2rem,4vw,3.5rem)' }}
+            {/* Left — label + large number */}
+            <div className="lg:sticky lg:top-32">
+              <p className="eyebrow mb-6">The Problem</p>
+              <p
+                className="font-serif font-light text-amber/20 leading-none select-none"
+                style={{ fontSize: 'clamp(6rem,14vw,12rem)', letterSpacing: '-0.05em' }}
+                aria-hidden="true"
               >
-                The First Father &amp; Son to Bootstrap
-                {' '}<em className="italic font-medium text-amber" style={{ fontStyle: 'italic' }}>a Unicorn.</em>
-              </h2>
-
-              <div className="flex flex-col gap-5">
-                <p className="font-sans font-light text-body-base text-text-secondary leading-[1.85]">
-                  David started Basalith the way most important companies start — not with a pitch deck,
-                  but with a problem he couldn't stop thinking about. As a father, he understood that the
-                  most irreplaceable thing he could leave his son wasn't money. It was memory. Context.
-                  The particular quality of his thinking, his values, his way of seeing the world.
-                </p>
-                <p className="font-sans font-light text-body-base text-text-secondary leading-[1.85]">
-                  Blake, his son, was ten years old when he wrote the first line of Basalith code.
-                  Not as a curiosity project. As a mission. He understood, with the clarity that children
-                  sometimes have about things adults complicate, that his father was building something
-                  that mattered — and that he wanted to be the one who built it with him.
-                </p>
-                <p className="font-sans font-light text-body-base text-text-secondary leading-[1.85]">
-                  There has never been a father and son who bootstrapped a company of this ambition together.
-                  We think that's exactly the point. Basalith is about what families can build when they
-                  take their legacy seriously. We are proof of our own product.
-                </p>
-              </div>
+                01
+              </p>
             </div>
 
-            {/* Team cards */}
-            <div className="flex flex-col gap-6">
-
-              {/* David */}
-              <div
-                className="rounded-sm border border-border-amber p-8 relative overflow-hidden"
-                style={{ background: 'linear-gradient(160deg,#221F14,#1D1B11)' }}
+            {/* Right — copy */}
+            <div className="flex flex-col gap-7">
+              <h2
+                className="font-serif font-semibold text-text-primary leading-[1.0] tracking-[-0.03em]"
+                style={{ fontSize: 'clamp(2rem,4vw,3.25rem)' }}
               >
-                <div className="absolute top-0 left-[12%] right-[12%] h-px bg-gradient-to-r from-transparent via-amber/40 to-transparent" />
-                <div className="flex items-center gap-6 mb-5">
-                  <div
-                    className="w-20 h-20 rounded-sm flex-shrink-0 overflow-hidden border border-amber/20"
-                    style={{ background: 'linear-gradient(145deg,#2A2820,#1E1C14)' }}
-                  >
-                    <SilhouetteAdult />
-                  </div>
-                  <div>
-                    <p className="font-serif text-[1.5rem] font-semibold text-text-primary leading-tight mb-1">
-                      David
-                    </p>
-                    <p className="eyebrow !text-[0.6rem]">Founder &amp; CEO</p>
-                  </div>
-                </div>
-                <p className="font-sans font-light text-body-sm text-text-secondary leading-[1.75]">
-                  David built Basalith because he wanted his son to know him — not just remember him.
-                  His background spans estate law, data architecture, and fifteen years building
-                  companies that take the long view. Basalith is the first one he built for centuries.
+                We Have Never Had a Serious Infrastructure for Human Memory.
+              </h2>
+              <p className="font-sans font-light text-body-base text-text-secondary leading-[1.88]">
+                Civilisations have always tried to preserve their most significant people.
+                Portraits. Journals. Stone monuments. The instinct is ancient. But the
+                execution has always been passive — a record of what someone looked like,
+                not how they thought. A collection of moments, not a continuity of mind.
+              </p>
+              <p className="font-sans font-light text-body-base text-text-secondary leading-[1.88]">
+                The technology industry promised to solve this. It did not. What it built
+                instead was an infrastructure for extracting value from personal data —
+                labeling it with anonymous contractors, feeding it to models that serve
+                advertisers, and storing it on servers that will outlive their business
+                model by, at best, a decade.
+              </p>
+              <p className="font-sans font-light text-body-base text-text-secondary leading-[1.88]">
+                The result is a generation of people who have produced more personal data
+                than any humans in history — and who have less control over it, less
+                understanding of what it means, and no mechanism to pass it to the people
+                who will one day want it most.
+              </p>
+
+              {/* Pull quote */}
+              <div className="border-l-2 border-amber pl-6 mt-4">
+                <p className="font-serif text-[1.3rem] italic text-text-secondary leading-[1.6] tracking-[-0.01em]">
+                  "The problem is not that we lack the data.
+                  The problem is that nobody built the institution."
                 </p>
               </div>
-
-              {/* Blake */}
-              <div
-                className="rounded-sm border border-border-subtle p-8 relative overflow-hidden"
-                style={{ background: 'linear-gradient(160deg,#1D1D20,#17171A)' }}
-              >
-                <div className="flex items-center gap-6 mb-5">
-                  <div
-                    className="w-20 h-20 rounded-sm flex-shrink-0 overflow-hidden border border-white/[0.08]"
-                    style={{ background: 'linear-gradient(145deg,#222226,#1A1A1D)' }}
-                  >
-                    <SilhouetteChild />
-                  </div>
-                  <div>
-                    <p className="font-serif text-[1.5rem] font-semibold text-text-primary leading-tight mb-1">
-                      Blake
-                    </p>
-                    <p className="eyebrow !text-[0.6rem]">Lead Developer</p>
-                  </div>
-                </div>
-                <p className="font-sans font-light text-body-sm text-text-secondary leading-[1.75]">
-                  Blake is ten years old and the lead developer of Basalith. He wrote his first
-                  line of production code before most of his classmates had read-only internet access.
-                  He is building the technology that will one day preserve his father's voice,
-                  his father's reasoning, his father's legacy — for Blake's own children.
-                </p>
-                <div className="mt-4 flex items-center gap-2">
-                  <span className="ai-dot" />
-                  <span className="font-sans text-[0.65rem] font-semibold tracking-[0.14em] uppercase text-amber-dim">
-                    Age 10 · Lead Developer
-                  </span>
-                </div>
-              </div>
-
             </div>
           </div>
         </section>
 
-        {/* ── MISSION STATEMENT ── */}
+        {/* ── THE MISSION ── */}
         <section
           className="relative bg-obsidian px-8 md:px-16 lg:px-24 py-36 overflow-hidden"
           aria-label="Mission"
         >
           <div
             className="absolute inset-0 pointer-events-none"
-            style={{ background: 'radial-gradient(ellipse 55% 60% at 50% 50%,rgba(255,179,71,0.045) 0%,transparent 65%)' }}
+            style={{ background: 'radial-gradient(ellipse 60% 55% at 50% 50%,rgba(255,179,71,0.045) 0%,transparent 65%)' }}
             aria-hidden="true"
           />
 
-          <div className="relative z-10 max-w-3xl mx-auto text-center mb-24">
-            <p className="eyebrow mb-6">Our Mission</p>
-            <h2
-              className="font-serif font-semibold text-text-primary leading-[0.95] tracking-[-0.035em] mb-8"
-              style={{ fontSize: 'clamp(2.25rem,5vw,4.25rem)' }}
-            >
-              To make the preservation of a human life as serious as the
-              {' '}<em className="italic font-medium text-amber" style={{ fontStyle: 'italic' }}>preservation of their estate.</em>
-            </h2>
-            <p className="font-sans font-light text-body-base text-text-secondary leading-[1.85]">
-              Every generation has left something behind. Journals. Portraits. Letters.
-              Property. We are the first generation with the tools to leave something more:
-              a living, evolving, legally governed record of a mind. Basalith exists to make
-              that a right, not a privilege — and to build the infrastructure that makes it permanent.
-            </p>
-          </div>
+          <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_1.4fr] gap-20 items-start">
 
-          {/* Values grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-5xl mx-auto">
-            {VALUES.map(({ num, title, body }) => (
-              <div
-                key={num}
-                className="group relative rounded-sm border border-border-subtle bg-white/[0.018] p-8 overflow-hidden transition-colors duration-300 hover:border-border-amber hover:bg-amber/[0.022]"
+            <div className="lg:sticky lg:top-32">
+              <p className="eyebrow mb-6">Our Mission</p>
+              <p
+                className="font-serif font-light text-amber/20 leading-none select-none"
+                style={{ fontSize: 'clamp(6rem,14vw,12rem)', letterSpacing: '-0.05em' }}
+                aria-hidden="true"
               >
-                <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-transparent to-transparent transition-all duration-300 group-hover:via-amber/38" />
-                <p className="font-serif text-[2.5rem] font-light text-amber/14 leading-none mb-3">{num}</p>
-                <p className="font-sans text-[0.78rem] font-bold tracking-[0.1em] uppercase text-text-primary mb-3">{title}</p>
-                <p className="font-sans font-light text-body-sm text-text-secondary leading-[1.75]">{body}</p>
+                02
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-7">
+              <h2
+                className="font-serif font-semibold text-text-primary leading-[1.0] tracking-[-0.03em]"
+                style={{ fontSize: 'clamp(2rem,4vw,3.25rem)' }}
+              >
+                To Make the Preservation of a Life as Serious as the Preservation of an Estate.
+              </h2>
+              <p className="font-sans font-light text-body-base text-text-secondary leading-[1.88]">
+                Basalith exists to build the institution that was never built. Not a
+                platform. Not an app. An institution — with the legal standing, the
+                technical architecture, and the governance model that the permanence
+                of human memory actually requires.
+              </p>
+              <p className="font-sans font-light text-body-base text-text-secondary leading-[1.88]">
+                We do this by treating personal data the way serious institutions treat
+                serious assets. With provenance. With chain of custody. With named
+                beneficiaries, legal instruments, and a fiduciary obligation to the
+                person whose life it represents — not to the shareholders of a
+                platform that happens to store it.
+              </p>
+              <p className="font-sans font-light text-body-base text-text-secondary leading-[1.88]">
+                The Golden Dataset is our name for the result: the highest-quality
+                labeled record of a human life ever assembled. Built by family.
+                Governed by law. Powered by whatever AI exists in the year
+                your grandchildren decide they want to understand who you were.
+              </p>
+
+              {/* Values */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+                {VALUES.map(({ num, title, body }) => (
+                  <div
+                    key={num}
+                    className="group relative rounded-sm border border-border-subtle bg-white/[0.018] p-6 overflow-hidden transition-colors duration-300 hover:border-border-amber hover:bg-amber/[0.022]"
+                  >
+                    <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-transparent to-transparent transition-all duration-300 group-hover:via-amber/38" />
+                    <p className="font-serif text-[2rem] font-light text-amber/14 leading-none mb-2">{num}</p>
+                    <p className="font-sans text-[0.75rem] font-bold tracking-[0.1em] uppercase text-text-primary mb-2">{title}</p>
+                    <p className="font-sans font-light text-[0.82rem] text-text-secondary leading-[1.72]">{body}</p>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
         </section>
 
-        {/* ── CLOSING STATEMENT ── */}
+        {/* ── THE VISION ── */}
         <section
-          className="relative bg-obsidian-deep px-8 md:px-16 py-36 text-center overflow-hidden"
-          aria-label="Closing"
+          className="relative bg-obsidian-deep px-8 md:px-16 lg:px-24 py-36 overflow-hidden"
+          aria-label="Long-term vision"
         >
-          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-border-amber to-transparent" />
+          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-border-subtle to-transparent" />
 
-          <div className="max-w-2xl mx-auto">
-            <p className="font-serif text-[1.75rem] md:text-[2.25rem] font-medium italic text-text-secondary leading-[1.45] tracking-[-0.02em] mb-10">
-              "We are not building a product.<br />
-              We are building proof that a family<br />
-              can take their legacy seriously —<br />
-              and that the technology now exists<br />
-              to honour that intention."
-            </p>
-            <div className="flex items-center justify-center gap-3 mb-10">
-              <div className="h-px w-12 bg-amber/30" />
-              <span className="font-sans text-[0.72rem] font-semibold tracking-[0.16em] uppercase text-amber-dim">
-                David &amp; Blake — Basalith
-              </span>
-              <div className="h-px w-12 bg-amber/30" />
+          <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_1.4fr] gap-20 items-start">
+
+            <div className="lg:sticky lg:top-32">
+              <p className="eyebrow mb-6">The Vision</p>
+              <p
+                className="font-serif font-light text-amber/20 leading-none select-none"
+                style={{ fontSize: 'clamp(6rem,14vw,12rem)', letterSpacing: '-0.05em' }}
+                aria-hidden="true"
+              >
+                03
+              </p>
             </div>
 
-            <a href="#cta" className="btn-monolith-amber group">
-              Begin Your Archive
-              <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
-            </a>
+            <div className="flex flex-col gap-0">
+              {VISION_ITEMS.map(({ horizon, title, body }, i) => (
+                <div
+                  key={i}
+                  className="py-10 border-b border-border-subtle last:border-b-0"
+                >
+                  <p className="eyebrow !text-[0.6rem] mb-3">{horizon}</p>
+                  <h3
+                    className="font-serif font-semibold text-text-primary leading-[1.1] tracking-[-0.02em] mb-4"
+                    style={{ fontSize: 'clamp(1.5rem,3vw,2.25rem)' }}
+                  >
+                    {title}
+                  </h3>
+                  <p className="font-sans font-light text-body-base text-text-secondary leading-[1.88]">
+                    {body}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── CLOSING ── */}
+        <section
+          className="relative bg-obsidian px-8 md:px-16 py-40 text-center overflow-hidden"
+          aria-label="Closing statement"
+        >
+          <div
+            className="absolute pointer-events-none"
+            style={{
+              width: 1000, height: 500,
+              top: '50%', left: '50%',
+              transform: 'translate(-50%,-50%)',
+              background: 'radial-gradient(ellipse,rgba(255,179,71,0.07) 0%,transparent 60%)',
+            }}
+            aria-hidden="true"
+          />
+
+          <div className="relative z-10 max-w-3xl mx-auto">
+            <p
+              className="font-serif font-medium text-text-secondary leading-[1.5] tracking-[-0.02em] mb-12"
+              style={{ fontSize: 'clamp(1.5rem,3.5vw,2.5rem)' }}
+            >
+              "Every generation has left something behind.
+              We are the first with the tools to leave something
+              that thinks back."
+            </p>
+
+            <div className="flex items-center justify-center gap-4 mb-14">
+              <div className="h-px w-16 bg-amber/25" />
+              <span className="ai-dot" />
+              <div className="h-px w-16 bg-amber/25" />
+            </div>
+
+            <p className="font-sans font-light text-body-base text-text-secondary leading-[1.82] mb-12 max-w-xl mx-auto">
+              If you are ready to take your legacy as seriously as your estate,
+              we are ready to help you build it.
+            </p>
+
+            <div className="flex items-center justify-center gap-5 flex-wrap">
+              <a href="/pricing" className="btn-monolith-amber group">
+                View Stewardship Plans
+                <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+              </a>
+              <a href="/contact" className="btn-monolith-ghost">
+                Schedule a Consultation
+              </a>
+            </div>
           </div>
         </section>
 
       </main>
-
       <Footer />
     </>
   )
