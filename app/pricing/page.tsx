@@ -89,7 +89,7 @@ const FAQ = [
   },
   {
     q: 'Is there a referral or partner programme?',
-    a: 'Yes. We offer a structured partnership programme for advisors, estate attorneys, and social marketers. Partners earn 20% commission on The Founding fee and recurring annual subscription revenue for the lifetime of referred clients. Contact us for details.',
+    a: 'Yes. We offer a structured partnership programme for advisors, estate attorneys, and social marketers. Contact us to receive the full programme details.',
   },
 ]
 
@@ -134,9 +134,7 @@ export default function PricingPage() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div>
                   <div className="ai-badge mb-5"><span className="ai-dot" />One-Time Investment</div>
-                  <h2 className="font-serif font-semibold text-text-primary leading-[1.0] tracking-[-0.03em] mb-3" style={{ fontSize: 'clamp(2rem,4vw,3rem)' }}>
-                    The Founding
-                  </h2>
+                  <h2 className="font-serif font-semibold text-text-primary leading-[1.0] tracking-[-0.03em] mb-3" style={{ fontSize: 'clamp(2rem,4vw,3rem)' }}>The Founding</h2>
                   <p className="font-sans font-light text-body-base text-text-secondary leading-[1.8] mb-6">
                     Every Basalith archive begins with The Founding — a comprehensive onboarding that establishes
                     your archive architecture, legal framework, and family contributor network.
@@ -167,9 +165,7 @@ export default function PricingPage() {
           <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 70% 50% at 50% 50%,rgba(255,179,71,0.04) 0%,transparent 65%)' }} aria-hidden="true" />
           <div className="text-center max-w-xl mx-auto mb-16">
             <p className="eyebrow mb-4">Annual Stewardship</p>
-            <h2 className="font-serif font-semibold text-text-primary leading-[1.0] tracking-[-0.03em]" style={{ fontSize: 'clamp(2rem,4vw,3.25rem)' }}>
-              Choose Your Level of Stewardship.
-            </h2>
+            <h2 className="font-serif font-semibold text-text-primary leading-[1.0] tracking-[-0.03em]" style={{ fontSize: 'clamp(2rem,4vw,3.25rem)' }}>Choose Your Level of Stewardship.</h2>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
             {TIERS.map(({ name, tagline, price, period, monthly, featured, features, cta }) => (
@@ -202,9 +198,7 @@ export default function PricingPage() {
               </div>
             ))}
           </div>
-          <p className="text-center font-sans text-[0.75rem] text-text-muted mt-8">
-            All plans require The Founding — a one-time setup investment of $2,500.
-          </p>
+          <p className="text-center font-sans text-[0.75rem] text-text-muted mt-8">All plans require The Founding — a one-time setup investment of $2,500.</p>
         </section>
 
         {/* ── PARTNER PROGRAMME ── */}
@@ -226,20 +220,10 @@ export default function PricingPage() {
                 other asset they own. Partners who can communicate that earn accordingly.
               </p>
             </div>
-            <div className="flex flex-col gap-5">
-              {[
-                { label: 'Founding Fee Commission',        value: '20%', sub: '$500 per new archive' },
-                { label: 'Annual Subscription Commission', value: '20%', sub: '$240 – $1,920 per client per year' },
-                { label: 'Lifetime Recurring',             value: '∞',   sub: 'Earn for the lifetime of every referred client' },
-              ].map(({ label, value, sub }) => (
-                <div key={label} className="rounded-sm border border-border-subtle bg-white/[0.02] p-6 flex items-center gap-6">
-                  <span className="font-serif font-semibold text-amber leading-none flex-shrink-0" style={{ fontSize: 'clamp(2rem,4vw,3rem)', letterSpacing: '-0.03em' }}>{value}</span>
-                  <div>
-                    <p className="font-sans text-[0.72rem] font-bold tracking-[0.12em] uppercase text-text-primary mb-1">{label}</p>
-                    <p className="font-sans text-[0.8rem] text-text-muted">{sub}</p>
-                  </div>
-                </div>
-              ))}
+            <div className="flex flex-col gap-5 justify-center">
+              <p className="font-sans font-light text-body-base text-text-secondary leading-[1.85]">
+                Partnership terms — including commission structure, onboarding, and client management — are shared privately with approved partners. Apply to receive the full programme details.
+              </p>
               <a href="/contact" className="btn-monolith-ghost text-center mt-2">Apply to Partner Programme →</a>
             </div>
           </div>
@@ -249,9 +233,7 @@ export default function PricingPage() {
         <section className="relative bg-obsidian px-8 md:px-16 lg:px-24 py-24 overflow-hidden" aria-label="Pricing FAQ">
           <div className="max-w-3xl mx-auto">
             <p className="eyebrow mb-5 text-center">Common Questions</p>
-            <h2 className="font-serif font-semibold text-text-primary leading-[1.0] tracking-[-0.03em] mb-16 text-center" style={{ fontSize: 'clamp(2rem,4vw,3.25rem)' }}>
-              What You Should Know.
-            </h2>
+            <h2 className="font-serif font-semibold text-text-primary leading-[1.0] tracking-[-0.03em] mb-16 text-center" style={{ fontSize: 'clamp(2rem,4vw,3.25rem)' }}>What You Should Know.</h2>
             <div className="flex flex-col gap-0">
               {FAQ.map(({ q, a }, i) => (
                 <div key={i} className="py-8 border-b border-border-subtle last:border-b-0">
@@ -268,23 +250,18 @@ export default function PricingPage() {
           <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-border-amber to-transparent" />
           <div className="absolute pointer-events-none" style={{ width: 900, height: 420, top: '50%', left: '50%', transform: 'translate(-50%,-50%)', background: 'radial-gradient(ellipse,rgba(255,179,71,0.08) 0%,transparent 65%)' }} aria-hidden="true" />
           <div className="relative z-10 max-w-2xl mx-auto">
-            <p className="eyebrow mb-6">Begin Today</p>
+            <p className="eyebrow mb-6">By Invitation of Intent</p>
             <h2 className="font-serif font-semibold text-text-primary leading-[0.92] tracking-[-0.04em] mb-6" style={{ fontSize: 'clamp(2.5rem,5vw,4.5rem)' }}>
-              Every Year You Wait Is a Year{' '}
-              <em className="italic font-medium text-amber" style={{ fontStyle: 'italic' }}>Unlabeled.</em>
+              Basalith Is Not{' '}
+              <em className="italic font-medium text-amber" style={{ fontStyle: 'italic' }}>For Everyone.</em>
             </h2>
             <p className="font-sans font-light text-body-base text-text-secondary leading-[1.82] mb-12">
-              Schedule a private consultation. We will walk you through the right tier for your
-              family, your estate structure, and your legacy goals.
+              It is for the rare few who understand that memory is an asset —
+              and that leaving it unarchived is a choice with consequences
+              their family will live with long after they are gone.
             </p>
-            <a href="/contact" className="btn-monolith-amber group">
-              Schedule a Private Consultation
-              <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
-            </a>
-            <p className="font-sans text-[0.75rem] text-text-muted mt-8">
-              Consultations are private and carry no obligation. ·{' '}
-              <a href="mailto:legacy@basalith.xyz" className="text-amber-dim hover:text-amber transition-colors">legacy@basalith.xyz</a>
-            </p>
+            <a href="/contact" className="btn-monolith-amber group">Apply for Access <span className="transition-transform duration-200 group-hover:translate-x-1">→</span></a>
+            <p className="font-sans text-[0.75rem] text-text-muted mt-8">Archives are accepted on a rolling basis.&nbsp;&middot;&nbsp;<a href="mailto:legacy@basalith.xyz" className="text-amber-dim hover:text-amber transition-colors">legacy@basalith.xyz</a></p>
           </div>
         </section>
 
