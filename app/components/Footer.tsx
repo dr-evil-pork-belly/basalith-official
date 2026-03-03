@@ -58,7 +58,7 @@ export default function Footer() {
 
       <div className="bg-obsidian-void border-t border-border-subtle px-8 md:px-16 lg:px-24 py-5 flex flex-col sm:flex-row justify-between items-center gap-3">
         <p className="font-sans text-[0.72rem] text-text-muted">
-          © {new Date().getFullYear()} Basalith Inc. All rights reserved.
+          © {new Date().getFullYear()} Heritage Nexus Inc. All rights reserved.
         </p>
         <p className="font-sans text-[0.72rem] font-bold tracking-[0.14em] uppercase text-amber-dim">
           The Asset That Never Leaves.

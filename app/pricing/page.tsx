@@ -283,7 +283,7 @@ export default function PricingPage() {
             </a>
             <p className="font-sans text-[0.75rem] text-text-muted mt-8">
               Consultations are private and carry no obligation. ·{' '}
-              <a href="mailto:legacy@basalith.com" className="text-amber-dim hover:text-amber transition-colors">legacy@basalith.com</a>
+              <a href="mailto:legacy@basalith.xyz" className="text-amber-dim hover:text-amber transition-colors">legacy@basalith.xyz</a>
             </p>
           </div>
         </section>
