@@ -1,316 +1,290 @@
 import Nav    from '../components/Nav'
 import Footer from '../components/Footer'
 
-const VALUES = [
+const TIERS = [
   {
-    num:   '01',
-    title: 'Memory Is Wealth',
-    body:  'Every civilisation has sought to preserve its most valuable people. We are the first generation with the tools to do it properly — with legal standing, emotional accuracy, and permanence measured in centuries, not server uptime.',
+    name:     'The Archive',
+    tagline:  'For individuals beginning their Golden Dataset.',
+    price:    '$1,200',
+    period:   'per year',
+    monthly:  '$100 / month equivalent',
+    featured: false,
+    features: [
+      'Core secure storage',
+      'Family contributor access — up to 5 people',
+      'Voice, photo & journal labeling',
+      'Annual AI model updates',
+      'Basic Digital Clone access',
+      'Data portability guarantee',
+      'Data Custodianship Reserve coverage',
+    ],
+    cta: 'Begin with The Archive',
   },
   {
-    num:   '02',
-    title: 'Family Over Algorithm',
-    body:  'The people who love you are the only accurate interpreters of your life. No amount of compute power replicates what your family simply knows. We built our entire model around this truth — and refused to compromise it.',
+    name:     'The Estate',
+    tagline:  'Full family archive with legal integration.',
+    price:    '$3,600',
+    period:   'per year',
+    monthly:  '$300 / month equivalent',
+    featured: true,
+    features: [
+      'Everything in The Archive',
+      'Expanded contributors — up to 15 people',
+      'Full Digital Clone with query access',
+      'Will & Trust integration support',
+      'Standardised bequest language included',
+      'Priority curation support',
+      'Dedicated Custodian designation',
+      'Annual estate compatibility review',
+    ],
+    cta: 'Begin with The Estate',
   },
   {
-    num:   '03',
-    title: 'Permanence By Design',
-    body:  'We do not build for engagement metrics. We do not optimise for retention. Every architectural decision — legal, technical, organisational — is made with a single question: will this still work in a hundred years?',
-  },
-  {
-    num:   '04',
-    title: 'Ownership Without Compromise',
-    body:  'Your data is yours. Not a licensing arrangement. Not subject to a terms-of-service revision. Structured as a legal asset from day one, portable on demand, and transferable to your heirs on your terms alone.',
+    name:     'The Dynasty',
+    tagline:  'Multi-generational governance for serious legacies.',
+    price:    '$9,600',
+    period:   'per year',
+    monthly:  '$800 / month equivalent',
+    featured: false,
+    features: [
+      'Everything in The Estate',
+      'Unlimited contributors',
+      'Full Family Trust legal instrument',
+      'Multi-generational access tiers',
+      'White-glove onboarding & setup',
+      'Dedicated archive manager',
+      'Annual in-person estate review',
+      'First access to new AI model generations',
+      'Custom Clone interaction boundaries',
+    ],
+    cta: 'Begin with The Dynasty',
   },
 ]
 
-const VISION_ITEMS = [
+const FOUNDING_INCLUDES = [
+  'Archive architecture & configuration',
+  'Legal framework compatibility review',
+  'Trust & estate integration assessment',
+  'Initial Essence Mapping family session',
+  'Contributor onboarding & training',
+  'Data migration from existing sources',
+]
+
+const FAQ = [
   {
-    horizon: 'Near Term',
-    title:   'The Golden Standard',
-    body:    'Establish Basalith as the definitive infrastructure for personal legacy preservation — the institution families turn to when they decide to take their memory as seriously as their estate.',
+    q: 'What is The Founding fee?',
+    a: 'The Founding is a one-time setup investment covering the full onboarding process — archive architecture, legal framework review, and your initial Essence Mapping session. It is paid once at the start of your relationship with Basalith.',
   },
   {
-    horizon: 'Medium Term',
-    title:   'The Legal Framework',
-    body:    'Drive the recognition of Golden Datasets as formal estate assets across major legal jurisdictions. Build the case law, the precedent, and the institutional partnerships that make digital legacy inheritance as routine as a property transfer.',
+    q: 'Can I change tiers later?',
+    a: 'Yes. You can upgrade at any time. Your Golden Dataset and all contributions carry forward seamlessly. Downgrades are available at your annual renewal date.',
   },
   {
-    horizon: 'Long Term',
-    title:   'The Living Archive',
-    body:    'A world in which every family maintains a governed, evolving record of who they were — accessible to future generations not as static photographs or faded letters, but as an intelligent presence that continues to think, reason, and respond.',
+    q: 'Can my Family Trust pay the annual subscription?',
+    a: 'Yes — and we recommend it. The Trust becomes the legal holder of your archive and the subscription contract, ensuring continuity independent of any individual.',
+  },
+  {
+    q: 'What happens to my archive if Basalith ceases operations?',
+    a: 'Your complete archive is available for export in open formats at any time. Our Data Custodianship Reserve — an independent legal structure funded by subscription revenue — ensures continuity in any scenario.',
+  },
+  {
+    q: 'Is there a referral or partner programme?',
+    a: 'Yes. We offer a structured partnership programme for advisors, estate attorneys, and social marketers. Partners earn 20% commission on The Founding fee and recurring annual subscription revenue for the lifetime of referred clients. Contact us for details.',
   },
 ]
 
-export default function AboutPage() {
+function CheckIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="flex-shrink-0 mt-0.5">
+      <circle cx="7" cy="7" r="6.5" stroke="rgba(255,179,71,0.3)" />
+      <path d="M4 7l2 2 4-4" stroke="#FFB347" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+export default function PricingPage() {
   return (
     <>
       <Nav />
       <main>
 
         {/* ── HERO ── */}
-        <section
-          className="relative min-h-[75vh] flex flex-col items-center justify-center text-center px-8 md:px-16 pt-40 pb-28 overflow-hidden bg-obsidian-void"
-          aria-label="About hero"
-        >
-          {/* Grid */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              backgroundImage:
-                'linear-gradient(rgba(255,255,255,0.022) 1px,transparent 1px),' +
-                'linear-gradient(90deg,rgba(255,255,255,0.022) 1px,transparent 1px)',
-              backgroundSize: '80px 80px',
-              maskImage: 'radial-gradient(ellipse 80% 80% at 50% 50%,black 20%,transparent 100%)',
-            }}
-            aria-hidden="true"
-          />
-          {/* Amber radiance */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{ background: 'radial-gradient(ellipse 55% 55% at 50% 60%,rgba(255,179,71,0.07) 0%,transparent 65%)' }}
-            aria-hidden="true"
-          />
-
-          <div className="relative z-10 max-w-4xl mx-auto">
-            <p className="eyebrow mb-7">Why We Exist</p>
-            <h1
-              className="font-serif font-semibold text-text-primary leading-[0.9] tracking-[-0.04em] mb-10"
-              style={{ fontSize: 'clamp(3rem,7.5vw,6.75rem)' }}
-            >
-              The Most Valuable Thing
-              <br />
-              You Own Is Not
-              <br />
-              <em className="italic font-medium text-amber" style={{ fontStyle: 'italic' }}>
-                On Your Balance Sheet.
-              </em>
+        <section className="relative bg-obsidian-void px-8 md:px-16 pt-40 pb-24 text-center overflow-hidden" aria-label="Pricing hero">
+          <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.022) 1px,transparent 1px)', backgroundSize: '80px 80px', maskImage: 'radial-gradient(ellipse 80% 80% at 50% 50%,black 20%,transparent 100%)' }} aria-hidden="true" />
+          <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 60%,rgba(255,179,71,0.07) 0%,transparent 65%)' }} aria-hidden="true" />
+          <div className="relative z-10 max-w-3xl mx-auto">
+            <p className="eyebrow mb-6">Stewardship Pricing</p>
+            <h1 className="font-serif font-semibold text-text-primary leading-[0.92] tracking-[-0.038em] mb-6" style={{ fontSize: 'clamp(3rem,6vw,5.5rem)' }}>
+              An Investment In{' '}
+              <em className="italic font-medium text-amber" style={{ fontStyle: 'italic' }}>Permanence.</em>
             </h1>
-            <p className="font-sans font-light text-body-lg text-text-secondary leading-[1.85] max-w-2xl mx-auto">
-              It is the particular way you think. The reasoning behind your decisions.
-              The things only your family knows about you — and what happens to all of
-              that when you are no longer here to explain it.
+            <p className="font-sans font-light text-body-base text-text-secondary leading-[1.82] max-w-xl mx-auto">
+              Basalith is priced as what it is — a generational asset under professional stewardship.
+              Not a software subscription. Not a storage plan. A governed legacy infrastructure with legal standing.
             </p>
           </div>
         </section>
 
-        {/* ── THE PROBLEM ── */}
-        <section
-          className="relative bg-obsidian-deep px-8 md:px-16 lg:px-24 py-36 overflow-hidden"
-          aria-label="The problem"
-        >
+        {/* ── THE FOUNDING ── */}
+        <section className="relative bg-obsidian-deep px-8 md:px-16 lg:px-24 py-24 overflow-hidden" aria-label="The Founding fee">
           <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-border-amber to-transparent" />
-
-          <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_1.4fr] gap-20 items-start">
-
-            {/* Left — label + large number */}
-            <div className="lg:sticky lg:top-32">
-              <p className="eyebrow mb-6">The Problem</p>
-              <p
-                className="font-serif font-light text-amber/20 leading-none select-none"
-                style={{ fontSize: 'clamp(6rem,14vw,12rem)', letterSpacing: '-0.05em' }}
-                aria-hidden="true"
-              >
-                01
-              </p>
-            </div>
-
-            {/* Right — copy */}
-            <div className="flex flex-col gap-7">
-              <h2
-                className="font-serif font-semibold text-text-primary leading-[1.0] tracking-[-0.03em]"
-                style={{ fontSize: 'clamp(2rem,4vw,3.25rem)' }}
-              >
-                We Have Never Had a Serious Infrastructure for Human Memory.
-              </h2>
-              <p className="font-sans font-light text-body-base text-text-secondary leading-[1.88]">
-                Civilisations have always tried to preserve their most significant people.
-                Portraits. Journals. Stone monuments. The instinct is ancient. But the
-                execution has always been passive — a record of what someone looked like,
-                not how they thought. A collection of moments, not a continuity of mind.
-              </p>
-              <p className="font-sans font-light text-body-base text-text-secondary leading-[1.88]">
-                The technology industry promised to solve this. It did not. What it built
-                instead was an infrastructure for extracting value from personal data —
-                labeling it with anonymous contractors, feeding it to models that serve
-                advertisers, and storing it on servers that will outlive their business
-                model by, at best, a decade.
-              </p>
-              <p className="font-sans font-light text-body-base text-text-secondary leading-[1.88]">
-                The result is a generation of people who have produced more personal data
-                than any humans in history — and who have less control over it, less
-                understanding of what it means, and no mechanism to pass it to the people
-                who will one day want it most.
-              </p>
-
-              {/* Pull quote */}
-              <div className="border-l-2 border-amber pl-6 mt-4">
-                <p className="font-serif text-[1.3rem] italic text-text-secondary leading-[1.6] tracking-[-0.01em]">
-                  "The problem is not that we lack the data.
-                  The problem is that nobody built the institution."
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── THE MISSION ── */}
-        <section
-          className="relative bg-obsidian px-8 md:px-16 lg:px-24 py-36 overflow-hidden"
-          aria-label="Mission"
-        >
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{ background: 'radial-gradient(ellipse 60% 55% at 50% 50%,rgba(255,179,71,0.045) 0%,transparent 65%)' }}
-            aria-hidden="true"
-          />
-
-          <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_1.4fr] gap-20 items-start">
-
-            <div className="lg:sticky lg:top-32">
-              <p className="eyebrow mb-6">Our Mission</p>
-              <p
-                className="font-serif font-light text-amber/20 leading-none select-none"
-                style={{ fontSize: 'clamp(6rem,14vw,12rem)', letterSpacing: '-0.05em' }}
-                aria-hidden="true"
-              >
-                02
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-7">
-              <h2
-                className="font-serif font-semibold text-text-primary leading-[1.0] tracking-[-0.03em]"
-                style={{ fontSize: 'clamp(2rem,4vw,3.25rem)' }}
-              >
-                To Make the Preservation of a Life as Serious as the Preservation of an Estate.
-              </h2>
-              <p className="font-sans font-light text-body-base text-text-secondary leading-[1.88]">
-                Basalith exists to build the institution that was never built. Not a
-                platform. Not an app. An institution — with the legal standing, the
-                technical architecture, and the governance model that the permanence
-                of human memory actually requires.
-              </p>
-              <p className="font-sans font-light text-body-base text-text-secondary leading-[1.88]">
-                We do this by treating personal data the way serious institutions treat
-                serious assets. With provenance. With chain of custody. With named
-                beneficiaries, legal instruments, and a fiduciary obligation to the
-                person whose life it represents — not to the shareholders of a
-                platform that happens to store it.
-              </p>
-              <p className="font-sans font-light text-body-base text-text-secondary leading-[1.88]">
-                The Golden Dataset is our name for the result: the highest-quality
-                labeled record of a human life ever assembled. Built by family.
-                Governed by law. Powered by whatever AI exists in the year
-                your grandchildren decide they want to understand who you were.
-              </p>
-
-              {/* Values */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
-                {VALUES.map(({ num, title, body }) => (
-                  <div
-                    key={num}
-                    className="group relative rounded-sm border border-border-subtle bg-white/[0.018] p-6 overflow-hidden transition-colors duration-300 hover:border-border-amber hover:bg-amber/[0.022]"
-                  >
-                    <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-transparent to-transparent transition-all duration-300 group-hover:via-amber/38" />
-                    <p className="font-serif text-[2rem] font-light text-amber/14 leading-none mb-2">{num}</p>
-                    <p className="font-sans text-[0.75rem] font-bold tracking-[0.1em] uppercase text-text-primary mb-2">{title}</p>
-                    <p className="font-sans font-light text-[0.82rem] text-text-secondary leading-[1.72]">{body}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── THE VISION ── */}
-        <section
-          className="relative bg-obsidian-deep px-8 md:px-16 lg:px-24 py-36 overflow-hidden"
-          aria-label="Long-term vision"
-        >
-          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-border-subtle to-transparent" />
-
-          <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_1.4fr] gap-20 items-start">
-
-            <div className="lg:sticky lg:top-32">
-              <p className="eyebrow mb-6">The Vision</p>
-              <p
-                className="font-serif font-light text-amber/20 leading-none select-none"
-                style={{ fontSize: 'clamp(6rem,14vw,12rem)', letterSpacing: '-0.05em' }}
-                aria-hidden="true"
-              >
-                03
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-0">
-              {VISION_ITEMS.map(({ horizon, title, body }, i) => (
-                <div
-                  key={i}
-                  className="py-10 border-b border-border-subtle last:border-b-0"
-                >
-                  <p className="eyebrow !text-[0.6rem] mb-3">{horizon}</p>
-                  <h3
-                    className="font-serif font-semibold text-text-primary leading-[1.1] tracking-[-0.02em] mb-4"
-                    style={{ fontSize: 'clamp(1.5rem,3vw,2.25rem)' }}
-                  >
-                    {title}
-                  </h3>
-                  <p className="font-sans font-light text-body-base text-text-secondary leading-[1.88]">
-                    {body}
+          <div className="max-w-5xl mx-auto">
+            <div className="rounded-sm border border-border-amber p-10 md:p-14 relative overflow-hidden" style={{ background: 'linear-gradient(160deg,#221F14,#1D1B11)' }}>
+              <div className="absolute top-0 left-[10%] right-[10%] h-px bg-gradient-to-r from-transparent via-amber/50 to-transparent" />
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                  <div className="ai-badge mb-5"><span className="ai-dot" />One-Time Investment</div>
+                  <h2 className="font-serif font-semibold text-text-primary leading-[1.0] tracking-[-0.03em] mb-3" style={{ fontSize: 'clamp(2rem,4vw,3rem)' }}>
+                    The Founding
+                  </h2>
+                  <p className="font-sans font-light text-body-base text-text-secondary leading-[1.8] mb-6">
+                    Every Basalith archive begins with The Founding — a comprehensive onboarding that establishes
+                    your archive architecture, legal framework, and family contributor network.
+                    Paid once. Built to last centuries.
                   </p>
+                  <div className="flex items-baseline gap-3 mb-2">
+                    <span className="font-serif font-semibold text-text-primary" style={{ fontSize: 'clamp(2.5rem,5vw,4rem)', letterSpacing: '-0.03em' }}>$2,500</span>
+                    <span className="font-sans text-[0.8rem] text-text-muted tracking-[0.08em] uppercase">one-time</span>
+                  </div>
+                  <p className="font-sans text-[0.75rem] text-text-muted">Required for all new archives. Includes first-year setup and onboarding.</p>
+                </div>
+                <div className="flex flex-col gap-3">
+                  <p className="eyebrow !text-[0.62rem] mb-2">What The Founding Includes</p>
+                  {FOUNDING_INCLUDES.map((item) => (
+                    <div key={item} className="flex items-start gap-3">
+                      <CheckIcon />
+                      <span className="font-sans text-body-sm text-text-secondary leading-[1.6]">{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── TIERS ── */}
+        <section className="relative bg-obsidian px-8 md:px-16 lg:px-24 py-24 overflow-hidden" aria-label="Pricing tiers">
+          <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 70% 50% at 50% 50%,rgba(255,179,71,0.04) 0%,transparent 65%)' }} aria-hidden="true" />
+          <div className="text-center max-w-xl mx-auto mb-16">
+            <p className="eyebrow mb-4">Annual Stewardship</p>
+            <h2 className="font-serif font-semibold text-text-primary leading-[1.0] tracking-[-0.03em]" style={{ fontSize: 'clamp(2rem,4vw,3.25rem)' }}>
+              Choose Your Level of Stewardship.
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {TIERS.map(({ name, tagline, price, period, monthly, featured, features, cta }) => (
+              <div key={name} className={['relative rounded-sm overflow-hidden flex flex-col', featured ? 'border border-border-amber' : 'border border-border-subtle'].join(' ')} style={{ background: featured ? 'linear-gradient(160deg,#221F14,#1D1B11)' : 'linear-gradient(160deg,#1D1D20,#17171A)' }}>
+                {featured && <div className="absolute top-0 left-[10%] right-[10%] h-px bg-gradient-to-r from-transparent via-amber/50 to-transparent" />}
+                {featured && <div className="absolute top-4 right-4"><div className="ai-badge !text-[0.55rem]">Most Popular</div></div>}
+                <div className="p-8 flex flex-col flex-1">
+                  <div className="mb-7">
+                    <h3 className={['font-serif text-[1.625rem] font-semibold leading-tight mb-2', featured ? 'text-text-primary' : 'text-text-secondary'].join(' ')}>{name}</h3>
+                    <p className="font-sans text-body-sm text-text-muted leading-[1.6]">{tagline}</p>
+                  </div>
+                  <div className="mb-1">
+                    <div className="flex items-baseline gap-2">
+                      <span className="font-serif font-semibold text-text-primary" style={{ fontSize: 'clamp(2rem,4vw,2.75rem)', letterSpacing: '-0.03em' }}>{price}</span>
+                      <span className="font-sans text-[0.75rem] text-text-muted tracking-[0.06em] uppercase">{period}</span>
+                    </div>
+                    <p className="font-sans text-[0.7rem] text-text-muted mt-1">{monthly}</p>
+                  </div>
+                  <div className={['h-px my-6', featured ? 'bg-amber/15' : 'bg-white/[0.06]'].join(' ')} />
+                  <div className="flex flex-col gap-3 flex-1 mb-8">
+                    {features.map((f) => (
+                      <div key={f} className="flex items-start gap-3">
+                        <CheckIcon />
+                        <span className="font-sans text-[0.825rem] text-text-secondary leading-[1.6]">{f}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <a href="/contact" className={featured ? 'btn-monolith-amber text-center' : 'btn-monolith text-center'}>{cta}</a>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-center font-sans text-[0.75rem] text-text-muted mt-8">
+            All plans require The Founding — a one-time setup investment of $2,500.
+          </p>
+        </section>
+
+        {/* ── PARTNER PROGRAMME ── */}
+        <section className="relative bg-obsidian-deep px-8 md:px-16 lg:px-24 py-24 overflow-hidden" aria-label="Partner programme">
+          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-border-subtle to-transparent" />
+          <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <p className="eyebrow mb-5">Partner Programme</p>
+              <h2 className="font-serif font-semibold text-text-primary leading-[1.0] tracking-[-0.03em] mb-6" style={{ fontSize: 'clamp(2rem,4vw,3.25rem)' }}>
+                Earn a Living From{' '}
+                <em className="italic font-medium text-amber" style={{ fontStyle: 'italic' }}>Selling Permanence.</em>
+              </h2>
+              <p className="font-sans font-light text-body-base text-text-secondary leading-[1.85] mb-4">
+                Basalith offers a structured partnership programme for estate attorneys, financial advisors,
+                luxury real estate professionals, and social marketers who believe in what we are building.
+              </p>
+              <p className="font-sans font-light text-body-base text-text-secondary leading-[1.85]">
+                We offer tremendous value to the buyer — a Golden Dataset is arguably more valuable than any
+                other asset they own. Partners who can communicate that earn accordingly.
+              </p>
+            </div>
+            <div className="flex flex-col gap-5">
+              {[
+                { label: 'Founding Fee Commission',        value: '20%', sub: '$500 per new archive' },
+                { label: 'Annual Subscription Commission', value: '20%', sub: '$240 – $1,920 per client per year' },
+                { label: 'Lifetime Recurring',             value: '∞',   sub: 'Earn for the lifetime of every referred client' },
+              ].map(({ label, value, sub }) => (
+                <div key={label} className="rounded-sm border border-border-subtle bg-white/[0.02] p-6 flex items-center gap-6">
+                  <span className="font-serif font-semibold text-amber leading-none flex-shrink-0" style={{ fontSize: 'clamp(2rem,4vw,3rem)', letterSpacing: '-0.03em' }}>{value}</span>
+                  <div>
+                    <p className="font-sans text-[0.72rem] font-bold tracking-[0.12em] uppercase text-text-primary mb-1">{label}</p>
+                    <p className="font-sans text-[0.8rem] text-text-muted">{sub}</p>
+                  </div>
+                </div>
+              ))}
+              <a href="/contact" className="btn-monolith-ghost text-center mt-2">Apply to Partner Programme →</a>
+            </div>
+          </div>
+        </section>
+
+        {/* ── FAQ ── */}
+        <section className="relative bg-obsidian px-8 md:px-16 lg:px-24 py-24 overflow-hidden" aria-label="Pricing FAQ">
+          <div className="max-w-3xl mx-auto">
+            <p className="eyebrow mb-5 text-center">Common Questions</p>
+            <h2 className="font-serif font-semibold text-text-primary leading-[1.0] tracking-[-0.03em] mb-16 text-center" style={{ fontSize: 'clamp(2rem,4vw,3.25rem)' }}>
+              What You Should Know.
+            </h2>
+            <div className="flex flex-col gap-0">
+              {FAQ.map(({ q, a }, i) => (
+                <div key={i} className="py-8 border-b border-border-subtle last:border-b-0">
+                  <p className="font-serif text-[1.25rem] font-medium text-text-primary leading-snug mb-3">{q}</p>
+                  <p className="font-sans font-light text-body-sm text-text-secondary leading-[1.8]">{a}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* ── CLOSING ── */}
-        <section
-          className="relative bg-obsidian px-8 md:px-16 py-40 text-center overflow-hidden"
-          aria-label="Closing statement"
-        >
-          <div
-            className="absolute pointer-events-none"
-            style={{
-              width: 1000, height: 500,
-              top: '50%', left: '50%',
-              transform: 'translate(-50%,-50%)',
-              background: 'radial-gradient(ellipse,rgba(255,179,71,0.07) 0%,transparent 60%)',
-            }}
-            aria-hidden="true"
-          />
-
-          <div className="relative z-10 max-w-3xl mx-auto">
-            <p
-              className="font-serif font-medium text-text-secondary leading-[1.5] tracking-[-0.02em] mb-12"
-              style={{ fontSize: 'clamp(1.5rem,3.5vw,2.5rem)' }}
-            >
-              "Every generation has left something behind.
-              We are the first with the tools to leave something
-              that thinks back."
+        {/* ── CTA ── */}
+        <section className="relative bg-obsidian-deep px-8 md:px-16 py-36 text-center overflow-hidden" aria-label="Pricing CTA">
+          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-border-amber to-transparent" />
+          <div className="absolute pointer-events-none" style={{ width: 900, height: 420, top: '50%', left: '50%', transform: 'translate(-50%,-50%)', background: 'radial-gradient(ellipse,rgba(255,179,71,0.08) 0%,transparent 65%)' }} aria-hidden="true" />
+          <div className="relative z-10 max-w-2xl mx-auto">
+            <p className="eyebrow mb-6">Begin Today</p>
+            <h2 className="font-serif font-semibold text-text-primary leading-[0.92] tracking-[-0.04em] mb-6" style={{ fontSize: 'clamp(2.5rem,5vw,4.5rem)' }}>
+              Every Year You Wait Is a Year{' '}
+              <em className="italic font-medium text-amber" style={{ fontStyle: 'italic' }}>Unlabeled.</em>
+            </h2>
+            <p className="font-sans font-light text-body-base text-text-secondary leading-[1.82] mb-12">
+              Schedule a private consultation. We will walk you through the right tier for your
+              family, your estate structure, and your legacy goals.
             </p>
-
-            <div className="flex items-center justify-center gap-4 mb-14">
-              <div className="h-px w-16 bg-amber/25" />
-              <span className="ai-dot" />
-              <div className="h-px w-16 bg-amber/25" />
-            </div>
-
-            <p className="font-sans font-light text-body-base text-text-secondary leading-[1.82] mb-12 max-w-xl mx-auto">
-              If you are ready to take your legacy as seriously as your estate,
-              we are ready to help you build it.
+            <a href="/contact" className="btn-monolith-amber group">
+              Schedule a Private Consultation
+              <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+            </a>
+            <p className="font-sans text-[0.75rem] text-text-muted mt-8">
+              Consultations are private and carry no obligation. ·{' '}
+              <a href="mailto:legacy@basalith.com" className="text-amber-dim hover:text-amber transition-colors">legacy@basalith.com</a>
             </p>
-
-            <div className="flex items-center justify-center gap-5 flex-wrap">
-              <a href="/pricing" className="btn-monolith-amber group">
-                View Stewardship Plans
-                <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
-              </a>
-              <a href="/contact" className="btn-monolith-ghost">
-                Schedule a Consultation
-              </a>
-            </div>
           </div>
         </section>
 
