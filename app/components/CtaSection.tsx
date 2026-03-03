@@ -5,7 +5,6 @@ export default function CtaSection() {
       aria-label="Call to action"
       className="relative bg-obsidian px-8 md:px-16 py-36 text-center overflow-hidden"
     >
-      {/* Centred amber radiance */}
       <div
         className="absolute pointer-events-none"
         style={{
@@ -18,37 +17,31 @@ export default function CtaSection() {
       />
 
       <div className="relative z-10 max-w-2xl mx-auto">
-        <p className="eyebrow mb-6">Begin Today</p>
+        <p className="eyebrow mb-6">By Invitation of Intent</p>
 
         <h2
           className="font-serif font-semibold text-text-primary leading-[0.9] tracking-[-0.04em] mb-6"
           style={{ fontSize: 'clamp(2.75rem,6vw,5.5rem)' }}
         >
-          The Only Regret<br />
-          Is Starting{' '}
-          <em className="italic font-medium text-amber" style={{ fontStyle: 'italic' }}>Later.</em>
+          Basalith Is Not{' '}
+          <em className="italic font-medium text-amber" style={{ fontStyle: 'italic' }}>For Everyone.</em>
         </h2>
 
         <p className="font-sans font-light text-body-base text-text-secondary leading-[1.82] mb-12">
-          Every day you wait is a day your family has not yet contributed what they know.
-          The archive you build in year one is the foundation everything else rests on.
+          It is for the rare few who understand that memory is an asset —
+          and that leaving it unarchived is a choice with consequences
+          their family will live with long after they are gone.
         </p>
 
         <div className="flex items-center justify-center gap-5 flex-wrap">
-          <a href="#" className="btn-monolith-amber group">
-            Schedule a Private Consultation
+          <a href="/pricing" className="btn-monolith-amber group">
+            View Stewardship Plans
             <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
           </a>
         </div>
 
         <p className="font-sans text-[0.75rem] text-text-muted tracking-[0.04em] mt-10">
-          Consultations are private and carry no obligation.{' '}
-          <a
-            href="mailto:legacy@basalith.xyz"
-            className="text-amber-dim hover:text-amber transition-colors duration-200"
-          >
-            legacy@basalith.xyz
-          </a>
+          Archives are accepted on a rolling basis.&nbsp;&middot;&nbsp;<a href="mailto:legacy@basalith.xyz" className="text-amber-dim hover:text-amber transition-colors duration-200">legacy@basalith.xyz</a>
         </p>
       </div>
     </section>
