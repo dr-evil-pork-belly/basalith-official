@@ -53,7 +53,7 @@ export default function Nav() {
         </ul>
 
         <div className="flex items-center gap-4">
-          <a href="#cta" className="btn-monolith-amber !py-2.5 !px-5 !text-[0.72rem]">Begin Archive</a>
+          <a href="/begin/tier" className="btn-monolith-amber !py-2.5 !px-5 !text-[0.72rem]">Begin Archive</a>
           <button
             className="md:hidden flex flex-col justify-center items-center gap-[5px] w-8 h-8"
             onClick={() => setOpen(!open)}
@@ -73,7 +73,7 @@ export default function Nav() {
               {label}
             </a>
           ))}
-          <a href="#cta" onClick={() => setOpen(false)} className="btn-monolith-amber mt-4">Begin Archive</a>
+          <a href="/begin/tier" onClick={() => setOpen(false)} className="btn-monolith-amber mt-4">Begin Archive</a>
         </div>
       )}
     </>
