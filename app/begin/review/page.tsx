@@ -43,7 +43,6 @@ export default function ReviewPage() {
           <p className="text-[0.7rem] font-bold tracking-[0.2em] uppercase text-stone-400 mb-2">Step 3 of 3</p>
           <h1 className="font-serif text-[2.5rem] font-semibold text-stone-900 leading-tight tracking-[-0.02em] mb-2">Review & Confirm</h1>
           <p className="font-sans text-[0.95rem] text-stone-500 leading-relaxed mb-12">Please confirm your details before we reserve your archive.</p>
-
           <div className="bg-white border border-stone-200 rounded-lg p-8 mb-8 flex flex-col gap-6">
             <div>
               <p className="font-sans text-[0.68rem] font-bold tracking-[0.15em] uppercase text-stone-400 mb-1">Selected Tier</p>
@@ -64,14 +63,10 @@ export default function ReviewPage() {
               {details.phone && <p className="font-sans text-[0.9rem] text-stone-500">{details.phone}</p>}
             </div>
           </div>
-
           {error && <p className="font-sans text-[0.8rem] text-red-500 mb-5">{error}</p>}
-
           <div className="flex items-center gap-4">
-            <button onClick={() => router.back()} className="font-sans text-[0.8rem] text-stone-400 hover:text-stone-600 transition-colors">← Back</button>
-            <button onClick={handleSubmit} disabled={loading} className="font-sans text-[0.8rem] font-bold tracking-[0.1em] uppercase px-8 py-4 rounded bg-stone-900 text-white hover:bg-stone-800 transition-all duration-200 disabled:opacity-50">
-              {loading ? 'Reserving...' : 'Reserve Your Archive →'}
-            </button>
+            <button onClick={() => router.back()} className="font-sans text-[0.8rem] text-stone-400 hover:text-stone-600 transition-colors">Back</button>
+            <button onClick={handleSubmit} disabled={loading} className="font-sans text-[0.8rem] font-bold tracking-[0.1em] uppercase px-8 py-4 rounded bg-stone-900 text-white hover:bg-stone-800 transition-all duration-200 disabled:opacity-50">{loading ? 'Reserving...' : 'Reserve Your Archive'}</button>
           </div>
         </div>
       </main>
