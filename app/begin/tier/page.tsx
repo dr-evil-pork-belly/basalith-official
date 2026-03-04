@@ -22,25 +22,25 @@ export default function TierPage() {
   return (
     <>
       <Nav />
-      <main className="min-h-screen bg-stone-100 px-8 md:px-16 lg:px-24 pt-36 pb-24">
+      <main className="min-h-screen bg-obsidian-void px-8 md:px-16 lg:px-24 pt-36 pb-24">
         <div className="max-w-4xl mx-auto">
-          <p className="text-[0.7rem] font-bold tracking-[0.2em] uppercase text-stone-500 mb-2">Step 1 of 3</p>
-          <h1 className="font-serif text-[2.5rem] font-semibold text-stone-900 leading-tight tracking-[-0.02em] mb-2">Choose Your Tier</h1>
-          <p className="font-sans text-[0.95rem] text-stone-600 leading-relaxed mb-12">All plans begin with The Founding - a one-time $2,500 setup investment.</p>
+          <p className="eyebrow mb-2">Step 1 of 3</p>
+          <h1 className="font-serif text-[2.5rem] font-semibold text-text-primary leading-tight tracking-[-0.02em] mb-2">Choose Your Tier</h1>
+          <p className="font-sans text-[0.95rem] text-text-secondary leading-relaxed mb-12">All plans begin with The Founding - a one-time $2,500 setup investment.</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">
             {TIERS.map(({ name, tagline, price, monthly, founding, featured }) => (
-              <button key={name} onClick={() => setSelected(name)} className={['text-left rounded-lg border-2 p-7 transition-all duration-200 cursor-pointer', selected === name ? 'border-amber-500 bg-amber-50' : featured ? 'border-stone-400 bg-white' : 'border-stone-300 bg-white hover:border-stone-400'].join(' ')}>
-                {featured && <span className="inline-block text-[0.6rem] font-bold tracking-[0.15em] uppercase text-amber-700 bg-amber-100 px-2 py-0.5 rounded mb-3">Most Popular</span>}
-                <h3 className="font-serif text-[1.25rem] font-semibold text-stone-900 mb-1">{name}</h3>
-                <p className="font-sans text-[0.8rem] text-stone-600 leading-relaxed mb-5">{tagline}</p>
-                <p className="font-serif text-[1.75rem] font-semibold text-stone-900 leading-none mb-1">{price}</p>
-                <p className="font-sans text-[0.72rem] text-stone-500 mb-3">{monthly}</p>
-                <p className="font-sans text-[0.72rem] text-stone-500 border-t border-stone-200 pt-3">{founding}</p>
-                {selected === name && <p className="font-sans text-[0.72rem] font-bold text-amber-600 mt-3">Selected</p>}
+              <button key={name} onClick={() => setSelected(name)} className={['text-left rounded-sm border p-7 transition-all duration-200 cursor-pointer', selected === name ? 'border-border-amber bg-obsidian-deep' : featured ? 'border-border-subtle bg-obsidian-deep' : 'border-border-subtle bg-obsidian hover:border-border-amber'].join(' ')}>
+                {featured && <span className="inline-block text-[0.6rem] font-bold tracking-[0.15em] uppercase text-amber bg-amber/10 px-2 py-0.5 rounded mb-3">Most Popular</span>}
+                <h3 className="font-serif text-[1.25rem] font-semibold text-text-primary mb-1">{name}</h3>
+                <p className="font-sans text-[0.8rem] text-text-secondary leading-relaxed mb-5">{tagline}</p>
+                <p className="font-serif text-[1.75rem] font-semibold text-text-primary leading-none mb-1">{price}</p>
+                <p className="font-sans text-[0.72rem] text-text-muted mb-3">{monthly}</p>
+                <p className="font-sans text-[0.72rem] text-text-muted border-t border-border-subtle pt-3">{founding}</p>
+                {selected === name && <p className="font-sans text-[0.72rem] font-bold text-amber mt-3">Selected</p>}
               </button>
             ))}
           </div>
-          <button onClick={handleContinue} disabled={!selected} className={['font-sans text-[0.8rem] font-bold tracking-[0.1em] uppercase px-8 py-4 rounded transition-all duration-200', selected ? 'bg-stone-900 text-white hover:bg-stone-700' : 'bg-stone-300 text-stone-500 cursor-not-allowed'].join(' ')}>
+          <button onClick={handleContinue} disabled={!selected} className={['font-sans text-[0.8rem] font-bold tracking-[0.1em] uppercase px-8 py-4 rounded-sm transition-all duration-200', selected ? 'bg-amber text-obsidian-void hover:bg-amber/90' : 'bg-white/[0.06] text-text-muted cursor-not-allowed'].join(' ')}>
             Continue
           </button>
         </div>

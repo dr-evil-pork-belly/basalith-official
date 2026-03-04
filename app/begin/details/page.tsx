@@ -22,29 +22,29 @@ export default function DetailsPage() {
   return (
     <>
       <Nav />
-      <main className="min-h-screen bg-stone-100 px-8 md:px-16 lg:px-24 pt-36 pb-24">
+      <main className="min-h-screen bg-obsidian-void px-8 md:px-16 lg:px-24 pt-36 pb-24">
         <div className="max-w-lg mx-auto">
-          <p className="text-[0.7rem] font-bold tracking-[0.2em] uppercase text-stone-500 mb-2">Step 2 of 3</p>
-          <h1 className="font-serif text-[2.5rem] font-semibold text-stone-900 leading-tight tracking-[-0.02em] mb-2">Your Details</h1>
-          <p className="font-sans text-[0.95rem] text-stone-600 leading-relaxed mb-12">We will use these to set up your archive and reach out with next steps.</p>
+          <p className="eyebrow mb-2">Step 2 of 3</p>
+          <h1 className="font-serif text-[2.5rem] font-semibold text-text-primary leading-tight tracking-[-0.02em] mb-2">Your Details</h1>
+          <p className="font-sans text-[0.95rem] text-text-secondary leading-relaxed mb-12">We will use these to set up your archive and reach out with next steps.</p>
           <div className="flex flex-col gap-5 mb-8">
             <div>
-              <label className="block font-sans text-[0.72rem] font-bold tracking-[0.12em] uppercase text-stone-600 mb-2">Full Name *</label>
-              <input name="name" value={form.name} onChange={handleChange} placeholder="Robert James Whitfield" className="w-full border-2 border-stone-300 rounded-md px-4 py-3 font-sans text-[0.95rem] text-stone-900 bg-white focus:outline-none focus:border-amber-500 transition-colors placeholder:text-stone-400" />
+              <label className="block font-sans text-[0.72rem] font-bold tracking-[0.12em] uppercase text-text-muted mb-2">Full Name *</label>
+              <input name="name" value={form.name} onChange={handleChange} placeholder="Robert James Whitfield" className="w-full border border-border-subtle rounded-sm px-4 py-3 font-sans text-[0.95rem] text-text-primary bg-obsidian focus:outline-none focus:border-border-amber transition-colors placeholder:text-text-muted" />
             </div>
             <div>
-              <label className="block font-sans text-[0.72rem] font-bold tracking-[0.12em] uppercase text-stone-600 mb-2">Email Address *</label>
-              <input name="email" value={form.email} onChange={handleChange} placeholder="robert@whitfield.com" className="w-full border-2 border-stone-300 rounded-md px-4 py-3 font-sans text-[0.95rem] text-stone-900 bg-white focus:outline-none focus:border-amber-500 transition-colors placeholder:text-stone-400" />
+              <label className="block font-sans text-[0.72rem] font-bold tracking-[0.12em] uppercase text-text-muted mb-2">Email Address *</label>
+              <input name="email" value={form.email} onChange={handleChange} placeholder="robert@whitfield.com" className="w-full border border-border-subtle rounded-sm px-4 py-3 font-sans text-[0.95rem] text-text-primary bg-obsidian focus:outline-none focus:border-border-amber transition-colors placeholder:text-text-muted" />
             </div>
             <div>
-              <label className="block font-sans text-[0.72rem] font-bold tracking-[0.12em] uppercase text-stone-600 mb-2">Phone <span className="font-normal normal-case tracking-normal text-stone-400">- optional</span></label>
-              <input name="phone" value={form.phone} onChange={handleChange} placeholder="+1 (555) 000-0000" className="w-full border-2 border-stone-300 rounded-md px-4 py-3 font-sans text-[0.95rem] text-stone-900 bg-white focus:outline-none focus:border-amber-500 transition-colors placeholder:text-stone-400" />
+              <label className="block font-sans text-[0.72rem] font-bold tracking-[0.12em] uppercase text-text-muted mb-2">Phone <span className="font-normal normal-case tracking-normal text-text-muted">- optional</span></label>
+              <input name="phone" value={form.phone} onChange={handleChange} placeholder="+1 (555) 000-0000" className="w-full border border-border-subtle rounded-sm px-4 py-3 font-sans text-[0.95rem] text-text-primary bg-obsidian focus:outline-none focus:border-border-amber transition-colors placeholder:text-text-muted" />
             </div>
           </div>
-          {error && <p className="font-sans text-[0.8rem] text-red-600 mb-5 font-medium">{error}</p>}
+          {error && <p className="font-sans text-[0.8rem] text-red-400 mb-5">{error}</p>}
           <div className="flex items-center gap-4">
-            <button onClick={() => router.back()} className="font-sans text-[0.8rem] font-medium text-stone-500 hover:text-stone-800 transition-colors">Back</button>
-            <button onClick={handleContinue} className="font-sans text-[0.8rem] font-bold tracking-[0.1em] uppercase px-8 py-4 rounded bg-stone-900 text-white hover:bg-stone-700 transition-all duration-200">Continue</button>
+            <button onClick={() => router.back()} className="font-sans text-[0.8rem] text-text-muted hover:text-text-primary transition-colors">Back</button>
+            <button onClick={handleContinue} className="font-sans text-[0.8rem] font-bold tracking-[0.1em] uppercase px-8 py-4 rounded-sm bg-amber text-obsidian-void hover:bg-amber/90 transition-all duration-200">Continue</button>
           </div>
         </div>
       </main>
