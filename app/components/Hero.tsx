@@ -193,7 +193,7 @@ export default function Hero() {
 
         {/* Actions */}
         <div ref={ref(3)} className="reveal reveal-delay-3 flex items-center gap-5 flex-wrap">
-          <a href="#cta" className="btn-monolith-amber group">
+          <a href="/begin/tier" className="btn-monolith-amber group">
             Begin Your Archive
             <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
           </a>
