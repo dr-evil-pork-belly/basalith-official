@@ -23,6 +23,9 @@ const publicSans = Public_Sans({
 export const metadata: Metadata = {
   title:       'Basalith — The Asset That Never Leaves',
   description: 'Your identity, preserved by the people who know it best. A Golden Dataset built by family, governed like an estate, inherited for centuries.',
+  icons: {
+    icon: '/basalith_favicon.svg',
+  },
   openGraph: {
     title:       'Basalith — The Asset That Never Leaves',
     description: 'High-end data storage powered by family labeling and Emotional Fidelity.',
@@ -34,18 +37,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${cormorant.variable} ${publicSans.variable}`}>
       <body>
-        {/* Grain texture — fixed, full-screen, pointer-events none */}
-        <div
-          className="grain fixed inset-0 z-[9997] pointer-events-none"
-          aria-hidden="true"
-        />
-
-        {/* Custom amber cursor — client component */}
+        <div className="grain fixed inset-0 z-[9997] pointer-events-none" aria-hidden="true" />
         <CursorTracker />
-
-        {/* Scroll-triggered reveal observer — client component */}
         <ScrollReveal />
-
         {children}
       </body>
     </html>
