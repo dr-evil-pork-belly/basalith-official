@@ -13,8 +13,9 @@ const COLS = [
     links: [
       { label: 'Estate Integration', href: '#' },
       { label: 'Trust Compatibility', href: '#' },
-      { label: 'Data Ownership', href: '#' },
-      { label: 'Privacy Policy', href: '#' },
+      { label: 'Data Ownership',     href: '/data-ownership' },
+      { label: 'Privacy Policy',     href: '/privacy-policy' },
+      { label: 'Terms of Service',   href: '/terms'          },
     ],
   },
   {

@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Nav from '../../components/Nav'
+import Footer from '../../components/Footer'
 
 const TIERS = [
   { name: 'The Archive', tagline: 'For individuals beginning their Golden Dataset.', price: '$1,200', monthly: '$100 / month equivalent', founding: '$2,500 one-time founding fee' },
@@ -40,11 +41,12 @@ export default function TierPage() {
               </button>
             ))}
           </div>
-          <button onClick={handleContinue} disabled={!selected} className={['font-sans text-[0.8rem] font-bold tracking-[0.1em] uppercase px-8 py-4 rounded-sm transition-all duration-200', selected ? 'bg-amber text-obsidian-void hover:bg-amber/90' : 'bg-white/[0.06] text-text-muted cursor-not-allowed'].join(' ')}>
-            Continue
+          <button onClick={handleContinue} disabled={!selected} className="btn-monolith-amber">
+            Continue →
           </button>
         </div>
       </main>
+      <Footer />
     </>
   )
 }
