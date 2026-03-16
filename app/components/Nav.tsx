@@ -9,6 +9,7 @@ const links = [
   { href: '#continuity', label: 'Continuity' },
   { href: '/about',      label: 'About'      },
   { href: '/pricing',    label: 'Pricing'    },
+  { href: '/partner',    label: 'Partners'   },
 ]
 
 export default function Nav() {

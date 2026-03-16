@@ -21,8 +21,9 @@ const COLS = [
   {
     heading: 'Company',
     links: [
-      { label: 'About Basalith', href: '/about' },
-      { label: 'Contact', href: '/contact' },
+      { label: 'About Basalith',    href: '/about'   },
+      { label: 'Partner Programme', href: '/partner' },
+      { label: 'Contact',           href: '/contact' },
     ],
   },
 ]
