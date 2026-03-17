@@ -16,6 +16,18 @@ function getGreeting(): string {
   return 'Good evening'
 }
 
+function timeAgo(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime()
+  const mins  = Math.floor(diff / 60_000)
+  if (mins < 2)   return 'just now'
+  if (mins < 60)  return `${mins}m ago`
+  const hrs = Math.floor(mins / 60)
+  if (hrs < 24)   return `${hrs}h ago`
+  const days = Math.floor(hrs / 24)
+  if (days < 30)  return `${days}d ago`
+  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+}
+
 // ── Stat card ─────────────────────────────────────────────────────────────────
 
 function StatCard({
@@ -86,17 +98,55 @@ export default async function DashboardPage() {
         .eq('invite_accepted', true)
     : { count: 0 }
 
-  // Fetch milestones (all, for count + recent list)
+  // Fetch milestones (all, for count + activity feed)
   const { data: milestones } = vault
     ? await supabase
         .from('milestones')
-        .select('*')
+        .select('id, title, trigger_type, status, created_at')
         .eq('vault_id', vault.id)
         .order('created_at', { ascending: false })
     : { data: [] }
 
-  const armedCount   = milestones?.filter(m => m.status === 'armed').length ?? 0
-  const recentFive   = milestones?.slice(0, 5) ?? []
+  const armedCount = milestones?.filter(m => m.status === 'armed').length ?? 0
+
+  // Fetch recent essence sessions with curator name + file name
+  const { data: sessions } = vault
+    ? await supabase
+        .from('essence_sessions')
+        .select('id, created_at, trait, choice_label, curator_id, file_id, profiles(full_name), vault_files(original_name)')
+        .eq('vault_id', vault.id)
+        .eq('skipped', false)
+        .order('created_at', { ascending: false })
+        .limit(10)
+    : { data: [] }
+
+  // Build unified activity feed — last 5 items by created_at
+  type ActivityItem =
+    | { kind: 'session'; id: string; created_at: string; curator_name: string; trait: string; choice_label: string; file_name: string }
+    | { kind: 'milestone'; id: string; created_at: string; title: string; trigger_type: string; status: string }
+
+  const sessionItems: ActivityItem[] = (sessions ?? []).map((s: Record<string, unknown>) => ({
+    kind:         'session' as const,
+    id:           s.id as string,
+    created_at:   s.created_at as string,
+    curator_name: (s.profiles as { full_name: string } | null)?.full_name ?? 'A curator',
+    trait:        s.trait as string,
+    choice_label: s.choice_label as string,
+    file_name:    (s.vault_files as { original_name: string } | null)?.original_name ?? 'a memory',
+  }))
+
+  const milestoneItems: ActivityItem[] = (milestones ?? []).map((m: Record<string, unknown>) => ({
+    kind:         'milestone' as const,
+    id:           m.id as string,
+    created_at:   m.created_at as string,
+    title:        m.title as string,
+    trigger_type: m.trigger_type as string,
+    status:       m.status as string,
+  }))
+
+  const activityFeed = [...sessionItems, ...milestoneItems]
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .slice(0, 5)
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -154,30 +204,71 @@ export default async function DashboardPage() {
             />
           </div>
 
-          {/* ── C: Recent milestones ── */}
+          {/* ── C: Recent Activity ── */}
           <div className="mb-10">
             <p className="font-sans text-[0.65rem] font-bold tracking-[0.18em] uppercase text-text-muted mb-4">
-              Recent Milestones
+              Recent Activity
             </p>
-            {recentFive.length === 0 ? (
+            {activityFeed.length === 0 ? (
               <div className="glass-obsidian rounded-sm px-6 py-8 text-center">
-                <p className="font-sans text-[0.82rem] text-text-muted">No milestones configured yet.</p>
+                <p className="font-sans text-[0.82rem] text-text-muted">No activity yet.</p>
                 <a href="/dashboard/milestones" className="font-sans text-[0.78rem] text-amber-dim hover:text-amber transition-colors duration-200 mt-2 inline-block">
                   Add your first milestone →
                 </a>
               </div>
             ) : (
               <div className="flex flex-col gap-2">
-                {recentFive.map((m: Record<string, unknown>) => (
+                {activityFeed.map(item => (
                   <div
-                    key={m.id as string}
+                    key={item.id}
                     className="glass-obsidian rounded-sm px-6 py-4 flex items-center justify-between gap-4"
                   >
-                    <div className="flex-1 min-w-0">
-                      <p className="font-sans text-[0.85rem] font-medium text-text-primary truncate">{m.title as string}</p>
-                      <p className="font-sans text-[0.72rem] text-text-muted mt-0.5">{m.trigger_type as string}</p>
-                    </div>
-                    <StatusBadge status={m.status as string} />
+                    {item.kind === 'session' ? (
+                      <>
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          {/* Essence icon */}
+                          <div className="w-7 h-7 rounded-full bg-amber/10 border border-amber/20 flex items-center justify-center flex-shrink-0">
+                            <span className="ai-dot !w-[5px] !h-[5px]" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-sans text-[0.85rem] font-medium text-text-primary truncate">
+                              {item.curator_name}{' '}
+                              <span className="font-normal text-text-muted">sealed</span>{' '}
+                              {item.file_name}
+                            </p>
+                            <p className="font-sans text-[0.72rem] text-text-muted mt-0.5">
+                              {item.trait} · {item.choice_label}
+                            </p>
+                          </div>
+                        </div>
+                        <span className="font-sans text-[0.68rem] text-text-muted flex-shrink-0">
+                          {timeAgo(item.created_at)}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          {/* Milestone icon */}
+                          <div className="w-7 h-7 rounded-sm border border-border-subtle bg-white/[0.03] flex items-center justify-center flex-shrink-0">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                              <path d="M12 22V12m0-8v4M4.93 4.93l2.83 2.83M17.07 17.07l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83M17.07 6.93l2.83-2.83" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-text-muted" />
+                            </svg>
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-sans text-[0.85rem] font-medium text-text-primary truncate">
+                              {item.title}
+                            </p>
+                            <p className="font-sans text-[0.72rem] text-text-muted mt-0.5">{item.trigger_type}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3 flex-shrink-0">
+                          <span className="font-sans text-[0.68rem] text-text-muted">
+                            {timeAgo(item.created_at)}
+                          </span>
+                          <StatusBadge status={item.status} />
+                        </div>
+                      </>
+                    )}
                   </div>
                 ))}
               </div>

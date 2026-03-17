@@ -11,6 +11,7 @@ type Curator = {
   clearance:       string
   is_key_holder:   boolean
   invite_accepted: boolean
+  invite_token:    string
   created_at:      string
 }
 
@@ -35,6 +36,50 @@ function ClearanceBadge({ clearance }: { clearance: string }) {
     <span className={`inline-flex items-center px-2 py-0.5 rounded-sm border font-sans text-[0.6rem] font-bold tracking-[0.12em] uppercase ${color}`}>
       {CLEARANCE_LABELS[clearance] ?? clearance}
     </span>
+  )
+}
+
+const INVITE_BASE = 'https://www.basalith.xyz/join?token='
+
+function CopyLinkButton({ token }: { token: string }) {
+  const [copied, setCopied] = useState(false)
+
+  async function handleCopy() {
+    try {
+      await navigator.clipboard.writeText(INVITE_BASE + token)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      // fallback: select a temp input
+    }
+  }
+
+  return (
+    <button
+      onClick={handleCopy}
+      className="inline-flex items-center gap-1.5 font-sans text-[0.68rem] font-bold tracking-[0.08em] uppercase px-2.5 py-1 rounded-sm border transition-all duration-150"
+      style={copied
+        ? { borderColor: 'rgba(52,211,153,0.3)', color: 'rgb(52,211,153)', background: 'rgba(52,211,153,0.06)' }
+        : { borderColor: 'rgba(255,179,71,0.2)', color: 'rgba(255,179,71,0.7)', background: 'rgba(255,179,71,0.04)' }
+      }
+    >
+      {copied ? (
+        <>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M5 12l5 5L20 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          Copied
+        </>
+      ) : (
+        <>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" strokeWidth="2" />
+            <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" strokeWidth="2" />
+          </svg>
+          Copy Link
+        </>
+      )}
+    </button>
   )
 }
 
@@ -156,30 +201,47 @@ export default function CuratorsPage() {
       ) : (
         <div className="flex flex-col gap-3 mb-8">
           {curators.map(c => (
-            <div key={c.id} className="glass-obsidian rounded-sm px-6 py-5 flex items-center justify-between gap-4 flex-wrap">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2.5 mb-0.5 flex-wrap">
-                  <p className="font-sans text-[0.88rem] font-medium text-text-primary">{c.display_name}</p>
-                  {c.is_key_holder && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-sm border border-amber/25 bg-amber/[0.07] font-sans text-[0.58rem] font-bold tracking-[0.14em] uppercase text-amber">
-                      <span className="ai-dot !w-[5px] !h-[5px]" />Key Holder
+            <div key={c.id} className="glass-obsidian rounded-sm px-6 py-5 flex flex-col gap-3">
+              <div className="flex items-center justify-between gap-4 flex-wrap">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2.5 mb-0.5 flex-wrap">
+                    <p className="font-sans text-[0.88rem] font-medium text-text-primary">{c.display_name}</p>
+                    {c.is_key_holder && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-sm border border-amber/25 bg-amber/[0.07] font-sans text-[0.58rem] font-bold tracking-[0.14em] uppercase text-amber">
+                        <span className="ai-dot !w-[5px] !h-[5px]" />Key Holder
+                      </span>
+                    )}
+                  </div>
+                  <p className="font-sans text-[0.75rem] text-text-muted">{c.email}</p>
+                  {c.relation && <p className="font-sans text-[0.72rem] text-text-muted mt-0.5">{c.relation}</p>}
+                </div>
+                <div className="flex items-center gap-3 flex-shrink-0">
+                  <ClearanceBadge clearance={c.clearance} />
+                  {c.invite_accepted ? (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-sm border border-emerald-500/25 bg-emerald-500/[0.07] font-sans text-[0.6rem] font-bold tracking-[0.12em] uppercase text-emerald-400">
+                      <svg width="8" height="8" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M5 12l5 5L20 7" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                      Active
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-sm border border-border-subtle bg-transparent font-sans text-[0.6rem] font-bold tracking-[0.12em] uppercase text-text-muted">
+                      Pending
                     </span>
                   )}
                 </div>
-                <p className="font-sans text-[0.75rem] text-text-muted">{c.email}</p>
-                {c.relation && <p className="font-sans text-[0.72rem] text-text-muted mt-0.5">{c.relation}</p>}
               </div>
-              <div className="flex items-center gap-3 flex-shrink-0">
-                <ClearanceBadge clearance={c.clearance} />
-                <span className={[
-                  'inline-flex items-center px-2 py-0.5 rounded-sm border font-sans text-[0.6rem] font-bold tracking-[0.12em] uppercase',
-                  c.invite_accepted
-                    ? 'text-emerald-400 border-emerald-500/25 bg-emerald-500/[0.07]'
-                    : 'text-text-muted border-border-subtle bg-transparent',
-                ].join(' ')}>
-                  {c.invite_accepted ? 'Accepted' : 'Pending'}
-                </span>
-              </div>
+
+              {/* Invite link — shown only for pending curators */}
+              {!c.invite_accepted && (
+                <div className="flex items-center gap-3 pt-1 border-t border-border-subtle flex-wrap">
+                  <p className="font-sans text-[0.68rem] text-text-muted truncate flex-1 min-w-0">
+                    <span className="text-text-muted/50 mr-1.5">Link</span>
+                    <span className="font-mono">{INVITE_BASE}{c.invite_token}</span>
+                  </p>
+                  <CopyLinkButton token={c.invite_token} />
+                </div>
+              )}
             </div>
           ))}
         </div>
