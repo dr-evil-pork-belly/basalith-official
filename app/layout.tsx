@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import { Cormorant_Garamond, Public_Sans } from 'next/font/google'
 import './globals.css'
-import CursorTracker from './components/CursorTracker'
-import ScrollReveal  from './components/ScrollReveal'
+import CursorTracker     from './components/CursorTracker'
+import ScrollReveal      from './components/ScrollReveal'
+import AuthErrorRedirect from './components/AuthErrorRedirect'
 
 const cormorant = Cormorant_Garamond({
   subsets:  ['latin'],
@@ -38,6 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${cormorant.variable} ${publicSans.variable}`}>
       <body>
         <div className="grain fixed inset-0 z-[9997] pointer-events-none" aria-hidden="true" />
+        <AuthErrorRedirect />
         <CursorTracker />
         <ScrollReveal />
         {children}
