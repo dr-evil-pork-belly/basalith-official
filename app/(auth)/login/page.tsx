@@ -25,11 +25,14 @@ function LoginForm() {
     setStatus('loading')
     setError('')
 
+    const origin = process.env.NEXT_PUBLIC_APP_URL ||
+      (typeof window !== 'undefined' ? window.location.origin : 'https://www.basalith.xyz')
+
     const supabase = createClient()
     const { error: otpError } = await supabase.auth.signInWithOtp({
       email: email.trim().toLowerCase(),
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: `${origin}/auth/callback`,
       },
     })
 
