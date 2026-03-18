@@ -9,20 +9,23 @@ export async function POST(req: NextRequest) {
   // Verify session
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
+  console.log('[invite-curator] user:', user ? { id: user.id, email: user.email } : null)
   if (!user) {
     return NextResponse.json({ ok: false, error: 'Unauthorised.' }, { status: 401 })
   }
 
   // Get vault
-  const { data: vault } = await supabase
+  const { data: vault, error: vaultError } = await supabase
     .from('vaults')
     .select('id')
     .eq('archivist_id', user.id)
     .single()
+  console.log('[invite-curator] vault lookup:', { vault, error: vaultError })
 
   if (!vault) {
     return NextResponse.json({ ok: false, error: 'No vault found.' }, { status: 404 })
   }
+  console.log('[invite-curator] vault_id:', vault.id)
 
   let body: unknown
   try { body = await req.json() } catch {
@@ -56,9 +59,10 @@ export async function POST(req: NextRequest) {
   }])
 
   if (insertError) {
-    console.error('[invite-curator] insert error:', insertError.message)
+    console.error('[invite-curator] insert error (full):', JSON.stringify(insertError, null, 2))
     return NextResponse.json({ ok: false, error: 'Failed to create curator record.' }, { status: 500 })
   }
+  console.log('[invite-curator] curator insert succeeded')
 
   // Send invite email via Supabase Auth
   const { error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(
@@ -75,7 +79,9 @@ export async function POST(req: NextRequest) {
 
   if (inviteError) {
     // Non-fatal — curator record exists, email can be resent manually
-    console.error('[invite-curator] invite email error:', inviteError.message)
+    console.error('[invite-curator] invite email error (full):', JSON.stringify(inviteError, null, 2))
+  } else {
+    console.log('[invite-curator] invite email sent successfully')
   }
 
   return NextResponse.json({ ok: true })
