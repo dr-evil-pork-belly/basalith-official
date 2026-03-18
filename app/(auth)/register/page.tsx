@@ -50,7 +50,8 @@ function RegisterForm() {
       email:    email.trim().toLowerCase(),
       password,
       options: {
-        data: { full_name: name.trim() },
+        data:              { full_name: name.trim() },
+        emailRedirectTo:   `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
       },
     })
 
