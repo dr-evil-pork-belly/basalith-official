@@ -47,7 +47,7 @@ function JoinForm() {
         return
       }
 
-      const vault = data.vaults as { display_name: string; archivist_id: string } | null
+      const vault = data.vaults as unknown as { display_name: string; archivist_id: string } | null
 
       setVaultInfo({
         display_name:    vault?.display_name ?? 'Your Vault',
