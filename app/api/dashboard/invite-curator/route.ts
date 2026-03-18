@@ -3,7 +3,7 @@ import { createClient }       from '@/lib/supabase-server'
 import { supabaseAdmin }      from '@/lib/supabase-admin'
 import { randomBytes }        from 'crypto'
 
-const VALID_CLEARANCE = ['curator', 'legal_financial', 'full'] as const
+const VALID_CLEARANCE = ['level_3_curator', 'level_4_legal', 'level_5_full'] as const
 
 export async function POST(req: NextRequest) {
   // Verify session
@@ -40,9 +40,10 @@ export async function POST(req: NextRequest) {
   if (!email || typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
     return NextResponse.json({ ok: false, error: 'A valid email is required.' }, { status: 422 })
   }
-  if (!clearance || !VALID_CLEARANCE.includes(clearance as typeof VALID_CLEARANCE[number])) {
-    return NextResponse.json({ ok: false, error: 'Invalid clearance level.' }, { status: 422 })
-  }
+  const allowedClearance = ['level_3_curator', 'level_4_legal', 'level_5_full'] as const
+  const validatedClearance: typeof allowedClearance[number] = allowedClearance.includes(clearance as typeof allowedClearance[number])
+    ? (clearance as typeof allowedClearance[number])
+    : 'level_3_curator'
 
   const invite_token = randomBytes(24).toString('hex')
 
@@ -51,7 +52,7 @@ export async function POST(req: NextRequest) {
     vault_id:        vault.id,
     email:           (email as string).trim().toLowerCase(),
     display_name:    (name as string).trim(),
-    clearance:       clearance,
+    clearance:       validatedClearance,
     is_key_holder:   Boolean(is_key_holder),
     invite_token,
     invite_accepted: false,

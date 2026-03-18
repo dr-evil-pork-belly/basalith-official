@@ -16,15 +16,15 @@ type Curator = {
 }
 
 const CLEARANCE_LABELS: Record<string, string> = {
-  curator:          'Curator Access',
-  legal_financial:  'Legal & Financial',
-  full:             'Full Access',
+  level_3_curator: 'Curator Access',
+  level_4_legal:   'Legal & Financial',
+  level_5_full:    'Full Access',
 }
 
 const CLEARANCE_OPTIONS = [
-  { value: 'curator',         label: 'Curator Access'    },
-  { value: 'legal_financial', label: 'Legal & Financial' },
-  { value: 'full',            label: 'Full Access'       },
+  { value: 'level_3_curator', label: 'Curator Access'    },
+  { value: 'level_4_legal',   label: 'Legal & Financial' },
+  { value: 'level_5_full',    label: 'Full Access'       },
 ]
 
 function ClearanceBadge({ clearance }: { clearance: string }) {
@@ -99,7 +99,7 @@ export default function CuratorsPage() {
     name:         '',
     email:        '',
     relation:     '',
-    clearance:    'curator',
+    clearance:    'level_3_curator',
     is_key_holder: false,
   })
 
