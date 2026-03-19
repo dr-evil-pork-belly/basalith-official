@@ -9,6 +9,12 @@ function formatBytes(bytes: number): string {
   return `${(bytes / 1_099_511_627_776).toFixed(2)} TB`
 }
 
+function formatBytesShort(bytes: number): string {
+  if (bytes === 0) return '0 GB'
+  if (bytes < 1_073_741_824) return `${(bytes / 1_073_741_824).toFixed(1)} GB`
+  return `${(bytes / 1_099_511_627_776).toFixed(1)} TB`
+}
+
 function getGreeting(): string {
   const h = new Date().getHours()
   if (h < 12) return 'Good morning'
@@ -49,6 +55,35 @@ function StatCard({
         {value}
       </p>
       {sub && <p className="font-sans text-[0.75rem] text-text-muted">{sub}</p>}
+    </div>
+  )
+}
+
+function StorageStatCard({
+  used, limit, fileCount,
+}: {
+  used:      number
+  limit:     number
+  fileCount: number
+}) {
+  const percent = limit > 0 ? Math.min(100, (used / limit) * 100) : 0
+  return (
+    <div className="glass-obsidian rounded-sm p-6 flex flex-col gap-2">
+      <p className="font-sans text-[0.65rem] font-bold tracking-[0.18em] uppercase text-text-muted">Storage Used</p>
+      <p className="font-serif font-semibold leading-none tracking-[-0.02em] text-text-primary text-[2.25rem]">
+        {formatBytesShort(used)}
+      </p>
+      <div className="flex items-center justify-between gap-2">
+        <p className="font-sans text-[0.75rem] text-text-muted">of {formatBytesShort(limit)}</p>
+        <p className="font-sans text-[0.72rem] text-text-muted tabular-nums">{fileCount.toLocaleString()} {fileCount === 1 ? 'file' : 'files'}</p>
+      </div>
+      {/* Progress bar */}
+      <div className="h-px w-full bg-white/[0.06] rounded-full overflow-hidden mt-1">
+        <div
+          className="h-full bg-amber/60 rounded-full transition-all duration-700"
+          style={{ width: `${percent}%` }}
+        />
+      </div>
     </div>
   )
 }
@@ -108,6 +143,14 @@ export default async function DashboardPage() {
     : { data: [] }
 
   const armedCount = milestones?.filter(m => m.status === 'armed').length ?? 0
+
+  // Fetch total file count
+  const { count: fileCount } = vault
+    ? await supabase
+        .from('vault_files')
+        .select('id', { count: 'exact', head: true })
+        .eq('vault_id', vault.id)
+    : { count: 0 }
 
   // Fetch recent essence sessions with curator name + file name
   const { data: sessions } = vault
@@ -186,10 +229,10 @@ export default async function DashboardPage() {
               sub="Golden Dataset depth"
               accent
             />
-            <StatCard
-              label="Storage Used"
-              value={formatBytes(vault.storage_used_bytes ?? 0)}
-              sub={`of ${formatBytes(vault.storage_limit_bytes ?? 107_374_182_400)}`}
+            <StorageStatCard
+              used={vault.storage_used_bytes ?? 0}
+              limit={vault.storage_limit_bytes ?? 107_374_182_400}
+              fileCount={fileCount ?? 0}
             />
             <StatCard
               label="Curators Active"
