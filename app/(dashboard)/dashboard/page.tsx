@@ -152,30 +152,30 @@ export default async function DashboardPage() {
         .eq('vault_id', vault.id)
     : { count: 0 }
 
-  // Fetch recent essence sessions with curator name + file name
-  const { data: sessions } = vault
+  // Fetch recent vault notifications (curator seal events)
+  const { data: notifications } = vault
     ? await supabase
-        .from('essence_sessions')
-        .select('id, created_at, trait, choice_label, curator_id, file_id, profiles(full_name), vault_files(original_name)')
+        .from('vault_notifications')
+        .select('id, created_at, type, curator_name, trait, choice_label, file_name, read')
         .eq('vault_id', vault.id)
-        .eq('skipped', false)
         .order('created_at', { ascending: false })
         .limit(10)
     : { data: [] }
 
   // Build unified activity feed — last 5 items by created_at
   type ActivityItem =
-    | { kind: 'session'; id: string; created_at: string; curator_name: string; trait: string; choice_label: string; file_name: string }
+    | { kind: 'notification'; id: string; created_at: string; curator_name: string; trait: string; choice_label: string; file_name: string; unread: boolean }
     | { kind: 'milestone'; id: string; created_at: string; title: string; trigger_type: string; status: string }
 
-  const sessionItems: ActivityItem[] = (sessions ?? []).map((s: Record<string, unknown>) => ({
-    kind:         'session' as const,
-    id:           s.id as string,
-    created_at:   s.created_at as string,
-    curator_name: (s.profiles as { full_name: string } | null)?.full_name ?? 'A curator',
-    trait:        s.trait as string,
-    choice_label: s.choice_label as string,
-    file_name:    (s.vault_files as { original_name: string } | null)?.original_name ?? 'a memory',
+  const notificationItems: ActivityItem[] = (notifications ?? []).map((n: Record<string, unknown>) => ({
+    kind:         'notification' as const,
+    id:           n.id as string,
+    created_at:   n.created_at as string,
+    curator_name: (n.curator_name as string | null) ?? 'A curator',
+    trait:        (n.trait as string | null) ?? '',
+    choice_label: (n.choice_label as string | null) ?? '',
+    file_name:    (n.file_name as string | null) ?? 'a memory',
+    unread:       !(n.read as boolean),
   }))
 
   const milestoneItems: ActivityItem[] = (milestones ?? []).map((m: Record<string, unknown>) => ({
@@ -187,7 +187,7 @@ export default async function DashboardPage() {
     status:       m.status as string,
   }))
 
-  const activityFeed = [...sessionItems, ...milestoneItems]
+  const activityFeed = [...notificationItems, ...milestoneItems]
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     .slice(0, 5)
 
@@ -264,12 +264,15 @@ export default async function DashboardPage() {
                 {activityFeed.map(item => (
                   <div
                     key={item.id}
-                    className="glass-obsidian rounded-sm px-6 py-4 flex items-center justify-between gap-4"
+                    className="glass-obsidian rounded-sm px-6 py-4 flex items-center justify-between gap-4 relative overflow-hidden"
                   >
-                    {item.kind === 'session' ? (
+                    {/* Unread amber left border for notifications */}
+                    {item.kind === 'notification' && item.unread && (
+                      <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-amber/70 rounded-r-full" />
+                    )}
+                    {item.kind === 'notification' ? (
                       <>
                         <div className="flex items-center gap-3 flex-1 min-w-0">
-                          {/* Essence icon */}
                           <div className="w-7 h-7 rounded-full bg-amber/10 border border-amber/20 flex items-center justify-center flex-shrink-0">
                             <span className="ai-dot !w-[5px] !h-[5px]" />
                           </div>

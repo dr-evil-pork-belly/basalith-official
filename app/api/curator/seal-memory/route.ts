@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: 'Invalid request body.' }, { status: 400 })
   }
 
-  const { file_id, trait, choice_label, choice_description, vault_id } =
+  const { file_id, trait, choice_label, choice_description, vault_id, curator_name, file_name, file_year } =
     body as Record<string, unknown>
 
   if (!file_id || typeof file_id !== 'string') {
@@ -94,6 +94,20 @@ export async function POST(req: NextRequest) {
     .from('vaults')
     .update({ essence_percent: newPercent })
     .eq('id', vault_id)
+
+  // Insert vault notification for archivist
+  await supabaseAdmin
+    .from('vault_notifications')
+    .insert([{
+      vault_id,
+      type:         'memory_sealed',
+      curator_name: curator_name && typeof curator_name === 'string' ? curator_name : null,
+      trait:        trait as string,
+      choice_label: choice_label as string,
+      file_name:    file_name   && typeof file_name   === 'string' ? file_name   : null,
+      file_year:    file_year   && typeof file_year   === 'number' ? file_year   : null,
+      read:         false,
+    }])
 
   return NextResponse.json({ ok: true, new_essence_percent: newPercent })
 }
