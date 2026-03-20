@@ -165,11 +165,8 @@ function MemoryCard({
       onClick={onClick}
       className={`relative rounded-sm overflow-hidden cursor-pointer transition-all duration-200 aspect-[4/3] flex flex-col glass-obsidian ${borderClass}`}
       style={{
-        animationName:           'cardReveal',
-        animationDuration:       '500ms',
-        animationDelay:          `${index * 120}ms`,
-        animationFillMode:       'both',
-        animationTimingFunction: 'cubic-bezier(0.16,1,0.3,1)',
+        animation:      `cardReveal 600ms cubic-bezier(0.16,1,0.3,1) both`,
+        animationDelay: `${index * 160}ms`,
       }}
       aria-pressed={selected}
       aria-label={isMystery ? 'Mystery Memory' : file.original_name}
@@ -181,16 +178,16 @@ function MemoryCard({
           <div
             className="absolute inset-0"
             style={{
-              background: 'linear-gradient(160deg,rgba(180,140,90,0.13) 0%,rgba(100,70,40,0.22) 60%,rgba(20,15,10,0.7) 100%)',
-              filter: mysteryRevealed ? 'blur(0px)' : 'blur(7px)',
-              transition: 'filter 1.2s cubic-bezier(0.16,1,0.3,1)',
+              background:  'linear-gradient(160deg,rgba(180,140,90,0.13) 0%,rgba(100,70,40,0.22) 60%,rgba(20,15,10,0.7) 100%)',
+              filter:      mysteryRevealed ? 'blur(0px) brightness(1)' : 'blur(6px) brightness(0.6)',
+              transition:  'filter 1200ms cubic-bezier(0.16,1,0.3,1)',
             }}
           />
           {/* Overlay (hidden when revealed) */}
           {!mysteryRevealed && (
             <div
               className="relative flex flex-col items-center gap-1.5"
-              style={{ animation: 'mysteryPulse 2.5s ease-in-out infinite' }}
+              style={{ animation: 'mysteryGlowPulse 2.5s ease-in-out infinite' }}
             >
               <span className="font-serif text-[2.2rem] font-semibold text-amber/80 leading-none">?</span>
               <span className="font-sans text-[0.5rem] font-bold tracking-[0.12em] uppercase text-amber/50">
@@ -260,6 +257,7 @@ function MemoryCard({
           style={{ animation: 'mysteryBorderPulse 2.5s ease-in-out infinite' }}
         />
       )}
+
     </button>
   )
 }
@@ -553,29 +551,6 @@ export default function EssencePage() {
 
   return (
     <>
-      <style>{`
-        @keyframes cardReveal {
-          from { opacity: 0; transform: translateY(10px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes mysteryPulse {
-          0%, 100% { opacity: 0.5; }
-          50%       { opacity: 1;   }
-        }
-        @keyframes mysteryBorderPulse {
-          0%, 100% { box-shadow: 0 0 0 1px rgba(255,179,71,0.25); }
-          50%       { box-shadow: 0 0 12px rgba(255,179,71,0.45); }
-        }
-        @keyframes consecrateFadeIn {
-          from { opacity: 0; }
-          to   { opacity: 1; }
-        }
-        @keyframes lineDraw {
-          from { width: 0%; }
-          to   { width: 100%; }
-        }
-      `}</style>
-
       <div className="flex flex-col gap-8">
 
         {/* ── Change 7: Emotional session header ── */}
@@ -749,22 +724,21 @@ export default function EssencePage() {
                 <div className="flex flex-col gap-4 pt-2">
                   {/* Gold line draws left-to-right */}
                   <div className="h-px bg-white/[0.06] rounded-full overflow-hidden w-full">
-                    <div
-                      className="h-full bg-amber/60 rounded-full"
-                      style={{
-                        animation: sealPhase === 'drawing'
-                          ? 'lineDraw 900ms cubic-bezier(0.16,1,0.3,1) forwards'
-                          : 'none',
-                        width: sealPhase === 'drawing' ? undefined : '100%',
-                      }}
-                    />
+                    {sealPhase === 'drawing' ? (
+                      <div
+                        className="h-full bg-amber/60 rounded-full"
+                        style={{ animation: 'lineDraw 900ms cubic-bezier(0.16,1,0.3,1) forwards' }}
+                      />
+                    ) : (
+                      <div className="h-full bg-amber/60 rounded-full w-full" />
+                    )}
                   </div>
 
                   {/* Consecration message */}
                   {(sealPhase === 'consecrating' || sealPhase === 'done') && (
                     <p
                       className="font-serif italic text-amber text-[0.95rem] text-center leading-[1.5]"
-                      style={{ animation: 'consecrateFadeIn 400ms ease forwards' }}
+                      style={{ animation: 'consecrateFade 400ms ease forwards' }}
                     >
                       This memory is now part of {vaultName}&apos;s permanent record.
                     </p>
@@ -774,7 +748,7 @@ export default function EssencePage() {
                   {isMysterySelected && (sealPhase === 'consecrating' || sealPhase === 'done') && (
                     <p
                       className="font-sans text-[0.78rem] text-text-muted text-center"
-                      style={{ animation: 'consecrateFadeIn 500ms 300ms ease both' }}
+                      style={{ animation: 'consecrateFade 500ms 300ms ease both' }}
                     >
                       You felt <span className="text-amber font-medium">{mysteryEmotion}</span>
                       {selected.year ? <> &middot; {selected.year}</> : null}
@@ -819,9 +793,9 @@ export default function EssencePage() {
         <div
           className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 glass-obsidian border border-amber/30 rounded-sm px-6 py-4 flex flex-col gap-1 shadow-[0_8px_32px_rgba(0,0,0,0.6)]"
           style={{
-            minWidth: '260px',
-            maxWidth: '340px',
-            animation: 'consecrateFadeIn 300ms ease forwards',
+            minWidth:  '260px',
+            maxWidth:  '340px',
+            animation: 'consecrateFade 300ms ease forwards',
           }}
         >
           <p className="font-sans text-[0.82rem] font-medium text-text-primary">
