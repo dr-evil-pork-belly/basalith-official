@@ -40,6 +40,33 @@ export default function Footer() {
             The archive of a life, governed with the same seriousness as an estate.
             We build for legacy.
           </p>
+          <div className="mt-6">
+            <p className="font-sans text-[0.58rem] font-bold tracking-[0.2em] uppercase text-text-muted mb-3">
+              The Basalith Ecosystem
+            </p>
+            <ul className="flex flex-col gap-2 list-none p-0 m-0">
+              <li>
+                <a
+                  href="https://basalith.life"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-sans text-[0.78rem] text-amber-dim no-underline transition-colors duration-200 hover:text-amber"
+                >
+                  basalith.life →
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://basalith.ai"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-sans text-[0.78rem] text-amber-dim no-underline transition-colors duration-200 hover:text-amber"
+                >
+                  basalith.ai →
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
 
         {COLS.map(({ heading, links }) => (

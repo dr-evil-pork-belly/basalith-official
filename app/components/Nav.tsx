@@ -39,8 +39,10 @@ export default function Nav() {
             : 'py-6 bg-gradient-to-b from-obsidian-void/90 to-transparent',
         ].join(' ')}
       >
-        <Link href="/" className="font-sans text-[0.8rem] font-bold tracking-[0.24em] uppercase text-text-primary no-underline">
+        <Link href="/" className="font-sans text-[0.8rem] font-bold tracking-[0.24em] uppercase text-text-primary no-underline flex items-baseline gap-0">
           Basalith
+          <span style={{ color: 'rgba(196,162,74,0.5)', margin: '0 0.3em' }} aria-hidden="true">·</span>
+          <span style={{ fontStyle: 'italic', fontWeight: 300, color: 'var(--text-muted)', fontSize: '0.85em', textTransform: 'lowercase', letterSpacing: '0.08em' }}>xyz</span>
         </Link>
 
         <ul className="hidden md:flex items-center gap-10 list-none m-0 p-0">
