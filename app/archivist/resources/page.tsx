@@ -19,7 +19,7 @@ const RESOURCES = [
   },
   {
     title:  'Brand Assets',
-    desc:   'Basalith logos, sigil files, colour palette, and usage guidelines. Approved materials only.',
+    desc:   'Basalith logos, sigil files, color palette, and usage guidelines. Approved materials only.',
     action: 'Coming Soon',
     href:   '#',
   },

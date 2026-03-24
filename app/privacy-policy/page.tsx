@@ -25,7 +25,7 @@ const SECTIONS = [
     num:   '03',
     title: 'Who Can Access It',
     body: [
-      'Data submitted through this site is accessible only to Heritage Nexus Inc. staff and authorised contractors operating under confidentiality obligations.',
+      'Data submitted through this site is accessible only to Heritage Nexus Inc. staff and authorized contractors operating under confidentiality obligations.',
       'We do not sell, license, rent, or otherwise transfer your personal data to third parties for any commercial purpose.',
       'We do not share your data with AI model providers, data brokers, advertising networks, or research organisations.',
       'Law enforcement requests are handled in accordance with applicable law. We will notify affected individuals of such requests where legally permitted to do so.',

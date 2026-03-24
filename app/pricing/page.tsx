@@ -95,8 +95,8 @@ const FAQ = [
     a: 'Your complete archive is available for export in open formats at any time. Our Data Custodianship Reserve — an independent legal structure funded by subscription revenue — ensures continuity in any scenario.',
   },
   {
-    q: 'Is there a referral or partner programme?',
-    a: 'Yes. We offer a structured partnership programme for advisors, estate attorneys, and social marketers. Contact us to receive the full programme details.',
+    q: 'Is there a referral or partner program?',
+    a: 'Yes. We offer a structured partnership program for advisors, estate attorneys, and social marketers. Contact us to receive the full program details.',
   },
 ]
 
@@ -281,18 +281,18 @@ export default function PricingPage() {
           </div>
         </section>
 
-        {/* ── PARTNER PROGRAMME ── */}
-        <section className="relative bg-obsidian-deep px-8 md:px-16 lg:px-24 py-24 overflow-hidden" aria-label="Partner programme">
+        {/* ── PARTNER PROGRAM ── */}
+        <section className="relative bg-obsidian-deep px-8 md:px-16 lg:px-24 py-24 overflow-hidden" aria-label="Partner program">
           <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-border-subtle to-transparent" />
           <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
-              <p className="eyebrow mb-5">Partner Programme</p>
+              <p className="eyebrow mb-5">Partner Program</p>
               <h2 className="font-serif font-semibold text-text-primary leading-[1.0] tracking-[-0.03em] mb-6" style={{ fontSize: 'clamp(2rem,4vw,3.25rem)' }}>
                 Earn a Living From{' '}
                 <em className="italic font-medium text-amber" style={{ fontStyle: 'italic' }}>Selling Permanence.</em>
               </h2>
               <p className="font-sans font-light text-body-base text-text-secondary leading-[1.85] mb-4">
-                Basalith offers a structured partnership programme for estate attorneys, financial advisors,
+                Basalith offers a structured partnership program for estate attorneys, financial advisors,
                 luxury real estate professionals, and social marketers who believe in what we are building.
               </p>
               <p className="font-sans font-light text-body-base text-text-secondary leading-[1.85]">
@@ -302,9 +302,9 @@ export default function PricingPage() {
             </div>
             <div className="flex flex-col gap-5 justify-center">
               <p className="font-sans font-light text-body-base text-text-secondary leading-[1.85]">
-                Partnership terms — including commission structure, onboarding, and client management — are shared privately with approved partners. Apply to receive the full programme details.
+                Partnership terms — including commission structure, onboarding, and client management — are shared privately with approved partners. Apply to receive the full program details.
               </p>
-              <a href="/contact" className="btn-monolith-ghost text-center mt-2">Apply to Partner Programme →</a>
+              <a href="/contact" className="btn-monolith-ghost text-center mt-2">Apply to Partner Program →</a>
             </div>
           </div>
         </section>

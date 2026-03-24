@@ -10,7 +10,7 @@ type Status = 'idle' | 'loading' | 'success' | 'error'
 const INTENTS: { value: Intent; label: string }[] = [
   { value: 'general', label: 'General Enquiry' },
   { value: 'pricing', label: 'Pricing Question' },
-  { value: 'partner', label: 'Partner Programme' },
+  { value: 'partner', label: 'Partner Program' },
   { value: 'press',   label: 'Press'             },
 ]
 

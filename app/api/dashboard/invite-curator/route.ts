@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   console.log('[invite-curator] user:', user ? { id: user.id, email: user.email } : null)
   if (!user) {
-    return NextResponse.json({ ok: false, error: 'Unauthorised.' }, { status: 401 })
+    return NextResponse.json({ ok: false, error: 'Unauthorized.' }, { status: 401 })
   }
 
   // Get vault

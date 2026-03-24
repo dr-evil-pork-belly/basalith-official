@@ -113,7 +113,7 @@ export default function PartnerPage() {
         {/* ── A: HERO ── */}
         <section
           className="relative bg-obsidian-void px-8 md:px-16 pt-40 pb-28 overflow-hidden"
-          aria-label="Partner programme hero"
+          aria-label="Partner program hero"
         >
           {/* Grid */}
           <div
@@ -135,7 +135,7 @@ export default function PartnerPage() {
           />
 
           <div className="relative z-10 max-w-3xl mx-auto text-center">
-            <p className="eyebrow mb-7">Partner Programme</p>
+            <p className="eyebrow mb-7">Partner Program</p>
             <h1
               className="font-serif font-semibold text-text-primary leading-[0.92] tracking-[-0.038em] mb-8"
               style={{ fontSize: 'clamp(3rem,6.5vw,5.75rem)' }}
@@ -147,7 +147,7 @@ export default function PartnerPage() {
             </h1>
             <p className="font-sans font-light text-body-base text-text-secondary leading-[1.82] max-w-2xl mx-auto mb-4">
               Basalith is the first institution purpose-built for legacy preservation as a legal asset.
-              Our partner programme is for professionals who already advise the families we serve —
+              Our partner program is for professionals who already advise the families we serve —
               and who want to offer them something no one else can.
             </p>
             <p className="font-sans font-light text-body-base text-text-secondary leading-[1.82] max-w-2xl mx-auto mb-12">
@@ -155,7 +155,7 @@ export default function PartnerPage() {
               A product that sells itself to the right client.
             </p>
             <a href="#apply" className="btn-monolith-amber">
-              Apply to Partner Programme →
+              Apply to Partner Program →
             </a>
           </div>
         </section>
@@ -274,7 +274,7 @@ export default function PartnerPage() {
                   </div>
                   <p className="eyebrow mb-4">Application Received</p>
                   <h3 className="font-serif text-[1.75rem] font-semibold text-text-primary leading-tight tracking-[-0.02em] mb-5">
-                    Welcome to the Programme.
+                    Welcome to the Program.
                   </h3>
                   <div
                     className="rounded-sm border border-border-amber px-6 py-4 mb-6 inline-block"

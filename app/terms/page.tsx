@@ -42,7 +42,7 @@ const SECTIONS = [
       'To the maximum extent permitted by applicable law, Heritage Nexus Inc. shall not be liable for any indirect, incidental, consequential, punitive, or special damages arising from or related to your use of the Basalith service, including but not limited to loss of data, loss of business, or loss of anticipated savings, even if we have been advised of the possibility of such damages.',
       'Our total aggregate liability to you for any claim arising out of or in connection with these Terms or the service shall not exceed the total fees paid by you to Heritage Nexus Inc. in the twelve months preceding the event giving rise to the claim.',
       'Nothing in these Terms excludes or limits our liability for death or personal injury caused by our negligence, fraud, or any other liability that cannot be excluded or limited by law.',
-      'Basalith is a data preservation and archival service. We make no representation that the Digital Clone or AI Presence features constitute a legally recognised representation of any person for the purposes of any legal proceeding, estate administration, or contractual obligation.',
+      'Basalith is a data preservation and archival service. We make no representation that the Digital Clone or AI Presence features constitute a legally recognized representation of any person for the purposes of any legal proceeding, estate administration, or contractual obligation.',
     ],
   },
   {
