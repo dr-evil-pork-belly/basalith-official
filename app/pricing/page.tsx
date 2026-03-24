@@ -61,13 +61,20 @@ const TIERS = [
   },
 ]
 
-const FOUNDING_INCLUDES = [
-  'Archive architecture & configuration',
-  'Legal framework compatibility review',
-  'Trust & estate integration assessment',
-  'Initial Essence Mapping family session',
-  'Contributor onboarding & training',
-  'Data migration from existing sources',
+const DELIVERABLES = [
+  { num: '01', title: 'Archive Architecture Build',      desc: 'Your permanent digital estate structure, configured for generational transfer and legal standing.' },
+  { num: '02', title: 'Legal Instrument Review',          desc: 'Compatibility assessment with your existing will, trust, and estate documents. Attorney-ready output.' },
+  { num: '03', title: 'Family Network Initialization',    desc: 'Contributor onboarding for up to 15 family members. Roles assigned. Access levels configured. Documented.' },
+  { num: '04', title: 'Founding Essence Session',         desc: 'Your first live family labelling session, guided by a Senior Archivist. 90 minutes. This is where it becomes real.' },
+  { num: '05', title: 'Data Migration',                   desc: 'Import from existing photo libraries, documents, and digital archives. Indexed and attributed.' },
+  { num: '06', title: 'Custodian Designation',            desc: "Your archive's legal custodian assigned and documented with formal estate standing." },
+]
+
+const FOUNDING_ESTABLISHES = [
+  'Your archive exists as a legal asset documented in your estate plan.',
+  'Your family has authenticated access with roles, permissions, and continuity.',
+  'Your Custodian is designated and has formal standing to govern the archive.',
+  'Your first Essence data is indexed, attributed, and stored with legal provenance.',
 ]
 
 const FAQ = [
@@ -128,33 +135,87 @@ export default function PricingPage() {
         {/* ── THE FOUNDING ── */}
         <section className="relative bg-obsidian-deep px-8 md:px-16 lg:px-24 py-24 overflow-hidden" aria-label="The Founding fee">
           <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-border-amber to-transparent" />
-          <div className="max-w-5xl mx-auto">
-            <div className="rounded-sm border border-border-amber p-10 md:p-14 relative overflow-hidden" style={{ background: 'linear-gradient(160deg,#221F14,#1D1B11)' }}>
-              <div className="absolute top-0 left-[10%] right-[10%] h-px bg-gradient-to-r from-transparent via-amber/50 to-transparent" />
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                <div>
-                  <div className="ai-badge mb-5"><span className="ai-dot" />One-Time Investment</div>
-                  <h2 className="font-serif font-semibold text-text-primary leading-[1.0] tracking-[-0.03em] mb-3" style={{ fontSize: 'clamp(2rem,4vw,3rem)' }}>The Founding</h2>
-                  <p className="font-sans font-light text-body-base text-text-secondary leading-[1.8] mb-6">
-                    Every Basalith archive begins with The Founding — a comprehensive onboarding that establishes
-                    your archive architecture, legal framework, and family contributor network.
-                    Paid once. Built to last centuries.
-                  </p>
-                  <div className="flex items-baseline gap-3 mb-2">
-                    <span className="font-serif font-semibold text-text-primary" style={{ fontSize: 'clamp(2.5rem,5vw,4rem)', letterSpacing: '-0.03em' }}>$2,500</span>
-                    <span className="font-sans text-[0.8rem] text-text-muted tracking-[0.08em] uppercase">one-time</span>
-                  </div>
-                  <p className="font-sans text-[0.75rem] text-text-muted">Required for all new archives. Includes first-year setup and onboarding.</p>
-                </div>
-                <div className="flex flex-col gap-3">
-                  <p className="eyebrow !text-[0.62rem] mb-2">What The Founding Includes</p>
-                  {FOUNDING_INCLUDES.map((item) => (
-                    <div key={item} className="flex items-start gap-3">
-                      <CheckIcon />
-                      <span className="font-sans text-body-sm text-text-secondary leading-[1.6]">{item}</span>
+          <div className="max-w-[860px] mx-auto rounded-sm overflow-hidden" style={{ background: '#0F0E0C', borderTop: '3px solid rgba(196,162,74,0.6)', border: '1px solid rgba(196,162,74,0.2)', borderTopColor: 'rgba(196,162,74,0.6)' }}>
+            <div className="p-10 md:p-14">
+
+              {/* Card header */}
+              <div className="flex items-start justify-between gap-4 mb-7">
+                <span className="font-sans text-[0.58rem] font-bold tracking-[0.22em] uppercase" style={{ color: '#C4A24A' }}>
+                  One-Time Engagement
+                </span>
+                <svg width="34" height="34" viewBox="0 0 34 34" fill="none" aria-hidden="true" className="flex-shrink-0 opacity-60">
+                  <polygon points="17,1 33,17 17,33 1,17" fill="none" stroke="#C4A24A" strokeWidth="1.4"/>
+                  <polygon points="17,7 27,17 17,27 7,17" fill="none" stroke="#C4A24A" strokeWidth="1.1"/>
+                  <polygon points="17,13 21,17 17,21 13,17" fill="#C4A24A"/>
+                </svg>
+              </div>
+
+              {/* Headline + sub */}
+              <h2 className="font-serif font-bold text-text-primary tracking-[-0.025em] mb-4" style={{ fontSize: '2.2rem' }}>
+                The Founding
+              </h2>
+              <p className="font-serif italic text-text-secondary leading-[1.75] mb-8" style={{ fontSize: '1rem' }}>
+                Every Basalith archive begins with The Founding —
+                a comprehensive legal and technical engagement that establishes
+                your archive&rsquo;s permanent infrastructure.
+                Executed once. Structured to last centuries.
+              </p>
+
+              {/* Divider */}
+              <div className="h-px mb-10" style={{ background: 'rgba(196,162,74,0.18)' }} />
+
+              {/* Two columns */}
+              <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-12">
+
+                {/* LEFT — deliverables */}
+                <div className="flex flex-col gap-7">
+                  {DELIVERABLES.map(({ num, title, desc }) => (
+                    <div key={num} className="flex gap-5 items-start">
+                      <span className="font-sans text-[0.62rem] font-bold tracking-[0.12em] flex-shrink-0 mt-1 w-7" style={{ color: '#C4A24A' }}>
+                        {num}
+                      </span>
+                      <div>
+                        <p className="font-sans text-[0.88rem] font-semibold text-text-primary mb-1">{title}</p>
+                        <p className="font-serif italic text-[0.9rem] text-text-secondary leading-[1.65]">{desc}</p>
+                      </div>
                     </div>
                   ))}
                 </div>
+
+                {/* RIGHT — establishes + price */}
+                <div className="flex flex-col">
+                  <p className="font-serif italic text-text-secondary mb-6" style={{ fontSize: '1rem' }}>
+                    Upon completion of The Founding,
+                  </p>
+                  <div className="flex flex-col gap-4 mb-8">
+                    {FOUNDING_ESTABLISHES.map((item) => (
+                      <div key={item} className="flex items-start gap-3">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="flex-shrink-0 mt-0.5" aria-hidden="true">
+                          <path d="M3 8l3.5 3.5L13 5" stroke="#C4A24A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        <p className="font-sans text-[0.83rem] text-text-secondary leading-[1.65]">{item}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Price block */}
+                  <div className="pt-6 mt-auto" style={{ borderTop: '1px solid rgba(196,162,74,0.12)' }}>
+                    <p className="font-serif font-bold text-text-primary leading-none mb-2" style={{ fontSize: '3rem', letterSpacing: '-0.03em' }}>
+                      $2,500
+                    </p>
+                    <p className="font-sans font-bold tracking-[0.2em] uppercase mb-3" style={{ fontSize: '0.6rem', color: '#C4A24A' }}>
+                      One-Time Engagement Fee
+                    </p>
+                    <p className="font-serif italic text-text-muted leading-[1.65] mb-3" style={{ fontSize: '0.85rem' }}>
+                      Required for all new archives. Includes your first-year stewardship selection below.
+                    </p>
+                    <p className="font-serif italic text-text-muted leading-[1.7]" style={{ fontSize: '0.8rem' }}>
+                      The Founding is executed by a Senior Archivist assigned to your family.
+                      Completion typically takes 2–3 weeks from engagement.
+                    </p>
+                  </div>
+                </div>
+
               </div>
             </div>
           </div>
@@ -199,6 +260,25 @@ export default function PricingPage() {
             ))}
           </div>
           <p className="text-center font-sans text-[0.75rem] text-text-muted mt-8">All plans require The Founding — a one-time setup investment of $2,500.</p>
+        </section>
+
+        {/* ── LEGAL FRAMING BLOCK ── */}
+        <section className="relative bg-obsidian px-8 md:px-16 lg:px-24 py-16 overflow-hidden" aria-label="Legal framing">
+          <div className="max-w-[680px] mx-auto rounded-sm px-10 py-12 text-center" style={{ background: 'rgba(196,162,74,0.04)', border: '1px solid rgba(196,162,74,0.10)' }}>
+            <p className="font-serif italic text-text-secondary leading-[1.85]" style={{ fontSize: '1.3rem' }}>
+              &ldquo;The Founding is not a setup fee.
+              It is a legal and technical engagement
+              executed by a Senior Archivist &mdash; the same
+              way an estate attorney executes a trust.
+              <br /><br />
+              You leave The Founding with six deliverables,
+              a designated Custodian, and an archive that
+              exists in your estate plan.&rdquo;
+            </p>
+            <p className="font-sans font-bold tracking-[0.22em] uppercase mt-8" style={{ fontSize: '0.44rem', color: '#C4A24A' }}>
+              All Archives Carry Legal Standing From Day One
+            </p>
+          </div>
         </section>
 
         {/* ── PARTNER PROGRAMME ── */}

@@ -97,7 +97,7 @@ function MonolithSlab() {
           {/* Footer */}
           <div className="flex justify-between items-center pt-3.5 border-t border-white/[0.07]">
             <span className="font-sans text-[0.6rem] tracking-[0.08em] text-text-muted">
-              Est. 2024 · 3 Contributors
+              Est. 2026 · 3 Contributors
             </span>
             <span className="font-serif text-[0.9rem] italic text-amber-dim">Gen I</span>
           </div>

@@ -27,6 +27,14 @@ export async function proxy(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
+  // Protect archivist portal — cookie-based password auth
+  if (pathname.startsWith('/archivist/') || pathname === '/archivist') {
+    const archivistAuth = request.cookies.get('archivist-auth')
+    if (!archivistAuth || archivistAuth.value !== process.env.ARCHIVIST_TOKEN) {
+      return NextResponse.redirect(new URL('/archivist-login', request.url))
+    }
+  }
+
   // Protect dashboard + curator routes — redirect unauthenticated users to login
   if (!user && (pathname.startsWith('/dashboard') || pathname.startsWith('/curator'))) {
     return NextResponse.redirect(new URL('/login', request.url))
@@ -41,5 +49,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/curator/:path*', '/login'],
+  matcher: ['/dashboard/:path*', '/curator/:path*', '/login', '/archivist/:path*', '/archivist'],
 }

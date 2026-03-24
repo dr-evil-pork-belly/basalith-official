@@ -51,14 +51,14 @@ function LegalDoc() {
 
         <div className="flex justify-between items-start mb-6">
           <span className="eyebrow !text-[0.6rem]">Basalith Legacy Instrument</span>
-          <span className="font-sans text-[0.6rem] text-text-muted tabular-nums">#BSL-2024-00419</span>
+          <span className="font-sans text-[0.6rem] text-text-muted tabular-nums">#BSL-2026-00419</span>
         </div>
 
         <p className="font-serif text-[1.8rem] font-semibold text-text-primary leading-[1.12] tracking-[-0.022em] mb-1.5">
           Whitfield<br />Family Archive
         </p>
         <p className="font-sans text-[0.72rem] text-text-muted mb-7">
-          Established March 2024 · Updated Annually
+          Established March 2026 · Updated Annually
         </p>
 
         <div className="divider-amber mb-6" />

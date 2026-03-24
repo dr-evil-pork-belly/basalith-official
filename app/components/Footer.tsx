@@ -89,9 +89,18 @@ export default function Footer() {
         <p className="font-sans text-[0.72rem] text-text-muted">
           © {new Date().getFullYear()} Heritage Nexus Inc. All rights reserved.
         </p>
-        <p className="font-sans text-[0.72rem] font-bold tracking-[0.14em] uppercase text-amber-dim">
-          The Asset That Never Leaves.
-        </p>
+        <div className="flex items-center gap-6">
+          <a
+            href="/join-archivists"
+            className="font-sans text-[0.62rem] tracking-[0.1em] text-text-muted no-underline hover:text-text-secondary transition-colors duration-200"
+            style={{ fontFamily: "'Space Mono', monospace" }}
+          >
+            Archivist Partners
+          </a>
+          <p className="font-sans text-[0.72rem] font-bold tracking-[0.14em] uppercase text-amber-dim">
+            The Asset That Never Leaves.
+          </p>
+        </div>
       </div>
     </>
   )
