@@ -8,8 +8,9 @@ const links = [
   { href: '#asset',       label: 'The Asset'   },
   { href: '#continuity',  label: 'Continuity'  },
   { href: '/about',       label: 'About'       },
-  { href: '/pricing',     label: 'Pricing'     },
-  { href: '/partner',     label: 'Partners'    },
+  { href: '/pricing',           label: 'Pricing'     },
+  { href: '/archive/dashboard', label: 'My Archive'  },
+  { href: '/partner',           label: 'Partners'    },
 ]
 
 export default function Nav() {

@@ -35,6 +35,14 @@ export async function proxy(request: NextRequest) {
     }
   }
 
+  // Protect archive portal — cookie-based password auth
+  if (pathname.startsWith('/archive/') || pathname === '/archive') {
+    const archiveAuth = request.cookies.get('archive-auth')
+    if (!archiveAuth || archiveAuth.value !== process.env.ARCHIVE_TOKEN) {
+      return NextResponse.redirect(new URL('/archive-login', request.url))
+    }
+  }
+
   // Protect dashboard + curator routes — redirect unauthenticated users to login
   if (!user && (pathname.startsWith('/dashboard') || pathname.startsWith('/curator'))) {
     return NextResponse.redirect(new URL('/login', request.url))
@@ -49,5 +57,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/curator/:path*', '/login', '/archivist/:path*', '/archivist'],
+  matcher: ['/dashboard/:path*', '/curator/:path*', '/login', '/archivist/:path*', '/archivist', '/archive/:path*', '/archive'],
 }
