@@ -203,15 +203,24 @@ export default function Hero() {
         </div>
 
         {/* Metrics */}
-        <div ref={ref(4)} className="reveal reveal-delay-4 flex gap-10 pt-6 border-t border-border-subtle">
-          {metrics.map(({ label, value }) => (
-            <div key={label}>
-              <span className="eyebrow !text-[0.62rem] block mb-1.5">{label}</span>
-              <span className="font-serif text-[1.9rem] font-semibold text-text-primary leading-none">
-                {value}
-              </span>
-            </div>
-          ))}
+        <div ref={ref(4)} className="reveal reveal-delay-4 pt-6 border-t border-border-subtle">
+          <div className="flex gap-10 mb-5">
+            {metrics.map(({ label, value }) => (
+              <div key={label}>
+                <span className="eyebrow !text-[0.62rem] block mb-1.5">{label}</span>
+                <span className="font-serif text-[1.9rem] font-semibold text-text-primary leading-none">
+                  {value}
+                </span>
+              </div>
+            ))}
+          </div>
+          <p
+            className="font-serif font-light leading-[1.7]"
+            style={{ fontSize: '1rem', fontStyle: 'italic', color: '#5C6166' }}
+          >
+            Upload everything.{' '}
+            <span style={{ color: '#9DA3A8' }}>Our AI finds what matters.</span>
+          </p>
         </div>
       </div>
 

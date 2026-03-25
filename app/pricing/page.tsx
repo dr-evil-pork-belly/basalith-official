@@ -66,7 +66,7 @@ const DELIVERABLES = [
   { num: '02', title: 'Legal Instrument Review',          desc: 'Compatibility assessment with your existing will, trust, and estate documents. Attorney-ready output.' },
   { num: '03', title: 'Family Network Initialization',    desc: 'Contributor onboarding for up to 15 family members. Roles assigned. Access levels configured. Documented.' },
   { num: '04', title: 'Founding Essence Session',         desc: 'Your first live family labelling session, guided by a Senior Archivist. 90 minutes. This is where it becomes real.' },
-  { num: '05', title: 'Data Migration',                   desc: 'Import from existing photo libraries, documents, and digital archives. Indexed and attributed.' },
+  { num: '05', title: 'AI-Processed Data Migration',       desc: 'Import from existing photo libraries, documents, and digital archives. Every photograph filtered, deduplicated, dated, and sequenced by our AI pipeline before it reaches the labelling interface.' },
   { num: '06', title: 'Custodian Designation',            desc: "Your archive's legal custodian assigned and documented with formal estate standing." },
 ]
 

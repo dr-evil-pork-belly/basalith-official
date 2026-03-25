@@ -61,6 +61,45 @@ export default function ContinuityPillar() {
         aria-hidden="true"
       />
 
+      {/* Before-the-labelling callout */}
+      <div
+        className="max-w-[680px] mx-auto mb-20 rounded-sm px-8 py-8 reveal"
+        style={{
+          background:  'rgba(196,162,74,0.04)',
+          border:      '1px solid rgba(196,162,74,0.1)',
+        }}
+      >
+        <p
+          style={{
+            fontFamily:    'monospace',
+            fontSize:      '0.44rem',
+            letterSpacing: '0.28em',
+            textTransform: 'uppercase' as const,
+            color:         'rgba(196,162,74,0.65)',
+            marginBottom:  '1rem',
+          }}
+        >
+          Before the Labelling Begins
+        </p>
+        <p
+          className="font-serif font-light leading-[1.85] mb-5"
+          style={{ fontSize: '1rem', color: '#9DA3A8' }}
+        >
+          Before your family labels a single photograph, our AI has already filtered
+          tens of thousands of images down to the ones that matter — organized by decade,
+          indexed by face, ranked by archive value.
+          <br /><br />
+          The labelling game begins at the emotional peak, not the organizational bottom.
+        </p>
+        <a
+          href="/#intelligence"
+          className="font-serif no-underline transition-colors duration-200"
+          style={{ fontSize: '0.88rem', fontStyle: 'italic', color: 'rgba(196,162,74,0.6)' }}
+        >
+          See how the Intelligence Layer works →
+        </a>
+      </div>
+
       {/* Header */}
       <div className="text-center max-w-[760px] mx-auto mb-24 reveal">
         <p className="eyebrow mb-5">The Continuity Pillar</p>

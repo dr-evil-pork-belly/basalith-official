@@ -108,6 +108,28 @@ input[type='range'].range-amber::-moz-range-thumb {
   cursor: pointer;
 }
 
+/* ── Archive milestone overlay ── */
+@keyframes sigilPulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.15); }
+}
+@keyframes milestoneGhostIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes milestoneMainIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes milestoneSubIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes milestoneOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
 /* ── Reduced motion ── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
