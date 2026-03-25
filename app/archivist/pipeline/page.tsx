@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 type Status = 'New' | 'Contacted' | 'Demo' | 'Proposal' | 'Closed' | 'Lost'
 type Tier   = '' | 'Archive' | 'Estate' | 'Dynasty'
@@ -11,13 +11,15 @@ type Prospect = {
   contact:     string
   status:      Status
   tier:        Tier
-  lastContact: string
-  nextAction:  string
+  last_contact: string
+  next_action:  string
+  notes:        string
+  created_at:   string
 }
 
 const STATUSES: Status[] = ['New', 'Contacted', 'Demo', 'Proposal', 'Closed', 'Lost']
 const TIERS:   Tier[]    = ['', 'Archive', 'Estate', 'Dynasty']
-const LS_KEY = 'basalith-archivist-pipeline-v1'
+const DB_CONFIGURED      = true
 
 const STATUS_COLOR: Record<Status, string> = {
   New:       '#5C6166',
@@ -28,57 +30,106 @@ const STATUS_COLOR: Record<Status, string> = {
   Lost:      '#444',
 }
 
-const EMPTY_FORM: Omit<Prospect, 'id'> = {
-  name: '', contact: '', status: 'New', tier: '', lastContact: '', nextAction: '',
+const EMPTY_FORM = {
+  name: '', contact: '', status: 'New' as Status, tier: '' as Tier,
+  last_contact: '', next_action: '', notes: '',
 }
 
-function load(): Prospect[] {
+const LS_KEY = 'basalith-archivist-pipeline-v1'
+
+function loadLocal(): Prospect[] {
   if (typeof window === 'undefined') return []
-  try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]') } catch { return [] }
-}
-
-function save(prospects: Prospect[]) {
-  localStorage.setItem(LS_KEY, JSON.stringify(prospects))
+  try {
+    return JSON.parse(localStorage.getItem(LS_KEY) || '[]').map((p: Record<string, string>) => ({
+      ...p,
+      last_contact: p.lastContact ?? p.last_contact ?? '',
+      next_action:  p.nextAction  ?? p.next_action  ?? '',
+      notes:        p.notes ?? '',
+    }))
+  } catch { return [] }
 }
 
 export default function PipelinePage() {
   const [prospects, setProspects] = useState<Prospect[]>([])
-  const [filter, setFilter]       = useState<Status | 'all'>('all')
-  const [adding, setAdding]       = useState(false)
-  const [form, setForm]           = useState<Omit<Prospect, 'id'>>(EMPTY_FORM)
+  const [filter,    setFilter]    = useState<Status | 'all'>('all')
+  const [adding,    setAdding]    = useState(false)
+  const [saving,    setSaving]    = useState(false)
+  const [form,      setForm]      = useState(EMPTY_FORM)
+  const [loading,   setLoading]   = useState(DB_CONFIGURED)
 
-  useEffect(() => { setProspects(load()) }, [])
+  const loadProspects = useCallback(async () => {
+    if (!DB_CONFIGURED) {
+      setProspects(loadLocal())
+      return
+    }
+    try {
+      const res = await fetch('/api/archivist/prospects')
+      if (!res.ok) throw new Error('API error')
+      const data = await res.json()
+      setProspects(data.prospects ?? [])
+    } catch {
+      setProspects(loadLocal())
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => { loadProspects() }, [loadProspects])
 
   function setField(key: keyof typeof EMPTY_FORM) {
-    return (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+    return (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
       setForm(f => ({ ...f, [key]: e.target.value }))
   }
 
-  function addProspect() {
+  async function addProspect() {
     if (!form.name.trim()) return
-    const p: Prospect = { ...form, id: Date.now().toString() }
-    const updated = [...prospects, p]
-    setProspects(updated)
-    save(updated)
-    setAdding(false)
-    setForm(EMPTY_FORM)
+    setSaving(true)
+    try {
+      if (DB_CONFIGURED) {
+        const res = await fetch('/api/archivist/prospects', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify(form),
+        })
+        if (!res.ok) throw new Error('Save failed')
+        const data = await res.json()
+        setProspects(prev => [data.prospect, ...prev])
+      } else {
+        const p: Prospect = { ...form, id: Date.now().toString(), created_at: new Date().toISOString() }
+        const updated = [p, ...prospects]
+        setProspects(updated)
+        localStorage.setItem(LS_KEY, JSON.stringify(updated))
+      }
+      setForm(EMPTY_FORM)
+      setAdding(false)
+    } catch {
+      // keep form open on error
+    } finally {
+      setSaving(false)
+    }
   }
 
-  function deleteProspect(id: string) {
-    const updated = prospects.filter(p => p.id !== id)
-    setProspects(updated)
-    save(updated)
+  async function updateStatus(id: string, status: Status) {
+    setProspects(prev => prev.map(p => p.id === id ? { ...p, status } : p))
+    if (DB_CONFIGURED) {
+      await fetch('/api/archivist/prospects', {
+        method:  'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ id, status }),
+      })
+    }
   }
 
-  function updateStatus(id: string, status: Status) {
-    const updated = prospects.map(p => p.id === id ? { ...p, status } : p)
-    setProspects(updated)
-    save(updated)
+  async function deleteProspect(id: string) {
+    setProspects(prev => prev.filter(p => p.id !== id))
+    if (DB_CONFIGURED) {
+      await fetch(`/api/archivist/prospects?id=${id}`, { method: 'DELETE' })
+    }
   }
 
   const filtered = filter === 'all' ? prospects : prospects.filter(p => p.status === filter)
 
-  const inputCls = 'bg-obsidian-deep border border-border-subtle rounded-sm px-3 py-2 font-sans text-[0.82rem] text-text-primary placeholder:text-text-muted focus:outline-none focus:border-amber/40 transition-colors duration-200'
+  const inputCls = 'bg-obsidian-deep border border-border-subtle rounded-sm px-3 py-2 font-sans text-[0.82rem] text-text-primary placeholder:text-text-muted focus:outline-none focus:border-amber/40 transition-colors duration-200 w-full'
 
   return (
     <div className="max-w-5xl">
@@ -90,10 +141,7 @@ export default function PipelinePage() {
             My Prospects
           </h1>
         </div>
-        <button
-          onClick={() => setAdding(true)}
-          className="btn-monolith-amber flex-shrink-0"
-        >
+        <button onClick={() => setAdding(true)} className="btn-monolith-amber flex-shrink-0">
           + Add Prospect
         </button>
       </div>
@@ -117,36 +165,56 @@ export default function PipelinePage() {
 
       {/* Add form */}
       {adding && (
-        <div className="rounded-sm border border-border-subtle p-6 mb-6" style={{ background: '#111112' }}>
-          <p className="font-sans text-[0.62rem] font-bold tracking-[0.18em] uppercase text-text-muted mb-4">New Prospect</p>
+        <div className="rounded-sm border px-6 py-6 mb-6" style={{ background: '#111112', borderColor: 'rgba(196,162,74,0.15)' }}>
+          <p className="font-sans text-[0.62rem] font-bold tracking-[0.18em] uppercase mb-5" style={{ color: 'rgba(196,162,74,0.7)' }}>
+            New Prospect
+          </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
-            <input className={inputCls + ' w-full'} placeholder="Name" value={form.name}        onChange={setField('name')}        />
-            <input className={inputCls + ' w-full'} placeholder="Contact (email / phone)" value={form.contact}     onChange={setField('contact')}     />
-            <input className={inputCls + ' w-full'} placeholder="Next action"  value={form.nextAction}  onChange={setField('nextAction')}  />
-            <select className={inputCls + ' w-full'} value={form.status} onChange={setField('status')}>
-              {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+            <input className={inputCls} placeholder="Name" value={form.name}        onChange={setField('name')}        />
+            <input className={inputCls} placeholder="Contact (email / phone)" value={form.contact}     onChange={setField('contact')}     />
+            <input className={inputCls} placeholder="Next action"  value={form.next_action}  onChange={setField('next_action')}  />
+            <select className={inputCls} value={form.status} onChange={setField('status')}>
+              {STATUSES.map(s => <option key={s} value={s} style={{ background: '#111112' }}>{s}</option>)}
             </select>
-            <select className={inputCls + ' w-full'} value={form.tier} onChange={setField('tier')}>
-              <option value="">Tier unknown</option>
-              {TIERS.filter(Boolean).map(t => <option key={t} value={t}>{t}</option>)}
+            <select className={inputCls} value={form.tier} onChange={setField('tier')}>
+              <option value="" style={{ background: '#111112' }}>Tier unknown</option>
+              {TIERS.filter(Boolean).map(t => <option key={t} value={t} style={{ background: '#111112' }}>{t}</option>)}
             </select>
-            <input className={inputCls + ' w-full'} type="date" value={form.lastContact} onChange={setField('lastContact')} />
+            <input className={inputCls} type="date" value={form.last_contact} onChange={setField('last_contact')} />
           </div>
+          <textarea
+            className={inputCls + ' resize-none mb-4'}
+            rows={2}
+            placeholder="Notes (optional)"
+            value={form.notes}
+            onChange={setField('notes')}
+          />
           <div className="flex gap-3">
-            <button onClick={addProspect} className="btn-monolith-amber">Save Prospect</button>
+            <button onClick={addProspect} disabled={saving} className="btn-monolith-amber disabled:opacity-50">
+              {saving ? 'Saving…' : 'Save Prospect'}
+            </button>
             <button onClick={() => { setAdding(false); setForm(EMPTY_FORM) }} className="btn-monolith-ghost">Cancel</button>
           </div>
         </div>
       )}
 
+      {/* Loading state */}
+      {loading && (
+        <div className="rounded-sm border border-border-subtle px-6 py-14 text-center" style={{ background: '#111112' }}>
+          <p className="font-serif italic text-text-muted" style={{ fontSize: '0.95rem' }}>Loading pipeline…</p>
+        </div>
+      )}
+
       {/* Table */}
-      {filtered.length === 0 ? (
+      {!loading && filtered.length === 0 && (
         <div className="rounded-sm border border-border-subtle px-6 py-14 text-center" style={{ background: '#111112' }}>
           <p className="font-serif italic text-text-muted" style={{ fontSize: '0.95rem' }}>
             {prospects.length === 0 ? 'No prospects yet. Add your first one above.' : 'No prospects match this filter.'}
           </p>
         </div>
-      ) : (
+      )}
+
+      {!loading && filtered.length > 0 && (
         <div className="rounded-sm border border-border-subtle overflow-hidden" style={{ background: '#111112' }}>
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -158,7 +226,7 @@ export default function PipelinePage() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map(({ id, name, contact, status, tier, lastContact, nextAction }, i) => (
+                {filtered.map(({ id, name, contact, status, tier, last_contact, next_action }, i) => (
                   <tr key={id} style={i < filtered.length - 1 ? { borderBottom: '1px solid rgba(255,255,255,0.06)' } : {}}>
                     <td className="px-4 py-3 font-sans text-[0.82rem] font-medium text-text-primary whitespace-nowrap">{name}</td>
                     <td className="px-4 py-3 font-sans text-[0.78rem] text-text-muted">{contact || '—'}</td>
@@ -173,12 +241,12 @@ export default function PipelinePage() {
                       </select>
                     </td>
                     <td className="px-4 py-3 font-sans text-[0.78rem] text-text-muted">{tier || '—'}</td>
-                    <td className="px-4 py-3 font-sans text-[0.75rem] text-text-muted whitespace-nowrap">{lastContact || '—'}</td>
-                    <td className="px-4 py-3 font-sans text-[0.78rem] text-text-secondary">{nextAction || '—'}</td>
+                    <td className="px-4 py-3 font-sans text-[0.75rem] text-text-muted whitespace-nowrap">{last_contact || '—'}</td>
+                    <td className="px-4 py-3 font-sans text-[0.78rem] text-text-secondary">{next_action || '—'}</td>
                     <td className="px-4 py-3">
                       <button
                         onClick={() => deleteProspect(id)}
-                        className="font-sans text-[0.65rem] text-text-muted hover:text-text-secondary transition-colors duration-150"
+                        className="font-sans text-[0.65rem] text-text-muted transition-colors duration-150"
                         aria-label={`Remove ${name}`}
                       >
                         ×

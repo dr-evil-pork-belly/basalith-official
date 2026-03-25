@@ -13,13 +13,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, error: 'Invalid password.' }, { status: 401 })
   }
 
-  const response = NextResponse.json({ success: true })
-  response.cookies.set('archivist-auth', process.env.ARCHIVIST_TOKEN!, {
+  const cookieOpts = {
     httpOnly: true,
     secure:   process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    sameSite: 'lax' as const,
     maxAge:   60 * 60 * 24 * 30, // 30 days
     path:     '/',
-  })
+  }
+
+  const response = NextResponse.json({ success: true })
+  response.cookies.set('archivist-auth', process.env.ARCHIVIST_TOKEN!, cookieOpts)
+  response.cookies.set('archivist-id',   process.env.DEMO_ARCHIVIST_ID!, cookieOpts)
   return response
 }

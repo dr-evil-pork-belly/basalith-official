@@ -159,6 +159,99 @@ create index if not exists idx_contributors_archive on contributors(archive_id);
 create index if not exists idx_decade_archive       on decade_coverage(archive_id);
 
 
+
+-- ═══════════════════════════════════════════════════════
+-- ARCHIVIST PORTAL — DATABASE SCHEMA
+-- ═══════════════════════════════════════════════════════
+
+-- ─────────────────────────────────────
+-- ARCHIVISTS
+-- One row per sales archivist
+-- ─────────────────────────────────────
+create table if not exists archivists (
+  id                    uuid    default gen_random_uuid() primary key,
+  created_at            timestamptz default now(),
+  name                  text    not null,
+  email                 text    not null unique,
+  phone                 text,
+  status                text    default 'active',                -- active | suspended | provisional
+  rank                  text    default 'Provisional Archivist', -- Provisional | Active | Senior | Master | Sovereign
+  total_closings        integer default 0,
+  this_month_closings   integer default 0,
+  sprint_closings       integer default 0,                       -- resets monthly
+  residual_income_cents integer default 0,                       -- annual residual in cents
+  last_active           timestamptz
+);
+
+-- ─────────────────────────────────────
+-- PROSPECTS
+-- CRM rows per archivist
+-- ─────────────────────────────────────
+create table if not exists prospects (
+  id              uuid    default gen_random_uuid() primary key,
+  created_at      timestamptz default now(),
+  updated_at      timestamptz default now(),
+  archivist_id    uuid    references archivists(id) on delete cascade,
+  name            text    not null,
+  contact         text,
+  status          text    default 'New',  -- New | Contacted | Demo | Proposal | Closed | Lost
+  tier            text    default '',     -- Archive | Estate | Dynasty | ''
+  last_contact    date,
+  next_action     text,
+  notes           text,
+  closed_at       timestamptz
+);
+
+-- ─────────────────────────────────────
+-- COMMISSIONS
+-- Earning history per archivist
+-- ─────────────────────────────────────
+create table if not exists commissions (
+  id              uuid    default gen_random_uuid() primary key,
+  created_at      timestamptz default now(),
+  archivist_id    uuid    references archivists(id) on delete cascade,
+  prospect_id     uuid    references prospects(id) on delete set null,
+  type            text    not null,              -- founding | residual | sprint | override
+  amount_cents    integer not null,
+  status          text    default 'pending',     -- pending | paid
+  description     text,
+  paid_at         timestamptz
+);
+
+-- ─────────────────────────────────────
+-- LEADERBOARD VIEW
+-- Ordered by this_month_closings desc
+-- ─────────────────────────────────────
+create or replace view archivist_leaderboard as
+  select
+    a.id,
+    a.name,
+    a.rank,
+    a.total_closings,
+    a.this_month_closings,
+    a.sprint_closings,
+    a.residual_income_cents,
+    coalesce(
+      (select p.tier from prospects p
+       where p.archivist_id = a.id and p.status = 'Closed' and p.tier != ''
+       order by
+         case p.tier when 'Dynasty' then 3 when 'Estate' then 2 when 'Archive' then 1 else 0 end desc
+       limit 1),
+      'Archive'
+    ) as top_tier
+  from archivists a
+  where a.status = 'active'
+  order by a.this_month_closings desc, a.total_closings desc;
+
+-- ─────────────────────────────────────
+-- INDEXES for archivist tables
+-- ─────────────────────────────────────
+create index if not exists idx_prospects_archivist  on prospects(archivist_id);
+create index if not exists idx_prospects_status     on prospects(archivist_id, status);
+create index if not exists idx_commissions_archivist on commissions(archivist_id);
+create index if not exists idx_commissions_status   on commissions(archivist_id, status);
+
+
 -- ═══════════════════════════════════════════════════════
 -- STORAGE SETUP (manual steps in Supabase Dashboard)
 -- ═══════════════════════════════════════════════════════

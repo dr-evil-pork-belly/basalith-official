@@ -3,8 +3,8 @@
 import { useState, useEffect, useCallback } from 'react'
 
 // ─── Set this to your Supabase archive UUID after running schema.sql ─────────
-const DEMO_ARCHIVE_ID = 'will-be-set-after-db-setup'
-const DB_CONFIGURED   = DEMO_ARCHIVE_ID !== 'will-be-set-after-db-setup'
+const DEMO_ARCHIVE_ID = 'f44f1818-8f17-499d-8f27-23e286e923f7'
+const DB_CONFIGURED   = true
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

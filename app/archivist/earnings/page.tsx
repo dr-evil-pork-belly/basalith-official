@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 type TierKey = 'Archive' | 'Estate' | 'Dynasty'
 
@@ -27,8 +27,28 @@ const SPRINTS = [
   { trigger: '#1 on leaderboard', bonus: '$2,500' },
 ]
 
+type CommissionRow = {
+  id:           string
+  created_at:   string
+  type:         string
+  amount_cents: number
+  status:       string
+  description:  string
+}
+
+type ArchivistSummary = {
+  total_closings:        number
+  this_month_closings:   number
+  residual_income_cents: number
+  rank:                  string
+}
+
 function fmt(n: number) {
   return '$' + Math.round(n).toLocaleString('en-US')
+}
+
+function fmtCents(cents: number) {
+  return '$' + (cents / 100).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
 }
 
 function Heading({ children }: { children: React.ReactNode }) {
@@ -46,13 +66,35 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 }
 
 export default function EarningsPage() {
-  const [closings, setClosings] = useState(5)
-  const [tier, setTier]         = useState<TierKey>('Estate')
+  const [closings,    setClosings]    = useState(5)
+  const [tier,        setTier]        = useState<TierKey>('Estate')
+  const [archivist,   setArchivist]   = useState<ArchivistSummary | null>(null)
+  const [commissions, setCommissions] = useState<CommissionRow[]>([])
+  const [loadingData, setLoadingData] = useState(true)
+
+  useEffect(() => {
+    fetch('/api/archivist/dashboard')
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (!data) return
+        setArchivist(data.archivist)
+        setCommissions(data.commissions ?? [])
+        if (data.archivist?.this_month_closings > 0) {
+          setClosings(data.archivist.this_month_closings)
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoadingData(false))
+  }, [])
 
   const upfront        = closings * 1000
   const annualResidual = closings * 12 * TIER_DATA[tier].residual
   const year1Total     = Math.round(closings * 12 * 1000 + closings * TIER_DATA[tier].residual * 6.5)
   const sprintEligible = closings >= 5
+
+  // Totals from real data
+  const totalEarned  = commissions.filter(c => c.status === 'paid').reduce((s, c) => s + c.amount_cents, 0)
+  const totalPending = commissions.filter(c => c.status === 'pending').reduce((s, c) => s + c.amount_cents, 0)
 
   return (
     <div className="max-w-4xl flex flex-col gap-16">
@@ -63,6 +105,70 @@ export default function EarningsPage() {
           Commission &amp; Residual Structure
         </h1>
       </div>
+
+      {/* ── REAL EARNINGS SUMMARY ── */}
+      {!loadingData && archivist && (
+        <div>
+          <Eyebrow>Your Summary</Eyebrow>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+            {[
+              { label: 'Total Earned',    value: fmtCents(totalEarned),                       sub: 'All paid commissions'          },
+              { label: 'Pending',         value: fmtCents(totalPending),                      sub: 'Awaiting payment cycle'        },
+              { label: 'Annual Residual', value: fmtCents(archivist.residual_income_cents),   sub: 'Current run rate'              },
+              { label: 'Total Closings',  value: String(archivist.total_closings),             sub: archivist.rank                 },
+            ].map(({ label, value, sub }) => (
+              <div key={label} className="rounded-sm border border-border-subtle px-5 py-5" style={{ background: '#111112' }}>
+                <p className="font-sans text-[0.58rem] font-bold tracking-[0.16em] uppercase text-text-muted mb-2">{label}</p>
+                <p className="font-serif font-semibold text-text-primary" style={{ fontSize: '1.6rem', letterSpacing: '-0.025em', color: '#C4A24A' }}>{value}</p>
+                <p className="font-sans text-[0.62rem] text-text-muted mt-1">{sub}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Commission history */}
+          {commissions.length > 0 && (
+            <div className="rounded-sm border border-border-subtle overflow-hidden" style={{ background: '#111112' }}>
+              <div className="px-6 py-4 border-b border-border-subtle">
+                <p className="font-sans text-[0.6rem] font-bold tracking-[0.18em] uppercase text-text-muted">Commission History</p>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                      {['Date', 'Description', 'Type', 'Amount', 'Status'].map(h => (
+                        <th key={h} className="text-left px-5 py-3 font-sans text-[0.58rem] font-bold tracking-[0.14em] uppercase text-text-muted">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {commissions.map((c, i) => (
+                      <tr key={c.id} style={i < commissions.length - 1 ? { borderBottom: '1px solid rgba(255,255,255,0.04)' } : {}}>
+                        <td className="px-5 py-3 font-sans text-[0.72rem] text-text-muted whitespace-nowrap">
+                          {new Date(c.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </td>
+                        <td className="px-5 py-3 font-sans text-[0.78rem] text-text-secondary">{c.description || '—'}</td>
+                        <td className="px-5 py-3">
+                          <span className="font-sans text-[0.62rem] font-bold tracking-[0.08em] uppercase px-2 py-0.5 rounded-sm capitalize"
+                            style={{ background: 'rgba(255,255,255,0.05)', color: '#9DA3A8' }}>
+                            {c.type}
+                          </span>
+                        </td>
+                        <td className="px-5 py-3 font-serif font-semibold" style={{ fontSize: '1rem', color: '#C4A24A', letterSpacing: '-0.02em' }}>
+                          {fmtCents(c.amount_cents)}
+                        </td>
+                        <td className="px-5 py-3 font-sans text-[0.72rem] capitalize"
+                          style={{ color: c.status === 'paid' ? '#4CAF50' : '#9DA3A8' }}>
+                          {c.status}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ── CALCULATOR ── */}
       <div>

@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from 'react'
 
+// ─── Set to your Supabase archive UUID ───────────────────────────────────────
+const DEMO_ARCHIVE_ID = 'f44f1818-8f17-499d-8f27-23e286e923f7'
+
 type Contributor = {
   id:        string
   name:      string
