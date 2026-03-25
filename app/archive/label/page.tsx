@@ -2,6 +2,10 @@
 
 import { useState, useRef, useEffect } from 'react'
 
+// ─── Set this to your Supabase archive UUID after running schema.sql ─────────
+const DEMO_ARCHIVE_ID = 'will-be-set-after-db-setup'
+const DB_CONFIGURED   = DEMO_ARCHIVE_ID !== 'will-be-set-after-db-setup'
+
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 type ArchiveItem = {
@@ -271,26 +275,62 @@ export default function LabelPage() {
     }
 
     try {
+      // Always cache to localStorage for offline resilience
       const items: ArchiveItem[] = JSON.parse(localStorage.getItem('archive-items') || '[]')
       items.unshift(newItem)
       localStorage.setItem('archive-items', JSON.stringify(items))
 
-      const newTotal  = items.length
-      const newStreak = streak + 1
-      localStorage.setItem('archive-streak', String(newStreak))
-      setStreak(newStreak)
-      setTotalLabeled(newTotal)
+      let localTotal  = items.length
+      let localStreak = streak + 1
+      localStorage.setItem('archive-streak', String(localStreak))
 
-      if (MILESTONE_THRESHOLDS.includes(newTotal)) {
-        setMilestoneCount(newTotal)
+      // Build API payload with correct field names
+      const peopleTagged = form.people
+        ? form.people.split(',').map(s => s.trim()).filter(Boolean)
+        : []
+
+      const payload = {
+        archiveId:           DEMO_ARCHIVE_ID,
+        photoBase64:         form.imageData ?? null,
+        photoName:           form.imageData ? 'photo.jpg' : null,
+        whatWasHappening:    form.story || null,
+        legacyNote:          form.essence || null,
+        yearTaken:           form.year    || null,
+        seasonTaken:         form.season  || null,
+        location:            form.location || null,
+        peopleTagged,
+        invitedContributor:  form.inviteEmail || null,
+        labelledBy:          form.contributor || 'owner',
       }
 
-      await fetch('/api/archive/save', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ ...newItem, imageData: undefined }),
-      }).catch(() => {})
+      // Try real DB save — use response values if successful
+      if (DB_CONFIGURED) {
+        try {
+          const res  = await fetch('/api/archive/save', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(payload),
+          })
+          if (res.ok) {
+            const data = await res.json()
+            if (!data.mock) {
+              localTotal  = data.archiveDepth  ?? localTotal
+              localStreak = data.streak        ?? localStreak
+              if (data.milestoneReached) setMilestoneCount(data.milestoneReached)
+            }
+          }
+        } catch {
+          // DB failed — milestones fall back to localStorage count
+        }
+      }
 
+      // Milestone check (localStorage-based when DB not configured)
+      if (!DB_CONFIGURED && MILESTONE_THRESHOLDS.includes(localTotal)) {
+        setMilestoneCount(localTotal)
+      }
+
+      setStreak(localStreak)
+      setTotalLabeled(localTotal)
       setSaved(true)
     } finally {
       setSaving(false)

@@ -1,0 +1,49 @@
+import { supabaseAdmin } from '@/lib/supabase-admin'
+import { NextRequest, NextResponse } from 'next/server'
+
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url)
+  const archiveId = searchParams.get('archiveId')
+
+  if (!archiveId || archiveId === 'will-be-set-after-db-setup') {
+    return NextResponse.json({ error: 'archiveId required' }, { status: 400 })
+  }
+
+  const [archive, decades, recentLabels, contributors] = await Promise.all([
+    supabaseAdmin
+      .from('archives')
+      .select('*')
+      .eq('id', archiveId)
+      .single(),
+
+    supabaseAdmin
+      .from('decade_coverage')
+      .select('decade, photo_count, labelled_count')
+      .eq('archive_id', archiveId)
+      .order('decade'),
+
+    supabaseAdmin
+      .from('labels')
+      .select('id, created_at, what_was_happening, year_taken, location, labelled_by, photograph_id')
+      .eq('archive_id', archiveId)
+      .order('created_at', { ascending: false })
+      .limit(10),
+
+    supabaseAdmin
+      .from('contributors')
+      .select('id, name, email, role, status, photos_labelled')
+      .eq('archive_id', archiveId)
+      .eq('status', 'active'),
+  ])
+
+  if (archive.error) {
+    return NextResponse.json({ error: 'Archive not found' }, { status: 404 })
+  }
+
+  return NextResponse.json({
+    archive:      archive.data,
+    decades:      decades.data      ?? [],
+    recentLabels: recentLabels.data ?? [],
+    contributors: contributors.data ?? [],
+  })
+}
