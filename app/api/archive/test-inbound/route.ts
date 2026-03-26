@@ -5,10 +5,11 @@ export async function GET() {
 
   return NextResponse.json({
     replyDomain,
-    fromEmail:              process.env.RESEND_FROM_EMAIL         || null,
-    resendConfigured:       !!process.env.RESEND_API_KEY,
+    fromEmail:               process.env.RESEND_FROM_EMAIL  || 'NOT SET',
+    resendConfigured:        !!process.env.RESEND_API_KEY,
     webhookSecretConfigured: !!process.env.RESEND_WEBHOOK_SECRET,
-    supabaseConfigured:     !!process.env.NEXT_PUBLIC_SUPABASE_URL,
-    sampleReplyAddress:     `morrison-test123@${replyDomain}`,
+    supabaseConfigured:      !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+    inngestConfigured:       !!process.env.INNGEST_EVENT_KEY,
+    sampleReplyAddress:      `morrison-test123@${replyDomain}`,
   })
 }
