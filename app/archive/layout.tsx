@@ -8,6 +8,7 @@ const NAV = [
   { href: '/archive/label',        label: 'Label'        },
   { href: '/archive/gallery',      label: 'Gallery'      },
   { href: '/archive/contributors', label: 'Contributors' },
+  { href: '/archive/preferences',  label: 'Email Delivery' },
 ]
 
 export default function ArchiveLayout({ children }: { children: React.ReactNode }) {

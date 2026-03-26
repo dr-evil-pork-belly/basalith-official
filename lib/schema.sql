@@ -273,3 +273,73 @@ create index if not exists idx_commissions_status   on commissions(archivist_id,
 -- so server-side uploads use the service role key (full access).
 -- The Storage policies above apply to future direct-browser uploads.
 -- ═══════════════════════════════════════════════════════
+
+
+-- ═══════════════════════════════════════════════════════
+-- EMAIL LABELLING SYSTEM
+-- ═══════════════════════════════════════════════════════
+
+-- ─────────────────────────────────────
+-- EMAIL SESSIONS
+-- Tracks each photograph email sent
+-- ─────────────────────────────────────
+create table if not exists email_sessions (
+  id                    uuid        default gen_random_uuid() primary key,
+  created_at            timestamptz default now(),
+  archive_id            uuid        references archives(id) on delete cascade,
+  photograph_id         uuid        references photographs(id),
+  sent_at               timestamptz,
+  reply_window_closes   timestamptz,              -- 48 hours after sent_at
+  recipients            text[],                   -- array of contributor emails
+  reply_count           integer     default 0,
+  summary_sent          boolean     default false,
+  subject_line          text,
+  reply_address         text        unique         -- e.g. whitfield-abc123@reply.basalith.xyz
+);
+
+-- ─────────────────────────────────────
+-- EMAIL REPLIES
+-- Each reply to a photograph email
+-- ─────────────────────────────────────
+create table if not exists email_replies (
+  id                  uuid        default gen_random_uuid() primary key,
+  created_at          timestamptz default now(),
+  session_id          uuid        references email_sessions(id),
+  archive_id          uuid        references archives(id),
+  photograph_id       uuid        references photographs(id),
+
+  contributor_email   text        not null,
+  contributor_name    text,
+
+  raw_reply           text        not null,
+
+  -- AI parsed fields
+  people_mentioned    text[],
+  year_estimate       text,
+  location_mentioned  text,
+  story_extracted     text,
+  legacy_note         text,
+
+  ai_parsed           boolean     default false,
+  saved_to_archive    boolean     default false,
+  confirmation_sent   boolean     default false
+);
+
+-- ─────────────────────────────────────
+-- EMAIL PREFERENCES
+-- Per-archive delivery settings
+-- ─────────────────────────────────────
+create table if not exists email_preferences (
+  id            uuid        default gen_random_uuid() primary key,
+  archive_id    uuid        references archives(id) on delete cascade unique,
+  cadence       text        default 'daily',         -- daily | three_weekly | weekly | paused
+  send_time     text        default '21:00',          -- HH:MM local time
+  timezone      text        default 'America/New_York',
+  active        boolean     default true,
+  last_sent_at  timestamptz,
+  next_send_at  timestamptz
+);
+
+create index if not exists idx_email_sessions_archive  on email_sessions(archive_id);
+create index if not exists idx_email_replies_session   on email_replies(session_id);
+create index if not exists idx_email_prefs_next_send   on email_preferences(next_send_at) where active = true;

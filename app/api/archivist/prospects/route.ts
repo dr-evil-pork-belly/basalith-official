@@ -1,13 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 
-function getArchivistId(req: NextRequest): string | null {
-  return req.cookies.get('archivist-id')?.value ?? process.env.DEMO_ARCHIVIST_ID ?? null
-}
-
 // GET /api/archivist/prospects
 export async function GET(req: NextRequest) {
-  const archivistId = getArchivistId(req)
+  const archivistId = req.nextUrl.searchParams.get('archivistId')
   if (!archivistId) return NextResponse.json({ error: 'No archivist ID' }, { status: 400 })
 
   const { data, error } = await supabaseAdmin
@@ -22,10 +18,10 @@ export async function GET(req: NextRequest) {
 
 // POST /api/archivist/prospects
 export async function POST(req: NextRequest) {
-  const archivistId = getArchivistId(req)
+  const body = await req.json()
+  const archivistId: string | null = body.archivistId ?? null
   if (!archivistId) return NextResponse.json({ error: 'No archivist ID' }, { status: 400 })
 
-  const body = await req.json()
   const { name, contact, status, tier, last_contact, next_action, notes } = body
 
   if (!name?.trim()) {
@@ -53,11 +49,11 @@ export async function POST(req: NextRequest) {
 
 // PATCH /api/archivist/prospects
 export async function PATCH(req: NextRequest) {
-  const archivistId = getArchivistId(req)
+  const body = await req.json()
+  const archivistId: string | null = body.archivistId ?? null
   if (!archivistId) return NextResponse.json({ error: 'No archivist ID' }, { status: 400 })
 
-  const body = await req.json()
-  const { id, ...updates } = body
+  const { id, archivistId: _aid, ...updates } = body
 
   if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 })
 
@@ -81,9 +77,9 @@ export async function PATCH(req: NextRequest) {
   return NextResponse.json({ prospect: data })
 }
 
-// DELETE /api/archivist/prospects?id=xxx
+// DELETE /api/archivist/prospects?id=xxx&archivistId=xxx
 export async function DELETE(req: NextRequest) {
-  const archivistId = getArchivistId(req)
+  const archivistId = req.nextUrl.searchParams.get('archivistId')
   if (!archivistId) return NextResponse.json({ error: 'No archivist ID' }, { status: 400 })
 
   const id = req.nextUrl.searchParams.get('id')

@@ -2,12 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 
 export async function GET(req: NextRequest) {
-  const archivistId =
-    req.cookies.get('archivist-id')?.value ??
-    process.env.DEMO_ARCHIVIST_ID
+  const archivistId = req.nextUrl.searchParams.get('id')
 
   if (!archivistId) {
-    return NextResponse.json({ error: 'No archivist ID' }, { status: 400 })
+    return NextResponse.json({ error: 'archivistId required' }, { status: 400 })
   }
 
   const [
@@ -45,13 +43,11 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Archivist not found' }, { status: 404 })
   }
 
-  // Pipeline counts by status
   const pipelineCounts: Record<string, number> = {}
   for (const p of (prospects ?? [])) {
     pipelineCounts[p.status] = (pipelineCounts[p.status] ?? 0) + 1
   }
 
-  // Today's actions: prospects with next_action set
   const todaysActions = (prospects ?? [])
     .filter(p => p.next_action && p.status !== 'Closed' && p.status !== 'Lost')
     .slice(0, 5)
@@ -60,8 +56,8 @@ export async function GET(req: NextRequest) {
     archivist,
     pipelineCounts,
     todaysActions,
-    commissions: commissions ?? [],
-    leaderboard: leaderboard ?? [],
+    commissions:    commissions    ?? [],
+    leaderboard:    leaderboard    ?? [],
     leaderboardError: leaderboardErr?.message ?? null,
   })
 }
