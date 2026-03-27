@@ -343,3 +343,7 @@ create table if not exists email_preferences (
 create index if not exists idx_email_sessions_archive  on email_sessions(archive_id);
 create index if not exists idx_email_replies_session   on email_replies(session_id);
 create index if not exists idx_email_prefs_next_send   on email_preferences(next_send_at) where active = true;
+
+-- Add resend_email_id for idempotent reply processing
+alter table email_replies
+  add column if not exists resend_email_id text unique;

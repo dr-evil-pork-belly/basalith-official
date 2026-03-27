@@ -34,8 +34,10 @@ export default function PreferencesClient({ archiveId }: { archiveId: string }) 
   const [loading,   setLoading]   = useState(true)
   const [saving,    setSaving]    = useState(false)
   const [sending,   setSending]   = useState(false)
+  const [checking,  setChecking]  = useState(false)
   const [saved,     setSaved]     = useState(false)
   const [testMsg,   setTestMsg]   = useState<string | null>(null)
+  const [replyMsg,  setReplyMsg]  = useState<string | null>(null)
 
   useEffect(() => {
     fetch(`/api/archive/preferences?archiveId=${archiveId}`)
@@ -67,6 +69,30 @@ export default function PreferencesClient({ archiveId }: { archiveId: string }) 
       // keep form open
     } finally {
       setSaving(false)
+    }
+  }
+
+  async function checkReplies() {
+    setChecking(true)
+    setReplyMsg(null)
+    try {
+      const res = await fetch('/api/archive/poll-replies', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ manual: true }),
+      })
+      const data = await res.json()
+      if (data.error) {
+        setReplyMsg(`Error: ${data.error}`)
+      } else {
+        setReplyMsg(data.processed > 0
+          ? `Found and saved ${data.processed} new ${data.processed === 1 ? 'reply' : 'replies'}.`
+          : 'No new replies found.')
+      }
+    } catch {
+      setReplyMsg('Failed to check replies.')
+    } finally {
+      setChecking(false)
     }
   }
 
@@ -190,6 +216,30 @@ export default function PreferencesClient({ archiveId }: { archiveId: string }) 
         {saved && (
           <p className="font-sans text-[0.72rem]" style={{ color: '#4CAF50' }}>Preferences updated.</p>
         )}
+      </div>
+
+      {/* Check replies */}
+      <div className="rounded-sm border border-[rgba(255,255,255,0.06)] px-6 py-6 mb-4" style={{ background: '#111112' }}>
+        <p className="font-sans text-[0.6rem] font-bold tracking-[0.18em] uppercase text-[#5C6166] mb-2">
+          Check for Replies
+        </p>
+        <p className="font-sans text-[0.75rem] mb-5" style={{ color: '#5C6166' }}>
+          Fetch and process any new replies from contributors that arrived since the last check.
+        </p>
+        <div className="flex items-center gap-4 flex-wrap">
+          <button
+            onClick={checkReplies}
+            disabled={checking}
+            className="btn-monolith-ghost disabled:opacity-50"
+          >
+            {checking ? 'Checking…' : 'Check for Replies →'}
+          </button>
+          {replyMsg && (
+            <p className="font-sans text-[0.72rem]" style={{ color: replyMsg.startsWith('Found') ? '#4CAF50' : '#9DA3A8' }}>
+              {replyMsg}
+            </p>
+          )}
+        </div>
       </div>
 
       {/* Test send */}

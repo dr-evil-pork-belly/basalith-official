@@ -40,5 +40,19 @@ export async function GET(req: NextRequest) {
     }
   }
 
+  // Also poll for any new inbound replies
+  try {
+    await fetch(`${siteUrl}/api/archive/poll-replies`, {
+      method:  'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': `Bearer ${process.env.CRON_SECRET}`,
+      },
+      body: JSON.stringify({ manual: false }),
+    })
+  } catch {
+    // Non-fatal — photo sends already completed
+  }
+
   return NextResponse.json({ processed: results.length, results })
 }
