@@ -10,17 +10,29 @@ const anthropic = new Anthropic()
 // The SDK does not support inbound/receiving endpoints yet — use REST directly.
 
 async function fetchReceivedEmails() {
-  const response = await fetch('https://api.resend.com/emails?limit=50', {
+  const url = 'https://api.resend.com/emails/receiving?limit=50'
+
+  console.log('Fetching received emails from:', url)
+
+  const response = await fetch(url, {
     headers: {
       'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
       'Content-Type':  'application/json',
     },
   })
+
+  console.log('Resend API status:', response.status)
+
   if (!response.ok) {
-    console.error('Resend API error:', response.status)
+    const errorText = await response.text()
+    console.error('Resend API error:', response.status, errorText)
     return []
   }
+
   const data = await response.json()
+  console.log('Resend API response keys:', Object.keys(data))
+  console.log('Email count:', data?.data?.length ?? 0)
+
   return (data?.data ?? data ?? []) as unknown[]
 }
 
