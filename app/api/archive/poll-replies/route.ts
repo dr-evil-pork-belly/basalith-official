@@ -92,9 +92,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ processed: 0, message: 'No active email sessions found' })
     }
 
+    // Normalise keys to lowercase for case-insensitive matching
     const sessionMap: Record<string, typeof sessions[number]> = {}
     for (const session of sessions) {
-      if (session.reply_address) sessionMap[session.reply_address] = session
+      if (session.reply_address) {
+        sessionMap[session.reply_address.toLowerCase()] = session
+      }
     }
 
     console.log('Active session addresses:', Object.keys(sessionMap))
@@ -127,15 +130,31 @@ export async function POST(req: Request) {
         })
 
         // Match To address to an active session
-        const toAddresses = Array.isArray(email.to) ? email.to : [email.to]
+        // Handle "Name <email>" display-name format and object shapes
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const toAddresses = (Array.isArray(email.to) ? email.to : [email.to]).map((addr: any) => {
+          if (!addr) return ''
+          const str = typeof addr === 'object'
+            ? (addr.email ?? addr.address ?? '')
+            : String(addr)
+          const match = str.match(/<([^>]+)>/)
+          return match ? match[1].toLowerCase() : str.toLowerCase().trim()
+        }).filter(Boolean)
+
         let matchedSession: typeof sessions[number] | null = null
+        let matchedAddress: string | null = null
 
         for (const toAddr of toAddresses) {
-          const addr = typeof toAddr === 'object' && toAddr !== null
-            ? (toAddr as { email?: string }).email ?? ''
-            : String(toAddr ?? '')
-          if (sessionMap[addr]) { matchedSession = sessionMap[addr]; break }
+          if (sessionMap[toAddr]) {
+            matchedSession  = sessionMap[toAddr]
+            matchedAddress  = toAddr
+            break
+          }
         }
+
+        console.log('Normalized to addresses:', toAddresses)
+        console.log('Session keys:', Object.keys(sessionMap))
+        console.log('Match found:', !!matchedSession)
 
         if (!matchedSession) {
           console.log('No session match for to:', toAddresses)
