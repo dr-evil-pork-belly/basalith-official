@@ -97,6 +97,8 @@ export async function POST(req: Request) {
       if (session.reply_address) sessionMap[session.reply_address] = session
     }
 
+    console.log('Active session addresses:', Object.keys(sessionMap))
+
     // Fetch all emails from Resend
     const receivedEmails = await fetchReceivedEmails()
 
@@ -112,10 +114,18 @@ export async function POST(req: Request) {
         id?: string; email_id?: string
         to?: string | string[] | Array<{ email?: string }>
         from?: string | { email?: string; name?: string }
+        subject?: string
         text?: string; html?: string
       }
 
       try {
+        console.log('Processing email:', {
+          id:      email.id ?? email.email_id,
+          to:      email.to,
+          from:    email.from,
+          subject: email.subject,
+        })
+
         // Match To address to an active session
         const toAddresses = Array.isArray(email.to) ? email.to : [email.to]
         let matchedSession: typeof sessions[number] | null = null
@@ -127,7 +137,10 @@ export async function POST(req: Request) {
           if (sessionMap[addr]) { matchedSession = sessionMap[addr]; break }
         }
 
-        if (!matchedSession) continue
+        if (!matchedSession) {
+          console.log('No session match for to:', toAddresses)
+          continue
+        }
 
         const emailId = email.id ?? email.email_id
         if (!emailId) continue
