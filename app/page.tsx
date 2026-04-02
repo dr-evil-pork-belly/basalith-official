@@ -1,12 +1,10 @@
-import Nav                from './components/Nav'
-import Hero               from './components/Hero'
-import MarqueeStrip       from './components/MarqueeStrip'
-import Comparison         from './components/Comparison'
-import AssetPillar        from './components/AssetPillar'
-import IntelligenceLayer  from './components/IntelligenceLayer'
-import ContinuityPillar   from './components/ContinuityPillar'
-import CtaSection         from './components/CtaSection'
-import Footer             from './components/Footer'
+import Nav             from './components/Nav'
+import Hero            from './components/Hero'
+import LetterSection   from './components/LetterSection'
+import ProductOverview from './components/ProductOverview'
+import EleanorSection  from './components/EleanorSection'
+import CtaSection      from './components/CtaSection'
+import Footer          from './components/Footer'
 
 export default function HomePage() {
   return (
@@ -14,11 +12,9 @@ export default function HomePage() {
       <Nav />
       <main>
         <Hero />
-        <MarqueeStrip />
-        <Comparison />
-        <AssetPillar />
-        <IntelligenceLayer />
-        <ContinuityPillar />
+        <LetterSection />
+        <ProductOverview />
+        <EleanorSection />
         <CtaSection />
       </main>
       <Footer />

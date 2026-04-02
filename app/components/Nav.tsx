@@ -4,13 +4,13 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 
 const links = [
-  { href: '#comparison',  label: 'The Method'  },
-  { href: '#asset',       label: 'The Asset'   },
-  { href: '#continuity',  label: 'Continuity'  },
-  { href: '/about',       label: 'About'       },
-  { href: '/pricing',           label: 'Pricing'     },
-  { href: '/archive/dashboard', label: 'My Archive'  },
-  { href: '/partner',           label: 'Partners'    },
+  { href: '/#product',          label: 'The Method' },
+  { href: '/#product',          label: 'The Asset'  },
+  { href: '/custodianship',     label: 'Continuity' },
+  { href: '/pricing',           label: 'Pricing'    },
+  { href: '/about',             label: 'About'      },
+  { href: '/archive/dashboard', label: 'My Archive' },
+  { href: '/partner',           label: 'Partners'   },
 ]
 
 export default function Nav() {
