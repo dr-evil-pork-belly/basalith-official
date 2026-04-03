@@ -4,22 +4,16 @@ export default function ProductOverview() {
       eyebrow: 'The Asset',
       headline: 'A life fully documented.',
       body: 'Every photograph labeled. Every story preserved. Every decade of your life captured by the people who lived it alongside you.',
-      linkLabel: 'How it works →',
-      linkHref: '/custodianship',
     },
     {
       eyebrow: 'The Intelligence',
       headline: 'An AI that learns how you think.',
       body: 'Our seven-layer pipeline filters, organizes, and prioritizes your archive automatically. Your entity grows more accurate with every deposit.',
-      linkLabel: 'The intelligence layer →',
-      linkHref: '/custodianship',
     },
     {
       eyebrow: 'The Continuity',
       headline: 'Centuries, not decades.',
       body: 'The entity improves with every generation of AI. What begins as a reasonable representation becomes, over decades, something extraordinarily accurate.',
-      linkLabel: 'What permanence means →',
-      linkHref: '/custodianship',
     },
   ]
 
@@ -93,20 +87,6 @@ export default function ProductOverview() {
               {card.body}
             </p>
 
-            <a
-              href={card.linkHref}
-              style={{
-                fontFamily:  'var(--font-serif, Georgia, serif)',
-                fontSize:    '0.9rem',
-                fontStyle:   'italic',
-                color:       'rgba(196,162,74,1)',
-                textDecoration: 'none',
-                marginTop:   '0.5rem',
-                display:     'inline-block',
-              }}
-            >
-              {card.linkLabel}
-            </a>
           </div>
         ))}
       </div>
