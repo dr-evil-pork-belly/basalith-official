@@ -226,13 +226,6 @@ export default function Hero() {
               </div>
             ))}
           </div>
-          <p
-            className="font-serif font-light leading-[1.7]"
-            style={{ fontSize: '1rem', fontStyle: 'italic', color: '#5C6166' }}
-          >
-            Upload everything.{' '}
-            <span style={{ color: '#9DA3A8' }}>Our AI finds what matters.</span>
-          </p>
         </div>
       </div>
 
