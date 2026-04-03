@@ -11,19 +11,21 @@ const COLS = [
   {
     heading: 'Legal',
     links: [
-      { label: 'Estate Integration', href: '#' },
-      { label: 'Trust Compatibility', href: '#' },
-      { label: 'Data Ownership',     href: '/data-ownership' },
-      { label: 'Privacy Policy',     href: '/privacy-policy' },
-      { label: 'Terms of Service',   href: '/terms'          },
+      { label: 'Privacy Policy',   href: '/privacy'          },
+      { label: 'Terms of Service', href: '/terms'            },
+      { label: 'Data Ownership',   href: '/data-ownership'   },
+      { label: 'Custodianship',    href: '/custodianship'    },
     ],
   },
   {
     heading: 'Company',
     links: [
-      { label: 'About Basalith',    href: '/about'   },
-      { label: 'Partner Program', href: '/partner' },
-      { label: 'Contact',           href: '/contact' },
+      { label: 'About',                href: '/about'                 },
+      { label: 'The Founding Session', href: '/founding-session'      },
+      { label: 'Join Archivists',      href: '/join-archivists'       },
+      { label: 'Partners',             href: '/partner'               },
+      { label: 'For Families',         href: '/posthumous-archive'    },
+      { label: 'Contact',              href: '/contact'               },
     ],
   },
 ]

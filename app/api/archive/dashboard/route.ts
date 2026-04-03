@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'archiveId required' }, { status: 400 })
   }
 
-  const [archive, decades, recentLabels, contributors] = await Promise.all([
+  const [archive, decades, recentLabels, contributors, photographs, ownerDeposits] = await Promise.all([
     supabaseAdmin
       .from('archives')
       .select('*')
@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
 
     supabaseAdmin
       .from('labels')
-      .select('id, created_at, what_was_happening, year_taken, location, labelled_by, photograph_id')
+      .select('id, created_at, what_was_happening, story_extracted, year_taken, location, labelled_by, photograph_id, is_primary_label')
       .eq('archive_id', archiveId)
       .order('created_at', { ascending: false })
       .limit(10),
@@ -34,6 +34,16 @@ export async function GET(req: NextRequest) {
       .select('id, name, email, role, status, photos_labelled')
       .eq('archive_id', archiveId)
       .eq('status', 'active'),
+
+    supabaseAdmin
+      .from('photographs')
+      .select('id, status')
+      .eq('archive_id', archiveId),
+
+    supabaseAdmin
+      .from('owner_deposits')
+      .select('id, created_at')
+      .eq('archive_id', archiveId),
   ])
 
   if (archive.error) {
@@ -41,9 +51,11 @@ export async function GET(req: NextRequest) {
   }
 
   return NextResponse.json({
-    archive:      archive.data,
-    decades:      decades.data      ?? [],
-    recentLabels: recentLabels.data ?? [],
-    contributors: contributors.data ?? [],
+    archive:       archive.data,
+    decades:       decades.data       ?? [],
+    recentLabels:  recentLabels.data  ?? [],
+    contributors:  contributors.data  ?? [],
+    photographs:   photographs.data   ?? [],
+    ownerDeposits: ownerDeposits.data ?? [],
   })
 }

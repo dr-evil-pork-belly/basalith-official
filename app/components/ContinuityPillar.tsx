@@ -9,7 +9,7 @@ const PHASES = [
   {
     phase:  'Phase Two',
     title:  'Essence\nMapping',
-    desc:   'Your Golden Dataset reaches sufficient depth. The first model is trained. Your Digital Clone becomes queryable — by you, for you, during your lifetime.',
+    desc:   'Your Golden Dataset reaches sufficient depth. The first model is trained. Your Digital Clone becomes queryable, for you, during your lifetime.',
     year:   'Year 2–5',
     active: true,
   },
@@ -33,12 +33,12 @@ const CARDS = [
   {
     num: '01',
     title: 'Dataset Depth',
-    desc: 'As more contributors annotate and more data is added, the model\'s training material becomes richer. A Clone trained on five years of Basalith data is more nuanced than one trained on one — because the input improves, not just the AI.',
+    desc: 'As more contributors annotate and more data is added, the model\'s training material becomes richer. A Clone trained on five years of Basalith data is more nuanced than one trained on one. The input improves, not just the AI.',
   },
   {
     num: '02',
     title: 'Family Curation',
-    desc: 'Your family can interact with the Clone and flag responses that don\'t feel accurate. These flags refine the model. Your family becomes the ongoing quality assurance team for your representation — for as long as they choose.',
+    desc: 'Your family can interact with the Clone and flag responses that don\'t feel accurate. These flags refine the model. Your family becomes the ongoing quality assurance team for your representation, for as long as they choose.',
   },
   {
     num: '03',
@@ -61,7 +61,7 @@ export default function ContinuityPillar() {
         aria-hidden="true"
       />
 
-      {/* Before-the-labelling callout */}
+      {/* Before-the-labeling callout */}
       <div
         className="max-w-[680px] mx-auto mb-20 rounded-sm px-8 py-8 reveal"
         style={{
@@ -79,7 +79,7 @@ export default function ContinuityPillar() {
             marginBottom:  '1rem',
           }}
         >
-          Before the Labelling Begins
+          Before the Labeling Begins
         </p>
         <p
           className="font-serif font-light leading-[1.85] mb-5"
@@ -89,7 +89,7 @@ export default function ContinuityPillar() {
           tens of thousands of images down to the ones that matter — organized by decade,
           indexed by face, ranked by archive value.
           <br /><br />
-          The labelling game begins at the emotional peak, not the organizational bottom.
+          The labeling game begins at the emotional peak, not the organizational bottom.
         </p>
         <a
           href="/#intelligence"
@@ -202,6 +202,31 @@ export default function ContinuityPillar() {
             <p className="font-sans font-light text-body-sm text-text-secondary leading-[1.72]">{desc}</p>
           </div>
         ))}
+      </div>
+
+      {/* Closing statement */}
+      <div className="max-w-[680px] mx-auto mt-20 text-center reveal">
+        <p
+          className="font-serif font-light"
+          style={{ fontSize: '1.05rem', color: '#9DA3A8', lineHeight: 1.9, marginBottom: '1.5rem' }}
+        >
+          The entity improves with every generation of AI. What begins as a reasonable representation
+          of your thinking becomes, over decades, something extraordinarily accurate. By the time your
+          great-grandchildren are old enough to ask it hard questions it will have the depth to answer them.
+        </p>
+        <p
+          className="font-serif font-light"
+          style={{ fontSize: '1.05rem', color: '#9DA3A8', lineHeight: 1.9, marginBottom: '0.75rem' }}
+        >
+          This is what generational wealth actually means.
+        </p>
+        <p
+          className="font-serif"
+          style={{ fontStyle: 'italic', fontSize: '1.2rem', color: '#B8A86A', lineHeight: 1.6 }}
+        >
+          Not the transfer of money.<br />
+          The transfer of the mind that earned it.
+        </p>
       </div>
     </section>
   )

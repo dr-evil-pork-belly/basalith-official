@@ -2,17 +2,17 @@ const STEPS = [
   {
     num: '01',
     title: 'Name It In Your Will',
-    desc: 'Your attorney designates your Golden Dataset as a formal estate asset using our standardised bequest language. Compatible with US and international frameworks.',
+    desc: 'Your attorney designates your Golden Dataset as a formal estate asset using our standardized bequest language. Compatible with US and international frameworks.',
   },
   {
     num: '02',
     title: 'Appoint a Custodian',
-    desc: 'Designate a trusted individual or institution as archive Custodian — analogous to a financial executor. They govern access and contribute on your behalf.',
+    desc: 'Designate a trusted individual or institution as archive Custodian, analogous to a financial executor. They govern access and contribute on your behalf.',
   },
   {
     num: '03',
     title: 'Hold It In Trust',
-    desc: 'Your Family Trust becomes the legal holder of the archive and subscription — ensuring generational continuity with no single point of failure.',
+    desc: 'Your Family Trust becomes the legal holder of the archive and subscription, ensuring generational continuity with no single point of failure.',
   },
   {
     num: '04',
@@ -26,7 +26,7 @@ const FIELDS = [
   { label: 'Legal Custodian',  value: 'Margaret A. Whitfield (Spouse)',        style: 'default' as const },
   { label: 'Trust Instrument', value: 'Whitfield Family Revocable Trust, 2019',style: 'default' as const },
   { label: 'Beneficiaries',    value: 'Sarah E. Whitfield · Thomas R. Whitfield',style: 'default' as const },
-  { label: 'Archive Status',   value: 'Active — Generation I',                style: 'amber'   as const },
+  { label: 'Archive Status',   value: 'Active · Generation I',                style: 'amber'   as const },
   { label: 'Continuity Term',  value: '200 years from date of creation',       style: 'default' as const },
 ]
 
@@ -140,6 +140,62 @@ export default function AssetPillar() {
           The people who built this company have children.
           We built this for them first.
         </p>
+
+        {/* Generational intelligence copy */}
+        <div style={{ marginTop: '2.5rem', paddingTop: '2rem', borderTop: '1px solid rgba(196,162,74,0.2)' }}>
+          <p
+            className="font-serif"
+            style={{
+              fontWeight:    700,
+              fontSize:      'clamp(1.4rem,3vw,2rem)',
+              color:         '#E8E4DC',
+              lineHeight:    1.4,
+              marginBottom:  '2rem',
+            }}
+          >
+            Every generation inherits the money.<br />
+            None of them inherit the mind that made it.
+          </p>
+          <p
+            className="font-serif font-light"
+            style={{
+              fontSize:      '1.05rem',
+              color:         '#9DA3A8',
+              lineHeight:    1.9,
+              marginBottom:  '1.25rem',
+            }}
+          >
+            The Basalith archive changes that. Every deposit you make, every story
+            your family labels, every decision you record. The system learns how
+            you think. The entity it builds is not a memorial. It is a thinking
+            partner trained on your actual judgment across your actual life.
+          </p>
+          <p
+            className="font-serif font-light"
+            style={{
+              fontSize:      '1.05rem',
+              color:         '#9DA3A8',
+              lineHeight:    1.9,
+              marginBottom:  '1.25rem',
+            }}
+          >
+            Your grandchildren will be able to ask it questions. It will answer
+            from forty years of documented wisdom.
+          </p>
+          <p
+            className="font-serif"
+            style={{
+              fontStyle:     'italic',
+              fontSize:      '1.1rem',
+              color:         '#9DA3A8',
+              lineHeight:    1.9,
+            }}
+          >
+            Not what you looked like.<br />
+            Not what you did.<br />
+            How you thought.
+          </p>
+        </div>
 
         {/* Steps */}
         <div className="mt-10 flex flex-col">

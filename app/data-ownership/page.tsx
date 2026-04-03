@@ -187,16 +187,13 @@ export default function DataOwnershipPage() {
             <p className="font-sans font-light text-body-base text-text-secondary leading-[1.82] mb-14 max-w-xl mx-auto">
               The Sovereignty Charter is executed at The Founding and exists independently of your subscription.
               It survives cancellation, corporate change, and time.
-              If you are ready to formalise yours, we are ready to begin.
+              If you are ready to formalize yours, we are ready to begin.
             </p>
 
             <div className="flex items-center justify-center gap-5 flex-wrap">
               <a href="/pricing" className="btn-monolith-amber group">
                 View Stewardship Plans
                 <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
-              </a>
-              <a href="/contact" className="btn-monolith-ghost">
-                Schedule a Consultation
               </a>
             </div>
           </div>

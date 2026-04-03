@@ -1,17 +1,17 @@
 const COLD = [
   { key: 'Who Labels',          value: 'Low-wage contractors, often overseas, with no connection to the subject.', sub: 'Averaged across millions of strangers.' },
   { key: 'Context Depth',       value: 'None. Statistical probability is mistaken for understanding.',              sub: 'The algorithm knows what a face looks like. Not whose.' },
-  { key: 'Emotional Accuracy',  value: 'Near zero. Emotion is inferred — never remembered.' },
+  { key: 'Emotional Accuracy',  value: 'Near zero. Emotion is inferred. Never remembered.' },
   { key: 'Ownership',           value: 'The platform. Your data enriches their model, not your legacy.' },
   { key: 'Lifespan',            value: 'Until the company shuts down, pivots, or is acquired.' },
   { key: 'Inheritability',      value: 'None. There is no mechanism for legal transfer.' },
 ]
 
 const WARM: { key: string; lead: string; rest: string; sub?: string }[] = [
-  { key: 'Who Labels',         lead: 'Your family and chosen circle —', rest: ' the only people in the world who know what your data actually means.', sub: 'Testimony, not statistics.' },
+  { key: 'Who Labels',         lead: 'Your family and chosen circle,', rest: ' the only people in the world who know what your data actually means.', sub: 'Testimony, not statistics.' },
   { key: 'Context Depth',      lead: 'Full biographical provenance.', rest: ' Every item carries the story of what it was, who was there, and why it mattered.' },
-  { key: 'Emotional Accuracy', lead: 'High.', rest: ' Emotion is contributed by those who felt it — not inferred by those who never knew you.' },
-  { key: 'Ownership',          lead: 'You — legally and structurally.', rest: ' Your Golden Dataset is a portable, transferable estate asset from day one.' },
+  { key: 'Emotional Accuracy', lead: 'High.', rest: ' Emotion is contributed by those who felt it, not inferred by those who never knew you.' },
+  { key: 'Ownership',          lead: 'Yours. Legally and structurally.', rest: ' Your Golden Dataset is a portable, transferable estate asset from day one.' },
   { key: 'Lifespan',           lead: 'Generational.', rest: ' Governed by your Family Trust. Not subject to platform decisions.' },
   { key: 'Inheritability',     lead: 'Full legal transfer.', rest: ' Named in your Will or Trust as a formal estate bequest.' },
 ]
@@ -36,7 +36,7 @@ export default function Comparison() {
         <p className="font-sans font-light text-body-base text-text-secondary leading-[1.8]">
           The AI industry built infrastructure for labeling data at scale.
           We built ours for labeling data with{' '}
-          <em className="font-serif italic">meaning</em> — one life at a time.
+          <em className="font-serif italic">meaning</em>, one life at a time.
         </p>
       </div>
 
@@ -59,7 +59,7 @@ export default function Comparison() {
             </h3>
             <p className="font-sans text-body-sm text-text-muted leading-[1.65]">
               Outsourced to anonymous contract workers.<br />
-              Optimised for throughput, not truth.
+              Optimized for throughput, not truth.
             </p>
           </div>
           {COLD.map(({ key, value, sub }) => (

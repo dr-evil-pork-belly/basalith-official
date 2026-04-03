@@ -22,7 +22,7 @@ const publicSans = Public_Sans({
 })
 
 export const metadata: Metadata = {
-  title:       'Basalith · XYZ — Sovereign Data Infrastructure',
+  title:       'Basalith · XYZ | Sovereign Data Infrastructure',
   description: 'The provenance record that powers your entity. Biological ledgers, strategic archives, lineage blueprints. Every deposit feeds the AI.',
   manifest:    '/site.webmanifest',
   icons: {

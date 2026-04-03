@@ -48,7 +48,7 @@ const AGENTS = [
     num:    '07',
     title:  'The Sequencing',
     job:    'Decides what you see first.',
-    body:   'The first photograph you see when you open the labelling interface is the single most emotionally resonant image in your entire upload. Not the most recent. Not the first uploaded. The one most likely to make you stop and remember. Every session begins at the emotional peak.',
+    body:   'The first photograph you see when you open the labeling interface is the single most emotionally resonant image in your entire upload. Not the most recent. Not the first uploaded. The one most likely to make you stop and remember. Every session begins at the emotional peak.',
     result: 'Archive opens with maximum impact',
   },
 ]

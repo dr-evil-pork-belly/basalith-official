@@ -235,7 +235,7 @@ export async function POST(req: Request) {
         })
 
         // Save to labels
-        await supabaseAdmin.from('labels').insert({
+        const { data: savedLabel } = await supabaseAdmin.from('labels').insert({
           photograph_id:      matchedSession.photograph_id,
           archive_id:         matchedSession.archive_id,
           labelled_by:        fromName || fromEmail,
@@ -244,7 +244,24 @@ export async function POST(req: Request) {
           people_tagged:      parsed.people_mentioned ?? [],
           is_primary_label:   false,
           essence_feed_status: 'pending',
-        })
+        }).select('id').single()
+
+        // Trigger contribution alert to archive owner
+        if (savedLabel?.id) {
+          try {
+            const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://basalith.xyz'
+            await fetch(`${siteUrl}/api/archive/contribution-alert`, {
+              method:  'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body:    JSON.stringify({
+                archiveId: matchedSession.archive_id,
+                labelId:   savedLabel.id,
+              }),
+            })
+          } catch {
+            // Non-fatal — label already saved
+          }
+        }
 
         // Increment session reply count
         await supabaseAdmin

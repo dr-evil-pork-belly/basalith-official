@@ -4,10 +4,13 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 const NAV = [
-  { href: '/archive/dashboard',    label: 'Archive'      },
-  { href: '/archive/label',        label: 'Label'        },
-  { href: '/archive/gallery',      label: 'Gallery'      },
-  { href: '/archive/contributors', label: 'Contributors' },
+  { href: '/archive/dashboard',    label: 'Archive'        },
+  { href: '/archive/entity',       label: 'My Entity'      },
+  { href: '/archive/wisdom',       label: 'Wisdom Session' },
+  { href: '/archive/label',        label: 'Label'          },
+  { href: '/archive/gallery',      label: 'Gallery'        },
+  { href: '/archive/contributors', label: 'Contributors'   },
+  { href: '/archive/dates',        label: 'Important Dates'},
   { href: '/archive/preferences',  label: 'Email Delivery' },
 ]
 
@@ -30,13 +33,16 @@ export default function ArchiveLayout({ children }: { children: React.ReactNode 
 
         <nav className="flex flex-col pt-4 pb-6 flex-1" aria-label="Archive navigation">
           {NAV.map(({ href, label }) => {
-            const active = pathname === href || pathname.startsWith(href + '/')
+            const active   = pathname === href || pathname.startsWith(href + '/')
+            const isEntity = href === '/archive/entity'
+            const isWisdom = href === '/archive/wisdom'
+            const isGold   = isEntity || isWisdom
             return (
               <Link
                 key={href}
                 href={href}
-                className="font-sans text-[0.7rem] tracking-[0.1em] uppercase no-underline px-6 py-3 transition-colors duration-200 relative"
-                style={{ color: active ? '#F0F0EE' : '#5C6166' }}
+                className="font-sans text-[0.7rem] tracking-[0.1em] uppercase no-underline px-6 py-3 transition-colors duration-200 relative flex items-center gap-2"
+                style={{ color: active ? '#F0F0EE' : isGold ? 'rgba(196,162,74,0.6)' : '#5C6166' }}
               >
                 {active && (
                   <span
@@ -44,6 +50,11 @@ export default function ArchiveLayout({ children }: { children: React.ReactNode 
                     style={{ background: 'rgba(196,162,74,0.7)' }}
                     aria-hidden="true"
                   />
+                )}
+                {isEntity && (
+                  <svg width="8" height="8" viewBox="0 0 8 8" fill="none" aria-hidden="true" style={{ flexShrink: 0 }}>
+                    <rect x="1" y="1" width="6" height="6" stroke="rgba(196,162,74,0.8)" strokeWidth="0.8" transform="rotate(45 4 4)" />
+                  </svg>
                 )}
                 {label}
               </Link>
@@ -74,17 +85,24 @@ export default function ArchiveLayout({ children }: { children: React.ReactNode 
         </div>
         <div className="flex overflow-x-auto scrollbar-none px-5 pb-3 gap-6">
           {NAV.map(({ href, label }) => {
-            const active = pathname === href || pathname.startsWith(href + '/')
+            const active   = pathname === href || pathname.startsWith(href + '/')
+            const isEntity = href === '/archive/entity'
+            const isGold   = isEntity || href === '/archive/wisdom'
             return (
               <Link
                 key={href}
                 href={href}
-                className="font-sans text-[0.62rem] tracking-[0.1em] uppercase no-underline whitespace-nowrap shrink-0 pb-px transition-colors duration-200"
+                className="font-sans text-[0.62rem] tracking-[0.1em] uppercase no-underline whitespace-nowrap shrink-0 pb-px transition-colors duration-200 flex items-center gap-1"
                 style={{
-                  color:       active ? '#F0F0EE' : '#5C6166',
+                  color:        active ? '#F0F0EE' : isGold ? 'rgba(196,162,74,0.6)' : '#5C6166',
                   borderBottom: active ? '1px solid rgba(196,162,74,0.6)' : '1px solid transparent',
                 }}
               >
+                {isEntity && (
+                  <svg width="7" height="7" viewBox="0 0 8 8" fill="none" aria-hidden="true">
+                    <rect x="1" y="1" width="6" height="6" stroke="rgba(196,162,74,0.8)" strokeWidth="0.8" transform="rotate(45 4 4)" />
+                  </svg>
+                )}
                 {label}
               </Link>
             )

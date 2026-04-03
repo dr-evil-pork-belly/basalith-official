@@ -347,3 +347,180 @@ create index if not exists idx_email_prefs_next_send   on email_preferences(next
 -- Add resend_email_id for idempotent reply processing
 alter table email_replies
   add column if not exists resend_email_id text unique;
+
+
+-- ═══════════════════════════════════════════════════════
+-- PRIMARY USER EXPERIENCE — OWNER NOTIFICATIONS & DEPOSITS
+-- Run this block in Supabase SQL Editor after initial schema
+-- ═══════════════════════════════════════════════════════
+
+-- Archive score tracking columns
+alter table archives
+  add column if not exists archive_score               integer     default 0,
+  add column if not exists score_breakdown             jsonb       default '{}',
+  add column if not exists owner_name                  text,
+  add column if not exists last_digest_sent_at         timestamptz,
+  add column if not exists last_weekly_report_sent_at  timestamptz;
+
+-- Primary user notifications log
+create table if not exists owner_notifications (
+  id          uuid        default gen_random_uuid() primary key,
+  created_at  timestamptz default now(),
+  archive_id  uuid        references archives(id) on delete cascade,
+  type        text        not null,
+  -- morning_digest | contribution_alert | milestone | deposit_prompt | weekly_report
+  subject     text,
+  sent_to     text,
+  sent_at     timestamptz,
+  metadata    jsonb       default '{}'
+);
+
+-- Deposits by primary user (owner's own memories)
+create table if not exists owner_deposits (
+  id              uuid        default gen_random_uuid() primary key,
+  created_at      timestamptz default now(),
+  archive_id      uuid        references archives(id) on delete cascade,
+  prompt          text,
+  response        text        not null,
+  photograph_id   uuid        references photographs(id),
+  essence_status  text        default 'pending'
+  -- pending | fed | excluded
+);
+
+create index if not exists idx_owner_notifications_archive on owner_notifications(archive_id);
+create index if not exists idx_owner_deposits_archive      on owner_deposits(archive_id);
+
+
+-- ═══════════════════════════════════════════════════════
+-- ENTITY CONVERSATIONS & ACCURACY TRACKING
+-- ═══════════════════════════════════════════════════════
+
+-- Entity conversation history
+create table if not exists entity_conversations (
+  id              uuid        default gen_random_uuid() primary key,
+  created_at      timestamptz default now(),
+  archive_id      uuid        references archives(id) on delete cascade,
+  session_id      uuid        default gen_random_uuid(),
+  -- groups messages in one sitting
+  role            text        not null,
+  -- user | entity
+  content         text        not null,
+  accuracy_rating text,
+  -- accurate | partial | inaccurate — null until user rates it
+  correction      text
+  -- user's correction if inaccurate
+);
+
+-- Entity accuracy tracking by dimension
+create table if not exists entity_accuracy (
+  id              uuid        default gen_random_uuid() primary key,
+  created_at      timestamptz default now(),
+  archive_id      uuid        references archives(id) on delete cascade,
+  dimension       text        not null,
+  -- professional_philosophy | relationship_to_family | core_values |
+  -- spiritual_beliefs | fears_and_vulnerabilities | early_life |
+  -- approach_to_money | approach_to_people | defining_experiences | wisdom_and_lessons
+  accuracy_score  float       default 0.0,
+  -- 0.0 to 1.0
+  deposit_count   integer     default 0,
+  label_count     integer     default 0,
+  last_updated    timestamptz default now()
+);
+
+create index if not exists idx_entity_conversations_archive on entity_conversations(archive_id);
+create index if not exists idx_entity_conversations_session on entity_conversations(session_id);
+create index if not exists idx_entity_accuracy_archive      on entity_accuracy(archive_id);
+
+
+-- ═══════════════════════════════════════════════════════
+-- WISDOM EXTRACTION SESSIONS
+-- Monthly structured sessions targeting lowest-scoring dimension
+-- ═══════════════════════════════════════════════════════
+
+create table if not exists wisdom_sessions (
+  id               uuid        default gen_random_uuid() primary key,
+  created_at       timestamptz default now(),
+  archive_id       uuid        references archives(id) on delete cascade,
+  dimension        text        not null,
+  -- matches DIMENSIONS ids: professional_philosophy | relationship_to_family | etc.
+  status           text        default 'in_progress',
+  -- in_progress | completed | skipped
+  current_question integer     default 0,
+  -- 0-4 (index of current question)
+  completed_at     timestamptz,
+  answers          jsonb       default '[]'
+  -- array of { questionId, question, answer, savedAt }
+);
+
+create index if not exists idx_wisdom_sessions_archive   on wisdom_sessions(archive_id);
+create index if not exists idx_wisdom_sessions_dimension on wisdom_sessions(archive_id, dimension);
+
+
+-- ═══════════════════════════════════════════════════════
+-- WITNESS SESSIONS
+-- Structured guided sessions for family / friends
+-- ═══════════════════════════════════════════════════════
+
+create table if not exists witness_sessions (
+  id                  uuid        default gen_random_uuid() primary key,
+  created_at          timestamptz default now(),
+  archive_id          uuid        references archives(id) on delete cascade,
+  contributor_email   text        not null,
+  contributor_name    text,
+  relationship        text        not null,
+  -- child | spouse | colleague | childhood_friend | sibling
+  subject_name        text        not null,
+  -- first name or how the contributor knows the subject, e.g. "David" or "Dad"
+  status              text        default 'in_progress',
+  -- in_progress | completed | abandoned
+  current_question    integer     default 0,
+  completed_at        timestamptz,
+  answers             jsonb       default '[]'
+  -- { questionId, question, answer, savedAt }[]
+);
+
+create table if not exists witness_deposits (
+  id                  uuid        default gen_random_uuid() primary key,
+  created_at          timestamptz default now(),
+  archive_id          uuid        references archives(id) on delete cascade,
+  witness_session_id  uuid        references witness_sessions(id),
+  contributor_email   text        not null,
+  contributor_name    text,
+  relationship        text        not null,
+  question_id         text        not null,
+  question_text       text        not null,
+  answer              text        not null,
+  what_it_captures    text,
+  essence_status      text        default 'pending'
+  -- pending | fed | excluded
+);
+
+create index if not exists idx_witness_sessions_archive  on witness_sessions(archive_id);
+create index if not exists idx_witness_deposits_archive  on witness_deposits(archive_id);
+create index if not exists idx_witness_deposits_session  on witness_deposits(witness_session_id);
+
+
+-- ═══════════════════════════════════════════════════════
+-- SIGNIFICANT DATES
+-- Life events that trigger curated photograph + memory sends
+-- ═══════════════════════════════════════════════════════
+
+create table if not exists significant_dates (
+  id           uuid        default gen_random_uuid() primary key,
+  created_at   timestamptz default now(),
+  archive_id   uuid        references archives(id) on delete cascade,
+  person_name  text        not null,
+  -- e.g. "Harold", "Mom", "Grandma Rose"
+  date_type    text        not null,
+  -- birthday | death_anniversary | wedding_anniversary | other
+  month        integer     not null check (month between 1 and 12),
+  day          integer     not null check (day between 1 and 31),
+  year         integer,
+  -- optional — birth year / death year etc. Used to calculate "would have turned X"
+  active       boolean     default true,
+  notes        text
+  -- optional personal note shown in the email send
+);
+
+create index if not exists idx_significant_dates_archive on significant_dates(archive_id);
+create index if not exists idx_significant_dates_month_day on significant_dates(month, day);

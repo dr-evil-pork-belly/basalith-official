@@ -169,25 +169,37 @@ export default function Hero() {
             className="font-serif font-semibold text-text-primary leading-[0.91] tracking-[-0.036em]"
             style={{ fontSize: 'clamp(3.25rem,7.5vw,6.5rem)' }}
           >
-            The Asset
+            The System That
             <em className="block italic font-medium text-amber not-italic" style={{ fontStyle: 'italic' }}>
-              That Never
+              Learns How
             </em>
-            Leaves.
+            You Think.
           </h1>
         </div>
 
         {/* Body */}
         <div ref={ref(2)} className="reveal reveal-delay-2 max-w-[440px]">
           <p className="font-sans font-light text-body-base leading-[1.82] text-text-secondary">
-            Your photographs, your voice, your thought — labeled by the people
-            who were present when they mattered. Not by algorithms.{' '}
-            <strong className="font-semibold text-text-primary">Not by strangers.</strong>{' '}
-            By your family.
+            While you are alive it studies you. It learns your judgment, your values,
+            your hard-won understanding of how the world works. When you are gone
+            it carries that knowledge forward.
           </p>
           <p className="font-sans font-light text-body-base leading-[1.82] text-text-secondary mt-3">
-            The result is a Golden Dataset: the most accurate record of a human life
-            ever assembled — and a legal asset your heirs will inherit for centuries.
+            Your descendants inherit not just what you built.
+            They inherit how you built it.
+          </p>
+          <p
+            className="font-serif font-light"
+            style={{
+              marginTop:  '1.25rem',
+              fontSize:   '0.95rem',
+              fontStyle:  'italic',
+              color:      '#5C6166',
+              lineHeight: 1.7,
+            }}
+          >
+            For everyone who has ever wished they could ask their grandmother
+            one more question.
           </p>
         </div>
 
