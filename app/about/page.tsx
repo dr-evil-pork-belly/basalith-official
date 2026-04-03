@@ -1,319 +1,157 @@
 import Nav    from '../components/Nav'
 import Footer from '../components/Footer'
+import type { Metadata } from 'next'
 
-const VALUES = [
-  {
-    num:   '01',
-    title: 'Memory Is Wealth',
-    body:  'Every civilisation has sought to preserve its most valuable people. We are the first generation with the tools to do it properly — with legal standing, emotional accuracy, and permanence measured in centuries, not server uptime.',
-  },
-  {
-    num:   '02',
-    title: 'Family Over Algorithm',
-    body:  'The people who love you are the only accurate interpreters of your life. No amount of compute power replicates what your family simply knows. We built our entire model around this truth — and refused to compromise it.',
-  },
-  {
-    num:   '03',
-    title: 'Permanence By Design',
-    body:  'We do not build for engagement metrics. We do not optimise for retention. Every architectural decision — legal, technical, organisational — is made with a single question: will this still work in a hundred years?',
-  },
-  {
-    num:   '04',
-    title: 'Ownership Without Compromise',
-    body:  'Your data is yours. Not a licensing arrangement. Not subject to a terms-of-service revision. Structured as a legal asset from day one, portable on demand, and transferable to your heirs on your terms alone.',
-  },
-]
+export const metadata: Metadata = {
+  title:       'About · Basalith',
+  description: "A founder's statement. Why Basalith exists.",
+}
 
-const VISION_ITEMS = [
-  {
-    horizon: 'Near Term',
-    title:   'The Golden Standard',
-    body:    'Establish Basalith as the definitive infrastructure for personal legacy preservation — the institution families turn to when they decide to take their memory as seriously as their estate.',
-  },
-  {
-    horizon: 'Medium Term',
-    title:   'The Legal Framework',
-    body:    'Drive the recognition of Golden Datasets as formal estate assets across major legal jurisdictions. Build the case law, the precedent, and the institutional partnerships that make digital legacy inheritance as routine as a property transfer.',
-  },
-  {
-    horizon: 'Long Term',
-    title:   'The Living Archive',
-    body:    'A world in which every family maintains a governed, evolving record of who they were — accessible to future generations not as static photographs or faded letters, but as an intelligent presence that continues to think, reason, and respond.',
-  },
-]
+const P: React.CSSProperties = {
+  fontFamily:   "'Cormorant Garamond', Georgia, serif",
+  fontWeight:   300,
+  fontSize:     '1.05rem',
+  lineHeight:   1.95,
+  color:        '#B8B4AB',
+  marginBottom: '1.8rem',
+  maxWidth:     '680px',
+  marginLeft:   'auto',
+  marginRight:  'auto',
+}
+
+const RULE: React.CSSProperties = {
+  borderTop:    '1px solid rgba(196,162,74,0.25)',
+  maxWidth:     '120px',
+  margin:       '2.5rem auto',
+  border:       'none',
+  borderTopWidth: '1px',
+  borderTopStyle: 'solid',
+  borderTopColor: 'rgba(196,162,74,0.25)',
+}
 
 export default function AboutPage() {
   return (
     <>
       <Nav />
-      <main>
+      <main style={{ background: '#0A0908' }}>
+        <section aria-label="Founder statement" style={{ padding: '10rem 2rem 8rem', background: '#0A0908' }}>
+          <div style={{ maxWidth: '720px', margin: '0 auto' }}>
 
-        {/* ── HERO ── */}
-        <section
-          className="relative min-h-[75vh] flex flex-col items-center justify-center text-center px-8 md:px-16 pt-40 pb-28 overflow-hidden bg-obsidian-void"
-          aria-label="About hero"
-        >
-          {/* Grid */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              backgroundImage:
-                'linear-gradient(rgba(255,255,255,0.022) 1px,transparent 1px),' +
-                'linear-gradient(90deg,rgba(255,255,255,0.022) 1px,transparent 1px)',
-              backgroundSize: '80px 80px',
-              maskImage: 'radial-gradient(ellipse 80% 80% at 50% 50%,black 20%,transparent 100%)',
-            }}
-            aria-hidden="true"
-          />
-          {/* Amber radiance */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{ background: 'radial-gradient(ellipse 55% 55% at 50% 60%,rgba(255,179,71,0.07) 0%,transparent 65%)' }}
-            aria-hidden="true"
-          />
+            <p style={{
+              fontFamily:    "'Space Mono', 'DM Mono', monospace",
+              fontSize:      '0.46rem',
+              letterSpacing: '0.4em',
+              textTransform: 'uppercase' as const,
+              color:         '#C4A24A',
+              marginBottom:  '1.5rem',
+              textAlign:     'center',
+            }}>
+              Why We Exist
+            </p>
 
-          <div className="relative z-10 max-w-4xl mx-auto">
-            <p className="eyebrow mb-7">Why We Exist</p>
-            <h1
-              className="font-serif font-semibold text-text-primary leading-[0.9] tracking-[-0.04em] mb-10"
-              style={{ fontSize: 'clamp(3rem,7.5vw,6.75rem)' }}
-            >
-              The Most Valuable Thing
-              <br />
-              You Own Is Not
-              <br />
-              <em className="italic font-medium text-amber" style={{ fontStyle: 'italic' }}>
-                On Your Balance Sheet.
-              </em>
+            <h1 style={{
+              fontFamily:    "'Cormorant Garamond', Georgia, serif",
+              fontWeight:    700,
+              fontSize:      'clamp(2.2rem, 5vw, 3.5rem)',
+              color:         '#F0EDE6',
+              lineHeight:    1.1,
+              letterSpacing: '-0.02em',
+              marginBottom:  '1rem',
+              textAlign:     'center',
+            }}>
+              The Most Valuable Thing<br />You Will Ever Own
             </h1>
-            <p className="font-sans font-light text-body-lg text-text-secondary leading-[1.85] max-w-2xl mx-auto">
-              It is the particular way you think. The reasoning behind your decisions.
-              The things only your family knows about you — and what happens to all of
-              that when you are no longer here to explain it.
-            </p>
-          </div>
-        </section>
 
-        {/* ── THE PROBLEM ── */}
-        <section
-          className="relative bg-obsidian-deep px-8 md:px-16 lg:px-24 py-36 overflow-hidden"
-          aria-label="The problem"
-        >
-          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-border-amber to-transparent" />
-
-          <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_1.4fr] gap-20 items-start">
-
-            {/* Left — label + large number */}
-            <div className="lg:sticky lg:top-32">
-              <p className="eyebrow mb-6">The Problem</p>
-              <p
-                className="font-serif font-light text-amber/20 leading-none select-none"
-                style={{ fontSize: 'clamp(6rem,14vw,12rem)', letterSpacing: '-0.05em' }}
-                aria-hidden="true"
-              >
-                01
-              </p>
-            </div>
-
-            {/* Right — copy */}
-            <div className="flex flex-col gap-7">
-              <h2
-                className="font-serif font-semibold text-text-primary leading-[1.0] tracking-[-0.03em]"
-                style={{ fontSize: 'clamp(2rem,4vw,3.25rem)' }}
-              >
-                We Have Never Had a Serious Infrastructure for Human Memory.
-              </h2>
-              <p className="font-sans font-light text-body-base text-text-secondary leading-[1.88]">
-                Civilisations have always tried to preserve their most significant people.
-                Portraits. Journals. Stone monuments. The instinct is ancient. But the
-                execution has always been passive — a record of what someone looked like,
-                not how they thought. A collection of moments, not a continuity of mind.
-              </p>
-              <p className="font-sans font-light text-body-base text-text-secondary leading-[1.88]">
-                The technology industry promised to solve this. It did not. What it built
-                instead was an infrastructure for extracting value from personal data —
-                labeling it with anonymous contractors, feeding it to models that serve
-                advertisers, and storing it on servers that will outlive their business
-                model by, at best, a decade.
-              </p>
-              <p className="font-sans font-light text-body-base text-text-secondary leading-[1.88]">
-                The result is a generation of people who have produced more personal data
-                than any humans in history — and who have less control over it, less
-                understanding of what it means, and no mechanism to pass it to the people
-                who will one day want it most.
-              </p>
-
-              {/* Pull quote */}
-              <div className="border-l-2 border-amber pl-6 mt-4">
-                <p className="font-serif text-[1.3rem] italic text-text-secondary leading-[1.6] tracking-[-0.01em]">
-                  "The problem is not that we lack the data.
-                  The problem is that nobody built the institution."
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── THE MISSION ── */}
-        <section
-          className="relative bg-obsidian px-8 md:px-16 lg:px-24 py-36 overflow-hidden"
-          aria-label="Mission"
-        >
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{ background: 'radial-gradient(ellipse 60% 55% at 50% 50%,rgba(255,179,71,0.045) 0%,transparent 65%)' }}
-            aria-hidden="true"
-          />
-
-          <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_1.4fr] gap-20 items-start">
-
-            <div className="lg:sticky lg:top-32">
-              <p className="eyebrow mb-6">Our Mission</p>
-              <p
-                className="font-serif font-light text-amber/20 leading-none select-none"
-                style={{ fontSize: 'clamp(6rem,14vw,12rem)', letterSpacing: '-0.05em' }}
-                aria-hidden="true"
-              >
-                02
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-7">
-              <h2
-                className="font-serif font-semibold text-text-primary leading-[1.0] tracking-[-0.03em]"
-                style={{ fontSize: 'clamp(2rem,4vw,3.25rem)' }}
-              >
-                To Make the Preservation of a Life as Serious as the Preservation of an Estate.
-              </h2>
-              <p className="font-sans font-light text-body-base text-text-secondary leading-[1.88]">
-                Basalith exists to build the institution that was never built. Not a
-                platform. Not an app. An institution — with the legal standing, the
-                technical architecture, and the governance model that the permanence
-                of human memory actually requires.
-              </p>
-              <p className="font-sans font-light text-body-base text-text-secondary leading-[1.88]">
-                We do this by treating personal data the way serious institutions treat
-                serious assets. With provenance. With chain of custody. With named
-                beneficiaries, legal instruments, and a fiduciary obligation to the
-                person whose life it represents — not to the shareholders of a
-                platform that happens to store it.
-              </p>
-              <p className="font-sans font-light text-body-base text-text-secondary leading-[1.88]">
-                The Golden Dataset is our name for the result: the highest-quality
-                labeled record of a human life ever assembled. Built by family.
-                Governed by law. Powered by whatever AI exists in the year
-                your grandchildren decide they want to understand who you were.
-              </p>
-
-              {/* Values */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
-                {VALUES.map(({ num, title, body }) => (
-                  <div
-                    key={num}
-                    className="group relative rounded-sm border border-border-subtle bg-white/[0.018] p-6 overflow-hidden transition-colors duration-300 hover:border-border-amber hover:bg-amber/[0.022]"
-                  >
-                    <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-transparent to-transparent transition-all duration-300 group-hover:via-amber/38" />
-                    <p className="font-serif text-[2rem] font-light text-amber/14 leading-none mb-2">{num}</p>
-                    <p className="font-sans text-[0.75rem] font-bold tracking-[0.1em] uppercase text-text-primary mb-2">{title}</p>
-                    <p className="font-sans font-light text-[0.82rem] text-text-secondary leading-[1.72]">{body}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── THE VISION ── */}
-        <section
-          className="relative bg-obsidian-deep px-8 md:px-16 lg:px-24 py-36 overflow-hidden"
-          aria-label="Long-term vision"
-        >
-          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-border-subtle to-transparent" />
-
-          <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_1.4fr] gap-20 items-start">
-
-            <div className="lg:sticky lg:top-32">
-              <p className="eyebrow mb-6">The Vision</p>
-              <p
-                className="font-serif font-light text-amber/20 leading-none select-none"
-                style={{ fontSize: 'clamp(6rem,14vw,12rem)', letterSpacing: '-0.05em' }}
-                aria-hidden="true"
-              >
-                03
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-0">
-              {VISION_ITEMS.map(({ horizon, title, body }, i) => (
-                <div
-                  key={i}
-                  className="py-10 border-b border-border-subtle last:border-b-0"
-                >
-                  <p className="eyebrow !text-[0.6rem] mb-3">{horizon}</p>
-                  <h3
-                    className="font-serif font-semibold text-text-primary leading-[1.1] tracking-[-0.02em] mb-4"
-                    style={{ fontSize: 'clamp(1.5rem,3vw,2.25rem)' }}
-                  >
-                    {title}
-                  </h3>
-                  <p className="font-sans font-light text-body-base text-text-secondary leading-[1.88]">
-                    {body}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── CLOSING ── */}
-        <section
-          className="relative bg-obsidian px-8 md:px-16 py-40 text-center overflow-hidden"
-          aria-label="Closing statement"
-        >
-          <div
-            className="absolute pointer-events-none"
-            style={{
-              width: 1000, height: 500,
-              top: '50%', left: '50%',
-              transform: 'translate(-50%,-50%)',
-              background: 'radial-gradient(ellipse,rgba(255,179,71,0.07) 0%,transparent 60%)',
-            }}
-            aria-hidden="true"
-          />
-
-          <div className="relative z-10 max-w-3xl mx-auto">
-            <p
-              className="font-serif font-medium text-text-secondary leading-[1.5] tracking-[-0.02em] mb-12"
-              style={{ fontSize: 'clamp(1.5rem,3.5vw,2.5rem)' }}
-            >
-              "Every generation has left something behind.
-              We are the first with the tools to leave something
-              that thinks back."
+            <p style={{
+              fontFamily:   "'Cormorant Garamond', Georgia, serif",
+              fontStyle:    'italic',
+              fontSize:     '1.05rem',
+              color:        '#9DA3A8',
+              textAlign:    'center',
+              margin:       '0 0 2rem',
+            }}>
+              A note from the founder.
             </p>
 
-            <div className="flex items-center justify-center gap-4 mb-14">
-              <div className="h-px w-16 bg-amber/25" />
-              <span className="ai-dot" />
-              <div className="h-px w-16 bg-amber/25" />
-            </div>
+            <div aria-hidden="true" style={{
+              width:        '100%',
+              height:       '1px',
+              marginBottom: '4rem',
+              background:   'linear-gradient(90deg, transparent, rgba(196,162,74,0.35), transparent)',
+            }} />
 
-            <p className="font-sans font-light text-body-base text-text-secondary leading-[1.82] mb-12 max-w-xl mx-auto">
-              If you are ready to take your legacy as seriously as your estate,
-              we are ready to help you build it.
+            {/* Section 1 */}
+            <p style={P}>I grew up without much.</p>
+
+            <p style={P}>Not without love. My mother made sure of that. She showed it the way she knew how: through her cooking, through her stories, through the particular way she was always there when everything else was not. But without money, without guidance, without anyone who had been where I was trying to go.</p>
+
+            <p style={P}>What I had was curiosity. And eventually I discovered that curiosity, applied consistently over time, becomes something close to a superpower.</p>
+
+            <p style={P}>I completed my undergraduate studies, then a master&rsquo;s degree, then a doctorate where I was supposed to research accounting and ended up researching happiness instead. That seemed like the more important question.</p>
+
+            <p style={P}>Every decade I look back and think the same thing: if I had known then what I know now, everything would have been different. Not easier. Different. Better directed. Less wasted.</p>
+
+            <p style={{ ...P, marginBottom: 0 }}>Knowledge compounds. That is the thing nobody tells you when you are young and trying to figure out which direction to point yourself. Every piece of knowledge you acquire becomes leverage for the next thing. The accumulation is slow and then suddenly it is not. You look back and realize the distance you have traveled.</p>
+
+            {/* Rule 1 */}
+            <div aria-hidden="true" style={RULE} />
+
+            {/* Section 2 */}
+            <p style={P}>My grandmother died when I was young. I did not know her well enough. I had questions I never asked. Questions I did not even know I had until she was gone and I realized I would never be able to ask them.</p>
+
+            <p style={P}>My mother is still here. She still tells her stories. And I notice now, with a clarity I did not have when I was younger, that I do not always listen as carefully as I should. Modern life moves fast. I have four children. They have school and sports and the ten thousand demands of being young right now. They love their grandparents. But they do not always have time to sit and listen. And their grandparents&rsquo; stories. The specific, irreplaceable, unrepeatable stories of specific lives actually lived. Are not being captured.</p>
+
+            <p style={{ ...P, marginBottom: 0 }}>This kept me up at night. For years.</p>
+
+            {/* Rule 2 */}
+            <div aria-hidden="true" style={RULE} />
+
+            {/* Section 3 */}
+            <p style={P}>A few years ago I went through what I can only describe as a sustained crisis. Not of failure. Of fear.</p>
+
+            <p style={P}>Everything around me was good. My family. My work. My life by any external measure.</p>
+
+            <p style={P}>But inside something was wrong. A particular kind of dread that I have since come to understand more clearly: the fear of not being there. The fear that my children and their children would not know where they came from, what was learned, what was survived, what was discovered about how to live.</p>
+
+            <p style={P}>I researched happiness for years. I know what the science says about meaning and connection and legacy. And I kept arriving at the same conclusion: the most meaningful thing most people will ever do is give the people who come after them the knowledge of how to live. Not through lectures. Through stories. Through the particular texture of a specific life, honestly told.</p>
+
+            <p style={{ ...P, marginBottom: 0 }}>The problem is that those stories disappear. Every day. Every loss. Every family that did not have time to sit down and ask the right questions.</p>
+
+            {/* Rule 3 */}
+            <div aria-hidden="true" style={RULE} />
+
+            {/* Section 4 */}
+            <p style={P}>I built Basalith because I believe knowledge is the most valuable thing one human being can give another.</p>
+
+            <p style={P}>I know this from my own life. I went from a kid with no clear future to building companies, raising a family, and understanding something that took decades to learn: knowledge is the cheat code. Every piece of it compounds. Every story passed down changes the trajectory of the person who receives it.</p>
+
+            <p style={P}>In 100 years the world will be unrecognizable. But the story of how your grandmother survived something hard, or your grandfather built something from nothing, or your mother showed love through cooking when she had no other way to show it. Those stories will still matter. They will still teach. They will still change how someone lives their life.</p>
+
+            <p style={P}>That is what Basalith preserves.</p>
+
+            <p style={{ ...P, marginBottom: '4rem' }}>That is why I built it.</p>
+
+            {/* Signoff */}
+            <div aria-hidden="true" style={{
+              width:        '80px',
+              height:       '1px',
+              background:   'rgba(196,162,74,0.4)',
+              margin:       '0 auto 1.5rem',
+            }} />
+
+            <p style={{
+              fontFamily:  "'Cormorant Garamond', Georgia, serif",
+              fontStyle:   'italic',
+              fontSize:    '1.1rem',
+              color:       '#B8B4AB',
+              textAlign:   'center',
+              margin:      0,
+            }}>
+              Dr. David Ha
             </p>
 
-            <div className="flex items-center justify-center gap-5 flex-wrap">
-              <a href="/pricing" className="btn-monolith-amber group">
-                View Stewardship Plans
-                <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
-              </a>
-              <a href="/contact" className="btn-monolith-ghost">
-                Schedule a Consultation
-              </a>
-            </div>
           </div>
         </section>
-
       </main>
       <Footer />
     </>
