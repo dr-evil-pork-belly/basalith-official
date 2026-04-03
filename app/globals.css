@@ -9,6 +9,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  scroll-behavior: smooth;
+}
+
 /* ── CSS Variables (mirror of Tailwind tokens for inline styles) ── */
 :root {
   --font-cormorant:   'Cormorant Garamond', Georgia, serif;

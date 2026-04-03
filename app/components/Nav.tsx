@@ -9,8 +9,8 @@ const links = [
   { href: '/custodianship',     label: 'Continuity' },
   { href: '/pricing',           label: 'Pricing'    },
   { href: '/about',             label: 'About'      },
-  { href: '/archive/dashboard', label: 'My Archive' },
-  { href: '/partner',           label: 'Partners'   },
+  { href: '/archive-login',     label: 'My Archive' },
+  { href: '/join-archivists',   label: 'Partners'   },
 ]
 
 export default function Nav() {
