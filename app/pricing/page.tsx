@@ -1,63 +1,75 @@
-import Nav    from '../components/Nav'
-import Footer from '../components/Footer'
+import Nav        from '../components/Nav'
+import Footer     from '../components/Footer'
+import PricingFAQ from '../components/PricingFAQ'
 
 const TIERS = [
   {
     name:     'The Archive',
-    tagline:  'For individuals beginning their Golden Dataset.',
+    tagline:  'For individuals beginning their legacy.',
     price:    '$1,200',
     period:   'per year',
     monthly:  '$100 / month equivalent',
     featured: false,
+    badge:    null as string | null,
     features: [
-      'Core secure storage',
-      'Family contributor access — up to 5 people',
+      'Secure archive infrastructure',
+      'Up to 5 family contributors',
+      'Unlimited photograph deposits',
       'Voice, photo & journal labeling',
-      'Annual AI model updates',
+      'Nightly photograph email to contributors',
       'Basic Digital Clone access',
+      'Annual AI model updates',
       'Data portability guarantee',
       'Data Custodianship Reserve coverage',
     ],
-    cta: 'Begin with The Archive',
+    cta: 'BEGIN WITH THE ARCHIVE',
   },
   {
     name:     'The Estate',
-    tagline:  'Full family archive with legal integration.',
+    tagline:  'For families building a generational asset.',
     price:    '$3,600',
     period:   'per year',
     monthly:  '$300 / month equivalent',
     featured: true,
+    badge:    'MOST POPULAR' as string | null,
     features: [
       'Everything in The Archive',
-      'Expanded contributors — up to 15 people',
-      'Full Digital Clone with query access',
-      'Will & Trust integration support',
-      'Standardised bequest language included',
-      'Priority curation support',
+      'Up to 15 family contributors',
+      'Full Digital Clone with conversational access',
+      'Will & Trust integration — bequest language prepared',
       'Dedicated Custodian designation',
       'Annual estate compatibility review',
+      'Priority curation support',
+      'basalith.ai entity priority access',
+      'Quarterly Provenance report',
+      'Family access tiers — control who sees what',
+      '48-hour response on all support requests',
     ],
-    cta: 'Begin with The Estate',
+    cta: 'BEGIN WITH THE ESTATE',
   },
   {
     name:     'The Dynasty',
-    tagline:  'Multi-generational governance for serious legacies.',
+    tagline:  'For legacies that must outlast generations.',
     price:    '$9,600',
     period:   'per year',
     monthly:  '$800 / month equivalent',
     featured: false,
+    badge:    'SOVEREIGN' as string | null,
     features: [
       'Everything in The Estate',
-      'Unlimited contributors',
+      'Unlimited contributors across generations',
       'Full Family Trust legal instrument',
       'Multi-generational access tiers',
-      'White-glove onboarding & setup',
-      'Dedicated archive manager',
+      'Dedicated Archive Manager — named professional, not a ticket queue',
+      'White-glove onboarding — we come to you',
       'Annual in-person estate review',
       'First access to new AI model generations',
-      'Custom Clone interaction boundaries',
+      'Custom Digital Clone interaction boundaries',
+      'Sovereign Archivist permanently assigned',
+      'Custom bequest language prepared',
+      '200-year perpetual storage guarantee',
     ],
-    cta: 'Begin with The Dynasty',
+    cta: 'BEGIN WITH THE DYNASTY',
   },
 ]
 
@@ -65,8 +77,8 @@ const DELIVERABLES = [
   { num: '01', title: 'Archive Architecture Build',      desc: 'Your permanent digital estate structure, configured for generational transfer and legal standing.' },
   { num: '02', title: 'Legal Instrument Review',          desc: 'Compatibility assessment with your existing will, trust, and estate documents. Attorney-ready output.' },
   { num: '03', title: 'Family Network Initialization',    desc: 'Contributor onboarding for up to 15 family members. Roles assigned. Access levels configured. Documented.' },
-  { num: '04', title: 'Founding Essence Session',         desc: 'Your first live family labelling session, guided by a Senior Archivist. 90 minutes. This is where it becomes real.' },
-  { num: '05', title: 'AI-Processed Data Migration',       desc: 'Import from existing photo libraries, documents, and digital archives. Every photograph filtered, deduplicated, dated, and sequenced by our AI pipeline before it reaches the labelling interface.' },
+  { num: '04', title: 'Founding Essence Session',         desc: 'Your first live family labeling session, guided by a Senior Archivist. 90 minutes. This is where it becomes real.' },
+  { num: '05', title: 'AI-Processed Data Migration',       desc: 'Import from existing photo libraries, documents, and digital archives. Every photograph filtered, deduplicated, dated, and sequenced by our AI pipeline before it reaches the labeling interface.' },
   { num: '06', title: 'Custodian Designation',            desc: "Your archive's legal custodian assigned and documented with formal estate standing." },
 ]
 
@@ -77,28 +89,26 @@ const FOUNDING_ESTABLISHES = [
   'Your first Essence data is indexed, attributed, and stored with legal provenance.',
 ]
 
-const FAQ = [
-  {
-    q: 'What is The Founding fee?',
-    a: 'The Founding is a one-time setup investment covering the full onboarding process — archive architecture, legal framework review, and your initial Essence Mapping session. It is paid once at the start of your relationship with Basalith.',
-  },
-  {
-    q: 'Can I change tiers later?',
-    a: 'Yes. You can upgrade at any time. Your Golden Dataset and all contributions carry forward seamlessly. Downgrades are available at your annual renewal date.',
-  },
-  {
-    q: 'Can my Family Trust pay the annual subscription?',
-    a: 'Yes — and we recommend it. The Trust becomes the legal holder of your archive and the subscription contract, ensuring continuity independent of any individual.',
-  },
-  {
-    q: 'What happens to my archive if Basalith ceases operations?',
-    a: 'Your complete archive is available for export in open formats at any time. Our Data Custodianship Reserve — an independent legal structure funded by subscription revenue — ensures continuity in any scenario.',
-  },
-  {
-    q: 'Is there a referral or partner program?',
-    a: 'Yes. We offer a structured partnership program for advisors, estate attorneys, and social marketers. Contact us to receive the full program details.',
-  },
-]
+
+const tierSepStyle: React.CSSProperties = {
+  fontFamily:    'monospace',
+  fontSize:      '0.38rem',
+  letterSpacing: '0.18em',
+  textTransform: 'uppercase',
+  color:         'rgba(240,237,230,0.2)',
+  writingMode:   'vertical-rl',
+  transform:     'rotate(180deg)',
+}
+
+function TierSeparator({ top, bottom }: { top: string; bottom: string }) {
+  return (
+    <div className="hidden lg:flex flex-col items-center justify-center gap-2 self-stretch py-12" aria-hidden="true">
+      <span style={tierSepStyle}>{top}</span>
+      <div style={{ flex: 1, width: '1px', background: 'rgba(255,255,255,0.05)' }} />
+      <span style={tierSepStyle}>{bottom}</span>
+    </div>
+  )
+}
 
 function CheckIcon() {
   return (
@@ -158,7 +168,7 @@ export default function PricingPage() {
                 Every Basalith archive begins with The Founding —
                 a comprehensive legal and technical engagement that establishes
                 your archive&rsquo;s permanent infrastructure.
-                Executed once. Structured to last centuries.
+                Executed once. Built to last centuries.
               </p>
 
               {/* Divider */}
@@ -221,6 +231,17 @@ export default function PricingPage() {
           </div>
         </section>
 
+        {/* ── FOUNDING LINKS ── */}
+        <div className="bg-obsidian-deep px-8 md:px-16 lg:px-24 pb-12 flex flex-col sm:flex-row items-center justify-center gap-6">
+          <a href="/founding-session" className="font-serif italic text-text-muted hover:text-amber transition-colors duration-200" style={{ fontSize: '0.95rem' }}>
+            What happens in your Founding session →
+          </a>
+          <span className="hidden sm:block text-border-subtle select-none" aria-hidden="true">·</span>
+          <a href="/custodianship" className="font-serif italic text-text-muted hover:text-amber transition-colors duration-200" style={{ fontSize: '0.95rem' }}>
+            Learn about the Data Custodianship Reserve →
+          </a>
+        </div>
+
         {/* ── TIERS ── */}
         <section className="relative bg-obsidian px-8 md:px-16 lg:px-24 py-24 overflow-hidden" aria-label="Pricing tiers">
           <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 70% 50% at 50% 50%,rgba(255,179,71,0.04) 0%,transparent 65%)' }} aria-hidden="true" />
@@ -228,38 +249,53 @@ export default function PricingPage() {
             <p className="eyebrow mb-4">Annual Stewardship</p>
             <h2 className="font-serif font-semibold text-text-primary leading-[1.0] tracking-[-0.03em]" style={{ fontSize: 'clamp(2rem,4vw,3.25rem)' }}>Choose Your Level of Stewardship.</h2>
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            {TIERS.map(({ name, tagline, price, period, monthly, featured, features, cta }) => (
-              <div key={name} className={['relative rounded-sm overflow-hidden flex flex-col', featured ? 'border border-border-amber' : 'border border-border-subtle'].join(' ')} style={{ background: featured ? 'linear-gradient(160deg,#221F14,#1D1B11)' : 'linear-gradient(160deg,#1D1D20,#17171A)' }}>
-                {featured && <div className="absolute top-0 left-[10%] right-[10%] h-px bg-gradient-to-r from-transparent via-amber/50 to-transparent" />}
-                {featured && <div className="absolute top-4 right-4"><div className="ai-badge !text-[0.55rem]">Most Popular</div></div>}
-                <div className="p-8 flex flex-col flex-1">
-                  <div className="mb-7">
-                    <h3 className={['font-serif text-[1.625rem] font-semibold leading-tight mb-2', featured ? 'text-text-primary' : 'text-text-secondary'].join(' ')}>{name}</h3>
-                    <p className="font-sans text-body-sm text-text-muted leading-[1.6]">{tagline}</p>
-                  </div>
-                  <div className="mb-1">
-                    <div className="flex items-baseline gap-2">
-                      <span className="font-serif font-semibold text-text-primary" style={{ fontSize: 'clamp(2rem,4vw,2.75rem)', letterSpacing: '-0.03em' }}>{price}</span>
-                      <span className="font-sans text-[0.75rem] text-text-muted tracking-[0.06em] uppercase">{period}</span>
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_48px_1fr_48px_1fr] gap-y-6 max-w-6xl mx-auto items-start">
+            {TIERS.map(({ name, tagline, price, period, monthly, featured, badge, features, cta }, i) => {
+              const sep = i === 1
+                ? <TierSeparator key="sep-1" top="↑ Core archive" bottom="↓ Full estate integration" />
+                : i === 2
+                  ? <TierSeparator key="sep-2" top="↑ Family archive" bottom="↓ Generational institution" />
+                  : null
+              return [
+                sep,
+                <div key={name} className={['relative rounded-sm overflow-hidden flex flex-col', featured ? 'border border-border-amber' : 'border border-border-subtle'].join(' ')} style={{ background: featured ? 'linear-gradient(160deg,#221F14,#1D1B11)' : 'linear-gradient(160deg,#1D1D20,#17171A)' }}>
+                  {featured && <div className="absolute top-0 left-[10%] right-[10%] h-px bg-gradient-to-r from-transparent via-amber/50 to-transparent" />}
+                  {badge && (
+                    <div className="absolute top-4 right-4">
+                      <div className="ai-badge !text-[0.55rem]">{badge}</div>
                     </div>
-                    <p className="font-sans text-[0.7rem] text-text-muted mt-1">{monthly}</p>
-                  </div>
-                  <div className={['h-px my-6', featured ? 'bg-amber/15' : 'bg-white/[0.06]'].join(' ')} />
-                  <div className="flex flex-col gap-3 flex-1 mb-8">
-                    {features.map((f) => (
-                      <div key={f} className="flex items-start gap-3">
-                        <CheckIcon />
-                        <span className="font-sans text-[0.825rem] text-text-secondary leading-[1.6]">{f}</span>
+                  )}
+                  <div className="p-8 flex flex-col flex-1">
+                    <div className="mb-7">
+                      <h3 className={['font-serif text-[1.625rem] font-semibold leading-tight mb-2', featured ? 'text-text-primary' : 'text-text-secondary'].join(' ')}>{name}</h3>
+                      <p className="font-sans text-body-sm text-text-muted leading-[1.6]">{tagline}</p>
+                    </div>
+                    <div className="mb-1">
+                      <div className="flex items-baseline gap-2">
+                        <span className="font-serif font-semibold text-text-primary" style={{ fontSize: 'clamp(2rem,4vw,2.75rem)', letterSpacing: '-0.03em' }}>{price}</span>
+                        <span className="font-sans text-[0.75rem] text-text-muted tracking-[0.06em] uppercase">{period}</span>
                       </div>
-                    ))}
+                      <p className="font-sans text-[0.7rem] text-text-muted mt-1">{monthly}</p>
+                    </div>
+                    <div className={['h-px my-6', featured ? 'bg-amber/15' : 'bg-white/[0.06]'].join(' ')} />
+                    <div className="flex flex-col gap-3 flex-1 mb-8">
+                      {features.map((f) => (
+                        <div key={f} className="flex items-start gap-3">
+                          <CheckIcon />
+                          <span className="font-sans text-[0.825rem] text-text-secondary leading-[1.6]">{f}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <a href="/contact" className={featured ? 'btn-monolith-amber text-center' : 'btn-monolith text-center'}>{cta}</a>
                   </div>
-                  <a href="/contact" className={featured ? 'btn-monolith-amber text-center' : 'btn-monolith text-center'}>{cta}</a>
-                </div>
-              </div>
-            ))}
+                </div>,
+              ]
+            })}
           </div>
           <p className="text-center font-sans text-[0.75rem] text-text-muted mt-8">All plans require The Founding — a one-time setup investment of $2,500.</p>
+          <p className="text-center font-serif italic text-text-muted mt-2" style={{ fontSize: '0.9rem' }}>
+            The Founding includes archive initialization, legal framework review, your first Essence Mapping session, and Custodian designation.
+          </p>
         </section>
 
         {/* ── LEGAL FRAMING BLOCK ── */}
@@ -281,49 +317,8 @@ export default function PricingPage() {
           </div>
         </section>
 
-        {/* ── PARTNER PROGRAM ── */}
-        <section className="relative bg-obsidian-deep px-8 md:px-16 lg:px-24 py-24 overflow-hidden" aria-label="Partner program">
-          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-border-subtle to-transparent" />
-          <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <p className="eyebrow mb-5">Partner Program</p>
-              <h2 className="font-serif font-semibold text-text-primary leading-[1.0] tracking-[-0.03em] mb-6" style={{ fontSize: 'clamp(2rem,4vw,3.25rem)' }}>
-                Earn a Living From{' '}
-                <em className="italic font-medium text-amber" style={{ fontStyle: 'italic' }}>Selling Permanence.</em>
-              </h2>
-              <p className="font-sans font-light text-body-base text-text-secondary leading-[1.85] mb-4">
-                Basalith offers a structured partnership program for estate attorneys, financial advisors,
-                luxury real estate professionals, and social marketers who believe in what we are building.
-              </p>
-              <p className="font-sans font-light text-body-base text-text-secondary leading-[1.85]">
-                We offer tremendous value to the buyer — a Golden Dataset is arguably more valuable than any
-                other asset they own. Partners who can communicate that earn accordingly.
-              </p>
-            </div>
-            <div className="flex flex-col gap-5 justify-center">
-              <p className="font-sans font-light text-body-base text-text-secondary leading-[1.85]">
-                Partnership terms — including commission structure, onboarding, and client management — are shared privately with approved partners. Apply to receive the full program details.
-              </p>
-              <a href="/contact" className="btn-monolith-ghost text-center mt-2">Apply to Partner Program →</a>
-            </div>
-          </div>
-        </section>
-
         {/* ── FAQ ── */}
-        <section className="relative bg-obsidian px-8 md:px-16 lg:px-24 py-24 overflow-hidden" aria-label="Pricing FAQ">
-          <div className="max-w-3xl mx-auto">
-            <p className="eyebrow mb-5 text-center">Common Questions</p>
-            <h2 className="font-serif font-semibold text-text-primary leading-[1.0] tracking-[-0.03em] mb-16 text-center" style={{ fontSize: 'clamp(2rem,4vw,3.25rem)' }}>What You Should Know.</h2>
-            <div className="flex flex-col gap-0">
-              {FAQ.map(({ q, a }, i) => (
-                <div key={i} className="py-8 border-b border-border-subtle last:border-b-0">
-                  <p className="font-serif text-[1.25rem] font-medium text-text-primary leading-snug mb-3">{q}</p>
-                  <p className="font-sans font-light text-body-sm text-text-secondary leading-[1.8]">{a}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        <PricingFAQ />
 
         {/* ── CTA ── */}
         <section className="relative bg-obsidian-deep px-8 md:px-16 py-36 text-center overflow-hidden" aria-label="Pricing CTA">
