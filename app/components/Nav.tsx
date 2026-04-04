@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 
 const links = [
-  { href: '/#product',          label: 'The Method' },
-  { href: '/#product',          label: 'The Asset'  },
+  { href: '/method',            label: 'The Method' },
+  { href: '/asset',             label: 'The Asset'  },
   { href: '/continuity',        label: 'Continuity' },
   { href: '/pricing',           label: 'Pricing'    },
   { href: '/about',             label: 'About'      },
