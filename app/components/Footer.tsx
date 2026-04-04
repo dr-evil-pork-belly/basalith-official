@@ -2,10 +2,10 @@ const COLS = [
   {
     heading: 'Product',
     links: [
-      { label: 'Essence Mapping',       href: '#'                   },
-      { label: 'Golden Dataset',        href: '#'                   },
-      { label: 'Digital Clone',         href: '#'                   },
-      { label: 'Legacy Plan',           href: '#'                   },
+      { label: 'Essence Mapping',       href: '/founding-session'   },
+      { label: 'Golden Dataset',        href: '/#product'           },
+      { label: 'Digital Clone',         href: 'https://basalith.ai' },
+      { label: 'Legacy Plan',           href: '/pricing'            },
       { label: 'The Founding Session',  href: '/founding-session'   },
       { label: 'The Witness Archive',   href: '/posthumous-archive' },
     ],
@@ -90,7 +90,7 @@ export default function Footer() {
 
       <div className="bg-obsidian-void border-t border-border-subtle px-8 md:px-16 lg:px-24 py-5 flex flex-col sm:flex-row justify-between items-center gap-3">
         <p className="font-sans text-[0.72rem] text-text-muted">
-          © {new Date().getFullYear()} Basalith. All rights reserved.
+          © {new Date().getFullYear()} Heritage Nexus Inc. All rights reserved.
         </p>
         <div className="flex items-center gap-6">
           <a
