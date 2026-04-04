@@ -3,8 +3,8 @@ import Footer from '../components/Footer'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title:       'The Posthumous Archive · Basalith',
-  description: 'For families who want to build an archive for someone they have lost. What can be built. What it honestly costs. How the process works.',
+  title:       'The Witness Archive — Basalith',
+  description: 'Build a permanent AI entity from the memories of everyone who loved them. The Witness Archive by Basalith.',
 }
 
 // ── shared tokens ────────────────────────────────────────────────────────────
@@ -43,8 +43,9 @@ const BODY: React.CSSProperties = {
   fontFamily:  "'Cormorant Garamond', Georgia, serif",
   fontWeight:  300,
   fontSize:    '1.1rem',
-  color:       '#9DA3A8',
+  color:       '#B8B4AB',
   lineHeight:  1.9,
+  marginBottom: '1.5rem',
 }
 
 const GOLD_RULE: React.CSSProperties = {
@@ -57,92 +58,178 @@ const GOLD_RULE: React.CSSProperties = {
 
 function Opening() {
   return (
-    <section
-      aria-label="Opening"
-      style={{
-        background: '#0A0908',
-        padding:    '8rem 2rem',
-      }}
-    >
+    <section aria-label="Opening" style={{ background: '#0A0908', padding: 'clamp(7rem,12vw,10rem) 2rem 6rem' }}>
       <div style={{ maxWidth: '680px', margin: '0 auto' }}>
-        <span style={EYEBROW}>For families who are starting after</span>
+        <span style={EYEBROW}>The Witness Archive</span>
 
         <h1 style={H1}>
-          Some families come to us after the loss.
-          <br />Not before it.
+          The people who loved them remember things<br />
+          they never knew about themselves.
         </h1>
 
+        <p style={BODY}>Every Basalith archive is built from two directions simultaneously.</p>
+
         <p style={BODY}>
-          They have boxes of photographs no one has labeled. Letters in
-          handwriting only one person could read. Voicemails saved for years
-          on phones that are starting to fail.
+          The subject deposits their own memories, wisdom, and beliefs —
+          the inside looking out.
         </p>
-        <p style={{ ...BODY, marginTop: '1.5rem' }}>
-          They want to know if something can still be built from what remains.
+
+        <p style={BODY}>
+          The people who knew them contribute what they observed, what they witnessed,
+          what only they could see — the outside looking in.
         </p>
-        <p
-          style={{
-            ...BODY,
-            marginTop: '1.5rem',
-            color:     '#F0EDE6',
-            fontStyle: 'italic',
-          }}
-        >
-          It can.
+
+        <p style={BODY}>
+          The combination of both produces the most accurate possible representation
+          of a human life.
+        </p>
+
+        <p style={BODY}>
+          When someone has passed, the inside data is frozen at whatever was deposited
+          while they were alive. But the outside data — the witness perspective —
+          is fully available.
+        </p>
+
+        <p style={{ ...BODY, color: '#F0EDE6', fontStyle: 'italic', marginBottom: 0 }}>
+          And witnesses, it turns out, often carry things about a person
+          that the person never knew about themselves.
         </p>
       </div>
     </section>
   )
 }
 
-// ── Section 2 — The honest truth ─────────────────────────────────────────────
+// ── Section 2 — What witnesses carry ────────────────────────────────────────
 
-function HonestTruth() {
+function WitnessesCarry() {
   return (
-    <section
-      aria-label="What we can build"
-      style={{
-        background: '#0A0908',
-        padding:    '0 2rem 6rem',
-      }}
-    >
+    <section aria-label="What witnesses carry" style={{ background: '#0C0B0A', padding: '6rem 2rem' }}>
       <div style={{ maxWidth: '680px', margin: '0 auto' }}>
-        <div aria-hidden="true" style={GOLD_RULE} />
-
-        <span style={EYEBROW}>What we can build</span>
+        <span style={EYEBROW}>What Witnesses Carry</span>
 
         <h2 style={H2}>
-          An entity bounded by<br />what was left behind.
+          A daughter remembers her father&rsquo;s patience in moments
+          he never thought of as patient.
         </h2>
 
         <p style={BODY}>
-          The entity we build will reflect the archive we are given.
+          A colleague remembers a decision that seemed small to the leader
+          but changed everything for the team.
         </p>
-        <p style={{ ...BODY, marginTop: '1.5rem' }}>
-          A rich archive — one built from thousands of labeled photographs,
-          transcribed letters, recorded stories from family members who knew
-          them — produces a rich entity. One that speaks in recognizable
-          patterns. That carries their known opinions, their specific memories,
-          their way of thinking about the world.
+
+        <p style={BODY}>
+          A childhood friend remembers who someone was before they became
+          who they thought they were.
         </p>
-        <p style={{ ...BODY, marginTop: '1.5rem' }}>
-          A sparse archive produces a sparser entity.
+
+        <p style={BODY}>
+          A spouse remembers who they were when no one was watching.
         </p>
-        <p style={{ ...BODY, marginTop: '1.5rem' }}>
-          We will never claim to give you back the person you lost.
+
+        <p style={BODY}>
+          These observations are not secondary to the archive. In many ways they
+          are the archive&rsquo;s most valuable data — because they capture dimensions
+          of a person that the person themselves would never think to deposit.
         </p>
-        <p style={{ ...BODY, marginTop: '1.5rem' }}>
-          We will give you the best possible preservation of who they were —
-          built from everything your family can provide, and held with the same
-          legal and technical permanence as any Basalith archive. That is what
-          we can honestly offer. That is what we will deliver.
+
+        <p style={BODY}>
+          When someone has passed, the witness perspective becomes everything.
+          And it is often richest immediately after a loss — when family members
+          are thinking about the person constantly, when memories are surfacing,
+          when stories are being told at gatherings that have never been told before.
+        </p>
+
+        <p style={{ ...BODY, color: '#F0EDE6', fontStyle: 'italic', marginBottom: 0 }}>
+          That is the moment to begin.
         </p>
       </div>
     </section>
   )
 }
 
-// ── Section 3 — The process ──────────────────────────────────────────────────
+// ── Section 3 — What we can build ───────────────────────────────────────────
+
+function WhatWeCanBuild() {
+  return (
+    <section aria-label="What we can build" style={{ background: '#0A0908', padding: '6rem 2rem' }}>
+      <div style={{ maxWidth: '680px', margin: '0 auto' }}>
+        <div aria-hidden="true" style={GOLD_RULE} />
+
+        <span style={EYEBROW}>What We Can Build</span>
+
+        <h2 style={H2}>
+          An entity built from what remains —<br />
+          and what the people who loved them remember.
+        </h2>
+
+        <p style={BODY}>The entity we build will reflect the archive we are given.</p>
+
+        <p style={BODY}>
+          A witness archive built from thousands of labeled photographs, transcribed
+          letters, guided family sessions, voicemails, and structured witness
+          observations — produces an entity of genuine depth. One that speaks
+          in recognizable patterns. That carries known opinions, specific memories,
+          a particular way of thinking about the world.
+        </p>
+
+        <p style={BODY}>A sparse witness archive produces a sparser entity.</p>
+
+        <p style={BODY}>We will never claim to give you back the person you lost.</p>
+
+        <p style={{ ...BODY, marginBottom: 0 }}>
+          We will build the most complete possible preservation of who they were —
+          from everything that remains and everything the people who loved them remember.
+          That is what we can honestly offer. That is what we will deliver.
+        </p>
+      </div>
+    </section>
+  )
+}
+
+// ── Section 4 — The missing piece ───────────────────────────────────────────
+
+function MissingPiece() {
+  return (
+    <section aria-label="The missing piece" style={{ background: '#0C0B0A', padding: '6rem 2rem' }}>
+      <div style={{ maxWidth: '680px', margin: '0 auto' }}>
+        <span style={EYEBROW}>The Missing Piece</span>
+
+        <h2 style={H2}>
+          Every witness archive has gaps.<br />
+          Here is how we close them.
+        </h2>
+
+        <p style={BODY}>When someone has passed, the data that only they could provide is frozen.</p>
+
+        <p style={BODY}>
+          We cannot recover memories they never deposited. We cannot ask them
+          questions they never answered. We cannot fill the gaps with invention.
+        </p>
+
+        <p style={BODY}>
+          What we can do is use every available witness to triangulate toward the truth.
+        </p>
+
+        <p style={BODY}>
+          When five people who loved the same person each answer the question
+          &ldquo;Describe a moment when you watched them handle something difficult&rdquo; —
+          the entity that emerges from those five answers is more accurate than
+          anything the subject alone could have produced.
+        </p>
+
+        <p style={BODY}>
+          Because the witnesses saw things the subject never saw about themselves.
+        </p>
+
+        <p style={{ ...BODY, color: '#F0EDE6', fontStyle: 'italic', marginBottom: 0 }}>
+          That is the witness archive. Not a lesser product. A different kind of truth.
+        </p>
+      </div>
+    </section>
+  )
+}
+
+// ── Section 5 — The process ──────────────────────────────────────────────────
 
 const STEPS = [
   {
@@ -153,12 +240,12 @@ const STEPS = [
   {
     n:    '02',
     name: 'Digitization Guidance',
-    body: 'We guide your family through what to scan, photograph, transcribe, and upload. We work with what exists — we never fabricate what doesn\'t.',
+    body: "We guide your family through what to scan, photograph, transcribe, and upload. We work with what exists — we never fabricate what doesn't.",
   },
   {
     n:    '03',
-    name: 'Guided Family Labeling Sessions',
-    body: 'Three 90-minute sessions with your family. We surface the photographs. Your family provides the stories. This is where the entity comes alive.',
+    name: 'Guided Witness Sessions',
+    body: "Three 90-minute guided sessions with your family. We surface the photographs. We ask the witness questions — the ones designed to extract what only each person from their specific vantage point could know. A daughter gets different questions than a colleague. A childhood friend gets different questions than a spouse. Every perspective adds something no other perspective can.",
   },
   {
     n:    '04',
@@ -179,15 +266,11 @@ const STEPS = [
 
 function TheProcess() {
   return (
-    <section
-      aria-label="The Posthumous Founding process"
-      style={{
-        background: '#0C0B0A',
-        padding:    '6rem 2rem',
-      }}
-    >
+    <section aria-label="The Witness Founding process" style={{ background: '#0A0908', padding: '6rem 2rem' }}>
       <div style={{ maxWidth: '680px', margin: '0 auto' }}>
-        <span style={EYEBROW}>The Posthumous Founding</span>
+        <div aria-hidden="true" style={GOLD_RULE} />
+
+        <span style={EYEBROW}>The Witness Founding</span>
 
         <h2 style={H2}>
           Six weeks. Your whole family.<br />Everything that remains.
@@ -197,39 +280,30 @@ function TheProcess() {
           {STEPS.map(({ n, name, body }) => (
             <div
               key={n}
-              style={{
-                display:   'grid',
-                gridTemplateColumns: '3rem 1fr',
-                gap:       '1.5rem',
-                alignItems: 'start',
-              }}
+              style={{ display: 'grid', gridTemplateColumns: '3rem 1fr', gap: '1.5rem', alignItems: 'start' }}
             >
-              <span
-                style={{
-                  fontFamily:    "'Space Mono', 'DM Mono', monospace",
-                  fontSize:      '0.62rem',
-                  letterSpacing: '0.1em',
-                  color:         'rgba(196,162,74,0.45)',
-                  paddingTop:    '0.2rem',
-                  display:       'block',
-                }}
-              >
+              <span style={{
+                fontFamily:    "'Space Mono', 'DM Mono', monospace",
+                fontSize:      '0.62rem',
+                letterSpacing: '0.1em',
+                color:         'rgba(196,162,74,0.45)',
+                paddingTop:    '0.2rem',
+                display:       'block',
+              }}>
                 {n}
               </span>
               <div>
-                <p
-                  style={{
-                    fontFamily:    "'Space Mono', 'DM Mono', monospace",
-                    fontSize:      '0.6rem',
-                    letterSpacing: '0.18em',
-                    textTransform: 'uppercase',
-                    color:         '#C4A24A',
-                    marginBottom:  '0.6rem',
-                  }}
-                >
+                <p style={{
+                  fontFamily:    "'Space Mono', 'DM Mono', monospace",
+                  fontSize:      '0.6rem',
+                  letterSpacing: '0.18em',
+                  textTransform: 'uppercase',
+                  color:         '#C4A24A',
+                  marginBottom:  '0.6rem',
+                }}>
                   {name}
                 </p>
-                <p style={{ ...BODY, fontSize: '1rem' }}>{body}</p>
+                <p style={{ ...BODY, fontSize: '1rem', marginBottom: 0 }}>{body}</p>
               </div>
             </div>
           ))}
@@ -239,108 +313,85 @@ function TheProcess() {
   )
 }
 
-// ── Section 4 — Pricing ──────────────────────────────────────────────────────
+// ── Section 6 — Pricing ──────────────────────────────────────────────────────
 
 function Pricing() {
   return (
-    <section
-      aria-label="Pricing"
-      style={{
-        background: '#0A0908',
-        padding:    '6rem 2rem',
-      }}
-    >
+    <section aria-label="Pricing" style={{ background: '#0C0B0A', padding: '6rem 2rem' }}>
       <div style={{ maxWidth: '680px', margin: '0 auto' }}>
         <div aria-hidden="true" style={GOLD_RULE} />
 
         <span style={EYEBROW}>Investment</span>
 
-        <div
-          style={{
-            border:       '1px solid rgba(196,162,74,0.15)',
-            padding:      '2.5rem',
-            marginBottom: '2rem',
-          }}
-        >
-          <p
-            style={{
-              fontFamily:    "'Space Mono', 'DM Mono', monospace",
-              fontSize:      '0.58rem',
-              letterSpacing: '0.22em',
-              textTransform: 'uppercase',
-              color:         '#C4A24A',
-              marginBottom:  '0.75rem',
-            }}
-          >
-            The Posthumous Founding
+        <div style={{ border: '1px solid rgba(196,162,74,0.15)', padding: '2.5rem', marginBottom: '2rem' }}>
+          <p style={{
+            fontFamily:    "'Space Mono', 'DM Mono', monospace",
+            fontSize:      '0.58rem',
+            letterSpacing: '0.22em',
+            textTransform: 'uppercase',
+            color:         '#C4A24A',
+            marginBottom:  '0.75rem',
+          }}>
+            The Witness Founding
           </p>
-          <p
-            style={{
-              fontFamily:  "'Cormorant Garamond', Georgia, serif",
-              fontWeight:  300,
-              fontSize:    '2.6rem',
-              color:       '#F0EDE6',
-              lineHeight:  1,
-              marginBottom: '0.4rem',
-            }}
-          >
+          <p style={{
+            fontFamily:   "'Cormorant Garamond', Georgia, serif",
+            fontWeight:   300,
+            fontSize:     '2.6rem',
+            color:        '#F0EDE6',
+            lineHeight:   1,
+            marginBottom: '0.4rem',
+          }}>
             $4,500
           </p>
-          <p
-            style={{
-              fontFamily:    "'Space Mono', 'DM Mono', monospace",
-              fontSize:      '0.58rem',
-              letterSpacing: '0.18em',
-              textTransform: 'uppercase',
-              color:         '#5C6166',
-            }}
-          >
+          <p style={{
+            fontFamily:    "'Space Mono', 'DM Mono', monospace",
+            fontSize:      '0.58rem',
+            letterSpacing: '0.18em',
+            textTransform: 'uppercase',
+            color:         '#5C6166',
+          }}>
             One-time engagement fee
           </p>
         </div>
 
-        <p style={{ ...BODY, fontSize: '1rem', marginBottom: '1.5rem' }}>
+        <p style={{ ...BODY, fontSize: '1rem' }}>
           Higher than the standard Founding because the labor is different.
           There is no ongoing deposit. There is a fixed body of material and
           six weeks of concentrated work to make the most of what remains.
         </p>
 
-        <p style={{ ...BODY, fontSize: '1rem', marginBottom: '3rem' }}>
+        <p style={{ ...BODY, fontSize: '1rem' }}>
           Ongoing stewardship continues at standard Archive or Estate tier
           pricing after the Founding is complete.
         </p>
 
-        <p
-          style={{
-            fontFamily:  "'Cormorant Garamond', Georgia, serif",
-            fontWeight:  300,
-            fontSize:    '0.95rem',
-            fontStyle:   'italic',
-            color:       '#5C6166',
-            lineHeight:  1.8,
-            marginBottom: '3rem',
-            paddingLeft: '1.25rem',
-            borderLeft:  '2px solid rgba(196,162,74,0.15)',
-          }}
-        >
-          The Posthumous Founding requires a consultation before engagement.
+        <p style={{
+          ...BODY,
+          fontSize:    '0.95rem',
+          fontStyle:   'italic',
+          color:       '#5C6166',
+          marginBottom: '3rem',
+          paddingLeft: '1.25rem',
+          borderLeft:  '2px solid rgba(196,162,74,0.15)',
+        }}>
+          The Witness Founding requires a consultation before engagement.
           Every family&rsquo;s situation is different. We will tell you honestly
           what we can build before you commit to anything.
         </p>
 
         <a
-          href="mailto:legacy@basalith.xyz?subject=Posthumous%20Archive%20Enquiry"
+          href="mailto:legacy@basalith.xyz?subject=Witness%20Archive%20Enquiry"
           style={{
-            display:       'inline-block',
-            fontFamily:    "'Space Mono', 'DM Mono', monospace",
-            fontSize:      '0.62rem',
-            letterSpacing: '0.22em',
-            textTransform: 'uppercase',
-            color:         '#9DA3A8',
+            display:        'inline-block',
+            fontFamily:     "'Space Mono', 'DM Mono', monospace",
+            fontSize:       '0.62rem',
+            letterSpacing:  '0.22em',
+            textTransform:  'uppercase',
+            color:          '#9DA3A8',
             textDecoration: 'none',
-            border:        '1px solid rgba(196,162,74,0.3)',
-            padding:       '1rem 2rem',
-            transition:    'border-color 0.2s, color 0.2s',
+            border:         '1px solid rgba(196,162,74,0.3)',
+            padding:        '1rem 2rem',
           }}
           className="hover:border-amber hover:text-text-primary"
         >
@@ -351,30 +402,21 @@ function Pricing() {
   )
 }
 
-// ── Section 5 — The honest caveat ────────────────────────────────────────────
+// ── Section 7 — Closing quote ────────────────────────────────────────────────
 
-function HonestCaveat() {
+function ClosingQuote() {
   return (
-    <section
-      aria-label="The honest caveat"
-      style={{
-        background: '#0C0B0A',
-        padding:    '7rem 2rem',
-        textAlign:  'center',
-      }}
-    >
+    <section aria-label="Closing" style={{ background: '#0A0908', padding: '7rem 2rem', textAlign: 'center' }}>
       <div style={{ maxWidth: '560px', margin: '0 auto' }}>
-        <p
-          style={{
-            fontFamily:  "'Cormorant Garamond', Georgia, serif",
-            fontWeight:  300,
-            fontSize:    '1.3rem',
-            fontStyle:   'italic',
-            color:       '#9DA3A8',
-            lineHeight:  1.85,
-            marginBottom: '3rem',
-          }}
-        >
+        <p style={{
+          fontFamily:   "'Cormorant Garamond', Georgia, serif",
+          fontWeight:   300,
+          fontSize:     '1.3rem',
+          fontStyle:    'italic',
+          color:        '#9DA3A8',
+          lineHeight:   1.85,
+          marginBottom: '3rem',
+        }}>
           &ldquo;We have had families come to us with a single shoebox of
           photographs and a handful of voicemails.
           <br /><br />
@@ -392,16 +434,14 @@ function HonestCaveat() {
           they had lost.&rdquo;
         </p>
 
-        <p
-          style={{
-            fontFamily:    "'Space Mono', 'DM Mono', monospace",
-            fontSize:      '0.44rem',
-            letterSpacing: '0.28em',
-            textTransform: 'uppercase',
-            color:         '#C4A24A',
-          }}
-        >
-          The Posthumous Archive &middot; Basalith &middot; AI
+        <p style={{
+          fontFamily:    "'Space Mono', 'DM Mono', monospace",
+          fontSize:      '0.44rem',
+          letterSpacing: '0.28em',
+          textTransform: 'uppercase',
+          color:         '#C4A24A',
+        }}>
+          The Witness Archive &middot; Basalith
         </p>
       </div>
     </section>
@@ -416,10 +456,12 @@ export default function PosthumousArchivePage() {
       <Nav />
       <main>
         <Opening />
-        <HonestTruth />
+        <WitnessesCarry />
+        <WhatWeCanBuild />
+        <MissingPiece />
         <TheProcess />
         <Pricing />
-        <HonestCaveat />
+        <ClosingQuote />
       </main>
       <Footer />
     </>

@@ -25,7 +25,7 @@ const COLS = [
       { label: 'The Founding Session', href: '/founding-session'      },
       { label: 'Join Archivists',      href: '/join-archivists'       },
       { label: 'Partners',             href: '/partner'               },
-      { label: 'For Families',         href: '/posthumous-archive'    },
+      { label: 'The Witness Archive',   href: '/posthumous-archive'    },
       { label: 'Contact',              href: '/contact'               },
     ],
   },
