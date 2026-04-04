@@ -217,7 +217,7 @@ export default function PricingPage() {
                       One-Time Engagement Fee
                     </p>
                     <p className="font-serif italic text-text-muted leading-[1.65] mb-3" style={{ fontSize: '0.85rem' }}>
-                      Required for all new archives. Includes your first-year stewardship selection below.
+                      Required for all new archives. Annual stewardship is selected and billed separately below.
                     </p>
                     <p className="font-serif italic text-text-muted leading-[1.7]" style={{ fontSize: '0.8rem' }}>
                       The Founding is executed by a Senior Archivist assigned to your family.
