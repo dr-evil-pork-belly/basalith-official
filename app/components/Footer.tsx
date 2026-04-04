@@ -2,10 +2,7 @@ const COLS = [
   {
     heading: 'Product',
     links: [
-      { label: 'Essence Mapping',       href: '/founding-session'   },
-      { label: 'Golden Dataset',        href: '/#product'           },
       { label: 'Digital Clone',         href: 'https://basalith.ai' },
-      { label: 'Legacy Plan',           href: '/pricing'            },
       { label: 'The Founding Session',  href: '/founding-session'   },
       { label: 'The Witness Archive',   href: '/posthumous-archive' },
     ],
