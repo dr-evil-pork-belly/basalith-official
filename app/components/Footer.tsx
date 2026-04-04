@@ -2,31 +2,31 @@ const COLS = [
   {
     heading: 'Product',
     links: [
-      { label: 'Essence Mapping', href: '#' },
-      { label: 'Golden Dataset', href: '#' },
-      { label: 'Digital Clone', href: '#' },
-      { label: 'Legacy Plan', href: '#' },
+      { label: 'Essence Mapping',       href: '#'                   },
+      { label: 'Golden Dataset',        href: '#'                   },
+      { label: 'Digital Clone',         href: '#'                   },
+      { label: 'Legacy Plan',           href: '#'                   },
+      { label: 'The Founding Session',  href: '/founding-session'   },
+      { label: 'The Witness Archive',   href: '/posthumous-archive' },
     ],
   },
   {
     heading: 'Legal',
     links: [
-      { label: 'Privacy Policy',   href: '/privacy'          },
-      { label: 'Terms of Service', href: '/terms'            },
-      { label: 'Data Ownership',   href: '/data-ownership'   },
-      { label: 'Continuity',       href: '/continuity'       },
-      { label: 'Custodianship',    href: '/custodianship'    },
+      { label: 'Privacy Policy',   href: '/privacy'        },
+      { label: 'Terms of Service', href: '/terms'          },
+      { label: 'Data Ownership',   href: '/data-ownership' },
+      { label: 'Continuity',       href: '/continuity'     },
+      { label: 'Custodianship',    href: '/custodianship'  },
     ],
   },
   {
     heading: 'Company',
     links: [
-      { label: 'About',                href: '/about'                 },
-      { label: 'The Founding Session', href: '/founding-session'      },
-      { label: 'Join Archivists',      href: '/join-archivists'       },
-      { label: 'Partners',             href: '/partner'               },
-      { label: 'The Witness Archive',   href: '/posthumous-archive'    },
-      { label: 'Contact',              href: '/contact'               },
+      { label: 'About',            href: '/about'           },
+      { label: 'Join Archivists',  href: '/join-archivists' },
+      { label: 'Partners',         href: '/join-archivists' },
+      { label: 'Contact',          href: '/contact'         },
     ],
   },
 ]
@@ -90,7 +90,7 @@ export default function Footer() {
 
       <div className="bg-obsidian-void border-t border-border-subtle px-8 md:px-16 lg:px-24 py-5 flex flex-col sm:flex-row justify-between items-center gap-3">
         <p className="font-sans text-[0.72rem] text-text-muted">
-          © {new Date().getFullYear()} Heritage Nexus Inc. All rights reserved.
+          © {new Date().getFullYear()} Basalith. All rights reserved.
         </p>
         <div className="flex items-center gap-6">
           <a
