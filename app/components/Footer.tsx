@@ -14,6 +14,7 @@ const COLS = [
       { label: 'Privacy Policy',   href: '/privacy'          },
       { label: 'Terms of Service', href: '/terms'            },
       { label: 'Data Ownership',   href: '/data-ownership'   },
+      { label: 'Continuity',       href: '/continuity'       },
       { label: 'Custodianship',    href: '/custodianship'    },
     ],
   },
