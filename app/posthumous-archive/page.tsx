@@ -351,10 +351,13 @@ function Pricing() {
             Witness Archive Stewardship
           </p>
           <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 700, fontSize: '2.5rem', color: '#F0EDE6', lineHeight: 1, marginBottom: '0.4rem' }}>
-            $2,400 <span style={{ fontSize: '1.2rem', fontWeight: 300 }}>/ year</span>
+            $3,600 <span style={{ fontSize: '1.2rem', fontWeight: 300 }}>/ year</span>
           </p>
-          <p style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.44rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#5C6166', marginBottom: '1.5rem' }}>
-            $200 / month equivalent
+          <p style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.44rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#5C6166', marginBottom: '0.75rem' }}>
+            $300 / month equivalent
+          </p>
+          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'italic', fontSize: '0.85rem', color: '#9DA3A8', lineHeight: 1.65, marginBottom: '1.5rem' }}>
+            Full Estate tier stewardship — the same infrastructure as any active Basalith archive.
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginBottom: '1.5rem' }}>
             {[
