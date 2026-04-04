@@ -323,77 +323,88 @@ function Pricing() {
 
         <span style={EYEBROW}>Investment</span>
 
-        <div style={{ border: '1px solid rgba(196,162,74,0.15)', padding: '2.5rem', marginBottom: '2rem' }}>
-          <p style={{
-            fontFamily:    "'Space Mono', 'DM Mono', monospace",
-            fontSize:      '0.58rem',
-            letterSpacing: '0.22em',
-            textTransform: 'uppercase',
-            color:         '#C4A24A',
-            marginBottom:  '0.75rem',
-          }}>
+        {/* Part 1 — The Founding */}
+        <div style={{ border: '1px solid rgba(196,162,74,0.2)', borderTop: '2px solid rgba(196,162,74,0.5)', borderRadius: '2px', padding: '2.5rem', marginBottom: '1.5rem' }}>
+          <p style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.44rem', letterSpacing: '0.28em', textTransform: 'uppercase', color: '#C4A24A', marginBottom: '1rem' }}>
             The Witness Founding
           </p>
-          <p style={{
-            fontFamily:   "'Cormorant Garamond', Georgia, serif",
-            fontWeight:   300,
-            fontSize:     '2.6rem',
-            color:        '#F0EDE6',
-            lineHeight:   1,
-            marginBottom: '0.4rem',
-          }}>
+          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 700, fontSize: '3rem', color: '#F0EDE6', lineHeight: 1, marginBottom: '0.4rem' }}>
             $4,500
           </p>
-          <p style={{
-            fontFamily:    "'Space Mono', 'DM Mono', monospace",
-            fontSize:      '0.58rem',
-            letterSpacing: '0.18em',
-            textTransform: 'uppercase',
-            color:         '#5C6166',
-          }}>
-            One-time engagement fee
+          <p style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.44rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#5C6166', marginBottom: '1rem' }}>
+            One-Time Engagement Fee
+          </p>
+          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'italic', fontSize: '0.9rem', color: '#9DA3A8', lineHeight: 1.7, marginBottom: '1.5rem' }}>
+            Six weeks. Every session. Everything that remains.
+          </p>
+          <div style={{ borderTop: '1px solid rgba(196,162,74,0.2)', width: '80px', margin: '0 0 1.5rem' }} />
+          <p style={{ ...BODY, fontSize: '0.95rem', marginBottom: 0 }}>
+            Higher than the standard Founding because the labor is different.
+            There is no ongoing deposit. There is a fixed body of material and
+            six weeks of concentrated work to make the most of what remains.
           </p>
         </div>
 
-        <p style={{ ...BODY, fontSize: '1rem' }}>
-          Higher than the standard Founding because the labor is different.
-          There is no ongoing deposit. There is a fixed body of material and
-          six weeks of concentrated work to make the most of what remains.
-        </p>
+        {/* Part 2 — Ongoing Stewardship */}
+        <div style={{ border: '1px solid rgba(255,255,255,0.06)', borderRadius: '2px', padding: '2.5rem', marginBottom: '2.5rem' }}>
+          <p style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.44rem', letterSpacing: '0.28em', textTransform: 'uppercase', color: '#C4A24A', marginBottom: '1rem' }}>
+            Witness Archive Stewardship
+          </p>
+          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 700, fontSize: '2.5rem', color: '#F0EDE6', lineHeight: 1, marginBottom: '0.4rem' }}>
+            $2,400 <span style={{ fontSize: '1.2rem', fontWeight: 300 }}>/ year</span>
+          </p>
+          <p style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.44rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#5C6166', marginBottom: '1.5rem' }}>
+            $200 / month equivalent
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginBottom: '1.5rem' }}>
+            {[
+              'Permanent secure archive storage',
+              'AI entity active and accessible',
+              'Annual AI model updates applied',
+              'Up to 10 family contributors',
+              'Nightly photograph emails continue',
+              'Custodian designation maintained',
+              'Data Custodianship Reserve coverage',
+              'Legal estate documentation preserved',
+            ].map(f => (
+              <div key={f} style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0 }}>
+                  <circle cx="7" cy="7" r="6.5" stroke="rgba(255,179,71,0.3)" />
+                  <path d="M4 7l2 2 4-4" stroke="#FFB347" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '0.95rem', color: '#B8B4AB', lineHeight: 1.5 }}>{f}</span>
+              </div>
+            ))}
+          </div>
+          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'italic', fontSize: '0.85rem', color: '#5C6166', lineHeight: 1.75, margin: 0 }}>
+            Stewardship begins after The Witness Founding is complete. Renews annually.
+            Cancel at any time — archive accessible for 90 days after cancellation.
+          </p>
+        </div>
 
-        <p style={{ ...BODY, fontSize: '1rem' }}>
-          Ongoing stewardship continues at standard Archive or Estate tier
-          pricing after the Founding is complete.
-        </p>
-
-        <p style={{
-          ...BODY,
-          fontSize:    '0.95rem',
-          fontStyle:   'italic',
-          color:       '#5C6166',
-          marginBottom: '3rem',
-          paddingLeft: '1.25rem',
-          borderLeft:  '2px solid rgba(196,162,74,0.15)',
-        }}>
+        {/* Consultation note + CTA */}
+        <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'italic', fontSize: '0.95rem', color: '#9DA3A8', lineHeight: 1.8, marginBottom: '2rem', maxWidth: '560px' }}>
           The Witness Founding requires a consultation before engagement.
           Every family&rsquo;s situation is different. We will tell you honestly
-          what we can build before you commit to anything.
+          what we can build — and what it will cost — before you commit to anything.
         </p>
 
         <a
           href="mailto:legacy@basalith.xyz?subject=Witness%20Archive%20Enquiry"
           style={{
             display:        'inline-block',
-            fontFamily:     "'Space Mono', 'DM Mono', monospace",
-            fontSize:       '0.62rem',
+            fontFamily:     "'Space Mono', monospace",
+            fontSize:       '0.58rem',
             letterSpacing:  '0.22em',
             textTransform:  'uppercase',
-            color:          '#9DA3A8',
+            color:          '#B8B4AB',
             textDecoration: 'none',
             border:         '1px solid rgba(196,162,74,0.3)',
+            borderRadius:   '2px',
             padding:        '1rem 2rem',
+            transition:     'border-color 0.2s, color 0.2s',
           }}
-          className="hover:border-amber hover:text-text-primary"
+          className="hover:border-amber hover:text-amber"
         >
           Request a Consultation
         </a>
