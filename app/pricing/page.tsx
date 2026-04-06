@@ -335,8 +335,7 @@ export default function PricingPage() {
               and that leaving it unarchived is a choice with consequences
               their family will live with long after they are gone.
             </p>
-            <a href="mailto:legacy@basalith.xyz" className="btn-monolith-amber group">Begin Your Archive <span className="transition-transform duration-200 group-hover:translate-x-1">→</span></a>
-            <div className="mt-8 flex flex-col items-center gap-1.5">
+            <div className="flex flex-col items-center gap-1.5">
               <p className="font-sans text-[0.75rem] text-text-muted">Archives are accepted on a rolling basis.</p>
               <a href="mailto:legacy@basalith.xyz" className="font-sans text-[0.75rem] tracking-[0.04em] text-amber-dim hover:text-amber transition-colors">legacy@basalith.xyz</a>
             </div>
