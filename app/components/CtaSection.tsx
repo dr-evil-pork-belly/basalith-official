@@ -41,7 +41,10 @@ export default function CtaSection() {
           <div className="flex items-center justify-center gap-5 flex-wrap">
             <a href="/pricing" className="btn-monolith-amber group">Apply for Access <span className="transition-transform duration-200 group-hover:translate-x-1">→</span></a>
           </div>
-          <p className="font-sans text-[0.75rem] text-text-muted tracking-[0.04em] mt-10">Archives are accepted on a rolling basis.&nbsp;&middot;&nbsp;<a href="mailto:legacy@basalith.xyz" className="text-amber-dim hover:text-amber transition-colors duration-200">legacy@basalith.xyz</a></p>
+          <div className="mt-10 flex flex-col items-center gap-1.5">
+            <p className="font-sans text-[0.75rem] text-text-muted tracking-[0.04em]">Archives are accepted on a rolling basis.</p>
+            <a href="mailto:legacy@basalith.xyz" className="font-sans text-[0.75rem] tracking-[0.04em] text-amber-dim hover:text-amber transition-colors duration-200">legacy@basalith.xyz</a>
+          </div>
         </div>
       </section>
       <EcosystemBridge />
