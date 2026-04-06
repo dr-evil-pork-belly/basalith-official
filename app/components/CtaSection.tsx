@@ -39,7 +39,7 @@ export default function CtaSection() {
           <h2 className="font-serif font-semibold text-text-primary leading-[0.9] tracking-[-0.04em] mb-6" style={{ fontSize: 'clamp(2.75rem,6vw,5.5rem)' }}>Basalith Is Not <em className="italic font-medium text-amber" style={{ fontStyle: 'italic' }}>For Everyone.</em></h2>
           <p className="font-sans font-light text-body-base text-text-secondary leading-[1.82] mb-12">It is for the rare few who understand that memory is an asset, and that leaving it unarchived is a choice with consequences their family will live with long after they are gone.</p>
           <div className="flex items-center justify-center gap-5 flex-wrap">
-            <a href="/contact" className="btn-monolith-amber group">Apply for Access <span className="transition-transform duration-200 group-hover:translate-x-1">→</span></a>
+            <a href="/pricing" className="btn-monolith-amber group">Apply for Access <span className="transition-transform duration-200 group-hover:translate-x-1">→</span></a>
           </div>
           <p className="font-sans text-[0.75rem] text-text-muted tracking-[0.04em] mt-10">Archives are accepted on a rolling basis.&nbsp;&middot;&nbsp;<a href="mailto:legacy@basalith.xyz" className="text-amber-dim hover:text-amber transition-colors duration-200">legacy@basalith.xyz</a></p>
         </div>
