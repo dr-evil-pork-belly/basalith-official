@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { inngest } from '@/lib/inngest'
 import { NextRequest, NextResponse } from 'next/server'
 
 const MILESTONE_NUMBERS = [1, 5, 10, 25, 50, 100, 250, 500]
@@ -59,7 +60,20 @@ export async function POST(req: NextRequest) {
 
     if (photoError) throw photoError
 
-    // ── 3. Create label record ────────────────────────────────────────────────
+    // ── 3. Fire filter agent if photo was uploaded ────────────────────────────
+    if (storagePath) {
+      inngest.send({
+        name: 'photo/uploaded',
+        data: {
+          photographId: photo.id,
+          archiveId,
+          storagePath,
+          uploadedBy: labelledBy || 'owner',
+        },
+      }).catch(() => {}) // non-fatal — agent pipeline is background
+    }
+
+    // ── 4. Create label record ────────────────────────────────────────────────
     const { error: labelError } = await supabaseAdmin
       .from('labels')
       .insert({

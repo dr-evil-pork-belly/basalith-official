@@ -131,7 +131,210 @@ const EMPTY: ArchiveItem = {
   inviteEmail: '', contributor: '', labeledAt: '',
 }
 
+const BATCH_SIZE = 20
+
+function BulkUploadTab({ archiveId }: { archiveId: string }) {
+  const [files,     setFiles]     = useState<File[]>([])
+  const [dragging,  setDragging]  = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [progress,  setProgress]  = useState(0) // 0-100
+  const [done,      setDone]      = useState<{ uploaded: number; failed: number } | null>(null)
+  const [error,     setError]     = useState<string | null>(null)
+  const dropRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  function addFiles(incoming: FileList | null) {
+    if (!incoming) return
+    const imgs = Array.from(incoming).filter(f => f.type.startsWith('image/'))
+    setFiles(prev => {
+      const existing = new Set(prev.map(f => f.name + f.size))
+      const next = imgs.filter(f => !existing.has(f.name + f.size))
+      return [...prev, ...next]
+    })
+  }
+
+  function onDrop(e: React.DragEvent) {
+    e.preventDefault()
+    setDragging(false)
+    addFiles(e.dataTransfer.files)
+  }
+
+  function removeFile(idx: number) {
+    setFiles(prev => prev.filter((_, i) => i !== idx))
+  }
+
+  async function upload() {
+    if (!files.length) return
+    setUploading(true)
+    setError(null)
+    setProgress(0)
+
+    let totalUploaded = 0
+    let totalFailed   = 0
+    const batches = []
+    for (let i = 0; i < files.length; i += BATCH_SIZE) {
+      batches.push(files.slice(i, i + BATCH_SIZE))
+    }
+
+    for (let b = 0; b < batches.length; b++) {
+      const batch = batches[b]
+      const fd = new FormData()
+      fd.append('archiveId', archiveId)
+      batch.forEach(f => fd.append('photos', f))
+
+      try {
+        const res  = await fetch('/api/archive/bulk-upload', { method: 'POST', body: fd })
+        const data = await res.json()
+        totalUploaded += data.uploaded ?? 0
+        totalFailed   += data.failed   ?? 0
+      } catch {
+        totalFailed += batch.length
+      }
+
+      setProgress(Math.round(((b + 1) / batches.length) * 100))
+    }
+
+    setUploading(false)
+    setDone({ uploaded: totalUploaded, failed: totalFailed })
+  }
+
+  if (done) {
+    return (
+      <div className="flex flex-col items-center gap-6 py-16 text-center">
+        <Sigil size={36} />
+        <div>
+          <p className="font-serif font-semibold" style={{ fontSize: '2rem', color: '#F0F0EE', lineHeight: 1.1 }}>
+            {done.uploaded} photograph{done.uploaded === 1 ? '' : 's'} received.
+          </p>
+          <p className="font-serif" style={{ fontSize: '1rem', color: 'rgba(196,162,74,0.7)', fontStyle: 'italic', marginTop: '0.5rem' }}>
+            Our AI is reviewing each one now.
+          </p>
+          {done.failed > 0 && (
+            <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.1em', color: '#5C6166', marginTop: '0.75rem' }}>
+              {done.failed} could not be uploaded — try again
+            </p>
+          )}
+        </div>
+        <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#5C6166', maxWidth: '320px' }}>
+          Check your gallery in 15–20 minutes. Blurry or unrelated photos will be filtered automatically.
+        </p>
+        <div className="flex gap-3 mt-2">
+          <button onClick={() => { setDone(null); setFiles([]) }}
+            className="btn-monolith-amber">
+            Upload More
+          </button>
+          <a href="/archive/gallery"
+            style={{ fontFamily: 'monospace', fontSize: '0.62rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#5C6166', display: 'flex', alignItems: 'center' }}>
+            View Gallery →
+          </a>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex flex-col gap-8">
+      {/* Drop zone */}
+      <div
+        ref={dropRef}
+        onDragOver={e => { e.preventDefault(); setDragging(true) }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={onDrop}
+        onClick={() => !uploading && inputRef.current?.click()}
+        className="w-full flex flex-col items-center justify-center gap-3 rounded-sm border py-14 transition-all duration-200 cursor-pointer"
+        style={{
+          borderColor:  dragging ? 'rgba(196,162,74,0.5)' : 'rgba(255,255,255,0.08)',
+          borderStyle:  'dashed',
+          background:   dragging ? 'rgba(196,162,74,0.04)' : '#111112',
+        }}
+      >
+        <div className="w-10 h-10 flex items-center justify-center rounded-sm border" style={{ borderColor: 'rgba(196,162,74,0.3)' }}>
+          <span style={{ color: 'rgba(196,162,74,0.6)', fontSize: '1.4rem', lineHeight: 1 }}>↑</span>
+        </div>
+        <p className="font-serif" style={{ color: '#F0F0EE', fontSize: '1rem', fontWeight: 300 }}>
+          {dragging ? 'Drop them here.' : 'Drop photographs here, or click to select.'}
+        </p>
+        <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.14em', color: '#5C6166', textTransform: 'uppercase' }}>
+          JPG · PNG · HEIC · Any image format
+        </p>
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          multiple
+          className="hidden"
+          onChange={e => addFiles(e.target.files)}
+        />
+      </div>
+
+      {/* File list */}
+      {files.length > 0 && (
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.7)' }}>
+              {files.length} photograph{files.length === 1 ? '' : 's'} queued
+            </p>
+            <button onClick={() => setFiles([])}
+              style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#5C6166' }}>
+              Clear all
+            </button>
+          </div>
+          <div className="flex flex-col gap-1.5" style={{ maxHeight: '220px', overflowY: 'auto' }}>
+            {files.map((f, i) => (
+              <div key={i} className="flex items-center justify-between px-3 py-2 rounded-sm"
+                style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
+                <div className="flex items-center gap-3 min-w-0">
+                  <span style={{ color: 'rgba(196,162,74,0.4)', fontSize: '0.7rem' }}>◻</span>
+                  <p style={{ fontFamily: 'monospace', fontSize: '0.55rem', color: '#F0F0EE', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {f.name}
+                  </p>
+                </div>
+                <button onClick={() => removeFile(i)} disabled={uploading}
+                  style={{ fontFamily: 'monospace', fontSize: '0.5rem', color: '#3A3F44', marginLeft: '0.75rem', flexShrink: 0 }}>
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Progress bar (while uploading) */}
+      {uploading && (
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#5C6166' }}>
+              Uploading…
+            </p>
+            <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', color: 'rgba(196,162,74,0.7)' }}>{progress}%</p>
+          </div>
+          <div className="w-full h-px" style={{ background: 'rgba(255,255,255,0.06)' }}>
+            <div className="h-px transition-all duration-300" style={{ width: `${progress}%`, background: 'rgba(196,162,74,0.8)' }} />
+          </div>
+        </div>
+      )}
+
+      {error && (
+        <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', color: '#9DA3A8' }}>{error}</p>
+      )}
+
+      <button
+        onClick={upload}
+        disabled={!files.length || uploading}
+        className="btn-monolith-amber w-full text-center disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        {uploading ? `Uploading ${progress}%…` : `Upload ${files.length || ''} Photograph${files.length === 1 ? '' : 's'}`}
+      </button>
+
+      <p style={{ fontFamily: 'monospace', fontSize: '0.48rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#3A3F44', textAlign: 'center' }}>
+        Uploaded in batches of {BATCH_SIZE} · Our AI reviews each photograph automatically
+      </p>
+    </div>
+  )
+}
+
 export default function LabelClient({ archiveId }: { archiveId: string }) {
+  const [tab, setTab]                       = useState<'single' | 'bulk'>('single')
   const [form, setForm]                     = useState<ArchiveItem>(EMPTY)
   const [imagePreview, setImagePreview]     = useState<string | null>(null)
   const [saving, setSaving]                 = useState(false)
@@ -327,10 +530,37 @@ export default function LabelClient({ archiveId }: { archiveId: string }) {
         <div className="mb-8">
           <p className="eyebrow mb-3">Labeling Game</p>
           <h1 className="font-serif font-semibold leading-[0.95] tracking-[-0.03em]" style={{ fontSize: 'clamp(1.8rem,3vw,2.4rem)', color: '#F0F0EE' }}>
-            Label a Memory
+            {tab === 'single' ? 'Label a Memory' : 'Upload Everything'}
           </h1>
         </div>
 
+        {/* Tab switcher */}
+        <div className="flex gap-0 mb-10 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+          {(['single', 'bulk'] as const).map(t => (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              style={{
+                fontFamily:    'monospace',
+                fontSize:      '0.5rem',
+                letterSpacing: '0.22em',
+                textTransform: 'uppercase',
+                padding:       '0.6rem 1.25rem',
+                color:         tab === t ? 'rgba(196,162,74,0.9)' : '#5C6166',
+                borderBottom:  tab === t ? '1px solid rgba(196,162,74,0.6)' : '1px solid transparent',
+                marginBottom:  '-1px',
+                background:    'transparent',
+                transition:    'color 0.15s',
+              }}
+            >
+              {t === 'single' ? 'One Photograph' : 'Upload Everything'}
+            </button>
+          ))}
+        </div>
+
+        {tab === 'bulk' && <BulkUploadTab archiveId={archiveId} />}
+
+        {tab === 'single' && (<>
         <div className="flex items-center gap-6 mb-10 px-5 py-4 rounded-sm border" style={{ background: '#111112', borderColor: 'rgba(255,255,255,0.06)' }}>
           <div>
             <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#5C6166', marginBottom: '0.25rem' }}>Streak</p>
@@ -451,6 +681,7 @@ export default function LabelClient({ archiveId }: { archiveId: string }) {
             [ Test Milestone Overlay — Remove Before Deploy ]
           </button>
         </div>
+        </>)}
 
       </div>
     </>

@@ -103,6 +103,42 @@ export default function GalleryClient({ archiveId }: { archiveId: string }) {
   const [total,      setTotal]      = useState(0)
   const [totalPages, setTotalPages] = useState(1)
 
+  const [processingStatus, setProcessingStatus] = useState<{
+    total:              number
+    processed:          number
+    kept:               number
+    discarded:          number
+    pending:            number
+    processingComplete: boolean
+  } | null>(null)
+  const [showComplete, setShowComplete] = useState(false)
+
+  useEffect(() => {
+    if (!archiveId) return
+    let interval: ReturnType<typeof setInterval>
+
+    const checkStatus = async () => {
+      try {
+        const res  = await fetch(`/api/archive/processing-status?archiveId=${archiveId}`)
+        const data = await res.json()
+        setProcessingStatus(data)
+        if (data.processingComplete || data.pending === 0) {
+          clearInterval(interval)
+          if (data.total > 0) {
+            setShowComplete(true)
+            setTimeout(() => setShowComplete(false), 6000)
+          }
+        }
+      } catch (err) {
+        console.error('Status check error:', err)
+      }
+    }
+
+    checkStatus()
+    interval = setInterval(checkStatus, 10000)
+    return () => clearInterval(interval)
+  }, [archiveId])
+
   useEffect(() => {
     const fn = (e: KeyboardEvent) => { if (e.key === 'Escape') setSelected(null) }
     window.addEventListener('keydown', fn)
@@ -174,6 +210,38 @@ export default function GalleryClient({ archiveId }: { archiveId: string }) {
           {loading ? '—' : `${total} ${total === 1 ? 'Memory' : 'Memories'} Archived`}
         </h1>
       </div>
+
+      {processingStatus && processingStatus.pending > 0 && (
+        <div style={{ background: 'rgba(196,162,74,0.06)', border: '1px solid rgba(196,162,74,0.15)', borderRadius: '2px', padding: '1rem 1.5rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+          <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#C4A24A', flexShrink: 0, animation: 'pulse 1.5s ease-in-out infinite' }} />
+          <div style={{ flex: 1 }}>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: '0.95rem', fontStyle: 'italic', color: '#F0EDE6', margin: '0 0 4px' }}>
+              Analyzing your photographs...
+            </p>
+            <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.38rem', letterSpacing: '0.2em', color: '#706C65', margin: '0 0 8px' }}>
+              {processingStatus.processed} OF {processingStatus.total} ANALYZED
+              {processingStatus.discarded > 0 && ` · ${processingStatus.discarded} REMOVED`}
+            </p>
+            <div style={{ height: '3px', background: 'rgba(240,237,230,0.08)', borderRadius: '2px', overflow: 'hidden', maxWidth: '300px' }}>
+              <div style={{ height: '100%', background: '#C4A24A', borderRadius: '2px', width: processingStatus.total > 0 ? `${Math.round((processingStatus.processed / processingStatus.total) * 100)}%` : '0%', transition: 'width 0.5s ease' }} />
+            </div>
+          </div>
+          <p style={{ fontFamily: 'Georgia, serif', fontSize: '0.8rem', fontStyle: 'italic', color: '#706C65', margin: 0, flexShrink: 0 }}>
+            Screenshots and unrelated photos are removed automatically.
+          </p>
+        </div>
+      )}
+
+      {showComplete && processingStatus && (
+        <div style={{ background: 'rgba(196,162,74,0.08)', border: '1px solid rgba(196,162,74,0.25)', borderRadius: '2px', padding: '1rem 1.5rem', marginBottom: '2rem', textAlign: 'center' }}>
+          <p style={{ fontFamily: 'Georgia, serif', fontSize: '1rem', fontStyle: 'italic', color: '#F0EDE6', margin: '0 0 4px' }}>
+            Analysis complete.
+          </p>
+          <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.4rem', letterSpacing: '0.25em', color: '#C4A24A', margin: 0 }}>
+            {processingStatus.kept} PHOTOGRAPHS READY · {processingStatus.discarded} REMOVED
+          </p>
+        </div>
+      )}
 
       <div className="flex flex-col sm:flex-row gap-4 mb-8">
         <input
