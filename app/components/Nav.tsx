@@ -57,8 +57,31 @@ export default function Nav() {
         </ul>
 
         <div className="flex items-center gap-4">
-          <a href="/archive-login" className="font-sans text-[0.72rem] font-medium tracking-[0.1em] uppercase text-text-muted no-underline transition-colors duration-200 hover:text-text-primary">Sign In</a>
-          <a href="/apply" className="btn-monolith-amber !py-2.5 !px-5 !text-[0.72rem]">Begin Archive</a>
+          <a
+            href="/archive-login"
+            style={{
+              fontFamily:    "'Space Mono', 'DM Mono', monospace",
+              fontSize:      '0.42rem',
+              letterSpacing: '0.25em',
+              textTransform: 'uppercase' as const,
+              color:         '#B8B4AB',
+              textDecoration: 'none',
+              border:        '1px solid rgba(196,162,74,0.4)',
+              padding:       '0.4rem 1.2rem',
+              background:    'transparent',
+              transition:    'border-color 0.2s, color 0.2s',
+            }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLElement).style.borderColor = 'rgba(196,162,74,0.9)'
+              ;(e.currentTarget as HTMLElement).style.color = '#C4A24A'
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLElement).style.borderColor = 'rgba(196,162,74,0.4)'
+              ;(e.currentTarget as HTMLElement).style.color = '#B8B4AB'
+            }}
+          >
+            Sign In
+          </a>
           <button
             className="md:hidden flex flex-col justify-center items-center gap-[5px] w-8 h-8"
             onClick={() => setOpen(!open)}
@@ -78,7 +101,23 @@ export default function Nav() {
               {label}
             </a>
           ))}
-          <a href="/pricing" onClick={() => setOpen(false)} className="btn-monolith-amber mt-4">Begin Archive</a>
+          <a
+            href="/apply"
+            onClick={() => setOpen(false)}
+            style={{
+              fontFamily:    "'Space Mono', 'DM Mono', monospace",
+              fontSize:      '0.44rem',
+              letterSpacing: '0.22em',
+              textTransform: 'uppercase' as const,
+              color:         '#C4A24A',
+              textDecoration: 'none',
+              borderTop:     '1px solid rgba(196,162,74,0.15)',
+              paddingTop:    '1rem',
+              marginTop:     '1rem',
+            }}
+          >
+            Request Your Founding →
+          </a>
         </div>
       )}
     </>
