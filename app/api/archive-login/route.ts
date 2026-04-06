@@ -1,34 +1,60 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import bcrypt from 'bcryptjs'
 
 export async function POST(req: NextRequest) {
   const { password } = await req.json()
 
-  // ── Resolve archive ID from credentials map ────────────────────────────────
-  // ARCHIVE_CREDENTIALS format: "pass1:uuid1,pass2:uuid2"
+  if (!password) {
+    return NextResponse.json({ error: 'Password required' }, { status: 400 })
+  }
+
   let archiveId: string | null = null
 
-  const credMap = process.env.ARCHIVE_CREDENTIALS || ''
-  if (credMap) {
-    for (const pair of credMap.split(',')) {
-      const [p, id] = pair.split(':')
-      if (p?.trim() === password) { archiveId = id?.trim() ?? null; break }
+  // ── 1. Check Supabase hashed credentials ──────────────────────────────────
+  const { data: allCredentials } = await supabaseAdmin
+    .from('archive_credentials')
+    .select('archive_id, password_hash')
+    .eq('is_active', true)
+
+  if (allCredentials && allCredentials.length > 0) {
+    for (const cred of allCredentials) {
+      const matches = await bcrypt.compare(password, cred.password_hash)
+      if (matches) {
+        archiveId = cred.archive_id
+        // Update last_used non-blocking
+        supabaseAdmin
+          .from('archive_credentials')
+          .update({ last_used_at: new Date().toISOString() })
+          .eq('archive_id', cred.archive_id)
+          .then(() => {})
+        break
+      }
     }
   }
 
-  // Fall back to single demo credential
-  if (!archiveId && password === process.env.ARCHIVE_PASSWORD) {
-    archiveId = process.env.DEMO_ARCHIVE_ID ?? null
+  // ── 2. Fall back to env var credentials ───────────────────────────────────
+  if (!archiveId) {
+    const credMap = process.env.ARCHIVE_CREDENTIALS || ''
+    if (credMap) {
+      for (const pair of credMap.split(',')) {
+        const [p, id] = pair.split(':')
+        if (p?.trim() === password) { archiveId = id?.trim() ?? null; break }
+      }
+    }
+    if (!archiveId && password === process.env.ARCHIVE_PASSWORD) {
+      archiveId = process.env.DEMO_ARCHIVE_ID ?? null
+    }
   }
 
   if (!archiveId) {
     return NextResponse.json({ error: 'Invalid password' }, { status: 401 })
   }
 
-  // ── Verify archive exists ──────────────────────────────────────────────────
+  // ── 3. Verify archive exists and is active ────────────────────────────────
   const { data: archive } = await supabaseAdmin
     .from('archives')
-    .select('id, name, family_name')
+    .select('id, name, family_name, status')
     .eq('id', archiveId)
     .single()
 

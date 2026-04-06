@@ -47,6 +47,13 @@ export default function ArchivistLayout({ children }: { children: React.ReactNod
           style={{ background: '#111112' }}
         >
           <nav className="flex-1 py-6 px-3 flex flex-col gap-0.5">
+            <a
+              href="/archivist/onboard"
+              className="flex items-center justify-center font-sans text-[0.72rem] font-bold tracking-[0.12em] uppercase no-underline mb-4 py-2.5 px-3 rounded-sm transition-all duration-150"
+              style={{ background: '#C4A24A', color: '#0A0908' }}
+            >
+              + New Client
+            </a>
             {NAV.map(({ label, href }) => {
               const active = pathname === href
               return (
@@ -83,6 +90,13 @@ export default function ArchivistLayout({ children }: { children: React.ReactNod
             style={{ background: '#111112' }}
           >
             <div className="flex gap-0 min-w-max">
+              <a
+                href="/archivist/onboard"
+                className="font-sans text-[0.68rem] font-bold tracking-[0.06em] px-4 py-3 no-underline flex-shrink-0"
+                style={{ color: '#C4A24A', borderBottom: '2px solid rgba(196,162,74,0.5)' }}
+              >
+                + New Client
+              </a>
               {NAV.map(({ label, href }) => {
                 const active = pathname === href
                 return (
