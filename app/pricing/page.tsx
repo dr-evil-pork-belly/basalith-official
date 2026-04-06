@@ -286,7 +286,7 @@ export default function PricingPage() {
                         </div>
                       ))}
                     </div>
-                    <a href="/contact" className={featured ? 'btn-monolith-amber text-center' : 'btn-monolith text-center'}>{cta}</a>
+                    <a href="mailto:legacy@basalith.xyz" className={featured ? 'btn-monolith-amber text-center' : 'btn-monolith text-center'}>{cta}</a>
                   </div>
                 </div>,
               ]
@@ -335,8 +335,11 @@ export default function PricingPage() {
               and that leaving it unarchived is a choice with consequences
               their family will live with long after they are gone.
             </p>
-            <a href="/contact" className="btn-monolith-amber group">Apply for Access <span className="transition-transform duration-200 group-hover:translate-x-1">→</span></a>
-            <p className="font-sans text-[0.75rem] text-text-muted mt-8">Archives are accepted on a rolling basis.&nbsp;&middot;&nbsp;<a href="mailto:legacy@basalith.xyz" className="text-amber-dim hover:text-amber transition-colors">legacy@basalith.xyz</a></p>
+            <a href="mailto:legacy@basalith.xyz" className="btn-monolith-amber group">Begin Your Archive <span className="transition-transform duration-200 group-hover:translate-x-1">→</span></a>
+            <div className="mt-8 flex flex-col items-center gap-1.5">
+              <p className="font-sans text-[0.75rem] text-text-muted">Archives are accepted on a rolling basis.</p>
+              <a href="mailto:legacy@basalith.xyz" className="font-sans text-[0.75rem] tracking-[0.04em] text-amber-dim hover:text-amber transition-colors">legacy@basalith.xyz</a>
+            </div>
           </div>
         </section>
 
