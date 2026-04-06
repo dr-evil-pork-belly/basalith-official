@@ -22,7 +22,7 @@ const TIERS = [
       'Data portability guarantee',
       'Data Custodianship Reserve coverage',
     ],
-    cta: 'BEGIN WITH THE ARCHIVE',
+    cta: 'REQUEST YOUR FOUNDING',
   },
   {
     name:     'The Estate',
@@ -45,7 +45,7 @@ const TIERS = [
       'Family access tiers — control who sees what',
       '48-hour response on all support requests',
     ],
-    cta: 'BEGIN WITH THE ESTATE',
+    cta: 'REQUEST YOUR FOUNDING',
   },
   {
     name:     'The Dynasty',
@@ -69,7 +69,7 @@ const TIERS = [
       'Custom bequest language prepared',
       '200-year perpetual storage guarantee',
     ],
-    cta: 'BEGIN WITH THE DYNASTY',
+    cta: 'REQUEST YOUR FOUNDING',
   },
 ]
 
@@ -286,7 +286,7 @@ export default function PricingPage() {
                         </div>
                       ))}
                     </div>
-                    <a href="mailto:legacy@basalith.xyz" className={featured ? 'btn-monolith-amber text-center' : 'btn-monolith text-center'}>{cta}</a>
+                    <a href="/apply" className={featured ? 'btn-monolith-amber text-center' : 'btn-monolith text-center'}>{cta}</a>
                   </div>
                 </div>,
               ]

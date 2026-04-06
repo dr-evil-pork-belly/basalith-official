@@ -273,31 +273,31 @@ export default function FoundingSessionPage() {
             </p>
 
             <a
-              href="/pricing"
+              href="/apply"
               style={{
                 display:        'inline-block',
                 fontFamily:     "'Space Mono', 'DM Mono', monospace",
                 fontSize:       '0.6rem',
                 letterSpacing:  '0.22em',
                 textTransform:  'uppercase' as const,
-                color:          '#9DA3A8',
+                color:          '#0A0908',
                 textDecoration: 'none',
-                border:         '1px solid rgba(196,162,74,0.25)',
+                background:     '#C4A24A',
                 padding:        '0.85rem 1.75rem',
                 marginBottom:   '1.5rem',
               }}
             >
-              View stewardship plans →
+              Request your Founding →
             </a>
 
             <p style={{
-              fontFamily:    "'Space Mono', 'DM Mono', monospace",
-              fontSize:      '0.52rem',
-              letterSpacing: '0.15em',
-              color:         '#5C6166',
-              marginTop:     '1.5rem',
+              fontFamily:  "'Cormorant Garamond', Georgia, serif",
+              fontSize:    '0.9rem',
+              fontStyle:   'italic',
+              color:       '#5C6166',
+              marginTop:   '1.5rem',
             }}>
-              Your Archivist will contact you within 24 hours of your Founding payment to schedule your session.
+              <a href="/pricing" style={{ color: '#706C65', textDecoration: 'none' }}>View stewardship plans →</a>
             </p>
 
           </div>

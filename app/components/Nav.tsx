@@ -58,7 +58,7 @@ export default function Nav() {
 
         <div className="flex items-center gap-4">
           <a href="/archive-login" className="font-sans text-[0.72rem] font-medium tracking-[0.1em] uppercase text-text-muted no-underline transition-colors duration-200 hover:text-text-primary">Sign In</a>
-          <a href="/pricing" className="btn-monolith-amber !py-2.5 !px-5 !text-[0.72rem]">Begin Archive</a>
+          <a href="/apply" className="btn-monolith-amber !py-2.5 !px-5 !text-[0.72rem]">Begin Archive</a>
           <button
             className="md:hidden flex flex-col justify-center items-center gap-[5px] w-8 h-8"
             onClick={() => setOpen(!open)}
