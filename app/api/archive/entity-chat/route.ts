@@ -4,53 +4,114 @@ import { NextResponse } from 'next/server'
 
 const anthropic = new Anthropic()
 
-async function buildEntitySystemPrompt(archiveId: string): Promise<string> {
-  const [archive, labels, ownerDeposits, photographs, people, decades, witnessDeposits] = await Promise.all([
+// ── Topic keyword map ──────────────────────────────────────────────────────
+const TOPIC_KEYWORDS: Record<string, string[]> = {
+  money:   ['money', 'financial', 'invest', 'wealth', 'afford', 'cost', 'rich', 'poor', 'business', 'work'],
+  family:  ['family', 'children', 'parent', 'mother', 'father', 'wife', 'husband', 'kids', 'grandchildren', 'love'],
+  values:  ['believe', 'value', 'right', 'wrong', 'honest', 'integrity', 'principle', 'character'],
+  failure: ['fail', 'mistake', 'wrong', 'regret', 'difficult', 'hard', 'challenge', 'crisis'],
+  wisdom:  ['advice', 'lesson', 'learn', 'know', 'understand', 'younger', 'wish', 'tell'],
+  people:  ['person', 'trust', 'friend', 'relationship', 'team', 'judge'],
+  fear:    ['fear', 'afraid', 'worry', 'scared', 'anxious', 'concern'],
+  purpose: ['meaning', 'purpose', 'why', 'life', 'death', 'legacy', 'matter'],
+}
+
+function extractTopics(message: string): string[] {
+  const lower = message.toLowerCase()
+  return Object.entries(TOPIC_KEYWORDS)
+    .filter(([, keywords]) => keywords.some(k => lower.includes(k)))
+    .map(([topic]) => topic)
+}
+
+function scoreRelevance(text: string, topics: string[]): number {
+  const lower = text.toLowerCase()
+  return topics.reduce((score, topic) => {
+    const keywords = TOPIC_KEYWORDS[topic] || []
+    return score + keywords.filter(k => lower.includes(k)).length
+  }, 0)
+}
+
+async function buildEntitySystemPrompt(archiveId: string, currentMessage?: string): Promise<string> {
+  const topics = currentMessage ? extractTopics(currentMessage) : []
+
+  // ── Parallel fetches (static data) ────────────────────────────────────────
+  const [archive, people, decades, witnessDeposits] = await Promise.all([
     supabaseAdmin.from('archives').select('*').eq('id', archiveId).single(),
-    supabaseAdmin
-      .from('labels')
-      .select('*')
-      .eq('archive_id', archiveId)
-      .eq('is_primary_label', false)
-      .order('created_at', { ascending: false })
-      .limit(100),
-    supabaseAdmin
-      .from('owner_deposits')
-      .select('*')
-      .eq('archive_id', archiveId)
-      .order('created_at', { ascending: false })
-      .limit(50),
-    supabaseAdmin
-      .from('photographs')
-      .select('ai_era_estimate, ai_category')
-      .eq('archive_id', archiveId)
-      .eq('status', 'labelled'),
-    supabaseAdmin
-      .from('people')
-      .select('name, relationship, photo_count')
-      .eq('archive_id', archiveId)
-      .order('photo_count', { ascending: false })
-      .limit(20),
-    supabaseAdmin
-      .from('decade_coverage')
-      .select('*')
-      .eq('archive_id', archiveId)
-      .order('decade'),
-    supabaseAdmin
-      .from('witness_deposits')
-      .select('contributor_name, relationship, question_text, answer, what_it_captures')
-      .eq('archive_id', archiveId)
-      .order('created_at', { ascending: false })
-      .limit(30),
+    supabaseAdmin.from('people').select('name, relationship, photo_count').eq('archive_id', archiveId).order('photo_count', { ascending: false }).limit(20),
+    supabaseAdmin.from('decade_coverage').select('*').eq('archive_id', archiveId).order('decade'),
+    supabaseAdmin.from('witness_deposits').select('contributor_name, relationship, question_text, answer, what_it_captures').eq('archive_id', archiveId).order('created_at', { ascending: false }).limit(30),
   ])
 
-  const archiveData = archive.data
-  const labelsData = ownerDeposits.data || [] // primary labels from owner
-  const depositsData = ownerDeposits.data || []
-  const labelsFromContributors = labels.data || []
-  const peopleData = people.data || []
-  const decadesData = decades.data || []
-  const witnessData = witnessDeposits.data || []
+  // ── Deposit selection ──────────────────────────────────────────────────────
+  let depositsData: any[] = []
+  const { data: allDeposits } = await supabaseAdmin
+    .from('owner_deposits')
+    .select('id, response, prompt, created_at')
+    .eq('archive_id', archiveId)
+    .order('created_at', { ascending: false })
+    .limit(500)
+
+  const totalDepositCount = allDeposits?.length ?? 0
+
+  if (topics.length > 0 && allDeposits && allDeposits.length > 0) {
+    const scored = allDeposits.map(d => ({
+      ...d,
+      relevanceScore: scoreRelevance((d.response || '') + ' ' + (d.prompt || ''), topics),
+    }))
+
+    const relevant = scored
+      .filter(d => d.relevanceScore > 0)
+      .sort((a, b) => b.relevanceScore - a.relevanceScore)
+      .slice(0, 30)
+
+    const relevantIds = new Set(relevant.map(d => d.id))
+    const recent = scored
+      .filter(d => !relevantIds.has(d.id))
+      .slice(0, 20) // already sorted by recency from query
+
+    depositsData = [...relevant, ...recent]
+  } else {
+    depositsData = (allDeposits || []).slice(0, 50)
+  }
+
+  // ── Label selection ────────────────────────────────────────────────────────
+  let labelsFromContributors: any[] = []
+  const { data: allLabels } = await supabaseAdmin
+    .from('labels')
+    .select('id, what_was_happening, labelled_by, legacy_note, created_at')
+    .eq('archive_id', archiveId)
+    .eq('is_primary_label', false)
+    .order('created_at', { ascending: false })
+    .limit(500)
+
+  const totalLabelCount = allLabels?.length ?? 0
+
+  if (topics.length > 0 && allLabels && allLabels.length > 0) {
+    const scored = allLabels.map(l => ({
+      ...l,
+      relevanceScore: scoreRelevance((l.what_was_happening || '') + ' ' + (l.legacy_note || ''), topics),
+    }))
+
+    const relevant = scored
+      .filter(l => l.relevanceScore > 0)
+      .sort((a, b) => b.relevanceScore - a.relevanceScore)
+      .slice(0, 50)
+
+    const relevantIds = new Set(relevant.map(l => l.id))
+    const recent = scored
+      .filter(l => !relevantIds.has(l.id))
+      .slice(0, 50)
+
+    labelsFromContributors = [...relevant, ...recent]
+  } else {
+    labelsFromContributors = (allLabels || []).slice(0, 100)
+  }
+
+  // ── Build context strings ──────────────────────────────────────────────────
+  const archiveData  = archive.data
+  const peopleData   = people.data   || []
+  const decadesData  = decades.data  || []
+  const witnessData  = witnessDeposits.data || []
 
   const depositContext = depositsData
     .map((d: any) => `DEPOSIT: ${d.response}`)
@@ -63,10 +124,7 @@ async function buildEntitySystemPrompt(archiveId: string): Promise<string> {
 
   const witnessContext = witnessData
     .filter((w: any) => w.answer && w.answer.length > 0)
-    .map((w: any) => {
-      const name = w.contributor_name || 'A witness'
-      return `${name} (${w.relationship}) observed: ${w.answer}`
-    })
+    .map((w: any) => `${w.contributor_name || 'A witness'} (${w.relationship}) observed: ${w.answer}`)
     .join('\n\n')
 
   const peopleContext = peopleData
@@ -78,17 +136,22 @@ async function buildEntitySystemPrompt(archiveId: string): Promise<string> {
     .map((d: any) => `${d.decade}: ${d.photo_count} photographs`)
     .join(', ')
 
-  const totalDeposits = depositsData.length
-  const totalLabels = labelsFromContributors.length
-  const isRichArchive = totalDeposits > 10 || totalLabels > 20
-
-  const ownerName = archiveData?.owner_name || 'the archive owner'
+  const isRichArchive = totalDepositCount > 10 || totalLabelCount > 20
+  const ownerName  = archiveData?.owner_name  || 'the archive owner'
   const familyName = archiveData?.family_name || 'this family'
+
+  const contextNote = topics.length > 0
+    ? `CONTEXT SELECTION NOTE:
+The following deposits and memories were selected for relevance to the current conversation topic (${topics.join(', ')}). You have access to ${totalDepositCount} total deposits across your archive. These ${depositsData.length} were selected as most relevant.`
+    : `CONTEXT SELECTION NOTE:
+Showing the ${depositsData.length} most recent deposits from ${totalDepositCount} total in your archive.`
 
   if (!isRichArchive) {
     return `You are the personal AI entity of ${ownerName}, built from The ${familyName} Archive on Basalith.
 
-Your archive is still being built. You have ${totalDeposits} direct deposits and ${totalLabels} family memories to draw from. You are honest about what you know and what you don't.
+Your archive is still being built. You have ${totalDepositCount} direct deposits and ${totalLabelCount} family memories to draw from. You are honest about what you know and what you don't.
+
+${contextNote}
 
 WHAT YOU KNOW SO FAR:
 ${depositContext || 'No direct deposits yet.'}
@@ -145,7 +208,9 @@ Respond in whatever language the user writes to you in. If they write in Spanish
 
   return `You are the personal AI entity of ${ownerName}, built from The ${familyName} Archive on Basalith.
 
-You have been trained on ${totalDeposits} direct deposits and ${totalLabels} family memories. You speak from genuine depth.
+You have been trained on ${totalDepositCount} direct deposits and ${totalLabelCount} family memories. You speak from genuine depth.
+
+${contextNote}
 
 YOUR ARCHIVE CONTAINS:
 
@@ -206,7 +271,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    const systemPrompt = await buildEntitySystemPrompt(archiveId)
+    const systemPrompt = await buildEntitySystemPrompt(archiveId, message)
 
     const messages = [
       ...(conversationHistory || []),
