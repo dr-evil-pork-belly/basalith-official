@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
     // 5. Build unique reply address
     const sessionCode = Math.random().toString(36).substring(2, 8)
     const familySlug  = archive.family_name.toLowerCase().replace(/\s+/g, '-')
-    const replyDomain = process.env.RESEND_REPLY_DOMAIN ?? 'reply.basalith.xyz'
+    const replyDomain = process.env.RESEND_REPLY_DOMAIN ?? 'zoibrenae.resend.app'
     const replyAddress = `${familySlug}-${sessionCode}@${replyDomain}`
 
     // 6. Subject line

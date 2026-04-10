@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     }, { onConflict: 'archive_id,email' })
 
     // If there's a photograph, create a session so their reply is captured
-    let replyAddress = `${archive.family_name.toLowerCase().replace(/\s+/g, '-')}-invite@${process.env.RESEND_REPLY_DOMAIN ?? 'reply.basalith.xyz'}`
+    let replyAddress = `${archive.family_name.toLowerCase().replace(/\s+/g, '-')}-invite@${process.env.RESEND_REPLY_DOMAIN ?? 'zoibrenae.resend.app'}`
     let photographUrl: string | null = null
 
     if (photographId) {
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
         // Create a session so reply is routed correctly
         const sessionCode = Math.random().toString(36).substring(2, 8)
         const familySlug  = archive.family_name.toLowerCase().replace(/\s+/g, '-')
-        replyAddress      = `${familySlug}-${sessionCode}@${process.env.RESEND_REPLY_DOMAIN ?? 'reply.basalith.xyz'}`
+        replyAddress      = `${familySlug}-${sessionCode}@${process.env.RESEND_REPLY_DOMAIN ?? 'zoibrenae.resend.app'}`
 
         await supabaseAdmin.from('email_sessions').insert({
           archive_id:          archiveId,
