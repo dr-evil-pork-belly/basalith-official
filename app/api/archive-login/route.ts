@@ -17,8 +17,12 @@ export async function POST(req: NextRequest) {
     .select('archive_id, password_hash')
     .eq('is_active', true)
 
+  console.log('[archive-login] Total credentials in DB:', allCredentials?.length ?? 0)
+  console.log('[archive-login] Password prefix:', password.substring(0, 4) + '...')
+
   if (allCredentials && allCredentials.length > 0) {
     for (const cred of allCredentials) {
+      console.log('[archive-login] Checking credential for archive:', cred.archive_id, '| hash prefix:', cred.password_hash.substring(0, 10))
       const matches = await bcrypt.compare(password, cred.password_hash)
       if (matches) {
         archiveId = cred.archive_id
@@ -71,7 +75,7 @@ export async function POST(req: NextRequest) {
   }
 
   const response = NextResponse.json({ success: true, archiveName: archive.name })
-  response.cookies.set('archive-auth', process.env.ARCHIVE_TOKEN!, cookieOptions)
-  response.cookies.set('archive-id',   archiveId,                   cookieOptions)
+  response.cookies.set('archive-auth', archiveId, cookieOptions)
+  response.cookies.set('archive-id',   archiveId, cookieOptions)
   return response
 }

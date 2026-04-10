@@ -13,7 +13,8 @@ export function proxy(request: NextRequest) {
   // Protect archive pages only
   if (pathname.startsWith('/archive/') || pathname === '/archive') {
     const auth = request.cookies.get('archive-auth')
-    if (!auth || auth.value !== process.env.ARCHIVE_TOKEN) {
+    const id   = request.cookies.get('archive-id')
+    if (!auth?.value || !id?.value || auth.value !== id.value) {
       return NextResponse.redirect(new URL('/archive-login', request.url))
     }
   }

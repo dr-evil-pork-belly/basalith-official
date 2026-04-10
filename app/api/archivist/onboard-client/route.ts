@@ -81,7 +81,9 @@ export async function POST(req: NextRequest) {
 
     // ── 2. Generate password ──────────────────────────────────────────────────
     const password     = generateClientPassword(familyName)
+    console.log('[onboard-client] Generating password:', password)
     const passwordHash = await bcrypt.hash(password, 12)
+    console.log('[onboard-client] Hash generated, length:', passwordHash.length)
 
     // ── 3. Create archive ─────────────────────────────────────────────────────
     const { data: archive, error: archiveError } = await supabaseAdmin
@@ -112,6 +114,7 @@ export async function POST(req: NextRequest) {
         is_active:     true,
       })
 
+    console.log('[onboard-client] Credential insert error:', credError?.message || 'none')
     if (credError) throw new Error('Failed to store credentials: ' + credError.message)
 
     // ── 5. Record commission (best-effort) ────────────────────────────────────
