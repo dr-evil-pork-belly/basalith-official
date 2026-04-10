@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
 
     // Notify legacy@basalith.xyz
     await resend.emails.send({
-      from:    `Basalith System <${process.env.RESEND_FROM_EMAIL ?? 'davidha@basalith.xyz'}>`,
+      from:    'Basalith <davidha@basalith.xyz>',
       to:      process.env.ADMIN_EMAIL ?? 'legacy@basalith.xyz',
       replyTo: email,
       subject: `New Archive Application — ${name}`,

@@ -152,7 +152,7 @@ export async function POST(req: NextRequest) {
     const firstName = (clientName || familyName).split(' ')[0]
 
     await resend.emails.send({
-      from:    `The ${familyName} Archive <${process.env.RESEND_FROM_EMAIL ?? 'davidha@basalith.xyz'}>`,
+      from:    `The ${familyName} Archive <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
       to:      clientEmail,
       subject: `Welcome to Basalith — The ${familyName} Archive is ready`,
       html:    buildWelcomeEmail(familyName, firstName, password, tierName, archivist.name),
@@ -160,7 +160,7 @@ export async function POST(req: NextRequest) {
 
     // ── 9. Notify legacy@basalith.xyz ─────────────────────────────────────────
     await resend.emails.send({
-      from:    `Basalith System <${process.env.RESEND_FROM_EMAIL ?? 'davidha@basalith.xyz'}>`,
+      from:    'Basalith <davidha@basalith.xyz>',
       to:      process.env.ADMIN_EMAIL ?? 'legacy@basalith.xyz',
       subject: `New Archive — The ${familyName} Archive (${tier}) — via ${archivist.name}`,
       html: `<p><strong>New archive initialized</strong></p>
