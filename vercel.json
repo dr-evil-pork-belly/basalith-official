@@ -3,6 +3,14 @@
     {
       "path": "/api/cron/send-photos",
       "schedule": "0 21 * * *"
+    },
+    {
+      "path": "/api/cron/weekly-prompt",
+      "schedule": "0 8 * * 1"
+    },
+    {
+      "path": "/api/cron/monthly-report",
+      "schedule": "0 9 1 * *"
     }
   ]
 }
