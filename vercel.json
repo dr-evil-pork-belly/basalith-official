@@ -9,8 +9,20 @@
       "schedule": "0 8 * * 1"
     },
     {
+      "path": "/api/cron/story-prompt-monday",
+      "schedule": "0 9 * * 1"
+    },
+    {
+      "path": "/api/cron/story-prompt-friday",
+      "schedule": "0 9 * * 5"
+    },
+    {
       "path": "/api/cron/monthly-report",
       "schedule": "0 9 1 * *"
+    },
+    {
+      "path": "/api/cron/gratitude-note",
+      "schedule": "0 9 2 * *"
     }
   ]
 }
