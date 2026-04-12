@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 
 type ArchiveItem = {
   id:          string
@@ -133,85 +133,158 @@ const EMPTY: ArchiveItem = {
 
 const BATCH_SIZE = 20
 
+type UploadStatus = 'idle' | 'selecting' | 'uploading' | 'complete'
+
+interface UploadState {
+  status:        UploadStatus
+  totalSelected: number
+  totalUploaded: number
+  totalFailed:   number
+  currentBatch:  number
+  totalBatches:  number
+}
+
 function BulkUploadTab({ archiveId }: { archiveId: string }) {
-  const [files,     setFiles]     = useState<File[]>([])
-  const [dragging,  setDragging]  = useState(false)
-  const [uploading, setUploading] = useState(false)
-  const [progress,  setProgress]  = useState(0) // 0-100
-  const [done,      setDone]      = useState<{ uploaded: number; failed: number } | null>(null)
-  const [error,     setError]     = useState<string | null>(null)
-  const dropRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const [state, setState] = useState<UploadState>({
+    status: 'idle', totalSelected: 0, totalUploaded: 0,
+    totalFailed: 0, currentBatch: 0, totalBatches: 0,
+  })
+  const [dragging, setDragging] = useState(false)
+  const inputRef       = useRef<HTMLInputElement>(null)
+  const queueRef       = useRef<File[]>([])
+  const isUploadingRef = useRef(false)
 
-  function addFiles(incoming: FileList | null) {
-    if (!incoming) return
-    const imgs = Array.from(incoming).filter(f => f.type.startsWith('image/'))
-    setFiles(prev => {
-      const existing = new Set(prev.map(f => f.name + f.size))
-      const next = imgs.filter(f => !existing.has(f.name + f.size))
-      return [...prev, ...next]
-    })
-  }
+  const processQueue = useCallback(async () => {
+    if (isUploadingRef.current) return
+    isUploadingRef.current = true
 
-  function onDrop(e: React.DragEvent) {
-    e.preventDefault()
-    setDragging(false)
-    addFiles(e.dataTransfer.files)
-  }
+    const queue       = queueRef.current
+    const totalBatches = Math.ceil(queue.length / BATCH_SIZE)
+    setState(prev => ({ ...prev, status: 'uploading', totalBatches }))
 
-  function removeFile(idx: number) {
-    setFiles(prev => prev.filter((_, i) => i !== idx))
-  }
+    let uploaded = 0
+    let failed   = 0
 
-  async function upload() {
-    if (!files.length) return
-    setUploading(true)
-    setError(null)
-    setProgress(0)
-
-    let totalUploaded = 0
-    let totalFailed   = 0
-    const batches = []
-    for (let i = 0; i < files.length; i += BATCH_SIZE) {
-      batches.push(files.slice(i, i + BATCH_SIZE))
-    }
-
-    for (let b = 0; b < batches.length; b++) {
-      const batch = batches[b]
-      const fd = new FormData()
-      fd.append('archiveId', archiveId)
-      batch.forEach(f => fd.append('photos', f))
+    for (let i = 0; i < queue.length; i += BATCH_SIZE) {
+      const batch       = queue.slice(i, i + BATCH_SIZE)
+      const batchNumber = Math.floor(i / BATCH_SIZE) + 1
+      setState(prev => ({ ...prev, currentBatch: batchNumber }))
 
       try {
-        const res  = await fetch('/api/archive/bulk-upload', { method: 'POST', body: fd })
-        const data = await res.json()
-        totalUploaded += data.uploaded ?? 0
-        totalFailed   += data.failed   ?? 0
+        const fd = new FormData()
+        fd.append('archiveId', archiveId)
+        fd.append('uploadedBy', 'owner')
+        for (const file of batch) fd.append('photos', file)
+
+        const res = await fetch('/api/archive/bulk-upload', {
+          method: 'POST',
+          body:   fd,
+          signal: AbortSignal.timeout(60000),
+        })
+        if (res.ok) {
+          const data = await res.json()
+          uploaded += data.uploaded ?? batch.length
+          failed   += data.failed   ?? 0
+        } else {
+          failed += batch.length
+        }
       } catch {
-        totalFailed += batch.length
+        failed += batch.length
       }
 
-      setProgress(Math.round(((b + 1) / batches.length) * 100))
+      setState(prev => ({ ...prev, totalUploaded: uploaded, totalFailed: failed }))
+      // brief pause between batches
+      await new Promise(r => setTimeout(r, 300))
     }
 
-    setUploading(false)
-    setDone({ uploaded: totalUploaded, failed: totalFailed })
+    isUploadingRef.current = false
+    queueRef.current = []
+    setState(prev => ({ ...prev, status: 'complete', totalUploaded: uploaded, totalFailed: failed }))
+  }, [archiveId])
+
+  const handleFiles = useCallback(async (fileList: FileList | null) => {
+    if (!fileList || fileList.length === 0) return
+
+    setState({ status: 'selecting', totalSelected: 0, totalUploaded: 0, totalFailed: 0, currentBatch: 0, totalBatches: 0 })
+
+    // Iterate lazily — never call Array.from(fileList) on large iCloud libraries
+    // as iOS resolves all iCloud references simultaneously, freezing the browser.
+    const collected: File[] = []
+    for (let i = 0; i < fileList.length; i++) {
+      collected.push(fileList[i])
+      // Yield to the UI every 50 files so the browser stays responsive
+      if (i % 50 === 49) {
+        setState(prev => ({ ...prev, totalSelected: i + 1 }))
+        await new Promise(r => setTimeout(r, 0))
+      }
+    }
+
+    queueRef.current = collected
+    setState(prev => ({ ...prev, totalSelected: collected.length }))
+    processQueue()
+  }, [processQueue])
+
+  function reset() {
+    setState({ status: 'idle', totalSelected: 0, totalUploaded: 0, totalFailed: 0, currentBatch: 0, totalBatches: 0 })
+    queueRef.current = []
+    isUploadingRef.current = false
+    if (inputRef.current) inputRef.current.value = ''
   }
 
-  if (done) {
+  // ── Selecting state ──────────────────────────────────────────────────────────
+  if (state.status === 'selecting') {
+    return (
+      <div className="flex flex-col items-center gap-4 py-16 text-center">
+        <p className="font-serif" style={{ fontSize: '1.1rem', fontStyle: 'italic', color: '#F0EDE6' }}>
+          Reading your photos…
+        </p>
+        <p style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.22em', color: '#C4A24A' }}>
+          {state.totalSelected} SELECTED
+        </p>
+      </div>
+    )
+  }
+
+  // ── Uploading state ──────────────────────────────────────────────────────────
+  if (state.status === 'uploading') {
+    const pct = state.totalBatches > 0
+      ? Math.round((state.currentBatch / state.totalBatches) * 100)
+      : 0
+    return (
+      <div style={{ padding: '2rem 0' }}>
+        <p className="font-serif" style={{ fontSize: '1.1rem', fontStyle: 'italic', color: '#F0EDE6', marginBottom: '0.5rem' }}>
+          Uploading your archive…
+        </p>
+        <div className="w-full" style={{ height: '4px', background: 'rgba(240,237,230,0.08)', borderRadius: '2px', margin: '1rem 0', overflow: 'hidden' }}>
+          <div style={{ height: '100%', background: '#C4A24A', borderRadius: '2px', width: `${pct}%`, transition: 'width 0.5s ease' }} />
+        </div>
+        <p style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.18em', color: '#5C6166' }}>
+          {state.totalUploaded} UPLOADED
+          {state.totalFailed > 0 && ` · ${state.totalFailed} FAILED`}
+          {' · '}BATCH {state.currentBatch} OF {state.totalBatches}
+        </p>
+        <p className="font-serif" style={{ fontSize: '0.85rem', fontStyle: 'italic', color: '#3A3830', marginTop: '1rem' }}>
+          Keep this page open. Our AI is analyzing each photo as it uploads.
+        </p>
+      </div>
+    )
+  }
+
+  // ── Complete state ───────────────────────────────────────────────────────────
+  if (state.status === 'complete') {
     return (
       <div className="flex flex-col items-center gap-6 py-16 text-center">
         <Sigil size={36} />
         <div>
           <p className="font-serif font-semibold" style={{ fontSize: '2rem', color: '#F0F0EE', lineHeight: 1.1 }}>
-            {done.uploaded} photograph{done.uploaded === 1 ? '' : 's'} received.
+            {state.totalUploaded} photograph{state.totalUploaded === 1 ? '' : 's'} received.
           </p>
           <p className="font-serif" style={{ fontSize: '1rem', color: 'rgba(196,162,74,0.7)', fontStyle: 'italic', marginTop: '0.5rem' }}>
             Our AI is reviewing each one now.
           </p>
-          {done.failed > 0 && (
+          {state.totalFailed > 0 && (
             <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.1em', color: '#5C6166', marginTop: '0.75rem' }}>
-              {done.failed} could not be uploaded — try again
+              {state.totalFailed} could not be uploaded — try again
             </p>
           )}
         </div>
@@ -219,10 +292,7 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
           Check your gallery in 15–20 minutes. Blurry or unrelated photos will be filtered automatically.
         </p>
         <div className="flex gap-3 mt-2">
-          <button onClick={() => { setDone(null); setFiles([]) }}
-            className="btn-monolith-amber">
-            Upload More
-          </button>
+          <button onClick={reset} className="btn-monolith-amber">Upload More</button>
           <a href="/archive/gallery"
             style={{ fontFamily: 'monospace', fontSize: '0.62rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#5C6166', display: 'flex', alignItems: 'center' }}>
             View Gallery →
@@ -232,20 +302,31 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
     )
   }
 
+  // ── Idle state ───────────────────────────────────────────────────────────────
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-6">
+
+      {/* iPhone tip */}
+      <div style={{ background: 'rgba(196,162,74,0.04)', border: '1px solid rgba(196,162,74,0.12)', borderRadius: '2px', padding: '1rem 1.25rem' }}>
+        <p style={{ fontFamily: 'monospace', fontSize: '0.42rem', letterSpacing: '0.25em', color: '#C4A24A', marginBottom: '0.4rem' }}>
+          FOR IPHONE · ICLOUD LIBRARIES
+        </p>
+        <p className="font-serif" style={{ fontSize: '0.88rem', fontStyle: 'italic', color: '#5C6166', lineHeight: 1.7, margin: 0 }}>
+          Select photos in batches of 200–300 rather than tapping Select All. Choose by date range or album. Each batch uploads automatically while you prepare the next.
+        </p>
+      </div>
+
       {/* Drop zone */}
       <div
-        ref={dropRef}
         onDragOver={e => { e.preventDefault(); setDragging(true) }}
         onDragLeave={() => setDragging(false)}
-        onDrop={onDrop}
-        onClick={() => !uploading && inputRef.current?.click()}
-        className="w-full flex flex-col items-center justify-center gap-3 rounded-sm border py-14 transition-all duration-200 cursor-pointer"
+        onDrop={e => { e.preventDefault(); setDragging(false); handleFiles(e.dataTransfer.files) }}
+        onClick={() => inputRef.current?.click()}
+        className="w-full flex flex-col items-center justify-center gap-3 rounded-sm border py-14 cursor-pointer transition-all duration-200"
         style={{
-          borderColor:  dragging ? 'rgba(196,162,74,0.5)' : 'rgba(255,255,255,0.08)',
-          borderStyle:  'dashed',
-          background:   dragging ? 'rgba(196,162,74,0.04)' : '#111112',
+          borderColor: dragging ? 'rgba(196,162,74,0.5)' : 'rgba(255,255,255,0.08)',
+          borderStyle: 'dashed',
+          background:  dragging ? 'rgba(196,162,74,0.04)' : '#111112',
         }}
       >
         <div className="w-10 h-10 flex items-center justify-center rounded-sm border" style={{ borderColor: 'rgba(196,162,74,0.3)' }}>
@@ -255,79 +336,20 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
           {dragging ? 'Drop them here.' : 'Drop photographs here, or click to select.'}
         </p>
         <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.14em', color: '#5C6166', textTransform: 'uppercase' }}>
-          JPG · PNG · HEIC · Any image format
+          JPG · PNG · HEIC · MOV · MP4 · Any format
         </p>
         <input
           ref={inputRef}
           type="file"
-          accept="image/*"
+          accept="image/*,video/*,.heic,.heif"
           multiple
           className="hidden"
-          onChange={e => addFiles(e.target.files)}
+          onChange={e => handleFiles(e.target.files)}
         />
       </div>
 
-      {/* File list */}
-      {files.length > 0 && (
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.7)' }}>
-              {files.length} photograph{files.length === 1 ? '' : 's'} queued
-            </p>
-            <button onClick={() => setFiles([])}
-              style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#5C6166' }}>
-              Clear all
-            </button>
-          </div>
-          <div className="flex flex-col gap-1.5" style={{ maxHeight: '220px', overflowY: 'auto' }}>
-            {files.map((f, i) => (
-              <div key={i} className="flex items-center justify-between px-3 py-2 rounded-sm"
-                style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
-                <div className="flex items-center gap-3 min-w-0">
-                  <span style={{ color: 'rgba(196,162,74,0.4)', fontSize: '0.7rem' }}>◻</span>
-                  <p style={{ fontFamily: 'monospace', fontSize: '0.55rem', color: '#F0F0EE', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {f.name}
-                  </p>
-                </div>
-                <button onClick={() => removeFile(i)} disabled={uploading}
-                  style={{ fontFamily: 'monospace', fontSize: '0.5rem', color: '#3A3F44', marginLeft: '0.75rem', flexShrink: 0 }}>
-                  ×
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Progress bar (while uploading) */}
-      {uploading && (
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#5C6166' }}>
-              Uploading…
-            </p>
-            <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', color: 'rgba(196,162,74,0.7)' }}>{progress}%</p>
-          </div>
-          <div className="w-full h-px" style={{ background: 'rgba(255,255,255,0.06)' }}>
-            <div className="h-px transition-all duration-300" style={{ width: `${progress}%`, background: 'rgba(196,162,74,0.8)' }} />
-          </div>
-        </div>
-      )}
-
-      {error && (
-        <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', color: '#9DA3A8' }}>{error}</p>
-      )}
-
-      <button
-        onClick={upload}
-        disabled={!files.length || uploading}
-        className="btn-monolith-amber w-full text-center disabled:opacity-40 disabled:cursor-not-allowed"
-      >
-        {uploading ? `Uploading ${progress}%…` : `Upload ${files.length || ''} Photograph${files.length === 1 ? '' : 's'}`}
-      </button>
-
-      <p style={{ fontFamily: 'monospace', fontSize: '0.48rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#3A3F44', textAlign: 'center' }}>
-        Uploaded in batches of {BATCH_SIZE} · Our AI reviews each photograph automatically
+      <p style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#3A3F44', textAlign: 'center' }}>
+        Uploads in batches of {BATCH_SIZE} · AI reviews each photograph automatically
       </p>
     </div>
   )
