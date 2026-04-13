@@ -4,21 +4,19 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 export const dynamic = 'force-dynamic'
 
 export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url)
+  const secretParam = searchParams.get('secret') || ''
+  const authHeader = req.headers.get('authorization') || ''
+  const headerSecret = authHeader.replace('Bearer ', '')
   const expectedSecret = process.env.CRON_SECRET || ''
-  const receivedHeader = req.headers.get('authorization') || ''
-  const receivedSecret = receivedHeader.replace('Bearer ', '')
 
-  console.log('Auth check:', {
-    expected: expectedSecret,
-    received: receivedSecret,
-    matches: receivedSecret === expectedSecret
-  })
+  const isAuthorized = expectedSecret && (
+    headerSecret === expectedSecret ||
+    secretParam === expectedSecret
+  )
 
-  if (!expectedSecret || receivedSecret !== expectedSecret) {
-    return NextResponse.json({
-      error: 'Unauthorized',
-      hint: `Expected: "${expectedSecret}", Received: "${receivedSecret}"`,
-    }, { status: 401 })
+  if (!isAuthorized) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   const now = new Date().toISOString()

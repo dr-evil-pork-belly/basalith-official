@@ -25,12 +25,8 @@ export async function POST(req: Request) {
     console.log('[test-cron] CRON_SECRET set:', !!cronSecret)
     console.log('[test-cron] Site URL:', siteUrl)
 
-    const response = await fetch(`${siteUrl}${cronRoute}?test=true`, {
-      method:  'GET',
-      headers: {
-        'Authorization': `Bearer ${cronSecret}`,
-        'Content-Type':  'application/json',
-      },
+    const response = await fetch(`${siteUrl}${cronRoute}?test=true&secret=${cronSecret}`, {
+      method: 'GET',
     })
 
     console.log('[test-cron] Response status:', response.status)
