@@ -1,9 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 
-export async function POST(req: NextRequest) {
-  // Validate archivist session
-  const archivistAuth = req.cookies.get('archivist-auth')
-  if (!archivistAuth?.value || archivistAuth.value !== process.env.ARCHIVIST_TOKEN) {
+export async function POST(req: Request) {
+  // Validate archivist session — same pattern as proxy.ts
+  // archivist-auth and archivist-id are both set to archivistId on login
+  const cookieStore = await cookies()
+  const authCookie = cookieStore.get('archivist-auth')
+  const idCookie   = cookieStore.get('archivist-id')
+
+  if (!authCookie?.value || !idCookie?.value || authCookie.value !== idCookie.value) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

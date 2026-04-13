@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
     archivistName: archivist.name,
     rank:          archivist.rank,
   })
-  response.cookies.set('archivist-auth', process.env.ARCHIVIST_TOKEN!, cookieOptions)
-  response.cookies.set('archivist-id',   archivistId,                   cookieOptions)
+  response.cookies.set('archivist-auth', archivistId, cookieOptions)
+  response.cookies.set('archivist-id',   archivistId, cookieOptions)
   return response
 }

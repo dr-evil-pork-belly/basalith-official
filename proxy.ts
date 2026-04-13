@@ -22,7 +22,8 @@ export function proxy(request: NextRequest) {
   // Protect archivist pages only
   if (pathname.startsWith('/archivist/') || pathname === '/archivist') {
     const auth = request.cookies.get('archivist-auth')
-    if (!auth || auth.value !== process.env.ARCHIVIST_TOKEN) {
+    const id   = request.cookies.get('archivist-id')
+    if (!auth?.value || !id?.value || auth.value !== id.value) {
       return NextResponse.redirect(new URL('/archivist-login', request.url))
     }
   }
