@@ -86,40 +86,12 @@ function SystemTestsPanel() {
         body:    JSON.stringify({ cronRoute: route }),
       })
       const envelope = await res.json()
-      // proxy returns { success, status, data }
-      // data is the raw cron route response
-      const d = envelope.data ?? envelope
-
-      if (!res.ok || envelope.error) {
-        setStates(s  => ({ ...s, [route]: 'error' }))
-        setMessages(m => ({ ...m, [route]: envelope.error ?? `HTTP ${res.status}` }))
-        return
-      }
-
-      if (d.skipped) {
-        setStates(s  => ({ ...s, [route]: 'ok' }))
-        setMessages(m => ({ ...m, [route]: `skipped — ${d.reason ?? ''}` }))
-        return
-      }
-
-      if (d.error) {
-        setStates(s  => ({ ...s, [route]: 'error' }))
-        setMessages(m => ({ ...m, [route]: d.error }))
-        return
-      }
-
-      // Build a human-readable summary from whatever the cron returned
-      const parts: string[] = []
-      if (d.sent     != null) parts.push(`sent: ${d.sent}`)
-      if (d.total    != null) parts.push(`total: ${d.total}`)
-      if (d.message)          parts.push(d.message)
-      if (d.weekNumber != null) parts.push(`week ${d.weekNumber}`)
-
-      setStates(s  => ({ ...s, [route]: 'ok' }))
-      setMessages(m => ({ ...m, [route]: parts.length ? parts.join('  ·  ') : 'done' }))
+      const isErr = !res.ok || !!envelope.error
+      setStates(s  => ({ ...s, [route]: isErr ? 'error' : 'ok' }))
+      setMessages(m => ({ ...m, [route]: JSON.stringify(envelope, null, 2) }))
     } catch (err: any) {
       setStates(s  => ({ ...s, [route]: 'error' }))
-      setMessages(m => ({ ...m, [route]: err.message }))
+      setMessages(m => ({ ...m, [route]: JSON.stringify({ fetchError: err.message }) }))
     }
   }, [])
 
@@ -154,9 +126,9 @@ function SystemTestsPanel() {
                 {state === 'running' ? '⟳ Running…' : state === 'ok' ? '✓ ' + label : state === 'error' ? '✗ ' + label : label}
               </button>
               {msg && (
-                <p className="font-sans text-[0.62rem] mt-2 leading-relaxed" style={{ color: state === 'error' ? '#ff6b6b' : '#5C6166' }}>
+                <pre className="text-[0.6rem] leading-relaxed mt-1 overflow-x-auto max-w-md whitespace-pre-wrap" style={{ color: state === 'error' ? '#ff6b6b' : '#5C6166', fontFamily: 'monospace' }}>
                   {msg}
-                </p>
+                </pre>
               )}
             </div>
           )

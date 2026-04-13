@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 
 const ALLOWED_ROUTES = [
   '/api/cron/send-photos',
@@ -9,24 +9,44 @@ const ALLOWED_ROUTES = [
   '/api/cron/gratitude-note',
 ]
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
-    const { cronRoute } = await req.json()
+    const body = await req.json()
+    const { cronRoute } = body
 
     if (!cronRoute || !ALLOWED_ROUTES.includes(cronRoute)) {
       return NextResponse.json({ error: 'Invalid route' }, { status: 400 })
     }
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+    const siteUrl    = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+    const cronSecret = process.env.CRON_SECRET ?? ''
+
+    console.log('[test-cron] Calling:', cronRoute)
+    console.log('[test-cron] CRON_SECRET set:', !!cronSecret)
+    console.log('[test-cron] Site URL:', siteUrl)
 
     const response = await fetch(`${siteUrl}${cronRoute}?test=true`, {
       method:  'GET',
-      headers: { Authorization: `Bearer ${process.env.CRON_SECRET}` },
+      headers: {
+        'Authorization': `Bearer ${cronSecret}`,
+        'Content-Type':  'application/json',
+      },
     })
 
+    console.log('[test-cron] Response status:', response.status)
+
     const data = await response.json()
-    return NextResponse.json({ success: response.ok, status: response.status, data })
+    console.log('[test-cron] Response data:', JSON.stringify(data))
+
+    return NextResponse.json({
+      success:    response.ok,
+      httpStatus: response.status,
+      data,
+      cronSecretSet: !!cronSecret,
+      siteUrl,
+    })
   } catch (error: any) {
-    return NextResponse.json({ error: error.message ?? 'Unknown error' }, { status: 500 })
+    console.error('[test-cron] Error:', error.message)
+    return NextResponse.json({ error: error.message, stack: error.stack }, { status: 500 })
   }
 }
