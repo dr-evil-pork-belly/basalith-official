@@ -5,9 +5,21 @@ import { DIMENSIONS } from '@/lib/entityAccuracy'
 import { getWeeklyPrompt, getWeekNumber } from '@/lib/weeklyPrompts'
 
 export async function GET(req: NextRequest) {
-  const authHeader = req.headers.get('authorization')
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 })
+  const expectedSecret = process.env.CRON_SECRET || ''
+  const receivedHeader = req.headers.get('authorization') || ''
+  const receivedSecret = receivedHeader.replace('Bearer ', '')
+
+  console.log('Auth check:', {
+    expected: expectedSecret,
+    received: receivedSecret,
+    matches: receivedSecret === expectedSecret
+  })
+
+  if (!expectedSecret || receivedSecret !== expectedSecret) {
+    return Response.json({
+      error: 'Unauthorized',
+      hint: `Expected: "${expectedSecret}", Received: "${receivedSecret}"`,
+    }, { status: 401 })
   }
 
   const isTest = new URL(req.url).searchParams.get('test') === 'true'
