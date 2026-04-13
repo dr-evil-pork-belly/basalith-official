@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 
 const SPRINT_TIERS = [
@@ -59,6 +59,98 @@ function fmt(cents: number) {
   return '$' + Math.round(cents / 100).toLocaleString('en-US')
 }
 
+// ── Cron test panel ───────────────────────────────────────────────────────────
+
+const CRON_JOBS = [
+  { label: 'Send Daily Photos',    route: '/api/cron/send-photos'          },
+  { label: 'Send Weekly Prompt',   route: '/api/cron/weekly-prompt'        },
+  { label: 'Send Monday Mystery',  route: '/api/cron/story-prompt-monday'  },
+  { label: 'Send Friday Reveal',   route: '/api/cron/story-prompt-friday'  },
+  { label: 'Send Monthly Report',  route: '/api/cron/monthly-report'       },
+  { label: 'Send Gratitude Note',  route: '/api/cron/gratitude-note'       },
+] as const
+
+type CronState = 'idle' | 'running' | 'ok' | 'error'
+
+function SystemTestsPanel() {
+  const [states,   setStates]   = useState<Record<string, CronState>>({})
+  const [messages, setMessages] = useState<Record<string, string>>({})
+
+  const run = useCallback(async (route: string) => {
+    setStates(s  => ({ ...s, [route]: 'running' }))
+    setMessages(m => ({ ...m, [route]: '' }))
+    try {
+      const res  = await fetch('/api/admin/test-cron', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ cronRoute: route }),
+      })
+      const data = await res.json()
+      if (res.ok && data.ok !== false) {
+        const r = data.result
+        const summary = r
+          ? Object.entries(r)
+              .filter(([k]) => !['isTest'].includes(k))
+              .map(([k, v]) => `${k}: ${v}`)
+              .join('  ·  ')
+          : 'done'
+        setStates(s  => ({ ...s, [route]: 'ok' }))
+        setMessages(m => ({ ...m, [route]: summary }))
+      } else {
+        setStates(s  => ({ ...s, [route]: 'error' }))
+        setMessages(m => ({ ...m, [route]: data.result?.error ?? data.error ?? 'unknown error' }))
+      }
+    } catch (err: any) {
+      setStates(s  => ({ ...s, [route]: 'error' }))
+      setMessages(m => ({ ...m, [route]: err.message }))
+    }
+  }, [])
+
+  return (
+    <div className="rounded-sm border mb-8" style={{ background: '#111112', borderColor: 'rgba(196,162,74,0.18)' }}>
+      <div className="px-6 py-4 border-b" style={{ borderColor: 'rgba(196,162,74,0.12)' }}>
+        <p className="font-sans text-[0.6rem] font-bold tracking-[0.22em] uppercase" style={{ color: 'rgba(196,162,74,0.7)' }}>
+          System Tests
+        </p>
+        <p className="font-sans text-[0.65rem] mt-0.5" style={{ color: '#3A3F44' }}>
+          Each call runs with ?test=true — bypasses day/date guards
+        </p>
+      </div>
+      <div className="p-6 flex flex-col gap-3">
+        {CRON_JOBS.map(({ label, route }) => {
+          const state = states[route] ?? 'idle'
+          const msg   = messages[route] ?? ''
+          return (
+            <div key={route} className="flex items-start gap-4">
+              <button
+                onClick={() => run(route)}
+                disabled={state === 'running'}
+                className="shrink-0 font-sans text-[0.62rem] font-medium tracking-[0.08em] uppercase px-4 py-2 rounded-sm transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  background:  state === 'ok' ? 'rgba(76,175,80,0.12)' : state === 'error' ? 'rgba(255,80,80,0.08)' : 'rgba(255,255,255,0.04)',
+                  border:      `1px solid ${state === 'ok' ? 'rgba(76,175,80,0.3)' : state === 'error' ? 'rgba(255,80,80,0.2)' : 'rgba(255,255,255,0.07)'}`,
+                  color:       state === 'ok' ? '#4CAF50' : state === 'error' ? '#ff6b6b' : '#9DA3A8',
+                  minWidth:    '190px',
+                  textAlign:   'left',
+                }}
+              >
+                {state === 'running' ? '⟳ Running…' : state === 'ok' ? '✓ ' + label : state === 'error' ? '✗ ' + label : label}
+              </button>
+              {msg && (
+                <p className="font-sans text-[0.62rem] mt-2 leading-relaxed" style={{ color: state === 'error' ? '#ff6b6b' : '#5C6166' }}>
+                  {msg}
+                </p>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+// ── Skeleton ───────────────────────────────────────────────────────────────────
+
 function Skeleton({ className }: { className?: string }) {
   return (
     <div className={`rounded-sm ${className ?? ''}`}
@@ -74,6 +166,12 @@ export default function DashboardClient({ archivistId }: { archivistId: string }
   const [leaderboard, setLeaderboard] = useState<LeaderRow[]>([])
   const [commissions, setCommissions] = useState<Commission[]>([])
   const [myRank,      setMyRank]      = useState<number | null>(null)
+  const [showDebug,   setShowDebug]   = useState(false)
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    setShowDebug(params.get('debug') === 'true' || process.env.NODE_ENV === 'development')
+  }, [])
 
   useEffect(() => { fetchFromDB() }, [])
 
@@ -267,6 +365,8 @@ export default function DashboardClient({ archivistId }: { archivistId: string }
           </ul>
         </div>
       )}
+
+      {showDebug && <SystemTestsPanel />}
 
       <div className="flex flex-wrap gap-3">
         <Link href="/archivist/pipeline"    className="btn-monolith-amber">View Pipeline →</Link>
