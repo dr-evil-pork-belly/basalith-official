@@ -303,6 +303,136 @@ function UpcomingDates({ archiveId }: { archiveId: string }) {
   )
 }
 
+// ── Memory Game Card component ───────────────────────────────────────────────
+
+type GameSession = {
+  id:            string
+  closesAt:      string
+  totalMemories: number
+  photoCount:    number
+}
+type GameLeaderRow = { name: string; count: number }
+
+function MemoryGameCard({ archiveId }: { archiveId: string }) {
+  const [session,     setSession]     = useState<GameSession | null>(null)
+  const [leaderboard, setLeaderboard] = useState<GameLeaderRow[]>([])
+  const [loading,     setLoading]     = useState(true)
+  const [copied,      setCopied]      = useState(false)
+
+  useEffect(() => {
+    fetch(`/api/game/active?archiveId=${archiveId}`)
+      .then(r => r.ok ? r.json() : { session: null })
+      .then(data => {
+        setSession(data.session ?? null)
+        setLeaderboard(data.leaderboard ?? [])
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [archiveId])
+
+  if (loading) return null
+
+  const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://basalith.xyz'
+
+  function handleCopyLink() {
+    if (!session) return
+    navigator.clipboard.writeText(`${siteUrl}/game/${session.id}`)
+      .then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000) })
+      .catch(() => {})
+  }
+
+  function hoursLeft(closesAt: string): string {
+    const diff = new Date(closesAt).getTime() - Date.now()
+    if (diff <= 0) return '0h'
+    const h = Math.floor(diff / 3600000)
+    const m = Math.floor((diff % 3600000) / 60000)
+    return h > 0 ? `${h}h ${m}m` : `${m}m`
+  }
+
+  if (!session) {
+    return (
+      <div className="rounded-sm mb-8" style={{ background: '#111112', border: '1px solid rgba(255,255,255,0.06)', padding: '1.25rem 1.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.18)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <path d="M3 9h18M9 21V9"/>
+          </svg>
+          <p style={{ fontFamily: 'monospace', fontSize: '0.48rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#3A3F44', margin: 0 }}>
+            Memory Game · Next game: Wednesday
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  const maxCount = leaderboard[0]?.count ?? 1
+
+  return (
+    <div className="rounded-sm mb-8" style={{ background: '#111112', border: '1px solid rgba(196,162,74,0.15)', borderTop: '2px solid rgba(196,162,74,0.4)' }}>
+      <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid rgba(255,255,255,0.04)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(196,162,74,0.8)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#C4A24A', margin: 0 }}>
+            Memory Game · Live
+          </p>
+        </div>
+        <p style={{ fontFamily: 'monospace', fontSize: '0.48rem', letterSpacing: '0.1em', color: 'rgba(196,162,74,0.5)', margin: 0 }}>
+          Closes in {hoursLeft(session.closesAt)}
+        </p>
+      </div>
+
+      <div style={{ padding: '1rem 1.5rem' }}>
+        <p style={{ fontFamily: 'monospace', fontSize: '0.48rem', letterSpacing: '0.1em', color: '#5C6166', margin: '0 0 0.75rem' }}>
+          {session.totalMemories} {session.totalMemories === 1 ? 'memory' : 'memories'} contributed so far
+        </p>
+
+        {leaderboard.length > 0 && (
+          <div style={{ marginBottom: '1rem' }}>
+            {leaderboard.slice(0, 3).map((row, i) => {
+              const barWidth = Math.round((row.count / maxCount) * 100)
+              return (
+                <div key={row.name} style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.4rem' }}>
+                  <span style={{ fontFamily: 'monospace', fontSize: '0.46rem', color: '#3A3F44', width: '14px', flexShrink: 0 }}>#{i + 1}</span>
+                  <span style={{ fontFamily: 'monospace', fontSize: '0.52rem', color: i === 0 ? '#C4A24A' : '#9DA3A8', minWidth: '80px', flexShrink: 0 }}>{row.name}</span>
+                  <div style={{ flex: 1, height: '4px', background: 'rgba(255,255,255,0.04)', borderRadius: '2px', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${barWidth}%`, background: i === 0 ? 'rgba(196,162,74,0.5)' : 'rgba(240,237,230,0.12)', borderRadius: '2px' }} />
+                  </div>
+                  <span style={{ fontFamily: 'monospace', fontSize: '0.48rem', color: '#5C6166', flexShrink: 0 }}>{row.count}</span>
+                </div>
+              )
+            })}
+          </div>
+        )}
+
+        {leaderboard.length === 0 && (
+          <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: '0.85rem', color: '#3A3F44', marginBottom: '1rem' }}>
+            No memories yet. Share the link to start.
+          </p>
+        )}
+
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <button
+            onClick={handleCopyLink}
+            style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: copied ? '#4CAF50' : '#C4A24A', background: 'transparent', border: `1px solid ${copied ? 'rgba(76,175,80,0.3)' : 'rgba(196,162,74,0.3)'}`, padding: '0.5rem 1rem', cursor: 'pointer', borderRadius: '2px', transition: 'all 0.15s' }}
+          >
+            {copied ? '✓ Copied' : 'Share Game Link →'}
+          </button>
+          <a
+            href={`/game/${session.id}/leaderboard`}
+            style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#5C6166', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.06)', padding: '0.5rem 1rem', borderRadius: '2px' }}
+          >
+            View Leaderboard →
+          </a>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 type ArchiveRow = {
   name:             string
   labelled_photos:  number
@@ -498,6 +628,9 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
 
       {/* ── UPCOMING DATES ── */}
       <UpcomingDates archiveId={archiveId} />
+
+      {/* ── MEMORY GAME ── */}
+      <MemoryGameCard archiveId={archiveId} />
 
       {/* ── STAT CARDS ── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">

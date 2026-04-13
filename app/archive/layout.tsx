@@ -6,7 +6,11 @@ import { usePathname } from 'next/navigation'
 const NAV = [
   { href: '/archive/dashboard',    label: 'Archive'        },
   { href: '/archive/entity',       label: 'My Entity'      },
+  { href: '/archive/voice',        label: 'Voice'          },
   { href: '/archive/wisdom',       label: 'Wisdom Session' },
+  { href: '/archive/writing',      label: 'Writing'        },
+  { href: '/archive/videos',       label: 'Videos'         },
+  { href: '/archive/upload',       label: 'Upload'         },
   { href: '/archive/label',        label: 'Label'          },
   { href: '/archive/gallery',      label: 'Gallery'        },
   { href: '/archive/contributors', label: 'Contributors'   },
@@ -33,10 +37,14 @@ export default function ArchiveLayout({ children }: { children: React.ReactNode 
 
         <nav className="flex flex-col pt-4 pb-6 flex-1" aria-label="Archive navigation">
           {NAV.map(({ href, label }) => {
-            const active   = pathname === href || pathname.startsWith(href + '/')
-            const isEntity = href === '/archive/entity'
-            const isWisdom = href === '/archive/wisdom'
-            const isGold   = isEntity || isWisdom
+            const active    = pathname === href || pathname.startsWith(href + '/')
+            const isEntity  = href === '/archive/entity'
+            const isVoice   = href === '/archive/voice'
+            const isWisdom  = href === '/archive/wisdom'
+            const isWriting = href === '/archive/writing'
+            const isVideos  = href === '/archive/videos'
+            const isUpload  = href === '/archive/upload'
+            const isGold    = isEntity || isWisdom || isVoice || isWriting || isVideos || isUpload
             return (
               <Link
                 key={href}
@@ -54,6 +62,29 @@ export default function ArchiveLayout({ children }: { children: React.ReactNode 
                 {isEntity && (
                   <svg width="8" height="8" viewBox="0 0 8 8" fill="none" aria-hidden="true" style={{ flexShrink: 0 }}>
                     <rect x="1" y="1" width="6" height="6" stroke="rgba(196,162,74,0.8)" strokeWidth="0.8" transform="rotate(45 4 4)" />
+                  </svg>
+                )}
+                {isVoice && (
+                  <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="rgba(196,162,74,0.8)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ flexShrink: 0 }}>
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                    <line x1="12" y1="19" x2="12" y2="23"/>
+                    <line x1="8"  y1="23" x2="16" y2="23"/>
+                  </svg>
+                )}
+                {isWriting && (
+                  <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="rgba(196,162,74,0.8)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ flexShrink: 0 }}>
+                    <path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                  </svg>
+                )}
+                {isVideos && (
+                  <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="rgba(196,162,74,0.8)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ flexShrink: 0 }}>
+                    <polygon points="5 3 19 12 5 21 5 3"/>
+                  </svg>
+                )}
+                {isUpload && (
+                  <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="rgba(196,162,74,0.8)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ flexShrink: 0 }}>
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
                   </svg>
                 )}
                 {label}
@@ -85,9 +116,13 @@ export default function ArchiveLayout({ children }: { children: React.ReactNode 
         </div>
         <div className="flex overflow-x-auto scrollbar-none px-5 pb-3 gap-6">
           {NAV.map(({ href, label }) => {
-            const active   = pathname === href || pathname.startsWith(href + '/')
-            const isEntity = href === '/archive/entity'
-            const isGold   = isEntity || href === '/archive/wisdom'
+            const active    = pathname === href || pathname.startsWith(href + '/')
+            const isEntity  = href === '/archive/entity'
+            const isVoice   = href === '/archive/voice'
+            const isWriting = href === '/archive/writing'
+            const isVideos  = href === '/archive/videos'
+            const isUpload  = href === '/archive/upload'
+            const isGold    = isEntity || isVoice || isWriting || isVideos || isUpload || href === '/archive/wisdom'
             return (
               <Link
                 key={href}
@@ -101,6 +136,29 @@ export default function ArchiveLayout({ children }: { children: React.ReactNode 
                 {isEntity && (
                   <svg width="7" height="7" viewBox="0 0 8 8" fill="none" aria-hidden="true">
                     <rect x="1" y="1" width="6" height="6" stroke="rgba(196,162,74,0.8)" strokeWidth="0.8" transform="rotate(45 4 4)" />
+                  </svg>
+                )}
+                {isVoice && (
+                  <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="rgba(196,162,74,0.8)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                    <line x1="12" y1="19" x2="12" y2="23"/>
+                    <line x1="8"  y1="23" x2="16" y2="23"/>
+                  </svg>
+                )}
+                {isWriting && (
+                  <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="rgba(196,162,74,0.8)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                  </svg>
+                )}
+                {isVideos && (
+                  <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="rgba(196,162,74,0.8)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <polygon points="5 3 19 12 5 21 5 3"/>
+                  </svg>
+                )}
+                {isUpload && (
+                  <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="rgba(196,162,74,0.8)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
                   </svg>
                 )}
                 {label}

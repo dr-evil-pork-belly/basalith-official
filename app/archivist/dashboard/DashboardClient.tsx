@@ -62,12 +62,15 @@ function fmt(cents: number) {
 // ── Cron test panel ───────────────────────────────────────────────────────────
 
 const CRON_JOBS = [
-  { label: 'Send Daily Photos',    route: '/api/cron/send-photos'          },
-  { label: 'Send Weekly Prompt',   route: '/api/cron/weekly-prompt'        },
-  { label: 'Send Monday Mystery',  route: '/api/cron/story-prompt-monday'  },
-  { label: 'Send Friday Reveal',   route: '/api/cron/story-prompt-friday'  },
-  { label: 'Send Monthly Report',  route: '/api/cron/monthly-report'       },
-  { label: 'Send Gratitude Note',  route: '/api/cron/gratitude-note'       },
+  { label: 'Send Daily Photos',          route: '/api/cron/send-photos'            },
+  { label: 'Send Weekly Prompt',         route: '/api/cron/weekly-prompt'          },
+  { label: 'Send Monday Mystery',        route: '/api/cron/story-prompt-monday'    },
+  { label: 'Send Friday Reveal',         route: '/api/cron/story-prompt-friday'    },
+  { label: 'Send Monthly Report',        route: '/api/cron/monthly-report'         },
+  { label: 'Send Gratitude Note',        route: '/api/cron/gratitude-note'         },
+  { label: 'Send Memory Game Start',     route: '/api/cron/memory-game-start'      },
+  { label: 'Send Memory Game Reminder',  route: '/api/cron/memory-game-reminder'   },
+  { label: 'Send Memory Game Summary',   route: '/api/cron/memory-game-summary'    },
 ] as const
 
 type CronState = 'idle' | 'running' | 'ok' | 'error'

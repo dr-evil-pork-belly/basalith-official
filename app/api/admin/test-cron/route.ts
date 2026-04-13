@@ -7,6 +7,9 @@ const ALLOWED_ROUTES = [
   '/api/cron/story-prompt-friday',
   '/api/cron/monthly-report',
   '/api/cron/gratitude-note',
+  '/api/cron/memory-game-start',
+  '/api/cron/memory-game-reminder',
+  '/api/cron/memory-game-summary',
 ]
 
 export async function POST(req: Request) {

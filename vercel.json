@@ -1,4 +1,15 @@
 {
+  "functions": {
+    "app/api/archive/transcribe-voice/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/archive/process-document/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/archive/process-video/route.ts": {
+      "maxDuration": 120
+    }
+  },
   "crons": [
     {
       "path": "/api/cron/send-photos",
@@ -23,6 +34,18 @@
     {
       "path": "/api/cron/gratitude-note",
       "schedule": "0 9 2 * *"
+    },
+    {
+      "path": "/api/cron/memory-game-start",
+      "schedule": "0 9 * * 3"
+    },
+    {
+      "path": "/api/cron/memory-game-reminder",
+      "schedule": "0 9 * * 5"
+    },
+    {
+      "path": "/api/cron/memory-game-summary",
+      "schedule": "0 18 * * 5"
     }
   ]
 }

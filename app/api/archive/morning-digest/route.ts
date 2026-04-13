@@ -183,6 +183,34 @@ export async function POST(req: Request) {
       }
     }
 
+    // Voice nudge — shown max once per month when archive has fewer than 3 voice recordings
+    let voiceNudgeHtml = ''
+    if (isFirstOfMonth) {
+      const { count: voiceCount } = await supabaseAdmin
+        .from('voice_recordings')
+        .select('id', { count: 'exact', head: true })
+        .eq('archive_id', archiveId)
+
+      if ((voiceCount ?? 0) < 3) {
+        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+        voiceNudgeHtml = `
+  <div style="margin:32px 0;padding:24px 32px;border-left:3px solid rgba(196,162,74,0.3);background:rgba(196,162,74,0.03)">
+    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#706C65;text-transform:uppercase;margin:0 0 12px">
+      YOUR VOICE IS NOT YET IN YOUR ARCHIVE
+    </p>
+    <p style="font-family:Georgia,serif;font-size:16px;font-style:italic;color:#F0EDE6;line-height:1.7;margin:0 0 8px">
+      Your archive has photographs and family memories. But your voice is not yet preserved.
+    </p>
+    <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#9DA3A8;line-height:1.7;margin:0 0 20px">
+      Two minutes. Say anything. Any language.
+    </p>
+    <a href="${baseUrl}/archive/voice" style="display:inline-block;background:transparent;color:#C4A24A;font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;text-decoration:none;padding:10px 20px;border-radius:2px;border:1px solid rgba(196,162,74,0.4)">
+      RECORD YOUR VOICE &rarr;
+    </a>
+  </div>`
+      }
+    }
+
     await resend.emails.send({
       from:    `${archiveName} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
       to:      archive.owner_email,
@@ -219,6 +247,8 @@ export async function POST(req: Request) {
   ${upcomingDatesHtml}
 
   ${wisdomSessionHtml}
+
+  ${voiceNudgeHtml}
 
     <div style="border-top:1px solid rgba(240,237,230,0.06);padding-top:24px">
       <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#706C65;margin:0 0 4px">

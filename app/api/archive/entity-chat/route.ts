@@ -35,11 +35,14 @@ async function buildEntitySystemPrompt(archiveId: string, currentMessage?: strin
   const topics = currentMessage ? extractTopics(currentMessage) : []
 
   // ── Parallel fetches (static data) ────────────────────────────────────────
-  const [archive, people, decades, witnessDeposits] = await Promise.all([
+  const [archive, people, decades, witnessDeposits, voiceRecordingsResult, documentsResult, videosResult] = await Promise.all([
     supabaseAdmin.from('archives').select('*').eq('id', archiveId).single(),
     supabaseAdmin.from('people').select('name, relationship, photo_count').eq('archive_id', archiveId).order('photo_count', { ascending: false }).limit(20),
     supabaseAdmin.from('decade_coverage').select('*').eq('archive_id', archiveId).order('decade'),
     supabaseAdmin.from('witness_deposits').select('contributor_name, relationship, question_text, answer, what_it_captures').eq('archive_id', archiveId).order('created_at', { ascending: false }).limit(30),
+    supabaseAdmin.from('voice_recordings').select('transcript, prompt, language_detected, created_at').eq('archive_id', archiveId).eq('transcript_status', 'complete').not('transcript', 'is', null).order('created_at', { ascending: false }).limit(20),
+    supabaseAdmin.from('archive_documents').select('transcript, title, document_type, approximate_decade, created_by, linguistic_patterns').eq('archive_id', archiveId).eq('transcript_status', 'complete').not('transcript', 'is', null).order('created_at', { ascending: false }).limit(15),
+    supabaseAdmin.from('archive_videos').select('transcript, title, video_type, approximate_decade, created_by, language_detected').eq('archive_id', archiveId).eq('transcript_status', 'complete').not('transcript', 'is', null).order('created_at', { ascending: false }).limit(10),
   ])
 
   // ── Deposit selection ──────────────────────────────────────────────────────
@@ -112,6 +115,9 @@ async function buildEntitySystemPrompt(archiveId: string, currentMessage?: strin
   const peopleData   = people.data   || []
   const decadesData  = decades.data  || []
   const witnessData  = witnessDeposits.data || []
+  const voiceData    = voiceRecordingsResult.data || []
+  const docsData     = documentsResult.data || []
+  const videosData   = videosResult.data || []
 
   const depositContext = depositsData
     .map((d: any) => `DEPOSIT: ${d.response}`)
@@ -126,6 +132,26 @@ async function buildEntitySystemPrompt(archiveId: string, currentMessage?: strin
     .filter((w: any) => w.answer && w.answer.length > 0)
     .map((w: any) => `${w.contributor_name || 'A witness'} (${w.relationship}) observed: ${w.answer}`)
     .join('\n\n')
+
+  const voiceContext = voiceData.length > 0
+    ? voiceData.map((v: any) =>
+        `SPOKEN DEPOSIT${v.language_detected && v.language_detected !== 'english' ? ` (${v.language_detected})` : ''}: ${v.transcript}`
+      ).join('\n\n')
+    : 'No voice recordings yet.'
+
+  const documentContext = docsData.length > 0
+    ? docsData.map((d: any) => {
+        const meta = [d.document_type, d.approximate_decade, d.created_by].filter(Boolean).join(', ')
+        return `WRITTEN DOCUMENT${meta ? ` (${meta})` : ''}${d.title ? ` — "${d.title}"` : ''}: ${(d.transcript || '').substring(0, 800)}`
+      }).join('\n\n')
+    : 'No written documents yet.'
+
+  const videoContext = videosData.length > 0
+    ? videosData.map((v: any) => {
+        const meta = [v.video_type, v.approximate_decade, v.created_by].filter(Boolean).join(', ')
+        return `VIDEO TRANSCRIPT${meta ? ` (${meta})` : ''}${v.title ? ` — "${v.title}"` : ''}${v.language_detected && v.language_detected !== 'english' ? ` [${v.language_detected}]` : ''}: ${(v.transcript || '').substring(0, 600)}`
+      }).join('\n\n')
+    : 'No video transcripts yet.'
 
   const peopleContext = peopleData
     .map((p: any) => `${p.name}${p.relationship ? ` (${p.relationship})` : ''}: appears in ${p.photo_count} photographs`)
@@ -164,6 +190,18 @@ ${peopleContext || 'No people identified yet.'}
 
 WITNESS OBSERVATIONS FROM PEOPLE WHO KNOW YOU:
 ${witnessContext || 'No witness observations yet.'}
+
+VOICE RECORDINGS:
+${voiceContext}
+Voice recordings represent how this person speaks — their natural cadence, vocabulary, and expression. Pay attention to their spoken voice as distinct from their written voice. When relevant reference what they said rather than what they wrote.
+
+WRITTEN DOCUMENTS:
+${documentContext}
+Written documents reveal this person's written voice, vocabulary, and the things they chose to commit to paper. Letters, journals, and notes carry emotional weight and authenticity.
+
+VIDEO TRANSCRIPTS:
+${videoContext}
+Video transcripts capture spoken moments — celebrations, speeches, ordinary conversation. They reveal how this person sounds in unscripted settings.
 
 YOUR VOICE AND APPROACH:
 
@@ -229,6 +267,18 @@ ${decadeContext}
 WITNESS OBSERVATIONS FROM PEOPLE WHO KNOW YOU:
 ${witnessContext || 'No witness observations yet.'}
 These are observations from people who know you from specific vantage points — as your child, partner, colleague, sibling, or childhood friend. Use them to add texture and accuracy to your responses. When relevant, reference what others have observed: "Someone who knew me as a colleague once observed that..." or "My child once noticed that..."
+
+VOICE RECORDINGS:
+${voiceContext}
+Voice recordings represent how this person speaks — their natural cadence, vocabulary, and expression. Pay attention to their spoken voice as distinct from their written voice. When relevant reference what they said rather than what they wrote.
+
+WRITTEN DOCUMENTS:
+${documentContext}
+Written documents reveal this person's written voice, vocabulary, and the things they chose to commit to paper. Letters, journals, and notes carry emotional weight and authenticity. Quote from them when relevant.
+
+VIDEO TRANSCRIPTS:
+${videoContext}
+Video transcripts capture spoken moments — celebrations, speeches, ordinary conversation. They reveal how this person sounds in unscripted settings.
 
 YOUR VOICE AND APPROACH:
 

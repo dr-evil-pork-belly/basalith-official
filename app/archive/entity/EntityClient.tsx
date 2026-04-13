@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import VoiceRecorder from '@/app/components/VoiceRecorder'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 type Message = {
@@ -117,6 +118,7 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
   const [correctionOpen,       setCorrectionOpen]       = useState<Record<string, boolean>>({})
   const [correctionText,       setCorrectionText]       = useState<Record<string, string>>({})
   const [correctionSaved,      setCorrectionSaved]      = useState<Record<string, boolean>>({})
+  const [showVoicePanel,       setShowVoicePanel]       = useState(false)
 
   const bottomRef    = useRef<HTMLDivElement>(null)
   const textareaRef  = useRef<HTMLTextAreaElement>(null)
@@ -757,6 +759,25 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
 
           {/* Input area */}
           <div style={{ borderTop: '1px solid rgba(196,162,74,0.1)', paddingTop: '1rem', marginTop: 0 }}>
+
+            {/* Voice panel — slides in above textarea */}
+            {showVoicePanel && (
+              <div style={{ marginBottom: '1rem' }}>
+                <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: '0.8rem', color: '#5C6166', marginBottom: '0.75rem', lineHeight: 1.6 }}>
+                  Your recording will be saved to your archive. The transcript will appear in the chat input.
+                </p>
+                <VoiceRecorder
+                  archiveId={archiveId}
+                  onComplete={(transcript) => {
+                    setInputValue(transcript)
+                    setShowVoicePanel(false)
+                    setTimeout(() => textareaRef.current?.focus(), 100)
+                  }}
+                  onClose={() => setShowVoicePanel(false)}
+                />
+              </div>
+            )}
+
             <textarea
               ref={textareaRef}
               rows={2}
@@ -778,9 +799,48 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
               }}
             />
             <div className="flex items-center justify-between mt-3">
-              <span style={{ fontFamily: 'monospace', fontSize: '0.38rem', color: '#5C6166' }}>
-                {inputValue.length > 200 ? `${inputValue.length} chars` : ''}
-              </span>
+              <div className="flex items-center gap-2">
+                {/* Microphone button */}
+                <button
+                  onClick={() => setShowVoicePanel(v => !v)}
+                  title="Record voice"
+                  style={{
+                    width:        '40px',
+                    height:       '40px',
+                    borderRadius: '50%',
+                    background:   showVoicePanel ? 'rgba(196,162,74,0.12)' : 'transparent',
+                    border:       showVoicePanel ? '1px solid #C4A24A' : '1px solid rgba(196,162,74,0.2)',
+                    cursor:       'pointer',
+                    display:      'flex',
+                    alignItems:   'center',
+                    justifyContent: 'center',
+                    transition:   'all 0.15s',
+                    flexShrink:   0,
+                  }}
+                  onMouseEnter={e => {
+                    if (!showVoicePanel) {
+                      e.currentTarget.style.borderColor = '#C4A24A'
+                      e.currentTarget.style.background  = 'rgba(196,162,74,0.08)'
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    if (!showVoicePanel) {
+                      e.currentTarget.style.borderColor = 'rgba(196,162,74,0.2)'
+                      e.currentTarget.style.background  = 'transparent'
+                    }
+                  }}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={showVoicePanel ? '#C4A24A' : 'rgba(196,162,74,0.7)'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                    <line x1="12" y1="19" x2="12" y2="23"/>
+                    <line x1="8"  y1="23" x2="16" y2="23"/>
+                  </svg>
+                </button>
+                <span style={{ fontFamily: 'monospace', fontSize: '0.38rem', color: '#5C6166' }}>
+                  {inputValue.length > 200 ? `${inputValue.length} chars` : ''}
+                </span>
+              </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={depositOnly}
