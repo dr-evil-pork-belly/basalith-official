@@ -85,21 +85,38 @@ function SystemTestsPanel() {
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ cronRoute: route }),
       })
-      const data = await res.json()
-      if (res.ok && data.ok !== false) {
-        const r = data.result
-        const summary = r
-          ? Object.entries(r)
-              .filter(([k]) => !['isTest'].includes(k))
-              .map(([k, v]) => `${k}: ${v}`)
-              .join('  ·  ')
-          : 'done'
-        setStates(s  => ({ ...s, [route]: 'ok' }))
-        setMessages(m => ({ ...m, [route]: summary }))
-      } else {
+      const envelope = await res.json()
+      // proxy returns { success, status, data }
+      // data is the raw cron route response
+      const d = envelope.data ?? envelope
+
+      if (!res.ok || envelope.error) {
         setStates(s  => ({ ...s, [route]: 'error' }))
-        setMessages(m => ({ ...m, [route]: data.result?.error ?? data.error ?? 'unknown error' }))
+        setMessages(m => ({ ...m, [route]: envelope.error ?? `HTTP ${res.status}` }))
+        return
       }
+
+      if (d.skipped) {
+        setStates(s  => ({ ...s, [route]: 'ok' }))
+        setMessages(m => ({ ...m, [route]: `skipped — ${d.reason ?? ''}` }))
+        return
+      }
+
+      if (d.error) {
+        setStates(s  => ({ ...s, [route]: 'error' }))
+        setMessages(m => ({ ...m, [route]: d.error }))
+        return
+      }
+
+      // Build a human-readable summary from whatever the cron returned
+      const parts: string[] = []
+      if (d.sent     != null) parts.push(`sent: ${d.sent}`)
+      if (d.total    != null) parts.push(`total: ${d.total}`)
+      if (d.message)          parts.push(d.message)
+      if (d.weekNumber != null) parts.push(`week ${d.weekNumber}`)
+
+      setStates(s  => ({ ...s, [route]: 'ok' }))
+      setMessages(m => ({ ...m, [route]: parts.length ? parts.join('  ·  ') : 'done' }))
     } catch (err: any) {
       setStates(s  => ({ ...s, [route]: 'error' }))
       setMessages(m => ({ ...m, [route]: err.message }))
