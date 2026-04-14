@@ -1,9 +1,9 @@
 {
   "redirects": [
     {
-      "source":      "/:path*",
+      "source":      "/(.*)",
       "has":         [{ "type": "host", "value": "www.basalith.xyz" }],
-      "destination": "https://basalith.xyz/:path*",
+      "destination": "https://basalith.xyz/$1",
       "permanent":   true
     }
   ],
