@@ -1,4 +1,12 @@
 {
+  "redirects": [
+    {
+      "source":      "/:path*",
+      "has":         [{ "type": "host", "value": "www.basalith.xyz" }],
+      "destination": "https://basalith.xyz/:path*",
+      "permanent":   true
+    }
+  ],
   "functions": {
     "app/api/archive/transcribe-voice/route.ts": {
       "maxDuration": 60
