@@ -142,15 +142,19 @@ interface UploadState {
   totalFailed:   number
   currentBatch:  number
   totalBatches:  number
+  lastError:     string
 }
 
 function BulkUploadTab({ archiveId }: { archiveId: string }) {
   const [state, setState] = useState<UploadState>({
     status: 'idle', totalSelected: 0, totalUploaded: 0,
-    totalFailed: 0, currentBatch: 0, totalBatches: 0,
+    totalFailed: 0, currentBatch: 0, totalBatches: 0, lastError: '',
   })
-  const [dragging, setDragging] = useState(false)
+  const [dragging,     setDragging]     = useState(false)
+  const [testResult,   setTestResult]   = useState<string | null>(null)
+  const [testLoading,  setTestLoading]  = useState(false)
   const inputRef       = useRef<HTMLInputElement>(null)
+  const testInputRef   = useRef<HTMLInputElement>(null)
   const queueRef       = useRef<File[]>([])
   const isUploadingRef = useRef(false)
 
@@ -176,6 +180,8 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
         fd.append('uploadedBy', 'owner')
         for (const file of batch) fd.append('photos', file)
 
+        console.log('Uploading batch:', batch.length, 'files to', archiveId)
+
         const res = await fetch('/api/archive/bulk-upload', {
           method: 'POST',
           body:   fd,
@@ -186,9 +192,19 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
           uploaded += data.uploaded ?? batch.length
           failed   += data.failed   ?? 0
         } else {
+          let errorMsg = `HTTP ${res.status}`
+          try {
+            const errorData = await res.json()
+            errorMsg = errorData.error || JSON.stringify(errorData)
+          } catch { /* body not JSON */ }
+          console.error('Batch upload failed:', errorMsg)
+          setState(prev => ({ ...prev, lastError: `Upload failed: ${errorMsg}` }))
           failed += batch.length
         }
-      } catch {
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err)
+        console.error('Batch upload exception:', msg)
+        setState(prev => ({ ...prev, lastError: `Upload failed: ${msg}` }))
         failed += batch.length
       }
 
@@ -205,7 +221,7 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
   const handleFiles = useCallback(async (fileList: FileList | null) => {
     if (!fileList || fileList.length === 0) return
 
-    setState({ status: 'selecting', totalSelected: 0, totalUploaded: 0, totalFailed: 0, currentBatch: 0, totalBatches: 0 })
+    setState({ status: 'selecting', totalSelected: 0, totalUploaded: 0, totalFailed: 0, currentBatch: 0, totalBatches: 0, lastError: '' })
 
     // Iterate lazily — never call Array.from(fileList) on large iCloud libraries
     // as iOS resolves all iCloud references simultaneously, freezing the browser.
@@ -225,10 +241,35 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
   }, [processQueue])
 
   function reset() {
-    setState({ status: 'idle', totalSelected: 0, totalUploaded: 0, totalFailed: 0, currentBatch: 0, totalBatches: 0 })
+    setState({ status: 'idle', totalSelected: 0, totalUploaded: 0, totalFailed: 0, currentBatch: 0, totalBatches: 0, lastError: '' })
+    setTestResult(null)
     queueRef.current = []
     isUploadingRef.current = false
     if (inputRef.current) inputRef.current.value = ''
+  }
+
+  async function handleTestUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setTestLoading(true)
+    setTestResult(null)
+    const fd = new FormData()
+    fd.append('archiveId', archiveId)
+    fd.append('uploadedBy', 'owner')
+    fd.append('photos', file)
+    console.log('Test upload: 1 file to', archiveId, 'name:', file.name, 'size:', file.size, 'type:', file.type)
+    try {
+      const res = await fetch('/api/archive/bulk-upload', { method: 'POST', body: fd })
+      const data = await res.json()
+      console.log('Test upload response:', data)
+      setTestResult(JSON.stringify(data, null, 2))
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err)
+      console.error('Test upload error:', msg)
+      setTestResult(`Error: ${msg}`)
+    }
+    setTestLoading(false)
+    if (testInputRef.current) testInputRef.current.value = ''
   }
 
   // ── Selecting state ──────────────────────────────────────────────────────────
@@ -283,9 +324,16 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
             Our AI is reviewing each one now.
           </p>
           {state.totalFailed > 0 && (
-            <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.1em', color: '#5C6166', marginTop: '0.75rem' }}>
-              {state.totalFailed} could not be uploaded — try again
-            </p>
+            <div style={{ marginTop: '0.75rem' }}>
+              <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.1em', color: '#5C6166' }}>
+                {state.totalFailed} could not be uploaded
+              </p>
+              {state.lastError && (
+                <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.06em', color: 'rgba(196,162,74,0.6)', marginTop: '0.4rem', wordBreak: 'break-all', maxWidth: '360px' }}>
+                  {state.lastError}
+                </p>
+              )}
+            </div>
           )}
         </div>
         <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#5C6166', maxWidth: '320px' }}>
@@ -351,6 +399,30 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
       <p style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#3A3F44', textAlign: 'center' }}>
         Uploads in batches of {BATCH_SIZE} · AI reviews each photograph automatically
       </p>
+
+      {/* Single-photo diagnostic test */}
+      <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '1.25rem' }}>
+        <input
+          ref={testInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleTestUpload}
+        />
+        <button
+          onClick={() => testInputRef.current?.click()}
+          disabled={testLoading}
+          style={{ fontFamily: 'monospace', fontSize: '0.46rem', letterSpacing: '0.12em', color: '#5C6166', background: 'none', border: 'none', cursor: 'pointer', padding: 0, textDecoration: 'underline', textUnderlineOffset: '3px' }}
+        >
+          {testLoading ? 'Testing…' : 'Having trouble? Try uploading one photo first →'}
+        </button>
+        {testResult && (
+          <pre style={{ marginTop: '0.75rem', fontFamily: 'monospace', fontSize: '0.5rem', color: 'rgba(196,162,74,0.7)', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '2px', padding: '0.75rem 1rem', overflowX: 'auto', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+            {testResult}
+          </pre>
+        )}
+      </div>
+
     </div>
   )
 }

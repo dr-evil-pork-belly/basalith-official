@@ -26,7 +26,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'No files provided' }, { status: 400 })
     }
 
-    console.log(`Bulk upload: ${files.length} files for archive ${archiveId}`)
+    console.log('Bulk upload called:', {
+      archiveId,
+      fileCount: files.length,
+      totalSize: files.reduce((s, f) => s + f.size, 0),
+    })
 
     const results: { photographId: string; fileName: string }[] = []
     const errors:  { file: string; error: string }[]            = []
@@ -45,6 +49,11 @@ export async function POST(req: NextRequest) {
             contentType: file.type || 'image/jpeg',
             upsert:      false,
           })
+
+        console.log('Storage upload result:', {
+          path,
+          error: uploadError?.message ?? null,
+        })
 
         if (uploadError) {
           errors.push({ file: file.name, error: uploadError.message })
