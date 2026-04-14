@@ -180,6 +180,7 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
         fd.append('uploadedBy', 'owner')
         for (const file of batch) fd.append('photos', file)
 
+        console.log('Sending upload with archiveId:', archiveId)
         console.log('Uploading batch:', batch.length, 'files to', archiveId)
 
         const res = await fetch('/api/archive/bulk-upload', {
