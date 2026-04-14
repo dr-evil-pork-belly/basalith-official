@@ -4,6 +4,8 @@ import { resend } from '@/lib/resend'
 import { DIMENSIONS } from '@/lib/entityAccuracy'
 import { getWeeklyPrompt, getWeekNumber } from '@/lib/weeklyPrompts'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const secretParam = searchParams.get('secret') || ''

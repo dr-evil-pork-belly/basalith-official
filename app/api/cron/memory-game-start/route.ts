@@ -198,7 +198,7 @@ export async function GET(req: NextRequest) {
       for (const contributor of contributors) {
         try {
           await resend.emails.send({
-            from:    `The ${archive.family_name} Archive <archive@basalith.xyz>`,
+            from:    `The ${archive.family_name} Archive <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
             to:      contributor.email,
             subject: `This week's memory game is live · ${archive.name}`,
             html:    buildGameStartEmail(

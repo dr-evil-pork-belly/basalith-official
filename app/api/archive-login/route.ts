@@ -66,6 +66,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Archive not found' }, { status: 404 })
   }
 
+  if (archive.status && archive.status !== 'active') {
+    return NextResponse.json({ error: 'Archive is not active' }, { status: 403 })
+  }
+
   const cookieOptions = {
     httpOnly: true,
     secure:   process.env.NODE_ENV === 'production',

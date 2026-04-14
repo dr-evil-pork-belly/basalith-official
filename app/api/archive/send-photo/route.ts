@@ -125,13 +125,17 @@ export async function POST(req: NextRequest) {
     )
 
     for (const contributor of contributors) {
-      await resend.emails.send({
-        from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
-        to:      contributor.email,
-        replyTo: replyAddress,
-        subject: subjectLine,
-        html:    emailHtml,
-      })
+      try {
+        await resend.emails.send({
+          from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
+          to:      contributor.email,
+          replyTo: replyAddress,
+          subject: subjectLine,
+          html:    emailHtml,
+        })
+      } catch (emailErr: unknown) {
+        console.error(`send-photo: email failed for ${contributor.email}:`, emailErr instanceof Error ? emailErr.message : emailErr)
+      }
     }
 
     // 9. Update delivery timestamps

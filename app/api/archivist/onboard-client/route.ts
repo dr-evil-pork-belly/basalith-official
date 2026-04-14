@@ -81,7 +81,6 @@ export async function POST(req: NextRequest) {
 
     // ── 2. Generate password ──────────────────────────────────────────────────
     const password     = generateClientPassword(familyName)
-    console.log('[onboard-client] Generating password:', password)
     const passwordHash = await bcrypt.hash(password, 12)
     console.log('[onboard-client] Hash generated, length:', passwordHash.length)
 
@@ -154,26 +153,35 @@ export async function POST(req: NextRequest) {
     const tierName = tierNames[tier] || 'The Estate'
     const firstName = (clientName || familyName).split(' ')[0]
 
-    await resend.emails.send({
-      from:    `The ${familyName} Archive <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
-      to:      clientEmail,
-      subject: `Welcome to Basalith — The ${familyName} Archive is ready`,
-      html:    buildWelcomeEmail(familyName, firstName, password, tierName, archivist.name),
-    })
+    try {
+      await resend.emails.send({
+        from:    `The ${familyName} Archive <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
+        to:      clientEmail,
+        subject: `Welcome to Basalith — The ${familyName} Archive is ready`,
+        html:    buildWelcomeEmail(familyName, firstName, password, tierName, archivist.name),
+      })
+    } catch (emailErr: unknown) {
+      console.error('[onboard-client] Welcome email failed:', emailErr instanceof Error ? emailErr.message : emailErr)
+      // Non-fatal — archive is created, password returned below regardless
+    }
 
-    // ── 9. Notify legacy@basalith.xyz ─────────────────────────────────────────
-    await resend.emails.send({
-      from:    'Basalith <davidha@basalith.xyz>',
-      to:      process.env.ADMIN_EMAIL ?? 'legacy@basalith.xyz',
-      subject: `New Archive — The ${familyName} Archive (${tier}) — via ${archivist.name}`,
-      html: `<p><strong>New archive initialized</strong></p>
-        <p>Family: The ${familyName} Archive</p>
-        <p>Client: ${clientName} (${clientEmail})</p>
-        <p>Tier: ${tierName}</p>
-        <p>Archivist: ${archivist.name}</p>
-        <p>Archive ID: ${archive.id}</p>
-        <p>Commission recorded: $1,000 pending</p>`,
-    })
+    // ── 9. Notify admin ───────────────────────────────────────────────────────
+    try {
+      await resend.emails.send({
+        from:    `Basalith <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
+        to:      process.env.ADMIN_EMAIL ?? 'legacy@basalith.xyz',
+        subject: `New Archive — The ${familyName} Archive (${tier}) — via ${archivist.name}`,
+        html: `<p><strong>New archive initialized</strong></p>
+          <p>Family: The ${familyName} Archive</p>
+          <p>Client: ${clientName} (${clientEmail})</p>
+          <p>Tier: ${tierName}</p>
+          <p>Archivist: ${archivist.name}</p>
+          <p>Archive ID: ${archive.id}</p>
+          <p>Commission recorded: $1,000 pending</p>`,
+      })
+    } catch (adminEmailErr: unknown) {
+      console.error('[onboard-client] Admin notification failed:', adminEmailErr instanceof Error ? adminEmailErr.message : adminEmailErr)
+    }
 
     return NextResponse.json({
       success:     true,

@@ -362,8 +362,9 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ response: entityResponse, sessionId: currentSessionId, wasDeposit })
-  } catch (error: any) {
-    console.error('Entity chat error:', error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : 'Unknown error'
+    console.error('Entity chat error:', msg)
+    return NextResponse.json({ error: msg }, { status: 500 })
   }
 }
