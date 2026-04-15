@@ -22,6 +22,7 @@ export async function GET(req: NextRequest) {
       storage_path,
       original_name,
       status,
+      priority_score,
       labels (
         what_was_happening,
         legacy_note,
@@ -34,11 +35,24 @@ export async function GET(req: NextRequest) {
       )
     `, { count: 'exact' })
     .eq('archive_id', archiveId)
-    .eq('status', 'labelled')
-    .order('created_at', { ascending: false })
+    .in('status', ['unlabelled', 'labelled', 'needs_review'])
+    .order('priority_score', { ascending: false })
     .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1)
 
+  if (decade) {
+    query = query.eq('decade', decade)
+  }
+
   const { data, error, count } = await query
+
+  console.log('Gallery fetch:', {
+    archiveId,
+    page,
+    decade,
+    photoCount: data?.length ?? 0,
+    total:      count,
+    error:      error?.message ?? null,
+  })
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
