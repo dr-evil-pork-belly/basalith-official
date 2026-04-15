@@ -194,43 +194,74 @@ async function uploadFileDirect(file: File, archiveId: string): Promise<boolean>
   }
 }
 
+const CONCURRENCY = 5
+
 function BulkUploadTab({ archiveId }: { archiveId: string }) {
   const [state, setState] = useState<UploadState>({
     status: 'idle', totalSelected: 0, totalUploaded: 0,
     totalFailed: 0, currentFile: 0, lastError: '',
   })
+  const [eta,         setEta]         = useState<string | null>(null)
   const [dragging,    setDragging]    = useState(false)
   const [testResult,  setTestResult]  = useState<string | null>(null)
   const [testLoading, setTestLoading] = useState(false)
-  const inputRef      = useRef<HTMLInputElement>(null)
-  const testInputRef  = useRef<HTMLInputElement>(null)
-  const queueRef      = useRef<File[]>([])
+  const inputRef       = useRef<HTMLInputElement>(null)
+  const testInputRef   = useRef<HTMLInputElement>(null)
+  const queueRef       = useRef<File[]>([])
   const isUploadingRef = useRef(false)
 
   const processQueue = useCallback(async () => {
     if (isUploadingRef.current) return
     isUploadingRef.current = true
 
-    const queue = queueRef.current
+    const queue     = queueRef.current
+    const total     = queue.length
+    const startTime = Date.now()
     setState(prev => ({ ...prev, status: 'uploading' }))
+    setEta(null)
 
-    let uploaded = 0
-    let failed   = 0
+    let uploaded  = 0
+    let failed    = 0
+    let completed = 0
 
-    for (let i = 0; i < queue.length; i++) {
-      setState(prev => ({ ...prev, currentFile: i + 1 }))
+    // Process files in chunks of CONCURRENCY (5 simultaneous uploads)
+    for (let i = 0; i < total; i += CONCURRENCY) {
+      const chunk   = queue.slice(i, i + CONCURRENCY)
+      const results = await Promise.allSettled(
+        chunk.map(file => uploadFileDirect(file, archiveId))
+      )
 
-      const success = await uploadFileDirect(queue[i], archiveId)
-      if (success) { uploaded++ } else { failed++ }
+      results.forEach(result => {
+        completed++
+        if (result.status === 'fulfilled' && result.value) { uploaded++ }
+        else { failed++ }
+      })
 
-      setState(prev => ({ ...prev, totalUploaded: uploaded, totalFailed: failed }))
+      setState(prev => ({
+        ...prev,
+        currentFile:   completed,
+        totalUploaded: uploaded,
+        totalFailed:   failed,
+      }))
 
-      // Brief pause every 10 files to avoid overwhelming Supabase
-      if (i % 10 === 9) await new Promise(r => setTimeout(r, 500))
+      // Update ETA after first chunk completes
+      if (completed >= CONCURRENCY && completed < total) {
+        const elapsed        = Date.now() - startTime
+        const avgPerFile     = elapsed / completed
+        const remaining      = (total - completed) * avgPerFile
+        const minutes        = Math.floor(remaining / 60000)
+        const seconds        = Math.floor((remaining % 60000) / 1000)
+        setEta(minutes > 0 ? `About ${minutes} minute${minutes === 1 ? '' : 's'} remaining` : 'Almost done…')
+        void seconds // used implicitly via minutes branch
+      }
+
+      // Brief pause between chunks to avoid overwhelming Supabase
+      if (i + CONCURRENCY < total) await new Promise(r => setTimeout(r, 200))
     }
 
     isUploadingRef.current = false
     queueRef.current = []
+    setEta(null)
     setState(prev => ({ ...prev, status: 'complete', totalUploaded: uploaded, totalFailed: failed }))
   }, [archiveId])
 
@@ -257,6 +288,7 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
 
   function reset() {
     setState({ status: 'idle', totalSelected: 0, totalUploaded: 0, totalFailed: 0, currentFile: 0, lastError: '' })
+    setEta(null)
     setTestResult(null)
     queueRef.current = []
     isUploadingRef.current = false
@@ -307,12 +339,17 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
           <div style={{ height: '100%', background: '#C4A24A', borderRadius: '2px', width: `${pct}%`, transition: 'width 0.4s ease' }} />
         </div>
         <p style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.18em', color: '#5C6166' }}>
-          UPLOADING {state.currentFile} OF {state.totalSelected}
+          {state.currentFile} OF {state.totalSelected}
           {state.totalUploaded > 0 && ` · ${state.totalUploaded} UPLOADED`}
           {state.totalFailed  > 0 && ` · ${state.totalFailed} FAILED`}
         </p>
+        {eta && (
+          <p style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.14em', color: 'rgba(196,162,74,0.5)', marginTop: '0.5rem' }}>
+            {eta.toUpperCase()}
+          </p>
+        )}
         <p className="font-serif" style={{ fontSize: '0.85rem', fontStyle: 'italic', color: '#3A3830', marginTop: '1rem' }}>
-          Each photo goes directly to the archive. Keep this page open.
+          Uploading {CONCURRENCY} photos at a time. Keep this page open.
         </p>
       </div>
     )
