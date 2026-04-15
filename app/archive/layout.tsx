@@ -10,7 +10,7 @@ const NAV = [
   { href: '/archive/wisdom',       label: 'Wisdom Session' },
   { href: '/archive/writing',      label: 'Writing'        },
   { href: '/archive/videos',       label: 'Videos'         },
-  { href: '/archive/upload',       label: 'Upload'         },
+  { href: '/archive/upload',       label: 'Docs & Videos'  },
   { href: '/archive/label',        label: 'Label'          },
   { href: '/archive/gallery',      label: 'Gallery'        },
   { href: '/archive/contributors', label: 'Contributors'   },

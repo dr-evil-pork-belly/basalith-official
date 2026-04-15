@@ -251,6 +251,25 @@ export default function UploadClient({ archiveId }: Props) {
         {/* PHOTOGRAPHS */}
         {activeSection === 'photographs' && (
           <div className="space-y-6">
+
+            {/* Photo redirect notice */}
+            <div style={{ background: 'rgba(196,162,74,0.06)', border: '1px solid rgba(196,162,74,0.2)', padding: '1rem 1.5rem' }}>
+              <p className="font-legacy text-base italic mb-1" style={{ color: '#F0EDE6' }}>
+                Uploading photos?
+              </p>
+              <p className="font-legacy text-base italic mb-4" style={{ color: 'rgba(240,237,230,0.55)' }}>
+                Photos are uploaded through the Label section in your sidebar.
+                This page is for videos, letters, and documents only.
+              </p>
+              <a
+                href="/archive/label"
+                className="inline-block font-compute text-xs tracking-widest no-underline"
+                style={{ background: '#C4A24A', color: '#0A0908', padding: '0.5rem 1.25rem' }}
+              >
+                GO TO PHOTO UPLOAD →
+              </a>
+            </div>
+
             <div
               className={`border-2 border-dashed rounded-lg p-12 text-center cursor-pointer transition-colors ${
                 dragging ? 'border-gold/60 bg-gold/5' : 'border-white/10 hover:border-white/20'
