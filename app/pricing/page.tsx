@@ -1,4 +1,10 @@
+import type { Metadata } from 'next'
 import Nav        from '../components/Nav'
+
+export const metadata: Metadata = {
+  title: 'Pricing',
+}
+
 import Footer     from '../components/Footer'
 import PricingFAQ from '../components/PricingFAQ'
 

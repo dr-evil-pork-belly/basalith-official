@@ -22,8 +22,12 @@ const publicSans = Public_Sans({
 })
 
 export const metadata: Metadata = {
-  title:       'Basalith · XYZ | Sovereign Data Infrastructure',
-  description: 'The provenance record that powers your entity. Biological ledgers, strategic archives, lineage blueprints. Every deposit feeds the AI.',
+  title: {
+    default:  'Basalith',
+    template: '%s · Basalith',
+  },
+  description: 'The archive of a life, governed with the same seriousness as an estate. We build for legacy.',
+  metadataBase: new URL('https://basalith.xyz'),
   manifest:    '/site.webmanifest',
   icons: {
     icon: [
@@ -40,16 +44,16 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title:       'Basalith · XYZ',
-    description: 'The provenance record that powers your entity.',
+    title:       'Basalith',
+    description: 'The archive of a life, governed with the same seriousness as an estate.',
     url:         'https://basalith.xyz',
-    siteName:    'Basalith XYZ',
+    siteName:    'Basalith',
     images:      [{ url: '/icon-512x512.png' }],
   },
   twitter: {
     card:        'summary',
-    title:       'Basalith · XYZ',
-    description: 'Sovereign data infrastructure.',
+    title:       'Basalith',
+    description: 'The archive of a life, governed with the same seriousness as an estate.',
     images:      ['/icon-512x512.png'],
   },
 }
