@@ -131,8 +131,6 @@ const EMPTY: ArchiveItem = {
   inviteEmail: '', contributor: '', labeledAt: '',
 }
 
-const BATCH_SIZE = 20
-
 type UploadStatus = 'idle' | 'selecting' | 'uploading' | 'complete'
 
 interface UploadState {
@@ -140,78 +138,95 @@ interface UploadState {
   totalSelected: number
   totalUploaded: number
   totalFailed:   number
-  currentBatch:  number
-  totalBatches:  number
+  currentFile:   number
   lastError:     string
+}
+
+// Upload a single file directly to Supabase Storage, bypassing Vercel size limits.
+// Returns true on success, false on any failure.
+async function uploadFileDirect(file: File, archiveId: string): Promise<boolean> {
+  try {
+    // Step 1 — get a presigned upload URL from our API (tiny JSON, no file data)
+    const urlRes = await fetch('/api/archive/upload-url', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ archiveId, fileName: file.name, fileType: file.type }),
+    })
+    if (!urlRes.ok) {
+      const err = await urlRes.json().catch(() => ({}))
+      throw new Error(err.error || `upload-url HTTP ${urlRes.status}`)
+    }
+    const { uploadUrl, path } = await urlRes.json()
+
+    // Step 2 — PUT the file directly to Supabase (no Vercel 4.5 MB limit applies)
+    const storageRes = await fetch(uploadUrl, {
+      method:  'PUT',
+      headers: { 'Content-Type': file.type || 'image/jpeg' },
+      body:    file,
+    })
+    if (!storageRes.ok) {
+      throw new Error(`Storage upload failed: HTTP ${storageRes.status}`)
+    }
+
+    // Step 3 — register the DB record and fire Inngest (tiny JSON again)
+    const regRes = await fetch('/api/archive/register-photo', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({
+        archiveId,
+        storagePath: path,
+        fileName:    file.name,
+        fileSize:    file.size,
+        fileType:    file.type,
+        uploadedBy:  'owner',
+      }),
+    })
+    if (!regRes.ok) {
+      const err = await regRes.json().catch(() => ({}))
+      throw new Error(err.error || `register-photo HTTP ${regRes.status}`)
+    }
+
+    return true
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error('uploadFileDirect failed for', file.name, ':', msg)
+    return false
+  }
 }
 
 function BulkUploadTab({ archiveId }: { archiveId: string }) {
   const [state, setState] = useState<UploadState>({
     status: 'idle', totalSelected: 0, totalUploaded: 0,
-    totalFailed: 0, currentBatch: 0, totalBatches: 0, lastError: '',
+    totalFailed: 0, currentFile: 0, lastError: '',
   })
-  const [dragging,     setDragging]     = useState(false)
-  const [testResult,   setTestResult]   = useState<string | null>(null)
-  const [testLoading,  setTestLoading]  = useState(false)
-  const inputRef       = useRef<HTMLInputElement>(null)
-  const testInputRef   = useRef<HTMLInputElement>(null)
-  const queueRef       = useRef<File[]>([])
+  const [dragging,    setDragging]    = useState(false)
+  const [testResult,  setTestResult]  = useState<string | null>(null)
+  const [testLoading, setTestLoading] = useState(false)
+  const inputRef      = useRef<HTMLInputElement>(null)
+  const testInputRef  = useRef<HTMLInputElement>(null)
+  const queueRef      = useRef<File[]>([])
   const isUploadingRef = useRef(false)
 
   const processQueue = useCallback(async () => {
     if (isUploadingRef.current) return
     isUploadingRef.current = true
 
-    const queue       = queueRef.current
-    const totalBatches = Math.ceil(queue.length / BATCH_SIZE)
-    setState(prev => ({ ...prev, status: 'uploading', totalBatches }))
+    const queue = queueRef.current
+    setState(prev => ({ ...prev, status: 'uploading' }))
 
     let uploaded = 0
     let failed   = 0
 
-    for (let i = 0; i < queue.length; i += BATCH_SIZE) {
-      const batch       = queue.slice(i, i + BATCH_SIZE)
-      const batchNumber = Math.floor(i / BATCH_SIZE) + 1
-      setState(prev => ({ ...prev, currentBatch: batchNumber }))
+    for (let i = 0; i < queue.length; i++) {
+      setState(prev => ({ ...prev, currentFile: i + 1 }))
 
-      try {
-        const fd = new FormData()
-        fd.append('archiveId', archiveId)
-        fd.append('uploadedBy', 'owner')
-        for (const file of batch) fd.append('photos', file)
-
-        console.log('Sending upload with archiveId:', archiveId)
-        console.log('Uploading batch:', batch.length, 'files to', archiveId)
-
-        const res = await fetch('/api/archive/bulk-upload', {
-          method: 'POST',
-          body:   fd,
-          signal: AbortSignal.timeout(60000),
-        })
-        if (res.ok) {
-          const data = await res.json()
-          uploaded += data.uploaded ?? batch.length
-          failed   += data.failed   ?? 0
-        } else {
-          let errorMsg = `HTTP ${res.status}`
-          try {
-            const errorData = await res.json()
-            errorMsg = errorData.error || JSON.stringify(errorData)
-          } catch { /* body not JSON */ }
-          console.error('Batch upload failed:', errorMsg)
-          setState(prev => ({ ...prev, lastError: `Upload failed: ${errorMsg}` }))
-          failed += batch.length
-        }
-      } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : String(err)
-        console.error('Batch upload exception:', msg)
-        setState(prev => ({ ...prev, lastError: `Upload failed: ${msg}` }))
-        failed += batch.length
-      }
+      const success = await uploadFileDirect(queue[i], archiveId)
+      if (success) { uploaded++ } else { failed++ }
 
       setState(prev => ({ ...prev, totalUploaded: uploaded, totalFailed: failed }))
-      // brief pause between batches
-      await new Promise(r => setTimeout(r, 300))
+
+      // Brief pause every 10 files to avoid overwhelming Supabase
+      if (i % 10 === 9) await new Promise(r => setTimeout(r, 500))
     }
 
     isUploadingRef.current = false
@@ -222,14 +237,13 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
   const handleFiles = useCallback(async (fileList: FileList | null) => {
     if (!fileList || fileList.length === 0) return
 
-    setState({ status: 'selecting', totalSelected: 0, totalUploaded: 0, totalFailed: 0, currentBatch: 0, totalBatches: 0, lastError: '' })
+    setState({ status: 'selecting', totalSelected: 0, totalUploaded: 0, totalFailed: 0, currentFile: 0, lastError: '' })
 
     // Iterate lazily — never call Array.from(fileList) on large iCloud libraries
     // as iOS resolves all iCloud references simultaneously, freezing the browser.
     const collected: File[] = []
     for (let i = 0; i < fileList.length; i++) {
       collected.push(fileList[i])
-      // Yield to the UI every 50 files so the browser stays responsive
       if (i % 50 === 49) {
         setState(prev => ({ ...prev, totalSelected: i + 1 }))
         await new Promise(r => setTimeout(r, 0))
@@ -242,7 +256,7 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
   }, [processQueue])
 
   function reset() {
-    setState({ status: 'idle', totalSelected: 0, totalUploaded: 0, totalFailed: 0, currentBatch: 0, totalBatches: 0, lastError: '' })
+    setState({ status: 'idle', totalSelected: 0, totalUploaded: 0, totalFailed: 0, currentFile: 0, lastError: '' })
     setTestResult(null)
     queueRef.current = []
     isUploadingRef.current = false
@@ -254,21 +268,13 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
     if (!file) return
     setTestLoading(true)
     setTestResult(null)
-    const fd = new FormData()
-    fd.append('archiveId', archiveId)
-    fd.append('uploadedBy', 'owner')
-    fd.append('photos', file)
-    console.log('Test upload: 1 file to', archiveId, 'name:', file.name, 'size:', file.size, 'type:', file.type)
-    try {
-      const res = await fetch('/api/archive/bulk-upload', { method: 'POST', body: fd })
-      const data = await res.json()
-      console.log('Test upload response:', data)
-      setTestResult(JSON.stringify(data, null, 2))
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err)
-      console.error('Test upload error:', msg)
-      setTestResult(`Error: ${msg}`)
-    }
+    console.log('Test upload:', file.name, file.size, 'bytes', file.type)
+    const success = await uploadFileDirect(file, archiveId)
+    console.log('Test upload result:', success)
+    setTestResult(success
+      ? `✓ Success — ${file.name} (${(file.size / 1024 / 1024).toFixed(1)} MB) uploaded.`
+      : `✗ Failed — check browser console for details.`
+    )
     setTestLoading(false)
     if (testInputRef.current) testInputRef.current.value = ''
   }
@@ -289,8 +295,8 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
 
   // ── Uploading state ──────────────────────────────────────────────────────────
   if (state.status === 'uploading') {
-    const pct = state.totalBatches > 0
-      ? Math.round((state.currentBatch / state.totalBatches) * 100)
+    const pct = state.totalSelected > 0
+      ? Math.round((state.currentFile / state.totalSelected) * 100)
       : 0
     return (
       <div style={{ padding: '2rem 0' }}>
@@ -298,15 +304,15 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
           Uploading your archive…
         </p>
         <div className="w-full" style={{ height: '4px', background: 'rgba(240,237,230,0.08)', borderRadius: '2px', margin: '1rem 0', overflow: 'hidden' }}>
-          <div style={{ height: '100%', background: '#C4A24A', borderRadius: '2px', width: `${pct}%`, transition: 'width 0.5s ease' }} />
+          <div style={{ height: '100%', background: '#C4A24A', borderRadius: '2px', width: `${pct}%`, transition: 'width 0.4s ease' }} />
         </div>
         <p style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.18em', color: '#5C6166' }}>
-          {state.totalUploaded} UPLOADED
-          {state.totalFailed > 0 && ` · ${state.totalFailed} FAILED`}
-          {' · '}BATCH {state.currentBatch} OF {state.totalBatches}
+          UPLOADING {state.currentFile} OF {state.totalSelected}
+          {state.totalUploaded > 0 && ` · ${state.totalUploaded} UPLOADED`}
+          {state.totalFailed  > 0 && ` · ${state.totalFailed} FAILED`}
         </p>
         <p className="font-serif" style={{ fontSize: '0.85rem', fontStyle: 'italic', color: '#3A3830', marginTop: '1rem' }}>
-          Keep this page open. Our AI is analyzing each photo as it uploads.
+          Each photo goes directly to the archive. Keep this page open.
         </p>
       </div>
     )
@@ -325,16 +331,9 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
             Our AI is reviewing each one now.
           </p>
           {state.totalFailed > 0 && (
-            <div style={{ marginTop: '0.75rem' }}>
-              <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.1em', color: '#5C6166' }}>
-                {state.totalFailed} could not be uploaded
-              </p>
-              {state.lastError && (
-                <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.06em', color: 'rgba(196,162,74,0.6)', marginTop: '0.4rem', wordBreak: 'break-all', maxWidth: '360px' }}>
-                  {state.lastError}
-                </p>
-              )}
-            </div>
+            <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.1em', color: '#5C6166', marginTop: '0.75rem' }}>
+              {state.totalFailed} could not be uploaded
+            </p>
           )}
         </div>
         <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#5C6166', maxWidth: '320px' }}>
@@ -361,7 +360,7 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
           FOR IPHONE · ICLOUD LIBRARIES
         </p>
         <p className="font-serif" style={{ fontSize: '0.88rem', fontStyle: 'italic', color: '#5C6166', lineHeight: 1.7, margin: 0 }}>
-          Select photos in batches of 200–300 rather than tapping Select All. Choose by date range or album. Each batch uploads automatically while you prepare the next.
+          Select photos in batches of 200–300 rather than tapping Select All. Choose by date range or album. Each photo uploads directly — no size limits.
         </p>
       </div>
 
@@ -385,7 +384,7 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
           {dragging ? 'Drop them here.' : 'Drop photographs here, or click to select.'}
         </p>
         <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.14em', color: '#5C6166', textTransform: 'uppercase' }}>
-          JPG · PNG · HEIC · MOV · MP4 · Any format
+          JPG · PNG · HEIC · MOV · MP4 · Any format · No size limit
         </p>
         <input
           ref={inputRef}
@@ -398,7 +397,7 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
       </div>
 
       <p style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#3A3F44', textAlign: 'center' }}>
-        Uploads in batches of {BATCH_SIZE} · AI reviews each photograph automatically
+        Photos upload directly to the archive · AI reviews each one automatically
       </p>
 
       {/* Single-photo diagnostic test */}
@@ -415,12 +414,12 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
           disabled={testLoading}
           style={{ fontFamily: 'monospace', fontSize: '0.46rem', letterSpacing: '0.12em', color: '#5C6166', background: 'none', border: 'none', cursor: 'pointer', padding: 0, textDecoration: 'underline', textUnderlineOffset: '3px' }}
         >
-          {testLoading ? 'Testing…' : 'Having trouble? Try uploading one photo first →'}
+          {testLoading ? 'Testing…' : 'Having trouble? Test with one photo first →'}
         </button>
         {testResult && (
-          <pre style={{ marginTop: '0.75rem', fontFamily: 'monospace', fontSize: '0.5rem', color: 'rgba(196,162,74,0.7)', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '2px', padding: '0.75rem 1rem', overflowX: 'auto', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+          <p style={{ marginTop: '0.6rem', fontFamily: 'monospace', fontSize: '0.5rem', color: testResult.startsWith('✓') ? 'rgba(100,200,100,0.8)' : 'rgba(196,162,74,0.7)', wordBreak: 'break-all' }}>
             {testResult}
-          </pre>
+          </p>
         )}
       </div>
 
