@@ -3,7 +3,7 @@ import Footer from '../components/Footer'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title:       'The Witness Archive — Basalith',
+  title:       'The Witness Archive',
   description: 'Build a permanent AI entity from the memories of everyone who loved them. The Witness Archive by Basalith.',
 }
 

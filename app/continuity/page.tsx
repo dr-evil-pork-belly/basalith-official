@@ -3,7 +3,7 @@ import Footer from '../components/Footer'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title:       'Continuity · Basalith',
+  title:       'Continuity',
   description: 'The entity does not stop when you do. It improves. Built for centuries, not decades.',
 }
 

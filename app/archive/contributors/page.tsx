@@ -1,6 +1,9 @@
+import type { Metadata } from 'next'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import ContributorsClient from './ContributorsClient'
+
+export const metadata: Metadata = { title: 'Contributors' }
 
 export default async function ArchiveContributorsPage() {
   const cookieStore = await cookies()

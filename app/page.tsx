@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Nav             from './components/Nav'
 
 export const metadata: Metadata = {
-  title: 'Basalith — The Asset That Never Leaves',
+  title: 'Basalith · Legacy AI',
 }
 
 import Hero            from './components/Hero'

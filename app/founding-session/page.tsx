@@ -3,7 +3,7 @@ import Footer from '../components/Footer'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title:       'The Founding Session · Basalith',
+  title:       'The Founding Session',
   description: '90 minutes. Your family. A Senior Archivist. Your first photographs. By the end of this session your archive exists — not as a promise, but as a fact.',
 }
 

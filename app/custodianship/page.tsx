@@ -3,7 +3,7 @@ import Footer from '../components/Footer'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title:       'Data Custodianship Reserve · Basalith',
+  title:       'Custodianship',
   description: 'Your archive does not depend on Basalith\'s continued existence. It depends on the Reserve.',
 }
 
