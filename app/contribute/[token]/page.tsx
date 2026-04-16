@@ -13,8 +13,10 @@ export const metadata: Metadata = {
 export default async function ContributePage({
   params,
 }: {
-  params: { token: string }
+  params: Promise<{ token: string }>
 }) {
+  const { token } = await params
+
   const admin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
@@ -23,7 +25,7 @@ export default async function ContributePage({
   const { data: contributor } = await admin
     .from('contributors')
     .select('*')
-    .eq('access_token', params.token)
+    .eq('access_token', token)
     .eq('status', 'active')
     .maybeSingle()
 
@@ -45,7 +47,7 @@ export default async function ContributePage({
 
   return (
     <ContributeClient
-      token={params.token}
+      token={token}
       contributor={{
         id:                 contributor.id,
         name:               contributor.name               ?? '',
