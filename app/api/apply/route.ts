@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
 
           <div style="margin-top: 40px; padding: 16px; background: #fffbf0; border-left: 3px solid #C4A24A;">
             <p style="font-family: monospace; font-size: 11px; color: #888; margin: 0 0 6px; text-transform: uppercase; letter-spacing: 0.15em;">Next Step</p>
-            <p style="margin: 0; font-size: 14px; color: #333;">Reply to this email to approve and assign an Archivist. Your reply goes directly to ${name} at ${email}.</p>
+            <p style="margin: 0; font-size: 14px; color: #333;">Reply to this email to approve and assign a Legacy Guide. Your reply goes directly to ${name} at ${email}.</p>
           </div>
         </div>
       `,

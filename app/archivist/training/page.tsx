@@ -102,11 +102,11 @@ export default function TrainingPage() {
         <div className="rounded-sm border border-border-subtle p-8" style={{ background: '#111112' }}>
           <div className="flex flex-col gap-6">
             {[
-              { step: '01', title: 'Introduction & Scope',      desc: 'The assigned Senior Archivist meets with the family. Roles are explained. Scope is defined. The relationship begins.' },
+              { step: '01', title: 'Introduction & Scope',      desc: 'The assigned Senior Legacy Guide meets with the family. Roles are explained. Scope is defined. The relationship begins.' },
               { step: '02', title: 'Legal Instrument Review',   desc: 'Existing will, trust, and estate documents are reviewed for archive compatibility. Attorney-ready output is produced.' },
               { step: '03', title: 'Archive Architecture',      desc: 'The digital estate structure is configured. Storage, access tiers, and generational transfer settings are established.' },
               { step: '04', title: 'Family Network Setup',      desc: 'Up to 15 family contributors are onboarded. Roles are assigned. Access levels are configured and documented.' },
-              { step: '05', title: 'Founding Essence Session',  desc: 'The first live labeling session — 90 minutes. This is where it becomes real. A Senior Archivist guides the family.' },
+              { step: '05', title: 'Founding Essence Session',  desc: 'The first live labeling session — 90 minutes. This is where it becomes real. A Senior Legacy Guide guides the family.' },
               { step: '06', title: 'Custodian Designation',     desc: 'The archive\'s legal custodian is formally assigned and documented with estate standing. The Founding is complete.' },
             ].map(({ step, title, desc }) => (
               <div key={step} className="flex gap-5">

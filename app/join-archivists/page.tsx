@@ -38,7 +38,7 @@ export default function JoinArchivistsPage() {
           <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 50% 40% at 50% 70%,rgba(196,162,74,0.06) 0%,transparent 65%)' }} aria-hidden="true" />
           <div className="relative z-10 max-w-2xl mx-auto">
 
-            <p className="eyebrow mb-6">The Archivist Program</p>
+            <p className="eyebrow mb-6">The Legacy Guide Program</p>
             <h1 className="font-serif font-semibold text-text-primary leading-[0.92] tracking-[-0.038em] mb-8" style={{ fontSize: 'clamp(2.5rem,5vw,4.5rem)' }}>
               Represent Basalith<br />in Your Community.
             </h1>
@@ -49,7 +49,7 @@ export default function JoinArchivistsPage() {
                 begin their archives before it is too late.
               </p>
               <p className="mb-5">
-                Archivists are not employees. They are trusted partners — professionals who
+                Legacy Guides are not employees. They are trusted partners — professionals who
                 understand what Basalith builds and who it is built for.
               </p>
               <p>

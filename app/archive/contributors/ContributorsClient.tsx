@@ -25,7 +25,7 @@ type WitnessSessionRow = {
   answers:           any[]
 }
 
-const ROLES = ['Family Member', 'Close Friend', 'Archivist', 'Curator', 'Researcher']
+const ROLES = ['Family Member', 'Close Friend', 'Legacy Guide', 'Curator', 'Researcher']
 const INITIAL_CONTRIB = { name: '', email: '', role: '' }
 const INITIAL_INVITE  = {
   contributorName:  '',

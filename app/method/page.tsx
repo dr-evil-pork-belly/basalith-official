@@ -138,7 +138,7 @@ export default function MethodPage() {
 
           <div style={{ textAlign: 'center', padding: '3rem 0' }}>
             <p style={{ ...body, fontStyle: 'italic', textAlign: 'center' }}>
-              The archive begins with The Founding — a 90-minute guided session with a Senior Archivist.
+              The archive begins with The Founding — a 90-minute guided session with a Senior Legacy Guide.
             </p>
             <a
               href="/founding-session"

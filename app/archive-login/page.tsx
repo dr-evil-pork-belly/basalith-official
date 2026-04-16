@@ -88,7 +88,7 @@ export default function ArchiveLoginPage() {
         </form>
 
         <p className="font-sans text-[0.62rem] tracking-[0.1em] uppercase text-center mt-10" style={{ color: '#3A3F44' }}>
-          Authorized archivists only
+          Authorized Legacy Guides only
         </p>
       </div>
     </main>

@@ -35,7 +35,7 @@ export default function ArchivistLayout({ children }: { children: React.ReactNod
           className="font-sans font-bold tracking-[0.22em] uppercase"
           style={{ fontSize: '0.55rem', color: '#C4A24A' }}
         >
-          Archivist Portal
+          Legacy Guide Portal
         </span>
       </header>
 

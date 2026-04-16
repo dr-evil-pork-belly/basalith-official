@@ -114,7 +114,7 @@ export default async function DashboardPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const firstName = user.email?.split('@')[0].split('.')[0] ?? 'Archivist'
+  const firstName = user.email?.split('@')[0].split('.')[0] ?? 'Legacy Guide'
   const displayName = firstName.charAt(0).toUpperCase() + firstName.slice(1)
 
   // Fetch vault for this user

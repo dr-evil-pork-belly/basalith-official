@@ -13,11 +13,11 @@ const TIER_DATA: Record<TierKey, { price: string; annual: number; residual: numb
 }
 
 const RANKS = [
-  { title: 'Provisional Archivist', range: '0–2',   rate: '40%',  override: '—',  notes: 'Demo account, training access'                       },
-  { title: 'Active Archivist',      range: '3–9',   rate: '40%',  override: '—',  notes: 'Sprint eligible, leaderboard access'                 },
-  { title: 'Senior Archivist',      range: '10–24', rate: '40%',  override: '2%', notes: 'Priority support, proposal builder, recruit override' },
-  { title: 'Master Archivist',      range: '25–49', rate: '40%',  override: '2%', notes: 'Sovereign Gathering, Council access'                 },
-  { title: 'Sovereign Archivist',   range: '50+',   rate: '27%',  override: '2%', notes: 'Founding Council, direct founder access'             },
+  { title: 'Provisional Legacy Guide', range: '0–2',   rate: '40%',  override: '—',  notes: 'Demo account, training access'                       },
+  { title: 'Active Legacy Guide',      range: '3–9',   rate: '40%',  override: '—',  notes: 'Sprint eligible, leaderboard access'                 },
+  { title: 'Senior Legacy Guide',      range: '10–24', rate: '40%',  override: '2%', notes: 'Priority support, proposal builder, recruit override' },
+  { title: 'Master Legacy Guide',      range: '25–49', rate: '40%',  override: '2%', notes: 'Sovereign Gathering, Council access'                 },
+  { title: 'Sovereign Legacy Guide',   range: '50+',   rate: '27%',  override: '2%', notes: 'Founding Council, direct founder access'             },
 ]
 
 const SPRINTS = [
@@ -323,7 +323,7 @@ export default function EarningsClient({ archivistId }: { archivistId: string })
               { label: 'Founding commissions', detail: 'Paid within 5 business days of Founding completion and payment clearance.'                  },
               { label: 'Monthly residuals',     detail: 'Paid on the 15th of each month for all active accounts from the prior period.'             },
               { label: 'Sprint bonuses',        detail: "Paid with the following month's residual cycle after sprint verification."                 },
-              { label: 'Override commissions',  detail: 'Paid monthly with residuals. Requires Senior Archivist rank or above.'                    },
+              { label: 'Override commissions',  detail: 'Paid monthly with residuals. Requires Senior Legacy Guide rank or above.'                 },
             ].map(({ label, detail }) => (
               <div key={label} className="flex gap-4">
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="flex-shrink-0 mt-0.5" aria-hidden="true">

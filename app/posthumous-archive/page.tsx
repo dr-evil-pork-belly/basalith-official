@@ -235,7 +235,7 @@ const STEPS = [
   {
     n:    '01',
     name: 'Material Assessment',
-    body: 'A Senior Archivist reviews everything your family can provide — photographs, letters, documents, audio, video. We tell you honestly what we can build from it.',
+    body: 'A Senior Legacy Guide reviews everything your family can provide — photographs, letters, documents, audio, video. We tell you honestly what we can build from it.',
   },
   {
     n:    '02',

@@ -120,7 +120,7 @@ function JoinForm() {
                 No Invitation Found.
               </h1>
               <p className="font-sans font-light text-body-sm text-text-secondary leading-[1.8] mb-8">
-                You need an invitation link to join a vault. Contact your vault&apos;s archivist.
+                You need an invitation link to join a vault. Contact your vault&apos;s Legacy Guide.
               </p>
               <a href="/login" className="btn-monolith-ghost inline-flex">Return to Sign In</a>
             </div>

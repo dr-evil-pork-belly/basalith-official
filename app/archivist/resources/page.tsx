@@ -1,7 +1,7 @@
 const RESOURCES = [
   {
     title:  'Demo Account',
-    desc:   'Your personal Basalith archive for live product demonstrations. Log in with your archivist credentials.',
+    desc:   'Your personal Basalith archive for live product demonstrations. Log in with your Legacy Guide credentials.',
     action: 'Access Demo',
     href:   '/dashboard',
   },
@@ -31,7 +31,7 @@ const RESOURCES = [
   },
   {
     title:  'Contact Support',
-    desc:   'Direct line to the Archivist support team. Senior Archivists and above receive priority response.',
+    desc:   'Direct line to the Legacy Guide support team. Senior Legacy Guides and above receive priority response.',
     action: 'Email Support',
     href:   'mailto:archivists@basalith.xyz',
   },

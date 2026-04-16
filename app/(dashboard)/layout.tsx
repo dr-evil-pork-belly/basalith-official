@@ -91,7 +91,7 @@ function Sidebar({ user, onClose }: { user: User | null; onClose?: () => void })
           Basalith
         </a>
         <p className="font-sans text-[0.6rem] font-bold tracking-[0.18em] uppercase text-amber-dim">
-          Archivist Portal
+          Legacy Guide Portal
         </p>
       </div>
 

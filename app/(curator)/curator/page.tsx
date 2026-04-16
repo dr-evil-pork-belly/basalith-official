@@ -165,7 +165,7 @@ export default async function CuratorHomePage() {
                 Awaiting Vault Link
               </p>
               <p className="font-sans text-[0.82rem] text-text-secondary leading-[1.7]">
-                Your invitation link hasn&apos;t been used yet. Check your email for your invitation link, or contact your vault&apos;s archivist.
+                Your invitation link hasn&apos;t been used yet. Check your email for your invitation link, or contact your vault&apos;s Legacy Guide.
               </p>
             </div>
           </div>

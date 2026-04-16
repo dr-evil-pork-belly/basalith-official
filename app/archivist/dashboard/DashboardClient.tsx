@@ -213,7 +213,7 @@ export default function DashboardClient({ archivistId }: { archivistId: string }
         <p className="font-sans text-[0.62rem] font-bold tracking-[0.2em] uppercase mb-2" style={{ color: '#C4A24A' }}>Welcome back</p>
         {loading ? <Skeleton className="h-8 w-64 mb-1" /> : (
           <h1 className="font-serif font-semibold text-text-primary tracking-[-0.025em]" style={{ fontSize: 'clamp(1.8rem,3vw,2.5rem)' }}>
-            {archivist?.name ?? 'Archivist Dashboard'}
+            {archivist?.name ?? 'Legacy Guide Dashboard'}
           </h1>
         )}
         {archivist && (

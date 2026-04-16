@@ -3,7 +3,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import DashboardClient from './DashboardClient'
 
-export const metadata: Metadata = { title: 'Archivist Dashboard' }
+export const metadata: Metadata = { title: 'Legacy Guide Dashboard' }
 
 export default async function ArchivistDashboardPage() {
   const cookieStore = await cookies()

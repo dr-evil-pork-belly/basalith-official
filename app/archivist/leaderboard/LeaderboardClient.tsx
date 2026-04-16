@@ -24,11 +24,11 @@ function fmtResidual(cents: number) {
 }
 
 const PLACEHOLDER: LeaderRow[] = [
-  { id: '1', name: 'J. Whitmore',    rank: 'Active Archivist',      total_closings: 18, this_month_closings: 5, sprint_closings: 5, top_tier: 'Estate',  residual_income_cents: 518400 },
-  { id: '2', name: 'M. Calloway',    rank: 'Senior Archivist',      total_closings: 14, this_month_closings: 4, sprint_closings: 4, top_tier: 'Dynasty', residual_income_cents: 1075200 },
-  { id: '3', name: 'S. Pemberton',   rank: 'Active Archivist',      total_closings: 12, this_month_closings: 3, sprint_closings: 3, top_tier: 'Estate',  residual_income_cents: 345600 },
-  { id: '4', name: 'A. Harrington',  rank: 'Provisional Archivist', total_closings: 9,  this_month_closings: 2, sprint_closings: 2, top_tier: 'Archive', residual_income_cents: 86400 },
-  { id: '5', name: 'R. Montague',    rank: 'Active Archivist',      total_closings: 7,  this_month_closings: 1, sprint_closings: 1, top_tier: 'Estate',  residual_income_cents: 201600 },
+  { id: '1', name: 'J. Whitmore',    rank: 'Active Legacy Guide',      total_closings: 18, this_month_closings: 5, sprint_closings: 5, top_tier: 'Estate',  residual_income_cents: 518400 },
+  { id: '2', name: 'M. Calloway',    rank: 'Senior Legacy Guide',      total_closings: 14, this_month_closings: 4, sprint_closings: 4, top_tier: 'Dynasty', residual_income_cents: 1075200 },
+  { id: '3', name: 'S. Pemberton',   rank: 'Active Legacy Guide',      total_closings: 12, this_month_closings: 3, sprint_closings: 3, top_tier: 'Estate',  residual_income_cents: 345600 },
+  { id: '4', name: 'A. Harrington',  rank: 'Provisional Legacy Guide', total_closings: 9,  this_month_closings: 2, sprint_closings: 2, top_tier: 'Archive', residual_income_cents: 86400 },
+  { id: '5', name: 'R. Montague',    rank: 'Active Legacy Guide',      total_closings: 7,  this_month_closings: 1, sprint_closings: 1, top_tier: 'Estate',  residual_income_cents: 201600 },
 ]
 
 export default function LeaderboardClient({ archivistId }: { archivistId: string }) {
@@ -90,7 +90,7 @@ export default function LeaderboardClient({ archivistId }: { archivistId: string
             <table className="w-full">
               <thead>
                 <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                  {['Rank', 'Archivist', tab === 'month' ? 'This Month' : 'Total Closings', 'Top Tier', 'Annual Residual'].map(h => (
+                  {['Rank', 'Legacy Guide', tab === 'month' ? 'This Month' : 'Total Closings', 'Top Tier', 'Annual Residual'].map(h => (
                     <th key={h} className="text-left px-5 py-3 font-sans text-[0.58rem] font-bold tracking-[0.14em] uppercase text-text-muted">{h}</th>
                   ))}
                 </tr>
@@ -141,7 +141,7 @@ export default function LeaderboardClient({ archivistId }: { archivistId: string
           <table className="w-full">
             <thead>
               <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                {['Archivist', 'Sprint Closings', 'Bonus Tier'].map(h => (
+                {['Legacy Guide', 'Sprint Closings', 'Bonus Tier'].map(h => (
                   <th key={h} className="text-left px-5 py-3 font-sans text-[0.56rem] font-bold tracking-[0.14em] uppercase text-text-muted">{h}</th>
                 ))}
               </tr>

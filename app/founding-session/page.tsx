@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title:       'The Founding Session',
-  description: '90 minutes. Your family. A Senior Archivist. Your first photographs. By the end of this session your archive exists — not as a promise, but as a fact.',
+  description: '90 minutes. Your family. A Senior Legacy Guide. Your first photographs. By the end of this session your archive exists — not as a promise, but as a fact.',
 }
 
 const EYEBROW: React.CSSProperties = {
@@ -64,12 +64,12 @@ const SESSION_STEPS = [
   {
     n:    '01',
     name: 'The First Photograph',
-    body: 'Your Archivist surfaces the first photograph. Often this is the moment families describe as when it became real. You begin labeling — not facts, but the story behind the facts. Who is in this photograph and what were they like? What was happening that day beyond what the camera shows? What would you want someone to know about this moment in fifty years?',
+    body: 'Your Legacy Guide surfaces the first photograph. Often this is the moment families describe as when it became real. You begin labeling — not facts, but the story behind the facts. Who is in this photograph and what were they like? What was happening that day beyond what the camera shows? What would you want someone to know about this moment in fifty years?',
   },
   {
     n:    '02',
     name: 'The Contributor Network',
-    body: 'Your Archivist walks you through inviting your family contributors. Each contributor receives their first photograph email that evening. By the end of your first day your archive already has multiple perspectives being built.',
+    body: 'Your Legacy Guide walks you through inviting your family contributors. Each contributor receives their first photograph email that evening. By the end of your first day your archive already has multiple perspectives being built.',
   },
   {
     n:    '03',
@@ -124,7 +124,7 @@ export default function FoundingSessionPage() {
               lineHeight:  1.8,
               marginBottom: '0',
             }}>
-              90 minutes. Your family. A Senior Archivist. Your first photographs.
+              90 minutes. Your family. A Senior Legacy Guide. Your first photographs.
               <br /><br />
               By the end of this session your archive exists — not as a promise, but as a fact.
             </p>

@@ -71,7 +71,7 @@ const TIERS = [
       'Annual in-person estate review',
       'First access to new AI model generations',
       'Custom Digital Clone interaction boundaries',
-      'Sovereign Archivist permanently assigned',
+      'Sovereign Legacy Guide permanently assigned',
       'Custom bequest language prepared',
       '200-year perpetual storage guarantee',
     ],
@@ -83,7 +83,7 @@ const DELIVERABLES = [
   { num: '01', title: 'Archive Architecture Build',      desc: 'Your permanent digital estate structure, configured for generational transfer and legal standing.' },
   { num: '02', title: 'Legal Instrument Review',          desc: 'Compatibility assessment with your existing will, trust, and estate documents. Attorney-ready output.' },
   { num: '03', title: 'Family Network Initialization',    desc: 'Contributor onboarding for up to 15 family members. Roles assigned. Access levels configured. Documented.' },
-  { num: '04', title: 'Founding Essence Session',         desc: 'Your first live family labeling session, guided by a Senior Archivist. 90 minutes. This is where it becomes real.' },
+  { num: '04', title: 'Founding Essence Session',         desc: 'Your first live family labeling session, guided by a Senior Legacy Guide. 90 minutes. This is where it becomes real.' },
   { num: '05', title: 'AI-Processed Data Migration',       desc: 'Import from existing photo libraries, documents, and digital archives. Every photograph filtered, deduplicated, dated, and sequenced by our AI pipeline before it reaches the labeling interface.' },
   { num: '06', title: 'Custodian Designation',            desc: "Your archive's legal custodian assigned and documented with formal estate standing." },
 ]
@@ -226,7 +226,7 @@ export default function PricingPage() {
                       Required for all new archives. Annual stewardship is selected and billed separately below.
                     </p>
                     <p className="font-serif italic text-text-muted leading-[1.7]" style={{ fontSize: '0.8rem' }}>
-                      The Founding is executed by a Senior Archivist assigned to your family.
+                      The Founding is executed by a Senior Legacy Guide assigned to your family.
                       Completion typically takes 2–3 weeks from engagement.
                     </p>
                   </div>
@@ -310,7 +310,7 @@ export default function PricingPage() {
             <p className="font-serif italic text-text-secondary leading-[1.85]" style={{ fontSize: '1.3rem' }}>
               &ldquo;The Founding is not a setup fee.
               It is a legal and technical engagement
-              executed by a Senior Archivist &mdash; the same
+              executed by a Senior Legacy Guide &mdash; the same
               way an estate attorney executes a trust.
               <br /><br />
               You leave The Founding with six deliverables,

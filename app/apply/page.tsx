@@ -136,7 +136,7 @@ export default function ApplyPage() {
               }}>
                 We review every application personally.<br /><br />
                 If your archive is a good fit you will hear from us within 48 hours
-                with your next steps and Archivist assignment.<br /><br />
+                with your next steps and Legacy Guide assignment.<br /><br />
                 We will not follow up with rejections.
               </p>
               <p style={{
@@ -234,7 +234,7 @@ export default function ApplyPage() {
                   <label style={LABEL}>How did you hear about us</label>
                   <select required value={form.referralSource} onChange={set('referralSource')} style={SELECT}>
                     <option value="" disabled style={{ color: '#3A3F44' }}>Select one</option>
-                    <option value="Referred by an Archivist">Referred by an Archivist</option>
+                    <option value="Referred by a Legacy Guide">Referred by a Legacy Guide</option>
                     <option value="Referred by an attorney or advisor">Referred by an attorney or advisor</option>
                     <option value="Found online">Found online</option>
                     <option value="Referred by a friend or family member">Referred by a friend or family member</option>

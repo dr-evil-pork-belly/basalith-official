@@ -47,7 +47,7 @@ export default function ArchivistLoginPage() {
             className="font-sans font-bold tracking-[0.22em] uppercase mt-3"
             style={{ fontSize: '0.55rem', color: '#C4A24A' }}
           >
-            Archivist Portal
+            Legacy Guide Portal
           </p>
         </div>
 
