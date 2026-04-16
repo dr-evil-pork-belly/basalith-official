@@ -5,12 +5,12 @@ import { WITNESS_SESSIONS, RELATIONSHIP_LABELS } from '@/lib/witnessSessions'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 type Contributor = {
-  id:        string
-  name:      string
-  email:     string
-  role:      string
-  addedAt:   string
-  itemCount: number
+  id:              string
+  name:            string
+  email:           string
+  role:            string
+  created_at:      string
+  photos_labelled: number
 }
 
 type WitnessSessionRow = {
@@ -136,6 +136,7 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
   const [contributors,   setContributors]   = useState<Contributor[]>([])
   const [form,           setForm]           = useState(INITIAL_CONTRIB)
   const [adding,         setAdding]         = useState(false)
+  const [addError,       setAddError]       = useState('')
   const [showForm,       setShowForm]       = useState(false)
   const [inviteForm,     setInviteForm]     = useState(INITIAL_INVITE)
   const [inviting,       setInviting]       = useState(false)
@@ -145,22 +146,19 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
   const [viewingSession, setViewingSession] = useState<WitnessSessionRow | null>(null)
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem('archive-contributors')
-      if (stored) setContributors(JSON.parse(stored))
-    } catch {}
+    fetchContributors()
     fetchWitnessSessions()
   }, [archiveId])
 
-  useEffect(() => {
+  async function fetchContributors() {
     try {
-      const items: { contributor: string }[] = JSON.parse(localStorage.getItem('archive-items') || '[]')
-      setContributors(prev => prev.map(c => ({
-        ...c,
-        itemCount: items.filter(i => i.contributor === c.name).length,
-      })))
+      const res = await fetch(`/api/archive/contributors?archiveId=${archiveId}`)
+      if (res.ok) {
+        const data = await res.json()
+        setContributors(data.contributors ?? [])
+      }
     } catch {}
-  }, [])
+  }
 
   async function fetchWitnessSessions() {
     try {
@@ -182,30 +180,37 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
       setInviteForm(f => ({ ...f, [key]: e.target.value }))
   }
 
-  function saveContributors(cs: Contributor[]) {
-    setContributors(cs)
-    localStorage.setItem('archive-contributors', JSON.stringify(cs))
-  }
-
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault()
     setAdding(true)
-    const newC: Contributor = {
-      id:        crypto.randomUUID(),
-      name:      form.name,
-      email:     form.email,
-      role:      form.role,
-      addedAt:   new Date().toISOString(),
-      itemCount: 0,
+    setAddError('')
+    try {
+      const res = await fetch('/api/archive/contributors', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ archiveId, name: form.name, email: form.email, role: form.role }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error)
+      setContributors(prev => [data.contributor, ...prev.filter(c => c.id !== data.contributor.id)])
+      setForm(INITIAL_CONTRIB)
+      setShowForm(false)
+    } catch (err: any) {
+      setAddError(err.message ?? 'Failed to add contributor')
+    } finally {
+      setAdding(false)
     }
-    saveContributors([...contributors, newC])
-    setForm(INITIAL_CONTRIB)
-    setShowForm(false)
-    setAdding(false)
   }
 
-  function remove(id: string) {
-    saveContributors(contributors.filter(c => c.id !== id))
+  async function remove(id: string) {
+    try {
+      await fetch('/api/archive/contributors', {
+        method:  'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ archiveId, contributorId: id }),
+      })
+      setContributors(prev => prev.filter(c => c.id !== id))
+    } catch {}
   }
 
   async function handleInvite(e: React.FormEvent) {
@@ -267,6 +272,9 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
               </select>
             </div>
           </div>
+          {addError && (
+            <p style={{ fontFamily: 'monospace', fontSize: '0.4rem', color: '#8B5555', marginBottom: '1rem' }}>{addError}</p>
+          )}
           <button type="submit" disabled={adding} className="btn-monolith-amber disabled:opacity-50">
             {adding ? 'Adding…' : 'Add to Archive'}
           </button>
@@ -304,11 +312,11 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
                     </span>
                   </td>
                   <td className="px-5 py-4">
-                    <p className="font-serif font-semibold" style={{ color: '#F0F0EE', fontSize: '1.1rem' }}>{c.itemCount}</p>
+                    <p className="font-serif font-semibold" style={{ color: '#F0F0EE', fontSize: '1.1rem' }}>{c.photos_labelled ?? 0}</p>
                   </td>
                   <td className="px-5 py-4">
                     <p className="font-sans text-[0.65rem]" style={{ color: '#5C6166' }}>
-                      {new Date(c.addedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      {new Date(c.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </p>
                   </td>
                   <td className="px-5 py-4 text-right">
