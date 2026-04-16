@@ -9,6 +9,8 @@ type Contributor = {
   name:            string
   email:           string
   role:            string
+  relationship:    string
+  access_token:    string | null
   created_at:      string
   photos_labelled: number
 }
@@ -26,7 +28,7 @@ type WitnessSessionRow = {
 }
 
 const ROLES = ['Family Member', 'Close Friend', 'Legacy Guide', 'Curator', 'Researcher']
-const INITIAL_CONTRIB = { name: '', email: '', role: '' }
+const INITIAL_CONTRIB = { name: '', email: '', role: '', relationship: '' }
 const INITIAL_INVITE  = {
   contributorName:  '',
   contributorEmail: '',
@@ -144,6 +146,9 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
   const [inviteError,    setInviteError]    = useState('')
   const [witnessSessions, setWitnessSessions] = useState<WitnessSessionRow[]>([])
   const [viewingSession, setViewingSession] = useState<WitnessSessionRow | null>(null)
+  const [copiedId,       setCopiedId]       = useState<string | null>(null)
+  const [sendingId,      setSendingId]      = useState<string | null>(null)
+  const [sentId,         setSentId]         = useState<string | null>(null)
 
   useEffect(() => {
     fetchContributors()
@@ -180,6 +185,37 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
       setInviteForm(f => ({ ...f, [key]: e.target.value }))
   }
 
+  function portalUrl(token: string | null) {
+    if (!token) return null
+    const base = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+    return `${base}/contribute/${token}`
+  }
+
+  async function copyPortalLink(c: Contributor) {
+    const url = portalUrl(c.access_token)
+    if (!url) return
+    try {
+      await navigator.clipboard.writeText(url)
+      setCopiedId(c.id)
+      setTimeout(() => setCopiedId(null), 2000)
+    } catch {}
+  }
+
+  async function sendPortalLink(c: Contributor) {
+    setSendingId(c.id)
+    try {
+      await fetch('/api/archive/contributors', {
+        method:  'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ action: 'resend-invite', archiveId, contributorId: c.id }),
+      })
+      setSentId(c.id)
+      setTimeout(() => setSentId(null), 3000)
+    } catch {} finally {
+      setSendingId(null)
+    }
+  }
+
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault()
     setAdding(true)
@@ -188,7 +224,7 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
       const res = await fetch('/api/archive/contributors', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ archiveId, name: form.name, email: form.email, role: form.role }),
+        body:    JSON.stringify({ archiveId, name: form.name, email: form.email, role: form.role, relationship: form.relationship || 'other' }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
@@ -255,7 +291,7 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
       {showForm && (
         <form onSubmit={handleAdd} className="rounded-sm border px-7 py-7 mb-8" style={{ background: '#111112', borderColor: 'rgba(196,162,74,0.15)' }}>
           <p className="font-sans text-[0.62rem] tracking-[0.14em] uppercase mb-6" style={{ color: 'rgba(196,162,74,0.7)' }}>New Contributor</p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
             <div>
               <label className={labelCls} style={labelStyle}>Full Name</label>
               <input type="text" required placeholder="Jane Whitmore" value={form.name} onChange={setContrib('name')} className={inputCls} style={inputStyle} />
@@ -269,6 +305,15 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
               <select required value={form.role} onChange={setContrib('role')} className={inputCls} style={{ ...inputStyle, cursor: 'pointer' }}>
                 <option value="" disabled style={{ background: '#111112' }}>Select role</option>
                 {ROLES.map(r => <option key={r} value={r} style={{ background: '#111112' }}>{r}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className={labelCls} style={labelStyle}>Relationship to Subject</label>
+              <select value={form.relationship} onChange={setContrib('relationship')} className={inputCls} style={{ ...inputStyle, cursor: 'pointer' }}>
+                <option value="" style={{ background: '#111112' }}>Select (optional)</option>
+                {Object.entries(RELATIONSHIP_LABELS).map(([value, label]) => (
+                  <option key={value} value={value} style={{ background: '#111112' }}>{label as string}</option>
+                ))}
               </select>
             </div>
           </div>
@@ -328,6 +373,92 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* ── CONTRIBUTOR PORTALS SECTION ── */}
+      {contributors.some(c => c.access_token) && (
+        <div style={{ marginTop: '3rem', paddingTop: '3rem', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="mb-6">
+            <p style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.7)', marginBottom: '0.5rem' }}>
+              Contributor Portals
+            </p>
+            <h2 className="font-serif font-semibold" style={{ fontSize: 'clamp(1.5rem,2.5vw,2rem)', color: '#F0F0EE', letterSpacing: '-0.02em' }}>
+              Portal Access
+            </h2>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            {contributors.filter(c => c.access_token).map(c => {
+              const url = portalUrl(c.access_token)
+              const relLabel = RELATIONSHIP_LABELS[c.relationship] ?? c.relationship ?? ''
+              return (
+                <div
+                  key={c.id}
+                  className="rounded-sm"
+                  style={{ background: '#111112', border: '1px solid rgba(255,255,255,0.06)', padding: '1rem 1.25rem' }}
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap mb-1">
+                        <p className="font-sans text-[0.8rem]" style={{ color: '#F0F0EE' }}>{c.name || c.email}</p>
+                        {relLabel && (
+                          <span style={{ fontFamily: 'monospace', fontSize: '0.38rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#5C6166', background: 'rgba(255,255,255,0.04)', padding: '2px 6px', borderRadius: '2px' }}>
+                            {relLabel as string}
+                          </span>
+                        )}
+                      </div>
+                      <p className="font-sans text-[0.62rem] truncate" style={{ color: '#3A3F44' }}>
+                        {url}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        onClick={() => copyPortalLink(c)}
+                        style={{
+                          background:    copiedId === c.id ? 'rgba(120,180,100,0.12)' : 'rgba(255,255,255,0.05)',
+                          border:        `1px solid ${copiedId === c.id ? 'rgba(120,180,100,0.3)' : 'rgba(255,255,255,0.08)'}`,
+                          borderRadius:  '2px',
+                          padding:       '0.45rem 0.9rem',
+                          fontFamily:    'monospace',
+                          fontSize:      '0.38rem',
+                          letterSpacing: '0.12em',
+                          textTransform: 'uppercase' as const,
+                          color:         copiedId === c.id ? 'rgba(120,180,100,0.9)' : '#9DA3A8',
+                          cursor:        'pointer',
+                          minHeight:     '44px',
+                          whiteSpace:    'nowrap' as const,
+                        }}
+                      >
+                        {copiedId === c.id ? 'Copied ✓' : 'Copy Link'}
+                      </button>
+                      <button
+                        onClick={() => sendPortalLink(c)}
+                        disabled={sendingId === c.id}
+                        style={{
+                          background:    sentId === c.id ? 'rgba(120,180,100,0.12)' : 'rgba(196,162,74,0.08)',
+                          border:        `1px solid ${sentId === c.id ? 'rgba(120,180,100,0.3)' : 'rgba(196,162,74,0.2)'}`,
+                          borderRadius:  '2px',
+                          padding:       '0.45rem 0.9rem',
+                          fontFamily:    'monospace',
+                          fontSize:      '0.38rem',
+                          letterSpacing: '0.12em',
+                          textTransform: 'uppercase' as const,
+                          color:         sentId === c.id ? 'rgba(120,180,100,0.9)' : 'rgba(196,162,74,0.8)',
+                          cursor:        sendingId === c.id ? 'not-allowed' : 'pointer',
+                          opacity:       sendingId === c.id ? 0.5 : 1,
+                          minHeight:     '44px',
+                          whiteSpace:    'nowrap' as const,
+                        }}
+                      >
+                        {sendingId === c.id ? 'Sending…' : sentId === c.id ? 'Sent ✓' : 'Send Link'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
         </div>
       )}
 

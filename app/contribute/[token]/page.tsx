@@ -1,0 +1,61 @@
+import { notFound } from 'next/navigation'
+import { getContributorByToken } from '@/lib/contributorToken'
+import { supabaseAdmin } from '@/lib/supabase-admin'
+import ContributeClient from './ContributeClient'
+import type { Metadata } from 'next'
+
+export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: 'Contributor Portal',
+  robots: { index: false, follow: false },
+}
+
+type Params = { token: string }
+
+export default async function ContributePage({ params }: { params: Params }) {
+  const { token } = params
+
+  const contributor = await getContributorByToken(token)
+
+  if (!contributor) notFound()
+
+  const archive = contributor.archives as {
+    id:          string
+    name:        string
+    family_name: string
+    owner_name:  string | null
+    status:      string
+  } | null
+
+  if (!archive || archive.status !== 'active') notFound()
+
+  // Update last accessed (non-blocking)
+  void supabaseAdmin
+    .from('contributors')
+    .update({ last_accessed_at: new Date().toISOString() })
+    .eq('id', contributor.id)
+
+  return (
+    <ContributeClient
+      token={token}
+      contributor={{
+        id:                  contributor.id,
+        name:                contributor.name ?? '',
+        email:               contributor.email,
+        relationship:        contributor.relationship ?? 'other',
+        photos_uploaded:     contributor.photos_uploaded     ?? 0,
+        videos_uploaded:     contributor.videos_uploaded     ?? 0,
+        voice_recordings:    contributor.voice_recordings    ?? 0,
+        questions_answered:  contributor.questions_answered  ?? 0,
+        photos_labelled:     contributor.photos_labelled     ?? 0,
+      }}
+      archive={{
+        id:          archive.id,
+        name:        archive.name,
+        family_name: archive.family_name,
+        owner_name:  archive.owner_name ?? '',
+      }}
+    />
+  )
+}
