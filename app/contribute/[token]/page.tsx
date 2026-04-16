@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation'
-import { getContributorByToken } from '@/lib/contributorToken'
-import { supabaseAdmin } from '@/lib/supabase-admin'
+import { createClient } from '@supabase/supabase-js'
 import ContributeClient from './ContributeClient'
 import type { Metadata } from 'next'
 
@@ -11,50 +10,79 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 }
 
-type Params = { token: string }
+export default async function ContributePage({
+  params,
+}: {
+  params: { token: string }
+}) {
+  console.log('[ContributePage] START')
+  console.log('[ContributePage] token:', params.token)
+  console.log('[ContributePage] token length:', params.token?.length)
+  console.log('[ContributePage] SUPABASE_URL set:', !!process.env.NEXT_PUBLIC_SUPABASE_URL)
+  console.log('[ContributePage] SERVICE_ROLE_KEY set:', !!process.env.SUPABASE_SERVICE_ROLE_KEY)
 
-export default async function ContributePage({ params }: { params: Params }) {
-  const { token } = params
+  const admin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  )
 
-  console.log('[ContributePage] Token received:', token?.substring(0, 10))
+  const { data: contributor, error: contribError } = await admin
+    .from('contributors')
+    .select('*')
+    .eq('access_token', params.token)
+    .eq('status', 'active')
+    .single()
 
-  const contributor = await getContributorByToken(token)
+  console.log('[ContributePage] contributor id:', contributor?.id ?? null)
+  console.log('[ContributePage] contributor error:', contribError?.message ?? null)
+  console.log('[ContributePage] contributor status:', contributor?.status ?? null)
 
-  console.log('[ContributePage] Contributor found:', !!contributor)
-  console.log('[ContributePage] Archive found:', !!(contributor as any)?.archives)
-  console.log('[ContributePage] Archive status:', (contributor as any)?.archives?.status)
+  if (!contributor) {
+    console.log('[ContributePage] NOT FOUND — no contributor with this token')
+    return notFound()
+  }
 
-  if (!contributor) return notFound()
+  const { data: archive, error: archiveError } = await admin
+    .from('archives')
+    .select('id, name, family_name, owner_name, status')
+    .eq('id', contributor.archive_id)
+    .single()
 
-  const archive = contributor.archives as {
-    id:          string
-    name:        string
-    family_name: string
-    owner_name:  string | null
-    status:      string
-  } | null
+  console.log('[ContributePage] archive id:', archive?.id ?? null)
+  console.log('[ContributePage] archive status:', archive?.status ?? null)
+  console.log('[ContributePage] archive error:', archiveError?.message ?? null)
 
-  if (!archive || archive.status !== 'active') return notFound()
+  if (!archive) {
+    console.log('[ContributePage] NOT FOUND — archive missing')
+    return notFound()
+  }
+
+  if (archive.status !== 'active') {
+    console.log('[ContributePage] NOT FOUND — archive status is:', archive.status)
+    return notFound()
+  }
+
+  console.log('[ContributePage] SUCCESS — rendering portal for:', contributor.name)
 
   // Update last accessed (non-blocking)
-  void supabaseAdmin
+  void admin
     .from('contributors')
     .update({ last_accessed_at: new Date().toISOString() })
     .eq('id', contributor.id)
 
   return (
     <ContributeClient
-      token={token}
+      token={params.token}
       contributor={{
-        id:                  contributor.id,
-        name:                contributor.name ?? '',
-        email:               contributor.email,
-        relationship:        contributor.relationship ?? 'other',
-        photos_uploaded:     contributor.photos_uploaded     ?? 0,
-        videos_uploaded:     contributor.videos_uploaded     ?? 0,
-        voice_recordings:    contributor.voice_recordings    ?? 0,
-        questions_answered:  contributor.questions_answered  ?? 0,
-        photos_labelled:     contributor.photos_labelled     ?? 0,
+        id:                 contributor.id,
+        name:               contributor.name               ?? '',
+        email:              contributor.email,
+        relationship:       contributor.relationship        ?? 'other',
+        photos_uploaded:    contributor.photos_uploaded     ?? 0,
+        videos_uploaded:    contributor.videos_uploaded     ?? 0,
+        voice_recordings:   contributor.voice_recordings    ?? 0,
+        questions_answered: contributor.questions_answered  ?? 0,
+        photos_labelled:    contributor.photos_labelled     ?? 0,
       }}
       archive={{
         id:          archive.id,
