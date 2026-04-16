@@ -19,14 +19,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const now = new Date().toISOString()
-
-  const { data: dueArchives, error } = await supabaseAdmin
-    .from('email_preferences')
-    .select('archive_id')
-    .eq('active', true)
-    .lte('next_send_at', now)
-    .limit(50)
+  const { data: activeArchives, error } = await supabaseAdmin
+    .from('archives')
+    .select('id')
+    .eq('status', 'active')
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
@@ -35,18 +31,18 @@ export async function GET(req: NextRequest) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
   const results = []
 
-  for (const pref of dueArchives ?? []) {
+  for (const archive of activeArchives ?? []) {
     try {
       const res = await fetch(`${siteUrl}/api/archive/send-photo`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ archiveId: pref.archive_id }),
+        body:    JSON.stringify({ archiveId: archive.id }),
       })
       const result = await res.json()
-      results.push({ archiveId: pref.archive_id, ...result })
+      results.push({ archiveId: archive.id, ...result })
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Unknown error'
-      results.push({ archiveId: pref.archive_id, error: msg })
+      results.push({ archiveId: archive.id, error: msg })
     }
   }
 
@@ -69,12 +65,12 @@ export async function GET(req: NextRequest) {
   const since = new Date()
   since.setDate(since.getDate() - 1)
 
-  const { data: activeArchives } = await supabaseAdmin
+  const { data: digestArchives } = await supabaseAdmin
     .from('archives')
     .select('id')
     .not('owner_email', 'is', null)
 
-  for (const archive of activeArchives ?? []) {
+  for (const archive of digestArchives ?? []) {
     try {
       // Check if any labels were added in the last 24 hours
       const { count } = await supabaseAdmin
