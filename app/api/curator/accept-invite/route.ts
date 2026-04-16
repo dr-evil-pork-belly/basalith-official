@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     .from('curators')
     .select('id, vault_id, invite_accepted')
     .eq('invite_token', token.trim())
-    .single()
+    .maybeSingle()
 
   if (findError || !curator) {
     return NextResponse.json({ ok: false, error: 'Invitation not found.' }, { status: 404 })

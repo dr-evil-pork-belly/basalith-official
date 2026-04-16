@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
           .from('photographs')
           .select('storage_path, ai_era_estimate')
           .eq('id', q.photograph_id)
-          .single()
+          .maybeSingle()
 
         if (photo?.storage_path) {
           const { data: signed } = await supabaseAdmin

@@ -21,7 +21,7 @@ export async function PATCH(
       .from('witness_sessions')
       .select('*')
       .eq('id', sessionId)
-      .single()
+      .maybeSingle()
 
     if (fetchErr || !session) {
       return NextResponse.json({ error: 'Session not found' }, { status: 404 })

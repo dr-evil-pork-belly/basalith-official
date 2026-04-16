@@ -28,7 +28,7 @@ export async function getContributorByToken(token: string) {
     .select('*')
     .eq('access_token', token)
     .eq('status', 'active')
-    .single()
+    .maybeSingle()
 
   console.log('[getContributorByToken] Contributor:', contributor?.id ?? null, contribError?.message ?? null)
 
@@ -38,7 +38,7 @@ export async function getContributorByToken(token: string) {
     .from('archives')
     .select('id, name, family_name, owner_name, owner_email, status')
     .eq('id', contributor.archive_id)
-    .single()
+    .maybeSingle()
 
   console.log('[getContributorByToken] Archive:', archive?.id ?? null, archive?.status ?? null, archiveError?.message ?? null)
 

@@ -53,7 +53,7 @@ export async function GET(req: Request) {
     .from('witness_sessions')
     .select('*')
     .eq('id', sessionId)
-    .single()
+    .maybeSingle()
 
   if (error || !session) {
     return NextResponse.json({ error: 'Session not found' }, { status: 404 })
@@ -63,7 +63,7 @@ export async function GET(req: Request) {
     .from('archives')
     .select('name, owner_name, family_name')
     .eq('id', session.archive_id)
-    .single()
+    .maybeSingle()
 
   const sessionDef = WITNESS_SESSIONS[session.relationship]
   if (!sessionDef) return NextResponse.json({ error: 'Unknown relationship' }, { status: 400 })

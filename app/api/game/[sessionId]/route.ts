@@ -14,7 +14,7 @@ export async function GET(
       .from('memory_game_sessions')
       .select('*')
       .eq('id', sessionId)
-      .single()
+      .maybeSingle()
 
     if (error || !session) {
       return NextResponse.json({ error: 'Session not found' }, { status: 404 })
@@ -25,7 +25,7 @@ export async function GET(
       .from('archives')
       .select('name, family_name, owner_name')
       .eq('id', session.archive_id)
-      .single()
+      .maybeSingle()
 
     // Get signed URLs for all photos (1 hour)
     const photoIds: string[] = session.photograph_ids ?? []
@@ -112,7 +112,7 @@ export async function POST(
       .from('memory_game_sessions')
       .select('id, archive_id, status, closes_at, total_memories')
       .eq('id', sessionId)
-      .single()
+      .maybeSingle()
 
     if (!session) {
       return NextResponse.json({ error: 'Session not found' }, { status: 404 })

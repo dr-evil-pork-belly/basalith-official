@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
       .eq('id', questionId)
       .eq('contributor_id', contributor.id)
       .eq('status', 'pending')
-      .single()
+      .maybeSingle()
 
     if (!question) return NextResponse.json({ error: 'Question not found' }, { status: 404 })
 
@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
         .from('photographs')
         .select('storage_path, ai_era_estimate')
         .eq('id', nextQuestion.photograph_id)
-        .single()
+        .maybeSingle()
       if (photo?.storage_path) {
         const { data: signed } = await supabaseAdmin
           .storage.from('photographs')

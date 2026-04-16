@@ -31,7 +31,7 @@ export default async function ContributePage({
     .select('*')
     .eq('access_token', params.token)
     .eq('status', 'active')
-    .single()
+    .maybeSingle()
 
   console.log('[ContributePage] contributor id:', contributor?.id ?? null)
   console.log('[ContributePage] contributor error:', contribError?.message ?? null)
@@ -46,7 +46,7 @@ export default async function ContributePage({
     .from('archives')
     .select('id, name, family_name, owner_name, status')
     .eq('id', contributor.archive_id)
-    .single()
+    .maybeSingle()
 
   console.log('[ContributePage] archive id:', archive?.id ?? null)
   console.log('[ContributePage] archive status:', archive?.status ?? null)
