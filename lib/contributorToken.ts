@@ -16,26 +16,35 @@ export async function generateContributorToken(contributorId: string): Promise<s
 }
 
 export async function getContributorByToken(token: string) {
-  if (!token || token.length < 32) return null
+  if (!token || token.length < 32) {
+    console.log('[getContributorByToken] Token too short or missing:', token?.length)
+    return null
+  }
 
-  const { data } = await supabaseAdmin
+  console.log('[getContributorByToken] Looking up token:', token.substring(0, 10))
+
+  const { data: contributor, error: contribError } = await supabaseAdmin
     .from('contributors')
-    .select(`
-      *,
-      archives (
-        id,
-        name,
-        family_name,
-        owner_name,
-        owner_email,
-        status
-      )
-    `)
+    .select('*')
     .eq('access_token', token)
     .eq('status', 'active')
     .single()
 
-  return data
+  console.log('[getContributorByToken] Contributor:', contributor?.id ?? null, contribError?.message ?? null)
+
+  if (!contributor) return null
+
+  const { data: archive, error: archiveError } = await supabaseAdmin
+    .from('archives')
+    .select('id, name, family_name, owner_name, owner_email, status')
+    .eq('id', contributor.archive_id)
+    .single()
+
+  console.log('[getContributorByToken] Archive:', archive?.id ?? null, archive?.status ?? null, archiveError?.message ?? null)
+
+  if (!archive) return null
+
+  return { ...contributor, archives: archive }
 }
 
 export async function generateQuestionsForContributor(

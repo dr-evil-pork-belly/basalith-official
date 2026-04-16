@@ -16,9 +16,15 @@ type Params = { token: string }
 export default async function ContributePage({ params }: { params: Params }) {
   const { token } = params
 
+  console.log('[ContributePage] Token received:', token?.substring(0, 10))
+
   const contributor = await getContributorByToken(token)
 
-  if (!contributor) notFound()
+  console.log('[ContributePage] Contributor found:', !!contributor)
+  console.log('[ContributePage] Archive found:', !!(contributor as any)?.archives)
+  console.log('[ContributePage] Archive status:', (contributor as any)?.archives?.status)
+
+  if (!contributor) return notFound()
 
   const archive = contributor.archives as {
     id:          string
@@ -28,7 +34,7 @@ export default async function ContributePage({ params }: { params: Params }) {
     status:      string
   } | null
 
-  if (!archive || archive.status !== 'active') notFound()
+  if (!archive || archive.status !== 'active') return notFound()
 
   // Update last accessed (non-blocking)
   void supabaseAdmin
