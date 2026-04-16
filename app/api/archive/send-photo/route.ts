@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
     // 2. Get active contributors
     const { data: contributors } = await supabaseAdmin
       .from('contributors')
-      .select('email, name')
+      .select('email, name, access_token')
       .eq('archive_id', archiveId)
       .eq('status', 'active')
 
@@ -110,22 +110,29 @@ export async function POST(req: NextRequest) {
       .select()
       .single()
 
-    // 8. Render email once, send to all contributors
-    const emailHtml = await render(
-      PhotographEmail({
-        archiveName:     archive.name,
-        familyName:      archive.family_name,
-        photographUrl:   signedUrlData.signedUrl,
-        yearEstimate:    photo.ai_era_estimate ?? null,
-        subjectContext:  '',
-        replyAddress,
-        contributorName: '',
-        sessionId:       session?.id ?? '',
-      })
-    )
+    // 8. Render and send per-contributor (portal URL differs per person)
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
 
     for (const contributor of contributors) {
       try {
+        const portalUrl = contributor.access_token
+          ? `${siteUrl}/contribute/${contributor.access_token}`
+          : null
+
+        const emailHtml = await render(
+          PhotographEmail({
+            archiveName:     archive.name,
+            familyName:      archive.family_name,
+            photographUrl:   signedUrlData.signedUrl,
+            yearEstimate:    photo.ai_era_estimate ?? null,
+            subjectContext:  '',
+            replyAddress,
+            contributorName: contributor.name ?? '',
+            sessionId:       session?.id ?? '',
+            portalUrl,
+          })
+        )
+
         await resend.emails.send({
           from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
           to:      contributor.email,

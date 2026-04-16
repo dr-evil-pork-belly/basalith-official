@@ -70,7 +70,8 @@ const CRON_JOBS = [
   { label: 'Send Gratitude Note',        route: '/api/cron/gratitude-note'         },
   { label: 'Send Memory Game Start',     route: '/api/cron/memory-game-start'      },
   { label: 'Send Memory Game Reminder',  route: '/api/cron/memory-game-reminder'   },
-  { label: 'Send Memory Game Summary',   route: '/api/cron/memory-game-summary'    },
+  { label: 'Send Memory Game Summary',          route: '/api/cron/memory-game-summary'  },
+  { label: 'Refresh Contributor Questions',      route: '/api/cron/weekly-prompt'        },
 ] as const
 
 type CronState = 'idle' | 'running' | 'ok' | 'error'

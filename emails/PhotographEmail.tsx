@@ -5,20 +5,22 @@ import {
 } from '@react-email/components'
 
 interface PhotographEmailProps {
-  archiveName:    string
-  familyName:     string
-  photographUrl:  string
-  yearEstimate:   string | null
-  subjectContext: string
-  replyAddress:   string
+  archiveName:     string
+  familyName:      string
+  photographUrl:   string
+  yearEstimate:    string | null
+  subjectContext:  string
+  replyAddress:    string
   contributorName: string
-  sessionId:      string
+  sessionId:       string
+  portalUrl?:      string | null
 }
 
 export function PhotographEmail({
   archiveName,
   photographUrl,
   yearEstimate,
+  portalUrl,
 }: PhotographEmailProps) {
   return (
     <Html>
@@ -104,6 +106,30 @@ export function PhotographEmail({
               Every reply becomes part of {archiveName} permanently.
             </Text>
           </Section>
+
+          {portalUrl && (
+            <Section style={{ padding: '0 32px', textAlign: 'center' as const }}>
+              <Hr style={{ border: 'none', borderTop: '1px solid rgba(240,237,230,0.06)', margin: '0 0 16px' }} />
+              <Text style={{
+                fontFamily: 'Georgia, serif',
+                fontSize:   '13px',
+                fontStyle:  'italic',
+                color:      '#3A3830',
+                margin:     '0 0 8px',
+              }}>
+                Want to do more than reply?
+              </Text>
+              <a href={portalUrl} style={{
+                fontFamily:    'Courier New, monospace',
+                fontSize:      '10px',
+                letterSpacing: '2px',
+                color:         '#C4A24A',
+                textDecoration: 'none',
+              }}>
+                VISIT YOUR CONTRIBUTOR PORTAL →
+              </a>
+            </Section>
+          )}
 
           <Section style={{ padding: '16px 32px 32px' }}>
             <Hr style={{ border: 'none', borderTop: '1px solid rgba(240,237,230,0.06)', margin: '0 0 16px' }} />

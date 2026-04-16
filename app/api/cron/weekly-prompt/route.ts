@@ -3,6 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
 import { DIMENSIONS } from '@/lib/entityAccuracy'
 import { getWeeklyPrompt, getWeekNumber } from '@/lib/weeklyPrompts'
+import { generateQuestionsForContributor } from '@/lib/contributorToken'
 
 export const dynamic = 'force-dynamic'
 
@@ -98,7 +99,28 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  return Response.json({ sent, total: archives.length, weekNumber, isTest })
+  // Refresh questions for all active contributors
+  const { data: allContributors } = await supabaseAdmin
+    .from('contributors')
+    .select('id, archive_id, relationship')
+    .eq('status', 'active')
+    .not('access_token', 'is', null)
+
+  let questionsRefreshed = 0
+  for (const contributor of allContributors ?? []) {
+    try {
+      await generateQuestionsForContributor(
+        contributor.id,
+        contributor.archive_id,
+        contributor.relationship || 'other',
+      )
+      questionsRefreshed++
+    } catch (err: unknown) {
+      console.error('[weekly-prompt] Question refresh failed:', contributor.id, err instanceof Error ? err.message : err)
+    }
+  }
+
+  return Response.json({ sent, total: archives.length, weekNumber, isTest, questionsRefreshed })
 }
 
 // ── Email builder ──────────────────────────────────────────────────────────────
