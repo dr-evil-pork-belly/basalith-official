@@ -240,10 +240,8 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
 
   async function remove(id: string) {
     try {
-      await fetch('/api/archive/contributors', {
-        method:  'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ archiveId, contributorId: id }),
+      await fetch(`/api/archive/contributors?id=${id}&archiveId=${archiveId}`, {
+        method: 'DELETE',
       })
       setContributors(prev => prev.filter(c => c.id !== id))
     } catch {}

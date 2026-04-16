@@ -161,16 +161,22 @@ export async function PATCH(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
-    const { archiveId, contributorId } = await req.json()
-    if (!archiveId || !contributorId) {
-      return NextResponse.json({ error: 'archiveId and contributorId required' }, { status: 400 })
+    const { searchParams } = new URL(req.url)
+    const contributorId = searchParams.get('id')
+    const archiveId     = searchParams.get('archiveId')
+
+    if (!contributorId) {
+      return NextResponse.json({ error: 'id required' }, { status: 400 })
     }
 
-    const { error } = await supabaseAdmin
+    const query = supabaseAdmin
       .from('contributors')
       .update({ status: 'inactive' })
       .eq('id', contributorId)
-      .eq('archive_id', archiveId)
+
+    if (archiveId) query.eq('archive_id', archiveId)
+
+    const { error } = await query
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
     return NextResponse.json({ success: true })
