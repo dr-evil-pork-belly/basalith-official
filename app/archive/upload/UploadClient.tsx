@@ -88,26 +88,58 @@ export default function UploadClient({ archiveId }: Props) {
 
   async function uploadPhotographs() {
     if (!photoFiles.length) return
-    setPhotoUpload({ status: 'uploading', message: `Uploading ${photoFiles.length} photo(s)…`, progress: 0 })
+    setPhotoUpload({ status: 'uploading', message: `Uploading ${photoFiles.length} photo${photoFiles.length > 1 ? 's' : ''}…`, progress: 0 })
 
-    let succeeded = 0
-    for (let i = 0; i < photoFiles.length; i++) {
-      const f = photoFiles[i]
+    const CONCURRENCY = 5
+    let succeeded  = 0
+    let completed  = 0
+    let startTime  = Date.now()
+    let timePerFile = 0
+
+    function progressMessage(done: number, total: number): string {
+      if (done < CONCURRENCY || timePerFile === 0) {
+        return `Uploading… (${done}/${total})`
+      }
+      const remaining = total - done
+      const secsLeft  = Math.round((remaining * timePerFile) / 1000)
+      if (secsLeft < 30) return `Almost done…`
+      const mins = Math.ceil(secsLeft / 60)
+      return `About ${mins} minute${mins > 1 ? 's' : ''} remaining…`
+    }
+
+    async function uploadOne(f: File): Promise<boolean> {
       const fd = new FormData()
       fd.append('file', f)
       fd.append('archiveId', archiveId)
-
       try {
         const res = await fetch('/api/archive/upload-photo', { method: 'POST', body: fd })
-        if (res.ok) succeeded++
+        return res.ok
       } catch {
-        // continue
+        return false
       }
-      setPhotoUpload({ status: 'uploading', message: `Uploading… (${i + 1}/${photoFiles.length})`, progress: Math.round(((i + 1) / photoFiles.length) * 100) })
+    }
+
+    for (let i = 0; i < photoFiles.length; i += CONCURRENCY) {
+      const batch   = photoFiles.slice(i, i + CONCURRENCY)
+      const results = await Promise.allSettled(batch.map(uploadOne))
+
+      results.forEach(r => {
+        if (r.status === 'fulfilled' && r.value) succeeded++
+      })
+      completed += batch.length
+
+      const elapsed   = Date.now() - startTime
+      timePerFile     = elapsed / completed
+
+      setPhotoUpload({
+        status:   'uploading',
+        message:  progressMessage(completed, photoFiles.length),
+        progress: Math.round((completed / photoFiles.length) * 100),
+      })
     }
 
     setPhotoFiles([])
-    setPhotoUpload({ status: 'success', message: `${succeeded} photo(s) uploaded successfully.`, progress: 100 })
+    setPhotoUpload({ status: 'success', message: `${succeeded} photo${succeeded !== 1 ? 's' : ''} uploaded successfully.`, progress: 100 })
   }
 
   async function uploadDocument() {

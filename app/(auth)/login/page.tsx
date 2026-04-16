@@ -77,7 +77,7 @@ function LoginForm() {
 
           {/* Header */}
           <div className="text-center mb-10">
-            <p className="eyebrow mb-4">Archivist Access</p>
+            <p className="eyebrow mb-4">Archive Access</p>
             <h1
               className="font-serif font-semibold text-text-primary leading-[0.95] tracking-[-0.035em] mb-4"
               style={{ fontSize: 'clamp(2.25rem,5vw,3.5rem)' }}

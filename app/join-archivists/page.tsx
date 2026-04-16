@@ -34,7 +34,7 @@ export default function JoinArchivistsPage() {
     <>
       <Nav />
       <main>
-        <section className="relative bg-obsidian-void px-8 md:px-16 pt-40 pb-32 overflow-hidden" aria-label="Join Archivists">
+        <section className="relative bg-obsidian-void px-8 md:px-16 pt-40 pb-32 overflow-hidden" aria-label="Join Legacy Guides">
           <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 50% 40% at 50% 70%,rgba(196,162,74,0.06) 0%,transparent 65%)' }} aria-hidden="true" />
           <div className="relative z-10 max-w-2xl mx-auto">
 

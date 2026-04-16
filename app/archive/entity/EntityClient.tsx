@@ -379,20 +379,31 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
 
       {/* ── Zero-state banner (shown above conversation always when archive is thin) ── */}
       {archiveState === 'thin' && messages.length === 0 && (
-        <div className="mb-8 text-center" style={{ maxWidth: '480px', margin: '0 auto 2.5rem' }}>
-          <div className="flex justify-center mb-4">
-            <Sigil size={40} pulse />
+        <div className="mb-8 text-center" style={{ maxWidth: '520px', margin: '0 auto 2.5rem' }}>
+          <div className="flex justify-center mb-5">
+            <Sigil size={44} pulse />
           </div>
-          <p className="font-serif" style={{ fontWeight: 700, fontSize: '2rem', color: '#F0EDE6', marginBottom: '1rem' }}>
-            Your entity is waiting.
+          <p className="font-serif" style={{ fontWeight: 700, fontSize: '2rem', color: '#F0EDE6', marginBottom: '1.25rem' }}>
+            Your entity is just beginning.
           </p>
-          <p className="font-serif italic font-light" style={{ fontSize: '1rem', color: '#9DA3A8', lineHeight: 1.8 }}>
-            Your entity is built from your archive. The more you deposit, the more
-            accurately it represents how you think.
-            <br /><br />
-            Start by asking it something simple. It will tell you honestly what it
-            knows and what it is still learning.
+          <p className="font-serif italic font-light" style={{ fontSize: '1rem', color: '#9DA3A8', lineHeight: 1.85, marginBottom: '1.5rem' }}>
+            An entity learns from what you put into your archive. The more you share, the
+            more accurately it represents how you think, what you believe, and how you speak.
           </p>
+          <div style={{ background: 'rgba(196,162,74,0.05)', border: '1px solid rgba(196,162,74,0.15)', borderRadius: '2px', padding: '1.25rem 1.5rem', textAlign: 'left' }}>
+            <p style={{ fontFamily: 'monospace', fontSize: '0.4rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.7)', marginBottom: '0.75rem' }}>
+              Three ways to build it
+            </p>
+            <p className="font-serif font-light" style={{ fontSize: '0.9rem', color: '#9DA3A8', lineHeight: 1.8, margin: '0 0 0.5rem' }}>
+              1. Ask it a question below and correct any answer that is wrong.
+            </p>
+            <p className="font-serif font-light" style={{ fontSize: '0.9rem', color: '#9DA3A8', lineHeight: 1.8, margin: '0 0 0.5rem' }}>
+              2. Use the Wisdom Session to answer structured questions about your life.
+            </p>
+            <p className="font-serif font-light" style={{ fontSize: '0.9rem', color: '#9DA3A8', lineHeight: 1.8, margin: 0 }}>
+              3. Type a belief, memory, or opinion directly into the box below as a deposit.
+            </p>
+          </div>
         </div>
       )}
 

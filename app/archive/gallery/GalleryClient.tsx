@@ -135,7 +135,7 @@ export default function GalleryClient({ archiveId }: { archiveId: string }) {
     }
 
     checkStatus()
-    interval = setInterval(checkStatus, 10000)
+    interval = setInterval(checkStatus, 30000)
     return () => clearInterval(interval)
   }, [archiveId])
 
@@ -216,10 +216,10 @@ export default function GalleryClient({ archiveId }: { archiveId: string }) {
           <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#C4A24A', flexShrink: 0, animation: 'pulse 1.5s ease-in-out infinite' }} />
           <div style={{ flex: 1 }}>
             <p style={{ fontFamily: 'Georgia, serif', fontSize: '0.95rem', fontStyle: 'italic', color: '#F0EDE6', margin: '0 0 4px' }}>
-              Analyzing your photographs...
+              {processingStatus.pending} photo{processingStatus.pending !== 1 ? 's' : ''} are being analyzed by AI.
             </p>
             <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.38rem', letterSpacing: '0.2em', color: '#706C65', margin: '0 0 8px' }}>
-              {processingStatus.processed} OF {processingStatus.total} ANALYZED
+              {processingStatus.processed} OF {processingStatus.total} COMPLETE · CHECK BACK IN A FEW MINUTES
               {processingStatus.discarded > 0 && ` · ${processingStatus.discarded} REMOVED`}
             </p>
             <div style={{ height: '3px', background: 'rgba(240,237,230,0.08)', borderRadius: '2px', overflow: 'hidden', maxWidth: '300px' }}>
@@ -275,11 +275,26 @@ export default function GalleryClient({ archiveId }: { archiveId: string }) {
 
       {!loading && filtered.length === 0 && (
         <div className="text-center py-20">
-          <p className="font-serif font-light" style={{ color: '#3A3F44', fontSize: '1.1rem' }}>
-            {items.length === 0 ? 'The archive is empty. Begin labeling memories.' : 'No memories match this filter.'}
-          </p>
-          {items.length === 0 && (
-            <a href="/archive/label" className="btn-monolith-amber inline-block mt-6">Label First Memory</a>
+          {items.length === 0 ? (
+            <>
+              <p className="font-serif font-light" style={{ color: '#9DA3A8', fontSize: '1.1rem', marginBottom: '0.5rem' }}>
+                Your archive is empty.
+              </p>
+              <p className="font-serif font-light" style={{ color: '#5C6166', fontSize: '1rem', marginBottom: '2rem' }}>
+                Upload your first photographs to begin.
+              </p>
+              <a
+                href="/archive/label"
+                className="inline-block font-compute text-xs tracking-widest no-underline"
+                style={{ background: '#C4A24A', color: '#0A0908', padding: '0.6rem 1.5rem' }}
+              >
+                UPLOAD PHOTOS →
+              </a>
+            </>
+          ) : (
+            <p className="font-serif font-light" style={{ color: '#3A3F44', fontSize: '1.1rem' }}>
+              No memories match this filter.
+            </p>
           )}
         </div>
       )}
