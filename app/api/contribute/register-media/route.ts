@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     const contributorName = contributor.name ?? contributor.email
 
     if (isVideo) {
-      const { error: dbError } = await supabaseAdmin.from('videos').insert({
+      const { error: dbError } = await supabaseAdmin.from('archive_videos').insert({
         archive_id:    archiveId,
         storage_path:  storagePath,
         original_name: fileName   || null,

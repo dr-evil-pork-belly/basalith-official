@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     // Insert record into appropriate table
     if (isVideo) {
       try {
-        await supabaseAdmin.from('videos').insert({
+        await supabaseAdmin.from('archive_videos').insert({
           archive_id:    archiveId,
           storage_path:  storagePath,
           original_name: file.name,
