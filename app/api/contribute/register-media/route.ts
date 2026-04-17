@@ -20,13 +20,17 @@ export async function POST(req: NextRequest) {
     const contributorName = contributor.name ?? contributor.email
 
     if (isVideo) {
+      const ext = fileName ? fileName.split('.').pop()?.toLowerCase() || 'bin' : 'bin'
       const { error: dbError } = await supabaseAdmin.from('archive_videos').insert({
-        archive_id:    archiveId,
-        storage_path:  storagePath,
-        original_name: fileName   || null,
-        file_size:     fileSize   ? parseInt(fileSize) : null,
-        uploaded_by:   contributorName,
-        status:        'pending',
+        archive_id:        archiveId,
+        storage_path:      storagePath,
+        file_name:         fileName         || null,
+        file_type:         ext,
+        video_type:        'home_video',
+        uploaded_by_name:  contributorName  || null,
+        file_size:         fileSize         ? parseInt(fileSize) : null,
+        processing_status: 'pending',
+        transcript_status: 'pending',
       })
       if (dbError) {
         console.error('[register-media] videos insert error:', dbError.message)
@@ -47,9 +51,9 @@ export async function POST(req: NextRequest) {
       const { error: dbError } = await supabaseAdmin.from('archive_documents').insert({
         archive_id:    archiveId,
         storage_path:  storagePath,
-        original_name: fileName   || null,
-        file_size:     fileSize   ? parseInt(fileSize) : null,
-        uploaded_by:   contributorName,
+        file_name:     fileName        || null,
+        file_size:     fileSize        ? parseInt(fileSize) : null,
+        uploaded_by:   contributorName || null,
         status:        'pending',
       })
       if (dbError) {

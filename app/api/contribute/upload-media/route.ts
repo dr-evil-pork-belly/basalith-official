@@ -43,12 +43,15 @@ export async function POST(req: NextRequest) {
     if (isVideo) {
       try {
         await supabaseAdmin.from('archive_videos').insert({
-          archive_id:    archiveId,
-          storage_path:  storagePath,
-          original_name: file.name,
-          file_size:     file.size,
-          uploaded_by:   contributorName,
-          status:        'pending',
+          archive_id:        archiveId,
+          storage_path:      storagePath,
+          file_name:         file.name,
+          file_type:         ext,
+          video_type:        'home_video',
+          uploaded_by_name:  contributorName || null,
+          file_size:         file.size,
+          processing_status: 'pending',
+          transcript_status: 'pending',
         })
       } catch {}
 
@@ -63,9 +66,9 @@ export async function POST(req: NextRequest) {
         await supabaseAdmin.from('archive_documents').insert({
           archive_id:    archiveId,
           storage_path:  storagePath,
-          original_name: file.name,
+          file_name:     file.name,
           file_size:     file.size,
-          uploaded_by:   contributorName,
+          uploaded_by:   contributorName || null,
           status:        'pending',
         })
       } catch {}
