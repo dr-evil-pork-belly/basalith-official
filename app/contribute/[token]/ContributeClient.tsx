@@ -270,9 +270,15 @@ function PhotoUploadSection({
       })
       console.log('[uploadOne] PUT response:', storageRes.status, storageRes.statusText)
       if (!storageRes.ok) {
-        const errorText = await storageRes.text()
-        console.log('[uploadOne] PUT error body:', errorText)
-        throw new Error(`Storage upload failed: ${storageRes.status} - ${errorText}`)
+        let errorDetail = ''
+        try { errorDetail = await storageRes.text() } catch {}
+        console.error('[uploadOne] Storage PUT failed:', {
+          status:     storageRes.status,
+          statusText: storageRes.statusText,
+          error:      errorDetail,
+          urlPrefix:  uploadUrl?.substring(0, 80),
+        })
+        throw new Error(`Storage upload failed: ${storageRes.status} ${errorDetail}`)
       }
 
       // Step 3 — register in DB
@@ -456,9 +462,15 @@ function MediaUploadSection({
       })
       console.log('[media-upload] PUT response:', storageRes.status, storageRes.statusText)
       if (!storageRes.ok) {
-        const errorText = await storageRes.text()
-        console.log('[media-upload] PUT error body:', errorText)
-        throw new Error(`Storage upload failed: ${storageRes.status} - ${errorText}`)
+        let errorDetail = ''
+        try { errorDetail = await storageRes.text() } catch {}
+        console.error('[media-upload] Storage PUT failed:', {
+          status:     storageRes.status,
+          statusText: storageRes.statusText,
+          error:      errorDetail,
+          urlPrefix:  uploadUrl?.substring(0, 80),
+        })
+        throw new Error(`Storage upload failed: ${storageRes.status} ${errorDetail}`)
       }
 
       // Step 3 — register in DB
