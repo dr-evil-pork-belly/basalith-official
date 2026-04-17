@@ -417,15 +417,46 @@ function MediaUploadSection({
   async function handleUpload() {
     if (!file) return
     setStatus('uploading')
+    setMessage('')
     try {
-      const fd = new FormData()
-      fd.append('token',     token)
-      fd.append('file',      file)
-      fd.append('mediaType', file.type.startsWith('video/') ? 'video' : 'document')
+      // Step 1 — get presigned URL (picks correct bucket by file type)
+      const urlRes = await fetch('/api/contribute/upload-url', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ token, fileName: file.name, fileType: file.type }),
+      })
+      if (!urlRes.ok) {
+        const err = await urlRes.json().catch(() => ({}))
+        throw new Error(err.error || `upload-url HTTP ${urlRes.status}`)
+      }
+      const { uploadUrl, path, archiveId, isVideo } = await urlRes.json()
 
-      const res  = await fetch('/api/contribute/upload-media', { method: 'POST', body: fd })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error)
+      // Step 2 — PUT directly to Supabase (bypasses Vercel size limit)
+      const storageRes = await fetch(uploadUrl, {
+        method:  'PUT',
+        headers: { 'Content-Type': file.type || 'application/octet-stream' },
+        body:    file,
+      })
+      if (!storageRes.ok) throw new Error(`Storage upload failed: ${storageRes.status}`)
+
+      // Step 3 — register in DB
+      const regRes = await fetch('/api/contribute/register-media', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({
+          token,
+          archiveId,
+          storagePath: path,
+          fileName:    file.name,
+          fileSize:    file.size,
+          fileType:    file.type,
+          isVideo,
+        }),
+      })
+      if (!regRes.ok) {
+        const regErr = await regRes.json().catch(() => ({}))
+        throw new Error(regErr.error || `register HTTP ${regRes.status}`)
+      }
 
       setFile(null)
       setStatus('success')
@@ -456,7 +487,7 @@ function MediaUploadSection({
         <input
           ref={inputRef}
           type="file"
-          accept="video/*,.pdf,.doc,.docx,.txt"
+          accept="video/*,.mov,.mp4,.m4v,.avi,.mkv,.webm,.pdf,.doc,.docx,.txt"
           className="hidden"
           onChange={e => { setFile(e.target.files?.[0] ?? null); e.target.value = '' }}
         />
@@ -464,7 +495,7 @@ function MediaUploadSection({
           {file ? file.name : 'TAP TO SELECT FILE'}
         </p>
         <p style={{ fontFamily: 'monospace', fontSize: '0.38rem', color: '#3A3F44', margin: '0.3rem 0 0' }}>
-          VIDEO · PDF · DOC · TXT
+          MOV · MP4 · AVI · PDF · DOC · TXT
         </p>
       </div>
 

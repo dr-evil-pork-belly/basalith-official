@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     console.log('fileName:', body.fileName)
     console.log('archiveId:', body.archiveId)
 
-    const { token, fileName, archiveId } = body
+    const { token, fileName, archiveId, fileType } = body
 
     if (!token || !fileName) {
       console.log('Missing token or fileName')
@@ -35,14 +35,26 @@ export async function POST(req: NextRequest) {
     }
 
     const resolvedArchiveId = archiveId || contributor.archive_id
-    const ext  = fileName.split('.').pop()?.toLowerCase() || 'jpg'
+    const ext = fileName.split('.').pop()?.toLowerCase() || 'bin'
+
+    const isVideo = (fileType?.startsWith('video/')) ||
+      ['mov', 'mp4', 'm4v', 'avi', 'mkv', 'webm', 'wmv'].includes(ext)
+    const isDocument = !isVideo && (
+      fileType?.includes('pdf') ||
+      fileType?.includes('word') ||
+      fileType?.startsWith('text/') ||
+      ['pdf', 'doc', 'docx', 'txt', 'rtf'].includes(ext)
+    )
+    const bucket = isVideo ? 'archive-videos' : isDocument ? 'archive-documents' : 'photographs'
+
     const path = `${resolvedArchiveId}/${Date.now()}-contrib-${Math.random().toString(36).substring(2, 9)}.${ext}`
 
+    console.log('File type:', fileType, '| ext:', ext, '| bucket:', bucket)
     console.log('Creating signed URL for path:', path)
 
     const { data, error: urlError } = await supabaseAdmin
       .storage
-      .from('photographs')
+      .from(bucket)
       .createSignedUploadUrl(path)
 
     console.log('Signed URL created:', !!data, 'error:', urlError?.message ?? null)
@@ -55,6 +67,9 @@ export async function POST(req: NextRequest) {
       uploadUrl:  data.signedUrl,
       path,
       archiveId:  resolvedArchiveId,
+      bucket,
+      isVideo,
+      isDocument,
     })
 
   } catch (err: unknown) {
