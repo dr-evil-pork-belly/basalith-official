@@ -24,19 +24,30 @@ export async function POST(req: NextRequest) {
       .insert({
         archive_id:     archiveId,
         storage_path:   storagePath,
-        original_name:  fileName    || null,
-        file_size:      fileSize    || null,
+        original_name:  fileName                         || null,
+        file_size:      fileSize ? parseInt(fileSize) : null,
         status:         'pending_ai',
         ai_processed:   false,
         priority_score: 0.5,
-        uploaded_by:    contributorName,
       })
       .select()
       .single()
 
     if (dbError || !photo) {
+      console.error('[register-photo] DB insert error:', dbError?.message, dbError?.details)
       throw new Error(dbError?.message || 'Failed to create photo record')
     }
+
+    // Track contributor attribution in labels table
+    try {
+      await supabaseAdmin.from('labels').insert({
+        archive_id:       archiveId,
+        photograph_id:    photo.id,
+        labelled_by:      contributorName,
+        is_primary_label: false,
+        essence_status:   'pending',
+      })
+    } catch {}
 
     // Fire Inngest event
     try {
