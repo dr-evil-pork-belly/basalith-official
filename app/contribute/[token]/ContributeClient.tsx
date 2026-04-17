@@ -245,15 +245,18 @@ function PhotoUploadSection({
   async function uploadOne(file: File): Promise<boolean> {
     try {
       // Step 1 — get signed URL
-      const urlRes  = await fetch('/api/contribute/upload-photo', {
+      const urlRes  = await fetch('/api/contribute/upload-url', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ token, fileName: file.name }),
       })
-      if (!urlRes.ok) throw new Error('Failed to get upload URL')
+      if (!urlRes.ok) {
+        const errBody = await urlRes.json().catch(() => ({}))
+        throw new Error(errBody.error || `upload-url HTTP ${urlRes.status}`)
+      }
       const { uploadUrl, path, archiveId } = await urlRes.json()
 
-      // Step 2 — PUT directly to Supabase
+      // Step 2 — PUT directly to Supabase (bypasses Vercel size limit)
       const storageRes = await fetch(uploadUrl, {
         method:  'PUT',
         headers: { 'Content-Type': file.type || 'image/jpeg' },
@@ -267,8 +270,13 @@ function PhotoUploadSection({
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ token, archiveId, storagePath: path, fileName: file.name, fileSize: file.size }),
       })
-      return regRes.ok
-    } catch {
+      if (!regRes.ok) {
+        const regErr = await regRes.json().catch(() => ({}))
+        throw new Error(regErr.error || `register-photo HTTP ${regRes.status}`)
+      }
+      return true
+    } catch (err: unknown) {
+      console.error('[uploadOne]', err instanceof Error ? err.message : err)
       return false
     }
   }
