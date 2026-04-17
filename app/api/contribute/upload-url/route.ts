@@ -49,15 +49,18 @@ export async function POST(req: NextRequest) {
 
     const path = `${resolvedArchiveId}/${Date.now()}-contrib-${Math.random().toString(36).substring(2, 9)}.${ext}`
 
-    console.log('File type:', fileType, '| ext:', ext, '| bucket:', bucket)
-    console.log('Creating signed URL for path:', path)
+    console.log('[upload-url] fileType:', fileType)
+    console.log('[upload-url] ext:', ext)
+    console.log('[upload-url] isVideo:', isVideo)
+    console.log('[upload-url] bucket:', bucket)
+    console.log('[upload-url] path:', path)
 
     const { data, error: urlError } = await supabaseAdmin
       .storage
       .from(bucket)
       .createSignedUploadUrl(path, { upsert: false })
 
-    console.log('Signed URL created:', !!data, 'error:', urlError?.message ?? null)
+    console.log('[upload-url] signedUrl created:', !!data?.signedUrl, urlError?.message)
 
     if (urlError || !data) {
       return NextResponse.json({ error: urlError?.message || 'Failed to create upload URL' }, { status: 500 })

@@ -257,12 +257,23 @@ function PhotoUploadSection({
       const { uploadUrl, path, archiveId } = await urlRes.json()
 
       // Step 2 — PUT directly to Supabase (bypasses Vercel size limit)
-      const storageRes = await fetch(uploadUrl, {
-        method:  'PUT',
-        headers: { 'Content-Type': file.type || 'image/jpeg', 'x-upsert': 'false' },
-        body:    file,
+      console.log('[uploadOne] Starting upload:', {
+        fileName: file.name,
+        fileType: file.type,
+        fileSize: file.size,
+        uploadUrl: uploadUrl?.substring(0, 50),
+        path,
       })
-      if (!storageRes.ok) throw new Error(`Storage upload failed: ${storageRes.status}`)
+      const storageRes = await fetch(uploadUrl, {
+        method: 'PUT',
+        body:   file,
+      })
+      console.log('[uploadOne] PUT response:', storageRes.status, storageRes.statusText)
+      if (!storageRes.ok) {
+        const errorText = await storageRes.text()
+        console.log('[uploadOne] PUT error body:', errorText)
+        throw new Error(`Storage upload failed: ${storageRes.status} - ${errorText}`)
+      }
 
       // Step 3 — register in DB
       const regRes = await fetch('/api/contribute/register-photo', {
@@ -432,12 +443,23 @@ function MediaUploadSection({
       const { uploadUrl, path, archiveId, isVideo } = await urlRes.json()
 
       // Step 2 — PUT directly to Supabase (bypasses Vercel size limit)
-      const storageRes = await fetch(uploadUrl, {
-        method:  'PUT',
-        headers: { 'Content-Type': file.type || 'application/octet-stream', 'x-upsert': 'false' },
-        body:    file,
+      console.log('[media-upload] Starting upload:', {
+        fileName: file.name,
+        fileType: file.type,
+        fileSize: file.size,
+        uploadUrl: uploadUrl?.substring(0, 50),
+        path,
       })
-      if (!storageRes.ok) throw new Error(`Storage upload failed: ${storageRes.status}`)
+      const storageRes = await fetch(uploadUrl, {
+        method: 'PUT',
+        body:   file,
+      })
+      console.log('[media-upload] PUT response:', storageRes.status, storageRes.statusText)
+      if (!storageRes.ok) {
+        const errorText = await storageRes.text()
+        console.log('[media-upload] PUT error body:', errorText)
+        throw new Error(`Storage upload failed: ${storageRes.status} - ${errorText}`)
+      }
 
       // Step 3 — register in DB
       const regRes = await fetch('/api/contribute/register-media', {
