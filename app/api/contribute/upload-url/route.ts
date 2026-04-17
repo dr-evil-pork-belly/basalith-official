@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
     const { data, error: urlError } = await supabaseAdmin
       .storage
       .from(bucket)
-      .createSignedUploadUrl(path)
+      .createSignedUploadUrl(path, { upsert: false })
 
     console.log('Signed URL created:', !!data, 'error:', urlError?.message ?? null)
 

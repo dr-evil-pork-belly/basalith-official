@@ -259,7 +259,7 @@ function PhotoUploadSection({
       // Step 2 — PUT directly to Supabase (bypasses Vercel size limit)
       const storageRes = await fetch(uploadUrl, {
         method:  'PUT',
-        headers: { 'Content-Type': file.type || 'image/jpeg' },
+        headers: { 'Content-Type': file.type || 'image/jpeg', 'x-upsert': 'false' },
         body:    file,
       })
       if (!storageRes.ok) throw new Error(`Storage upload failed: ${storageRes.status}`)
@@ -434,7 +434,7 @@ function MediaUploadSection({
       // Step 2 — PUT directly to Supabase (bypasses Vercel size limit)
       const storageRes = await fetch(uploadUrl, {
         method:  'PUT',
-        headers: { 'Content-Type': file.type || 'application/octet-stream' },
+        headers: { 'Content-Type': file.type || 'application/octet-stream', 'x-upsert': 'false' },
         body:    file,
       })
       if (!storageRes.ok) throw new Error(`Storage upload failed: ${storageRes.status}`)
