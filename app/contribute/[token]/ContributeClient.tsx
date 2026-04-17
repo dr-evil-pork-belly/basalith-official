@@ -279,7 +279,7 @@ function PhotoUploadSection({
     setProgress(0)
 
     let succeeded = 0
-    const BATCH = 3
+    const BATCH = 5
 
     for (let i = 0; i < files.length; i += BATCH) {
       const batch   = files.slice(i, i + BATCH)

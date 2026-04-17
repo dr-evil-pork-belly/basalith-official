@@ -53,13 +53,23 @@ export async function POST(req: NextRequest) {
       console.error('Inngest error (non-fatal):', inngestErr instanceof Error ? inngestErr.message : inngestErr)
     }
 
-    // Increment contributor photos_uploaded count (best-effort)
+    // Increment contributor photos_uploaded count atomically (best-effort)
     try {
+      await supabaseAdmin.rpc('increment_contributor_photos_uploaded', {
+        p_contributor_id: contributor.id,
+      })
+    } catch {
+      // RPC may not exist — fallback to read-then-write
+      const { data: current } = await supabaseAdmin
+        .from('contributors')
+        .select('photos_uploaded')
+        .eq('id', contributor.id)
+        .maybeSingle()
       await supabaseAdmin
         .from('contributors')
-        .update({ photos_uploaded: (contributor.photos_uploaded ?? 0) + 1 })
+        .update({ photos_uploaded: (current?.photos_uploaded ?? 0) + 1 })
         .eq('id', contributor.id)
-    } catch {}
+    }
 
     // Notify archive owner (best-effort)
     const archive = contributor.archives as { name: string; family_name: string; owner_email: string | null } | null
