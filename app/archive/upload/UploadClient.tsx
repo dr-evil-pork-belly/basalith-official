@@ -36,6 +36,15 @@ const DECADES = [
   '1920s','1930s','1940s','1950s','1960s','1970s','1980s','1990s','2000s','2010s','2020s',
 ]
 
+function humanizeUploadError(raw: string | undefined): string {
+  if (!raw) return 'This file could not be uploaded. Please try again.'
+  const m = raw.toLowerCase()
+  if (m.includes('fetch') || m === 'networkerror' || m.includes('network request failed')) return 'Connection lost. Please try again.'
+  if (/\b[45]\d{2}\b/.test(m) || m.includes('storage')) return 'This file could not be uploaded. Please try again.'
+  if (m === 'null' || m === 'undefined') return 'Something went wrong. Please try again.'
+  return 'This file could not be uploaded. Please try again.'
+}
+
 export default function UploadClient({ archiveId }: Props) {
   const [activeSection, setActiveSection] = useState<UploadSection>('photographs')
 
@@ -169,7 +178,7 @@ export default function UploadClient({ archiveId }: Props) {
         progress: 100,
       })
     } catch (err: unknown) {
-      setDocUpload({ status: 'error', message: err instanceof Error ? err.message : 'Upload failed', progress: 0 })
+      setDocUpload({ status: 'error', message: humanizeUploadError(err instanceof Error ? err.message : undefined), progress: 0 })
     }
   }
 
@@ -205,7 +214,7 @@ export default function UploadClient({ archiveId }: Props) {
         progress: 100,
       })
     } catch (err: unknown) {
-      setVideoUpload({ status: 'error', message: err instanceof Error ? err.message : 'Upload failed', progress: 0 })
+      setVideoUpload({ status: 'error', message: humanizeUploadError(err instanceof Error ? err.message : undefined), progress: 0 })
     }
   }
 

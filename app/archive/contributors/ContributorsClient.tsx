@@ -38,6 +38,16 @@ const INITIAL_INVITE  = {
   personalNote:     '',
 }
 
+function humanizeError(raw: string | undefined): string {
+  if (!raw) return 'Something went wrong. Please try again.'
+  const m = raw.toLowerCase()
+  if (m.includes('fetch') || m === 'networkerror' || m.includes('network request failed')) return 'Connection lost. Please try again.'
+  if (/\b[45]\d{2}\b/.test(m)) return 'Something went wrong. Please try again.'
+  if (m === 'null' || m === 'undefined' || m.includes(' is null') || m.includes(' is undefined')) return 'Something went wrong. Please try again.'
+  if (m.includes('storage')) return 'This file could not be uploaded. Please try again.'
+  return raw
+}
+
 const inputCls   = 'w-full bg-transparent font-sans text-[0.82rem] placeholder:text-[#3A3F44] focus:outline-none pb-2 transition-colors duration-200'
 const inputStyle = { color: '#F0F0EE', borderBottom: '1px solid rgba(255,255,255,0.10)' }
 const labelCls   = 'font-sans text-[0.56rem] font-bold tracking-[0.14em] uppercase block mb-2'
@@ -232,7 +242,7 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
       setForm(INITIAL_CONTRIB)
       setShowForm(false)
     } catch (err: any) {
-      setAddError(err.message ?? 'Failed to add contributor')
+      setAddError(humanizeError(err.message))
     } finally {
       setAdding(false)
     }
@@ -263,7 +273,7 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
       setInviteForm(INITIAL_INVITE)
       fetchWitnessSessions()
     } catch (err: any) {
-      setInviteError(err.message ?? 'Failed to send invitation')
+      setInviteError(humanizeError(err.message))
     } finally {
       setInviting(false)
     }
@@ -281,7 +291,7 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
             Archive Access
           </h1>
         </div>
-        <button onClick={() => setShowForm(!showForm)} className="btn-monolith-amber shrink-0 !py-2.5 !px-5 !text-[0.7rem]">
+        <button onClick={() => setShowForm(!showForm)} className="btn-monolith-amber shrink-0 !py-2.5 !px-5 !text-[0.7rem]" style={{ minHeight: '44px' }}>
           {showForm ? 'Cancel' : 'Add Contributor'}
         </button>
       </div>

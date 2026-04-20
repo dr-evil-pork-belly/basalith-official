@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useState } from 'react'
 
 const PRIMARY_NAV = [
   { href: '/archive/dashboard',    label: 'Archive'        },
@@ -24,7 +25,8 @@ const SECONDARY_NAV = [
 const NAV = [...PRIMARY_NAV, ...SECONDARY_NAV]
 
 export default function ArchiveLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname()
+  const pathname       = usePathname()
+  const [confirmSignOut, setConfirmSignOut] = useState(false)
 
   return (
     <div className="min-h-screen flex" style={{ background: '#0C0C0D' }}>
@@ -112,13 +114,37 @@ export default function ArchiveLayout({ children }: { children: React.ReactNode 
         </nav>
 
         <div className="px-6 pb-8">
-          <a
-            href="/api/archive-signout"
-            className="font-sans text-[0.62rem] tracking-[0.1em] uppercase no-underline transition-colors duration-200"
-            style={{ color: '#3A3F44' }}
-          >
-            Sign Out
-          </a>
+          {confirmSignOut ? (
+            <div>
+              <p className="font-sans text-[0.56rem] tracking-[0.08em] uppercase mb-2" style={{ color: '#9DA3A8' }}>
+                Sign out?
+              </p>
+              <div className="flex items-center gap-3">
+                <a
+                  href="/api/archive-signout"
+                  className="font-sans text-[0.56rem] tracking-[0.1em] uppercase no-underline"
+                  style={{ color: '#C4A24A' }}
+                >
+                  Yes, sign out
+                </a>
+                <button
+                  onClick={() => setConfirmSignOut(false)}
+                  className="font-sans text-[0.56rem] tracking-[0.1em] uppercase"
+                  style={{ color: '#5C6166', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={() => setConfirmSignOut(true)}
+              className="font-sans text-[0.62rem] tracking-[0.1em] uppercase transition-colors duration-200"
+              style={{ color: '#3A3F44', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+            >
+              Sign Out
+            </button>
+          )}
         </div>
       </aside>
 
@@ -128,9 +154,15 @@ export default function ArchiveLayout({ children }: { children: React.ReactNode 
           <Link href="/" className="font-sans text-[0.7rem] font-bold tracking-[0.2em] uppercase no-underline" style={{ color: '#F0F0EE' }}>
             Basalith Archive
           </Link>
-          <a href="/api/archive-signout" className="font-sans text-[0.58rem] tracking-[0.1em] uppercase no-underline" style={{ color: '#5C6166' }}>
-            Out
-          </a>
+          {confirmSignOut ? (
+            <a href="/api/archive-signout" className="font-sans text-[0.58rem] tracking-[0.1em] uppercase no-underline" style={{ color: '#C4A24A' }}>
+              Confirm
+            </a>
+          ) : (
+            <button onClick={() => setConfirmSignOut(true)} className="font-sans text-[0.58rem] tracking-[0.1em] uppercase" style={{ color: '#5C6166', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+              Sign Out
+            </button>
+          )}
         </div>
         <div className="flex overflow-x-auto scrollbar-none px-5 pb-3 gap-6">
           {NAV.map(({ href, label }) => {

@@ -449,6 +449,7 @@ export default function WisdomClient({ archiveId }: { archiveId: string }) {
                 border:        'none',
                 borderRadius:  '2px',
                 padding:       '0.7rem 2rem',
+                minHeight:     '44px',
                 fontFamily:    'monospace',
                 fontSize:      '0.44rem',
                 letterSpacing: '0.3em',

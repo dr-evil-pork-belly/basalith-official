@@ -196,9 +196,19 @@ function AccuracyDashboard({ archiveId }: { archiveId: string }) {
 
       {/* Footer stats */}
       {!loading && data && (
-        <p style={{ fontFamily: 'monospace', fontSize: '0.4rem', letterSpacing: '0.1em', color: '#5C6166' }}>
-          {data.totalDeposits} deposit{data.totalDeposits !== 1 ? 's' : ''} · {data.totalConversations} conversation{data.totalConversations !== 1 ? 's' : ''} · {data.totalLabels} family memor{data.totalLabels !== 1 ? 'ies' : 'y'}
-        </p>
+        <>
+          <p style={{ fontFamily: 'monospace', fontSize: '0.4rem', letterSpacing: '0.1em', color: '#5C6166' }}>
+            {data.totalDeposits} deposit{data.totalDeposits !== 1 ? 's' : ''} · {data.totalConversations} conversation{data.totalConversations !== 1 ? 's' : ''} · {data.totalLabels} family memor{data.totalLabels !== 1 ? 'ies' : 'y'}
+          </p>
+          <p style={{ fontFamily: 'Georgia, serif', fontSize: '0.9rem', fontStyle: 'italic', color: '#706C65', marginTop: '0.75rem' }}>
+            Your entity is {data.overallScore}% accurate across 10 dimensions of your life.{' '}
+            {data.overallScore >= 80 ? 'Speaking with authority.' :
+             data.overallScore >= 60 ? 'Speaking with depth.' :
+             data.overallScore >= 40 ? 'Taking shape.' :
+             data.overallScore >= 20 ? 'Still learning.' :
+             'Just beginning.'}
+          </p>
+        </>
       )}
     </div>
   )
@@ -528,6 +538,7 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
   const [stats,                setStats]                = useState({ total: 0, streak: 0, contributors: 0, thisMonth: 0 })
   const [entityConversations,  setEntityConversations]  = useState(0)
   const [significantDates,     setSignificantDates]     = useState(0)
+  const [contributorNames,     setContributorNames]     = useState<string[]>([])
   const [scoreData,            setScoreData]            = useState<{ score: number; label: string; breakdown: Record<string, ScoreBreakdown> } | null>(null)
 
   useEffect(() => { fetchFromDB() }, [archiveId])
@@ -543,6 +554,7 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
       setByDecade(buildDecadeMap(data.decades ?? []))
 
       const conts = (data.contributors ?? []).length
+      setContributorNames((data.contributors ?? []).map((c: { name: string }) => c.name.split(' ')[0]))
 
       const recentRows = (data.recentLabels ?? []).map((l: LabelRow) => ({
         id:          l.id,
@@ -675,7 +687,6 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
           [
             { label: 'Labeled Photos', value: stats.total        },
             { label: 'Current Streak', value: stats.streak       },
-            { label: 'Contributors',   value: stats.contributors  },
             { label: 'This Month',     value: stats.thisMonth     },
           ].map(({ label, value }) => (
             <div key={label} className="rounded-sm px-5 py-5 border" style={{ background: '#111112', borderColor: 'rgba(255,255,255,0.06)' }}>
@@ -686,7 +697,26 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
                 {value}
               </p>
             </div>
-          ))
+          )).concat([
+            <div key="contributors" className="rounded-sm px-5 py-5 border" style={{ background: '#111112', borderColor: 'rgba(255,255,255,0.06)' }}>
+              <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#5C6166', marginBottom: '0.5rem' }}>
+                Contributors
+              </p>
+              <p className="font-serif font-semibold" style={{ fontSize: '2rem', color: '#F0F0EE', lineHeight: 1, marginBottom: '0.4rem' }}>
+                {stats.contributors}
+              </p>
+              <p className="font-serif italic" style={{ fontSize: '0.75rem', color: '#5C6166', lineHeight: 1.5 }}>
+                {contributorNames.length === 0
+                  ? 'No contributors yet.'
+                  : contributorNames.length === 1
+                  ? `${contributorNames[0]} is building your archive.`
+                  : contributorNames.length === 2
+                  ? `${contributorNames[0]} and ${contributorNames[1]} are building your archive.`
+                  : `${contributorNames[0]}, ${contributorNames[1]}, and ${contributorNames.length - 2} other${contributorNames.length - 2 !== 1 ? 's' : ''} are building your archive.`
+                }
+              </p>
+            </div>
+          ])
         )}
       </div>
 

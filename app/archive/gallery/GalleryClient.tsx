@@ -218,9 +218,12 @@ export default function GalleryClient({ archiveId }: { archiveId: string }) {
             <p style={{ fontFamily: 'Georgia, serif', fontSize: '0.95rem', fontStyle: 'italic', color: '#F0EDE6', margin: '0 0 4px' }}>
               {processingStatus.pending} photo{processingStatus.pending !== 1 ? 's' : ''} are being analyzed by AI.
             </p>
-            <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.38rem', letterSpacing: '0.2em', color: '#706C65', margin: '0 0 8px' }}>
-              {processingStatus.processed} OF {processingStatus.total} COMPLETE · CHECK BACK IN A FEW MINUTES
+            <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.38rem', letterSpacing: '0.2em', color: '#706C65', margin: '0 0 4px' }}>
+              {processingStatus.processed} OF {processingStatus.total} ANALYZED
               {processingStatus.discarded > 0 && ` · ${processingStatus.discarded} REMOVED`}
+            </p>
+            <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.38rem', letterSpacing: '0.2em', color: '#5C6166', margin: '0 0 8px' }}>
+              THIS USUALLY TAKES 15-20 MINUTES · YOUR GALLERY WILL UPDATE AUTOMATICALLY
             </p>
             <div style={{ height: '3px', background: 'rgba(240,237,230,0.08)', borderRadius: '2px', overflow: 'hidden', maxWidth: '300px' }}>
               <div style={{ height: '100%', background: '#C4A24A', borderRadius: '2px', width: processingStatus.total > 0 ? `${Math.round((processingStatus.processed / processingStatus.total) * 100)}%` : '0%', transition: 'width 0.5s ease' }} />

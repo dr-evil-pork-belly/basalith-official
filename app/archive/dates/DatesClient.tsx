@@ -24,6 +24,15 @@ const DATE_TYPES = [
   { value: 'other',               label: 'Other'               },
 ]
 
+function humanizeError(raw: string | undefined): string {
+  if (!raw) return 'Something went wrong. Please try again.'
+  const m = raw.toLowerCase()
+  if (m.includes('fetch') || m === 'networkerror' || m.includes('network request failed')) return 'Connection lost. Please try again.'
+  if (/\b[45]\d{2}\b/.test(m)) return 'Something went wrong. Please try again.'
+  if (m === 'null' || m === 'undefined' || m.includes(' is null') || m.includes(' is undefined')) return 'Something went wrong. Please try again.'
+  return raw
+}
+
 function daysUntil(month: number, day: number): number {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
@@ -105,12 +114,12 @@ export default function DatesClient({ archiveId }: { archiveId: string }) {
       console.log('dates fetch response:', json)
       if (json.error) {
         console.error('dates fetch error:', json.error)
-        setFetchErr(json.error)
+        setFetchErr(humanizeError(json.error))
       }
       setDates(json.dates ?? [])
     } catch (err: any) {
       console.error('dates fetch exception:', err)
-      setFetchErr(err.message)
+      setFetchErr(humanizeError(err.message))
     } finally {
       setLoading(false)
     }
@@ -140,7 +149,7 @@ export default function DatesClient({ archiveId }: { archiveId: string }) {
       const json = await r.json()
       console.log('dates POST response:', json)
       if (!r.ok || json.error) {
-        setSaveErr(json.error || 'Save failed')
+        setSaveErr(humanizeError(json.error || `HTTP ${r.status}`))
         return
       }
       setForm({ personName: '', dateType: 'birthday', month: '', day: '', year: '', notes: '' })
@@ -149,7 +158,7 @@ export default function DatesClient({ archiveId }: { archiveId: string }) {
       await fetchDates()
     } catch (err: any) {
       console.error('dates POST exception:', err)
-      setSaveErr(err.message)
+      setSaveErr(humanizeError(err.message))
     } finally {
       setSaving(false)
     }
