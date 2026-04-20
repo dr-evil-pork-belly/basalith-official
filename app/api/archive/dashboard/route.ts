@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'archiveId required' }, { status: 400 })
   }
 
-  const [archive, decades, recentLabels, contributors, photographs, ownerDeposits] = await Promise.all([
+  const [archive, decades, recentLabels, contributors, photographs, ownerDeposits, entityConvos, significantDates] = await Promise.all([
     supabaseAdmin
       .from('archives')
       .select('*')
@@ -44,6 +44,16 @@ export async function GET(req: NextRequest) {
       .from('owner_deposits')
       .select('id, created_at')
       .eq('archive_id', archiveId),
+
+    supabaseAdmin
+      .from('entity_conversations')
+      .select('id', { count: 'exact', head: true })
+      .eq('archive_id', archiveId),
+
+    supabaseAdmin
+      .from('significant_dates')
+      .select('id', { count: 'exact', head: true })
+      .eq('archive_id', archiveId),
   ])
 
   if (archive.error) {
@@ -51,11 +61,13 @@ export async function GET(req: NextRequest) {
   }
 
   return NextResponse.json({
-    archive:       archive.data,
-    decades:       decades.data       ?? [],
-    recentLabels:  recentLabels.data  ?? [],
-    contributors:  contributors.data  ?? [],
-    photographs:   photographs.data   ?? [],
-    ownerDeposits: ownerDeposits.data ?? [],
+    archive:             archive.data,
+    decades:             decades.data       ?? [],
+    recentLabels:        recentLabels.data  ?? [],
+    contributors:        contributors.data  ?? [],
+    photographs:         photographs.data   ?? [],
+    ownerDeposits:       ownerDeposits.data ?? [],
+    entityConversations: entityConvos.count ?? 0,
+    significantDates:    significantDates.count ?? 0,
   })
 }

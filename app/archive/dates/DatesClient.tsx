@@ -325,8 +325,11 @@ export default function DatesClient({ archiveId }: { archiveId: string }) {
         </p>
       ) : sortedDates.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '3rem 0' }}>
-          <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', color: '#5C6166', fontSize: '0.95rem' }}>
+          <p style={{ fontFamily: 'Georgia, serif', fontWeight: 600, color: '#9DA3A8', fontSize: '1rem', marginBottom: '0.5rem' }}>
             No important dates added yet.
+          </p>
+          <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', color: '#5C6166', fontSize: '0.9rem', lineHeight: 1.7, maxWidth: '360px', margin: '0 auto' }}>
+            Add birthdays and anniversaries. Your archive will remember them automatically every year.
           </p>
         </div>
       ) : (

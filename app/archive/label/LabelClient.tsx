@@ -28,7 +28,7 @@ const MILESTONE_TEXTS: Record<number, { main: string; sub: string }> = {
   10:  { main: 'Ten photographs.\nA decade comes alive.',          sub: 'KEEP GOING'                                },
   25:  { main: 'Twenty-five.\nThis family is being remembered.',   sub: 'THE ARCHIVE IS TAKING SHAPE'               },
   50:  { main: 'Fifty photographs.\nThis is a serious archive.',   sub: 'HALF A CENTURY OF MOMENTS · PRESERVED'     },
-  100: { main: 'One hundred.\nThis is a legacy.',                  sub: 'THE WHITFIELD ARCHIVE · GENERATION I'      },
+  100: { main: 'One hundred.\nThis is a legacy.',                  sub: 'ONE HUNDRED MEMORIES · PRESERVED FOREVER'  },
 }
 
 function getDepthScore(item: Partial<ArchiveItem>): number {
@@ -604,12 +604,6 @@ export default function LabelClient({ archiveId }: { archiveId: string }) {
     if (fileRef.current) fileRef.current.value = ''
   }
 
-  function testMilestone() {
-    const keys = Object.keys(MILESTONE_TEXTS).map(Number)
-    const k    = keys[Math.floor(Math.random() * keys.length)]
-    setMilestoneCount(k)
-    setShowOverlay(true)
-  }
 
   if (saved) {
     return (
@@ -806,12 +800,6 @@ export default function LabelClient({ archiveId }: { archiveId: string }) {
 
         </form>
 
-        <div className="mt-8 pt-6 border-t" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
-          <button type="button" onClick={testMilestone} className="w-full py-2 rounded-sm border transition-colors duration-200"
-            style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#3A3F44', borderColor: 'rgba(255,255,255,0.04)', background: 'transparent' }}>
-            [ Test Milestone Overlay — Remove Before Deploy ]
-          </button>
-        </div>
         </>)}
 
       </div>

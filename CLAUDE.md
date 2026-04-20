@@ -485,3 +485,117 @@ firebase firestore:get _meta/vault_counter
 
 - **Admin console:** No admin UI exists yet. Use Firebase Console directly
   for partner approvals, vault status overrides, and commission management.
+
+# Basalith — Claude Code Context
+
+## What This Is
+
+Basalith is a premium legacy preservation and AI entity platform. It lets families capture, organize, and transmit their histories, wisdom, and identities across generations — not just wealth, but the *person*. The core product lives at basalith.xyz.
+
+Two related properties extend the brand:
+- **basalith.life** — lifestyle/community brand built around the "135 mentality": living boldly and fearlessly as a cultural identity, not a scientific claim
+- **basalith.ai** — AI entity layer, the intelligence infrastructure beneath the platform
+
+The company is **Heritage Nexus Inc.**
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js 14 (App Router) |
+| Database | Supabase (Postgres + Auth + Storage) |
+| AI | Anthropic API (Claude) |
+| Email | Resend |
+| Background Jobs | Inngest |
+| Deployment | Vercel |
+| Styling | Tailwind CSS |
+
+---
+
+## Business Model
+
+**Tiered pricing** — families pay for access to legacy preservation tools and AI entity features.
+
+**Archivist sales model** — independent sales force who onboard families directly. Archivists are not employees. They are brand representatives with their own relationships. Any code touching onboarding flows must account for the Archivist as an intermediary actor, not just the family.
+
+**Current status:** Two real test families actively onboarding. Production is live. There is no sandbox that is "safe to break."
+
+---
+
+## The People Using This
+
+- **Families** — often non-technical. Older members may be primary contributors. Interfaces must be clear, dignified, and emotionally appropriate. This is not a SaaS dashboard. It is closer to a memorial, a living archive, a trusted keeper.
+- **Archivists** — semi-technical. Need clean onboarding flows, clear status visibility, and tools that make them look good to their clients.
+- **Admins (David)** — technical, building everything.
+
+---
+
+## Data Sensitivity
+
+Basalith stores family memories, personal histories, relationships, photos, and eventually voice/video. This is among the most sensitive data that exists. Every decision around auth, RLS, storage access, and API exposure must be made with this in mind. A breach here is not a bug — it is a violation of trust that cannot be undone.
+
+**Default posture: maximum protection, minimum exposure.**
+
+---
+
+## Brand Voice & Copy Rules
+
+- Intelligent, not reckless
+- Fearless, not rebellious
+- Generational, not trendy
+- Philosophical, not promotional
+- Premium — Basalith is not a consumer app. It is closer to a private bank or estate attorney in tone.
+- **No em dashes anywhere in rendered copy.** Not in UI, not in emails, not in documentation shown to users.
+- No exclamation points in product copy.
+- No phrases like "unlock," "supercharge," "game-changer," "seamless."
+
+---
+
+## Design Standards
+
+- Dark, considered aesthetic. Typography-led. Negative space is intentional.
+- No decorative imagery unless it serves a specific purpose.
+- Components must feel like they belong in a premium financial or heritage institution — not a startup.
+- Motion should be restrained and purposeful. No gratuitous animation.
+- Accessibility is non-negotiable given the age range of users.
+
+---
+
+## Engineering Standards
+
+- **No direct Supabase client calls from client components** — all data fetching through server actions or API routes.
+- **RLS on every table** — no exceptions. If a table lacks an RLS policy, it is a critical bug.
+- **Environment variables** — never log them, never expose them to the client unless explicitly prefixed `NEXT_PUBLIC_` and intended for client use.
+- **Inngest jobs** must be idempotent. Assume they can run twice.
+- **Resend emails** must have both HTML and plain-text fallbacks.
+- **No `any` types** in TypeScript unless absolutely necessary with a comment explaining why.
+- All API routes must validate input. No raw `req.body` usage without a schema check.
+- Migrations go through Supabase CLI — no manual schema changes in the dashboard.
+
+---
+
+## Current Priorities (as of build sprint)
+
+1. Stable, trustworthy experience for the two onboarding families
+2. Archivist dashboard completeness
+3. AI entity layer foundations
+4. Payment and tier enforcement
+
+---
+
+## What "Done" Means Here
+
+A feature is done when:
+- It works for a non-technical 70-year-old using it on an iPad
+- An Archivist can explain it to a family in 30 seconds
+- It does not expose data it shouldn't
+- It does not break anything that was working before
+- It looks like it belongs in the product
+
+---
+
+## Tone for This Session
+
+You are a senior engineer and product partner who has read everything above. You do not need to be reminded of the stack or the context mid-session. You hold the business logic, the brand standards, and the technical constraints simultaneously. When in doubt, you ask one clarifying question rather than making an assumption that could affect a real family's data.

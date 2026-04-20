@@ -300,9 +300,14 @@ export default function VoiceClient({ archiveId }: { archiveId: string }) {
             Loading recordings...
           </p>
         ) : recordings.length === 0 ? (
-          <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: '0.95rem', color: '#3A3830', textAlign: 'center', padding: '2rem 0' }}>
-            Your voice is not yet in your archive.<br />Record your first memory above.
-          </p>
+          <div style={{ textAlign: 'center', padding: '2.5rem 0' }}>
+            <p style={{ fontFamily: 'Georgia, serif', fontWeight: 600, fontSize: '1rem', color: '#9DA3A8', marginBottom: '0.5rem' }}>
+              Your voice is not in your archive.
+            </p>
+            <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: '0.9rem', color: '#5C6166', lineHeight: 1.7, marginBottom: '1.25rem' }}>
+              Record a memory in any language. Your words are transcribed and preserved permanently.
+            </p>
+          </div>
         ) : (
           <div>
             {recordings.map(r => (

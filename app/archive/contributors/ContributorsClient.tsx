@@ -326,8 +326,11 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
 
       {contributors.length === 0 && (
         <div className="text-center py-12">
-          <p className="font-serif font-light" style={{ color: '#3A3F44', fontSize: '1rem' }}>
-            No contributors yet. Add the first person to this archive.
+          <p className="font-serif font-semibold" style={{ color: '#9DA3A8', fontSize: '1rem', marginBottom: '0.5rem' }}>
+            No contributors yet.
+          </p>
+          <p className="font-serif italic" style={{ color: '#5C6166', fontSize: '0.9rem', lineHeight: 1.7, maxWidth: '380px', margin: '0 auto' }}>
+            Invite family members to contribute their memories. Each person receives photographs by email and can reply with what they remember.
           </p>
         </div>
       )}

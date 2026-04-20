@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { calculateArchiveScore } from '@/lib/archiveScore'
+import OnboardingGuide from '@/app/components/OnboardingGuide'
 
 // ── Accuracy types ──────────────────────────────────────────────────────────
 type DimensionResult = {
@@ -435,6 +436,7 @@ function MemoryGameCard({ archiveId }: { archiveId: string }) {
 
 type ArchiveRow = {
   name:             string
+  owner_name:       string | null
   labelled_photos:  number
   total_photos:     number
   current_streak:   number
@@ -519,12 +521,14 @@ function timeAgo(isoStr: string): string {
 }
 
 export default function DashboardClient({ archiveId }: { archiveId: string }) {
-  const [loading,      setLoading]      = useState(true)
-  const [archive,      setArchive]      = useState<ArchiveRow | null>(null)
-  const [byDecade,     setByDecade]     = useState<Record<string, number>>({})
-  const [recent,       setRecent]       = useState<{ id: string; quote: string; contributor: string; year: string; ago: string }[]>([])
-  const [stats,        setStats]        = useState({ total: 0, streak: 0, contributors: 0, thisMonth: 0 })
-  const [scoreData,    setScoreData]    = useState<{ score: number; label: string; breakdown: Record<string, ScoreBreakdown> } | null>(null) // kept for archive score calculation
+  const [loading,              setLoading]              = useState(true)
+  const [archive,              setArchive]              = useState<ArchiveRow | null>(null)
+  const [byDecade,             setByDecade]             = useState<Record<string, number>>({})
+  const [recent,               setRecent]               = useState<{ id: string; quote: string; contributor: string; year: string; ago: string }[]>([])
+  const [stats,                setStats]                = useState({ total: 0, streak: 0, contributors: 0, thisMonth: 0 })
+  const [entityConversations,  setEntityConversations]  = useState(0)
+  const [significantDates,     setSignificantDates]     = useState(0)
+  const [scoreData,            setScoreData]            = useState<{ score: number; label: string; breakdown: Record<string, ScoreBreakdown> } | null>(null)
 
   useEffect(() => { fetchFromDB() }, [archiveId])
 
@@ -556,6 +560,8 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
 
       setRecent(recentRows)
       setStats({ total: a.labelled_photos, streak: a.current_streak, contributors: conts, thisMonth: thisMonthLabels })
+      setEntityConversations(data.entityConversations ?? 0)
+      setSignificantDates(data.significantDates ?? 0)
 
       // Calculate archive score
       const result = calculateArchiveScore(
@@ -610,18 +616,47 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
     <div className="max-w-4xl mx-auto">
 
       <div className="mb-10">
-        <p className="eyebrow mb-3">Archive Overview</p>
         {loading ? (
-          <Skeleton className="h-8 w-64 mb-1" />
+          <>
+            <Skeleton className="h-8 w-56 mb-3" />
+            <Skeleton className="h-4 w-80" />
+          </>
         ) : (
-          <h1
-            className="font-serif font-semibold leading-[0.95] tracking-[-0.03em]"
-            style={{ fontSize: 'clamp(1.8rem,3.5vw,2.8rem)', color: '#F0F0EE' }}
-          >
-            {archive?.name ?? 'The Family Archive'}
-          </h1>
+          <>
+            <h1
+              className="font-serif font-semibold leading-[0.95] tracking-[-0.03em] mb-3"
+              style={{ fontSize: 'clamp(1.8rem,3.5vw,2.8rem)', color: '#F0F0EE' }}
+            >
+              {(() => {
+                const hour      = new Date().getHours()
+                const firstName = archive?.owner_name?.split(' ')[0] ?? null
+                const greeting  = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
+                return firstName ? `${greeting}, ${firstName}.` : `${greeting}.`
+              })()}
+            </h1>
+            <p style={{ fontFamily: 'monospace', fontSize: '0.48rem', letterSpacing: '0.12em', color: '#5C6166' }}>
+              {(() => {
+                const n = archive?.total_photos ?? 0
+                if (n === 0)       return 'Your archive is ready for its first photographs.'
+                if (n <= 10)       return `Your archive is growing. ${n} photograph${n !== 1 ? 's' : ''} preserved so far.`
+                if (n <= 50)       return `Your archive is taking shape. ${n} photographs preserved.`
+                return `A meaningful archive. ${n} photographs and counting.`
+              })()}
+            </p>
+          </>
         )}
       </div>
+
+      {/* ── ONBOARDING GUIDE (first-time users) ── */}
+      {!loading && (
+        <OnboardingGuide
+          archiveId={archiveId}
+          photoCount={archive?.total_photos ?? stats.total}
+          contributorCount={stats.contributors}
+          entityConversations={entityConversations}
+          significantDates={significantDates}
+        />
+      )}
 
       {/* ── ENTITY ACCURACY DASHBOARD ── */}
       <AccuracyDashboard archiveId={archiveId} />
@@ -709,9 +744,15 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
             </div>
           ) : recent.length === 0 ? (
             <div className="px-6 py-10 text-center">
-              <p className="font-serif font-light" style={{ color: '#3A3F44', fontSize: '0.95rem' }}>
-                No memories added yet.<br />Begin with the first photograph.
+              <p className="font-serif" style={{ color: '#5C6166', fontSize: '1rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+                Your archive is empty.
               </p>
+              <p className="font-serif italic" style={{ color: '#3A3F44', fontSize: '0.9rem', lineHeight: 1.6, marginBottom: '1.25rem' }}>
+                Upload your family photographs to begin. Your family will receive one photograph by email every evening and can reply with their memories.
+              </p>
+              <Link href="/archive/label" className="no-underline" style={{ fontFamily: 'monospace', fontSize: '0.46rem', letterSpacing: '0.2em', color: '#C4A24A' }}>
+                UPLOAD YOUR FIRST PHOTOS →
+              </Link>
             </div>
           ) : (
             <ul>
@@ -738,9 +779,9 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
 
         <div className="flex flex-col gap-4">
           {[
-            { href: '/archive/label',        label: 'Label a Photo',    desc: 'Upload and annotate a memory from the archive.',  gold: true  },
-            { href: '/archive/gallery',       label: 'View Gallery',     desc: 'Browse labeled memories across all decades.',     gold: false },
-            { href: '/archive/contributors',  label: 'Contributors',     desc: 'Manage who can add to this archive.',             gold: false },
+            { href: '/archive/label',        label: 'Upload Photos',    desc: 'Upload photographs from your phone or computer.',  gold: true  },
+            { href: '/archive/gallery',       label: 'View Gallery',     desc: 'Browse preserved memories across all decades.',    gold: false },
+            { href: '/archive/contributors',  label: 'Contributors',     desc: 'Invite family to contribute their memories.',      gold: false },
           ].map(({ href, label, desc, gold }) => (
             <Link
               key={href}
@@ -753,6 +794,27 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
               <p className="font-sans text-[0.72rem] leading-relaxed" style={{ color: '#5C6166' }}>{desc}</p>
             </Link>
           ))}
+
+          {/* Next email time */}
+          {!loading && (
+            <div className="rounded-sm border px-5 py-4" style={{ background: '#111112', borderColor: 'rgba(255,255,255,0.04)' }}>
+              <p style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.1em', color: '#3A3F44', marginBottom: '0.25rem' }}>
+                NEXT PHOTOGRAPH EMAIL
+              </p>
+              <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.1em', color: '#5C6166' }}>
+                {(() => {
+                  const now  = new Date()
+                  const utcH = now.getUTCHours()
+                  return utcH < 21 ? 'Tonight at 9pm' : 'Tomorrow at 9pm'
+                })()}
+              </p>
+              {stats.contributors > 0 && (
+                <p style={{ fontFamily: 'monospace', fontSize: '0.42rem', letterSpacing: '0.08em', color: '#3A3F44', marginTop: '0.35rem' }}>
+                  {stats.contributors} family member{stats.contributors !== 1 ? 's' : ''} receiving photos
+                </p>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

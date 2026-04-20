@@ -277,18 +277,18 @@ export default function GalleryClient({ archiveId }: { archiveId: string }) {
         <div className="text-center py-20">
           {items.length === 0 ? (
             <>
-              <p className="font-serif font-light" style={{ color: '#9DA3A8', fontSize: '1.1rem', marginBottom: '0.5rem' }}>
+              <p className="font-serif font-semibold" style={{ color: '#9DA3A8', fontSize: '1.1rem', marginBottom: '0.75rem' }}>
                 Your archive is empty.
               </p>
-              <p className="font-serif font-light" style={{ color: '#5C6166', fontSize: '1rem', marginBottom: '2rem' }}>
-                Upload your first photographs to begin.
+              <p className="font-serif italic" style={{ color: '#5C6166', fontSize: '0.95rem', lineHeight: 1.7, marginBottom: '2rem', maxWidth: '420px', margin: '0 auto 2rem' }}>
+                Upload your family photographs to begin. Your family will receive one photograph by email every evening and can reply with their memories.
               </p>
               <a
                 href="/archive/label"
                 className="inline-block font-compute text-xs tracking-widest no-underline"
                 style={{ background: '#C4A24A', color: '#0A0908', padding: '0.6rem 1.5rem' }}
               >
-                UPLOAD PHOTOS →
+                UPLOAD YOUR FIRST PHOTOS →
               </a>
             </>
           ) : (
