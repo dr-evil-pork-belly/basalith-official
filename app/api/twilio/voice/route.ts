@@ -35,14 +35,48 @@ export async function POST(req: NextRequest) {
   // ── 1. Check archives table (owner) ──────────────────────────────────────────
   const { data: archiveOwner } = await supabaseAdmin
     .from('archives')
-    .select('id, name, family_name, owner_name, owner_email, status')
+    .select('id, name, family_name, owner_name, owner_email, status, preferred_language')
     .eq('owner_phone', from)
     .eq('status', 'active')
     .maybeSingle()
 
   if (archiveOwner) {
-    const firstName = archiveOwner.owner_name?.split(' ')[0] ?? 'there'
-    const action    = `${siteUrl}/api/twilio/recording?archiveId=${archiveOwner.id}&isOwner=true`
+    const firstName  = archiveOwner.owner_name?.split(' ')[0] ?? 'there'
+    const action     = `${siteUrl}/api/twilio/recording?archiveId=${archiveOwner.id}&isOwner=true`
+    const isZh       = archiveOwner.preferred_language === 'zh'
+
+    if (isZh) {
+      return twimlResponse(`<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="Polly.Zhiyu-Neural" language="cmn-CN">
+    您好，${firstName}。
+  </Say>
+  <Pause length="1"/>
+  <Say voice="Polly.Zhiyu-Neural" language="cmn-CN">
+    欢迎来到您的 Basalith 档案。
+  </Say>
+  <Pause length="1"/>
+  <Say voice="Polly.Zhiyu-Neural" language="cmn-CN">
+    请在提示音后分享您的故事或回忆。
+  </Say>
+  <Pause length="1"/>
+  <Say voice="Polly.Zhiyu-Neural" language="cmn-CN">
+    说完后请按任意键。
+  </Say>
+  <Record
+    action="${action}"
+    method="POST"
+    maxLength="300"
+    finishOnKey="*"
+    playBeep="true"
+    transcribe="false"
+  />
+  <Say voice="Polly.Zhiyu-Neural" language="cmn-CN">
+    未收到录音。请稍后再次拨打。再见。
+  </Say>
+  <Hangup/>
+</Response>`)
+    }
 
     return twimlResponse(`<?xml version="1.0" encoding="UTF-8"?>
 <Response>

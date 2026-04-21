@@ -160,6 +160,37 @@ export async function POST(req: NextRequest) {
     ? `${siteUrl}/api/twilio/continue?archiveId=${archiveId}&isOwner=true`
     : `${siteUrl}/api/twilio/continue?contributorId=${contributorId}&archiveId=${archiveId}`
 
+  const { data: archiveLang } = await supabaseAdmin
+    .from('archives')
+    .select('preferred_language')
+    .eq('id', archiveId)
+    .maybeSingle()
+
+  const isZh = archiveLang?.preferred_language === 'zh'
+
+  if (isZh) {
+    const continuePromptZh = isOwner
+      ? '如果您想继续录制，请按1。或者直接挂断电话。'
+      : '如果您想回答下一个问题，请按1。或者直接挂断电话。'
+
+    return twimlResponse(`<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="Polly.Zhiyu-Neural" language="cmn-CN">
+    谢谢您。您的故事已经保存到档案中了。
+  </Say>
+  <Pause length="1"/>
+  <Say voice="Polly.Zhiyu-Neural" language="cmn-CN">
+    ${continuePromptZh}
+  </Say>
+  <Gather numDigits="1" action="${continueUrl}" method="POST" timeout="10">
+  </Gather>
+  <Say voice="Polly.Zhiyu-Neural" language="cmn-CN">
+    谢谢您。再见。
+  </Say>
+  <Hangup/>
+</Response>`)
+  }
+
   const continuePrompt = isOwner
     ? 'Would you like to record another memory? Press 1 to continue, or hang up when you are done.'
     : 'Would you like to answer another question? Press 1 to continue, or hang up when you are done.'

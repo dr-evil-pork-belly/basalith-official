@@ -16,8 +16,26 @@ export async function POST(req: NextRequest) {
   const formData = await req.formData()
   const digit    = formData.get('Digits') as string | null
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+
+  const { data: archiveLang } = await supabaseAdmin
+    .from('archives')
+    .select('preferred_language')
+    .eq('id', archiveId)
+    .maybeSingle()
+
+  const isZh = archiveLang?.preferred_language === 'zh'
+
   if (digit !== '1') {
-    return twimlResponse(`<?xml version="1.0" encoding="UTF-8"?>
+    return isZh
+      ? twimlResponse(`<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="Polly.Zhiyu-Neural" language="cmn-CN">
+    谢谢您。再见。
+  </Say>
+  <Hangup/>
+</Response>`)
+      : twimlResponse(`<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Say voice="Polly.Joanna-Neural" language="en-US">
     Thank you. Goodbye.
@@ -26,11 +44,35 @@ export async function POST(req: NextRequest) {
 </Response>`)
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
-
   // Owner — free-form deposit, no question lookup needed
   if (isOwner) {
     const action = `${siteUrl}/api/twilio/recording?archiveId=${archiveId}&isOwner=true`
+
+    if (isZh) {
+      return twimlResponse(`<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="Polly.Zhiyu-Neural" language="cmn-CN">
+    请分享另一段回忆。
+  </Say>
+  <Pause length="1"/>
+  <Say voice="Polly.Zhiyu-Neural" language="cmn-CN">
+    提示音后开始说话，说完后按任意键。
+  </Say>
+  <Record
+    action="${action}"
+    method="POST"
+    maxLength="300"
+    finishOnKey="*"
+    playBeep="true"
+    transcribe="false"
+  />
+  <Say voice="Polly.Zhiyu-Neural" language="cmn-CN">
+    未收到录音。再见。
+  </Say>
+  <Hangup/>
+</Response>`)
+    }
+
     return twimlResponse(`<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Say voice="Polly.Joanna-Neural" language="en-US">
@@ -66,9 +108,38 @@ export async function POST(req: NextRequest) {
 
   const question     = questions?.[0] ?? null
   const questionText = question?.question_text
-    ?? 'Tell me another memory that matters to you.'
+    ?? (isZh ? '请分享一段对您来说重要的回忆。' : 'Tell me another memory that matters to you.')
 
   const action = `${siteUrl}/api/twilio/recording?contributorId=${contributorId}&questionId=${question?.id ?? ''}&archiveId=${archiveId}`
+
+  if (isZh) {
+    return twimlResponse(`<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="Polly.Zhiyu-Neural" language="cmn-CN">
+    这是您的下一个问题。
+  </Say>
+  <Pause length="1"/>
+  <Say voice="Polly.Zhiyu-Neural" language="cmn-CN">
+    ${questionText}
+  </Say>
+  <Pause length="2"/>
+  <Say voice="Polly.Zhiyu-Neural" language="cmn-CN">
+    请在提示音后说出您的回答，说完后按任意键。
+  </Say>
+  <Record
+    action="${action}"
+    method="POST"
+    maxLength="300"
+    finishOnKey="*"
+    playBeep="true"
+    transcribe="false"
+  />
+  <Say voice="Polly.Zhiyu-Neural" language="cmn-CN">
+    未收到录音。再见。
+  </Say>
+  <Hangup/>
+</Response>`)
+  }
 
   return twimlResponse(`<?xml version="1.0" encoding="UTF-8"?>
 <Response>
