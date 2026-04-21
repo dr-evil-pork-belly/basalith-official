@@ -166,16 +166,20 @@ export async function POST(req: NextRequest) {
 
   return twimlResponse(`<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="alice" language="en-US">
-    Thank you. Your memory has been saved to the archive.
+  <Say voice="Polly.Joanna-Neural" language="en-US">
+    Thank you.
   </Say>
   <Pause length="1"/>
-  <Say voice="alice" language="en-US">
+  <Say voice="Polly.Joanna-Neural" language="en-US">
+    Your memory has been saved to the archive.
+  </Say>
+  <Pause length="1"/>
+  <Say voice="Polly.Joanna-Neural" language="en-US">
     ${continuePrompt}
   </Say>
   <Gather numDigits="1" action="${continueUrl}" method="POST" timeout="10">
   </Gather>
-  <Say voice="alice" language="en-US">
+  <Say voice="Polly.Joanna-Neural" language="en-US">
     Thank you. Goodbye.
   </Say>
   <Hangup/>

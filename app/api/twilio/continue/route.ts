@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
   if (digit !== '1') {
     return twimlResponse(`<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="alice" language="en-US">
+  <Say voice="Polly.Joanna-Neural" language="en-US">
     Thank you. Goodbye.
   </Say>
   <Hangup/>
@@ -33,8 +33,12 @@ export async function POST(req: NextRequest) {
     const action = `${siteUrl}/api/twilio/recording?archiveId=${archiveId}&isOwner=true`
     return twimlResponse(`<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="alice" language="en-US">
-    Please share another memory. Speak after the tone. Press any key when finished.
+  <Say voice="Polly.Joanna-Neural" language="en-US">
+    Please share another memory.
+  </Say>
+  <Pause length="1"/>
+  <Say voice="Polly.Joanna-Neural" language="en-US">
+    Speak after the tone. Press any key when you are finished.
   </Say>
   <Record
     action="${action}"
@@ -44,7 +48,7 @@ export async function POST(req: NextRequest) {
     playBeep="true"
     transcribe="false"
   />
-  <Say voice="alice" language="en-US">
+  <Say voice="Polly.Joanna-Neural" language="en-US">
     We did not receive a recording. Goodbye.
   </Say>
   <Hangup/>
@@ -68,11 +72,15 @@ export async function POST(req: NextRequest) {
 
   return twimlResponse(`<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="alice" language="en-US">
-    Here is your next question: ${questionText}
+  <Say voice="Polly.Joanna-Neural" language="en-US">
+    Here is your next question.
   </Say>
   <Pause length="1"/>
-  <Say voice="alice" language="en-US">
+  <Say voice="Polly.Joanna-Neural" language="en-US">
+    ${questionText}
+  </Say>
+  <Pause length="2"/>
+  <Say voice="Polly.Joanna-Neural" language="en-US">
     Please speak your answer after the tone. Press any key when you are finished.
   </Say>
   <Record
@@ -83,7 +91,7 @@ export async function POST(req: NextRequest) {
     playBeep="true"
     transcribe="false"
   />
-  <Say voice="alice" language="en-US">
+  <Say voice="Polly.Joanna-Neural" language="en-US">
     We did not receive a recording. Goodbye.
   </Say>
   <Hangup/>

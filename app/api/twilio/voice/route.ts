@@ -46,12 +46,20 @@ export async function POST(req: NextRequest) {
 
     return twimlResponse(`<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="alice" language="en-US">
-    Welcome, ${firstName}. You are adding to your archive.
+  <Say voice="Polly.Joanna-Neural" language="en-US">
+    Welcome, ${firstName}.
   </Say>
   <Pause length="1"/>
-  <Say voice="alice" language="en-US">
-    Please share a memory, a story, or anything you want preserved. Speak after the tone. Press any key when finished.
+  <Say voice="Polly.Joanna-Neural" language="en-US">
+    You are adding to your archive.
+  </Say>
+  <Pause length="1"/>
+  <Say voice="Polly.Joanna-Neural" language="en-US">
+    Please share a memory, a story, or anything you want preserved.
+  </Say>
+  <Pause length="1"/>
+  <Say voice="Polly.Joanna-Neural" language="en-US">
+    Speak after the tone. Press any key when you are finished.
   </Say>
   <Record
     action="${action}"
@@ -61,7 +69,7 @@ export async function POST(req: NextRequest) {
     playBeep="true"
     transcribe="false"
   />
-  <Say voice="alice" language="en-US">
+  <Say voice="Polly.Joanna-Neural" language="en-US">
     We did not receive a recording. Please call back to try again. Goodbye.
   </Say>
   <Hangup/>
@@ -95,16 +103,28 @@ export async function POST(req: NextRequest) {
 
     return twimlResponse(`<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="alice" language="en-US">
-    Welcome, ${firstName}. You are recording for ${archiveName}.
+  <Say voice="Polly.Joanna-Neural" language="en-US">
+    Welcome, ${firstName}.
   </Say>
   <Pause length="1"/>
-  <Say voice="alice" language="en-US">
-    Here is your question: ${questionText}
+  <Say voice="Polly.Joanna-Neural" language="en-US">
+    You are recording for ${archiveName}.
   </Say>
   <Pause length="1"/>
-  <Say voice="alice" language="en-US">
-    Please speak your answer after the tone. Take as long as you need. Press any key when you are finished.
+  <Say voice="Polly.Joanna-Neural" language="en-US">
+    Here is your question.
+  </Say>
+  <Pause length="1"/>
+  <Say voice="Polly.Joanna-Neural" language="en-US">
+    ${questionText}
+  </Say>
+  <Pause length="2"/>
+  <Say voice="Polly.Joanna-Neural" language="en-US">
+    Please speak your answer after the tone.
+  </Say>
+  <Pause length="1"/>
+  <Say voice="Polly.Joanna-Neural" language="en-US">
+    Take as long as you need. Press any key when you are finished.
   </Say>
   <Record
     action="${action}"
@@ -114,7 +134,7 @@ export async function POST(req: NextRequest) {
     playBeep="true"
     transcribe="false"
   />
-  <Say voice="alice" language="en-US">
+  <Say voice="Polly.Joanna-Neural" language="en-US">
     We did not receive a recording. Please call back to try again. Goodbye.
   </Say>
   <Hangup/>
@@ -124,11 +144,20 @@ export async function POST(req: NextRequest) {
   // ── 3. Unknown caller ─────────────────────────────────────────────────────────
   return twimlResponse(`<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="alice" language="en-US">
-    Welcome to Basalith.
-    We did not recognize your phone number.
-    Please ask the archive owner to add your phone number to your contributor profile.
-    Goodbye.
+  <Say voice="Polly.Joanna-Neural" language="en-US">
+    Hello, and thank you for calling Basalith.
+  </Say>
+  <Pause length="1"/>
+  <Say voice="Polly.Joanna-Neural" language="en-US">
+    We were not able to find your phone number in our records.
+  </Say>
+  <Pause length="1"/>
+  <Say voice="Polly.Joanna-Neural" language="en-US">
+    To get started, please ask the person who invited you to add your number to your profile.
+  </Say>
+  <Pause length="1"/>
+  <Say voice="Polly.Joanna-Neural" language="en-US">
+    Once they do, you are welcome to call back. Take care.
   </Say>
   <Hangup/>
 </Response>`)
