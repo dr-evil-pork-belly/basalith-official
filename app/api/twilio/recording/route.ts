@@ -13,6 +13,7 @@ export async function POST(req: NextRequest) {
   const contributorId = searchParams.get('contributorId') ?? ''
   const questionId    = searchParams.get('questionId')    ?? ''
   const archiveId     = searchParams.get('archiveId')     ?? ''
+  const isOwner       = searchParams.get('isOwner') === 'true'
 
   const formData         = await req.formData()
   const recordingUrl     = formData.get('RecordingUrl')     as string | null
@@ -86,46 +87,56 @@ export async function POST(req: NextRequest) {
       mime_type:         'audio/mp3',
     })
 
-    // Create owner_deposit from transcript
-    let depositId: string | null = null
+    // Persist transcript
     if (transcript && transcript.length > 20) {
-      const { data: deposit } = await supabaseAdmin
-        .from('owner_deposits')
-        .insert({
+      if (isOwner) {
+        // Owner deposit — feeds directly into entity accuracy
+        await supabaseAdmin.from('owner_deposits').insert({
           archive_id:     archiveId,
-          prompt:         'Phone call recording',
+          prompt:         'Phone call deposit',
           response:       transcript,
           essence_status: 'pending',
           source:         'phone_recording',
         })
-        .select('id')
-        .single()
-      depositId = deposit?.id ?? null
-
-      // Mark question answered
-      if (questionId && depositId) {
-        await supabaseAdmin
-          .from('contributor_questions')
-          .update({ status: 'answered', answer_text: transcript, answered_at: new Date().toISOString(), deposit_id: depositId })
-          .eq('id', questionId)
-      }
-
-      // Save to labels so it surfaces in family memories feed
-      if (contributorId) {
-        const { data: contrib } = await supabaseAdmin
-          .from('contributors')
-          .select('name')
-          .eq('id', contributorId)
+      } else {
+        // Contributor — save to owner_deposits + labels + mark question answered
+        const { data: deposit } = await supabaseAdmin
+          .from('owner_deposits')
+          .insert({
+            archive_id:     archiveId,
+            prompt:         'Phone call recording',
+            response:       transcript,
+            essence_status: 'pending',
+            source:         'phone_recording',
+          })
+          .select('id')
           .single()
 
-        if (contrib) {
-          await supabaseAdmin.from('labels').insert({
-            archive_id:        archiveId,
-            labelled_by:       contrib.name,
-            what_was_happening: transcript,
-            is_primary_label:  false,
-            essence_status:    'pending',
-          })
+        const depositId = deposit?.id ?? null
+
+        if (questionId && depositId) {
+          await supabaseAdmin
+            .from('contributor_questions')
+            .update({ status: 'answered', answer_text: transcript, answered_at: new Date().toISOString(), deposit_id: depositId })
+            .eq('id', questionId)
+        }
+
+        if (contributorId) {
+          const { data: contrib } = await supabaseAdmin
+            .from('contributors')
+            .select('name')
+            .eq('id', contributorId)
+            .single()
+
+          if (contrib) {
+            await supabaseAdmin.from('labels').insert({
+              archive_id:         archiveId,
+              labelled_by:        contrib.name,
+              what_was_happening: transcript,
+              is_primary_label:   false,
+              essence_status:     'pending',
+            })
+          }
         }
       }
     }
@@ -145,7 +156,13 @@ export async function POST(req: NextRequest) {
   }
 
   const siteUrl     = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
-  const continueUrl = `${siteUrl}/api/twilio/continue?contributorId=${contributorId}&archiveId=${archiveId}`
+  const continueUrl = isOwner
+    ? `${siteUrl}/api/twilio/continue?archiveId=${archiveId}&isOwner=true`
+    : `${siteUrl}/api/twilio/continue?contributorId=${contributorId}&archiveId=${archiveId}`
+
+  const continuePrompt = isOwner
+    ? 'Would you like to record another memory? Press 1 to continue, or hang up when you are done.'
+    : 'Would you like to answer another question? Press 1 to continue, or hang up when you are done.'
 
   return twimlResponse(`<?xml version="1.0" encoding="UTF-8"?>
 <Response>
@@ -154,12 +171,12 @@ export async function POST(req: NextRequest) {
   </Say>
   <Pause length="1"/>
   <Say voice="alice" language="en-US">
-    Would you like to answer another question? Press 1 to continue, or hang up when you are done.
+    ${continuePrompt}
   </Say>
   <Gather numDigits="1" action="${continueUrl}" method="POST" timeout="10">
   </Gather>
   <Say voice="alice" language="en-US">
-    Thank you for contributing to the archive. Goodbye.
+    Thank you. Goodbye.
   </Say>
   <Hangup/>
 </Response>`)

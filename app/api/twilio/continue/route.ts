@@ -11,6 +11,7 @@ export async function POST(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const contributorId = searchParams.get('contributorId') ?? ''
   const archiveId     = searchParams.get('archiveId')     ?? ''
+  const isOwner       = searchParams.get('isOwner') === 'true'
 
   const formData = await req.formData()
   const digit    = formData.get('Digits') as string | null
@@ -19,13 +20,38 @@ export async function POST(req: NextRequest) {
     return twimlResponse(`<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Say voice="alice" language="en-US">
-    Thank you for contributing to the archive. Goodbye.
+    Thank you. Goodbye.
   </Say>
   <Hangup/>
 </Response>`)
   }
 
-  // Get next pending question
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+
+  // Owner — free-form deposit, no question lookup needed
+  if (isOwner) {
+    const action = `${siteUrl}/api/twilio/recording?archiveId=${archiveId}&isOwner=true`
+    return twimlResponse(`<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="alice" language="en-US">
+    Please share another memory. Speak after the tone. Press any key when finished.
+  </Say>
+  <Record
+    action="${action}"
+    method="POST"
+    maxLength="300"
+    finishOnKey="*"
+    playBeep="true"
+    transcribe="false"
+  />
+  <Say voice="alice" language="en-US">
+    We did not receive a recording. Goodbye.
+  </Say>
+  <Hangup/>
+</Response>`)
+  }
+
+  // Contributor — get next pending question
   const { data: questions } = await supabaseAdmin
     .from('contributor_questions')
     .select('id, question_text')
@@ -34,13 +60,11 @@ export async function POST(req: NextRequest) {
     .order('created_at', { ascending: true })
     .limit(1)
 
-  const question = questions?.[0] ?? null
-
+  const question     = questions?.[0] ?? null
   const questionText = question?.question_text
     ?? 'Tell me another memory that matters to you.'
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
-  const action  = `${siteUrl}/api/twilio/recording?contributorId=${contributorId}&questionId=${question?.id ?? ''}&archiveId=${archiveId}`
+  const action = `${siteUrl}/api/twilio/recording?contributorId=${contributorId}&questionId=${question?.id ?? ''}&archiveId=${archiveId}`
 
   return twimlResponse(`<?xml version="1.0" encoding="UTF-8"?>
 <Response>
