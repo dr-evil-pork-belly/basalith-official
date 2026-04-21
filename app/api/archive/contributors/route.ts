@@ -31,52 +31,24 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'archiveId and email required' }, { status: 400 })
     }
 
-    const trimmedEmail = email.trim()
-
-    const { data: existing } = await supabaseAdmin
+    const { data, error } = await supabaseAdmin
       .from('contributors')
-      .select('id, name, email, role, status, photos_labelled, created_at, access_token, relationship, phone')
-      .eq('archive_id', archiveId)
-      .eq('email', trimmedEmail)
-      .maybeSingle()
-
-    let data: typeof existing = null
-    let dbError: { message: string } | null = null
-
-    if (existing) {
-      const { data: updated, error: updateErr } = await supabaseAdmin
-        .from('contributors')
-        .update({
-          name:         name?.trim()     ?? existing.name,
-          role:         role             ?? existing.role,
-          relationship: relationship     ?? existing.relationship ?? 'other',
-          status:       'active',
-          phone:        phone?.trim()    ?? existing.phone ?? null,
-        })
-        .eq('id', existing.id)
-        .select('id, name, email, role, status, photos_labelled, created_at, access_token, relationship, phone')
-        .single()
-      data    = updated
-      dbError = updateErr
-    } else {
-      const { data: inserted, error: insertErr } = await supabaseAdmin
-        .from('contributors')
-        .insert({
+      .upsert(
+        {
           archive_id:   archiveId,
-          email:        trimmedEmail,
-          name:         name?.trim()     ?? null,
-          role:         role             ?? null,
-          relationship: relationship     ?? 'other',
+          email:        email.trim(),
+          name:         name?.trim()  ?? null,
+          role:         role          ?? null,
+          relationship: relationship  ?? 'other',
           status:       'active',
-          phone:        phone?.trim()    ?? null,
-        })
-        .select('id, name, email, role, status, photos_labelled, created_at, access_token, relationship, phone')
-        .single()
-      data    = inserted
-      dbError = insertErr
-    }
+          phone:        phone?.trim() ?? null,
+        },
+        { onConflict: 'archive_id,email', ignoreDuplicates: false },
+      )
+      .select('id, name, email, role, status, photos_labelled, created_at, access_token, relationship, phone')
+      .single()
 
-    if (dbError || !data) return NextResponse.json({ error: dbError?.message ?? 'Failed to save contributor' }, { status: 500 })
+    if (error || !data) return NextResponse.json({ error: error?.message ?? 'Failed to save contributor' }, { status: 500 })
 
     // Generate or refresh access token (best-effort)
     let portalToken: string | null = null
