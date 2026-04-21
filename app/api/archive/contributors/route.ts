@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
 
   const { data, error } = await supabaseAdmin
     .from('contributors')
-    .select('id, name, email, role, status, photos_labelled, created_at, access_token, relationship')
+    .select('id, name, email, role, status, photos_labelled, created_at, access_token, relationship, phone')
     .eq('archive_id', archiveId)
     .eq('status', 'active')
     .order('created_at', { ascending: false })
@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const { archiveId, name, email, role, relationship } = await req.json()
+    const { archiveId, name, email, role, relationship, phone } = await req.json()
     if (!archiveId || !email) {
       return NextResponse.json({ error: 'archiveId and email required' }, { status: 400 })
     }
@@ -41,10 +41,11 @@ export async function POST(req: NextRequest) {
           role:         role             ?? null,
           relationship: relationship     ?? 'other',
           status:       'active',
+          phone:        phone?.trim()    ?? null,
         },
         { onConflict: 'archive_id,email' },
       )
-      .select('id, name, email, role, status, photos_labelled, created_at, access_token, relationship')
+      .select('id, name, email, role, status, photos_labelled, created_at, access_token, relationship, phone')
       .single()
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
@@ -93,6 +94,7 @@ export async function POST(req: NextRequest) {
             ownerName:   archive.owner_name ?? '',
             portalUrl,
             siteUrl,
+            twilioPhone: process.env.NEXT_PUBLIC_TWILIO_PHONE_NUMBER ?? null,
           }),
         })
       }
@@ -149,6 +151,7 @@ export async function PATCH(req: NextRequest) {
         ownerName:   archive.owner_name ?? '',
         portalUrl,
         siteUrl,
+        twilioPhone: process.env.NEXT_PUBLIC_TWILIO_PHONE_NUMBER ?? null,
       }),
     })
 
@@ -193,6 +196,7 @@ function buildContributorInviteEmail({
   ownerName,
   portalUrl,
   siteUrl,
+  twilioPhone,
 }: {
   firstName:   string
   archiveName: string
@@ -200,6 +204,7 @@ function buildContributorInviteEmail({
   ownerName:   string
   portalUrl:   string | null
   siteUrl:     string
+  twilioPhone?: string | null
 }): string {
   return `<!DOCTYPE html>
 <html>
@@ -258,6 +263,21 @@ function buildContributorInviteEmail({
       Tonight you will receive your first photograph by email.
       Simply reply with whatever you remember — your memories go directly into the archive.
     </p>
+
+    ${twilioPhone ? `
+    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);padding:20px 24px;margin:0 0 28px">
+      <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#9DA3A8;margin:0 0 10px">
+        PREFER TO RECORD BY PHONE?
+      </p>
+      <p style="font-family:Georgia,serif;font-size:28px;font-weight:700;color:#F0EDE6;margin:0 0 10px;letter-spacing:0.05em">
+        ${twilioPhone}
+      </p>
+      <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#706C65;line-height:1.7;margin:0">
+        Call this number from your registered phone. A friendly voice will guide you through a few questions.
+        No login or password needed.
+      </p>
+    </div>
+    ` : ''}
 
     <div style="border-top:1px solid rgba(240,237,230,0.06);padding-top:24px">
       <a href="${siteUrl}" style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830;text-decoration:none">

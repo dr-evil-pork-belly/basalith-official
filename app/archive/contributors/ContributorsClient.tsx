@@ -13,6 +13,7 @@ type Contributor = {
   access_token:    string | null
   created_at:      string
   photos_labelled: number
+  phone:           string | null
 }
 
 type WitnessSessionRow = {
@@ -28,7 +29,7 @@ type WitnessSessionRow = {
 }
 
 const ROLES = ['Family Member', 'Close Friend', 'Legacy Guide', 'Curator', 'Researcher']
-const INITIAL_CONTRIB = { name: '', email: '', role: '', relationship: '' }
+const INITIAL_CONTRIB = { name: '', email: '', role: '', relationship: '', phone: '' }
 const INITIAL_INVITE  = {
   contributorName:  '',
   contributorEmail: '',
@@ -234,7 +235,7 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
       const res = await fetch('/api/archive/contributors', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ archiveId, name: form.name, email: form.email, role: form.role, relationship: form.relationship || 'other' }),
+        body:    JSON.stringify({ archiveId, name: form.name, email: form.email, role: form.role, relationship: form.relationship || 'other', phone: form.phone || null }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
@@ -324,6 +325,22 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
                 ))}
               </select>
             </div>
+          </div>
+          <div className="mb-5">
+            <label className={labelCls} style={labelStyle}>
+              Phone number <span style={{ color: '#3A3F44', fontWeight: 400 }}>(optional — for phone call recording)</span>
+            </label>
+            <input
+              type="tel"
+              placeholder="+1 555 000 0000"
+              value={form.phone}
+              onChange={setContrib('phone')}
+              className={inputCls}
+              style={inputStyle}
+            />
+            <p style={{ fontFamily: 'monospace', fontSize: '0.38rem', letterSpacing: '0.08em', color: '#3A3F44', marginTop: '0.4rem' }}>
+              Include country code. They can call {process.env.NEXT_PUBLIC_TWILIO_PHONE_NUMBER || 'your archive number'} to record stories by phone.
+            </p>
           </div>
           {addError && (
             <p style={{ fontFamily: 'monospace', fontSize: '0.4rem', color: '#8B5555', marginBottom: '1rem' }}>{addError}</p>

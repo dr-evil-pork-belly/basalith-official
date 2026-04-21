@@ -15,6 +15,7 @@ type ContributorProps = {
   voice_recordings:   number
   questions_answered: number
   photos_labelled:    number
+  phone:              string | null
 }
 
 type ArchiveProps = {
@@ -623,6 +624,110 @@ function VoiceSection({
   )
 }
 
+// ── Phone call section ────────────────────────────────────────────────────────
+
+function PhoneCallSection({
+  contributorId,
+  hasPhone,
+  token,
+}: {
+  contributorId: string
+  hasPhone:      boolean
+  token:         string
+}) {
+  const twilioPhone = process.env.NEXT_PUBLIC_TWILIO_PHONE_NUMBER
+  const [phone,     setPhone]     = useState('')
+  const [saving,    setSaving]    = useState(false)
+  const [saved,     setSaved]     = useState(false)
+  const [phoneOnFile, setPhoneOnFile] = useState(hasPhone)
+
+  if (!twilioPhone) return null
+
+  async function savePhone() {
+    if (!phone.trim()) return
+    setSaving(true)
+    try {
+      const res  = await fetch('/api/contribute/save-phone', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ token, phone: phone.trim() }),
+      })
+      if (res.ok) {
+        setSaved(true)
+        setPhoneOnFile(true)
+      }
+    } catch {}
+    setSaving(false)
+  }
+
+  return (
+    <SectionCard title="Call in your stories">
+      {phoneOnFile ? (
+        <div>
+          <p className="font-serif" style={{ fontWeight: 700, fontSize: '1.8rem', color: '#F0EDE6', letterSpacing: '0.04em', marginBottom: '0.5rem', lineHeight: 1 }}>
+            {twilioPhone}
+          </p>
+          <p className="font-serif italic" style={{ fontSize: '0.9rem', color: '#9DA3A8', lineHeight: 1.75, marginBottom: '0.75rem' }}>
+            Call this number from your registered phone. A friendly voice will guide you through a question.
+            No login or password needed.
+          </p>
+          <p style={{ fontFamily: 'monospace', fontSize: '0.38rem', letterSpacing: '0.14em', color: '#5C6166' }}>
+            CALL FROM YOUR REGISTERED PHONE · ANY TIME
+          </p>
+        </div>
+      ) : (
+        <div>
+          <p className="font-serif italic" style={{ fontSize: '0.9rem', color: '#9DA3A8', lineHeight: 1.75, marginBottom: '1.25rem' }}>
+            Add your phone number to record stories by phone call. No login needed — just call and speak.
+          </p>
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+            <input
+              type="tel"
+              value={phone}
+              onChange={e => setPhone(e.target.value)}
+              placeholder="+1 555 000 0000"
+              style={{
+                background:   'transparent',
+                border:       'none',
+                borderBottom: '1px solid rgba(255,255,255,0.15)',
+                color:        '#F0EDE6',
+                fontFamily:   'Georgia, serif',
+                fontSize:     '1rem',
+                padding:      '0.4rem 0',
+                outline:      'none',
+                flex:         1,
+                minWidth:     '160px',
+              }}
+            />
+            <button
+              onClick={savePhone}
+              disabled={!phone.trim() || saving}
+              style={{
+                background:    phone.trim() ? '#C4A24A' : 'rgba(196,162,74,0.2)',
+                border:        'none',
+                borderRadius:  '2px',
+                padding:       '0.5rem 1.25rem',
+                minHeight:     '44px',
+                fontFamily:    'monospace',
+                fontSize:      '0.4rem',
+                letterSpacing: '0.25em',
+                textTransform: 'uppercase',
+                color:         phone.trim() ? '#0A0908' : '#5C6166',
+                cursor:        phone.trim() && !saving ? 'pointer' : 'not-allowed',
+              }}
+            >
+              {saving ? 'Saving...' : saved ? 'Saved' : 'Save Number'}
+            </button>
+          </div>
+          <p style={{ fontFamily: 'monospace', fontSize: '0.38rem', letterSpacing: '0.1em', color: '#3A3F44', marginTop: '0.75rem' }}>
+            Include country code. Your number is only used for call-in recording.
+          </p>
+        </div>
+      )}
+    </SectionCard>
+  )
+}
+
 // ── Contributions section ──────────────────────────────────────────────────────
 
 function ContributionsSection({
@@ -737,6 +842,13 @@ export default function ContributeClient({
           archiveId={archive.id}
           subjectName={subjectName}
           onRecorded={() => setVoiceRecordings(prev => prev + 1)}
+        />
+
+        {/* Phone call recording */}
+        <PhoneCallSection
+          contributorId={contributor.id}
+          hasPhone={!!contributor.phone}
+          token={token}
         />
 
         {/* Contributions summary */}
