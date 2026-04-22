@@ -25,40 +25,50 @@ export async function POST(req: Request) {
 
     const { data: archive, error: archiveError } = await supabaseAdmin
       .from('archives')
-      .select('id, name, family_name, owner_name, owner_email, magic_link_token, preferred_language')
+      .select('id, name, family_name, owner_name, owner_email, preferred_language')
       .eq('id', archiveId)
       .maybeSingle()
 
     console.log('[send-magic-link] archiveError:', archiveError?.message)
-    console.log('[send-magic-link] archive:', archive?.id, archive?.name, 'token:', !!archive?.magic_link_token, 'email:', archive?.owner_email)
+    console.log('[send-magic-link] archive:', archive?.id, archive?.name, 'email:', archive?.owner_email)
 
     if (!archive?.owner_email) {
       return Response.json({ error: 'Archive not found' }, { status: 404 })
     }
 
+    // Fetch magic_link_token separately — column may not exist yet on older DBs
+    const { data: tokenData, error: tokenError } = await supabaseAdmin
+      .from('archives')
+      .select('magic_link_token')
+      .eq('id', archiveId)
+      .maybeSingle()
+
+    console.log('[send-magic-link] tokenError:', tokenError?.message)
+    console.log('[send-magic-link] has token:', !!tokenData?.magic_link_token)
+
+    let magicToken: string = tokenData?.magic_link_token ?? ''
+
     // Generate token on the fly if missing (existing archives pre-migration)
-    if (!archive.magic_link_token) {
+    if (!magicToken) {
       console.log('[send-magic-link] no token — generating one')
-      const newToken = Array.from(crypto.getRandomValues(new Uint8Array(32)))
+      magicToken = Array.from(crypto.getRandomValues(new Uint8Array(32)))
         .map(b => b.toString(16).padStart(2, '0'))
         .join('')
 
-      await supabaseAdmin
+      const { error: updateError } = await supabaseAdmin
         .from('archives')
         .update({
-          magic_link_token:     newToken,
+          magic_link_token:      magicToken,
           magic_link_created_at: new Date().toISOString(),
         })
         .eq('id', archiveId)
 
-      archive.magic_link_token = newToken
+      console.log('[send-magic-link] token update error:', updateError?.message)
     }
-
-    console.log('[send-magic-link] has token:', !!archive.magic_link_token)
 
     const siteUrl      = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
     const fromEmail    = process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'
-    const magicLinkUrl = `${siteUrl}/api/archive/magic-login?token=${archive.magic_link_token}`
+    const magicLinkUrl = `${siteUrl}/api/archive/magic-login?token=${magicToken}`
     const firstName    = (archive.owner_name ?? archive.family_name).split(' ')[0]
     const isZh         = archive.preferred_language === 'zh'
 
