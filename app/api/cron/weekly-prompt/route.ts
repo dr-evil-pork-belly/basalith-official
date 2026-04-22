@@ -2,7 +2,8 @@ import { NextRequest } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
 import { DIMENSIONS } from '@/lib/entityAccuracy'
-import { getWeeklyPrompt, getWeekNumber } from '@/lib/weeklyPrompts'
+import { getWeeklyPrompt, getWeeklyPromptZh, getWeekNumber } from '@/lib/weeklyPrompts'
+import { t } from '@/lib/emailTranslations'
 import { generateQuestionsForContributor } from '@/lib/contributorToken'
 
 export const dynamic = 'force-dynamic'
@@ -35,7 +36,7 @@ export async function GET(req: NextRequest) {
 
   const { data: archives } = await supabaseAdmin
     .from('archives')
-    .select('id, name, family_name, owner_email, owner_name')
+    .select('id, name, family_name, owner_email, owner_name, preferred_language')
     .eq('status', 'active')
     .not('owner_email', 'is', null)
 
@@ -63,7 +64,10 @@ export async function GET(req: NextRequest) {
       const dimensionLabel = dimension?.label       ?? 'Wisdom and Lessons'
       const dimensionDesc  = dimension?.description ?? 'What you have learned from living'
 
-      const prompt        = getWeeklyPrompt(weakestDimension, weekNumber)
+      const lang           = (archive as any).preferred_language ?? 'en'
+      const prompt         = lang === 'zh'
+        ? getWeeklyPromptZh(weakestDimension, weekNumber)
+        : getWeeklyPrompt(weakestDimension, weekNumber)
       const ownerFirstName = archive.owner_name?.split(' ')[0] ?? 'there'
 
       // Overall accuracy for display
@@ -79,7 +83,7 @@ export async function GET(req: NextRequest) {
       await resend.emails.send({
         from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
         to:      archive.owner_email,
-        subject: `This week's question — ${archive.name}`,
+        subject: lang === 'zh' ? `本周问题 · ${archive.name}` : `This week's question — ${archive.name}`,
         html:    buildWeeklyPromptEmail({
           archiveName:      archive.name,
           ownerFirstName,
@@ -89,6 +93,7 @@ export async function GET(req: NextRequest) {
           overallScore,
           prompt,
           weekNumber,
+          lang,
         }),
       })
 
@@ -133,6 +138,7 @@ function buildWeeklyPromptEmail({
   overallScore,
   prompt,
   weekNumber,
+  lang = 'en',
 }: {
   archiveName:      string
   ownerFirstName:   string
@@ -142,10 +148,12 @@ function buildWeeklyPromptEmail({
   overallScore:     number
   prompt:           string
   weekNumber:       number
+  lang?:            string
 }): string {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
-  const dateStr = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).toUpperCase()
-  const depthLabel = getDepthLabel(overallScore)
+  const siteUrl    = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+  const dateLocale = lang === 'zh' ? 'zh-CN' : 'en-US'
+  const dateStr    = new Date().toLocaleDateString(dateLocale, { month: 'long', day: 'numeric', year: 'numeric' }).toUpperCase()
+  const depthLabel = getDepthLabel(overallScore, lang)
 
   return `<!DOCTYPE html>
 <html>
@@ -156,7 +164,7 @@ function buildWeeklyPromptEmail({
       ${archiveName.toUpperCase()}
     </p>
     <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830;margin:0">
-      MONDAY PROMPT · WEEK ${weekNumber} · ${dateStr}
+      ${lang === 'zh' ? `每周提问 · 第${weekNumber}周 · ${dateStr}` : `MONDAY PROMPT · WEEK ${weekNumber} · ${dateStr}`}
     </p>
   </div>
 
@@ -164,7 +172,7 @@ function buildWeeklyPromptEmail({
 
     <div style="margin-bottom:24px">
       <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;margin:0 0 8px">
-        THIS WEEK'S FOCUS
+        ${lang === 'zh' ? '本周焦点' : "THIS WEEK'S FOCUS"}
       </p>
       <p style="font-family:Georgia,serif;font-size:18px;font-weight:700;color:#F0EDE6;margin:0 0 4px">
         ${dimensionLabel}
@@ -190,7 +198,7 @@ function buildWeeklyPromptEmail({
 
     <a href="${siteUrl}/archive/entity"
       style="display:block;background:#C4A24A;color:#0A0908;font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;text-decoration:none;padding:14px 24px;text-align:center;margin-bottom:16px">
-      ANSWER THIS QUESTION →
+      ${t('weeklyPromptCTA', lang)}
     </a>
 
     <p style="font-family:Georgia,serif;font-size:13px;font-style:italic;color:#3A3830;text-align:center;margin:0 0 24px">
@@ -200,7 +208,7 @@ function buildWeeklyPromptEmail({
     <div style="border-top:1px solid rgba(240,237,230,0.06);margin:0 0 20px"></div>
 
     <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#706C65;margin:0 0 8px">
-      YOUR ENTITY · CURRENT DEPTH
+      ${lang === 'zh' ? '您的实体 · 当前深度' : 'YOUR ENTITY · CURRENT DEPTH'}
     </p>
     <p style="font-family:Georgia,serif;font-size:36px;font-weight:700;color:#F0EDE6;margin:0 0 4px;line-height:1">
       ${overallScore}%
@@ -226,7 +234,14 @@ function buildWeeklyPromptEmail({
 </html>`
 }
 
-function getDepthLabel(score: number): string {
+function getDepthLabel(score: number, lang = 'en'): string {
+  if (lang === 'zh') {
+    if (score >= 80) return '权威发言'
+    if (score >= 60) return '深度呈现'
+    if (score >= 40) return '逐渐成形'
+    if (score >= 20) return '仍在学习'
+    return '刚刚开始'
+  }
   if (score >= 80) return 'Speaking with authority'
   if (score >= 60) return 'Speaking with depth'
   if (score >= 40) return 'Taking shape'

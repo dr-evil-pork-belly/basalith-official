@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
+import { t } from '@/lib/emailTranslations'
 
 export const dynamic = 'force-dynamic'
 
@@ -35,7 +36,7 @@ export async function GET(req: NextRequest) {
 
   const { data: archives } = await supabaseAdmin
     .from('archives')
-    .select('id, name, family_name, owner_email, owner_name')
+    .select('id, name, family_name, owner_email, owner_name, preferred_language')
     .eq('status', 'active')
     .not('owner_email', 'is', null)
 
@@ -87,13 +88,17 @@ export async function GET(req: NextRequest) {
         : 0
       const weakestDimensions = (accuracyRows ?? []).slice(0, 3)
 
+      const lang           = (archive as any).preferred_language ?? 'en'
       const ownerFirstName = archive.owner_name?.split(' ')[0] ?? 'there'
-      const monthName      = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+      const dateLocale     = lang === 'zh' ? 'zh-CN' : 'en-US'
+      const monthName      = new Date().toLocaleDateString(dateLocale, { month: 'long', year: 'numeric' })
 
       await resend.emails.send({
         from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
         to:      archive.owner_email,
-        subject: `Your archive in ${monthName} — ${archive.name}`,
+        subject: lang === 'zh'
+          ? `${archive.name} · ${monthName}档案报告`
+          : `Your archive in ${monthName} — ${archive.name}`,
         html:    buildMonthlyReportEmail({
           archiveName:             archive.name,
           ownerFirstName,
@@ -111,6 +116,7 @@ export async function GET(req: NextRequest) {
           mostActiveCount:         mostActive?.[1]   ?? 0,
           mostLabeledDecade:       topDecade?.[0]?.decade ?? null,
           weakestDimensions,
+          lang,
         }),
       })
 
@@ -142,6 +148,7 @@ function buildMonthlyReportEmail({
   mostActiveCount,
   mostLabeledDecade,
   weakestDimensions,
+  lang = 'en',
 }: {
   archiveName:           string
   ownerFirstName:        string
@@ -159,12 +166,18 @@ function buildMonthlyReportEmail({
   mostActiveCount:       number
   mostLabeledDecade:     string | null
   weakestDimensions:     Array<{ dimension: string; accuracy_score: number }>
+  lang?:                 string
 }): string {
   const siteUrl    = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
   const hasActivity = newPhotos > 0 || newLabels > 0 || newDeposits > 0
-  const depthLabel  = getDepthLabel(overallScore)
+  const depthLabel  = getDepthLabel(overallScore, lang)
 
-  const statRows = [
+  const statRows = lang === 'zh' ? [
+    newPhotos       > 0 ? [newPhotos,       '张照片已上传']   : null,
+    newLabels       > 0 ? [newLabels,       '条家族记忆已贡献'] : null,
+    newContributors > 0 ? [newContributors, '位新贡献者加入']  : null,
+    newDeposits     > 0 ? [newDeposits,     '条直接存档记录']  : null,
+  ].filter(Boolean) as [number, string][] : [
     newPhotos    > 0 ? [newPhotos,    newPhotos    === 1 ? 'photograph uploaded'         : 'photographs uploaded']        : null,
     newLabels    > 0 ? [newLabels,    newLabels    === 1 ? 'family memory contributed'   : 'family memories contributed'] : null,
     newContributors > 0 ? [newContributors, newContributors === 1 ? 'new contributor joined' : 'new contributors joined'] : null,
@@ -180,14 +193,14 @@ function buildMonthlyReportEmail({
       ${archiveName.toUpperCase()}
     </p>
     <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830;margin:0">
-      MONTHLY REPORT · ${monthName.toUpperCase()}
+      ${lang === 'zh' ? `月度报告 · ${monthName}` : `MONTHLY REPORT · ${monthName.toUpperCase()}`}
     </p>
   </div>
 
   <div style="padding:32px">
 
     <p style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#F0EDE6;margin:0 0 8px">
-      ${hasActivity ? 'Here is what your archive built this month.' : 'Your archive is waiting for you.'}
+      ${hasActivity ? t('monthlyReportTitle', lang) : (lang === 'zh' ? '您的档案在等待您。' : 'Your archive is waiting for you.')}
     </p>
     <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#706C65;margin:0 0 32px">
       ${monthName} · ${archiveName}
@@ -195,7 +208,7 @@ function buildMonthlyReportEmail({
 
     ${hasActivity ? `
     <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;margin:0 0 16px">
-      THIS MONTH
+      ${lang === 'zh' ? '本月' : 'THIS MONTH'}
     </p>
     <table style="width:100%;border-collapse:collapse;margin-bottom:32px">
       ${statRows.map(([n, label]) => `
@@ -218,7 +231,7 @@ function buildMonthlyReportEmail({
     ${mostActiveContributor ? `
     <div style="background:rgba(196,162,74,0.04);border:1px solid rgba(196,162,74,0.1);padding:16px 20px;margin-bottom:24px">
       <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;margin:0 0 8px">
-        MOST ACTIVE CONTRIBUTOR
+        ${lang === 'zh' ? '最活跃的贡献者' : 'MOST ACTIVE CONTRIBUTOR'}
       </p>
       <p style="font-family:Georgia,serif;font-size:18px;font-weight:700;color:#F0EDE6;margin:0 0 4px">
         ${mostActiveContributor}
@@ -238,7 +251,7 @@ function buildMonthlyReportEmail({
     <div style="border-top:1px solid rgba(240,237,230,0.06);margin:0 0 24px"></div>
 
     <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;margin:0 0 8px">
-      YOUR ENTITY · OVERALL DEPTH
+      ${lang === 'zh' ? '您的实体 · 整体深度' : 'YOUR ENTITY · OVERALL DEPTH'}
     </p>
     <p style="font-family:Georgia,serif;font-size:48px;font-weight:700;color:#F0EDE6;margin:0 0 4px;line-height:1">
       ${overallScore}%
@@ -273,7 +286,7 @@ function buildMonthlyReportEmail({
 
     <a href="${siteUrl}/archive/dashboard"
       style="display:block;background:#C4A24A;color:#0A0908;font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;text-decoration:none;padding:14px 24px;text-align:center">
-      VIEW YOUR ARCHIVE →
+      ${t('viewArchive', lang)}
     </a>
 
   </div>
@@ -290,7 +303,14 @@ function buildMonthlyReportEmail({
 </html>`
 }
 
-function getDepthLabel(score: number): string {
+function getDepthLabel(score: number, lang = 'en'): string {
+  if (lang === 'zh') {
+    if (score >= 80) return '权威发言——我们最丰富的档案之一'
+    if (score >= 60) return '深度呈现——已达到卓越的准确度'
+    if (score >= 40) return '逐渐成形——您的实体正在变得清晰'
+    if (score >= 20) return '仍在学习——真正的深度正在涌现'
+    return '刚刚开始——基础正在奠定'
+  }
   if (score >= 80) return 'Speaking with authority — one of our richest archives'
   if (score >= 60) return 'Speaking with depth — remarkable accuracy achieved'
   if (score >= 40) return 'Taking shape — your entity is becoming recognizable'

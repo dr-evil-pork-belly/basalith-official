@@ -29,7 +29,17 @@ type WitnessSessionRow = {
 }
 
 const ROLES = ['Family Member', 'Close Friend', 'Legacy Guide', 'Curator', 'Researcher']
-const INITIAL_CONTRIB = { name: '', email: '', role: '', relationship: '', phone: '' }
+const LANGUAGES = [
+  { value: 'en',  label: 'English (default)' },
+  { value: 'zh',  label: '中文 (Chinese)' },
+  { value: 'es',  label: 'Español (Spanish)' },
+  { value: 'tl',  label: 'Tagalog' },
+  { value: 'vi',  label: 'Vietnamese (Tiếng Việt)' },
+  { value: 'ko',  label: 'Korean (한국어)' },
+  { value: 'other', label: 'Other' },
+]
+
+const INITIAL_CONTRIB = { name: '', email: '', role: '', relationship: '', phone: '', preferred_language: 'en' }
 const INITIAL_INVITE  = {
   contributorName:  '',
   contributorEmail: '',
@@ -235,7 +245,7 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
       const res = await fetch('/api/archive/contributors', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ archiveId, name: form.name, email: form.email, role: form.role, relationship: form.relationship || 'other', phone: form.phone || null }),
+        body:    JSON.stringify({ archiveId, name: form.name, email: form.email, role: form.role, relationship: form.relationship || 'other', phone: form.phone || null, preferred_language: form.preferred_language || 'en' }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
@@ -341,6 +351,16 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
             <p style={{ fontFamily: 'monospace', fontSize: '0.38rem', letterSpacing: '0.08em', color: '#3A3F44', marginTop: '0.4rem' }}>
               Include country code. They can call {process.env.NEXT_PUBLIC_TWILIO_PHONE_NUMBER || 'your archive number'} to record stories by phone.
             </p>
+          </div>
+          <div className="mb-5">
+            <label className={labelCls} style={labelStyle}>
+              Preferred language <span style={{ color: '#3A3F44', fontWeight: 400 }}>(optional — for emails and portal)</span>
+            </label>
+            <select value={form.preferred_language} onChange={setContrib('preferred_language')} className={inputCls} style={{ ...inputStyle, cursor: 'pointer' }}>
+              {LANGUAGES.map(l => (
+                <option key={l.value} value={l.value} style={{ background: '#111112' }}>{l.label}</option>
+              ))}
+            </select>
           </div>
           {addError && (
             <p style={{ fontFamily: 'monospace', fontSize: '0.4rem', color: '#8B5555', marginBottom: '1rem' }}>{addError}</p>

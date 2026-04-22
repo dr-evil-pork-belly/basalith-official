@@ -3,6 +3,7 @@ import { resend } from '@/lib/resend'
 import { NextResponse } from 'next/server'
 import { WISDOM_SESSIONS } from '@/lib/wisdomSessions'
 import { DIMENSIONS } from '@/lib/entityAccuracy'
+import { t } from '@/lib/emailTranslations'
 
 export async function POST(req: Request) {
   try {
@@ -78,9 +79,11 @@ export async function POST(req: Request) {
       `
     }).join('')
 
+    const lang           = archive.preferred_language ?? 'en'
     const ownerFirstName = archive.owner_name?.split(' ')[0] || 'there'
     const archiveName    = archive.name || 'Your Archive'
-    const dateStr        = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
+    const dateLocale     = lang === 'zh' ? 'zh-CN' : 'en-US'
+    const dateStr        = new Date().toLocaleDateString(dateLocale, { weekday: 'long', month: 'long', day: 'numeric' })
 
     // Upcoming significant dates within 7 days
     const todayDate  = new Date()
@@ -110,7 +113,7 @@ export async function POST(req: Request) {
     const upcomingDatesHtml = soonDates.length > 0 ? `
   <div style="margin:0 0 32px;padding:20px 24px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:2px">
     <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#5C6166;text-transform:uppercase;margin:0 0 16px">
-      COMING UP THIS WEEK
+      ${lang === 'zh' ? '本周即将到来' : 'COMING UP THIS WEEK'}
     </p>
     ${soonDates.map(d => `
     <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px">
@@ -121,7 +124,9 @@ export async function POST(req: Request) {
       <div>
         <p style="font-family:Georgia,serif;font-size:15px;color:#F0EDE6;margin:0 0 2px">${d.person_name}</p>
         <p style="font-family:'Courier New',monospace;font-size:9px;letter-spacing:2px;color:#5C6166;margin:0;text-transform:uppercase">
-          ${d.days === 0 ? 'TODAY' : d.days === 1 ? 'TOMORROW' : `IN ${d.days} DAYS`}
+          ${lang === 'zh'
+  ? (d.days === 0 ? '今天' : d.days === 1 ? '明天' : `${d.days} 天后`)
+  : (d.days === 0 ? 'TODAY' : d.days === 1 ? 'TOMORROW' : `IN ${d.days} DAYS`)}
         </p>
       </div>
     </div>`).join('')}
@@ -165,7 +170,7 @@ export async function POST(req: Request) {
         wisdomSessionHtml = `
   <div style="margin:32px 0;padding:24px 32px;border-left:3px solid rgba(196,162,74,0.6);background:rgba(196,162,74,0.04)">
     <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;text-transform:uppercase;margin:0 0 12px">
-      YOUR MONTHLY SESSION IS READY
+      ${lang === 'zh' ? '本月精华课程已就绪' : 'YOUR MONTHLY SESSION IS READY'}
     </p>
     <p style="font-family:Georgia,serif;font-size:18px;font-weight:700;color:#F0EDE6;margin:0 0 8px">
       This month: ${session.title}
@@ -196,7 +201,7 @@ export async function POST(req: Request) {
         voiceNudgeHtml = `
   <div style="margin:32px 0;padding:24px 32px;border-left:3px solid rgba(196,162,74,0.3);background:rgba(196,162,74,0.03)">
     <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#706C65;text-transform:uppercase;margin:0 0 12px">
-      YOUR VOICE IS NOT YET IN YOUR ARCHIVE
+      ${lang === 'zh' ? '您的声音尚未保存到档案' : 'YOUR VOICE IS NOT YET IN YOUR ARCHIVE'}
     </p>
     <p style="font-family:Georgia,serif;font-size:16px;font-style:italic;color:#F0EDE6;line-height:1.7;margin:0 0 8px">
       Your archive has photographs and family memories. But your voice is not yet preserved.
@@ -214,7 +219,7 @@ export async function POST(req: Request) {
     await resend.emails.send({
       from:    `${archiveName} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
       to:      archive.owner_email,
-      subject: `${archiveName} · Today's memories`,
+      subject: `${archiveName} · ${t('todayMemories', lang)}`,
       html: `<body style="background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:600px;margin:0 auto;padding:0">
 
   <div style="padding:32px 32px 0">
@@ -236,8 +241,8 @@ export async function POST(req: Request) {
 
     <p style="font-size:20px;font-style:italic;color:#F0EDE6;line-height:1.5;margin:0 0 24px">
       ${recentLabels.length === 1
-        ? `Someone remembered something, ${ownerFirstName}.`
-        : `${recentLabels.length} people remembered something, ${ownerFirstName}.`}
+        ? (lang === 'zh' ? `有人分享了一段回忆，${ownerFirstName}。` : `Someone remembered something, ${ownerFirstName}.`)
+        : (lang === 'zh' ? `${recentLabels.length} 位成员分享了回忆，${ownerFirstName}。` : `${recentLabels.length} people remembered something, ${ownerFirstName}.`)}
     </p>
 
     <div style="border-left:2px solid rgba(196,162,74,0.3);padding-left:20px;margin:0 0 32px">
@@ -271,7 +276,7 @@ export async function POST(req: Request) {
     <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830;line-height:1.8;margin:24px 0 0">
       BASALITH &middot; XYZ<br>
       ${archiveName} &middot; Generation I<br>
-      Your archive grows every day.
+      ${lang === 'zh' ? '您的档案每天都在成长。' : 'Your archive grows every day.'}
     </p>
   </div>
 

@@ -59,6 +59,7 @@ export default async function ContributePage({
         questions_answered: contributor.questions_answered  ?? 0,
         photos_labelled:    contributor.photos_labelled     ?? 0,
         phone:              contributor.phone               ?? null,
+        preferred_language: contributor.preferred_language  ?? 'en',
       }}
       archive={{
         id:          archive.id,

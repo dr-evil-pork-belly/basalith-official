@@ -3,6 +3,7 @@ import {
   Section, Img, Text, Hr,
   Preview, Font,
 } from '@react-email/components'
+import { t } from '@/lib/emailTranslations'
 
 interface PhotographEmailProps {
   archiveName:     string
@@ -14,6 +15,7 @@ interface PhotographEmailProps {
   contributorName: string
   sessionId:       string
   portalUrl?:      string | null
+  lang?:           string
 }
 
 export function PhotographEmail({
@@ -21,6 +23,7 @@ export function PhotographEmail({
   photographUrl,
   yearEstimate,
   portalUrl,
+  lang = 'en',
 }: PhotographEmailProps) {
   return (
     <Html>
@@ -28,7 +31,7 @@ export function PhotographEmail({
         <Font fontFamily="Georgia" fallbackFontFamily="serif" />
       </Head>
       <Preview>
-        {archiveName} · {yearEstimate || 'Unknown year'} · Do you know this moment?
+        {archiveName} · {yearEstimate || 'Unknown year'} · {t('doYouKnowThisMoment', lang)}
       </Preview>
       <Body style={{ backgroundColor: '#0A0908', fontFamily: 'Georgia, serif', margin: 0, padding: 0 }}>
         <Container style={{ maxWidth: '600px', margin: '0 auto', backgroundColor: '#0A0908' }}>
@@ -82,7 +85,7 @@ export function PhotographEmail({
               lineHeight: '1.6',
               margin: '0 0 16px',
             }}>
-              What do you remember about this photograph?
+              {t('photoQuestion', lang)}
             </Text>
             <Text style={{
               fontFamily: 'Georgia, serif',
@@ -92,8 +95,7 @@ export function PhotographEmail({
               lineHeight: '1.8',
               margin: 0,
             }}>
-              Reply to this email with anything you know — who is in it, when and where it was
-              taken, what was happening, what you want the family to remember about this moment.
+              {t('photoReplyBody', lang)}
             </Text>
             <Text style={{
               fontFamily: 'Georgia, serif',
@@ -103,7 +105,7 @@ export function PhotographEmail({
               margin: '16px 0 0',
               lineHeight: '1.6',
             }}>
-              Every reply becomes part of {archiveName} permanently.
+              {t('photoReplyPermanent', lang)} {archiveName} {t('photoReplyPermanentEnd', lang)}
             </Text>
           </Section>
 
@@ -117,7 +119,7 @@ export function PhotographEmail({
                 color:      '#3A3830',
                 margin:     '0 0 8px',
               }}>
-                Want to do more than reply?
+                {t('photoMoreThanReply', lang)}
               </Text>
               <a href={portalUrl} style={{
                 fontFamily:    'Courier New, monospace',
@@ -126,7 +128,7 @@ export function PhotographEmail({
                 color:         '#C4A24A',
                 textDecoration: 'none',
               }}>
-                VISIT YOUR CONTRIBUTOR PORTAL →
+                {t('visitPortal', lang)}
               </a>
             </Section>
           )}
@@ -141,7 +143,7 @@ export function PhotographEmail({
               margin: 0,
               lineHeight: '1.8',
             }}>
-              BASALITH · XYZ{'\n'}{archiveName} · Generation I{'\n'}Reply to share your memory
+              BASALITH · XYZ{'\n'}{archiveName} · Generation I{'\n'}{t('replyWithMemory', lang)}
             </Text>
           </Section>
 

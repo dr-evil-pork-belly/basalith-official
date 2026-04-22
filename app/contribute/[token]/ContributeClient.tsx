@@ -16,7 +16,33 @@ type ContributorProps = {
   questions_answered: number
   photos_labelled:    number
   phone:              string | null
+  preferred_language: string
 }
+
+const PORTAL_UI = {
+  en: {
+    welcome:          (name: string) => `Welcome, ${name}.`,
+    contributions:    'Your contributions',
+    addPhotos:        'Add your photos',
+    videosAndDocs:    'Videos and documents',
+    recordMemory:     'Record a memory',
+    callInStories:    'Call in your stories',
+    questionsForYou:  'Questions for you',
+    footerNote:       'Everything you share here is preserved permanently.',
+    contributions_n:  (n: number) => `${n} CONTRIBUTION${n !== 1 ? 'S' : ''}`,
+  },
+  zh: {
+    welcome:          (name: string) => `欢迎您，${name}。`,
+    contributions:    '您的贡献',
+    addPhotos:        '上传照片',
+    videosAndDocs:    '视频和文件',
+    recordMemory:     '录制回忆',
+    callInStories:    '电话录制故事',
+    questionsForYou:  '您的专属问题',
+    footerNote:       '您在此分享的一切都将被永久保存。',
+    contributions_n:  (n: number) => `${n} 条贡献`,
+  },
+} as const
 
 type ArchiveProps = {
   id:          string
@@ -88,10 +114,12 @@ function QuestionsSection({
   token,
   archiveName,
   ownerName,
+  lang = 'en',
 }: {
   token:       string
   archiveName: string
   ownerName:   string
+  lang?:       string
 }) {
   const [questions,    setQuestions]    = useState<Question[]>([])
   const [answers,      setAnswers]      = useState<Record<string, string>>({})
@@ -137,7 +165,7 @@ function QuestionsSection({
 
   if (loading) {
     return (
-      <SectionCard title="Questions for you" prominent>
+      <SectionCard title={PORTAL_UI[lang === 'zh' ? 'zh' : 'en'].questionsForYou} prominent>
         <div style={{ height: '80px', background: 'rgba(255,255,255,0.03)', borderRadius: '2px', animation: 'pulse 1.5s ease-in-out infinite' }} />
       </SectionCard>
     )
@@ -149,8 +177,10 @@ function QuestionsSection({
 
   return (
     <SectionCard
-      title="Questions for you"
-      subtitle={`The archive has ${questions.length} question${questions.length !== 1 ? 's' : ''} only you can answer.`}
+      title={PORTAL_UI[lang === 'zh' ? 'zh' : 'en'].questionsForYou}
+      subtitle={lang === 'zh'
+        ? `档案中有 ${questions.length} 个只有您能回答的问题。`
+        : `The archive has ${questions.length} question${questions.length !== 1 ? 's' : ''} only you can answer.`}
       prominent
     >
       <div className="flex flex-col" style={{ gap: '2rem' }}>
@@ -230,11 +260,13 @@ function PhotoUploadSection({
   archiveName,
   subjectName,
   onUploaded,
+  lang = 'en',
 }: {
   token:       string
   archiveName: string
   subjectName: string
   onUploaded:  (count: number) => void
+  lang?:       string
 }) {
   const [files,    setFiles]    = useState<File[]>([])
   const [status,   setStatus]   = useState<UploadStatus>('idle')
@@ -322,8 +354,10 @@ function PhotoUploadSection({
 
   return (
     <SectionCard
-      title="Add your photos"
-      subtitle={`Photographs you have of ${subjectName} from your own collection.`}
+      title={PORTAL_UI[lang === 'zh' ? 'zh' : 'en'].addPhotos}
+      subtitle={lang === 'zh'
+        ? `您收藏中有关${subjectName}的照片。`
+        : `Photographs you have of ${subjectName} from your own collection.`}
     >
       <div
         style={{
@@ -423,9 +457,11 @@ function PhotoUploadSection({
 function MediaUploadSection({
   token,
   onUploaded,
+  lang = 'en',
 }: {
   token:      string
   onUploaded: () => void
+  lang?:      string
 }) {
   const [file,     setFile]     = useState<File | null>(null)
   const [status,   setStatus]   = useState<UploadStatus>('idle')
@@ -505,8 +541,8 @@ function MediaUploadSection({
 
   return (
     <SectionCard
-      title="Videos and documents"
-      subtitle="Home videos, letters, documents, anything from your collection."
+      title={PORTAL_UI[lang === 'zh' ? 'zh' : 'en'].videosAndDocs}
+      subtitle={lang === 'zh' ? '家庭录像、信件、文件——您收藏中的任何内容。' : 'Home videos, letters, documents, anything from your collection.'}
     >
       <div
         style={{
@@ -579,17 +615,21 @@ function VoiceSection({
   archiveId,
   subjectName,
   onRecorded,
+  lang = 'en',
 }: {
   archiveId:   string
   subjectName: string
   onRecorded:  () => void
+  lang?:       string
 }) {
   const [showRecorder, setShowRecorder] = useState(false)
 
   return (
     <SectionCard
-      title="Record a memory"
-      subtitle={`Speak in any language. Share a memory of ${subjectName} in your own words.`}
+      title={PORTAL_UI[lang === 'zh' ? 'zh' : 'en'].recordMemory}
+      subtitle={lang === 'zh'
+        ? `用任何语言讲述。用您自己的话分享关于${subjectName}的回忆。`
+        : `Speak in any language. Share a memory of ${subjectName} in your own words.`}
     >
       {!showRecorder ? (
         <button
@@ -630,10 +670,12 @@ function PhoneCallSection({
   contributorId,
   hasPhone,
   token,
+  lang = 'en',
 }: {
   contributorId: string
   hasPhone:      boolean
   token:         string
+  lang?:         string
 }) {
   const twilioPhone = process.env.NEXT_PUBLIC_TWILIO_PHONE_NUMBER
   const [phone,     setPhone]     = useState('')
@@ -661,7 +703,7 @@ function PhoneCallSection({
   }
 
   return (
-    <SectionCard title="Call in your stories">
+    <SectionCard title={PORTAL_UI[lang === 'zh' ? 'zh' : 'en'].callInStories}>
       {phoneOnFile ? (
         <div>
           <p className="font-serif" style={{ fontWeight: 700, fontSize: '1.8rem', color: '#F0EDE6', letterSpacing: '0.04em', marginBottom: '0.5rem', lineHeight: 1 }}>
@@ -736,17 +778,19 @@ function ContributionsSection({
   voiceRecordings,
   questionsAnswered,
   photosLabelled,
+  lang = 'en',
 }: {
   photosUploaded:    number
   videosUploaded:    number
   voiceRecordings:   number
   questionsAnswered: number
   photosLabelled:    number
+  lang?:             string
 }) {
   const total = photosUploaded + videosUploaded + voiceRecordings + questionsAnswered + photosLabelled
 
   return (
-    <SectionCard title="Your contributions">
+    <SectionCard title={PORTAL_UI[lang === 'zh' ? 'zh' : 'en'].contributions}>
       {total === 0 ? (
         <p className="font-serif italic" style={{ color: '#5C6166', fontSize: '0.9rem' }}>
           Nothing yet. Your first contribution is just above.
@@ -789,6 +833,8 @@ export default function ContributeClient({
   const [videosUploaded,    setVideosUploaded]    = useState(contributor.videos_uploaded)
   const [voiceRecordings,   setVoiceRecordings]   = useState(contributor.voice_recordings)
 
+  const lang          = contributor.preferred_language === 'zh' ? 'zh' : 'en'
+  const ui            = PORTAL_UI[lang]
   const firstName     = contributor.name ? contributor.name.split(' ')[0] : 'there'
   const relLabel      = RELATIONSHIP_LABELS[contributor.relationship] ?? 'Contributor'
   const subjectName   = archive.owner_name ? archive.owner_name.split(' ')[0] : 'the archive subject'
@@ -803,10 +849,10 @@ export default function ContributeClient({
           {archive.name}
         </p>
         <p className="font-serif" style={{ fontWeight: 700, fontSize: '1.5rem', color: '#F0EDE6', margin: '0 0 0.4rem' }}>
-          Welcome, {firstName}.
+          {ui.welcome(firstName)}
         </p>
         <p style={{ fontFamily: 'monospace', fontSize: '0.38rem', letterSpacing: '0.15em', color: '#5C6166', margin: 0 }}>
-          {relLabel}{totalContribs > 0 ? ` · ${totalContribs} CONTRIBUTION${totalContribs !== 1 ? 'S' : ''}` : ''}
+          {relLabel}{totalContribs > 0 ? ` · ${ui.contributions_n(totalContribs)}` : ''}
         </p>
       </div>
 
@@ -821,6 +867,7 @@ export default function ContributeClient({
           token={token}
           archiveName={archive.name}
           ownerName={archive.owner_name}
+          lang={lang}
         />
 
         {/* Photos */}
@@ -829,12 +876,14 @@ export default function ContributeClient({
           archiveName={archive.name}
           subjectName={subjectName}
           onUploaded={count => setPhotosUploaded(prev => prev + count)}
+          lang={lang}
         />
 
         {/* Videos & Documents */}
         <MediaUploadSection
           token={token}
           onUploaded={() => setVideosUploaded(prev => prev + 1)}
+          lang={lang}
         />
 
         {/* Voice */}
@@ -842,6 +891,7 @@ export default function ContributeClient({
           archiveId={archive.id}
           subjectName={subjectName}
           onRecorded={() => setVoiceRecordings(prev => prev + 1)}
+          lang={lang}
         />
 
         {/* Phone call recording */}
@@ -849,6 +899,7 @@ export default function ContributeClient({
           contributorId={contributor.id}
           hasPhone={!!contributor.phone}
           token={token}
+          lang={lang}
         />
 
         {/* Contributions summary */}
@@ -858,6 +909,7 @@ export default function ContributeClient({
           voiceRecordings={voiceRecordings}
           questionsAnswered={contributor.questions_answered}
           photosLabelled={contributor.photos_labelled}
+          lang={lang}
         />
 
         {/* Footer */}
@@ -866,7 +918,7 @@ export default function ContributeClient({
             BASALITH · XYZ
           </p>
           <p className="font-serif italic" style={{ fontSize: '0.8rem', color: '#3A3F44', margin: '0.4rem 0 0' }}>
-            Everything you share here is preserved permanently.
+            {ui.footerNote}
           </p>
         </div>
       </div>

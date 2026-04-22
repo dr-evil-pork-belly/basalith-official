@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const { archiveId, name, email, role, relationship, phone } = await req.json()
+    const { archiveId, name, email, role, relationship, phone, preferred_language } = await req.json()
     if (!archiveId || !email) {
       return NextResponse.json({ error: 'archiveId and email required' }, { status: 400 })
     }
@@ -35,17 +35,18 @@ export async function POST(req: NextRequest) {
       .from('contributors')
       .upsert(
         {
-          archive_id:   archiveId,
-          email:        email.trim(),
-          name:         name?.trim()  ?? null,
-          role:         role          ?? null,
-          relationship: relationship  ?? 'other',
-          status:       'active',
-          phone:        phone?.trim() ?? null,
+          archive_id:         archiveId,
+          email:              email.trim(),
+          name:               name?.trim()          ?? null,
+          role:               role                  ?? null,
+          relationship:       relationship           ?? 'other',
+          status:             'active',
+          phone:              phone?.trim()          ?? null,
+          preferred_language: preferred_language     ?? 'en',
         },
         { onConflict: 'archive_id,email', ignoreDuplicates: false },
       )
-      .select('id, name, email, role, status, photos_labelled, created_at, access_token, relationship, phone')
+      .select('id, name, email, role, status, photos_labelled, created_at, access_token, relationship, phone, preferred_language')
       .single()
 
     if (error || !data) return NextResponse.json({ error: error?.message ?? 'Failed to save contributor' }, { status: 500 })
@@ -83,10 +84,15 @@ export async function POST(req: NextRequest) {
         const fromEmail = process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'
         const portalUrl = portalToken ? `${siteUrl}/contribute/${portalToken}` : null
 
+        const contribLang = data.preferred_language ?? 'en'
+        const inviteSubject = contribLang === 'zh'
+          ? `您已被邀请加入${archive.family_name}家族档案`
+          : `You have been invited to The ${archive.family_name} Archive`
+
         await resend.emails.send({
           from:    `The ${archive.family_name} Archive <${fromEmail}>`,
           to:      data.email,
-          subject: `You have been invited to The ${archive.family_name} Archive`,
+          subject: inviteSubject,
           html:    buildContributorInviteEmail({
             firstName,
             archiveName: archive.name,
@@ -95,6 +101,7 @@ export async function POST(req: NextRequest) {
             portalUrl,
             siteUrl,
             twilioPhone: process.env.NEXT_PUBLIC_TWILIO_PHONE_NUMBER ?? null,
+            lang:        contribLang,
           }),
         })
       }
@@ -197,15 +204,43 @@ function buildContributorInviteEmail({
   portalUrl,
   siteUrl,
   twilioPhone,
+  lang = 'en',
 }: {
-  firstName:   string
-  archiveName: string
-  familyName:  string
-  ownerName:   string
-  portalUrl:   string | null
-  siteUrl:     string
+  firstName:    string
+  archiveName:  string
+  familyName:   string
+  ownerName:    string
+  portalUrl:    string | null
+  siteUrl:      string
   twilioPhone?: string | null
+  lang?:        string
 }): string {
+  const isZh = lang === 'zh'
+
+  const inviteBody = isZh
+    ? `您已被邀请为${archiveName}${ownerName ? `——${ownerName}的档案` : ''}做贡献。`
+    : `You have been invited to contribute to ${archiveName}${ownerName ? ` — ${ownerName}'s archive` : ''}.`
+
+  const archiveDesc = isZh
+    ? `这份档案是${familyName}家族的永久记录。作为贡献者，您将通过电子邮件收到档案中的照片，并可以通过您的个人页面分享您自己的照片、视频和回忆。`
+    : `This archive is a permanent record of the ${familyName} family. As a contributor, you will receive photographs from the archive by email, and you can share your own photographs, videos, and memories through your personal portal.`
+
+  const tonightMsg = isZh
+    ? '今晚您将收到第一张照片。直接回复邮件分享您记得的任何内容——您的回忆将直接进入档案。'
+    : 'Tonight you will receive your first photograph by email. Simply reply with whatever you remember — your memories go directly into the archive.'
+
+  const portalLabel   = isZh ? '您的贡献者页面'           : 'YOUR CONTRIBUTOR PORTAL'
+  const bookmarkNote  = isZh ? '请收藏此链接。这是您访问档案的专属入口，无需密码。' : 'Bookmark this link. It is your personal access to the archive. No password needed.'
+  const portalCanLabel = isZh ? '通过您的页面您可以：'      : 'THROUGH YOUR PORTAL YOU CAN:'
+  const portalCaps    = isZh
+    ? `上传您自己收藏的照片<br>上传视频和文件<br>录制语音回忆<br>回答关于${ownerName || '档案主题'}的问题`
+    : `Upload photographs from your own collection<br>Upload videos and documents<br>Record voice memories<br>Answer questions about ${ownerName || 'the archive subject'}`
+
+  const phoneLabel = isZh ? '更喜欢用电话录音？' : 'PREFER TO RECORD BY PHONE?'
+  const phoneNote  = isZh
+    ? '从您注册的电话号码拨打此号码。友好的语音将引导您完成几个问题，无需登录或密码。'
+    : 'Call this number from your registered phone. A friendly voice will guide you through a few questions. No login or password needed.'
+
   return `<!DOCTYPE html>
 <html>
 <body style="background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:560px;margin:0 auto;padding:0">
@@ -224,57 +259,49 @@ function buildContributorInviteEmail({
 
     <div style="border-left:2px solid rgba(196,162,74,0.4);padding:0 0 0 24px;margin:0 0 28px">
       <p style="font-family:Georgia,serif;font-size:16px;font-weight:300;color:#F0EDE6;line-height:1.9;font-style:italic;margin:0">
-        You have been invited to contribute to ${archiveName}${ownerName ? ` — ${ownerName}'s archive` : ''}.
+        ${inviteBody}
       </p>
     </div>
 
     <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#9DA3A8;line-height:1.8;margin:0 0 28px">
-      This archive is a permanent record of the ${familyName} family. As a contributor,
-      you will receive photographs from the archive by email, and you can share your
-      own photographs, videos, and memories through your personal portal.
+      ${archiveDesc}
     </p>
 
     ${portalUrl ? `
     <div style="background:rgba(196,162,74,0.06);border:1px solid rgba(196,162,74,0.2);padding:20px 24px;margin:0 0 28px">
       <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;margin:0 0 12px">
-        YOUR CONTRIBUTOR PORTAL
+        ${portalLabel}
       </p>
       <a href="${portalUrl}" style="font-family:Georgia,serif;font-size:14px;color:#C4A24A;word-break:break-all">
         ${portalUrl}
       </a>
       <p style="font-family:Georgia,serif;font-size:13px;font-style:italic;color:#706C65;margin:12px 0 0;line-height:1.7">
-        Bookmark this link. It is your personal access to the archive.
-        No password needed.
+        ${bookmarkNote}
       </p>
     </div>
 
     <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#706C65;margin:0 0 8px">
-      THROUGH YOUR PORTAL YOU CAN:
+      ${portalCanLabel}
     </p>
     <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#9DA3A8;line-height:2;margin:0 0 28px">
-      Upload photographs from your own collection<br>
-      Upload videos and documents<br>
-      Record voice memories<br>
-      Answer questions about ${ownerName || 'the archive subject'}
+      ${portalCaps}
     </p>
     ` : ''}
 
     <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#9DA3A8;line-height:1.8;margin:0 0 28px">
-      Tonight you will receive your first photograph by email.
-      Simply reply with whatever you remember — your memories go directly into the archive.
+      ${tonightMsg}
     </p>
 
     ${twilioPhone ? `
     <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);padding:20px 24px;margin:0 0 28px">
       <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#9DA3A8;margin:0 0 10px">
-        PREFER TO RECORD BY PHONE?
+        ${phoneLabel}
       </p>
       <p style="font-family:Georgia,serif;font-size:28px;font-weight:700;color:#F0EDE6;margin:0 0 10px;letter-spacing:0.05em">
         ${twilioPhone}
       </p>
       <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#706C65;line-height:1.7;margin:0">
-        Call this number from your registered phone. A friendly voice will guide you through a few questions.
-        No login or password needed.
+        ${phoneNote}
       </p>
     </div>
     ` : ''}

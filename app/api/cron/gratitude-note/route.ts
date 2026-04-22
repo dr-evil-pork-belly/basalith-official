@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
 import Anthropic from '@anthropic-ai/sdk'
+import { t } from '@/lib/emailTranslations'
 
 export const dynamic = 'force-dynamic'
 
@@ -72,7 +73,7 @@ export async function GET(req: NextRequest) {
       const firstName = contributorName.split(' ')[0]
       const { data: contributor } = await supabaseAdmin
         .from('contributors')
-        .select('email, name')
+        .select('email, name, preferred_language')
         .eq('archive_id', archive.id)
         .ilike('name', `${firstName}%`)
         .limit(1)
@@ -80,11 +81,16 @@ export async function GET(req: NextRequest) {
 
       if (!contributor?.email) continue
 
+      const lang = (contributor as any).preferred_language ?? 'en'
+
       // Ask Claude to write a personal note from the archive
       const memorySample = data.memories.slice(0, 2).join(' · ')
 
       let noteText: string
       try {
+        const langInstruction = lang === 'zh'
+          ? '\n- Write entirely in Simplified Chinese (简体中文). End with "— ${archive.family_name}档案"'
+          : `\n- End with "— The ${archive.family_name} Archive"`
         const aiResponse = await anthropic.messages.create({
           model:      'claude-sonnet-4-6',
           max_tokens: 200,
@@ -102,25 +108,26 @@ The note should:
 - Express genuine gratitude for what their memories preserve
 - Be 3-4 sentences maximum
 - Feel personal not corporate
-- End with "— The ${archive.family_name} Archive"
 - Never use the words "amazing", "wonderful", or "incredible"
-- Sound like a quiet human moment not a marketing email
+- Sound like a quiet human moment not a marketing email${langInstruction}
 
 Return only the note text. Nothing else.`,
           }],
         })
         noteText = aiResponse.content[0].type === 'text'
           ? aiResponse.content[0].text.trim()
-          : fallbackNote(firstName, data.count, archive.family_name)
+          : fallbackNote(firstName, data.count, archive.family_name, lang)
       } catch {
-        noteText = fallbackNote(firstName, data.count, archive.family_name)
+        noteText = fallbackNote(firstName, data.count, archive.family_name, lang)
       }
 
       await resend.emails.send({
         from:    `The ${archive.family_name} Archive <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
         to:      contributor.email,
-        subject: `A note from The ${archive.family_name} Archive`,
-        html:    buildGratitudeEmail(archive.family_name, firstName, data.count, noteText),
+        subject: lang === 'zh'
+          ? `来自${archive.family_name}档案的感谢`
+          : `A note from The ${archive.family_name} Archive`,
+        html:    buildGratitudeEmail(archive.family_name, firstName, data.count, noteText, lang),
       })
 
       sent++
@@ -133,7 +140,10 @@ Return only the note text. Nothing else.`,
   return Response.json({ sent, total: archives?.length ?? 0, isTest })
 }
 
-function fallbackNote(firstName: string, count: number, familyName: string): string {
+function fallbackNote(firstName: string, count: number, familyName: string, lang = 'en'): string {
+  if (lang === 'zh') {
+    return `${firstName}——您本月为${familyName}档案贡献了${count}条回忆。正因为您，档案中存在着那些在其他任何地方都找不到的珍贵记录。这比您想象的更有意义。\n— ${familyName}档案`
+  }
   return `${firstName} — you contributed ${count} memories to The ${familyName} Archive this month. Because of you, things exist in this archive that would not exist anywhere else. That matters more than you know.\n— The ${familyName} Archive`
 }
 
@@ -142,6 +152,7 @@ function buildGratitudeEmail(
   firstName:         string,
   contributionCount: number,
   noteText:          string,
+  lang = 'en',
 ): string {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
 
@@ -169,7 +180,7 @@ function buildGratitudeEmail(
 
     <div style="border-top:1px solid rgba(240,237,230,0.06);padding-top:24px">
       <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#3A3830;margin:0 0 16px">
-        Your memories are preserved in this archive permanently.
+        ${lang === 'zh' ? '您的回忆已永久保存在档案中。' : 'Your memories are preserved in this archive permanently.'}
       </p>
       <a href="${siteUrl}" style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830;text-decoration:none">
         BASALITH · XYZ

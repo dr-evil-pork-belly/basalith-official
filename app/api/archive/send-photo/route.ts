@@ -3,6 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
 import { PhotographEmail } from '@/emails/PhotographEmail'
 import { render } from '@react-email/render'
+import { t } from '@/lib/emailTranslations'
 
 function calculateNextSend(prefs: { cadence: string; send_time: string }): string {
   const now  = new Date()
@@ -41,7 +42,7 @@ export async function POST(req: NextRequest) {
     // 2. Get active contributors
     const { data: contributors } = await supabaseAdmin
       .from('contributors')
-      .select('email, name, access_token')
+      .select('email, name, access_token, preferred_language')
       .eq('archive_id', archiveId)
       .eq('status', 'active')
 
@@ -91,7 +92,7 @@ export async function POST(req: NextRequest) {
     const replyDomain = process.env.RESEND_REPLY_DOMAIN ?? 'zoibrenae.resend.app'
     const replyAddress = `${familySlug}-${sessionCode}@${replyDomain}`
 
-    // 6. Subject line
+    // 6. Subject line (built per-contributor below; this is a fallback for the session record)
     const yearStr     = photo.ai_era_estimate ? ` · ${photo.ai_era_estimate}` : ''
     const subjectLine = `${archive.name}${yearStr} · Do you know this moment?`
 
@@ -115,9 +116,11 @@ export async function POST(req: NextRequest) {
 
     for (const contributor of contributors) {
       try {
-        const portalUrl = contributor.access_token
+        const lang       = (contributor as any).preferred_language ?? 'en'
+        const portalUrl  = contributor.access_token
           ? `${siteUrl}/contribute/${contributor.access_token}`
           : null
+        const contribSubject = `${archive.name}${yearStr} · ${t('doYouKnowThisMoment', lang)}`
 
         const emailHtml = await render(
           PhotographEmail({
@@ -130,6 +133,7 @@ export async function POST(req: NextRequest) {
             contributorName: contributor.name ?? '',
             sessionId:       session?.id ?? '',
             portalUrl,
+            lang,
           })
         )
 
@@ -137,7 +141,7 @@ export async function POST(req: NextRequest) {
           from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
           to:      contributor.email,
           replyTo: replyAddress,
-          subject: subjectLine,
+          subject: contribSubject,
           html:    emailHtml,
         })
       } catch (emailErr: unknown) {

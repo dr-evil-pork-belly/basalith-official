@@ -1,0 +1,63 @@
+export const translations = {
+  en: {
+    doYouKnowThisMoment:    'Do you know this moment?',
+    addYourMemory:          'ADD A MEMORY →',
+    archiveFooter:          'The archive remembers.',
+    replyWithMemory:        'Reply to this email with what you remember.',
+    visitPortal:            'VISIT YOUR CONTRIBUTOR PORTAL →',
+    goodMorning:            'Good morning',
+    goodAfternoon:          'Good afternoon',
+    goodEvening:            'Good evening',
+    weeklyPromptTitle:      "This week's question",
+    weeklyPromptCTA:        'ANSWER THIS QUESTION →',
+    monthlyReportTitle:     'Here is what your archive built this month.',
+    gratitudeTitle:         'A note from the archive',
+    welcomeTitle:           'Welcome to Basalith',
+    contributorInviteTitle: 'You have been invited to contribute to',
+    contributorInviteBody:  'has invited you to contribute your memories.',
+    tonightEmail:           'Tonight at 9pm your family will receive their first photograph.',
+    noLoginNeeded:          'No account needed.',
+    callToRecord:           'PREFER TO RECORD BY PHONE?',
+    viewArchive:            'VIEW YOUR ARCHIVE →',
+    todayMemories:          "Today's memories",
+    photoQuestion:          'What do you remember about this photograph?',
+    photoReplyBody:         'Reply to this email with anything you know — who is in it, when and where it was taken, what was happening, what you want the family to remember about this moment.',
+    photoReplyPermanent:    'Every reply becomes part of',
+    photoReplyPermanentEnd: 'permanently.',
+    photoMoreThanReply:     'Want to do more than reply?',
+  },
+  zh: {
+    doYouKnowThisMoment:    '您认识照片中的这个时刻吗？',
+    addYourMemory:          '添加您的回忆 →',
+    archiveFooter:          '档案永远铭记。',
+    replyWithMemory:        '请回复此邮件分享您的记忆。',
+    visitPortal:            '访问您的贡献者页面 →',
+    goodMorning:            '早上好',
+    goodAfternoon:          '下午好',
+    goodEvening:            '晚上好',
+    weeklyPromptTitle:      '本周的问题',
+    weeklyPromptCTA:        '回答这个问题 →',
+    monthlyReportTitle:     '这是您的档案本月的成果。',
+    gratitudeTitle:         '来自档案的感谢',
+    welcomeTitle:           '欢迎来到 Basalith',
+    contributorInviteTitle: '您已被邀请为以下档案做贡献：',
+    contributorInviteBody:  '邀请您分享您的回忆。',
+    tonightEmail:           '今晚9点，您的家人将收到第一张照片。',
+    noLoginNeeded:          '无需注册账户。',
+    callToRecord:           '更喜欢用电话录音？',
+    viewArchive:            '查看您的档案 →',
+    todayMemories:          '今日回忆',
+    photoQuestion:          '您还记得这张照片中的什么？',
+    photoReplyBody:         '请回复此邮件，分享您的记忆——照片中有谁、是何时何地拍摄的、当时发生了什么、您希望家人铭记这个时刻的什么。',
+    photoReplyPermanent:    '您的每一次回复都将永久留存在',
+    photoReplyPermanentEnd: '中。',
+    photoMoreThanReply:     '想要做更多？',
+  },
+} as const
+
+export type TranslationKey = keyof typeof translations.en
+
+export function t(key: TranslationKey, language = 'en'): string {
+  const lang = language === 'zh' ? 'zh' : 'en'
+  return translations[lang][key] ?? translations.en[key]
+}
