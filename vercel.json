@@ -46,6 +46,10 @@
     {
       "path": "/api/cron/memory-game-summary",
       "schedule": "0 18 * * 5"
+    },
+    {
+      "path": "/api/cron/daily-reflection",
+      "schedule": "0 8 * * *"
     }
   ]
 }

@@ -99,6 +99,7 @@ const CRON_BUTTONS = [
   { label: 'MEMORY GAME',        route: 'memory-game' },
   { label: 'GAME REMINDER',      route: 'memory-game-reminder' },
   { label: 'GAME SUMMARY',       route: 'memory-game-summary' },
+  { label: 'DAILY REFLECTION',  route: 'daily-reflection'    },
 ]
 
 // ── Action handler ─────────────────────────────────────────────────────────────

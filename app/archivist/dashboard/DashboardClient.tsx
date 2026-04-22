@@ -72,6 +72,7 @@ const CRON_JOBS = [
   { label: 'Send Memory Game Reminder',  route: '/api/cron/memory-game-reminder'   },
   { label: 'Send Memory Game Summary',          route: '/api/cron/memory-game-summary'  },
   { label: 'Refresh Contributor Questions',      route: '/api/cron/weekly-prompt'        },
+  { label: 'Send Daily Reflection',             route: '/api/cron/daily-reflection'     },
 ] as const
 
 type CronState = 'idle' | 'running' | 'ok' | 'error'

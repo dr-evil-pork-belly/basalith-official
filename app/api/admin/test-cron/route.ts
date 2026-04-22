@@ -10,6 +10,7 @@ const ALLOWED_ROUTES = [
   '/api/cron/memory-game-start',
   '/api/cron/memory-game-reminder',
   '/api/cron/memory-game-summary',
+  '/api/cron/daily-reflection',
 ]
 
 export async function POST(req: Request) {
