@@ -156,6 +156,11 @@ async function notifyOwnerOnCompletion(
     from:    `${archiveName} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
     to:      archive.owner_email,
     subject: `${contributorName} just completed their witness session · ${archiveName}`,
+    headers: {
+      'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
+      'X-Entity-Ref-ID':  `basalith-${session.archive_id}-${Date.now()}`,
+      'Precedence':       'bulk',
+    },
     html: `<body style="background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:600px;margin:0 auto;padding:0">
 
   <div style="padding:32px 32px 24px">

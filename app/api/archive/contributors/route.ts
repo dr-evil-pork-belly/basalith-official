@@ -93,6 +93,11 @@ export async function POST(req: NextRequest) {
           from:    `The ${archive.family_name} Archive <${fromEmail}>`,
           to:      data.email,
           subject: inviteSubject,
+          headers: {
+            'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
+            'X-Entity-Ref-ID':  `basalith-${archiveId}-${Date.now()}`,
+            'Precedence':       'bulk',
+          },
           html:    buildContributorInviteEmail({
             firstName,
             archiveName: archive.name,
@@ -151,6 +156,11 @@ export async function PATCH(req: NextRequest) {
       from:    `The ${archive.family_name} Archive <${fromEmail}>`,
       to:      contributor.email,
       subject: `Your contributor portal link — The ${archive.family_name} Archive`,
+      headers: {
+        'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
+        'X-Entity-Ref-ID':  `basalith-${archiveId}-${Date.now()}`,
+        'Precedence':       'bulk',
+      },
       html:    buildContributorInviteEmail({
         firstName,
         archiveName: archive.name,

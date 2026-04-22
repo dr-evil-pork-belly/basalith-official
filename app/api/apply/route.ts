@@ -33,6 +33,11 @@ export async function POST(req: NextRequest) {
       to:      process.env.ADMIN_EMAIL ?? 'legacy@basalith.xyz',
       replyTo: email,
       subject: `New Archive Application — ${name}`,
+      headers: {
+        'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
+        'X-Entity-Ref-ID':  `basalith-apply-${Date.now()}`,
+        'Precedence':       'bulk',
+      },
       html: `
         <div style="font-family: Georgia, serif; max-width: 600px; color: #1a1a1a; padding: 32px;">
           <p style="font-family: monospace; font-size: 11px; letter-spacing: 0.2em; color: #888; text-transform: uppercase; margin: 0 0 24px;">

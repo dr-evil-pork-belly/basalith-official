@@ -201,6 +201,11 @@ Context from the archive owner's own words: ${depositContext || 'No context avai
           to:      recipient.email,
           subject,
           html,
+          headers: {
+            'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
+            'X-Entity-Ref-ID':  `basalith-${archiveId}-${Date.now()}`,
+            'Precedence':       'bulk',
+          },
         })
         sentCount++
       } catch (err: any) {

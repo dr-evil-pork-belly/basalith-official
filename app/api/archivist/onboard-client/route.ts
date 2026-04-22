@@ -3,6 +3,12 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
 import bcrypt from 'bcryptjs'
 
+function generateMagicLinkToken(): string {
+  const bytes = new Uint8Array(32)
+  crypto.getRandomValues(bytes)
+  return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('')
+}
+
 function generateClientPassword(familyName: string): string {
   const clean = familyName.replace(/\s+/g, '').replace(/[^a-zA-Z]/g, '')
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
@@ -14,12 +20,14 @@ function generateClientPassword(familyName: string): string {
 }
 
 function buildWelcomeEmail(
-  familyName: string,
-  firstName:  string,
-  password:   string,
-  tierName:   string,
+  familyName:    string,
+  firstName:     string,
+  password:      string,
+  tierName:      string,
   archivistName: string,
+  magicLinkUrl:  string | null,
 ): string {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
   return `<!DOCTYPE html>
 <html>
 <body style="background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:600px;margin:0 auto;padding:32px">
@@ -32,12 +40,30 @@ function buildWelcomeEmail(
   <p style="font-size:16px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 24px">
     Your archive has been initialized. ${archivistName} will be in touch shortly to schedule your Founding Session.
   </p>
-  <div style="background:rgba(196,162,74,0.06);border:1px solid rgba(196,162,74,0.2);border-top:3px solid rgba(196,162,74,0.6);padding:24px;margin:0 0 24px">
+
+  ${magicLinkUrl ? `
+  <div style="background:rgba(196,162,74,0.08);border:1px solid rgba(196,162,74,0.3);border-top:3px solid rgba(196,162,74,0.8);padding:24px;margin:0 0 24px">
+    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;margin:0 0 12px;text-transform:uppercase">
+      Your Personal Archive Link
+    </p>
+    <p style="font-size:15px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 16px">
+      Click the link below to access your archive. No password required.
+    </p>
+    <a href="${magicLinkUrl}" style="display:inline-block;font-family:'Courier New',monospace;font-size:12px;color:#C4A24A;word-break:break-all;margin:0 0 12px">
+      ${magicLinkUrl}
+    </a>
+    <p style="font-size:13px;font-style:italic;color:#706C65;margin:0;line-height:1.7">
+      Bookmark this link. It is your personal entry to the archive and never expires.
+    </p>
+  </div>
+  ` : ''}
+
+  <div style="background:rgba(196,162,74,0.04);border:1px solid rgba(196,162,74,0.15);padding:24px;margin:0 0 24px">
     <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;margin:0 0 16px;text-transform:uppercase">
-      Your Login Details
+      Password Login (Alternative)
     </p>
     <p style="font-size:14px;color:#B8B4AB;margin:0 0 8px">
-      <strong style="color:#F0EDE6">URL:</strong> basalith.xyz/archive-login
+      <strong style="color:#F0EDE6">URL:</strong> ${siteUrl}/archive-login
     </p>
     <p style="font-size:14px;color:#B8B4AB;margin:0 0 8px">
       <strong style="color:#F0EDE6">Password:</strong> ${password}
@@ -47,7 +73,7 @@ function buildWelcomeEmail(
     </p>
   </div>
   <p style="font-size:15px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 16px">
-    Once you log in you can begin uploading photographs. Our AI will analyze everything — removing screenshots and unrelated photos automatically.
+    Once you are inside you can begin uploading photographs. Our AI will analyze everything, removing screenshots and unrelated images automatically.
   </p>
   <p style="font-size:15px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 24px">
     Your Founding Session with ${archivistName} is being scheduled. You will hear from them within 24 hours.
@@ -85,16 +111,20 @@ export async function POST(req: NextRequest) {
     console.log('[onboard-client] Hash generated, length:', passwordHash.length)
 
     // ── 3. Create archive ─────────────────────────────────────────────────────
+    const magicLinkToken = generateMagicLinkToken()
+
     const { data: archive, error: archiveError } = await supabaseAdmin
       .from('archives')
       .insert({
-        name:        `The ${familyName} Archive`,
-        family_name: familyName,
-        owner_email: clientEmail,
-        owner_name:  clientName || null,
+        name:                `The ${familyName} Archive`,
+        family_name:         familyName,
+        owner_email:         clientEmail,
+        owner_name:          clientName || null,
         tier,
-        generation:  'Generation I',
-        status:      'active',
+        generation:          'Generation I',
+        status:              'active',
+        magic_link_token:    magicLinkToken,
+        magic_link_created_at: new Date().toISOString(),
       })
       .select()
       .single()
@@ -152,13 +182,20 @@ export async function POST(req: NextRequest) {
     const tierNames: Record<string, string> = { archive: 'The Archive', estate: 'The Estate', dynasty: 'The Dynasty' }
     const tierName = tierNames[tier] || 'The Estate'
     const firstName = (clientName || familyName).split(' ')[0]
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+    const magicLinkUrl = `${siteUrl}/api/archive/magic-login?token=${magicLinkToken}`
 
     try {
       await resend.emails.send({
         from:    `The ${familyName} Archive <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
         to:      clientEmail,
         subject: `Welcome to Basalith — The ${familyName} Archive is ready`,
-        html:    buildWelcomeEmail(familyName, firstName, password, tierName, archivist.name),
+        html:    buildWelcomeEmail(familyName, firstName, password, tierName, archivist.name, magicLinkUrl),
+        headers: {
+          'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
+          'X-Entity-Ref-ID':  `basalith-${archive.id}-${Date.now()}`,
+          'Precedence':       'bulk',
+        },
       })
     } catch (emailErr: unknown) {
       console.error('[onboard-client] Welcome email failed:', emailErr instanceof Error ? emailErr.message : emailErr)
@@ -171,6 +208,11 @@ export async function POST(req: NextRequest) {
         from:    `Basalith <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
         to:      process.env.ADMIN_EMAIL ?? 'legacy@basalith.xyz',
         subject: `New Archive — The ${familyName} Archive (${tier}) — via ${archivist.name}`,
+        headers: {
+          'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
+          'X-Entity-Ref-ID':  `basalith-${archive.id}-${Date.now()}`,
+          'Precedence':       'bulk',
+        },
         html: `<p><strong>New archive initialized</strong></p>
           <p>Family: The ${familyName} Archive</p>
           <p>Client: ${clientName} (${clientEmail})</p>
@@ -184,12 +226,13 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({
-      success:     true,
-      archiveId:   archive.id,
-      archiveName: `The ${familyName} Archive`,
+      success:      true,
+      archiveId:    archive.id,
+      archiveName:  `The ${familyName} Archive`,
       clientEmail,
       password,
-      message:     `The ${familyName} Archive has been initialized. Login credentials sent to ${clientEmail}.`,
+      magicLink:    magicLinkUrl,
+      message:      `The ${familyName} Archive has been initialized. Login credentials sent to ${clientEmail}.`,
     })
 
   } catch (error: any) {

@@ -278,6 +278,11 @@ export async function POST(req: Request) {
             from:    `${archiveName} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
             to:      fromEmail,
             subject: `Your memory has been saved · ${archiveName}`,
+            headers: {
+              'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
+              'X-Entity-Ref-ID':  `basalith-${matchedSession.archive_id}-${Date.now()}`,
+              'Precedence':       'bulk',
+            },
             html: `<body style="background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:600px;margin:0 auto;padding:32px">
   <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#C4A24A;text-transform:uppercase">${archiveName}</p>
   <p style="font-size:18px;font-style:italic;color:#F0EDE6;line-height:1.6">Thank you${firstName ? ', ' + firstName : ''}.</p>

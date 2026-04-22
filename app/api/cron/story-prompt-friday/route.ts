@@ -108,6 +108,11 @@ export async function GET(req: NextRequest) {
             to:      contributor.email,
             subject: `Friday reveal — here is what the family knows · ${archive.name}`,
             html:    buildFridayEmail(archive.family_name, photoUrl, photo.ai_era_estimate, responses, dateStr),
+            headers: {
+              'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
+              'X-Entity-Ref-ID':  `basalith-${session.archive_id}-${Date.now()}`,
+              'Precedence':       'bulk',
+            },
           })
         } catch (emailErr: any) {
           console.error(`[story-prompt-friday] Email failed for ${contributor.email}:`, emailErr.message)
