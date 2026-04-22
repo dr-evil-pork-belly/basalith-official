@@ -31,6 +31,7 @@ type ArchiveData = {
   entityDepth:         number
   health:              'green' | 'amber' | 'red'
   alerts:              AlertItem[]
+  magicLinkToken:      string | null
 }
 
 type ActivityItem = {
@@ -185,9 +186,13 @@ function ActionBtn({
 
 function ArchiveCard({ archive, onRefresh }: { archive: ArchiveData; onRefresh: () => void }) {
   const router = useRouter()
-  const [impersonating, setImpersonating] = useState(false)
-  const [emailState,    setEmailState]    = useState<Record<string, 'idle' | 'sending' | 'done' | 'error'>>({})
-  const [alertStates,   setAlertStates]   = useState<Record<string, string>>({})
+  const [impersonating,  setImpersonating]  = useState(false)
+  const [emailState,     setEmailState]     = useState<Record<string, 'idle' | 'sending' | 'done' | 'error'>>({})
+  const [alertStates,    setAlertStates]    = useState<Record<string, string>>({})
+  const [linkCopied,     setLinkCopied]     = useState(false)
+  const [sendingLink,    setSendingLink]    = useState(false)
+  const [linkEmailState, setLinkEmailState] = useState<'idle' | 'done' | 'error'>('idle')
+  const [emailStatus,    setEmailStatus]    = useState<'idle' | 'sending' | 'sent' | 'failed'>('idle')
 
   async function handleImpersonate() {
     setImpersonating(true)
@@ -224,6 +229,47 @@ function ArchiveCard({ archive, onRefresh }: { archive: ArchiveData; onRefresh: 
     const result = await callAlert(url)
     setAlertStates(prev => ({ ...prev, [key]: result }))
     setTimeout(() => setAlertStates(prev => ({ ...prev, [key]: '' })), 3000)
+  }
+
+  function handleCopyLink() {
+    if (!archive.magicLinkToken) return
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+    const url = `${siteUrl}/api/archive/magic-login?token=${archive.magicLinkToken}`
+    navigator.clipboard.writeText(url).then(() => {
+      setLinkCopied(true)
+      setTimeout(() => setLinkCopied(false), 2000)
+    })
+  }
+
+  async function handleEmailOwner() {
+    setEmailStatus('sending')
+    try {
+      const res = await fetch('/api/god/send-magic-link', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ archiveId: archive.id }),
+      })
+      setEmailStatus(res.ok ? 'sent' : 'failed')
+    } catch {
+      setEmailStatus('failed')
+    }
+    setTimeout(() => setEmailStatus('idle'), 3000)
+  }
+
+  async function handleEmailLink() {
+    setSendingLink(true)
+    try {
+      const res = await fetch('/api/god/send-magic-link', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ archiveId: archive.id }),
+      })
+      setLinkEmailState(res.ok ? 'done' : 'error')
+    } catch {
+      setLinkEmailState('error')
+    }
+    setSendingLink(false)
+    setTimeout(() => setLinkEmailState('idle'), 3000)
   }
 
   const borderColor = HEALTH_BORDER[archive.health]
@@ -307,14 +353,51 @@ function ArchiveCard({ archive, onRefresh }: { archive: ArchiveData; onRefresh: 
         </div>
       )}
 
+      {/* Magic link section */}
+      {archive.magicLinkToken && (
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '0.6rem', marginBottom: '0.6rem' }}>
+          <p style={{ ...mono, fontSize: '0.32rem', letterSpacing: '0.12em', color: '#5C6166', margin: '0 0 0.4rem' }}>
+            MAGIC LINK
+          </p>
+          <p style={{ ...mono, fontSize: '0.32rem', color: '#3A3F44', margin: '0 0 0.4rem', wordBreak: 'break-all' as const }}>
+            {`…magic-login?token=${archive.magicLinkToken.slice(0, 12)}…`}
+          </p>
+          <div style={{ display: 'flex', gap: '0.3rem' }}>
+            <ActionBtn
+              label={linkCopied ? 'COPIED' : 'COPY LINK'}
+              onClick={handleCopyLink}
+              small
+            />
+            <ActionBtn
+              label={sendingLink ? '...' : linkEmailState === 'done' ? 'SENT' : linkEmailState === 'error' ? 'FAILED' : 'EMAIL TO OWNER'}
+              onClick={handleEmailLink}
+              small
+            />
+          </div>
+        </div>
+      )}
+
       {/* Action buttons */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
         <ActionBtn label={impersonating ? '...' : 'VIEW ARCHIVE'} onClick={handleImpersonate} variant="gold" small />
-        <ActionBtn
-          label={`mailto:${archive.ownerEmail}`.startsWith('mailto:undefined') ? 'NO EMAIL' : 'EMAIL OWNER'}
-          onClick={() => window.open(`mailto:${archive.ownerEmail}`)}
-          small
-        />
+        <button
+          onClick={handleEmailOwner}
+          disabled={emailStatus === 'sending'}
+          style={{
+            background:    'rgba(255,255,255,0.05)',
+            border:        '1px solid rgba(255,255,255,0.08)',
+            borderRadius:  '2px',
+            padding:       '3px 8px',
+            ...mono,
+            fontSize:      '0.36rem',
+            letterSpacing: '0.15em',
+            color:         emailStatus === 'sent' ? '#4AC47C' : emailStatus === 'failed' ? '#C44A4A' : emailStatus === 'sending' ? '#5C6166' : '#9DA3A8',
+            cursor:        emailStatus === 'sending' ? 'not-allowed' : 'pointer',
+            whiteSpace:    'nowrap',
+          }}
+        >
+          {emailStatus === 'sending' ? 'SENDING...' : emailStatus === 'sent' ? '✓ SENT' : emailStatus === 'failed' ? '✗ FAILED' : 'EMAIL OWNER'}
+        </button>
         <ActionBtn
           label={emailState['no_photos'] === 'sending' ? '...' : emailState['no_photos'] === 'done' ? 'SENT' : 'NUDGE PHOTOS'}
           onClick={() => handleEmail('no_photos')}
