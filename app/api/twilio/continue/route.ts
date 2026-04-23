@@ -7,6 +7,15 @@ function twimlResponse(xml: string): NextResponse {
   return new NextResponse(xml, { headers: { 'Content-Type': 'text/xml' } })
 }
 
+function xmlSafe(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/'/g, '&apos;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+}
+
 export async function POST(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const contributorId = searchParams.get('contributorId') ?? ''
@@ -27,36 +36,36 @@ export async function POST(req: NextRequest) {
   const isZh = archiveLang?.preferred_language === 'zh'
 
   if (digit !== '1') {
-    return isZh
-      ? twimlResponse(`<?xml version="1.0" encoding="UTF-8"?>
+    const twiml = isZh
+      ? `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="Polly.Zhiyu-Neural" language="cmn-CN">
+  <Say voice="alice" language="zh-CN">
     谢谢您。再见。
   </Say>
   <Hangup/>
-</Response>`)
-      : twimlResponse(`<?xml version="1.0" encoding="UTF-8"?>
+</Response>`
+      : `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="Polly.Joanna-Neural" language="en-US">
+  <Say voice="alice">
     Thank you. Goodbye.
   </Say>
   <Hangup/>
-</Response>`)
+</Response>`
+
+    console.log('[twilio/continue] TwiML response:')
+    console.log(twiml)
+    return twimlResponse(twiml)
   }
 
   // Owner — free-form deposit, no question lookup needed
   if (isOwner) {
     const action = `${siteUrl}/api/twilio/recording?archiveId=${archiveId}&isOwner=true`
 
-    if (isZh) {
-      return twimlResponse(`<?xml version="1.0" encoding="UTF-8"?>
+    const twiml = isZh
+      ? `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="Polly.Zhiyu-Neural" language="cmn-CN">
-    请分享另一段回忆。
-  </Say>
-  <Pause length="1"/>
-  <Say voice="Polly.Zhiyu-Neural" language="cmn-CN">
-    提示音后开始说话，说完后按任意键。
+  <Say voice="alice" language="zh-CN">
+    请分享另一段回忆。提示音后开始说话，说完后按任意键。
   </Say>
   <Record
     action="${action}"
@@ -66,20 +75,18 @@ export async function POST(req: NextRequest) {
     playBeep="true"
     transcribe="false"
   />
-  <Say voice="Polly.Zhiyu-Neural" language="cmn-CN">
+  <Say voice="alice" language="zh-CN">
     未收到录音。再见。
   </Say>
   <Hangup/>
-</Response>`)
-    }
-
-    return twimlResponse(`<?xml version="1.0" encoding="UTF-8"?>
+</Response>`
+      : `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="Polly.Joanna-Neural" language="en-US">
+  <Say voice="alice">
     Please share another memory.
   </Say>
   <Pause length="1"/>
-  <Say voice="Polly.Joanna-Neural" language="en-US">
+  <Say voice="alice">
     Speak after the tone. Press any key when you are finished.
   </Say>
   <Record
@@ -90,11 +97,15 @@ export async function POST(req: NextRequest) {
     playBeep="true"
     transcribe="false"
   />
-  <Say voice="Polly.Joanna-Neural" language="en-US">
+  <Say voice="alice">
     We did not receive a recording. Goodbye.
   </Say>
   <Hangup/>
-</Response>`)
+</Response>`
+
+    console.log('[twilio/continue] TwiML response:')
+    console.log(twiml)
+    return twimlResponse(twiml)
   }
 
   // Contributor — get next pending question
@@ -107,23 +118,25 @@ export async function POST(req: NextRequest) {
     .limit(1)
 
   const question     = questions?.[0] ?? null
-  const questionText = question?.question_text
-    ?? (isZh ? '请分享一段对您来说重要的回忆。' : 'Tell me another memory that matters to you.')
+  const questionText = xmlSafe(
+    question?.question_text
+      ?? (isZh ? '请分享一段对您来说重要的回忆。' : 'Tell me another memory that matters to you.')
+  )
 
   const action = `${siteUrl}/api/twilio/recording?contributorId=${contributorId}&questionId=${question?.id ?? ''}&archiveId=${archiveId}`
 
-  if (isZh) {
-    return twimlResponse(`<?xml version="1.0" encoding="UTF-8"?>
+  const twiml = isZh
+    ? `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="Polly.Zhiyu-Neural" language="cmn-CN">
+  <Say voice="alice" language="zh-CN">
     这是您的下一个问题。
   </Say>
   <Pause length="1"/>
-  <Say voice="Polly.Zhiyu-Neural" language="cmn-CN">
+  <Say voice="alice" language="zh-CN">
     ${questionText}
   </Say>
   <Pause length="2"/>
-  <Say voice="Polly.Zhiyu-Neural" language="cmn-CN">
+  <Say voice="alice" language="zh-CN">
     请在提示音后说出您的回答，说完后按任意键。
   </Say>
   <Record
@@ -134,24 +147,22 @@ export async function POST(req: NextRequest) {
     playBeep="true"
     transcribe="false"
   />
-  <Say voice="Polly.Zhiyu-Neural" language="cmn-CN">
+  <Say voice="alice" language="zh-CN">
     未收到录音。再见。
   </Say>
   <Hangup/>
-</Response>`)
-  }
-
-  return twimlResponse(`<?xml version="1.0" encoding="UTF-8"?>
+</Response>`
+    : `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="Polly.Joanna-Neural" language="en-US">
+  <Say voice="alice">
     Here is your next question.
   </Say>
   <Pause length="1"/>
-  <Say voice="Polly.Joanna-Neural" language="en-US">
+  <Say voice="alice">
     ${questionText}
   </Say>
   <Pause length="2"/>
-  <Say voice="Polly.Joanna-Neural" language="en-US">
+  <Say voice="alice">
     Please speak your answer after the tone. Press any key when you are finished.
   </Say>
   <Record
@@ -162,9 +173,13 @@ export async function POST(req: NextRequest) {
     playBeep="true"
     transcribe="false"
   />
-  <Say voice="Polly.Joanna-Neural" language="en-US">
+  <Say voice="alice">
     We did not receive a recording. Goodbye.
   </Say>
   <Hangup/>
-</Response>`)
+</Response>`
+
+  console.log('[twilio/continue] TwiML response:')
+  console.log(twiml)
+  return twimlResponse(twiml)
 }

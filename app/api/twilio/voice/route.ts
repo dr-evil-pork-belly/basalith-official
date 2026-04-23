@@ -17,6 +17,16 @@ function validateTwilioRequest(req: NextRequest, params: Record<string, string>)
   return twilio.validateRequest(authToken, signature, url, params)
 }
 
+// Escape XML special characters so owner/contributor names never break TwiML.
+function xmlSafe(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/'/g, '&apos;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+}
+
 export async function POST(req: NextRequest) {
   const formData = await req.formData()
   const params   = Object.fromEntries(formData.entries()) as Record<string, string>
@@ -41,27 +51,18 @@ export async function POST(req: NextRequest) {
     .maybeSingle()
 
   if (archiveOwner) {
-    const firstName  = archiveOwner.owner_name?.split(' ')[0] ?? 'there'
-    const action     = `${siteUrl}/api/twilio/recording?archiveId=${archiveOwner.id}&isOwner=true`
-    const isZh       = archiveOwner.preferred_language === 'zh'
+    const firstName = xmlSafe((archiveOwner.owner_name ?? 'there').split(' ')[0])
+    const action    = `${siteUrl}/api/twilio/recording?archiveId=${archiveOwner.id}&isOwner=true`
+    const isZh      = archiveOwner.preferred_language === 'zh'
+
+    let twiml: string
 
     if (isZh) {
-      return twimlResponse(`<?xml version="1.0" encoding="UTF-8"?>
+      // Simplified Chinese path — alice voice, single Say to avoid Polly issues.
+      twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="Polly.Zhiyu-Neural" language="cmn-CN">
-    您好，${firstName}。
-  </Say>
-  <Pause length="1"/>
-  <Say voice="Polly.Zhiyu-Neural" language="cmn-CN">
-    欢迎来到您的 Basalith 档案。
-  </Say>
-  <Pause length="1"/>
-  <Say voice="Polly.Zhiyu-Neural" language="cmn-CN">
-    请在提示音后分享您的故事或回忆。
-  </Say>
-  <Pause length="1"/>
-  <Say voice="Polly.Zhiyu-Neural" language="cmn-CN">
-    说完后请按任意键。
+  <Say voice="alice" language="zh-CN">
+    您好，${firstName}。请在提示音后说话。说完后按任意键。
   </Say>
   <Record
     action="${action}"
@@ -71,28 +72,27 @@ export async function POST(req: NextRequest) {
     playBeep="true"
     transcribe="false"
   />
-  <Say voice="Polly.Zhiyu-Neural" language="cmn-CN">
+  <Say voice="alice" language="zh-CN">
     未收到录音。请稍后再次拨打。再见。
   </Say>
   <Hangup/>
-</Response>`)
-    }
-
-    return twimlResponse(`<?xml version="1.0" encoding="UTF-8"?>
+</Response>`
+    } else {
+      twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="Polly.Joanna-Neural" language="en-US">
+  <Say voice="alice">
     Welcome, ${firstName}.
   </Say>
   <Pause length="1"/>
-  <Say voice="Polly.Joanna-Neural" language="en-US">
+  <Say voice="alice">
     You are adding to your archive.
   </Say>
   <Pause length="1"/>
-  <Say voice="Polly.Joanna-Neural" language="en-US">
+  <Say voice="alice">
     Please share a memory, a story, or anything you want preserved.
   </Say>
   <Pause length="1"/>
-  <Say voice="Polly.Joanna-Neural" language="en-US">
+  <Say voice="alice">
     Speak after the tone. Press any key when you are finished.
   </Say>
   <Record
@@ -103,11 +103,16 @@ export async function POST(req: NextRequest) {
     playBeep="true"
     transcribe="false"
   />
-  <Say voice="Polly.Joanna-Neural" language="en-US">
+  <Say voice="alice">
     We did not receive a recording. Please call back to try again. Goodbye.
   </Say>
   <Hangup/>
-</Response>`)
+</Response>`
+    }
+
+    console.log('[twilio/voice] TwiML response:')
+    console.log(twiml)
+    return twimlResponse(twiml)
   }
 
   // ── 2. Check contributors table ───────────────────────────────────────────────
@@ -127,37 +132,39 @@ export async function POST(req: NextRequest) {
       .order('created_at', { ascending: true })
       .limit(1)
 
-    const question    = questions?.[0] ?? null
-    const archiveName = (contributor as any).archives?.name ?? 'your archive'
-    const firstName   = contributor.name?.split(' ')[0] ?? 'there'
-    const questionText = question?.question_text
-      ?? 'Tell me a memory that matters to you. It can be about anything — a moment, a person, a place.'
+    const question     = questions?.[0] ?? null
+    const archiveName  = xmlSafe((contributor as any).archives?.name ?? 'your archive')
+    const firstName    = xmlSafe((contributor.name ?? 'there').split(' ')[0])
+    const questionText = xmlSafe(
+      question?.question_text
+        ?? 'Tell me a memory that matters to you. It can be about anything. A moment, a person, a place.'
+    )
 
     const action = `${siteUrl}/api/twilio/recording?contributorId=${contributor.id}&questionId=${question?.id ?? ''}&archiveId=${contributor.archive_id}`
 
-    return twimlResponse(`<?xml version="1.0" encoding="UTF-8"?>
+    const twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="Polly.Joanna-Neural" language="en-US">
+  <Say voice="alice">
     Welcome, ${firstName}.
   </Say>
   <Pause length="1"/>
-  <Say voice="Polly.Joanna-Neural" language="en-US">
+  <Say voice="alice">
     You are recording for ${archiveName}.
   </Say>
   <Pause length="1"/>
-  <Say voice="Polly.Joanna-Neural" language="en-US">
+  <Say voice="alice">
     Here is your question.
   </Say>
   <Pause length="1"/>
-  <Say voice="Polly.Joanna-Neural" language="en-US">
+  <Say voice="alice">
     ${questionText}
   </Say>
   <Pause length="2"/>
-  <Say voice="Polly.Joanna-Neural" language="en-US">
+  <Say voice="alice">
     Please speak your answer after the tone.
   </Say>
   <Pause length="1"/>
-  <Say voice="Polly.Joanna-Neural" language="en-US">
+  <Say voice="alice">
     Take as long as you need. Press any key when you are finished.
   </Say>
   <Record
@@ -168,31 +175,39 @@ export async function POST(req: NextRequest) {
     playBeep="true"
     transcribe="false"
   />
-  <Say voice="Polly.Joanna-Neural" language="en-US">
+  <Say voice="alice">
     We did not receive a recording. Please call back to try again. Goodbye.
   </Say>
   <Hangup/>
-</Response>`)
+</Response>`
+
+    console.log('[twilio/voice] TwiML response:')
+    console.log(twiml)
+    return twimlResponse(twiml)
   }
 
   // ── 3. Unknown caller ─────────────────────────────────────────────────────────
-  return twimlResponse(`<?xml version="1.0" encoding="UTF-8"?>
+  const twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="Polly.Joanna-Neural" language="en-US">
+  <Say voice="alice">
     Hello, and thank you for calling Basalith.
   </Say>
   <Pause length="1"/>
-  <Say voice="Polly.Joanna-Neural" language="en-US">
+  <Say voice="alice">
     We were not able to find your phone number in our records.
   </Say>
   <Pause length="1"/>
-  <Say voice="Polly.Joanna-Neural" language="en-US">
+  <Say voice="alice">
     To get started, please ask the person who invited you to add your number to your profile.
   </Say>
   <Pause length="1"/>
-  <Say voice="Polly.Joanna-Neural" language="en-US">
+  <Say voice="alice">
     Once they do, you are welcome to call back. Take care.
   </Say>
   <Hangup/>
-</Response>`)
+</Response>`
+
+  console.log('[twilio/voice] TwiML response:')
+  console.log(twiml)
+  return twimlResponse(twiml)
 }

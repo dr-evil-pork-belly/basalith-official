@@ -168,51 +168,52 @@ export async function POST(req: NextRequest) {
 
   const isZh = archiveLang?.preferred_language === 'zh'
 
-  if (isZh) {
-    const continuePromptZh = isOwner
-      ? '如果您想继续录制，请按1。或者直接挂断电话。'
-      : '如果您想回答下一个问题，请按1。或者直接挂断电话。'
+  const continuePromptZh = isOwner
+    ? '如果您想继续录制，请按1。或者直接挂断电话。'
+    : '如果您想回答下一个问题，请按1。或者直接挂断电话。'
+  const continuePromptEn = isOwner
+    ? 'Would you like to record another memory? Press 1 to continue, or hang up when you are done.'
+    : 'Would you like to answer another question? Press 1 to continue, or hang up when you are done.'
 
-    return twimlResponse(`<?xml version="1.0" encoding="UTF-8"?>
+  const twiml = isZh
+    ? `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="Polly.Zhiyu-Neural" language="cmn-CN">
+  <Say voice="alice" language="zh-CN">
     谢谢您。您的故事已经保存到档案中了。
   </Say>
   <Pause length="1"/>
-  <Say voice="Polly.Zhiyu-Neural" language="cmn-CN">
+  <Say voice="alice" language="zh-CN">
     ${continuePromptZh}
   </Say>
   <Gather numDigits="1" action="${continueUrl}" method="POST" timeout="10">
   </Gather>
-  <Say voice="Polly.Zhiyu-Neural" language="cmn-CN">
+  <Say voice="alice" language="zh-CN">
     谢谢您。再见。
   </Say>
   <Hangup/>
-</Response>`)
-  }
-
-  const continuePrompt = isOwner
-    ? 'Would you like to record another memory? Press 1 to continue, or hang up when you are done.'
-    : 'Would you like to answer another question? Press 1 to continue, or hang up when you are done.'
-
-  return twimlResponse(`<?xml version="1.0" encoding="UTF-8"?>
+</Response>`
+    : `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="Polly.Joanna-Neural" language="en-US">
+  <Say voice="alice">
     Thank you.
   </Say>
   <Pause length="1"/>
-  <Say voice="Polly.Joanna-Neural" language="en-US">
+  <Say voice="alice">
     Your memory has been saved to the archive.
   </Say>
   <Pause length="1"/>
-  <Say voice="Polly.Joanna-Neural" language="en-US">
-    ${continuePrompt}
+  <Say voice="alice">
+    ${continuePromptEn}
   </Say>
   <Gather numDigits="1" action="${continueUrl}" method="POST" timeout="10">
   </Gather>
-  <Say voice="Polly.Joanna-Neural" language="en-US">
+  <Say voice="alice">
     Thank you. Goodbye.
   </Say>
   <Hangup/>
-</Response>`)
+</Response>`
+
+  console.log('[twilio/recording] TwiML response:')
+  console.log(twiml)
+  return twimlResponse(twiml)
 }
