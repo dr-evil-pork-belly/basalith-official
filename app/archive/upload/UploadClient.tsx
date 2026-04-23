@@ -174,7 +174,7 @@ export default function UploadClient({ archiveId }: Props) {
       setDocCreatedBy('')
       setDocUpload({
         status:   'success',
-        message:  `Document processed. ${data.wordCount} words extracted${data.title ? ` — "${data.title}"` : ''}.`,
+        message:  `Document processed. ${data.wordCount} words extracted${data.title ? `: "${data.title}"` : ''}.`,
         progress: 100,
       })
     } catch (err: unknown) {
@@ -189,7 +189,7 @@ export default function UploadClient({ archiveId }: Props) {
       return
     }
 
-    setVideoUpload({ status: 'uploading', message: 'Uploading and transcribing video — this may take a minute…', progress: 30 })
+    setVideoUpload({ status: 'uploading', message: 'Uploading and transcribing video. This may take a minute.', progress: 30 })
 
     const fd = new FormData()
     fd.append('file',       videoFile)
@@ -210,7 +210,7 @@ export default function UploadClient({ archiveId }: Props) {
       setVideoCreatedBy('')
       setVideoUpload({
         status:   'success',
-        message:  `Video processed. ${data.wordCount} words transcribed${data.languageDetected ? ` (${data.languageDetected})` : ''}${data.title ? ` — "${data.title}"` : ''}.`,
+        message:  `Video processed. ${data.wordCount} words transcribed${data.languageDetected ? ` (${data.languageDetected})` : ''}${data.title ? `: "${data.title}"` : ''}.`,
         progress: 100,
       })
     } catch (err: unknown) {
@@ -268,7 +268,7 @@ export default function UploadClient({ archiveId }: Props) {
         <div className="mb-10">
           <p className="font-compute text-xs tracking-widest text-gold/60 uppercase mb-2">Archive</p>
           <h1 className="font-legacy text-4xl text-white-ghost mb-2">Upload</h1>
-          <p className="font-compute text-xs text-white-ghost/40">Add to your archive — photographs, documents, videos, or voice recordings.</p>
+          <p className="font-compute text-xs text-white-ghost/40">Add to your archive: photographs, documents, videos, or voice recordings.</p>
         </div>
 
         {/* Section tabs */}
@@ -423,7 +423,7 @@ export default function UploadClient({ archiveId }: Props) {
             </div>
 
             <div>
-              <label className="font-compute text-xs text-white-ghost/40 tracking-wider block mb-1.5">TITLE (optional — AI will generate if blank)</label>
+              <label className="font-compute text-xs text-white-ghost/40 tracking-wider block mb-1.5">TITLE (optional, AI will generate if blank)</label>
               <input
                 type="text"
                 value={docTitle}
@@ -515,7 +515,7 @@ export default function UploadClient({ archiveId }: Props) {
             </div>
 
             <div>
-              <label className="font-compute text-xs text-white-ghost/40 tracking-wider block mb-1.5">TITLE (optional — AI will generate if blank)</label>
+              <label className="font-compute text-xs text-white-ghost/40 tracking-wider block mb-1.5">TITLE (optional, AI will generate if blank)</label>
               <input
                 type="text"
                 value={videoTitle}

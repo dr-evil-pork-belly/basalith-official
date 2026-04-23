@@ -177,7 +177,7 @@ function RegisterForm() {
                   </div>
                   <div>
                     <label htmlFor="password" className="block font-sans text-[0.72rem] font-bold tracking-[0.12em] uppercase text-text-muted mb-2">
-                      Password <span className="font-normal normal-case tracking-normal text-text-muted/60">— min 8 characters</span>
+                      Password <span className="font-normal normal-case tracking-normal text-text-muted/60">(min 8 characters)</span>
                     </label>
                     <input
                       id="password"

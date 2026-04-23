@@ -338,7 +338,7 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
           </div>
           <div className="mb-5">
             <label className={labelCls} style={labelStyle}>
-              Phone number <span style={{ color: '#3A3F44', fontWeight: 400 }}>(optional — for phone call recording)</span>
+              Phone number <span style={{ color: '#3A3F44', fontWeight: 400 }}>(optional, for phone call recording)</span>
             </label>
             <input
               type="tel"
@@ -354,7 +354,7 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
           </div>
           <div className="mb-5">
             <label className={labelCls} style={labelStyle}>
-              Preferred language <span style={{ color: '#3A3F44', fontWeight: 400 }}>(optional — for emails and portal)</span>
+              Preferred language <span style={{ color: '#3A3F44', fontWeight: 400 }}>(optional, for emails and portal)</span>
             </label>
             <select value={form.preferred_language} onChange={setContrib('preferred_language')} className={inputCls} style={{ ...inputStyle, cursor: 'pointer' }}>
               {LANGUAGES.map(l => (

@@ -36,7 +36,7 @@ function TierPageContent() {
           <BeginProgress step={1} />
           <p className="eyebrow mb-2">Step 1 of 3</p>
           <h1 className="font-serif text-[2.5rem] font-semibold text-text-primary leading-tight tracking-[-0.02em] mb-2">Choose Your Tier</h1>
-          <p className="font-sans text-[0.95rem] text-text-secondary leading-relaxed mb-12">All plans begin with The Founding — a one-time $2,500 setup investment.</p>
+          <p className="font-sans text-[0.95rem] text-text-secondary leading-relaxed mb-12">All plans begin with The Founding, a one-time $2,500 setup investment.</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">
             {TIERS.map(({ name, tagline, price, monthly, founding, featured }) => (
               <button

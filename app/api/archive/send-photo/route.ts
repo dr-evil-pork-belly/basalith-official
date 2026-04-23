@@ -143,6 +143,11 @@ export async function POST(req: NextRequest) {
           replyTo: replyAddress,
           subject: contribSubject,
           html:    emailHtml,
+          headers: {
+            'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
+            'X-Entity-Ref-ID':  `basalith-${archiveId}-${Date.now()}`,
+            'Precedence':       'bulk',
+          },
         })
       } catch (emailErr: unknown) {
         console.error(`send-photo: email failed for ${contributor.email}:`, emailErr instanceof Error ? emailErr.message : emailErr)

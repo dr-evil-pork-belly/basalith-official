@@ -151,11 +151,11 @@ Return ONLY valid JSON with no markdown fences:
     let depositId = null
     if (transcript && wordCount > 10) {
       const depositPrompt =
-        videoType === 'home_video'  ? `Home video — ${decade || 'undated'}` :
-        videoType === 'interview'   ? `Interview — ${decade || 'undated'}` :
-        videoType === 'speech'      ? `Speech or presentation — ${decade || 'undated'}` :
-        videoType === 'celebration' ? `Celebration video — ${decade || 'undated'}` :
-        `Video recording — ${decade || 'undated'}`
+        videoType === 'home_video'  ? `Home video, ${decade || 'undated'}` :
+        videoType === 'interview'   ? `Interview, ${decade || 'undated'}` :
+        videoType === 'speech'      ? `Speech or presentation, ${decade || 'undated'}` :
+        videoType === 'celebration' ? `Celebration video, ${decade || 'undated'}` :
+        `Video recording, ${decade || 'undated'}`
 
       const { data: deposit } = await supabaseAdmin
         .from('owner_deposits')

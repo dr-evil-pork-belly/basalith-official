@@ -78,14 +78,14 @@ export async function POST(req: NextRequest) {
     ${senderName} found a photograph you might remember.
   </p>
   <p style="font-size:15px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 16px">
-    ${senderName} is building ${archive.name} — a permanent record of the family's history.
+    ${senderName} is building ${archive.name}, a permanent record of the family's history.
     They found a photograph and thought you might know something about it.
   </p>
   <p style="font-size:15px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 16px">
     Reply to this email with anything you remember. Your memory will be added to the archive permanently.
   </p>
   <p style="font-size:14px;font-style:italic;color:#706C65;line-height:1.6;margin:0 0 32px">
-    You'll receive occasional photographs from the archive — one at a time, whenever something is found that you might know.
+    You'll receive occasional photographs from the archive, one at a time, whenever something is found that you might know.
   </p>
   <hr style="border:none;border-top:1px solid rgba(240,237,230,0.06);margin:0 0 24px">
   <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830;line-height:1.8">
@@ -100,6 +100,11 @@ export async function POST(req: NextRequest) {
       replyTo: replyAddress,
       subject: `${senderName} found a photograph you might remember · ${archive.name}`,
       html,
+      headers: {
+        'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
+        'X-Entity-Ref-ID':  `basalith-${archiveId}-${Date.now()}`,
+        'Precedence':       'bulk',
+      },
     })
 
     return NextResponse.json({ success: true })

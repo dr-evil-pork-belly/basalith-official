@@ -231,7 +231,7 @@ export default function WitnessClient({ sessionId }: { sessionId: string }) {
       </h1>
 
       <p className="font-serif italic font-light" style={{ fontSize: '1rem', color: '#9DA3A8', lineHeight: 1.9, maxWidth: '520px' }}>
-        {subjectName} is building a permanent archive of their life — one that their
+        {subjectName} is building a permanent archive of their life, one that their
         grandchildren and great-grandchildren will be able to access for generations.
         <br /><br />
         You have been invited because your perspective is irreplaceable. The things

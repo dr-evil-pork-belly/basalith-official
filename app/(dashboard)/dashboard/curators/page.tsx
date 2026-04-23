@@ -286,7 +286,7 @@ export default function CuratorsPage() {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block font-sans text-[0.68rem] font-bold tracking-[0.12em] uppercase text-text-muted mb-2">Relation <span className="font-normal normal-case tracking-normal">— optional</span></label>
+                    <label className="block font-sans text-[0.68rem] font-bold tracking-[0.12em] uppercase text-text-muted mb-2">Relation <span className="font-normal normal-case tracking-normal">(optional)</span></label>
                     <input name="relation" value={form.relation} onChange={handleChange} placeholder="Spouse, Attorney, Daughter…" className={inputClass} />
                   </div>
                   <div>

@@ -80,6 +80,11 @@ export async function POST(req: NextRequest) {
         to:      recipient,
         subject: `What the family remembered · ${archiveName}`,
         html,
+        headers: {
+          'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
+          'X-Entity-Ref-ID':  `basalith-${session.archive_id}-${Date.now()}`,
+          'Precedence':       'bulk',
+        },
       })
     }
 

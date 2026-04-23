@@ -295,7 +295,7 @@ export default function GameClient({ sessionId }: { sessionId: string }) {
 
           <div style={{ marginBottom: '2rem' }}>
             <label style={{ display: 'block', fontFamily: '"Courier New", monospace', fontSize: '0.64rem', letterSpacing: '0.18em', color: '#706C65', marginBottom: '0.5rem' }}>
-              YOUR EMAIL <span style={{ color: '#3A3830' }}>(optional — to receive the summary)</span>
+              YOUR EMAIL <span style={{ color: '#3A3830' }}>(optional, to receive the summary)</span>
             </label>
             <input
               type="email"
@@ -399,7 +399,7 @@ export default function GameClient({ sessionId }: { sessionId: string }) {
             onKeyDown={e => {
               if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) handleSaveMemory()
             }}
-            placeholder="Any memory, any detail — even partial memories help."
+            placeholder="Any memory, any detail. Even partial memories help."
             rows={4}
             style={{ width: '100%', minHeight: '120px', background: 'transparent', border: 'none', borderBottom: '1px solid rgba(196,162,74,0.3)', color: '#F0EDE6', fontFamily: 'Georgia, serif', fontSize: '1rem', fontStyle: 'italic', lineHeight: 1.7, padding: '0.5rem 0', outline: 'none', resize: 'vertical', boxSizing: 'border-box' }}
           />

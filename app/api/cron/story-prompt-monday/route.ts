@@ -97,6 +97,11 @@ export async function GET(req: NextRequest) {
             to:      contributor.email,
             subject: `Monday mystery — what was happening here? · ${archive.name}`,
             html:    buildMondayEmail(archive.family_name, photoUrl, selectedPhoto.ai_era_estimate, dateStr),
+            headers: {
+              'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
+              'X-Entity-Ref-ID':  `basalith-${archive.id}-${Date.now()}`,
+              'Precedence':       'bulk',
+            },
           })
           emailsSent++
         } catch (emailErr: any) {

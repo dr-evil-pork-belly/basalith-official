@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title:       'The Founding Session',
-  description: '90 minutes. Your family. A Senior Legacy Guide. Your first photographs. By the end of this session your archive exists — not as a promise, but as a fact.',
+  description: '90 minutes. Your family. A Senior Legacy Guide. Your first photographs. By the end of this session your archive exists, not as a promise, but as a fact.',
 }
 
 const EYEBROW: React.CSSProperties = {
@@ -56,7 +56,7 @@ const BEFORE_ITEMS = [
   {
     n:    '03',
     name: 'Fifteen Minutes of Preparation',
-    body: 'Think about one person whose story you most want to preserve. Not their biography — their voice. The particular way they described things. What they said about what mattered. What they never said but you understood anyway.',
+    body: 'Think about one person whose story you most want to preserve. Not their biography. Their voice. The particular way they described things. What they said about what mattered. What they never said but you understood anyway.',
   },
 ]
 
@@ -64,7 +64,7 @@ const SESSION_STEPS = [
   {
     n:    '01',
     name: 'The First Photograph',
-    body: 'Your Legacy Guide surfaces the first photograph. Often this is the moment families describe as when it became real. You begin labeling — not facts, but the story behind the facts. Who is in this photograph and what were they like? What was happening that day beyond what the camera shows? What would you want someone to know about this moment in fifty years?',
+    body: 'Your Legacy Guide surfaces the first photograph. Often this is the moment families describe as when it became real. You begin labeling: not facts, but the story behind the facts. Who is in this photograph and what were they like? What was happening that day beyond what the camera shows? What would you want someone to know about this moment in fifty years?',
   },
   {
     n:    '02',
@@ -74,12 +74,12 @@ const SESSION_STEPS = [
   {
     n:    '03',
     name: 'The Archive Structure',
-    body: 'Your decades are mapped. The gaps are identified. You can see — visually — which parts of the story are documented and which parts are waiting. This map becomes your guide for everything that follows.',
+    body: 'Your decades are mapped. The gaps are identified. You can see, visually, which parts of the story are documented and which parts are waiting. This map becomes your guide for everything that follows.',
   },
   {
     n:    '04',
     name: 'The First Essence Deposit',
-    body: 'The session closes with your first direct deposit — something only you know, in your own words, about the person or period you most want to preserve. This becomes the seed of your AI entity\'s understanding of what mattered.',
+    body: 'The session closes with your first direct deposit: something only you know, in your own words, about the person or period you most want to preserve. This becomes the seed of your AI entity\'s understanding of what mattered.',
   },
 ]
 
@@ -126,7 +126,7 @@ export default function FoundingSessionPage() {
             }}>
               90 minutes. Your family. A Senior Legacy Guide. Your first photographs.
               <br /><br />
-              By the end of this session your archive exists — not as a promise, but as a fact.
+              By the end of this session your archive exists, not as a promise, but as a fact.
             </p>
 
             <div aria-hidden="true" style={GOLD_RULE} />
@@ -243,7 +243,7 @@ export default function FoundingSessionPage() {
             <p style={BODY}>Most families describe the Founding session as the moment they understood what they had been missing.</p>
             <p style={BODY}>Not the technology. Not the product.</p>
             <p style={BODY}>The conversation.</p>
-            <p style={BODY}>The specific, unhurried conversation about the specific people who made them who they are — a conversation modern life almost never creates space for.</p>
+            <p style={BODY}>The specific, unhurried conversation about the specific people who made them who they are. A conversation modern life almost never creates space for.</p>
             <p style={BODY}>The archive is what remains after that conversation.</p>
             <p style={{ ...BODY, fontStyle: 'italic', color: '#E8E4DC' }}>The conversation is the product.</p>
 

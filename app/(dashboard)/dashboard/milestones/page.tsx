@@ -256,7 +256,7 @@ export default function MilestonesPage() {
                   <input name="title" value={form.title} onChange={handleChange} placeholder="Distribute estate assets to Sarah" className={inputClass} />
                 </div>
                 <div>
-                  <label className="block font-sans text-[0.68rem] font-bold tracking-[0.12em] uppercase text-text-muted mb-2">Description <span className="font-normal normal-case tracking-normal">— optional</span></label>
+                  <label className="block font-sans text-[0.68rem] font-bold tracking-[0.12em] uppercase text-text-muted mb-2">Description <span className="font-normal normal-case tracking-normal">(optional)</span></label>
                   <textarea name="description" value={form.description} onChange={handleChange} rows={3} placeholder="Describe the condition in plain language…" className={inputClass + ' resize-none'} />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -279,7 +279,7 @@ export default function MilestonesPage() {
                 </div>
                 {curators.length > 0 && (
                   <div>
-                    <label className="block font-sans text-[0.68rem] font-bold tracking-[0.12em] uppercase text-text-muted mb-2">Beneficiary <span className="font-normal normal-case tracking-normal">— optional</span></label>
+                    <label className="block font-sans text-[0.68rem] font-bold tracking-[0.12em] uppercase text-text-muted mb-2">Beneficiary <span className="font-normal normal-case tracking-normal">(optional)</span></label>
                     <select name="beneficiary_id" value={form.beneficiary_id} onChange={handleChange} className={inputClass + ' appearance-none'}>
                       <option value="">No specific beneficiary</option>
                       {curators.map(c => <option key={c.id} value={c.id}>{c.display_name}</option>)}

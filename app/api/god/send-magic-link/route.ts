@@ -83,6 +83,11 @@ export async function POST(req: Request) {
       to:      archive.owner_email,
       subject,
       html,
+      headers: {
+        'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
+        'X-Entity-Ref-ID':  `basalith-${archiveId}-${Date.now()}`,
+        'Precedence':       'bulk',
+      },
     })
 
     console.log('[send-magic-link] email sent to:', archive.owner_email)

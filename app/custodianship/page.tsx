@@ -56,7 +56,7 @@ const GUARANTEES = [
   {
     n:    '03',
     title: 'Complete Data Portability',
-    body:  'Your archive — every photograph, every label, every story, every voice recording — is exportable in full at any time. You are never locked in.',
+    body:  'Your archive, every photograph, every label, every story, every voice recording, is exportable in full at any time. You are never locked in.',
   },
   {
     n:    '04',
@@ -106,7 +106,7 @@ export default function CustodianshipPage() {
             <span style={EYEBROW}>What the Reserve Is</span>
             <h2 style={H2}>What the Reserve Is</h2>
 
-            <p style={BODY}>Every active Basalith archive contributes to the Data Custodianship Reserve — a dedicated fund maintained separately from Basalith&rsquo;s operating finances.</p>
+            <p style={BODY}>Every active Basalith archive contributes to the Data Custodianship Reserve, a dedicated fund maintained separately from Basalith&rsquo;s operating finances.</p>
             <p style={BODY}>The Reserve has one purpose: to ensure that every family archive survives regardless of what happens to the company that built it.</p>
             <p style={{ ...BODY, color: '#E8E4DC', fontStyle: 'italic' }}>This is what we mean when we say permanent. Not permanent while we are here. Permanent.</p>
 
@@ -175,7 +175,7 @@ export default function CustodianshipPage() {
             <p style={{ ...BODY, fontStyle: 'italic' }}>Most digital services end.</p>
             <p style={{ ...BODY, fontStyle: 'italic' }}>Companies are acquired, pivoted, shut down. The average lifespan of a technology company is measured in years, not decades.</p>
             <p style={{ ...BODY, fontStyle: 'italic' }}>Basalith is building something that is supposed to last centuries.</p>
-            <p style={{ ...BODY, fontStyle: 'italic' }}>Those two facts require a serious answer — not a terms of service clause, but an actual structural mechanism that functions independently of our survival.</p>
+            <p style={{ ...BODY, fontStyle: 'italic' }}>Those two facts require a serious answer, not a terms of service clause, but an actual structural mechanism that functions independently of our survival.</p>
             <p style={{ ...BODY, fontStyle: 'italic' }}>The Reserve is that mechanism.</p>
             <p style={{ ...BODY, fontStyle: 'italic', marginBottom: 0 }}>It is the reason we can use the word permanent and mean it.</p>
 
@@ -202,7 +202,7 @@ export default function CustodianshipPage() {
               Not if we&rsquo;re still around.
               Not if the technology still exists in its current form.
               <br /><br />
-              Simply — they should be able to access it.
+              Simply, they should be able to access it.
               <br /><br />
               The Reserve exists to make that sentence true.&rdquo;
             </p>

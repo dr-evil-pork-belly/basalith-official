@@ -154,7 +154,7 @@ export async function POST(req: NextRequest) {
         commission_type: 'founding_fee',
         amount:          1000,
         status:          'pending',
-        notes:           `${familyName} Archive — ${tier} tier founding`,
+        notes:           `${familyName} Archive, ${tier} tier founding`,
       })
       .then(() => {})
 
@@ -189,7 +189,7 @@ export async function POST(req: NextRequest) {
       await resend.emails.send({
         from:    `The ${familyName} Archive <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
         to:      clientEmail,
-        subject: `Welcome to Basalith — The ${familyName} Archive is ready`,
+        subject: `Welcome to Basalith. The ${familyName} Archive is ready.`,
         html:    buildWelcomeEmail(familyName, firstName, password, tierName, archivist.name, magicLinkUrl),
         headers: {
           'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
@@ -207,7 +207,7 @@ export async function POST(req: NextRequest) {
       await resend.emails.send({
         from:    `Basalith <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
         to:      process.env.ADMIN_EMAIL ?? 'legacy@basalith.xyz',
-        subject: `New Archive — The ${familyName} Archive (${tier}) — via ${archivist.name}`,
+        subject: `New Archive: The ${familyName} Archive (${tier}) via ${archivist.name}`,
         headers: {
           'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
           'X-Entity-Ref-ID':  `basalith-${archive.id}-${Date.now()}`,

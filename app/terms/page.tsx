@@ -10,7 +10,7 @@ const SECTIONS = [
     title: 'The Service',
     body: [
       'Basalith is a personal legacy preservation service operated by Heritage Nexus Inc. ("we", "us", "the Company"). By creating an archive or submitting an application, you ("the Subscriber") agree to be bound by these Terms of Service in their entirety.',
-      'Basalith provides a governed digital archive infrastructure — including secure storage, family contributor tools, AI-assisted Essence Mapping, and Digital Clone access — as described in the service tier documentation current at the time of your Founding.',
+      'Basalith provides a governed digital archive infrastructure, including secure storage, family contributor tools, AI-assisted Essence Mapping, and Digital Clone access, as described in the service tier documentation current at the time of your Founding.',
       'These Terms govern the commercial relationship between you and Heritage Nexus Inc. The separate Sovereignty Charter, executed at the time of your Founding, governs the ownership, governance, and continuity of your archive as a legal asset. In any conflict between these Terms and your Sovereignty Charter, the Sovereignty Charter takes precedence in respect of archive content and ownership rights.',
       'We reserve the right to update these Terms. Material changes will be communicated by email no fewer than 30 days before taking effect. Continued use of the service after that date constitutes acceptance.',
     ],
@@ -31,8 +31,8 @@ const SECTIONS = [
     body: [
       'You may cancel your annual subscription at any time by providing written notice to legacy@basalith.xyz. Cancellation takes effect at the end of the current billing period. No partial refunds are issued for unused subscription time.',
       'Upon cancellation, you retain full rights to a complete export of your archive in open, portable formats. This export right is unconditional and does not require a reason. Export requests are fulfilled within 30 business days.',
-      'Cancellation of a subscription is distinct from dissolution of your archive. Dissolution — the permanent deletion of all archive content from our systems — is a separate, deliberate act governed by your Sovereignty Charter and requires a verified written request from the designated Custodian.',
-      'If Basalith ceases operations for any reason, the Data Custodianship Reserve — an independent legal structure funded by subscription revenue — ensures that all archives are transferred to a successor custodian or returned to subscribers in full. The terms of this arrangement are specified in your Sovereignty Charter.',
+      'Cancellation of a subscription is distinct from dissolution of your archive. Dissolution, meaning the permanent deletion of all archive content from our systems, is a separate, deliberate act governed by your Sovereignty Charter and requires a verified written request from the designated Custodian.',
+      'If Basalith ceases operations for any reason, the Data Custodianship Reserve, an independent legal structure funded by subscription revenue, ensures that all archives are transferred to a successor custodian or returned to subscribers in full. The terms of this arrangement are specified in your Sovereignty Charter.',
     ],
   },
   {
@@ -98,7 +98,7 @@ export default function TermsPage() {
             </h1>
             <p className="font-sans font-light text-body-base text-text-secondary leading-[1.82] max-w-xl mx-auto">
               These terms govern the commercial relationship between you and Heritage Nexus Inc.
-              Your Sovereignty Charter — a separate binding document — governs your archive as a legal asset.
+              Your Sovereignty Charter, a separate binding document, governs your archive as a legal asset.
             </p>
             <p className="font-sans text-[0.75rem] text-text-muted mt-6">
               Last updated: March 2026 &nbsp;·&nbsp; Governing law: {GOVERNING_STATE}
@@ -123,7 +123,7 @@ export default function TermsPage() {
                 The Sovereignty Charter
               </h2>
               <p className="font-sans font-light text-body-base text-text-secondary leading-[1.85]">
-                Every Basalith archive is governed by a Sovereignty Charter — a separate legal instrument executed at The Founding.
+                Every Basalith archive is governed by a Sovereignty Charter, a separate legal instrument executed at The Founding.
                 The Charter establishes your absolute ownership of the archive, the terms of its inheritance, the rights of your designated Custodian,
                 and the conditions under which dissolution may occur. These Terms of Service govern the commercial subscription.
                 The Sovereignty Charter governs the archive as a legal asset. Where they conflict, the Sovereignty Charter prevails.

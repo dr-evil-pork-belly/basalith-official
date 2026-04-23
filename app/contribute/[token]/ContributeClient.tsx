@@ -720,7 +720,7 @@ function PhoneCallSection({
       ) : (
         <div>
           <p className="font-serif italic" style={{ fontSize: '0.9rem', color: '#9DA3A8', lineHeight: 1.75, marginBottom: '1.25rem' }}>
-            Add your phone number to record stories by phone call. No login needed — just call and speak.
+            Add your phone number to record stories by phone call. No login needed. Just call and speak.
           </p>
           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-end', flexWrap: 'wrap' }}>
             <input

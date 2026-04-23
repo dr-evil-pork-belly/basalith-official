@@ -206,7 +206,7 @@ export default function ContactPage() {
                     {/* Message */}
                     <div>
                       <label htmlFor="message" className="block font-sans text-[0.72rem] font-bold tracking-[0.12em] uppercase text-text-muted mb-2">
-                        Message <span className="font-normal normal-case tracking-normal text-text-muted">— optional</span>
+                        Message <span className="font-normal normal-case tracking-normal text-text-muted">(optional)</span>
                       </label>
                       <textarea
                         id="message"

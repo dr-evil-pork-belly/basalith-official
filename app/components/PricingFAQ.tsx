@@ -11,7 +11,7 @@ const ITEMS: Item[] = [
   {
     q: 'What exactly is The Founding?',
     a: <>
-      The Founding is a one-time setup investment covering the full onboarding process — archive architecture,
+      The Founding is a one-time setup investment covering the full onboarding process: archive architecture,
       legal framework review, and your initial Essence Mapping session. It is paid once at the start of your
       relationship with Basalith. Your annual stewardship plan begins after The Founding is complete.
       {' '}<a href="/founding-session" style={{ color: '#C4A24A', textDecoration: 'none' }}>
@@ -22,7 +22,7 @@ const ITEMS: Item[] = [
   {
     q: 'What happens to my archive if Basalith ceases to exist?',
     a: <>
-      Every active archive is covered by the Data Custodianship Reserve — a dedicated fund maintained
+      Every active archive is covered by the Data Custodianship Reserve, a dedicated fund maintained
       separately from our operating finances. If Basalith were to cease operations, the Reserve funds a
       minimum of 10 years of continued archive storage and access under an independent custodian institution.
       Your archive does not depend on our continued existence.
@@ -41,7 +41,7 @@ const ITEMS: Item[] = [
     q: 'Can my family access the archive after I am gone?',
     a: `Yes. This is one of the core purposes of the archive. Your designated Custodian has formal estate
       standing to govern the archive after your passing. Contributors retain their access. The archive
-      continues. Your AI entity — if initialized — remains available to your family indefinitely.
+      continues. Your AI entity, if initialized, remains available to your family indefinitely.
       The Estate and Dynasty tiers include specific provisions for multi-generational access and inheritance.`,
   },
   {
@@ -63,7 +63,7 @@ const ITEMS: Item[] = [
   {
     q: 'Can I upgrade my stewardship tier?',
     a: `Yes, at any time. Upgrades take effect at your next renewal date. Your archive content, contributors,
-      and entity are fully preserved across all tiers — upgrading unlocks additional features and
+      and entity are fully preserved across all tiers. Upgrading unlocks additional features and
       stewardship services, it does not require any re-initialization.`,
   },
 ]

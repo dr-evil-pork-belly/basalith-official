@@ -286,7 +286,7 @@ export default function DatesClient({ archiveId }: { archiveId: string }) {
             </div>
 
             <div style={{ gridColumn: '1 / -1' }}>
-              <label style={FIELD_LABEL_STYLE}>Personal note (optional — included in the email)</label>
+              <label style={FIELD_LABEL_STYLE}>Personal note (optional, included in the email)</label>
               <textarea
                 style={{ ...INPUT_STYLE, minHeight: '72px', resize: 'vertical' } as React.CSSProperties}
                 placeholder="A sentence or two about why this date matters..."

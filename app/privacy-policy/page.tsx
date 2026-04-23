@@ -35,7 +35,7 @@ const SECTIONS = [
     num:   '04',
     title: 'Data Retention',
     body: [
-      'Pre-signup enquiry data — archive applications and contact form submissions — is retained for as long as is necessary to manage your enquiry and maintain a record of our correspondence.',
+      'Pre-signup enquiry data, including archive applications and contact form submissions, is retained for as long as is necessary to manage your enquiry and maintain a record of our correspondence.',
       'If your enquiry does not result in an active service agreement, we will delete your submission data within 24 months of your last interaction with us, or immediately upon a verified deletion request.',
       'Data associated with active Basalith archives is governed by your Sovereignty Charter and the terms of your service agreement, which take precedence over this policy in respect of archive content.',
     ],
@@ -54,7 +54,7 @@ const SECTIONS = [
     title: 'Cookies',
     body: [
       'This site does not use advertising cookies, tracking cookies, or third-party analytics cookies.',
-      'We use only essential session cookies required for the operation of our onboarding flow — specifically, to temporarily preserve your tier selection and contact details across steps. This data is stored in your browser\'s localStorage and is cleared upon completion or abandonment of the flow.',
+      'We use only essential session cookies required for the operation of our onboarding flow. These temporarily preserve your tier selection and contact details across steps. This data is stored in your browser\'s localStorage and is cleared upon completion or abandonment of the flow.',
       'By using this site, you consent to this limited, functional use of browser storage.',
     ],
   },

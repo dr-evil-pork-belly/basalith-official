@@ -70,13 +70,13 @@ function Opening() {
         <p style={BODY}>Every Basalith archive is built from two directions simultaneously.</p>
 
         <p style={BODY}>
-          The subject deposits their own memories, wisdom, and beliefs —
+          The subject deposits their own memories, wisdom, and beliefs,
           the inside looking out.
         </p>
 
         <p style={BODY}>
           The people who knew them contribute what they observed, what they witnessed,
-          what only they could see — the outside looking in.
+          what only they could see, the outside looking in.
         </p>
 
         <p style={BODY}>
@@ -86,7 +86,7 @@ function Opening() {
 
         <p style={BODY}>
           When someone has passed, the inside data is frozen at whatever was deposited
-          while they were alive. But the outside data — the witness perspective —
+          while they were alive. But the outside data, the witness perspective,
           is fully available.
         </p>
 
@@ -128,13 +128,13 @@ function WitnessesCarry() {
 
         <p style={BODY}>
           These observations are not secondary to the archive. In many ways they
-          are the archive&rsquo;s most valuable data — because they capture dimensions
+          are the archive&rsquo;s most valuable data, because they capture dimensions
           of a person that the person themselves would never think to deposit.
         </p>
 
         <p style={BODY}>
           When someone has passed, the witness perspective becomes everything.
-          And it is often richest immediately after a loss — when family members
+          And it is often richest immediately after a loss, when family members
           are thinking about the person constantly, when memories are surfacing,
           when stories are being told at gatherings that have never been told before.
         </p>
@@ -158,7 +158,7 @@ function WhatWeCanBuild() {
         <span style={EYEBROW}>What We Can Build</span>
 
         <h2 style={H2}>
-          An entity built from what remains —<br />
+          An entity built from what remains,<br />
           and what the people who loved them remember.
         </h2>
 
@@ -167,7 +167,7 @@ function WhatWeCanBuild() {
         <p style={BODY}>
           A witness archive built from thousands of labeled photographs, transcribed
           letters, guided family sessions, voicemails, and structured witness
-          observations — produces an entity of genuine depth. One that speaks
+          observations, produces an entity of genuine depth. One that speaks
           in recognizable patterns. That carries known opinions, specific memories,
           a particular way of thinking about the world.
         </p>
@@ -177,7 +177,7 @@ function WhatWeCanBuild() {
         <p style={BODY}>We will never claim to give you back the person you lost.</p>
 
         <p style={{ ...BODY, marginBottom: 0 }}>
-          We will build the most complete possible preservation of who they were —
+          We will build the most complete possible preservation of who they were,
           from everything that remains and everything the people who loved them remember.
           That is what we can honestly offer. That is what we will deliver.
         </p>
@@ -212,8 +212,8 @@ function MissingPiece() {
 
         <p style={BODY}>
           When five people who loved the same person each answer the question
-          &ldquo;Describe a moment when you watched them handle something difficult&rdquo; —
-          the entity that emerges from those five answers is more accurate than
+          &ldquo;Describe a moment when you watched them handle something difficult.&rdquo;
+          The entity that emerges from those five answers is more accurate than
           anything the subject alone could have produced.
         </p>
 
@@ -235,27 +235,27 @@ const STEPS = [
   {
     n:    '01',
     name: 'Material Assessment',
-    body: 'A Senior Legacy Guide reviews everything your family can provide — photographs, letters, documents, audio, video. We tell you honestly what we can build from it.',
+    body: 'A Senior Legacy Guide reviews everything your family can provide: photographs, letters, documents, audio, video. We tell you honestly what we can build from it.',
   },
   {
     n:    '02',
     name: 'Digitization Guidance',
-    body: "We guide your family through what to scan, photograph, transcribe, and upload. We work with what exists — we never fabricate what doesn't.",
+    body: "We guide your family through what to scan, photograph, transcribe, and upload. We work with what exists. We never fabricate what does not.",
   },
   {
     n:    '03',
     name: 'Guided Witness Sessions',
-    body: "Three 90-minute guided sessions with your family. We surface the photographs. We ask the witness questions — the ones designed to extract what only each person from their specific vantage point could know. A daughter gets different questions than a colleague. A childhood friend gets different questions than a spouse. Every perspective adds something no other perspective can.",
+    body: "Three 90-minute guided sessions with your family. We surface the photographs. We ask the witness questions, the ones designed to extract what only each person from their specific vantage point could know. A daughter gets different questions than a colleague. A childhood friend gets different questions than a spouse. Every perspective adds something no other perspective can.",
   },
   {
     n:    '04',
     name: 'Letter and Document Transcription',
-    body: 'Written correspondence, journals, notes — transcribed and indexed with their voice intact.',
+    body: 'Written correspondence, journals, notes, transcribed and indexed with their voice intact.',
   },
   {
     n:    '05',
     name: 'Audio and Video Processing',
-    body: 'Voicemails, home videos, recordings — processed and integrated into the archive as primary source material.',
+    body: 'Voicemails, home videos, recordings, processed and integrated into the archive as primary source material.',
   },
   {
     n:    '06',
@@ -357,7 +357,7 @@ function Pricing() {
             $300 / month equivalent
           </p>
           <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'italic', fontSize: '0.85rem', color: '#9DA3A8', lineHeight: 1.65, marginBottom: '1.5rem' }}>
-            Full Estate tier stewardship — the same infrastructure as any active Basalith archive.
+            Full Estate tier stewardship, the same infrastructure as any active Basalith archive.
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginBottom: '1.5rem' }}>
             {[
@@ -381,7 +381,7 @@ function Pricing() {
           </div>
           <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'italic', fontSize: '0.85rem', color: '#5C6166', lineHeight: 1.75, margin: 0 }}>
             Stewardship begins after The Witness Founding is complete. Renews annually.
-            Cancel at any time — archive accessible for 90 days after cancellation.
+            Cancel at any time. Archive accessible for 90 days after cancellation.
           </p>
         </div>
 
@@ -389,7 +389,7 @@ function Pricing() {
         <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'italic', fontSize: '0.95rem', color: '#9DA3A8', lineHeight: 1.8, marginBottom: '2rem', maxWidth: '560px' }}>
           The Witness Founding requires a consultation before engagement.
           Every family&rsquo;s situation is different. We will tell you honestly
-          what we can build — and what it will cost — before you commit to anything.
+          what we can build, and what it will cost, before you commit to anything.
         </p>
 
         <a
@@ -443,8 +443,8 @@ function ClosingQuote() {
           <br /><br />
           Nothing does.
           <br /><br />
-          But a carefully built archive — honest about what it is and what it
-          isn&rsquo;t — can let a family keep talking to someone they thought
+          But a carefully built archive, honest about what it is and what it
+          is not, can let a family keep talking to someone they thought
           they had lost.&rdquo;
         </p>
 

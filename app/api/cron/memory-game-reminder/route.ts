@@ -100,7 +100,7 @@ export async function GET(req: NextRequest) {
           await resend.emails.send({
             from:    `The ${archive.family_name} Archive <archive@basalith.xyz>`,
             to:      contributor.email,
-            subject: `The game closes ${hoursLeft <= 3 ? 'soon' : 'today'} — ${session.total_memories} memories so far · ${archive.name}`,
+            subject: `The game closes ${hoursLeft <= 3 ? 'soon' : 'today'}: ${session.total_memories} memories so far · ${archive.name}`,
             html: `<!DOCTYPE html>
 <html>
 <body style="background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:600px;margin:0 auto;padding:0">
@@ -153,6 +153,11 @@ export async function GET(req: NextRequest) {
 
 </body>
 </html>`,
+            headers: {
+              'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
+              'X-Entity-Ref-ID':  `basalith-${archive.id}-${Date.now()}`,
+              'Precedence':       'bulk',
+            },
           })
           sent++
         } catch (emailErr: unknown) {

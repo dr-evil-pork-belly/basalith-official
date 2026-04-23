@@ -83,7 +83,7 @@ export default function AssetPage() {
           </p>
           <p style={body}>
             The result is the most accurate record of a human life ever assembled. Not a curated
-            highlight reel. The actual texture of a specific life — the hard years, the ordinary
+            highlight reel. The actual texture of a specific life: the hard years, the ordinary
             years, the years that defined everything that came after.
           </p>
 
@@ -94,7 +94,7 @@ export default function AssetPage() {
             their particular way of thinking about the world.
           </p>
           <p style={body}>
-            It is not a simulation. It is a preservation — of everything the archive contains
+            It is not a simulation. It is a preservation of everything the archive contains
             about how a specific person actually thought.
           </p>
           <p style={body}>
@@ -108,8 +108,8 @@ export default function AssetPage() {
             Businesses sometimes transfer.
           </p>
           <p style={body}>
-            But the judgment — the pattern recognition, the specific way of thinking about risk
-            and opportunity and people that took a lifetime to develop — that disappears with
+            But the judgment, the pattern recognition, the specific way of thinking about risk
+            and opportunity and people that took a lifetime to develop. That disappears with
             the person who built it.
           </p>
           <p style={body}>Every generation starts over. They inherit the money but not the mind that made it.</p>

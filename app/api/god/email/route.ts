@@ -64,6 +64,11 @@ export async function POST(req: NextRequest) {
       from:    `${archive.name} <${fromEmail}>`,
       to:      archive.owner_email,
       subject: template.subject,
+      headers: {
+        'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
+        'X-Entity-Ref-ID':  `basalith-${archiveId}-${Date.now()}`,
+        'Precedence':       'bulk',
+      },
       html: `<!DOCTYPE html>
 <html>
 <body style="background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:520px;margin:0 auto;padding:0">

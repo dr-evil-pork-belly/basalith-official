@@ -30,13 +30,13 @@ export default function AncestorSection() {
           <br /><br />
           She was twenty-two years old. She spoke no English. She had almost nothing.
           <br /><br />
-          I know these facts the way you know facts from a book — accurately, but
+          I know these facts the way you know facts from a book, accurately, but
           without weight.
           <br /><br />
           What I don&rsquo;t know is what she thought about on the crossing. Whether
           she was terrified or certain or both. What she left behind that she never
-          spoke of. What she understood about starting over that her grandchildren —
-          comfortable, settled, safe — never needed to learn.
+          spoke of. What she understood about starting over that her grandchildren,
+          comfortable, settled, safe, never needed to learn.
           <br /><br />
           She died before I was born.
           <br /><br />
@@ -44,7 +44,7 @@ export default function AncestorSection() {
           <br /><br />
           But I think about her more than I think about most people I have actually met.
           <br /><br />
-          I think about her because I know — I know — she would have had things to say
+          I think about her because I know, I know, she would have had things to say
           that would have changed how I live my life.
           <br /><br />
           And she never got to say them.
@@ -87,13 +87,13 @@ export default function AncestorSection() {
             textAlign: 'center',
           }}
         >
-          What would your great-grandchildren give to be able to talk to you —
+          What would your great-grandchildren give to be able to talk to you,
           <br /><br />
           not read about you,
           <br /><br />
           not see photographs of you,
           <br /><br />
-          but actually talk to you —
+          but actually talk to you,
           <br /><br />
           forty years from now?
         </p>

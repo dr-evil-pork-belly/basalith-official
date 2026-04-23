@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
       from:    'Basalith <davidha@basalith.xyz>',
       to:      process.env.ADMIN_EMAIL ?? 'legacy@basalith.xyz',
       replyTo: email,
-      subject: `New Archive Application — ${name}`,
+      subject: `New Archive Application: ${name}`,
       headers: {
         'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
         'X-Entity-Ref-ID':  `basalith-apply-${Date.now()}`,

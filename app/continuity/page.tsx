@@ -109,7 +109,7 @@ export default function ContinuityPage() {
           </p>
           <p style={body}>
             But the judgment, the pattern recognition, the specific way of thinking about risk and
-            opportunity and people that took a lifetime to develop — that disappears with the person
+            opportunity and people that took a lifetime to develop. That disappears with the person
             who built it.
           </p>
           <p style={body}>
@@ -175,7 +175,7 @@ export default function ContinuityPage() {
               &ldquo;In 100 years the world will be unrecognizable.<br /><br />
               But the story of how your grandmother survived something hard,
               or your grandfather built something from nothing,
-              or your mother showed love through cooking when she had no other way to show it —<br /><br />
+              or your mother showed love through cooking when she had no other way to show it,<br /><br />
               those stories will still matter.<br /><br />
               They will still teach.<br />
               They will still change how someone lives their life.&rdquo;

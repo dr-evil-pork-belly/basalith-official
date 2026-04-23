@@ -42,13 +42,13 @@ const TIERS = [
       'Everything in The Archive',
       'Up to 15 family contributors',
       'Full Digital Clone with conversational access',
-      'Will & Trust integration — bequest language prepared',
+      'Will & Trust integration, bequest language prepared',
       'Dedicated Custodian designation',
       'Annual estate compatibility review',
       'Priority curation support',
       'basalith.ai entity priority access',
       'Quarterly Provenance report',
-      'Family access tiers — control who sees what',
+      'Family access tiers, control who sees what',
       '48-hour response on all support requests',
     ],
     cta: 'REQUEST YOUR FOUNDING',
@@ -66,8 +66,8 @@ const TIERS = [
       'Unlimited contributors across generations',
       'Full Family Trust legal instrument',
       'Multi-generational access tiers',
-      'Dedicated Archive Manager — named professional, not a ticket queue',
-      'White-glove onboarding — we come to you',
+      'Dedicated Archive Manager. Named professional, not a ticket queue.',
+      'White-glove onboarding. We come to you.',
       'Annual in-person estate review',
       'First access to new AI model generations',
       'Custom Digital Clone interaction boundaries',
@@ -142,7 +142,7 @@ export default function PricingPage() {
               <em className="italic font-medium text-amber" style={{ fontStyle: 'italic' }}>Permanence.</em>
             </h1>
             <p className="font-sans font-light text-body-base text-text-secondary leading-[1.82] max-w-xl mx-auto">
-              Basalith is priced as what it is — a generational asset under professional stewardship.
+              Basalith is priced as what it is: a generational asset under professional stewardship.
               Not a software subscription. Not a storage plan. A governed legacy infrastructure with legal standing.
             </p>
           </div>
@@ -171,7 +171,7 @@ export default function PricingPage() {
                 The Founding
               </h2>
               <p className="font-serif italic text-text-secondary leading-[1.75] mb-8" style={{ fontSize: '1rem' }}>
-                Every Basalith archive begins with The Founding —
+                Every Basalith archive begins with The Founding,
                 a comprehensive legal and technical engagement that establishes
                 your archive&rsquo;s permanent infrastructure.
                 Executed once. Built to last centuries.
@@ -298,7 +298,7 @@ export default function PricingPage() {
               ]
             })}
           </div>
-          <p className="text-center font-sans text-[0.75rem] text-text-muted mt-8">All plans require The Founding — a one-time setup investment of $2,500.</p>
+          <p className="text-center font-sans text-[0.75rem] text-text-muted mt-8">All plans require The Founding, a one-time setup investment of $2,500.</p>
           <p className="text-center font-serif italic text-text-muted mt-2" style={{ fontSize: '0.9rem' }}>
             The Founding includes archive initialization, legal framework review, your first Essence Mapping session, and Custodian designation.
           </p>
@@ -310,7 +310,7 @@ export default function PricingPage() {
             <p className="font-serif italic text-text-secondary leading-[1.85]" style={{ fontSize: '1.3rem' }}>
               &ldquo;The Founding is not a setup fee.
               It is a legal and technical engagement
-              executed by a Senior Legacy Guide &mdash; the same
+              executed by a Senior Legacy Guide, the same
               way an estate attorney executes a trust.
               <br /><br />
               You leave The Founding with six deliverables,
@@ -337,7 +337,7 @@ export default function PricingPage() {
               <em className="italic font-medium text-amber" style={{ fontStyle: 'italic' }}>For Everyone.</em>
             </h2>
             <p className="font-sans font-light text-body-base text-text-secondary leading-[1.82] mb-12">
-              It is for the rare few who understand that memory is an asset —
+              It is for the rare few who understand that memory is an asset,
               and that leaving it unarchived is a choice with consequences
               their family will live with long after they are gone.
             </p>

@@ -210,6 +210,11 @@ export async function GET(req: NextRequest) {
               contributors.length,
               closesAt
             ),
+            headers: {
+              'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
+              'X-Entity-Ref-ID':  `basalith-${archive.id}-${Date.now()}`,
+              'Precedence':       'bulk',
+            },
           })
         } catch (emailErr: unknown) {
           const msg = emailErr instanceof Error ? emailErr.message : String(emailErr)

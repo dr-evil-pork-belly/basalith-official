@@ -32,7 +32,7 @@ export default function EleanorSection() {
               marginBottom: '0.5rem',
             }}
           >
-            Eleanor, 74 &mdash; daughter
+            Eleanor, 74, daughter
           </p>
           <p
             className="font-serif font-light"

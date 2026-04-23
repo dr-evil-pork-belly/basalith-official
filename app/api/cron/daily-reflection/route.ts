@@ -67,6 +67,11 @@ export async function GET(req: NextRequest) {
         to:      archive.owner_email,
         subject,
         html:    buildDailyReflectionEmail(archive.name, firstName, question, formattedPhone, lang),
+        headers: {
+          'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
+          'X-Entity-Ref-ID':  `basalith-${archive.id}-${Date.now()}`,
+          'Precedence':       'bulk',
+        },
       })
 
       sent++

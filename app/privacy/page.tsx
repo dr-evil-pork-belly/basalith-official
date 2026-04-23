@@ -102,7 +102,7 @@ export default function PrivacyPage() {
                 'Communications between you and Basalith',
               ].map((item) => (
                 <li key={item} style={LI}>
-                  <span style={{ color: 'rgba(196,162,74,0.5)', marginRight: '0.5rem' }}>—</span>
+                  <span style={{ color: 'rgba(196,162,74,0.5)', marginRight: '0.5rem' }}>·</span>
                   {item}
                 </li>
               ))}
@@ -121,7 +121,7 @@ export default function PrivacyPage() {
                 'Improve our services',
               ].map((item) => (
                 <li key={item} style={LI}>
-                  <span style={{ color: 'rgba(196,162,74,0.5)', marginRight: '0.5rem' }}>—</span>
+                  <span style={{ color: 'rgba(196,162,74,0.5)', marginRight: '0.5rem' }}>·</span>
                   {item}
                 </li>
               ))}
@@ -145,7 +145,7 @@ export default function PrivacyPage() {
                 'Face data is stored only within your archive and never shared',
               ].map((item) => (
                 <li key={item} style={LI}>
-                  <span style={{ color: 'rgba(196,162,74,0.5)', marginRight: '0.5rem' }}>—</span>
+                  <span style={{ color: 'rgba(196,162,74,0.5)', marginRight: '0.5rem' }}>·</span>
                   {item}
                 </li>
               ))}
@@ -169,7 +169,7 @@ export default function PrivacyPage() {
                 'Close your account and export your data',
               ].map((item) => (
                 <li key={item} style={LI}>
-                  <span style={{ color: 'rgba(196,162,74,0.5)', marginRight: '0.5rem' }}>—</span>
+                  <span style={{ color: 'rgba(196,162,74,0.5)', marginRight: '0.5rem' }}>·</span>
                   {item}
                 </li>
               ))}

@@ -72,13 +72,13 @@ export default function DetailsPage() {
             </div>
             <div>
               <label className="block font-sans text-[0.72rem] font-bold tracking-[0.12em] uppercase text-text-muted mb-2">
-                Phone <span className="font-normal normal-case tracking-normal text-text-muted">— optional</span>
+                Phone <span className="font-normal normal-case tracking-normal text-text-muted">(optional)</span>
               </label>
               <input name="phone" type="tel" value={form.phone} onChange={handleChange} placeholder="+1 (555) 000-0000" autoComplete="tel" className={inputClass} />
             </div>
             <div>
               <label className="block font-sans text-[0.72rem] font-bold tracking-[0.12em] uppercase text-text-muted mb-1">
-                Referral Code <span className="font-normal normal-case tracking-normal text-text-muted">— optional</span>
+                Referral Code <span className="font-normal normal-case tracking-normal text-text-muted">(optional)</span>
               </label>
               <p className="font-sans text-[0.72rem] text-text-muted mb-2">Leave blank if you were not referred.</p>
               <input name="referral" value={form.referral} onChange={handleChange} placeholder="BSL-XXX-00000" autoComplete="off" className={inputClass} />

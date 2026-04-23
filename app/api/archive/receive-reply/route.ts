@@ -197,6 +197,11 @@ export async function POST(req: NextRequest) {
       from:    `${archive?.name ?? 'The Archive'} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
       to:      contributorEmail,
       subject: `Your memory has been saved · ${archive?.name ?? 'The Archive'}`,
+      headers: {
+        'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
+        'X-Entity-Ref-ID':  `basalith-${session.archive_id}-${Date.now()}`,
+        'Precedence':       'bulk',
+      },
       html:    buildConfirmationEmail(
         archive?.name ?? 'The Archive',
         contributorName,

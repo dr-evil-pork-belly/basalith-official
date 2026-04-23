@@ -95,6 +95,11 @@ export async function GET(req: NextRequest) {
           weekNumber,
           lang,
         }),
+        headers: {
+          'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
+          'X-Entity-Ref-ID':  `basalith-${archive.id}-${Date.now()}`,
+          'Precedence':       'bulk',
+        },
       })
 
       sent++

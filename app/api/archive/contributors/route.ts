@@ -155,7 +155,7 @@ export async function PATCH(req: NextRequest) {
     await resend.emails.send({
       from:    `The ${archive.family_name} Archive <${fromEmail}>`,
       to:      contributor.email,
-      subject: `Your contributor portal link — The ${archive.family_name} Archive`,
+      subject: `Your contributor portal link for The ${archive.family_name} Archive`,
       headers: {
         'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
         'X-Entity-Ref-ID':  `basalith-${archiveId}-${Date.now()}`,
@@ -229,7 +229,7 @@ function buildContributorInviteEmail({
 
   const inviteBody = isZh
     ? `您已被邀请为${archiveName}${ownerName ? `——${ownerName}的档案` : ''}做贡献。`
-    : `You have been invited to contribute to ${archiveName}${ownerName ? ` — ${ownerName}'s archive` : ''}.`
+    : `You have been invited to contribute to ${archiveName}${ownerName ? `, ${ownerName}'s archive` : ''}.`
 
   const archiveDesc = isZh
     ? `这份档案是${familyName}家族的永久记录。作为贡献者，您将通过电子邮件收到档案中的照片，并可以通过您的个人页面分享您自己的照片、视频和回忆。`
@@ -237,7 +237,7 @@ function buildContributorInviteEmail({
 
   const tonightMsg = isZh
     ? '今晚您将收到第一张照片。直接回复邮件分享您记得的任何内容——您的回忆将直接进入档案。'
-    : 'Tonight you will receive your first photograph by email. Simply reply with whatever you remember — your memories go directly into the archive.'
+    : 'Tonight you will receive your first photograph by email. Simply reply with whatever you remember. Your memories go directly into the archive.'
 
   const portalLabel   = isZh ? '您的贡献者页面'           : 'YOUR CONTRIBUTOR PORTAL'
   const bookmarkNote  = isZh ? '请收藏此链接。这是您访问档案的专属入口，无需密码。' : 'Bookmark this link. It is your personal access to the archive. No password needed.'

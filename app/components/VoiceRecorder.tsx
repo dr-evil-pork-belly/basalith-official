@@ -246,7 +246,7 @@ export default function VoiceRecorder({
             {formatDuration(duration)}
           </p>
           <p style={{ fontFamily: 'Georgia, serif', fontSize: '0.85rem', fontStyle: 'italic', color: '#706C65', marginBottom: '2rem' }}>
-            Recording — speak naturally
+            Recording. Speak naturally.
           </p>
           <button
             onClick={stopRecording}

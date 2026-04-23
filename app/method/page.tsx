@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title:       'The Method',
-  description: 'How the Basalith archive is built. Two directions simultaneously — from the inside out and the outside in.',
+  description: 'How the Basalith archive is built. Two directions simultaneously, from the inside out and the outside in.',
 }
 
 const eyebrow: React.CSSProperties = {
@@ -101,12 +101,12 @@ export default function MethodPage() {
 
           <h2 style={h2}>The combination produces something neither could produce alone.</h2>
           <p style={body}>
-            When inside and outside data are combined — the deposits, the witness observations,
-            the family memories, the entity conversations — the result is the most accurate possible
+            When inside and outside data are combined (the deposits, the witness observations,
+            the family memories, the entity conversations) the result is the most accurate possible
             representation of a human life.
           </p>
           <p style={body}>
-            Not a curated version. Not a highlight reel. The actual person — as they saw themselves
+            Not a curated version. Not a highlight reel. The actual person, as they saw themselves
             and as the people who loved them saw them.
           </p>
 
@@ -138,7 +138,7 @@ export default function MethodPage() {
 
           <div style={{ textAlign: 'center', padding: '3rem 0' }}>
             <p style={{ ...body, fontStyle: 'italic', textAlign: 'center' }}>
-              The archive begins with The Founding — a 90-minute guided session with a Senior Legacy Guide.
+              The archive begins with The Founding, a 90-minute guided session with a Senior Legacy Guide.
             </p>
             <a
               href="/founding-session"

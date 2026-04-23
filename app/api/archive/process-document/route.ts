@@ -159,11 +159,11 @@ Return ONLY valid JSON with no markdown fences:
     let depositId = null
     if (transcript && wordCount > 10) {
       const depositPrompt =
-        documentType === 'personal_letter'  ? `Personal letter — ${decade || 'undated'}` :
-        documentType === 'journal_entry'    ? `Journal entry — ${decade || 'undated'}` :
-        documentType === 'email'            ? `Email correspondence — ${decade || 'undated'}` :
-        documentType === 'speech'           ? `Speech or presentation — ${decade || 'undated'}` :
-        `Written document — ${decade || 'undated'}`
+        documentType === 'personal_letter'  ? `Personal letter, ${decade || 'undated'}` :
+        documentType === 'journal_entry'    ? `Journal entry, ${decade || 'undated'}` :
+        documentType === 'email'            ? `Email correspondence, ${decade || 'undated'}` :
+        documentType === 'speech'           ? `Speech or presentation, ${decade || 'undated'}` :
+        `Written document, ${decade || 'undated'}`
 
       const { data: deposit } = await supabaseAdmin
         .from('owner_deposits')

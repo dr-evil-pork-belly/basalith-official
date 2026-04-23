@@ -51,7 +51,7 @@ I would give almost anything to ask him about that grain elevator now.`}
             marginBottom:  '1.25rem',
           }}
         >
-          &mdash; Written by a daughter, 2024
+          Written by a daughter, 2024
         </p>
 
         <p

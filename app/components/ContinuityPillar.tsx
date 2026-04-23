@@ -86,7 +86,7 @@ export default function ContinuityPillar() {
           style={{ fontSize: '1rem', color: '#9DA3A8' }}
         >
           Before your family labels a single photograph, our AI has already filtered
-          tens of thousands of images down to the ones that matter — organized by decade,
+          tens of thousands of images down to the ones that matter, organized by decade,
           indexed by face, ranked by archive value.
           <br /><br />
           The labeling game begins at the emotional peak, not the organizational bottom.
@@ -113,7 +113,7 @@ export default function ContinuityPillar() {
           to Living Intelligence.
         </h2>
         <p className="font-sans font-light text-body-base text-text-secondary leading-[1.82]">
-          The Golden Dataset does not sit still. It evolves — trained on new contributions,
+          The Golden Dataset does not sit still. It evolves, trained on new contributions,
           refined by your family's testimony, powered by whatever AI exists in the year
           your grandchildren ask it a question.
         </p>

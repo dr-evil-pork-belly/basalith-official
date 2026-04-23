@@ -152,6 +152,11 @@ export async function POST(req: NextRequest) {
   </div>
 </body>
 </html>`,
+        headers: {
+          'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
+          'X-Entity-Ref-ID':  `basalith-${archiveId}-${Date.now()}`,
+          'Precedence':       'bulk',
+        },
       }).catch(() => {})
     }
 

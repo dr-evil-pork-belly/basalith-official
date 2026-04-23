@@ -220,6 +220,11 @@ export async function POST(req: Request) {
       from:    `${archiveName} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
       to:      archive.owner_email,
       subject: `${archiveName} · ${t('todayMemories', lang)}`,
+      headers: {
+        'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
+        'X-Entity-Ref-ID':  `basalith-${archiveId}-${Date.now()}`,
+        'Precedence':       'bulk',
+      },
       html: `<body style="background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:600px;margin:0 auto;padding:0">
 
   <div style="padding:32px 32px 0">
@@ -287,7 +292,7 @@ export async function POST(req: Request) {
     await supabaseAdmin.from('owner_notifications').insert({
       archive_id: archiveId,
       type:       'morning_digest',
-      subject:    `Daily digest — ${recentLabels.length} new ${recentLabels.length === 1 ? 'memory' : 'memories'}`,
+      subject:    `Daily digest: ${recentLabels.length} new ${recentLabels.length === 1 ? 'memory' : 'memories'}`,
       sent_to:    archive.owner_email,
       sent_at:    new Date().toISOString(),
       metadata:   { labelCount: recentLabels.length },

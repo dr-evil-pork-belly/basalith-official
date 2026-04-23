@@ -49,7 +49,7 @@ export default function JoinArchivistsPage() {
                 begin their archives before it is too late.
               </p>
               <p className="mb-5">
-                Legacy Guides are not employees. They are trusted partners — professionals who
+                Legacy Guides are not employees. They are trusted partners, professionals who
                 understand what Basalith builds and who it is built for.
               </p>
               <p>

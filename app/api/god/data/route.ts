@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
     voiceRes,
     videosRes,
   ] = await Promise.allSettled([
-    supabaseAdmin.from('archives').select('id, name, family_name, owner_name, owner_email, tier, status, created_at'),
+    supabaseAdmin.from('archives').select('id, name, family_name, owner_name, owner_email, tier, status, created_at, magic_link_token'),
     supabaseAdmin.from('photographs').select('archive_id, status, created_at').order('created_at', { ascending: false }).limit(1000),
     supabaseAdmin.from('contributors').select('archive_id, status, name, created_at'),
     supabaseAdmin.from('owner_deposits').select('archive_id, created_at'),
@@ -162,6 +162,7 @@ export async function GET(req: NextRequest) {
       entityDepth,
       health,
       alerts,
+      magicLinkToken:     archive.magic_link_token ?? null,
     }
   })
 

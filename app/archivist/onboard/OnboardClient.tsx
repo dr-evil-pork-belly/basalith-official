@@ -7,6 +7,7 @@ type Result = {
   archiveName: string
   clientEmail: string
   password:    string
+  magicLink?:  string
 }
 
 const LABEL: React.CSSProperties = {
@@ -51,6 +52,8 @@ function Sigil() {
 }
 
 export default function OnboardClient({ archivistId }: { archivistId: string }) {
+  const [linkCopied, setLinkCopied] = useState(false)
+
   const [form, setForm] = useState({
     familyName:  '',
     clientName:  '',
@@ -94,7 +97,7 @@ export default function OnboardClient({ archivistId }: { archivistId: string }) 
     setError(null)
   }
 
-  const TIER_LABELS: Record<string, string> = { archive: 'The Archive — $1,200/yr', estate: 'The Estate — $3,600/yr', dynasty: 'The Dynasty — $9,600/yr' }
+  const TIER_LABELS: Record<string, string> = { archive: 'The Archive ($1,200/yr)', estate: 'The Estate ($3,600/yr)', dynasty: 'The Dynasty ($9,600/yr)' }
   const tierLabel = TIER_LABELS[form.tier] || ''
 
   return (
@@ -122,16 +125,38 @@ export default function OnboardClient({ archivistId }: { archivistId: string }) 
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginBottom: '1.5rem', textAlign: 'left', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '2px', padding: '1rem 1.25rem' }}>
             {[
-              ['CLIENT', result.clientEmail],
-              ['TIER',   tierLabel],
+              ['CLIENT',   result.clientEmail],
+              ['TIER',     tierLabel],
               ['PASSWORD', result.password],
-              ['STATUS', 'Login credentials sent'],
+              ['STATUS',   'Login credentials sent'],
             ].map(([k, v]) => (
               <div key={k} style={{ display: 'flex', gap: '0.75rem', alignItems: 'baseline' }}>
                 <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.38rem', letterSpacing: '0.2em', color: '#5C6166', flexShrink: 0, width: '70px' }}>{k}</span>
                 <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '0.9rem', color: k === 'PASSWORD' ? '#C4A24A' : '#B8B4AB' }}>{v}</span>
               </div>
             ))}
+            {result.magicLink && (
+              <div style={{ marginTop: '0.5rem', paddingTop: '0.5rem', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
+                  <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.38rem', letterSpacing: '0.2em', color: '#5C6166', flexShrink: 0, width: '70px', paddingTop: '0.15rem' }}>LINK</span>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '0.78rem', color: '#C4A24A', wordBreak: 'break-all', margin: '0 0 0.4rem', lineHeight: 1.5 }}>
+                      {result.magicLink}
+                    </p>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(result.magicLink!)
+                        setLinkCopied(true)
+                        setTimeout(() => setLinkCopied(false), 2000)
+                      }}
+                      style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.38rem', letterSpacing: '0.15em', textTransform: 'uppercase' as const, color: linkCopied ? '#4AC47C' : '#C4A24A', background: 'transparent', border: `1px solid ${linkCopied ? 'rgba(74,196,124,0.3)' : 'rgba(196,162,74,0.3)'}`, padding: '0.25rem 0.6rem', cursor: 'pointer' }}
+                    >
+                      {linkCopied ? 'Copied' : 'Copy Link'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
           <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '0.88rem', fontStyle: 'italic', color: '#9DA3A8', lineHeight: 1.7, margin: '0 0 1.5rem' }}>
             {result.clientEmail.split('@')[0]} has been sent their login details. Schedule their Founding Session within 24 hours.
@@ -179,9 +204,9 @@ export default function OnboardClient({ archivistId }: { archivistId: string }) 
           <div>
             <label style={LABEL}>Stewardship Tier</label>
             <select value={form.tier} onChange={set('tier')} style={{ ...INPUT, cursor: 'pointer' }}>
-              <option value="archive">The Archive — $1,200/year</option>
-              <option value="estate">The Estate — $3,600/year (recommended)</option>
-              <option value="dynasty">The Dynasty — $9,600/year</option>
+              <option value="archive">The Archive ($1,200/year)</option>
+              <option value="estate">The Estate ($3,600/year, recommended)</option>
+              <option value="dynasty">The Dynasty ($9,600/year)</option>
             </select>
           </div>
 

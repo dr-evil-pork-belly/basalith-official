@@ -6,7 +6,7 @@ const AGENTS = [
     num:    '01',
     title:  'The Filter',
     job:    'Removes what doesn\'t belong.',
-    body:   'Every uploaded image is classified instantly. Screenshots, receipts, food photographs, random objects — separated automatically from the photographs that matter. Your family never sees the noise.',
+    body:   'Every uploaded image is classified instantly. Screenshots, receipts, food photographs, random objects: separated automatically from the photographs that matter. Your family never sees the noise.',
     result: '60–70% of noise eliminated',
   },
   {
@@ -20,27 +20,27 @@ const AGENTS = [
     num:    '03',
     title:  'The Classification',
     job:    'Understands what it is looking at.',
-    body:   'Every photograph is analyzed for what it contains — faces, event type, setting, emotional register. When you open a photograph to label it, the form is already partially filled. You confirm. You correct. You add what only you would know.',
+    body:   'Every photograph is analyzed for what it contains: faces, event type, setting, emotional register. When you open a photograph to label it, the form is already partially filled. You confirm. You correct. You add what only you would know.',
     result: 'Labels pre-suggested by AI',
   },
   {
     num:    '04',
     title:  'The Dating',
     job:    'Establishes when.',
-    body:   'EXIF data where available. Visual analysis where it isn\'t — clothing, technology, film grain, and context all contribute to an era estimate. Photographs without timestamps are dated to within a decade, often within a few years.',
+    body:   'EXIF data where available. Visual analysis where it is not: clothing, technology, film grain, and context all contribute to an era estimate. Photographs without timestamps are dated to within a decade, often within a few years.',
     result: 'Every photograph anchored in time',
   },
   {
     num:    '05',
     title:  'The Recognition',
     job:    'Finds the same face across decades.',
-    body:   'When a family member identifies someone in one photograph, that face is matched across the entire archive. Every photograph containing that person surfaces — including ones taken forty years apart. The archive begins to see the family as the family sees itself.',
+    body:   'When a family member identifies someone in one photograph, that face is matched across the entire archive. Every photograph containing that person surfaces, including ones taken forty years apart. The archive begins to see the family as the family sees itself.',
     result: 'One identification · Hundreds found',
   },
   {
     num:    '06',
     title:  'The Quality Assessment',
-    job:    'Scores every photograph for archive value — not aesthetics.',
+    job:    'Scores every photograph for archive value. Not aesthetics.',
     body:   'A blurry photograph of your grandmother laughing has higher archive value than a technically perfect sunset. Our scoring weighs faces, uniqueness, rarity, and emotional register. The photographs that matter most surface first.',
     result: 'Highest value photographs prioritized',
   },
@@ -105,7 +105,7 @@ export default function IntelligenceLayer() {
             across iPhones, cloud storage, hard drives, and scanned albums.
           </p>
           <p className="mb-4">
-            We built an AI pipeline specifically for this moment — the overwhelming handoff
+            We built an AI pipeline specifically for this moment: the overwhelming handoff
             of a lifetime of visual memory.
           </p>
           <p>
@@ -196,7 +196,7 @@ export default function IntelligenceLayer() {
           Most families arrive with decades of visual memory in complete disorder.
           <br /><br />
           They leave The Founding with a curated, chronologically anchored, face-indexed
-          archive — ready to label, ready to share, ready to pass on.
+          archive, ready to label, ready to share, ready to pass on.
         </p>
 
         <p

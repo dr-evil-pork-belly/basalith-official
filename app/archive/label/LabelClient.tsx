@@ -304,8 +304,8 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
     const success = await uploadFileDirect(file, archiveId)
     console.log('Test upload result:', success)
     setTestResult(success
-      ? `✓ Success — ${file.name} (${(file.size / 1024 / 1024).toFixed(1)} MB) uploaded.`
-      : `✗ Failed — check browser console for details.`
+      ? `✓ Success: ${file.name} (${(file.size / 1024 / 1024).toFixed(1)} MB) uploaded.`
+      : `✗ Failed. Check browser console for details.`
     )
     setTestLoading(false)
     if (testInputRef.current) testInputRef.current.value = ''
@@ -397,7 +397,7 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
           FOR IPHONE · ICLOUD LIBRARIES
         </p>
         <p className="font-serif" style={{ fontSize: '0.88rem', fontStyle: 'italic', color: '#5C6166', lineHeight: 1.7, margin: 0 }}>
-          Select photos in batches of 200–300 rather than tapping Select All. Choose by date range or album. Each photo uploads directly — no size limits.
+          Select photos in batches of 200–300 rather than tapping Select All. Choose by date range or album. Each photo uploads directly. No size limits.
         </p>
       </div>
 

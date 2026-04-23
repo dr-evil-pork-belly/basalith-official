@@ -98,7 +98,7 @@ export async function GET(req: NextRequest) {
         to:      archive.owner_email,
         subject: lang === 'zh'
           ? `${archive.name} · ${monthName}档案报告`
-          : `Your archive in ${monthName} — ${archive.name}`,
+          : `Your archive in ${monthName}: ${archive.name}`,
         html:    buildMonthlyReportEmail({
           archiveName:             archive.name,
           ownerFirstName,
@@ -118,6 +118,11 @@ export async function GET(req: NextRequest) {
           weakestDimensions,
           lang,
         }),
+        headers: {
+          'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
+          'X-Entity-Ref-ID':  `basalith-${archive.id}-${Date.now()}`,
+          'Precedence':       'bulk',
+        },
       })
 
       sent++
@@ -311,9 +316,9 @@ function getDepthLabel(score: number, lang = 'en'): string {
     if (score >= 20) return '仍在学习——真正的深度正在涌现'
     return '刚刚开始——基础正在奠定'
   }
-  if (score >= 80) return 'Speaking with authority — one of our richest archives'
-  if (score >= 60) return 'Speaking with depth — remarkable accuracy achieved'
-  if (score >= 40) return 'Taking shape — your entity is becoming recognizable'
-  if (score >= 20) return 'Still learning — real depth is emerging'
-  return 'Just beginning — the foundation is being laid'
+  if (score >= 80) return 'Speaking with authority: one of our richest archives'
+  if (score >= 60) return 'Speaking with depth: remarkable accuracy achieved'
+  if (score >= 40) return 'Taking shape: your entity is becoming recognizable'
+  if (score >= 20) return 'Still learning: real depth is emerging'
+  return 'Just beginning: the foundation is being laid'
 }

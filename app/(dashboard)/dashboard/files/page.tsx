@@ -453,7 +453,7 @@ export default function FilesPage() {
                 className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-white/[0.02] transition-colors duration-150"
               >
                 <span className="font-sans text-[0.72rem] font-bold tracking-[0.1em] uppercase text-text-muted">
-                  Add Metadata <span className="font-normal normal-case tracking-normal">— applies to all files in this batch</span>
+                  Add Metadata <span className="font-normal normal-case tracking-normal">. Applies to all files in this batch.</span>
                 </span>
                 <svg
                   width="11" height="11" viewBox="0 0 12 12" fill="none"

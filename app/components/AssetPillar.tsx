@@ -128,7 +128,7 @@ export default function AssetPillar() {
         </h2>
         <p className="font-sans font-light text-body-base text-text-secondary leading-[1.82] mb-4">
           A Basalith Golden Dataset is not a subscription service that evaporates when
-          you stop paying. It is a structured digital asset — classified, documented,
+          you stop paying. It is a structured digital asset, classified, documented,
           and governed from the moment of creation.
         </p>
         <p className="font-sans font-light text-body-base text-text-secondary leading-[1.82] mb-4">
