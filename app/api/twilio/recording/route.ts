@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 
-export const dynamic   = 'force-dynamic'
+export const dynamic    = 'force-dynamic'
 export const maxDuration = 60
 
 function twimlResponse(xml: string): NextResponse {
@@ -24,32 +24,59 @@ export async function POST(req: NextRequest) {
   const archiveId        = searchParams.get('archiveId')     ?? ''
   const isOwner          = searchParams.get('isOwner') === 'true'
 
-  const formData          = await req.formData()
+  const formData = await req.formData()
+
+  // Log every param Twilio sends so we can debug URL / auth issues.
+  console.log('[twilio/recording] all params:')
+  for (const [key, value] of formData.entries()) {
+    console.log(`  ${key}: ${value}`)
+  }
+
   const recordingUrl      = formData.get('RecordingUrl')      as string | null
+  const recordingSid      = formData.get('RecordingSid')      as string | null
   const recordingDuration = formData.get('RecordingDuration') as string | null
   const callSid           = formData.get('CallSid')           as string | null
 
-  console.log(`[twilio/recording] sid=${callSid} archiveId=${archiveId} duration=${recordingDuration}s`)
+  console.log(`[twilio/recording] sid=${callSid} archiveId=${archiveId} duration=${recordingDuration}s recordingSid=${recordingSid}`)
 
-  if (!recordingUrl || !archiveId) {
+  if (!archiveId) {
     return twimlResponse(`<?xml version="1.0" encoding="UTF-8"?><Response><Hangup/></Response>`)
   }
 
-  try {
-    // Wait for Twilio to finish processing the recording
-    await new Promise(resolve => setTimeout(resolve, 2000))
+  // ── Download + process (non-fatal — always return TwiML) ─────────────────────
+  let storagePath    = ''
+  let transcript     = ''
+  let downloadOk     = false
 
-    // Download MP3 from Twilio with Basic Auth
-    const audioResponse = await fetch(`${recordingUrl}.mp3`, {
+  try {
+    // Give Twilio 3 seconds to finish processing before we fetch.
+    await new Promise(resolve => setTimeout(resolve, 3000))
+
+    // Build explicit API URL from RecordingSid (more reliable than RecordingUrl + .mp3).
+    const accountSid  = process.env.TWILIO_ACCOUNT_SID
+    const authToken   = process.env.TWILIO_AUTH_TOKEN
+    const downloadUrl = recordingSid && accountSid
+      ? `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Recordings/${recordingSid}.mp3`
+      : recordingUrl
+        ? `${recordingUrl}.mp3`
+        : null
+
+    if (!downloadUrl) {
+      throw new Error('No RecordingSid or RecordingUrl — cannot download')
+    }
+
+    console.log(`[twilio/recording] downloading from: ${downloadUrl}`)
+
+    const audioResponse = await fetch(downloadUrl, {
       headers: {
-        Authorization: 'Basic ' + Buffer.from(
-          `${process.env.TWILIO_ACCOUNT_SID}:${process.env.TWILIO_AUTH_TOKEN}`
-        ).toString('base64'),
+        Authorization: 'Basic ' + Buffer.from(`${accountSid}:${authToken}`).toString('base64'),
       },
     })
 
+    console.log(`[twilio/recording] download status: ${audioResponse.status} ${audioResponse.statusText}`)
+
     if (!audioResponse.ok) {
-      throw new Error(`Twilio recording download failed: ${audioResponse.status}`)
+      throw new Error(`Download failed: ${audioResponse.status} ${audioResponse.statusText}`)
     }
 
     const audioBuffer = await audioResponse.arrayBuffer()
@@ -62,9 +89,10 @@ export async function POST(req: NextRequest) {
       .upload(fileName, audioBuffer, { contentType: 'audio/mp3', upsert: false })
 
     if (uploadErr) throw new Error(`Storage upload: ${uploadErr.message}`)
+    storagePath = fileName
+    downloadOk  = true
 
     // Transcribe with Whisper
-    let transcript = ''
     try {
       const whisperForm = new FormData()
       whisperForm.append('file', new Blob([audioBuffer], { type: 'audio/mp3' }), 'recording.mp3')
@@ -80,29 +108,48 @@ export async function POST(req: NextRequest) {
       if (whisperRes.ok) {
         const data = await whisperRes.json()
         transcript = data.text ?? ''
+        console.log(`[twilio/recording] transcript (${transcript.length} chars): ${transcript.slice(0, 100)}`)
+      } else {
+        console.error('[twilio/recording] Whisper returned', whisperRes.status)
       }
     } catch (err) {
       console.error('[twilio/recording] Whisper failed:', err)
     }
 
-    // Save voice_recording row
-    await supabaseAdmin.from('voice_recordings').insert({
-      archive_id:        archiveId,
-      storage_path:      fileName,
-      duration_seconds:  parseInt(recordingDuration ?? '0') || 0,
-      transcript:        transcript || null,
-      transcript_status: transcript ? 'complete' : 'failed',
-      prompt:            'Phone call recording',
-      mime_type:         'audio/mp3',
-    })
+  } catch (err: unknown) {
+    console.error('[twilio/recording] Download/upload failed:', err instanceof Error ? err.message : err)
+  }
 
-    // Persist transcript
-    if (transcript && transcript.length > 20) {
+  // ── Save voice_recordings row (always — with whatever we have) ───────────────
+  try {
+    await supabaseAdmin.from('voice_recordings').insert({
+      archive_id:            archiveId,
+      storage_path:          storagePath || `twilio:${recordingSid ?? 'unknown'}`,
+      duration_seconds:      parseInt(recordingDuration ?? '0') || 0,
+      transcript:            transcript || null,
+      transcript_status:     downloadOk ? (transcript ? 'complete' : 'failed') : 'pending',
+      prompt:                'Phone call recording',
+      mime_type:             'audio/mp3',
+      twilio_recording_sid:  recordingSid ?? null,
+    })
+  } catch (err: unknown) {
+    console.error('[twilio/recording] voice_recordings insert failed:', err instanceof Error ? err.message : err)
+  }
+
+  // ── Save deposit / labels (always — with transcript if we have it) ────────────
+  try {
+    const depositText = transcript && transcript.length > 20
+      ? transcript
+      : downloadOk
+        ? null  // downloaded but no transcript — skip deposit
+        : `Phone recording received (${recordingDuration}s). Audio retrieval pending — RecordingSid: ${recordingSid ?? 'unknown'}.`
+
+    if (depositText) {
       if (isOwner) {
         await supabaseAdmin.from('owner_deposits').insert({
           archive_id:     archiveId,
           prompt:         'Phone call deposit',
-          response:       transcript,
+          response:       depositText,
           essence_status: 'pending',
           source:         'phone_recording',
         })
@@ -112,7 +159,7 @@ export async function POST(req: NextRequest) {
           .insert({
             archive_id:     archiveId,
             prompt:         'Phone call recording',
-            response:       transcript,
+            response:       depositText,
             essence_status: 'pending',
             source:         'phone_recording',
           })
@@ -121,14 +168,14 @@ export async function POST(req: NextRequest) {
 
         const depositId = deposit?.id ?? null
 
-        if (questionId && depositId) {
+        if (questionId && depositId && transcript) {
           await supabaseAdmin
             .from('contributor_questions')
             .update({ status: 'answered', answer_text: transcript, answered_at: new Date().toISOString(), deposit_id: depositId })
             .eq('id', questionId)
         }
 
-        if (contributorId) {
+        if (contributorId && transcript) {
           const { data: contrib } = await supabaseAdmin
             .from('contributors')
             .select('name')
@@ -147,21 +194,25 @@ export async function POST(req: NextRequest) {
         }
       }
     }
+  } catch (err: unknown) {
+    console.error('[twilio/recording] deposit insert failed:', err instanceof Error ? err.message : err)
+  }
 
-    // Notify archive owner
+  // ── Notification (always) ─────────────────────────────────────────────────────
+  try {
     await supabaseAdmin.from('owner_notifications').insert({
       archive_id: archiveId,
       type:       'phone_recording',
       subject:    'New phone recording received',
       sent_to:    archiveId,
       sent_at:    new Date().toISOString(),
-      metadata:   { contributorId, duration: recordingDuration, hasTranscript: !!transcript },
+      metadata:   { contributorId, duration: recordingDuration, hasTranscript: !!transcript, downloadOk, recordingSid },
     })
-
   } catch (err: unknown) {
-    console.error('[twilio/recording] Processing failed:', err instanceof Error ? err.message : err)
+    console.error('[twilio/recording] notification insert failed:', err instanceof Error ? err.message : err)
   }
 
+  // ── Return TwiML (always — Twilio is waiting) ─────────────────────────────────
   const siteUrl      = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
   const continueBase = `${siteUrl}/api/twilio/continue`
 
@@ -184,7 +235,6 @@ export async function POST(req: NextRequest) {
     ? 'Would you like to record another memory? Press 1 to continue, or hang up when you are done.'
     : 'Would you like to answer another question? Press 1 to continue, or hang up when you are done.'
 
-  // No voice attribute for Chinese — Twilio default handles CJK better than alice.
   const twiml = isZh
     ? `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
