@@ -16,6 +16,15 @@ function xmlSafe(str: string): string {
     .replace(/>/g, '&gt;')
 }
 
+// Build an action URL with & escaped as &amp; for valid XML attributes.
+function buildActionUrl(base: string, params: Record<string, string>): string {
+  const query = Object.entries(params)
+    .filter(([, v]) => v)
+    .map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
+    .join('&amp;')
+  return `${base}?${query}`
+}
+
 export async function POST(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const contributorId = searchParams.get('contributorId') ?? ''
@@ -25,7 +34,8 @@ export async function POST(req: NextRequest) {
   const formData = await req.formData()
   const digit    = formData.get('Digits') as string | null
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+  const siteUrl      = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+  const recordingBase = `${siteUrl}/api/twilio/recording`
 
   const { data: archiveLang } = await supabaseAdmin
     .from('archives')
@@ -36,19 +46,16 @@ export async function POST(req: NextRequest) {
   const isZh = archiveLang?.preferred_language === 'zh'
 
   if (digit !== '1') {
+    // No voice attribute for Chinese — Twilio default handles CJK better than alice.
     const twiml = isZh
       ? `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="alice" language="zh-CN">
-    谢谢您。再见。
-  </Say>
+  <Say>谢谢您。再见。</Say>
   <Hangup/>
 </Response>`
       : `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="alice">
-    Thank you. Goodbye.
-  </Say>
+  <Say voice="alice">Thank you. Goodbye.</Say>
   <Hangup/>
 </Response>`
 
@@ -59,14 +66,12 @@ export async function POST(req: NextRequest) {
 
   // Owner — free-form deposit, no question lookup needed
   if (isOwner) {
-    const action = `${siteUrl}/api/twilio/recording?archiveId=${archiveId}&isOwner=true`
+    const action = buildActionUrl(recordingBase, { archiveId, isOwner: 'true' })
 
     const twiml = isZh
       ? `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="alice" language="zh-CN">
-    请分享另一段回忆。提示音后开始说话，说完后按任意键。
-  </Say>
+  <Say>请分享另一段回忆。提示音后开始说话，说完后按任意键。</Say>
   <Record
     action="${action}"
     method="POST"
@@ -75,20 +80,14 @@ export async function POST(req: NextRequest) {
     playBeep="true"
     transcribe="false"
   />
-  <Say voice="alice" language="zh-CN">
-    未收到录音。再见。
-  </Say>
+  <Say>未收到录音。再见。</Say>
   <Hangup/>
 </Response>`
       : `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="alice">
-    Please share another memory.
-  </Say>
+  <Say voice="alice">Please share another memory.</Say>
   <Pause length="1"/>
-  <Say voice="alice">
-    Speak after the tone. Press any key when you are finished.
-  </Say>
+  <Say voice="alice">Speak after the tone. Press any key when you are finished.</Say>
   <Record
     action="${action}"
     method="POST"
@@ -97,9 +96,7 @@ export async function POST(req: NextRequest) {
     playBeep="true"
     transcribe="false"
   />
-  <Say voice="alice">
-    We did not receive a recording. Goodbye.
-  </Say>
+  <Say voice="alice">We did not receive a recording. Goodbye.</Say>
   <Hangup/>
 </Response>`
 
@@ -123,22 +120,20 @@ export async function POST(req: NextRequest) {
       ?? (isZh ? '请分享一段对您来说重要的回忆。' : 'Tell me another memory that matters to you.')
   )
 
-  const action = `${siteUrl}/api/twilio/recording?contributorId=${contributorId}&questionId=${question?.id ?? ''}&archiveId=${archiveId}`
+  const action = buildActionUrl(recordingBase, {
+    contributorId,
+    questionId: question?.id ?? '',
+    archiveId,
+  })
 
   const twiml = isZh
     ? `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="alice" language="zh-CN">
-    这是您的下一个问题。
-  </Say>
+  <Say>这是您的下一个问题。</Say>
   <Pause length="1"/>
-  <Say voice="alice" language="zh-CN">
-    ${questionText}
-  </Say>
+  <Say>${questionText}</Say>
   <Pause length="2"/>
-  <Say voice="alice" language="zh-CN">
-    请在提示音后说出您的回答，说完后按任意键。
-  </Say>
+  <Say>请在提示音后说出您的回答，说完后按任意键。</Say>
   <Record
     action="${action}"
     method="POST"
@@ -147,24 +142,16 @@ export async function POST(req: NextRequest) {
     playBeep="true"
     transcribe="false"
   />
-  <Say voice="alice" language="zh-CN">
-    未收到录音。再见。
-  </Say>
+  <Say>未收到录音。再见。</Say>
   <Hangup/>
 </Response>`
     : `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="alice">
-    Here is your next question.
-  </Say>
+  <Say voice="alice">Here is your next question.</Say>
   <Pause length="1"/>
-  <Say voice="alice">
-    ${questionText}
-  </Say>
+  <Say voice="alice">${questionText}</Say>
   <Pause length="2"/>
-  <Say voice="alice">
-    Please speak your answer after the tone. Press any key when you are finished.
-  </Say>
+  <Say voice="alice">Please speak your answer after the tone. Press any key when you are finished.</Say>
   <Record
     action="${action}"
     method="POST"
@@ -173,9 +160,7 @@ export async function POST(req: NextRequest) {
     playBeep="true"
     transcribe="false"
   />
-  <Say voice="alice">
-    We did not receive a recording. Goodbye.
-  </Say>
+  <Say voice="alice">We did not receive a recording. Goodbye.</Say>
   <Hangup/>
 </Response>`
 

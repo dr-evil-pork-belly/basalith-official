@@ -17,7 +17,7 @@ function validateTwilioRequest(req: NextRequest, params: Record<string, string>)
   return twilio.validateRequest(authToken, signature, url, params)
 }
 
-// Escape XML special characters so owner/contributor names never break TwiML.
+// Escape XML special characters so dynamic strings never break TwiML.
 function xmlSafe(str: string): string {
   return str
     .replace(/&/g, '&amp;')
@@ -25,6 +25,15 @@ function xmlSafe(str: string): string {
     .replace(/"/g, '&quot;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
+}
+
+// Build an action URL with & escaped as &amp; for valid XML attributes.
+function buildActionUrl(base: string, params: Record<string, string>): string {
+  const query = Object.entries(params)
+    .filter(([, v]) => v)
+    .map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
+    .join('&amp;')
+  return `${base}?${query}`
 }
 
 export async function POST(req: NextRequest) {
@@ -40,7 +49,8 @@ export async function POST(req: NextRequest) {
 
   console.log(`[twilio/voice] Incoming call from ${from} sid=${callSid}`)
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+  const siteUrl      = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+  const recordingBase = `${siteUrl}/api/twilio/recording`
 
   // ── 1. Check archives table (owner) ──────────────────────────────────────────
   const { data: archiveOwner } = await supabaseAdmin
@@ -52,18 +62,16 @@ export async function POST(req: NextRequest) {
 
   if (archiveOwner) {
     const firstName = xmlSafe((archiveOwner.owner_name ?? 'there').split(' ')[0])
-    const action    = `${siteUrl}/api/twilio/recording?archiveId=${archiveOwner.id}&isOwner=true`
+    const action    = buildActionUrl(recordingBase, { archiveId: archiveOwner.id, isOwner: 'true' })
     const isZh      = archiveOwner.preferred_language === 'zh'
 
     let twiml: string
 
     if (isZh) {
-      // Simplified Chinese path — alice voice, single Say to avoid Polly issues.
+      // No voice attribute for Chinese — Twilio default handles CJK better than alice.
       twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="alice" language="zh-CN">
-    您好，${firstName}。请在提示音后说话。说完后按任意键。
-  </Say>
+  <Say>您好，${firstName}。请在提示音后说话。说完后按任意键。</Say>
   <Record
     action="${action}"
     method="POST"
@@ -72,29 +80,19 @@ export async function POST(req: NextRequest) {
     playBeep="true"
     transcribe="false"
   />
-  <Say voice="alice" language="zh-CN">
-    未收到录音。请稍后再次拨打。再见。
-  </Say>
+  <Say>未收到录音。请稍后再次拨打。再见。</Say>
   <Hangup/>
 </Response>`
     } else {
       twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="alice">
-    Welcome, ${firstName}.
-  </Say>
+  <Say voice="alice">Welcome, ${firstName}.</Say>
   <Pause length="1"/>
-  <Say voice="alice">
-    You are adding to your archive.
-  </Say>
+  <Say voice="alice">You are adding to your archive.</Say>
   <Pause length="1"/>
-  <Say voice="alice">
-    Please share a memory, a story, or anything you want preserved.
-  </Say>
+  <Say voice="alice">Please share a memory, a story, or anything you want preserved.</Say>
   <Pause length="1"/>
-  <Say voice="alice">
-    Speak after the tone. Press any key when you are finished.
-  </Say>
+  <Say voice="alice">Speak after the tone. Press any key when you are finished.</Say>
   <Record
     action="${action}"
     method="POST"
@@ -103,9 +101,7 @@ export async function POST(req: NextRequest) {
     playBeep="true"
     transcribe="false"
   />
-  <Say voice="alice">
-    We did not receive a recording. Please call back to try again. Goodbye.
-  </Say>
+  <Say voice="alice">We did not receive a recording. Please call back to try again. Goodbye.</Say>
   <Hangup/>
 </Response>`
     }
@@ -140,33 +136,25 @@ export async function POST(req: NextRequest) {
         ?? 'Tell me a memory that matters to you. It can be about anything. A moment, a person, a place.'
     )
 
-    const action = `${siteUrl}/api/twilio/recording?contributorId=${contributor.id}&questionId=${question?.id ?? ''}&archiveId=${contributor.archive_id}`
+    const action = buildActionUrl(recordingBase, {
+      contributorId: contributor.id,
+      questionId:    question?.id ?? '',
+      archiveId:     contributor.archive_id,
+    })
 
     const twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="alice">
-    Welcome, ${firstName}.
-  </Say>
+  <Say voice="alice">Welcome, ${firstName}.</Say>
   <Pause length="1"/>
-  <Say voice="alice">
-    You are recording for ${archiveName}.
-  </Say>
+  <Say voice="alice">You are recording for ${archiveName}.</Say>
   <Pause length="1"/>
-  <Say voice="alice">
-    Here is your question.
-  </Say>
+  <Say voice="alice">Here is your question.</Say>
   <Pause length="1"/>
-  <Say voice="alice">
-    ${questionText}
-  </Say>
+  <Say voice="alice">${questionText}</Say>
   <Pause length="2"/>
-  <Say voice="alice">
-    Please speak your answer after the tone.
-  </Say>
+  <Say voice="alice">Please speak your answer after the tone.</Say>
   <Pause length="1"/>
-  <Say voice="alice">
-    Take as long as you need. Press any key when you are finished.
-  </Say>
+  <Say voice="alice">Take as long as you need. Press any key when you are finished.</Say>
   <Record
     action="${action}"
     method="POST"
@@ -175,9 +163,7 @@ export async function POST(req: NextRequest) {
     playBeep="true"
     transcribe="false"
   />
-  <Say voice="alice">
-    We did not receive a recording. Please call back to try again. Goodbye.
-  </Say>
+  <Say voice="alice">We did not receive a recording. Please call back to try again. Goodbye.</Say>
   <Hangup/>
 </Response>`
 
@@ -189,21 +175,13 @@ export async function POST(req: NextRequest) {
   // ── 3. Unknown caller ─────────────────────────────────────────────────────────
   const twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="alice">
-    Hello, and thank you for calling Basalith.
-  </Say>
+  <Say voice="alice">Hello, and thank you for calling Basalith.</Say>
   <Pause length="1"/>
-  <Say voice="alice">
-    We were not able to find your phone number in our records.
-  </Say>
+  <Say voice="alice">We were not able to find your phone number in our records.</Say>
   <Pause length="1"/>
-  <Say voice="alice">
-    To get started, please ask the person who invited you to add your number to your profile.
-  </Say>
+  <Say voice="alice">To get started, please ask the person who invited you to add your number to your profile.</Say>
   <Pause length="1"/>
-  <Say voice="alice">
-    Once they do, you are welcome to call back. Take care.
-  </Say>
+  <Say voice="alice">Once they do, you are welcome to call back. Take care.</Say>
   <Hangup/>
 </Response>`
 

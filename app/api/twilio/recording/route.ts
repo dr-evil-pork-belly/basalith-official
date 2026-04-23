@@ -8,17 +8,26 @@ function twimlResponse(xml: string): NextResponse {
   return new NextResponse(xml, { headers: { 'Content-Type': 'text/xml' } })
 }
 
+// Build an action URL with & escaped as &amp; for valid XML attributes.
+function buildActionUrl(base: string, params: Record<string, string>): string {
+  const query = Object.entries(params)
+    .filter(([, v]) => v)
+    .map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
+    .join('&amp;')
+  return `${base}?${query}`
+}
+
 export async function POST(req: NextRequest) {
   const { searchParams } = new URL(req.url)
-  const contributorId = searchParams.get('contributorId') ?? ''
-  const questionId    = searchParams.get('questionId')    ?? ''
-  const archiveId     = searchParams.get('archiveId')     ?? ''
-  const isOwner       = searchParams.get('isOwner') === 'true'
+  const contributorId    = searchParams.get('contributorId') ?? ''
+  const questionId       = searchParams.get('questionId')    ?? ''
+  const archiveId        = searchParams.get('archiveId')     ?? ''
+  const isOwner          = searchParams.get('isOwner') === 'true'
 
-  const formData         = await req.formData()
-  const recordingUrl     = formData.get('RecordingUrl')     as string | null
+  const formData          = await req.formData()
+  const recordingUrl      = formData.get('RecordingUrl')      as string | null
   const recordingDuration = formData.get('RecordingDuration') as string | null
-  const callSid          = formData.get('CallSid')          as string | null
+  const callSid           = formData.get('CallSid')           as string | null
 
   console.log(`[twilio/recording] sid=${callSid} archiveId=${archiveId} duration=${recordingDuration}s`)
 
@@ -90,7 +99,6 @@ export async function POST(req: NextRequest) {
     // Persist transcript
     if (transcript && transcript.length > 20) {
       if (isOwner) {
-        // Owner deposit — feeds directly into entity accuracy
         await supabaseAdmin.from('owner_deposits').insert({
           archive_id:     archiveId,
           prompt:         'Phone call deposit',
@@ -99,7 +107,6 @@ export async function POST(req: NextRequest) {
           source:         'phone_recording',
         })
       } else {
-        // Contributor — save to owner_deposits + labels + mark question answered
         const { data: deposit } = await supabaseAdmin
           .from('owner_deposits')
           .insert({
@@ -155,10 +162,12 @@ export async function POST(req: NextRequest) {
     console.error('[twilio/recording] Processing failed:', err instanceof Error ? err.message : err)
   }
 
-  const siteUrl     = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+  const siteUrl      = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+  const continueBase = `${siteUrl}/api/twilio/continue`
+
   const continueUrl = isOwner
-    ? `${siteUrl}/api/twilio/continue?archiveId=${archiveId}&isOwner=true`
-    : `${siteUrl}/api/twilio/continue?contributorId=${contributorId}&archiveId=${archiveId}`
+    ? buildActionUrl(continueBase, { archiveId, isOwner: 'true' })
+    : buildActionUrl(continueBase, { contributorId, archiveId })
 
   const { data: archiveLang } = await supabaseAdmin
     .from('archives')
@@ -175,41 +184,28 @@ export async function POST(req: NextRequest) {
     ? 'Would you like to record another memory? Press 1 to continue, or hang up when you are done.'
     : 'Would you like to answer another question? Press 1 to continue, or hang up when you are done.'
 
+  // No voice attribute for Chinese — Twilio default handles CJK better than alice.
   const twiml = isZh
     ? `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="alice" language="zh-CN">
-    谢谢您。您的故事已经保存到档案中了。
-  </Say>
+  <Say>谢谢您。您的故事已经保存到档案中了。</Say>
   <Pause length="1"/>
-  <Say voice="alice" language="zh-CN">
-    ${continuePromptZh}
-  </Say>
+  <Say>${continuePromptZh}</Say>
   <Gather numDigits="1" action="${continueUrl}" method="POST" timeout="10">
   </Gather>
-  <Say voice="alice" language="zh-CN">
-    谢谢您。再见。
-  </Say>
+  <Say>谢谢您。再见。</Say>
   <Hangup/>
 </Response>`
     : `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="alice">
-    Thank you.
-  </Say>
+  <Say voice="alice">Thank you.</Say>
   <Pause length="1"/>
-  <Say voice="alice">
-    Your memory has been saved to the archive.
-  </Say>
+  <Say voice="alice">Your memory has been saved to the archive.</Say>
   <Pause length="1"/>
-  <Say voice="alice">
-    ${continuePromptEn}
-  </Say>
+  <Say voice="alice">${continuePromptEn}</Say>
   <Gather numDigits="1" action="${continueUrl}" method="POST" timeout="10">
   </Gather>
-  <Say voice="alice">
-    Thank you. Goodbye.
-  </Say>
+  <Say voice="alice">Thank you. Goodbye.</Say>
   <Hangup/>
 </Response>`
 
