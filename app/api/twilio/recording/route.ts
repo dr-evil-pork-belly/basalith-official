@@ -17,7 +17,63 @@ function buildActionUrl(base: string, params: Record<string, string>): string {
   return `${base}?${query}`
 }
 
+// Download a Twilio recording MP3 with up to maxRetries attempts.
+// Passes baseUrl (without .mp3) and appends the format suffix internally.
+// Waits longer between each retry to give Twilio time to process.
+async function downloadRecording(
+  baseUrl: string,
+  accountSid: string,
+  authToken: string,
+  maxRetries = 3,
+): Promise<ArrayBuffer | null> {
+  const authHeader = 'Basic ' + Buffer.from(`${accountSid}:${authToken}`).toString('base64')
+  const url        = `${baseUrl}.mp3`
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    if (attempt > 1) {
+      const waitMs = attempt * 3000   // 3s, 6s, 9s
+      console.log(`[twilio/recording] attempt ${attempt}/${maxRetries} — waiting ${waitMs}ms`)
+      await new Promise(resolve => setTimeout(resolve, waitMs))
+    }
+
+    console.log(`[twilio/recording] download attempt ${attempt}/${maxRetries}: ${url}`)
+
+    const response = await fetch(url, { headers: { Authorization: authHeader } })
+
+    console.log(`[twilio/recording] attempt ${attempt} status: ${response.status} ${response.statusText}`)
+
+    if (response.ok) {
+      return await response.arrayBuffer()
+    }
+
+    if (response.status === 404) {
+      console.log('[twilio/recording] 404 — recording not ready yet, retrying')
+      continue
+    }
+
+    if (response.status === 401) {
+      console.error('[twilio/recording] 401 — auth failed, check TWILIO_AUTH_TOKEN in Vercel env vars')
+      continue   // might be a timing issue; retry anyway
+    }
+
+    console.error(`[twilio/recording] unexpected status ${response.status}, retrying`)
+  }
+
+  return null
+}
+
 export async function POST(req: NextRequest) {
+  // ── Credential sanity check (visible in Vercel logs) ─────────────────────────
+  const accountSid = process.env.TWILIO_ACCOUNT_SID ?? ''
+  const authToken  = process.env.TWILIO_AUTH_TOKEN  ?? ''
+  console.log(
+    '[twilio/recording] credentials check —',
+    'SID length:', accountSid.length,
+    'SID prefix:', accountSid.substring(0, 4),
+    'token length:', authToken.length,
+  )
+  // SID should be 34 chars starting with 'AC'; token should be 32 chars.
+
   const { searchParams } = new URL(req.url)
   const contributorId    = searchParams.get('contributorId') ?? ''
   const questionId       = searchParams.get('questionId')    ?? ''
@@ -26,7 +82,7 @@ export async function POST(req: NextRequest) {
 
   const formData = await req.formData()
 
-  // Log every param Twilio sends so we can debug URL / auth issues.
+  // Log every param Twilio sends so we can see the exact URLs and SIDs.
   console.log('[twilio/recording] all params:')
   for (const [key, value] of formData.entries()) {
     console.log(`  ${key}: ${value}`)
@@ -44,43 +100,31 @@ export async function POST(req: NextRequest) {
   }
 
   // ── Download + process (non-fatal — always return TwiML) ─────────────────────
-  let storagePath    = ''
-  let transcript     = ''
-  let downloadOk     = false
+  let storagePath = ''
+  let transcript  = ''
+  let downloadOk  = false
 
   try {
-    // Give Twilio 3 seconds to finish processing before we fetch.
-    await new Promise(resolve => setTimeout(resolve, 3000))
+    // Give Twilio 5 seconds to finish encoding before the first attempt.
+    console.log('[twilio/recording] waiting 5s for Twilio to process recording')
+    await new Promise(resolve => setTimeout(resolve, 5000))
 
-    // Build explicit API URL from RecordingSid (more reliable than RecordingUrl + .mp3).
-    const accountSid  = process.env.TWILIO_ACCOUNT_SID
-    const authToken   = process.env.TWILIO_AUTH_TOKEN
-    const downloadUrl = recordingSid && accountSid
-      ? `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Recordings/${recordingSid}.mp3`
-      : recordingUrl
-        ? `${recordingUrl}.mp3`
-        : null
+    // Build base URL from RecordingSid (more reliable than RecordingUrl).
+    const baseUrl = recordingSid && accountSid
+      ? `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Recordings/${recordingSid}`
+      : recordingUrl ?? null
 
-    if (!downloadUrl) {
+    if (!baseUrl) {
       throw new Error('No RecordingSid or RecordingUrl — cannot download')
     }
 
-    console.log(`[twilio/recording] downloading from: ${downloadUrl}`)
+    const audioBuffer = await downloadRecording(baseUrl, accountSid, authToken)
 
-    const audioResponse = await fetch(downloadUrl, {
-      headers: {
-        Authorization: 'Basic ' + Buffer.from(`${accountSid}:${authToken}`).toString('base64'),
-      },
-    })
-
-    console.log(`[twilio/recording] download status: ${audioResponse.status} ${audioResponse.statusText}`)
-
-    if (!audioResponse.ok) {
-      throw new Error(`Download failed: ${audioResponse.status} ${audioResponse.statusText}`)
+    if (!audioBuffer) {
+      throw new Error('All download attempts failed')
     }
 
-    const audioBuffer = await audioResponse.arrayBuffer()
-    const fileName    = `${archiveId}/phone-${Date.now()}.mp3`
+    const fileName = `${archiveId}/phone-${Date.now()}.mp3`
 
     // Upload to Supabase Storage
     const { error: uploadErr } = await supabaseAdmin
@@ -108,7 +152,7 @@ export async function POST(req: NextRequest) {
       if (whisperRes.ok) {
         const data = await whisperRes.json()
         transcript = data.text ?? ''
-        console.log(`[twilio/recording] transcript (${transcript.length} chars): ${transcript.slice(0, 100)}`)
+        console.log(`[twilio/recording] transcript (${transcript.length} chars): ${transcript.slice(0, 120)}`)
       } else {
         console.error('[twilio/recording] Whisper returned', whisperRes.status)
       }
@@ -123,26 +167,26 @@ export async function POST(req: NextRequest) {
   // ── Save voice_recordings row (always — with whatever we have) ───────────────
   try {
     await supabaseAdmin.from('voice_recordings').insert({
-      archive_id:            archiveId,
-      storage_path:          storagePath || `twilio:${recordingSid ?? 'unknown'}`,
-      duration_seconds:      parseInt(recordingDuration ?? '0') || 0,
-      transcript:            transcript || null,
-      transcript_status:     downloadOk ? (transcript ? 'complete' : 'failed') : 'pending',
-      prompt:                'Phone call recording',
-      mime_type:             'audio/mp3',
-      twilio_recording_sid:  recordingSid ?? null,
+      archive_id:           archiveId,
+      storage_path:         storagePath || `pending/${recordingSid ?? 'unknown'}`,
+      duration_seconds:     parseInt(recordingDuration ?? '0') || 0,
+      transcript:           transcript || null,
+      transcript_status:    downloadOk ? (transcript ? 'complete' : 'failed') : 'pending',
+      prompt:               'Phone call recording',
+      mime_type:            'audio/mp3',
+      twilio_recording_sid: recordingSid ?? null,
     })
   } catch (err: unknown) {
     console.error('[twilio/recording] voice_recordings insert failed:', err instanceof Error ? err.message : err)
   }
 
-  // ── Save deposit / labels (always — with transcript if we have it) ────────────
+  // ── Save deposit / labels (always — transcript or placeholder) ────────────────
   try {
     const depositText = transcript && transcript.length > 20
       ? transcript
       : downloadOk
-        ? null  // downloaded but no transcript — skip deposit
-        : `Phone recording received (${recordingDuration}s). Audio retrieval pending — RecordingSid: ${recordingSid ?? 'unknown'}.`
+        ? null   // downloaded but Whisper gave nothing — skip
+        : `[Voice recording — ${recordingDuration ?? '?'} seconds — transcription pending. RecordingSid: ${recordingSid ?? 'unknown'}]`
 
     if (depositText) {
       if (isOwner) {
@@ -171,7 +215,12 @@ export async function POST(req: NextRequest) {
         if (questionId && depositId && transcript) {
           await supabaseAdmin
             .from('contributor_questions')
-            .update({ status: 'answered', answer_text: transcript, answered_at: new Date().toISOString(), deposit_id: depositId })
+            .update({
+              status:      'answered',
+              answer_text: transcript,
+              answered_at: new Date().toISOString(),
+              deposit_id:  depositId,
+            })
             .eq('id', questionId)
         }
 
