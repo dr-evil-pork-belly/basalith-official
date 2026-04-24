@@ -80,6 +80,10 @@ export async function POST(req: NextRequest) {
   const archiveId        = searchParams.get('archiveId')     ?? ''
   const isOwner          = searchParams.get('isOwner') === 'true'
 
+  console.log('[twilio/recording] archiveId from params:', archiveId)
+  console.log('[twilio/recording] isOwner:', isOwner)
+  console.log('[twilio/recording] contributorId:', contributorId)
+
   const formData = await req.formData()
 
   // Log every param Twilio sends so we can see the exact URLs and SIDs.
@@ -166,16 +170,23 @@ export async function POST(req: NextRequest) {
 
   // ── Save voice_recordings row (always — with whatever we have) ───────────────
   try {
-    await supabaseAdmin.from('voice_recordings').insert({
-      archive_id:           archiveId,
-      storage_path:         storagePath || `pending/${recordingSid ?? 'unknown'}`,
-      duration_seconds:     parseInt(recordingDuration ?? '0') || 0,
-      transcript:           transcript || null,
-      transcript_status:    downloadOk ? (transcript ? 'complete' : 'failed') : 'pending',
-      prompt:               'Phone call recording',
-      mime_type:            'audio/mp3',
-      twilio_recording_sid: recordingSid ?? null,
-    })
+    console.log('[twilio/recording] saving voice_recordings row — archiveId:', archiveId, 'downloadOk:', downloadOk, 'transcriptLen:', transcript.length)
+    const { data: vrRow, error: vrError } = await supabaseAdmin
+      .from('voice_recordings')
+      .insert({
+        archive_id:           archiveId,
+        storage_path:         storagePath || `pending/${recordingSid ?? 'unknown'}`,
+        duration_seconds:     parseInt(recordingDuration ?? '0') || 0,
+        transcript:           transcript || null,
+        transcript_status:    downloadOk ? (transcript ? 'complete' : 'failed') : 'pending',
+        prompt:               'Phone call recording',
+        mime_type:            'audio/mp3',
+        twilio_recording_sid: recordingSid ?? null,
+      })
+      .select('id')
+      .single()
+    console.log('[twilio/recording] voice_recordings saved:', vrRow?.id)
+    if (vrError) console.error('[twilio/recording] voice_recordings error:', vrError.message, vrError.details, vrError.hint)
   } catch (err: unknown) {
     console.error('[twilio/recording] voice_recordings insert failed:', err instanceof Error ? err.message : err)
   }
@@ -188,17 +199,29 @@ export async function POST(req: NextRequest) {
         ? null   // downloaded but Whisper gave nothing — skip
         : `[Voice recording — ${recordingDuration ?? '?'} seconds — transcription pending. RecordingSid: ${recordingSid ?? 'unknown'}]`
 
+    console.log('[twilio/recording] deposit — archiveId:', archiveId, 'isOwner:', isOwner, 'transcriptLen:', transcript.length, 'depositText?', !!depositText)
+
     if (depositText) {
       if (isOwner) {
-        await supabaseAdmin.from('owner_deposits').insert({
-          archive_id:     archiveId,
-          prompt:         'Phone call deposit',
-          response:       depositText,
-          essence_status: 'pending',
-          source:         'phone_recording',
-        })
+        console.log('[twilio/recording] saving owner deposit — archiveId:', archiveId)
+        const { data: deposit, error: depositError } = await supabaseAdmin
+          .from('owner_deposits')
+          .insert({
+            archive_id:     archiveId,
+            prompt:         'Phone call deposit',
+            response:       depositText,
+            essence_status: 'pending',
+            source:         'phone_recording',
+          })
+          .select()
+          .single()
+        console.log('[twilio/recording] deposit saved:', deposit?.id)
+        if (depositError) {
+          console.error('[twilio/recording] DEPOSIT FAILED:', depositError.message, depositError.details, depositError.hint)
+        }
       } else {
-        const { data: deposit } = await supabaseAdmin
+        console.log('[twilio/recording] saving contributor deposit — archiveId:', archiveId)
+        const { data: deposit, error: depositError } = await supabaseAdmin
           .from('owner_deposits')
           .insert({
             archive_id:     archiveId,
@@ -209,6 +232,11 @@ export async function POST(req: NextRequest) {
           })
           .select('id')
           .single()
+
+        console.log('[twilio/recording] contributor deposit saved:', deposit?.id)
+        if (depositError) {
+          console.error('[twilio/recording] DEPOSIT FAILED:', depositError.message, depositError.details, depositError.hint)
+        }
 
         const depositId = deposit?.id ?? null
 
@@ -242,6 +270,8 @@ export async function POST(req: NextRequest) {
           }
         }
       }
+    } else {
+      console.log('[twilio/recording] no depositText — skipping deposit insert')
     }
   } catch (err: unknown) {
     console.error('[twilio/recording] deposit insert failed:', err instanceof Error ? err.message : err)
