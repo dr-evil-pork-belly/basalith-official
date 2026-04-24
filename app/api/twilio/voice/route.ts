@@ -61,9 +61,15 @@ export async function POST(req: NextRequest) {
     .maybeSingle()
 
   if (archiveOwner) {
+    console.log('[twilio/voice] archive found:', archiveOwner.id)
+    console.log('[twilio/voice] owner name:', archiveOwner.owner_name)
+    console.log('[twilio/voice] preferred_language:', archiveOwner.preferred_language)
+
     const firstName = xmlSafe((archiveOwner.owner_name ?? 'there').split(' ')[0])
     const action    = buildActionUrl(recordingBase, { archiveId: archiveOwner.id, isOwner: 'true' })
     const isZh      = archiveOwner.preferred_language === 'zh'
+
+    console.log('[twilio/voice] isZh:', isZh, '— routing to', isZh ? 'Chinese' : 'English', 'branch')
 
     let twiml: string
 
@@ -77,6 +83,7 @@ export async function POST(req: NextRequest) {
     method="POST"
     maxLength="300"
     finishOnKey="1234567890*#"
+    timeout="5"
     playBeep="true"
     transcribe="false"
   />
@@ -98,6 +105,7 @@ export async function POST(req: NextRequest) {
     method="POST"
     maxLength="300"
     finishOnKey="1234567890*#"
+    timeout="5"
     playBeep="true"
     transcribe="false"
   />
@@ -160,6 +168,7 @@ export async function POST(req: NextRequest) {
     method="POST"
     maxLength="300"
     finishOnKey="1234567890*#"
+    timeout="5"
     playBeep="true"
     transcribe="false"
   />

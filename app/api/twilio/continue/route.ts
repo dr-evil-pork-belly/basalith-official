@@ -77,6 +77,7 @@ export async function POST(req: NextRequest) {
     method="POST"
     maxLength="300"
     finishOnKey="1234567890*#"
+    timeout="5"
     playBeep="true"
     transcribe="false"
   />
@@ -93,6 +94,7 @@ export async function POST(req: NextRequest) {
     method="POST"
     maxLength="300"
     finishOnKey="1234567890*#"
+    timeout="5"
     playBeep="true"
     transcribe="false"
   />
@@ -139,6 +141,7 @@ export async function POST(req: NextRequest) {
     method="POST"
     maxLength="300"
     finishOnKey="1234567890*#"
+    timeout="5"
     playBeep="true"
     transcribe="false"
   />
@@ -157,6 +160,7 @@ export async function POST(req: NextRequest) {
     method="POST"
     maxLength="300"
     finishOnKey="1234567890*#"
+    timeout="5"
     playBeep="true"
     transcribe="false"
   />
