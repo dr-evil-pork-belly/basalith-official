@@ -118,7 +118,6 @@ export async function POST(req: NextRequest) {
           prompt:         depositPrompt,
           response:       transcript,
           essence_status: 'pending',
-          source:         'voice_recording',
         })
         .select()
         .single()

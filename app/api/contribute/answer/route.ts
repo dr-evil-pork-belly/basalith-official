@@ -47,7 +47,6 @@ export async function POST(req: NextRequest) {
       archive_id: archiveId,
       prompt:     question.question_text,
       response:   answerText.trim(),
-      source:     'contributor_question',
       created_at: now,
     })
 

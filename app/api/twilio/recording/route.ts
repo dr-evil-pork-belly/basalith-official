@@ -211,7 +211,6 @@ export async function POST(req: NextRequest) {
             prompt:         'Phone call deposit',
             response:       depositText,
             essence_status: 'pending',
-            source:         'phone_recording',
           })
           .select()
           .single()
@@ -228,7 +227,6 @@ export async function POST(req: NextRequest) {
             prompt:         'Phone call recording',
             response:       depositText,
             essence_status: 'pending',
-            source:         'phone_recording',
           })
           .select('id')
           .single()

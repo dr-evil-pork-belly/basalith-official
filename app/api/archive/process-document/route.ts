@@ -167,7 +167,7 @@ Return ONLY valid JSON with no markdown fences:
 
       const { data: deposit } = await supabaseAdmin
         .from('owner_deposits')
-        .insert({ archive_id: archiveId, prompt: depositPrompt, response: transcript, essence_status: 'pending', source: 'document_upload' })
+        .insert({ archive_id: archiveId, prompt: depositPrompt, response: transcript, essence_status: 'pending' })
         .select()
         .single()
 
