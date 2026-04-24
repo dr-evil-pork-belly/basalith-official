@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
         // No voice attribute for Chinese — Twilio default handles CJK better than alice.
         twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say>您好，${firstName}。请在提示音后说话。说完后按任意键。</Say>
+  <Say voice="Polly.Zhiyu">您好，${firstName}。请在提示音后说话。说完后按任意键。</Say>
   <Record
     action="${action}"
     method="POST"
@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
     playBeep="true"
     transcribe="false"
   />
-  <Say>未收到录音。请稍后再次拨打。再见。</Say>
+  <Say voice="Polly.Zhiyu">未收到录音。请稍后再次拨打。再见。</Say>
   <Hangup/>
 </Response>`
       } else {

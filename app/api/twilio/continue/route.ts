@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
     const twiml = isZh
       ? `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say>谢谢您。再见。</Say>
+  <Say voice="Polly.Zhiyu">谢谢您。再见。</Say>
   <Hangup/>
 </Response>`
       : `<?xml version="1.0" encoding="UTF-8"?>
@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
     const twiml = isZh
       ? `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say>请分享另一段回忆。提示音后开始说话，说完后按任意键。</Say>
+  <Say voice="Polly.Zhiyu">请分享另一段回忆。提示音后开始说话，说完后按任意键。</Say>
   <Record
     action="${action}"
     method="POST"
@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
     playBeep="true"
     transcribe="false"
   />
-  <Say>未收到录音。再见。</Say>
+  <Say voice="Polly.Zhiyu">未收到录音。再见。</Say>
   <Hangup/>
 </Response>`
       : `<?xml version="1.0" encoding="UTF-8"?>
@@ -131,11 +131,11 @@ export async function POST(req: NextRequest) {
   const twiml = isZh
     ? `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say>这是您的下一个问题。</Say>
+  <Say voice="Polly.Zhiyu">这是您的下一个问题。</Say>
   <Pause length="1"/>
-  <Say>${questionText}</Say>
+  <Say voice="Polly.Zhiyu">${questionText}</Say>
   <Pause length="2"/>
-  <Say>请在提示音后说出您的回答，说完后按任意键。</Say>
+  <Say voice="Polly.Zhiyu">请在提示音后说出您的回答，说完后按任意键。</Say>
   <Record
     action="${action}"
     method="POST"
@@ -145,7 +145,7 @@ export async function POST(req: NextRequest) {
     playBeep="true"
     transcribe="false"
   />
-  <Say>未收到录音。再见。</Say>
+  <Say voice="Polly.Zhiyu">未收到录音。再见。</Say>
   <Hangup/>
 </Response>`
     : `<?xml version="1.0" encoding="UTF-8"?>

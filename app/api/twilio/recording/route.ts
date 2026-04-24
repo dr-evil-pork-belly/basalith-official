@@ -315,12 +315,12 @@ export async function POST(req: NextRequest) {
   const twiml = isZh
     ? `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say>谢谢您。您的故事已经保存到档案中了。</Say>
+  <Say voice="Polly.Zhiyu">谢谢您。您的故事已经保存到档案中了。</Say>
   <Pause length="1"/>
-  <Say>${continuePromptZh}</Say>
+  <Say voice="Polly.Zhiyu">${continuePromptZh}</Say>
   <Gather numDigits="1" action="${continueUrl}" method="POST" timeout="10">
   </Gather>
-  <Say>谢谢您。再见。</Say>
+  <Say voice="Polly.Zhiyu">谢谢您。再见。</Say>
   <Hangup/>
 </Response>`
     : `<?xml version="1.0" encoding="UTF-8"?>
