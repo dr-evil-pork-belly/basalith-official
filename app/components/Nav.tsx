@@ -3,22 +3,19 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 
-const links = [
-  { href: '/method',            label: 'The Method' },
-  { href: '/asset',             label: 'The Asset'  },
-  { href: '/continuity',        label: 'Continuity' },
-  { href: '/pricing',           label: 'Pricing'    },
-  { href: '/about',             label: 'About'      },
-  { href: '/archive-login',     label: 'My Archive' },
-  { href: '/join-archivists',   label: 'Partners'   },
+const LINKS = [
+  { href: '/method',     label: 'The Method'  },
+  { href: '/asset',      label: 'The Asset'   },
+  { href: '/pricing',    label: 'Pricing'     },
+  { href: '/about',      label: 'About'       },
 ]
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false)
-  const [open, setOpen] = useState(false)
+  const [open,     setOpen]     = useState(false)
 
   useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > 48)
+    const fn = () => setScrolled(window.scrollY > 40)
     window.addEventListener('scroll', fn, { passive: true })
     return () => window.removeEventListener('scroll', fn)
   }, [])
@@ -28,96 +25,183 @@ export default function Nav() {
     return () => { document.body.style.overflow = '' }
   }, [open])
 
+  const MONO: React.CSSProperties = {
+    fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+    fontSize:      '0.56rem',
+    letterSpacing: '0.22em',
+    textTransform: 'uppercase' as const,
+  }
+
   return (
     <>
       <nav
-        aria-label="Primary"
-        className={[
-          'fixed inset-x-0 top-0 z-[100] flex items-center justify-between',
-          'px-8 md:px-16 transition-all duration-300',
-          scrolled
-            ? 'py-4 bg-obsidian-void/95 backdrop-blur-lg border-b border-border-subtle'
-            : 'py-6 bg-gradient-to-b from-obsidian-void/90 to-transparent',
-        ].join(' ')}
+        aria-label="Primary navigation"
+        style={{
+          position:        'fixed',
+          inset:           '0 0 auto 0',
+          zIndex:          100,
+          display:         'flex',
+          alignItems:      'center',
+          justifyContent:  'space-between',
+          padding:         scrolled ? '18px clamp(24px,6vw,80px)' : '28px clamp(24px,6vw,80px)',
+          background:      scrolled ? 'rgba(250,250,248,0.96)' : 'transparent',
+          backdropFilter:  scrolled ? 'blur(12px)' : 'none',
+          boxShadow:       scrolled ? '0 1px 0 rgba(26,24,20,0.06)' : 'none',
+          transition:      'all 400ms cubic-bezier(0.16,1,0.3,1)',
+        }}
       >
-        <Link href="/" className="font-sans text-[0.8rem] font-bold tracking-[0.24em] uppercase text-text-primary no-underline flex items-baseline gap-0">
+        {/* Wordmark */}
+        <Link
+          href="/"
+          style={{
+            ...MONO,
+            fontSize:      '0.62rem',
+            letterSpacing: '0.32em',
+            color:         'var(--color-text-primary)',
+            textDecoration: 'none',
+            fontWeight:    700,
+          }}
+        >
           Basalith
-          <span style={{ color: 'rgba(196,162,74,0.5)', margin: '0 0.3em' }} aria-hidden="true">·</span>
-          <span style={{ fontStyle: 'italic', fontWeight: 300, color: 'var(--text-muted)', fontSize: '0.85em', textTransform: 'lowercase', letterSpacing: '0.08em' }}>xyz</span>
         </Link>
 
-        <ul className="hidden md:flex items-center gap-10 list-none m-0 p-0">
-          {links.map(({ href, label }) => (
-            <li key={label}>
-              <a href={href} className="font-sans text-[0.72rem] font-medium tracking-[0.1em] uppercase text-text-muted no-underline transition-colors duration-200 hover:text-text-primary">
+        {/* Desktop links */}
+        <ul style={{ display: 'flex', alignItems: 'center', gap: '40px', listStyle: 'none', margin: 0, padding: 0 }} className="hidden md:flex">
+          {LINKS.map(({ href, label }) => (
+            <li key={href}>
+              <Link
+                href={href}
+                style={{
+                  ...MONO,
+                  color:          'var(--color-text-muted)',
+                  textDecoration: 'none',
+                  transition:     'color 200ms ease',
+                }}
+                onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = 'var(--color-text-primary)'}
+                onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = 'var(--color-text-muted)'}
+              >
                 {label}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
 
-        <div className="flex items-center gap-4">
-          <a
+        {/* Right side */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          {/* Archive sign in */}
+          <Link
             href="/archive-login"
+            className="hidden md:block"
             style={{
-              fontFamily:    "'Space Mono', 'DM Mono', monospace",
-              fontSize:      '0.42rem',
-              letterSpacing: '0.25em',
-              textTransform: 'uppercase' as const,
-              color:         '#B8B4AB',
+              ...MONO,
+              color:          'var(--color-text-muted)',
               textDecoration: 'none',
-              border:        '1px solid rgba(196,162,74,0.4)',
-              padding:       '0.4rem 1.2rem',
-              background:    'transparent',
-              transition:    'border-color 0.2s, color 0.2s',
+              transition:     'color 200ms ease',
             }}
-            onMouseEnter={e => {
-              (e.currentTarget as HTMLElement).style.borderColor = 'rgba(196,162,74,0.9)'
-              ;(e.currentTarget as HTMLElement).style.color = '#C4A24A'
-            }}
-            onMouseLeave={e => {
-              (e.currentTarget as HTMLElement).style.borderColor = 'rgba(196,162,74,0.4)'
-              ;(e.currentTarget as HTMLElement).style.color = '#B8B4AB'
-            }}
+            onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = 'var(--color-text-primary)'}
+            onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = 'var(--color-text-muted)'}
           >
-            Sign In
-          </a>
+            My Archive
+          </Link>
+
+          {/* Primary CTA */}
+          <Link
+            href="/apply"
+            className="hidden md:block"
+            style={{
+              ...MONO,
+              color:          'var(--color-surface)',
+              textDecoration: 'none',
+              background:     'var(--color-void)',
+              padding:        '11px 24px',
+              borderRadius:   'var(--radius-sm)',
+              transition:     'background 250ms ease',
+              whiteSpace:     'nowrap',
+            }}
+            onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'rgba(26,24,20,0.8)'}
+            onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'var(--color-void)'}
+          >
+            Request Founding
+          </Link>
+
+          {/* Hamburger */}
           <button
-            className="md:hidden flex flex-col justify-center items-center gap-[5px] w-8 h-8"
-            onClick={() => setOpen(!open)}
             aria-label="Toggle menu"
+            aria-expanded={open}
+            onClick={() => setOpen(!open)}
+            className="md:hidden"
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', flexDirection: 'column', gap: '5px', width: 28, height: 28, justifyContent: 'center' }}
           >
-            <span className={['block h-px w-5 bg-text-primary transition-all duration-300', open ? 'rotate-45 translate-y-[6px]' : ''].join(' ')} />
-            <span className={['block h-px w-5 bg-text-primary transition-all duration-300', open ? 'opacity-0' : ''].join(' ')} />
-            <span className={['block h-px w-5 bg-text-primary transition-all duration-300', open ? '-rotate-45 -translate-y-[6px]' : ''].join(' ')} />
+            <span style={{ display: 'block', height: '1px', width: '100%', background: 'var(--color-text-primary)', transition: 'all 300ms ease', transform: open ? 'rotate(45deg) translate(4px, 4px)' : 'none' }} />
+            <span style={{ display: 'block', height: '1px', width: '100%', background: 'var(--color-text-primary)', transition: 'all 300ms ease', opacity: open ? 0 : 1 }} />
+            <span style={{ display: 'block', height: '1px', width: '100%', background: 'var(--color-text-primary)', transition: 'all 300ms ease', transform: open ? 'rotate(-45deg) translate(4px, -4px)' : 'none' }} />
           </button>
         </div>
       </nav>
 
+      {/* Mobile menu */}
       {open && (
-        <div className="fixed inset-0 z-[99] bg-obsidian-void flex flex-col items-center justify-center gap-10 md:hidden">
-          {links.map(({ href, label }) => (
-            <a key={label} href={href} onClick={() => setOpen(false)} className="font-serif text-[2rem] font-medium text-text-primary no-underline tracking-[-0.02em] hover:text-amber transition-colors duration-200">
+        <div
+          style={{
+            position:       'fixed',
+            inset:          0,
+            zIndex:         99,
+            background:     'var(--color-bg)',
+            display:        'flex',
+            flexDirection:  'column',
+            alignItems:     'center',
+            justifyContent: 'center',
+            gap:            '40px',
+          }}
+        >
+          {LINKS.map(({ href, label }) => (
+            <Link
+              key={href}
+              href={href}
+              onClick={() => setOpen(false)}
+              style={{
+                fontFamily:     'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+                fontSize:       '2rem',
+                fontWeight:     300,
+                color:          'var(--color-text-primary)',
+                textDecoration: 'none',
+                letterSpacing:  '-0.01em',
+              }}
+            >
               {label}
-            </a>
+            </Link>
           ))}
-          <a
+          <Link
+            href="/archive-login"
+            onClick={() => setOpen(false)}
+            style={{
+              fontFamily:     'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+              fontSize:       '2rem',
+              fontWeight:     300,
+              color:          'var(--color-text-muted)',
+              textDecoration: 'none',
+            }}
+          >
+            My Archive
+          </Link>
+          <Link
             href="/apply"
             onClick={() => setOpen(false)}
             style={{
-              fontFamily:    "'Space Mono', 'DM Mono', monospace",
-              fontSize:      '0.44rem',
-              letterSpacing: '0.22em',
+              fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+              fontSize:      '0.6rem',
+              letterSpacing: '0.28em',
               textTransform: 'uppercase' as const,
-              color:         '#C4A24A',
+              color:         'var(--color-surface)',
               textDecoration: 'none',
-              borderTop:     '1px solid rgba(196,162,74,0.15)',
-              paddingTop:    '1rem',
-              marginTop:     '1rem',
+              background:    'var(--color-void)',
+              padding:       '14px 32px',
+              borderRadius:  'var(--radius-sm)',
+              marginTop:     '8px',
             }}
           >
-            Request Your Founding →
-          </a>
+            Request Your Founding
+          </Link>
         </div>
       )}
     </>

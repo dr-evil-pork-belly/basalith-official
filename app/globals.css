@@ -1,53 +1,190 @@
 /* ─────────────────────────────────────────────────────────────────────────
    BASALITH — GLOBAL CSS
-   Obsidian Minimalist × Heritage Luxury
-   All design tokens live in tailwind.config.ts.
-   This file handles: font imports, body defaults, keyframes, grain.
+   Light luxury design system (marketing). Portal pages override inline.
+   Design references: Rolex, Patek Philippe — restrained, generous, serious.
 ───────────────────────────────────────────────────────────────────────── */
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ── Design System — CSS Variables ── */
+:root {
+  /* Marketing site — light theme */
+  --color-bg:           #FAFAF8;
+  --color-surface:      #FFFFFF;
+  --color-surface-alt:  #F5F3EE;
+  --color-void:         #0A0908;
+
+  --color-gold:         #B8963E;
+  --color-gold-light:   #C4A24A;
+  --color-gold-subtle:  rgba(184,150,62,0.08);
+  --color-gold-border:  rgba(184,150,62,0.2);
+
+  --color-text-primary:   #1A1814;
+  --color-text-secondary: #4A4640;
+  --color-text-muted:     #8A8680;
+  --color-text-faint:     #C0BDB8;
+
+  --color-border:        rgba(26,24,20,0.08);
+  --color-border-medium: rgba(26,24,20,0.15);
+
+  /* Portal — dark theme (referenced by portal pages inline) */
+  --portal-bg:      #0C0B09;
+  --portal-surface: #141210;
+  --portal-alt:     #1C1A17;
+  --portal-gold:    #C4A24A;
+  --portal-border:  rgba(196,162,74,0.1);
+  --portal-text:    #F0EDE6;
+  --portal-muted:   #706C65;
+
+  /* Typography */
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-mono:  'Space Mono', 'Courier New', monospace;
+
+  /* These mirror next/font CSS variables */
+  --font-cormorant:   'Cormorant Garamond', Georgia, serif;
+  --font-public-sans: 'Public Sans', system-ui, sans-serif;
+
+  /* Type scale */
+  --text-display: clamp(3rem, 7vw, 7rem);
+  --text-hero:    clamp(2.5rem, 5vw, 5rem);
+  --text-h1:      clamp(2rem, 4vw, 3.5rem);
+  --text-h2:      clamp(1.5rem, 3vw, 2.5rem);
+  --text-h3:      clamp(1.25rem, 2vw, 1.75rem);
+  --text-body-lg: 1.25rem;
+  --text-body:    1.1rem;
+  --text-body-sm: 1rem;
+  --text-label:   0.65rem;
+  --text-caption: 0.55rem;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 40px;
+  --space-6: 64px;
+  --space-7: 96px;
+  --space-8: 160px;
+
+  /* Layout */
+  --max-width:              1200px;
+  --max-width-text:         640px;
+  --section-padding:        120px;
+  --section-padding-mobile: 64px;
+
+  /* Motion */
+  --ease-expo:     cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-slow:      800ms;
+  --dur-mid:       400ms;
+  --dur-fast:      200ms;
+
+  /* Shape */
+  --radius-sm:   2px;
+  --radius-md:   4px;
+  --radius-lg:   8px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm:   0 1px 3px rgba(26,24,20,0.06);
+  --shadow-md:   0 4px 16px rgba(26,24,20,0.08);
+  --shadow-lg:   0 16px 48px rgba(26,24,20,0.12);
+  --shadow-gold: 0 4px 24px rgba(184,150,62,0.15);
+}
+
 html {
   scroll-behavior: smooth;
 }
 
-/* ── CSS Variables (mirror of Tailwind tokens for inline styles) ── */
-:root {
-  --font-cormorant:   'Cormorant Garamond', Georgia, serif;
-  --font-public-sans: 'Public Sans', system-ui, sans-serif;
-
-  --obsidian:       #1A1A1B;
-  --obsidian-deep:  #111112;
-  --obsidian-void:  #0C0C0D;
-  --amber:          #FFB347;
-  --amber-light:    #FFCA7A;
-  --amber-dim:      #C47D1A;
-  --text-primary:   #F0F0EE;
-  --text-secondary: #9DA3A8;
-  --text-muted:     #5C6166;
-  --border-subtle:  rgba(255,255,255,0.06);
-  --border-amber:   rgba(255,179,71,0.35);
-}
-
-/* ── Body ── */
+/* ── Body defaults — light marketing theme ── */
 body {
-  font-family: var(--font-public-sans);
-  background-color: #0C0C0D;
-  color: #9DA3A8;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
-  cursor: none;
+  font-family:              var(--font-cormorant);
+  background-color:         var(--color-bg);
+  color:                    var(--color-text-secondary);
+  -webkit-font-smoothing:   antialiased;
+  -moz-osx-font-smoothing:  grayscale;
+  overflow-x:               hidden;
 }
 
-/* Grain texture overlay — applied via layout.tsx div, defined here */
+/* ── Grain texture ── */
 .grain {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.024'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.018'/%3E%3C/svg%3E");
 }
 
-/* ── Essence Game keyframes ── */
+/* ── Marketing component utilities ── */
+.section-padding {
+  padding: var(--section-padding) clamp(24px, 6vw, 80px);
+}
+@media (max-width: 768px) {
+  .section-padding {
+    padding: var(--section-padding-mobile) 24px;
+  }
+}
+
+/* Eyebrow text — Space Mono, gold, tracking */
+.eyebrow-light {
+  font-family:    var(--font-mono);
+  font-size:      var(--text-caption);
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color:          var(--color-gold);
+  display:        flex;
+  align-items:    center;
+  gap:            12px;
+}
+.eyebrow-light::before {
+  content:    '';
+  display:    block;
+  width:      24px;
+  height:     1px;
+  background: var(--color-gold);
+  flex-shrink: 0;
+}
+
+/* Reveal animation (used by ScrollReveal component) */
+[data-reveal] {
+  opacity:   0;
+  transform: translateY(32px);
+  transition: opacity var(--dur-slow) var(--ease-expo),
+              transform var(--dur-slow) var(--ease-expo);
+}
+[data-reveal].revealed {
+  opacity:   1;
+  transform: translateY(0);
+}
+
+/* ── Stagger reveal delays ── */
+[data-reveal-delay="1"] { transition-delay: 100ms; }
+[data-reveal-delay="2"] { transition-delay: 200ms; }
+[data-reveal-delay="3"] { transition-delay: 300ms; }
+[data-reveal-delay="4"] { transition-delay: 400ms; }
+
+/* ── Hero headline line animation ── */
+@keyframes lineReveal {
+  from {
+    opacity:   0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity:   1;
+    transform: translateY(0);
+  }
+}
+
+.headline-line {
+  display:              block;
+  animation:            lineReveal var(--dur-slow) var(--ease-expo) both;
+}
+.headline-line-1 { animation-delay: 0ms;   }
+.headline-line-2 { animation-delay: 150ms; }
+.headline-line-3 { animation-delay: 300ms; }
+
+/* ── Portal dark theme overrides ── */
+/* Portal pages set background inline — these keep internal elements consistent */
+
+/* ── Essence Game keyframes (portal) ── */
 @keyframes cardReveal {
   from { opacity: 0; transform: translateY(20px) scale(0.96); filter: brightness(0); }
   to   { opacity: 1; transform: translateY(0)    scale(1);    filter: brightness(1); }
@@ -68,56 +205,10 @@ body {
   0%, 100% { opacity: 0.5; }
   50%       { opacity: 1;   }
 }
-
 @keyframes pulse {
   0%, 100% { opacity: 1;   }
   50%       { opacity: 0.3; }
 }
-
-/* ── Range input (Archivist calculator) ── */
-input[type='range'].range-amber {
-  -webkit-appearance: none;
-  appearance: none;
-  height: 2px;
-  background: rgba(196,162,74,0.2);
-  border-radius: 9999px;
-  outline: none;
-  cursor: pointer;
-  width: 100%;
-}
-input[type='range'].range-amber::-webkit-slider-runnable-track {
-  height: 2px;
-  background: rgba(196,162,74,0.2);
-  border-radius: 9999px;
-}
-input[type='range'].range-amber::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 16px;
-  height: 16px;
-  background: #C4A24A;
-  border: none;
-  border-radius: 2px;
-  transform: rotate(45deg);
-  cursor: pointer;
-  margin-top: -7px;
-}
-input[type='range'].range-amber::-moz-range-track {
-  height: 2px;
-  background: rgba(196,162,74,0.2);
-  border-radius: 9999px;
-}
-input[type='range'].range-amber::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
-  background: #C4A24A;
-  border: none;
-  border-radius: 2px;
-  transform: rotate(45deg);
-  cursor: pointer;
-}
-
-/* ── Archive milestone overlay ── */
 @keyframes sigilPulse {
   0%, 100% { transform: scale(1); }
   50%       { transform: scale(1.15); }
@@ -139,11 +230,35 @@ input[type='range'].range-amber::-moz-range-thumb {
   to   { opacity: 0; }
 }
 
+/* ── Range input (portal) ── */
+input[type='range'].range-amber {
+  -webkit-appearance: none;
+  appearance:         none;
+  height:             2px;
+  background:         rgba(196,162,74,0.2);
+  border-radius:      9999px;
+  outline:            none;
+  cursor:             pointer;
+  width:              100%;
+}
+input[type='range'].range-amber::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance:         none;
+  width:              16px;
+  height:             16px;
+  background:         #C4A24A;
+  border:             none;
+  border-radius:      2px;
+  transform:          rotate(45deg);
+  cursor:             pointer;
+  margin-top:         -7px;
+}
+
 /* ── Reduced motion ── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
-    animation-duration: 0.01ms !important;
+    animation-duration:       0.01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    transition-duration:      0.01ms !important;
   }
 }

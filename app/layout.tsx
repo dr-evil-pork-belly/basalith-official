@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
-import { Cormorant_Garamond, Public_Sans } from 'next/font/google'
+import { Cormorant_Garamond, Space_Mono } from 'next/font/google'
 import './globals.css'
-import CursorTracker     from './components/CursorTracker'
 import ScrollReveal      from './components/ScrollReveal'
 import AuthErrorRedirect from './components/AuthErrorRedirect'
 
@@ -13,11 +12,10 @@ const cormorant = Cormorant_Garamond({
   display:  'swap',
 })
 
-const publicSans = Public_Sans({
+const spaceMono = Space_Mono({
   subsets:  ['latin'],
-  weight:   ['200', '300', '400', '500', '600', '700', '800'],
-  style:    ['normal', 'italic'],
-  variable: '--font-public-sans',
+  weight:   ['400', '700'],
+  variable: '--font-space-mono',
   display:  'swap',
 })
 
@@ -60,11 +58,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${cormorant.variable} ${publicSans.variable}`}>
+    <html lang="en" className={`${cormorant.variable} ${spaceMono.variable}`}>
       <body>
         <div className="grain fixed inset-0 z-[9997] pointer-events-none" aria-hidden="true" />
         <AuthErrorRedirect />
-        <CursorTracker />
         <ScrollReveal />
         {children}
       </body>

@@ -7,155 +7,167 @@ export const metadata: Metadata = {
   description: 'How the Basalith archive is built. Two directions simultaneously, from the inside out and the outside in.',
 }
 
-const eyebrow: React.CSSProperties = {
-  fontFamily:    "'Space Mono', 'Courier New', monospace",
-  fontSize:      '0.44rem',
-  letterSpacing: '0.4em',
-  color:         '#C4A24A',
-  textTransform: 'uppercase',
-  marginBottom:  '1rem',
+const SERIF: React.CSSProperties = {
+  fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
 }
-
-const h1: React.CSSProperties = {
-  fontFamily:    "'Cormorant Garamond', Georgia, serif",
-  fontSize:      'clamp(2rem, 5vw, 3.5rem)',
-  fontWeight:    700,
-  color:         '#F0EDE6',
-  lineHeight:    1.2,
-  marginBottom:  '1rem',
+const MONO: React.CSSProperties = {
+  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+  textTransform: 'uppercase' as const,
+  letterSpacing: '0.28em',
 }
-
-const sub: React.CSSProperties = {
-  fontFamily:   "'Cormorant Garamond', Georgia, serif",
+const H2: React.CSSProperties = {
+  ...SERIF,
+  fontSize:     'clamp(1.4rem, 2.5vw, 1.9rem)',
+  fontWeight:   500,
+  color:        'var(--color-text-primary)',
+  lineHeight:   1.2,
+  marginBottom: '16px',
+  marginTop:    '48px',
+}
+const BODY: React.CSSProperties = {
+  ...SERIF,
   fontSize:     '1.1rem',
-  fontStyle:    'italic',
-  color:        '#706C65',
-  marginBottom: '4rem',
-}
-
-const h2: React.CSSProperties = {
-  fontFamily:   "'Cormorant Garamond', Georgia, serif",
-  fontSize:     '1.3rem',
-  fontWeight:   700,
-  color:        '#F0EDE6',
-  marginBottom: '1.5rem',
-  marginTop:    '3rem',
-}
-
-const body: React.CSSProperties = {
-  fontFamily:   "'Cormorant Garamond', Georgia, serif",
-  fontSize:     '1rem',
   fontWeight:   300,
-  color:        '#B8B4AB',
   lineHeight:   1.9,
-  marginBottom: '1.5rem',
+  color:        'var(--color-text-secondary)',
+  marginBottom: '20px',
+}
+const RULE: React.CSSProperties = {
+  width:      '40px',
+  height:     '1px',
+  background: 'var(--color-gold)',
+  margin:     '48px 0',
 }
 
-const divider: React.CSSProperties = {
-  borderTop: '1px solid rgba(196,162,74,0.2)',
-  margin:    '3rem auto',
-  maxWidth:  '120px',
-}
+const STEPS = [
+  {
+    n:     '01',
+    title: 'Inside looking out',
+    body:  [
+      'The archive subject deposits their own memories, wisdom, decisions, and beliefs directly. Through guided wisdom sessions, entity conversations, and structured deposits across ten dimensions of their life and thinking.',
+      'This is the data only they can provide. Their first-person account of who they are, what they learned, what they believe, and what they want their descendants to know.',
+    ],
+  },
+  {
+    n:     '02',
+    title: 'Outside looking in',
+    body:  [
+      'The people who know them contribute what they observed. Family members label photographs. Contributors answer witness session questions designed for their specific relationship to the subject.',
+      'A daughter sees things her father never knew were visible. A colleague remembers decisions that shaped a team. A childhood friend carries who someone was before they became who they think they are.',
+    ],
+  },
+  {
+    n:     '03',
+    title: 'The combination',
+    body:  [
+      'When inside and outside data are combined (the deposits, the witness observations, the family memories, the entity conversations) the result is the most accurate possible representation of a human life.',
+      'Not a curated version. Not a highlight reel. The actual person, as they saw themselves and as the people who loved them saw them.',
+    ],
+  },
+  {
+    n:     '04',
+    title: 'The nightly photograph email',
+    body:  [
+      'Every evening at 9pm one photograph from the archive is sent to every active contributor. No login required. No app to open.',
+      'Contributors reply with what they remember. Their replies are parsed by AI and saved to the archive permanently. The archive builds itself around the family, without anyone having to organize a session or schedule a call.',
+    ],
+  },
+  {
+    n:     '05',
+    title: 'The Intelligence Layer',
+    body:  [
+      'Before a single photograph reaches the labeling interface our seven-layer AI pipeline has already processed every upload. Screenshots removed. Duplicates collapsed. Photographs scored by archive value. The most emotionally resonant image in a collection of thousands surfaces first.',
+      'The family never sees the noise. They only see what matters.',
+    ],
+  },
+]
 
 export default function MethodPage() {
   return (
     <>
       <Nav />
-      <main style={{ background: '#0A0908' }}>
-        <div style={{ maxWidth: '760px', margin: '0 auto', padding: '8rem 2rem' }}>
+      <main style={{ background: 'var(--color-bg)' }}>
 
-          <p style={eyebrow}>The Method</p>
+        {/* Hero */}
+        <section style={{ padding: 'clamp(140px,16vw,180px) clamp(24px,6vw,80px) clamp(60px,8vw,80px)', maxWidth: 'calc(var(--max-width-text) + 160px)', margin: '0 auto' }}>
+          <p
+            style={{
+              ...MONO,
+              fontSize:     'var(--text-caption)',
+              color:        'var(--color-gold)',
+              display:      'flex',
+              alignItems:   'center',
+              gap:          '12px',
+              marginBottom: '24px',
+            }}
+          >
+            <span style={{ display: 'block', width: '24px', height: '1px', background: 'var(--color-gold)', flexShrink: 0 }} aria-hidden="true" />
+            The Method
+          </p>
+          <h1
+            style={{
+              ...SERIF,
+              fontSize:      'var(--text-h1)',
+              fontWeight:    300,
+              lineHeight:    1.15,
+              color:         'var(--color-text-primary)',
+              letterSpacing: '-0.025em',
+              marginBottom:  '20px',
+            }}
+          >
+            How the archive is built.
+          </h1>
+          <p
+            style={{
+              ...SERIF,
+              fontSize:  '1.2rem',
+              fontStyle: 'italic',
+              fontWeight: 300,
+              lineHeight: 1.7,
+              color:     'var(--color-text-muted)',
+            }}
+          >
+            Two directions. Simultaneously. From the inside out and the outside in.
+          </p>
+        </section>
 
-          <h1 style={h1}>How the archive is built.</h1>
+        {/* Steps */}
+        <section style={{ padding: '0 clamp(24px,6vw,80px) clamp(80px,10vw,120px)', maxWidth: 'calc(var(--max-width-text) + 160px)', margin: '0 auto' }}>
+          {STEPS.map(({ n, title, body }, i) => (
+            <div key={n} data-reveal style={{ display: 'grid', gridTemplateColumns: '3rem 1fr', gap: '32px', marginBottom: '56px' }}>
+              <div>
+                <p style={{ ...MONO, fontSize: '0.52rem', color: 'var(--color-gold)', paddingTop: '4px' }}>{n}</p>
+              </div>
+              <div>
+                <h2 style={{ ...H2, marginTop: 0 }}>{title}</h2>
+                {body.map((para, j) => <p key={j} style={BODY}>{para}</p>)}
+                {i < STEPS.length - 1 && <div style={RULE} aria-hidden="true" />}
+              </div>
+            </div>
+          ))}
 
-          <p style={sub}>Two directions. Simultaneously. From the inside out and the outside in.</p>
-
-          <div style={divider} />
-
-          <h2 style={h2}>Inside looking out.</h2>
-          <p style={body}>
-            The archive subject deposits their own memories, wisdom, decisions, and beliefs directly.
-            Through guided wisdom sessions, entity conversations, and structured deposits across ten
-            dimensions of their life and thinking.
-          </p>
-          <p style={body}>
-            This is the data only they can provide. Their first-person account of who they are,
-            what they learned, what they believe, and what they want their descendants to know.
-          </p>
-
-          <h2 style={h2}>Outside looking in.</h2>
-          <p style={body}>
-            The people who know them contribute what they observed. Family members label photographs.
-            Contributors answer witness session questions designed for their specific relationship
-            to the subject.
-          </p>
-          <p style={body}>
-            A daughter sees things her father never knew were visible. A colleague remembers decisions
-            that shaped a team. A childhood friend carries who someone was before they became who
-            they think they are.
-          </p>
-          <p style={body}>
-            These observations capture dimensions of a person that the person themselves would never
-            think to deposit.
-          </p>
-
-          <h2 style={h2}>The combination produces something neither could produce alone.</h2>
-          <p style={body}>
-            When inside and outside data are combined (the deposits, the witness observations,
-            the family memories, the entity conversations) the result is the most accurate possible
-            representation of a human life.
-          </p>
-          <p style={body}>
-            Not a curated version. Not a highlight reel. The actual person, as they saw themselves
-            and as the people who loved them saw them.
-          </p>
-
-          <h2 style={h2}>The nightly photograph email.</h2>
-          <p style={body}>
-            Every evening at 9pm one photograph from the archive is sent to every active contributor.
-            No login required. No app to open.
-          </p>
-          <p style={body}>
-            Contributors reply with what they remember. Their replies are parsed by AI and saved to
-            the archive permanently. A confirmation arrives within minutes. A summary of all replies
-            reaches the primary user the next morning.
-          </p>
-          <p style={body}>
-            The archive builds itself around the family. Without anyone having to organize a session,
-            schedule a call, or remember to do anything.
-          </p>
-
-          <h2 style={h2}>The Intelligence Layer.</h2>
-          <p style={body}>
-            Before a single photograph reaches the labeling interface our seven-layer AI pipeline
-            has already processed every upload. Screenshots removed. Duplicates collapsed.
-            Photographs scored by archive value. The most emotionally resonant image in a collection
-            of thousands surfaces first.
-          </p>
-          <p style={body}>The family never sees the noise. They only see what matters.</p>
-
-          <div style={divider} />
-
-          <div style={{ textAlign: 'center', padding: '3rem 0' }}>
-            <p style={{ ...body, fontStyle: 'italic', textAlign: 'center' }}>
+          {/* CTA */}
+          <div style={{ textAlign: 'center', paddingTop: '32px', borderTop: '1px solid var(--color-border)' }}>
+            <p style={{ ...BODY, fontStyle: 'italic', textAlign: 'center' }}>
               The archive begins with The Founding, a 90-minute guided session with a Senior Legacy Guide.
             </p>
             <a
               href="/founding-session"
               style={{
-                fontFamily:     "'Space Mono', monospace",
-                fontSize:       '0.44rem',
-                letterSpacing:  '0.35em',
-                color:          '#C4A24A',
+                ...MONO,
+                fontSize:       'var(--text-caption)',
+                color:          'var(--color-gold)',
                 textDecoration: 'none',
-                textTransform:  'uppercase',
+                display:        'inline-flex',
+                alignItems:     'center',
+                gap:            '8px',
               }}
             >
-              What happens in The Founding →
+              What happens in The Founding <span aria-hidden="true">→</span>
             </a>
           </div>
+        </section>
 
-        </div>
       </main>
       <Footer />
     </>

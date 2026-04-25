@@ -1,12 +1,19 @@
 import type { Metadata } from 'next'
 import Nav        from '../components/Nav'
-
-export const metadata: Metadata = {
-  title: 'Pricing',
-}
-
 import Footer     from '../components/Footer'
 import PricingFAQ from '../components/PricingFAQ'
+
+export const metadata: Metadata = { title: 'Pricing' }
+
+const MONO: React.CSSProperties = {
+  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+  textTransform: 'uppercase' as const,
+  letterSpacing: '0.28em',
+}
+
+const SERIF: React.CSSProperties = {
+  fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+}
 
 const TIERS = [
   {
@@ -16,19 +23,17 @@ const TIERS = [
     period:   'per year',
     monthly:  '$100 / month equivalent',
     featured: false,
-    badge:    null as string | null,
     features: [
       'Secure archive infrastructure',
       'Up to 5 family contributors',
       'Unlimited photograph deposits',
-      'Voice, photo & journal labeling',
+      'Voice, photo and journal labeling',
       'Nightly photograph email to contributors',
       'Basic Digital Clone access',
       'Annual AI model updates',
       'Data portability guarantee',
       'Data Custodianship Reserve coverage',
     ],
-    cta: 'REQUEST YOUR FOUNDING',
   },
   {
     name:     'The Estate',
@@ -37,12 +42,11 @@ const TIERS = [
     period:   'per year',
     monthly:  '$300 / month equivalent',
     featured: true,
-    badge:    'MOST POPULAR' as string | null,
     features: [
       'Everything in The Archive',
       'Up to 15 family contributors',
       'Full Digital Clone with conversational access',
-      'Will & Trust integration, bequest language prepared',
+      'Will and Trust integration, bequest language prepared',
       'Dedicated Custodian designation',
       'Annual estate compatibility review',
       'Priority curation support',
@@ -51,7 +55,6 @@ const TIERS = [
       'Family access tiers, control who sees what',
       '48-hour response on all support requests',
     ],
-    cta: 'REQUEST YOUR FOUNDING',
   },
   {
     name:     'The Dynasty',
@@ -60,7 +63,6 @@ const TIERS = [
     period:   'per year',
     monthly:  '$800 / month equivalent',
     featured: false,
-    badge:    'SOVEREIGN' as string | null,
     features: [
       'Everything in The Estate',
       'Unlimited contributors across generations',
@@ -72,55 +74,25 @@ const TIERS = [
       'First access to new AI model generations',
       'Custom Digital Clone interaction boundaries',
       'Sovereign Legacy Guide permanently assigned',
-      'Custom bequest language prepared',
       '200-year perpetual storage guarantee',
     ],
-    cta: 'REQUEST YOUR FOUNDING',
   },
 ]
 
-const DELIVERABLES = [
-  { num: '01', title: 'Archive Architecture Build',      desc: 'Your permanent digital estate structure, configured for generational transfer and legal standing.' },
-  { num: '02', title: 'Legal Instrument Review',          desc: 'Compatibility assessment with your existing will, trust, and estate documents. Attorney-ready output.' },
-  { num: '03', title: 'Family Network Initialization',    desc: 'Contributor onboarding for up to 15 family members. Roles assigned. Access levels configured. Documented.' },
-  { num: '04', title: 'Founding Essence Session',         desc: 'Your first live family labeling session, guided by a Senior Legacy Guide. 90 minutes. This is where it becomes real.' },
-  { num: '05', title: 'AI-Processed Data Migration',       desc: 'Import from existing photo libraries, documents, and digital archives. Every photograph filtered, deduplicated, dated, and sequenced by our AI pipeline before it reaches the labeling interface.' },
-  { num: '06', title: 'Custodian Designation',            desc: "Your archive's legal custodian assigned and documented with formal estate standing." },
+const FOUNDING_DELIVERABLES = [
+  { n: '01', title: 'Archive Architecture Build',   desc: 'Your permanent digital estate structure, configured for generational transfer and legal standing.' },
+  { n: '02', title: 'Legal Instrument Review',       desc: 'Compatibility assessment with your existing will, trust, and estate documents. Attorney-ready output.' },
+  { n: '03', title: 'Family Network Initialization', desc: 'Contributor onboarding for up to 15 family members. Roles assigned. Access levels configured.' },
+  { n: '04', title: 'Founding Essence Session',      desc: 'Your first live family labeling session, guided by a Senior Legacy Guide. 90 minutes. This is where it becomes real.' },
+  { n: '05', title: 'AI-Processed Data Migration',   desc: 'Every photograph filtered, deduplicated, dated, and sequenced by our AI pipeline before it reaches the labeling interface.' },
+  { n: '06', title: 'Custodian Designation',         desc: "Your archive's legal custodian assigned and documented with formal estate standing." },
 ]
 
-const FOUNDING_ESTABLISHES = [
-  'Your archive exists as a legal asset documented in your estate plan.',
-  'Your family has authenticated access with roles, permissions, and continuity.',
-  'Your Custodian is designated and has formal standing to govern the archive.',
-  'Your first Essence data is indexed, attributed, and stored with legal provenance.',
-]
-
-
-const tierSepStyle: React.CSSProperties = {
-  fontFamily:    'monospace',
-  fontSize:      '0.38rem',
-  letterSpacing: '0.18em',
-  textTransform: 'uppercase',
-  color:         'rgba(240,237,230,0.2)',
-  writingMode:   'vertical-rl',
-  transform:     'rotate(180deg)',
-}
-
-function TierSeparator({ top, bottom }: { top: string; bottom: string }) {
+function Check() {
   return (
-    <div className="hidden lg:flex flex-col items-center justify-center gap-2 self-stretch py-12" aria-hidden="true">
-      <span style={tierSepStyle}>{top}</span>
-      <div style={{ flex: 1, width: '1px', background: 'rgba(255,255,255,0.05)' }} />
-      <span style={tierSepStyle}>{bottom}</span>
-    </div>
-  )
-}
-
-function CheckIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="flex-shrink-0 mt-0.5">
-      <circle cx="7" cy="7" r="6.5" stroke="rgba(255,179,71,0.3)" />
-      <path d="M4 7l2 2 4-4" stroke="#FFB347" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0, marginTop: '2px' }} aria-hidden="true">
+      <circle cx="7" cy="7" r="6.5" stroke="rgba(184,150,62,0.3)" />
+      <path d="M4 7l2 2 4-4" stroke="var(--color-gold)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }
@@ -129,227 +101,304 @@ export default function PricingPage() {
   return (
     <>
       <Nav />
-      <main>
+      <main style={{ background: 'var(--color-bg)' }}>
 
-        {/* ── HERO ── */}
-        <section className="relative bg-obsidian-void px-8 md:px-16 pt-40 pb-24 text-center overflow-hidden" aria-label="Pricing hero">
-          <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.022) 1px,transparent 1px)', backgroundSize: '80px 80px', maskImage: 'radial-gradient(ellipse 80% 80% at 50% 50%,black 20%,transparent 100%)' }} aria-hidden="true" />
-          <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 60%,rgba(255,179,71,0.07) 0%,transparent 65%)' }} aria-hidden="true" />
-          <div className="relative z-10 max-w-3xl mx-auto">
-            <p className="eyebrow mb-6">Stewardship Pricing</p>
-            <h1 className="font-serif font-semibold text-text-primary leading-[0.92] tracking-[-0.038em] mb-6" style={{ fontSize: 'clamp(3rem,6vw,5.5rem)' }}>
-              An Investment In{' '}
-              <em className="italic font-medium text-amber" style={{ fontStyle: 'italic' }}>Permanence.</em>
-            </h1>
-            <p className="font-sans font-light text-body-base text-text-secondary leading-[1.82] max-w-xl mx-auto">
-              Basalith is priced as what it is: a generational asset under professional stewardship.
-              Not a software subscription. Not a storage plan. A governed legacy infrastructure with legal standing.
-            </p>
-          </div>
-        </section>
-
-        {/* ── THE FOUNDING ── */}
-        <section className="relative bg-obsidian-deep px-8 md:px-16 lg:px-24 py-24 overflow-hidden" aria-label="The Founding fee">
-          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-border-amber to-transparent" />
-          <div className="max-w-[860px] mx-auto rounded-sm overflow-hidden" style={{ background: '#0F0E0C', borderTop: '3px solid rgba(196,162,74,0.6)', border: '1px solid rgba(196,162,74,0.2)', borderTopColor: 'rgba(196,162,74,0.6)' }}>
-            <div className="p-10 md:p-14">
-
-              {/* Card header */}
-              <div className="flex items-start justify-between gap-4 mb-7">
-                <span className="font-sans text-[0.58rem] font-bold tracking-[0.22em] uppercase" style={{ color: '#C4A24A' }}>
-                  One-Time Engagement
-                </span>
-                <svg width="34" height="34" viewBox="0 0 34 34" fill="none" aria-hidden="true" className="flex-shrink-0 opacity-60">
-                  <polygon points="17,1 33,17 17,33 1,17" fill="none" stroke="#C4A24A" strokeWidth="1.4"/>
-                  <polygon points="17,7 27,17 17,27 7,17" fill="none" stroke="#C4A24A" strokeWidth="1.1"/>
-                  <polygon points="17,13 21,17 17,21 13,17" fill="#C4A24A"/>
-                </svg>
-              </div>
-
-              {/* Headline + sub */}
-              <h2 className="font-serif font-bold text-text-primary tracking-[-0.025em] mb-4" style={{ fontSize: '2.2rem' }}>
-                The Founding
-              </h2>
-              <p className="font-serif italic text-text-secondary leading-[1.75] mb-8" style={{ fontSize: '1rem' }}>
-                Every Basalith archive begins with The Founding,
-                a comprehensive legal and technical engagement that establishes
-                your archive&rsquo;s permanent infrastructure.
-                Executed once. Built to last centuries.
-              </p>
-
-              {/* Divider */}
-              <div className="h-px mb-10" style={{ background: 'rgba(196,162,74,0.18)' }} />
-
-              {/* Two columns */}
-              <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-12">
-
-                {/* LEFT — deliverables */}
-                <div className="flex flex-col gap-7">
-                  {DELIVERABLES.map(({ num, title, desc }) => (
-                    <div key={num} className="flex gap-5 items-start">
-                      <span className="font-sans text-[0.62rem] font-bold tracking-[0.12em] flex-shrink-0 mt-1 w-7" style={{ color: '#C4A24A' }}>
-                        {num}
-                      </span>
-                      <div>
-                        <p className="font-sans text-[0.88rem] font-semibold text-text-primary mb-1">{title}</p>
-                        <p className="font-serif italic text-[0.9rem] text-text-secondary leading-[1.65]">{desc}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* RIGHT — establishes + price */}
-                <div className="flex flex-col">
-                  <p className="font-serif italic text-text-secondary mb-6" style={{ fontSize: '1rem' }}>
-                    Upon completion of The Founding,
-                  </p>
-                  <div className="flex flex-col gap-4 mb-8">
-                    {FOUNDING_ESTABLISHES.map((item) => (
-                      <div key={item} className="flex items-start gap-3">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="flex-shrink-0 mt-0.5" aria-hidden="true">
-                          <path d="M3 8l3.5 3.5L13 5" stroke="#C4A24A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                        <p className="font-sans text-[0.83rem] text-text-secondary leading-[1.65]">{item}</p>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Price block */}
-                  <div className="pt-6 mt-auto" style={{ borderTop: '1px solid rgba(196,162,74,0.12)' }}>
-                    <p className="font-serif font-bold text-text-primary leading-none mb-2" style={{ fontSize: '3rem', letterSpacing: '-0.03em' }}>
-                      $2,500
-                    </p>
-                    <p className="font-sans font-bold tracking-[0.2em] uppercase mb-3" style={{ fontSize: '0.6rem', color: '#C4A24A' }}>
-                      One-Time Engagement Fee
-                    </p>
-                    <p className="font-serif italic text-text-muted leading-[1.65] mb-3" style={{ fontSize: '0.85rem' }}>
-                      Required for all new archives. Annual stewardship is selected and billed separately below.
-                    </p>
-                    <p className="font-serif italic text-text-muted leading-[1.7]" style={{ fontSize: '0.8rem' }}>
-                      The Founding is executed by a Senior Legacy Guide assigned to your family.
-                      Completion typically takes 2–3 weeks from engagement.
-                    </p>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── FOUNDING LINKS ── */}
-        <div className="bg-obsidian-deep px-8 md:px-16 lg:px-24 pb-12 flex flex-col sm:flex-row items-center justify-center gap-6">
-          <a href="/founding-session" className="font-serif italic text-text-muted hover:text-amber transition-colors duration-200" style={{ fontSize: '0.95rem' }}>
-            What happens in your Founding session →
-          </a>
-          <span className="hidden sm:block text-border-subtle select-none" aria-hidden="true">·</span>
-          <a href="/custodianship" className="font-serif italic text-text-muted hover:text-amber transition-colors duration-200" style={{ fontSize: '0.95rem' }}>
-            Learn about the Data Custodianship Reserve →
-          </a>
-        </div>
-
-        {/* ── TIERS ── */}
-        <section className="relative bg-obsidian px-8 md:px-16 lg:px-24 py-24 overflow-hidden" aria-label="Pricing tiers">
-          <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 70% 50% at 50% 50%,rgba(255,179,71,0.04) 0%,transparent 65%)' }} aria-hidden="true" />
-          <div className="text-center max-w-xl mx-auto mb-16">
-            <p className="eyebrow mb-4">Annual Stewardship</p>
-            <h2 className="font-serif font-semibold text-text-primary leading-[1.0] tracking-[-0.03em]" style={{ fontSize: 'clamp(2rem,4vw,3.25rem)' }}>Choose Your Level of Stewardship.</h2>
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_48px_1fr_48px_1fr] gap-y-6 max-w-6xl mx-auto items-start">
-            {TIERS.map(({ name, tagline, price, period, monthly, featured, badge, features, cta }, i) => {
-              const sep = i === 1
-                ? <TierSeparator key="sep-1" top="↑ Core archive" bottom="↓ Full estate integration" />
-                : i === 2
-                  ? <TierSeparator key="sep-2" top="↑ Family archive" bottom="↓ Generational institution" />
-                  : null
-              return [
-                sep,
-                <div key={name} className={['relative rounded-sm overflow-hidden flex flex-col', featured ? 'border border-border-amber' : 'border border-border-subtle'].join(' ')} style={{ background: featured ? 'linear-gradient(160deg,#221F14,#1D1B11)' : 'linear-gradient(160deg,#1D1D20,#17171A)' }}>
-                  {featured && <div className="absolute top-0 left-[10%] right-[10%] h-px bg-gradient-to-r from-transparent via-amber/50 to-transparent" />}
-                  {badge && (
-                    <div className="absolute top-4 right-4">
-                      <div className="ai-badge !text-[0.55rem]">{badge}</div>
-                    </div>
-                  )}
-                  <div className="p-8 flex flex-col flex-1">
-                    <div className="mb-7">
-                      <h3 className={['font-serif text-[1.625rem] font-semibold leading-tight mb-2', featured ? 'text-text-primary' : 'text-text-secondary'].join(' ')}>{name}</h3>
-                      <p className="font-sans text-body-sm text-text-muted leading-[1.6]">{tagline}</p>
-                    </div>
-                    <div className="mb-1">
-                      <div className="flex items-baseline gap-2">
-                        <span className="font-serif font-semibold text-text-primary" style={{ fontSize: 'clamp(2rem,4vw,2.75rem)', letterSpacing: '-0.03em' }}>{price}</span>
-                        <span className="font-sans text-[0.75rem] text-text-muted tracking-[0.06em] uppercase">{period}</span>
-                      </div>
-                      <p className="font-sans text-[0.7rem] text-text-muted mt-1">{monthly}</p>
-                    </div>
-                    <div className={['h-px my-6', featured ? 'bg-amber/15' : 'bg-white/[0.06]'].join(' ')} />
-                    <div className="flex flex-col gap-3 flex-1 mb-8">
-                      {features.map((f) => (
-                        <div key={f} className="flex items-start gap-3">
-                          <CheckIcon />
-                          <span className="font-sans text-[0.825rem] text-text-secondary leading-[1.6]">{f}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <a href="/apply" className={featured ? 'btn-monolith-amber text-center' : 'btn-monolith text-center'}>{cta}</a>
-                  </div>
-                </div>,
-              ]
-            })}
-          </div>
-          <p className="text-center font-sans text-[0.75rem] text-text-muted mt-8">All plans require The Founding, a one-time setup investment of $2,500.</p>
-          <p className="text-center font-serif italic text-text-muted mt-2" style={{ fontSize: '0.9rem' }}>
-            The Founding includes archive initialization, legal framework review, your first Essence Mapping session, and Custodian designation.
+        {/* Hero */}
+        <section
+          style={{
+            padding:    'clamp(140px,18vw,200px) clamp(24px,6vw,80px) clamp(80px,10vw,120px)',
+            textAlign:  'center',
+            background: 'var(--color-bg)',
+          }}
+        >
+          <p
+            style={{
+              ...MONO,
+              fontSize:     'var(--text-caption)',
+              color:        'var(--color-gold)',
+              display:      'flex',
+              alignItems:   'center',
+              justifyContent: 'center',
+              gap:          '12px',
+              marginBottom: '24px',
+            }}
+          >
+            <span style={{ width: '24px', height: '1px', background: 'var(--color-gold)', display: 'block', flexShrink: 0 }} aria-hidden="true" />
+            Stewardship Pricing
+            <span style={{ width: '24px', height: '1px', background: 'var(--color-gold)', display: 'block', flexShrink: 0 }} aria-hidden="true" />
+          </p>
+          <h1
+            style={{
+              ...SERIF,
+              fontSize:     'var(--text-hero)',
+              fontWeight:   300,
+              lineHeight:   1.1,
+              color:        'var(--color-text-primary)',
+              letterSpacing: '-0.025em',
+              marginBottom: '24px',
+            }}
+          >
+            An Investment in{' '}
+            <em style={{ color: 'var(--color-gold)', fontStyle: 'italic' }}>Permanence.</em>
+          </h1>
+          <p
+            style={{
+              ...SERIF,
+              fontSize:   '1.15rem',
+              fontStyle:  'italic',
+              fontWeight: 300,
+              lineHeight: 1.8,
+              color:      'var(--color-text-secondary)',
+              maxWidth:   '520px',
+              margin:     '0 auto',
+            }}
+          >
+            Basalith is priced as what it is: a generational asset under professional stewardship.
+            Not a software subscription. Not a storage plan.
           </p>
         </section>
 
-        {/* ── LEGAL FRAMING BLOCK ── */}
-        <section className="relative bg-obsidian px-8 md:px-16 lg:px-24 py-16 overflow-hidden" aria-label="Legal framing">
-          <div className="max-w-[680px] mx-auto rounded-sm px-10 py-12 text-center" style={{ background: 'rgba(196,162,74,0.04)', border: '1px solid rgba(196,162,74,0.10)' }}>
-            <p className="font-serif italic text-text-secondary leading-[1.85]" style={{ fontSize: '1.3rem' }}>
-              &ldquo;The Founding is not a setup fee.
-              It is a legal and technical engagement
-              executed by a Senior Legacy Guide, the same
-              way an estate attorney executes a trust.
-              <br /><br />
-              You leave The Founding with six deliverables,
-              a designated Custodian, and an archive that
-              exists in your estate plan.&rdquo;
+        {/* The Founding */}
+        <section
+          style={{
+            background: 'var(--color-void)',
+            padding:    'clamp(64px,8vw,96px) clamp(24px,6vw,80px)',
+          }}
+        >
+          <div
+            style={{
+              maxWidth:     '860px',
+              margin:       '0 auto',
+              borderTop:    '2px solid rgba(196,162,74,0.6)',
+              border:       '1px solid rgba(196,162,74,0.18)',
+              borderTopColor: 'rgba(196,162,74,0.6)',
+              padding:      'clamp(40px,5vw,64px)',
+              background:   '#0D0C0A',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
+              <p style={{ ...MONO, fontSize: '0.52rem', color: 'var(--color-gold)' }}>One-Time Engagement</p>
+              <svg width="32" height="32" viewBox="0 0 34 34" fill="none" aria-hidden="true" style={{ opacity: 0.5 }}>
+                <polygon points="17,1 33,17 17,33 1,17" fill="none" stroke="#C4A24A" strokeWidth="1.4"/>
+                <polygon points="17,7 27,17 17,27 7,17" fill="none" stroke="#C4A24A" strokeWidth="1.1"/>
+                <polygon points="17,13 21,17 17,21 13,17" fill="#C4A24A"/>
+              </svg>
+            </div>
+
+            <h2 style={{ ...SERIF, fontSize: '2.25rem', fontWeight: 300, color: 'rgba(250,248,244,0.9)', marginBottom: '12px' }}>
+              The Founding
+            </h2>
+            <p style={{ ...SERIF, fontSize: '1.05rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.45)', lineHeight: 1.8, marginBottom: '40px', maxWidth: '600px' }}>
+              Every Basalith archive begins with The Founding, a comprehensive legal and technical engagement
+              that establishes your archive&rsquo;s permanent infrastructure. Executed once. Built to last centuries.
             </p>
-            <p className="font-sans font-bold tracking-[0.22em] uppercase mt-8" style={{ fontSize: '0.44rem', color: '#C4A24A' }}>
-              All Archives Carry Legal Standing From Day One
-            </p>
+
+            <div style={{ height: '1px', background: 'rgba(196,162,74,0.15)', marginBottom: '40px' }} />
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '48px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
+                {FOUNDING_DELIVERABLES.map(({ n, title, desc }) => (
+                  <div key={n} style={{ display: 'flex', gap: '20px' }}>
+                    <span style={{ ...MONO, fontSize: '0.48rem', color: 'var(--color-gold)', flexShrink: 0, paddingTop: '2px', width: '24px' }}>{n}</span>
+                    <div>
+                      <p style={{ ...MONO, fontSize: '0.52rem', color: 'rgba(250,248,244,0.75)', marginBottom: '4px' }}>{title}</p>
+                      <p style={{ ...SERIF, fontSize: '0.9rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.35)', lineHeight: 1.7 }}>{desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+                <div style={{ borderTop: '1px solid rgba(196,162,74,0.15)', paddingTop: '32px' }}>
+                  <p style={{ ...SERIF, fontSize: '3.5rem', fontWeight: 300, color: 'rgba(250,248,244,0.9)', lineHeight: 1, letterSpacing: '-0.02em', marginBottom: '8px' }}>$2,500</p>
+                  <p style={{ ...MONO, fontSize: '0.48rem', color: 'var(--color-gold)', marginBottom: '16px' }}>One-Time Engagement Fee</p>
+                  <p style={{ ...SERIF, fontSize: '0.88rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.3)', lineHeight: 1.7 }}>
+                    Required for all new archives. Annual stewardship selected separately.
+                    Executed by a Senior Legacy Guide assigned to your family.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '24px', marginTop: '40px', flexWrap: 'wrap' }}>
+              <a href="/founding-session" className="pricing-ghost-link" style={{ ...SERIF, fontSize: '0.9rem', fontStyle: 'italic', color: 'rgba(196,162,74,0.6)', textDecoration: 'none', transition: 'color 200ms ease' }}>
+                What happens in your Founding session →
+              </a>
+            </div>
           </div>
         </section>
 
-        {/* ── FAQ ── */}
+        {/* Annual Tiers */}
+        <section
+          style={{
+            background: 'var(--color-surface-alt)',
+            padding:    'clamp(64px,8vw,96px) clamp(24px,6vw,80px)',
+          }}
+        >
+          <div style={{ textAlign: 'center', marginBottom: '56px' }}>
+            <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '16px' }}>
+              <span style={{ width: '24px', height: '1px', background: 'var(--color-gold)', display: 'block', flexShrink: 0 }} aria-hidden="true" />
+              Annual Stewardship
+              <span style={{ width: '24px', height: '1px', background: 'var(--color-gold)', display: 'block', flexShrink: 0 }} aria-hidden="true" />
+            </p>
+            <h2 style={{ ...SERIF, fontSize: 'var(--text-h1)', fontWeight: 300, color: 'var(--color-text-primary)', letterSpacing: '-0.02em' }}>
+              Choose Your Level of Stewardship.
+            </h2>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', maxWidth: '1100px', margin: '0 auto' }}>
+            {TIERS.map(({ name, tagline, price, period, monthly, featured, features }) => (
+              <div
+                key={name}
+                style={{
+                  background:  featured ? 'var(--color-void)' : 'var(--color-surface)',
+                  border:      featured ? '1px solid rgba(184,150,62,0.35)' : '1px solid var(--color-border)',
+                  borderRadius: 'var(--radius-md)',
+                  padding:     '36px',
+                  display:     'flex',
+                  flexDirection: 'column',
+                  boxShadow:   featured ? 'var(--shadow-gold)' : 'var(--shadow-sm)',
+                  position:    'relative',
+                }}
+              >
+                {featured && (
+                  <div style={{ position: 'absolute', top: 0, left: '15%', right: '15%', height: '1px', background: 'linear-gradient(90deg,transparent,rgba(184,150,62,0.5),transparent)' }} aria-hidden="true" />
+                )}
+                {featured && (
+                  <p style={{ ...MONO, fontSize: '0.44rem', color: 'var(--color-gold)', marginBottom: '20px' }}>Most Popular</p>
+                )}
+
+                <h3
+                  style={{
+                    ...SERIF,
+                    fontSize:     '1.5rem',
+                    fontWeight:   500,
+                    color:        featured ? 'rgba(250,248,244,0.9)' : 'var(--color-text-primary)',
+                    marginBottom: '6px',
+                  }}
+                >
+                  {name}
+                </h3>
+                <p
+                  style={{
+                    ...SERIF,
+                    fontSize:     '0.9rem',
+                    fontStyle:    'italic',
+                    fontWeight:   300,
+                    color:        featured ? 'rgba(250,248,244,0.4)' : 'var(--color-text-muted)',
+                    marginBottom: '28px',
+                    lineHeight:   1.6,
+                  }}
+                >
+                  {tagline}
+                </p>
+
+                <div style={{ marginBottom: '6px' }}>
+                  <span
+                    style={{
+                      ...SERIF,
+                      fontSize:      'clamp(2rem,3.5vw,2.75rem)',
+                      fontWeight:    300,
+                      color:         featured ? 'rgba(250,248,244,0.9)' : 'var(--color-text-primary)',
+                      letterSpacing: '-0.025em',
+                    }}
+                  >
+                    {price}
+                  </span>
+                  <span style={{ ...MONO, fontSize: '0.48rem', color: featured ? 'rgba(250,248,244,0.3)' : 'var(--color-text-muted)', marginLeft: '8px' }}>
+                    {period}
+                  </span>
+                </div>
+                <p style={{ ...MONO, fontSize: '0.44rem', color: featured ? 'rgba(250,248,244,0.25)' : 'var(--color-text-faint)', marginBottom: '24px' }}>
+                  {monthly}
+                </p>
+
+                <div style={{ height: '1px', background: featured ? 'rgba(250,248,244,0.06)' : 'var(--color-border)', marginBottom: '24px' }} />
+
+                <ul style={{ listStyle: 'none', margin: '0 0 32px', padding: 0, display: 'flex', flexDirection: 'column', gap: '10px', flex: 1 }}>
+                  {features.map(f => (
+                    <li key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                      <Check />
+                      <span
+                        style={{
+                          ...SERIF,
+                          fontSize:   '0.9rem',
+                          fontWeight: 300,
+                          lineHeight: 1.5,
+                          color:      featured ? 'rgba(250,248,244,0.55)' : 'var(--color-text-secondary)',
+                        }}
+                      >
+                        {f}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+
+                <a
+                  href="/apply"
+                  style={{
+                    ...MONO,
+                    display:        'block',
+                    textAlign:      'center',
+                    textDecoration: 'none',
+                    padding:        '13px 24px',
+                    borderRadius:   'var(--radius-sm)',
+                    fontSize:       'var(--text-caption)',
+                    background:     featured ? 'var(--color-gold)' : 'transparent',
+                    color:          featured ? '#0A0908' : 'var(--color-text-secondary)',
+                    border:         featured ? 'none' : '1px solid var(--color-border-medium)',
+                    transition:     'all 250ms ease',
+                  }}
+                >
+                  Request Your Founding
+                </a>
+              </div>
+            ))}
+          </div>
+
+          <p style={{ ...SERIF, fontSize: '0.9rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--color-text-muted)', textAlign: 'center', marginTop: '32px' }}>
+            All plans require The Founding, a one-time setup investment of $2,500.
+          </p>
+        </section>
+
+        {/* FAQ */}
         <PricingFAQ />
 
-        {/* ── CTA ── */}
-        <section className="relative bg-obsidian-deep px-8 md:px-16 py-36 text-center overflow-hidden" aria-label="Pricing CTA">
-          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-border-amber to-transparent" />
-          <div className="absolute pointer-events-none" style={{ width: 900, height: 420, top: '50%', left: '50%', transform: 'translate(-50%,-50%)', background: 'radial-gradient(ellipse,rgba(255,179,71,0.08) 0%,transparent 65%)' }} aria-hidden="true" />
-          <div className="relative z-10 max-w-2xl mx-auto">
-            <p className="eyebrow mb-6">By Invitation of Intent</p>
-            <h2 className="font-serif font-semibold text-text-primary leading-[0.92] tracking-[-0.04em] mb-6" style={{ fontSize: 'clamp(2.5rem,5vw,4.5rem)' }}>
-              Basalith Is Not{' '}
-              <em className="italic font-medium text-amber" style={{ fontStyle: 'italic' }}>For Everyone.</em>
-            </h2>
-            <p className="font-sans font-light text-body-base text-text-secondary leading-[1.82] mb-12">
-              It is for the rare few who understand that memory is an asset,
-              and that leaving it unarchived is a choice with consequences
-              their family will live with long after they are gone.
-            </p>
-            <div className="flex flex-col items-center gap-1.5">
-              <p className="font-sans text-[0.75rem] text-text-muted">Archives are accepted on a rolling basis.</p>
-              <a href="mailto:legacy@basalith.xyz" className="font-sans text-[0.75rem] tracking-[0.04em] text-amber-dim hover:text-amber transition-colors">legacy@basalith.xyz</a>
-            </div>
+        {/* CTA */}
+        <section style={{ background: 'var(--color-void)', padding: 'clamp(80px,12vw,120px) clamp(24px,6vw,80px)', textAlign: 'center' }}>
+          <h2 style={{ ...SERIF, fontSize: 'var(--text-h1)', fontWeight: 300, color: 'rgba(250,248,244,0.9)', letterSpacing: '-0.02em', marginBottom: '20px' }}>
+            Basalith Is Not{' '}
+            <em style={{ fontStyle: 'italic', color: 'var(--color-gold)' }}>For Everyone.</em>
+          </h2>
+          <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: 'rgba(250,248,244,0.4)', maxWidth: '480px', margin: '0 auto 40px' }}>
+            It is for the rare few who understand that memory is an asset,
+            and that leaving it unarchived is a choice with consequences
+            their family will live with long after they are gone.
+          </p>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
+            <a href="/apply" style={{ ...MONO, fontSize: 'var(--text-caption)', display: 'inline-block', textDecoration: 'none', background: 'var(--color-gold)', color: '#0A0908', padding: '14px 32px', borderRadius: 'var(--radius-sm)' }}>
+              Begin Your Application
+            </a>
           </div>
+          <p style={{ ...MONO, fontSize: '0.46rem', color: 'rgba(250,248,244,0.2)', marginTop: '24px' }}>
+            Archives accepted on a rolling basis · legacy@basalith.xyz
+          </p>
         </section>
 
       </main>
       <Footer />
+
+      <style>{`
+        .pricing-ghost-link:hover { color: var(--color-gold) !important; }
+        @media (max-width: 900px) {
+          section:nth-child(4) div[style*="grid-template-columns: repeat(3"] {
+            grid-template-columns: 1fr !important;
+          }
+          section:nth-child(3) div[style*="grid-template-columns: 1.2fr"] {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </>
   )
 }

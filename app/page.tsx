@@ -1,27 +1,28 @@
 import type { Metadata } from 'next'
-import Nav             from './components/Nav'
 
 export const metadata: Metadata = {
   title: 'Basalith · Legacy AI',
+  description: 'The archive of a life, governed with the same seriousness as an estate. We build for legacy.',
 }
 
-import Hero            from './components/Hero'
-import LetterSection   from './components/LetterSection'
-import ProductOverview from './components/ProductOverview'
-import EleanorSection  from './components/EleanorSection'
-import CtaSection      from './components/CtaSection'
-import Footer          from './components/Footer'
+import Nav                  from './components/Nav'
+import HeroSection          from './components/HeroSection'
+import PhilosophySection    from './components/PhilosophySection'
+import HowItWorksSection    from './components/HowItWorksSection'
+import StorySection         from './components/StorySection'
+import PricingTeaserSection from './components/PricingTeaserSection'
+import Footer               from './components/Footer'
 
 export default function HomePage() {
   return (
     <>
       <Nav />
       <main>
-        <Hero />
-        <LetterSection />
-        <ProductOverview />
-        <EleanorSection />
-        <CtaSection />
+        <HeroSection />
+        <PhilosophySection />
+        <HowItWorksSection />
+        <StorySection />
+        <PricingTeaserSection />
       </main>
       <Footer />
     </>

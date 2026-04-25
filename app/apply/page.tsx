@@ -4,53 +4,34 @@ import { useState } from 'react'
 import Nav    from '../components/Nav'
 import Footer from '../components/Footer'
 
-const EYEBROW: React.CSSProperties = {
-  fontFamily:    "'Space Mono', 'DM Mono', monospace",
-  fontSize:      '0.42rem',
-  letterSpacing: '0.4em',
-  textTransform: 'uppercase' as const,
-  color:         '#C4A24A',
-  display:       'block',
-  marginBottom:  '1.25rem',
-}
-
 const LABEL: React.CSSProperties = {
   display:       'block',
-  fontFamily:    "'Space Mono', 'DM Mono', monospace",
-  fontSize:      '0.42rem',
-  letterSpacing: '0.25em',
+  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+  fontSize:      '0.52rem',
+  letterSpacing: '0.3em',
   textTransform: 'uppercase' as const,
-  color:         '#5C6166',
-  marginBottom:  '0.65rem',
+  color:         'var(--color-text-muted)',
+  marginBottom:  '8px',
 }
 
 const INPUT: React.CSSProperties = {
-  width:          '100%',
-  background:     'transparent',
-  border:         'none',
-  borderBottom:   '1px solid rgba(196,162,74,0.2)',
-  outline:        'none',
-  fontFamily:     "'Cormorant Garamond', Georgia, serif",
-  fontSize:       '1rem',
-  color:          '#F0EDE6',
-  padding:        '0.4rem 0 0.6rem',
-  lineHeight:     1.5,
+  width:        '100%',
+  background:   'var(--color-surface)',
+  border:       '1px solid var(--color-border)',
+  borderRadius: 'var(--radius-sm)',
+  outline:      'none',
+  fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontSize:     '1.1rem',
+  fontWeight:   300,
+  color:        'var(--color-text-primary)',
+  padding:      '14px 16px',
+  lineHeight:   1.5,
+  boxSizing:    'border-box' as const,
+  transition:   'border-color 200ms ease, box-shadow 200ms ease',
 }
 
-const SELECT: React.CSSProperties = {
-  ...INPUT,
-  cursor:      'pointer',
-  appearance:  'none' as const,
-}
-
-function Sigil({ size = 32 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 40 40" fill="none" aria-hidden="true">
-      <rect x="20" y="3"  width="12" height="12" transform="rotate(45 20 3)"  fill="none" stroke="rgba(196,162,74,0.45)" strokeWidth="1"/>
-      <rect x="20" y="10" width="8"  height="8"  transform="rotate(45 20 10)" fill="none" stroke="rgba(196,162,74,0.75)" strokeWidth="1"/>
-      <rect x="20" y="16" width="4"  height="4"  transform="rotate(45 20 16)" fill="rgba(196,162,74,0.95)"/>
-    </svg>
-  )
+const SERIF: React.CSSProperties = {
+  fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
 }
 
 export default function ApplyPage() {
@@ -90,125 +71,146 @@ export default function ApplyPage() {
     }
   }
 
-  const focusStyle = `
-    input:focus, select:focus, textarea:focus {
-      border-bottom-color: rgba(196,162,74,0.5) !important;
-    }
-    select option {
-      background: #111112;
-      color: #F0EDE6;
-    }
-    ::placeholder {
-      color: #3A3F44;
-      font-style: italic;
-    }
-  `
-
   return (
     <>
-      <style>{focusStyle}</style>
+      <style>{`
+        .apply-input:focus {
+          border-color: var(--color-gold) !important;
+          box-shadow: var(--shadow-gold) !important;
+        }
+        .apply-input::placeholder {
+          color: var(--color-text-faint);
+          font-style: italic;
+        }
+        .apply-input option {
+          background: #fff;
+          color: var(--color-text-primary);
+        }
+      `}</style>
       <Nav />
-      <main style={{ background: '#0A0908', minHeight: '100vh' }}>
-        <section style={{ maxWidth: '600px', margin: '0 auto', padding: '10rem 2rem 8rem' }}>
+      <main style={{ background: 'var(--color-bg)', minHeight: '100svh' }}>
+        <section style={{ maxWidth: '600px', margin: '0 auto', padding: 'clamp(140px,16vw,180px) clamp(24px,6vw,48px) clamp(80px,10vw,120px)' }}>
 
           {submitted ? (
-            <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
-              <Sigil size={32} />
-              <h1 style={{
-                fontFamily:    "'Cormorant Garamond', Georgia, serif",
-                fontWeight:    700,
-                fontSize:      '1.5rem',
-                color:         '#F0EDE6',
-                lineHeight:    1.2,
-                margin:        0,
-              }}>
+            <div style={{ textAlign: 'center' }}>
+              {/* Gold sigil */}
+              <div
+                aria-hidden="true"
+                style={{
+                  width:        '40px',
+                  height:       '1px',
+                  background:   'var(--color-gold)',
+                  margin:       '0 auto 40px',
+                }}
+              />
+              <h1 style={{ ...SERIF, fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: 500, color: 'var(--color-text-primary)', marginBottom: '20px', lineHeight: 1.2 }}>
                 Your application has been received.
               </h1>
-              <p style={{
-                fontFamily:  "'Cormorant Garamond', Georgia, serif",
-                fontWeight:  300,
-                fontSize:    '1rem',
-                fontStyle:   'italic',
-                color:       '#9DA3A8',
-                lineHeight:  1.9,
-                maxWidth:    '480px',
-                margin:      0,
-              }}>
-                We review every application personally.<br /><br />
-                If your archive is a good fit you will hear from us within 48 hours
-                with your next steps and Legacy Guide assignment.<br /><br />
+              <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--color-text-secondary)', lineHeight: 1.9, maxWidth: '420px', margin: '0 auto 32px' }}>
+                We review every application personally. If your archive is a good fit you will
+                hear from us within 48 hours with your next steps and Legacy Guide assignment.
+                <br /><br />
                 We will not follow up with rejections.
               </p>
               <p style={{
-                fontFamily:    "'Space Mono', 'DM Mono', monospace",
-                fontSize:      '0.42rem',
+                fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+                fontSize:      '0.48rem',
                 letterSpacing: '0.3em',
-                color:         '#C4A24A',
-                marginTop:     '1rem',
+                textTransform: 'uppercase' as const,
+                color:         'var(--color-gold)',
               }}>
-                BASALITH · HERITAGE NEXUS INC.
+                Basalith · Heritage Nexus Inc.
               </p>
             </div>
           ) : (
             <>
-              <span style={EYEBROW}>Request Your Founding</span>
+              <p
+                style={{
+                  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+                  fontSize:      'var(--text-caption)',
+                  letterSpacing: '0.35em',
+                  textTransform: 'uppercase' as const,
+                  color:         'var(--color-gold)',
+                  display:       'flex',
+                  alignItems:    'center',
+                  gap:           '12px',
+                  marginBottom:  '24px',
+                }}
+              >
+                <span style={{ display: 'block', width: '24px', height: '1px', background: 'var(--color-gold)', flexShrink: 0 }} aria-hidden="true" />
+                Request Your Founding
+              </p>
 
-              <h1 style={{
-                fontFamily:    "'Cormorant Garamond', Georgia, serif",
-                fontWeight:    700,
-                fontSize:      'clamp(2rem, 4vw, 3rem)',
-                color:         '#F0EDE6',
-                lineHeight:    1.15,
-                letterSpacing: '-0.02em',
-                marginBottom:  '1.5rem',
-              }}>
+              <h1
+                style={{
+                  ...SERIF,
+                  fontSize:      'var(--text-h1)',
+                  fontWeight:    300,
+                  lineHeight:    1.15,
+                  color:         'var(--color-text-primary)',
+                  letterSpacing: '-0.025em',
+                  marginBottom:  '20px',
+                }}
+              >
                 Every archive begins<br />with a conversation.
               </h1>
 
-              <p style={{
-                fontFamily:  "'Cormorant Garamond', Georgia, serif",
-                fontWeight:  300,
-                fontSize:    '1.05rem',
-                fontStyle:   'italic',
-                color:       '#9DA3A8',
-                lineHeight:  1.85,
-                maxWidth:    '520px',
-                marginBottom: '3.5rem',
-              }}>
+              <p
+                style={{
+                  ...SERIF,
+                  fontSize:     '1.1rem',
+                  fontStyle:    'italic',
+                  fontWeight:   300,
+                  lineHeight:   1.85,
+                  color:        'var(--color-text-secondary)',
+                  marginBottom: '52px',
+                }}
+              >
                 Tell us a little about yourself and what brings you to Basalith.
                 We review every application personally and respond within 48 hours.
               </p>
 
-              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
+              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
 
                 <div>
-                  <label style={LABEL}>Your Name</label>
+                  <label style={LABEL} htmlFor="apply-name">Your Name</label>
                   <input
+                    id="apply-name"
                     type="text"
                     required
                     placeholder="First and last name"
                     value={form.name}
                     onChange={set('name')}
+                    className="apply-input"
                     style={INPUT}
                   />
                 </div>
 
                 <div>
-                  <label style={LABEL}>Email Address</label>
+                  <label style={LABEL} htmlFor="apply-email">Email Address</label>
                   <input
+                    id="apply-email"
                     type="email"
                     required
                     placeholder="your@email.com"
                     value={form.email}
                     onChange={set('email')}
+                    className="apply-input"
                     style={INPUT}
                   />
                 </div>
 
                 <div>
-                  <label style={LABEL}>Who is the primary archive subject</label>
-                  <select required value={form.subject} onChange={set('subject')} style={SELECT}>
-                    <option value="" disabled style={{ color: '#3A3F44' }}>Select one</option>
+                  <label style={LABEL} htmlFor="apply-subject">Who is the primary archive subject</label>
+                  <select
+                    id="apply-subject"
+                    required
+                    value={form.subject}
+                    onChange={set('subject')}
+                    className="apply-input"
+                    style={{ ...INPUT, cursor: 'pointer', appearance: 'none' as const }}
+                  >
+                    <option value="" disabled>Select one</option>
                     <option value="Myself">Myself</option>
                     <option value="A parent">A parent</option>
                     <option value="A grandparent">A grandparent</option>
@@ -219,21 +221,30 @@ export default function ApplyPage() {
                 </div>
 
                 <div>
-                  <label style={LABEL}>What brings you to Basalith</label>
+                  <label style={LABEL} htmlFor="apply-reason">What brings you to Basalith</label>
                   <textarea
-                    rows={4}
+                    id="apply-reason"
+                    rows={5}
                     required
                     placeholder="Tell us what you are hoping to preserve and why now."
                     value={form.reason}
                     onChange={set('reason')}
-                    style={{ ...INPUT, resize: 'none' as const, lineHeight: 1.7 }}
+                    className="apply-input"
+                    style={{ ...INPUT, resize: 'none' as const, lineHeight: 1.75 }}
                   />
                 </div>
 
                 <div>
-                  <label style={LABEL}>How did you hear about us</label>
-                  <select required value={form.referralSource} onChange={set('referralSource')} style={SELECT}>
-                    <option value="" disabled style={{ color: '#3A3F44' }}>Select one</option>
+                  <label style={LABEL} htmlFor="apply-source">How did you hear about us</label>
+                  <select
+                    id="apply-source"
+                    required
+                    value={form.referralSource}
+                    onChange={set('referralSource')}
+                    className="apply-input"
+                    style={{ ...INPUT, cursor: 'pointer', appearance: 'none' as const }}
+                  >
+                    <option value="" disabled>Select one</option>
                     <option value="Referred by a Legacy Guide">Referred by a Legacy Guide</option>
                     <option value="Referred by an attorney or advisor">Referred by an attorney or advisor</option>
                     <option value="Found online">Found online</option>
@@ -243,12 +254,7 @@ export default function ApplyPage() {
                 </div>
 
                 {error && (
-                  <p style={{
-                    fontFamily: "'Space Mono', monospace",
-                    fontSize:   '0.52rem',
-                    color:      '#9DA3A8',
-                    letterSpacing: '0.06em',
-                  }}>
+                  <p style={{ ...SERIF, fontSize: '0.9rem', fontStyle: 'italic', color: 'var(--color-text-muted)' }}>
                     {error}
                   </p>
                 )}
@@ -257,18 +263,21 @@ export default function ApplyPage() {
                   type="submit"
                   disabled={submitting}
                   style={{
-                    fontFamily:      "'Space Mono', 'DM Mono', monospace",
-                    fontSize:        '0.44rem',
-                    letterSpacing:   '0.3em',
-                    textTransform:   'uppercase' as const,
-                    background:      submitting ? 'rgba(196,162,74,0.5)' : '#C4A24A',
-                    color:           '#0A0908',
-                    border:          'none',
-                    padding:         '1rem 2rem',
-                    cursor:          submitting ? 'not-allowed' : 'pointer',
-                    width:           '100%',
-                    transition:      'background 0.2s',
+                    fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+                    fontSize:      'var(--text-caption)',
+                    letterSpacing: '0.3em',
+                    textTransform: 'uppercase' as const,
+                    background:    submitting ? 'rgba(184,150,62,0.6)' : 'var(--color-gold)',
+                    color:         '#FAFAF8',
+                    border:        'none',
+                    borderRadius:  'var(--radius-sm)',
+                    padding:       '16px 32px',
+                    cursor:        submitting ? 'not-allowed' : 'pointer',
+                    width:         '100%',
+                    transition:    'background 250ms ease',
                   }}
+                  onMouseEnter={e => { if (!submitting) (e.currentTarget as HTMLElement).style.background = 'var(--color-gold-light)' }}
+                  onMouseLeave={e => { if (!submitting) (e.currentTarget as HTMLElement).style.background = 'var(--color-gold)' }}
                 >
                   {submitting ? 'Submitting…' : 'Submit Application'}
                 </button>
