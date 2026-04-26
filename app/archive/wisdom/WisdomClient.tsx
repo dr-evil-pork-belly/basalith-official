@@ -347,6 +347,14 @@ export default function WisdomClient({ archiveId }: { archiveId: string }) {
 
     return (
       <div style={{ maxWidth: '680px' }}>
+      <style>{`
+        @media (max-width: 480px) {
+          .wisdom-card { padding: 1.5rem 1.25rem 1.25rem !important; }
+          .wisdom-buttons { flex-direction: column-reverse !important; align-items: stretch !important; }
+          .wisdom-buttons .wisdom-save-btn { width: 100% !important; text-align: center !important; justify-content: center !important; }
+          .wisdom-buttons .wisdom-skip-btn { text-align: center !important; padding: 0.5rem 0 !important; }
+        }
+      `}</style>
 
         {/* Header */}
         <div className="mb-8">
@@ -367,7 +375,7 @@ export default function WisdomClient({ archiveId }: { archiveId: string }) {
         </div>
 
         {/* Question card */}
-        <div style={{
+        <div className="wisdom-card" style={{
           borderTop:    '3px solid rgba(196,162,74,0.5)',
           background:   'rgba(196,162,74,0.03)',
           border:       '1px solid rgba(196,162,74,0.1)',
@@ -419,10 +427,11 @@ export default function WisdomClient({ archiveId }: { archiveId: string }) {
           )}
 
           {/* Buttons */}
-          <div className="flex items-center justify-between gap-4">
+          <div className="wisdom-buttons flex items-center justify-between gap-4">
             <button
               onClick={() => saveAndContinue(true)}
               disabled={saving}
+              className="wisdom-skip-btn"
               style={{
                 background:    'none',
                 border:        'none',
@@ -444,6 +453,7 @@ export default function WisdomClient({ archiveId }: { archiveId: string }) {
             <button
               onClick={() => saveAndContinue(false)}
               disabled={!canSave || saving}
+              className="wisdom-save-btn"
               style={{
                 background:    canSave && !saving ? 'rgba(196,162,74,1)' : 'rgba(196,162,74,0.25)',
                 border:        'none',

@@ -137,6 +137,11 @@ export default function VoiceClient({ archiveId }: { archiveId: string }) {
 
   return (
     <div style={{ maxWidth: '680px' }}>
+      <style>{`
+        @media (max-width: 480px) {
+          .voice-tab { padding: 0.6rem 0.5rem !important; font-size: 0.5rem !important; letter-spacing: 0.1em !important; }
+        }
+      `}</style>
 
       {/* ── Header ── */}
       <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.52rem', letterSpacing: '0.3em', color: '#C4A24A', textTransform: 'uppercase', margin: '0 0 14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -167,6 +172,7 @@ export default function VoiceClient({ archiveId }: { archiveId: string }) {
             <button
               key={t}
               onClick={() => { setTab(t); setSelectedPrompt(null) }}
+              className="voice-tab"
               style={{
                 fontFamily:    '"Courier New", monospace',
                 fontSize:      '0.62rem',
