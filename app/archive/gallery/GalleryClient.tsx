@@ -452,7 +452,7 @@ export default function GalleryClient({ archiveId }: { archiveId: string }) {
                 style={{ display: 'block', width: '100%', objectFit: 'cover', maxHeight: '400px' }}
               />
             )}
-            <div style={{ padding: '28px 32px', overflowY: 'auto' }}>
+            <div style={{ padding: 'clamp(16px,4vw,28px) clamp(16px,5vw,32px)', overflowY: 'auto' }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', marginBottom: '20px' }}>
                 <div>
                   <h2 style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontSize: '1.4rem', fontWeight: 500, color: '#F0EDE6', lineHeight: 1.25, marginBottom: '6px' }}>
@@ -472,7 +472,7 @@ export default function GalleryClient({ archiveId }: { archiveId: string }) {
               </div>
 
               {(selected.people || selected.contributor) && (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px 32px', marginBottom: '20px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '16px 32px', marginBottom: '20px' }}>
                   {selected.people && (
                     <div>
                       <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.44rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(112,108,101,0.5)', marginBottom: '4px' }}>People</p>

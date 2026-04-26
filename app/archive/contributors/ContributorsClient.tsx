@@ -383,8 +383,8 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
       )}
 
       {contributors.length > 0 && (
-        <div className="rounded-sm border overflow-hidden mb-8" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-          <table className="w-full" style={{ borderCollapse: 'collapse' }}>
+        <div className="rounded-sm border overflow-hidden mb-8" style={{ borderColor: 'rgba(255,255,255,0.06)', overflowX: 'auto' }}>
+          <table className="w-full" style={{ borderCollapse: 'collapse', minWidth: '520px' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', background: '#111112' }}>
                 {['Name', 'Role', 'Labels', 'Added', ''].map(h => (
@@ -622,8 +622,8 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
             <p style={{ fontFamily: 'monospace', fontSize: '0.4rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: '#5C6166', marginBottom: '1rem' }}>
               Sent Invitations
             </p>
-            <div className="rounded-sm border overflow-hidden" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-              <table className="w-full" style={{ borderCollapse: 'collapse' }}>
+            <div className="rounded-sm border overflow-hidden" style={{ borderColor: 'rgba(255,255,255,0.06)', overflowX: 'auto' }}>
+              <table className="w-full" style={{ borderCollapse: 'collapse', minWidth: '560px' }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', background: '#111112' }}>
                     {['Name', 'Relationship', 'Status', 'Answered', 'Sent', ''].map(h => (

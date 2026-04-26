@@ -643,7 +643,7 @@ export default function LabelClient({ archiveId }: { archiveId: string }) {
 
   const monoLabel = { display: 'block', fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.35em', textTransform: 'uppercase' as const, color: 'rgba(196,162,74,0.75)', marginBottom: '0.75rem' }
   const compactLabel = { display: 'block', fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.28em', textTransform: 'uppercase' as const, color: '#5C6166', marginBottom: '0.6rem' }
-  const baseInput = { width: '100%', background: 'transparent', color: '#F0F0EE', borderBottom: '1px solid rgba(255,255,255,0.10)', outline: 'none', fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: '0.88rem' }
+  const baseInput = { width: '100%', background: 'transparent', color: '#F0F0EE', borderBottom: '1px solid rgba(255,255,255,0.10)', outline: 'none', fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: '1rem' }
 
   return (
     <>

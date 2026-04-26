@@ -76,7 +76,7 @@ function AccuracyDashboard({ archiveId }: { archiveId: string }) {
         background:  'rgba(196,162,74,0.04)',
         border:      '1px solid rgba(196,162,74,0.12)',
         borderTop:   '3px solid rgba(196,162,74,0.5)',
-        padding:     '2rem 2.5rem',
+        padding:     'clamp(1.25rem,4vw,2rem) clamp(1rem,4vw,2.5rem)',
       }}
     >
       {/* Header row */}
@@ -137,7 +137,7 @@ function AccuracyDashboard({ archiveId }: { archiveId: string }) {
           {data.dimensions.map((dim, i) => (
             <div key={dim.id} className="flex items-center gap-3">
               {/* Label */}
-              <div style={{ width: '140px', flexShrink: 0 }}>
+              <div style={{ width: 'clamp(90px,28%,140px)', flexShrink: 0 }}>
                 <p className="font-serif" style={{ fontWeight: 700, fontSize: '0.9rem', color: '#F0EDE6', lineHeight: 1.2 }}>
                   {dim.label}
                 </p>

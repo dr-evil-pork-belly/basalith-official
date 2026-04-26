@@ -393,11 +393,29 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
         </div>
       )}
 
+      <style>{`
+        @media (max-width: 1024px) {
+          .entity-left-col  { order: 2; }
+          .entity-right-col { order: 1; }
+        }
+        @media (max-width: 768px) {
+          .entity-input-area {
+            position: sticky;
+            bottom: 0;
+            background: #0A0A0B;
+            z-index: 10;
+            padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px)) !important;
+            border-top: 1px solid rgba(196,162,74,0.15) !important;
+            padding-top: 0.75rem !important;
+          }
+        }
+      `}</style>
+
       {/* ── Two-column layout ── */}
       <div className="flex flex-col lg:flex-row gap-8">
 
         {/* ── LEFT: context + prompts (35%) ── */}
-        <div style={{ width: '100%', maxWidth: '320px', flexShrink: 0 }}>
+        <div className="entity-left-col" style={{ width: '100%', maxWidth: '320px', flexShrink: 0 }}>
 
           {/* Mini accuracy panel */}
           <div className="mb-6">
@@ -536,7 +554,7 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
         </div>
 
         {/* ── RIGHT: conversation (65%) ── */}
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div className="entity-right-col" style={{ flex: 1, minWidth: 0 }}>
 
           {/* Conversation header */}
           <div className="mb-4">
@@ -705,7 +723,7 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
                                   border:       'none',
                                   borderBottom: '1px solid rgba(196,162,74,0.3)',
                                   color:        '#9DA3A8',
-                                  fontSize:     '0.9rem',
+                                  fontSize:     '1rem',
                                   padding:      '0.25rem 0',
                                   outline:      'none',
                                   fontStyle:    'italic',
@@ -761,7 +779,7 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
           </div>
 
           {/* Input area */}
-          <div style={{ borderTop: '1px solid rgba(196,162,74,0.1)', paddingTop: '1rem', marginTop: 0, paddingBottom: 'max(0px, env(safe-area-inset-bottom, 0px))' }}>
+          <div className="entity-input-area" style={{ borderTop: '1px solid rgba(196,162,74,0.1)', paddingTop: '1rem', marginTop: 0, paddingBottom: 'max(0px, env(safe-area-inset-bottom, 0px))' }}>
 
             {/* Voice panel — slides in above textarea */}
             {showVoicePanel && (
@@ -808,8 +826,8 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
                   onClick={() => setShowVoicePanel(v => !v)}
                   title="Record voice"
                   style={{
-                    width:        '40px',
-                    height:       '40px',
+                    width:        '44px',
+                    height:       '44px',
                     borderRadius: '50%',
                     background:   showVoicePanel ? 'rgba(196,162,74,0.12)' : 'transparent',
                     border:       showVoicePanel ? '1px solid #C4A24A' : '1px solid rgba(196,162,74,0.2)',

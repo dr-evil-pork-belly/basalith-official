@@ -46,7 +46,13 @@ export default function JoinArchivistsPage() {
 
   return (
     <>
-      <style>{`.jag-input:focus { border-color: var(--color-gold) !important; box-shadow: var(--shadow-gold) !important; } .jag-input::placeholder { color: var(--color-text-faint); font-style: italic; }`}</style>
+      <style>{`
+        .jag-input:focus { border-color: var(--color-gold) !important; box-shadow: var(--shadow-gold) !important; }
+        .jag-input::placeholder { color: var(--color-text-faint); font-style: italic; }
+        @media (max-width: 600px) {
+          .jag-name-email-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
       <Nav />
       <main style={{ background: 'var(--color-bg)' }}>
         <section style={{ padding: 'clamp(140px,16vw,180px) clamp(24px,6vw,80px) clamp(80px,10vw,120px)' }} aria-label="Join Legacy Guides">
@@ -94,7 +100,7 @@ export default function JoinArchivistsPage() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '20px' }}>
+                <div className="jag-name-email-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '20px' }}>
                   <div>
                     <label style={LABEL}>Full Name</label>
                     <input type="text" required placeholder="Your name" value={form.fullName} onChange={set('fullName')} className="jag-input" style={INPUT} />
