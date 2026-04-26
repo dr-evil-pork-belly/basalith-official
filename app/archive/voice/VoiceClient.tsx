@@ -139,19 +139,20 @@ export default function VoiceClient({ archiveId }: { archiveId: string }) {
     <div style={{ maxWidth: '680px' }}>
 
       {/* ── Header ── */}
-      <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.68rem', letterSpacing: '0.3em', color: '#C4A24A', textTransform: 'uppercase', margin: '0 0 0.75rem' }}>
-        VOICE ARCHIVE
+      <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.52rem', letterSpacing: '0.3em', color: '#C4A24A', textTransform: 'uppercase', margin: '0 0 14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <span style={{ display: 'block', width: '20px', height: '1px', background: '#C4A24A', flexShrink: 0 }} aria-hidden="true" />
+        Voice Archive
       </p>
-      <h1 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '2.2rem', color: '#F0EDE6', margin: '0 0 1rem', lineHeight: 1.2 }}>
+      <h1 style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontWeight: 300, fontSize: 'clamp(1.8rem,3vw,2.4rem)', color: '#F0EDE6', margin: '0 0 16px', lineHeight: 1.15, letterSpacing: '-0.02em' }}>
         Your voice. Preserved.
       </h1>
-      <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: '1.05rem', color: '#9DA3A8', lineHeight: 1.75, maxWidth: '560px', margin: '0 0 1rem' }}>
+      <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontWeight: 300, fontSize: '1.05rem', color: '#9DA3A8', lineHeight: 1.8, maxWidth: '560px', margin: '0 0 12px' }}>
         Speak your memories, wisdom, and stories in any language.
         Every recording is transcribed and saved to your archive permanently.
         Your voice is preserved alongside your words.
       </p>
-      <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.62rem', letterSpacing: '0.14em', color: '#3A3830', marginBottom: '2rem' }}>
-        SUPPORTS VIETNAMESE · SPANISH · CANTONESE · ARABIC · TAGALOG · KOREAN · ENGLISH · AND 93 MORE
+      <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.44rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(112,108,101,0.4)', marginBottom: '28px' }}>
+        Supports Vietnamese · Spanish · Cantonese · Arabic · Tagalog · Korean · English · and 93 more
       </p>
 
       {/* Thin gold rule */}

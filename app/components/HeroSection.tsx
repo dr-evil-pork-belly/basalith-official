@@ -161,46 +161,65 @@ export default function HeroSection() {
           minHeight:  'clamp(400px, 60vh, 900px)',
         }}
       >
-        {/* Photograph placeholder — warm family portrait gradient */}
+        {/* Archival photograph — warm parchment gradient with aged paper texture */}
+        {/* PLACEHOLDER: Replace with actual family archive photograph */}
         <div
           style={{
             position:   'absolute',
             inset:      0,
-            background: 'linear-gradient(160deg, #F2E4C8 0%, #DEC08A 30%, #C9A06A 55%, #A07845 80%, #7A5530 100%)',
+            background: 'linear-gradient(170deg, #EFE0C0 0%, #D4AA72 20%, #B8894A 42%, #9A6E30 65%, #7A5225 85%, #5C3A18 100%)',
           }}
         />
-        {/* Grain over photo */}
+        {/* Warm vignette — draws eye to center */}
         <div
           style={{
             position:   'absolute',
             inset:      0,
-            background: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'300\' height=\'300\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3CfeColorMatrix type=\'saturate\' values=\'0\'/%3E%3C/filter%3E%3Crect width=\'300\' height=\'300\' filter=\'url(%23n)\' opacity=\'0.06\'/%3E%3C/svg%3E")',
-            opacity:    0.6,
+            background: 'radial-gradient(ellipse 70% 80% at 50% 40%, transparent 35%, rgba(60,30,10,0.45) 100%)',
           }}
         />
-        {/* Gold frame — inset */}
+        {/* Film grain texture overlay */}
+        <div
+          style={{
+            position:   'absolute',
+            inset:      0,
+            backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='500'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='500' height='500' filter='url(%23grain)' opacity='0.09'/%3E%3C/svg%3E\")",
+            opacity:    1,
+          }}
+        />
+        {/* Aged border — inset frame */}
         <div
           style={{
             position:     'absolute',
-            inset:        '24px',
-            border:       '1px solid rgba(184,150,62,0.35)',
+            inset:        '20px',
+            border:       '1px solid rgba(250,235,200,0.18)',
             pointerEvents: 'none',
           }}
+        />
+        {/* Horizontal scan lines — aged photograph effect */}
+        <div
+          style={{
+            position:             'absolute',
+            inset:                0,
+            backgroundImage:      'repeating-linear-gradient(transparent, transparent 3px, rgba(0,0,0,0.015) 3px, rgba(0,0,0,0.015) 4px)',
+            pointerEvents:        'none',
+          }}
+          aria-hidden="true"
         />
         {/* Caption watermark */}
         <p
           style={{
             position:      'absolute',
-            bottom:        '36px',
-            left:          '36px',
+            bottom:        '32px',
+            left:          '32px',
             fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
-            fontSize:      '0.45rem',
-            letterSpacing: '0.3em',
+            fontSize:      '0.42rem',
+            letterSpacing: '0.28em',
             textTransform: 'uppercase' as const,
-            color:         'rgba(250,240,220,0.5)',
+            color:         'rgba(250,235,200,0.35)',
           }}
         >
-          The Archive Begins Here
+          The Archive Begins Here · Photograph Pending
         </p>
       </div>
 

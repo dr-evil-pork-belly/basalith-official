@@ -8,42 +8,42 @@ export const metadata: Metadata = {
 }
 
 const EYEBROW: React.CSSProperties = {
-  fontFamily:    "'Space Mono', 'DM Mono', monospace",
-  fontSize:      '0.58rem',
-  letterSpacing: '0.22em',
+  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+  fontSize:      'var(--text-caption)',
+  letterSpacing: '0.35em',
   textTransform: 'uppercase' as const,
-  color:         '#C4A24A',
-  marginBottom:  '1rem',
-  display:       'block',
+  color:         'var(--color-gold)',
+  marginBottom:  '20px',
+  display:       'flex',
+  alignItems:    'center',
+  gap:           '12px',
 }
 
 const H2: React.CSSProperties = {
-  fontFamily:    "'Cormorant Garamond', Georgia, serif",
-  fontWeight:    700,
-  fontSize:      '1.35rem',
-  color:         '#F0EDE6',
-  lineHeight:    1.3,
-  marginBottom:  '1rem',
-  marginTop:     '3rem',
+  fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontWeight:   500,
+  fontSize:     '1.35rem',
+  color:        'var(--color-text-primary)',
+  lineHeight:   1.3,
+  marginBottom: '12px',
+  marginTop:    '48px',
 }
 
 const BODY: React.CSSProperties = {
-  fontFamily:  "'Cormorant Garamond', Georgia, serif",
-  fontWeight:  300,
-  fontSize:    '1rem',
-  color:       '#9DA3A8',
-  lineHeight:  1.85,
-  marginBottom: '0.75rem',
+  fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontWeight:   300,
+  fontSize:     '1.05rem',
+  color:        'var(--color-text-secondary)',
+  lineHeight:   1.85,
+  marginBottom: '12px',
 }
 
 const LI: React.CSSProperties = {
-  ...{
-    fontFamily:  "'Cormorant Garamond', Georgia, serif",
-    fontWeight:  300,
-    fontSize:    '1rem',
-    color:       '#9DA3A8',
-    lineHeight:  1.85,
-  },
+  fontFamily:    'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontWeight:    300,
+  fontSize:      '1.05rem',
+  color:         'var(--color-text-secondary)',
+  lineHeight:    1.85,
   listStyleType: 'none',
   paddingLeft:   '1rem',
   position:      'relative' as const,
@@ -53,35 +53,39 @@ export default function PrivacyPage() {
   return (
     <>
       <Nav />
-      <main style={{ background: '#0A0908' }}>
-        <section aria-label="Privacy Policy" style={{ padding: '10rem 2rem 8rem' }}>
+      <main style={{ background: 'var(--color-bg)' }}>
+        <section aria-label="Privacy Policy" style={{ padding: 'clamp(140px,16vw,180px) clamp(24px,6vw,48px) clamp(80px,10vw,120px)' }}>
           <div style={{ maxWidth: '720px', margin: '0 auto' }}>
 
-            <span style={EYEBROW}>Legal</span>
+            <p style={EYEBROW}>
+              <span style={{ display: 'block', width: '24px', height: '1px', background: 'var(--color-gold)', flexShrink: 0 }} aria-hidden="true" />
+              Legal
+            </p>
 
             <h1 style={{
-              fontFamily:    "'Cormorant Garamond', Georgia, serif",
-              fontWeight:    700,
+              fontFamily:    'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+              fontWeight:    300,
               fontSize:      'clamp(2.5rem, 5vw, 4rem)',
-              color:         '#F0EDE6',
+              color:         'var(--color-text-primary)',
               lineHeight:    1.1,
-              letterSpacing: '-0.02em',
-              marginBottom:  '1rem',
+              letterSpacing: '-0.025em',
+              marginBottom:  '16px',
             }}>
               Privacy Policy
             </h1>
 
             <p style={{
-              fontFamily:    "'Space Mono', 'DM Mono', monospace",
-              fontSize:      '0.6rem',
-              letterSpacing: '0.1em',
-              color:         '#5C6166',
-              marginBottom:  '3rem',
+              fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+              fontSize:      '0.52rem',
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              color:         'var(--color-text-faint)',
+              marginBottom:  '48px',
             }}>
               Last updated: March 2026
             </p>
 
-            <div aria-hidden="true" style={{ height: '1px', background: 'linear-gradient(90deg, rgba(196,162,74,0.4), transparent)', marginBottom: '3rem' }} />
+            <div aria-hidden="true" style={{ height: '1px', background: 'var(--color-border)', marginBottom: '48px' }} />
 
             {/* 1 */}
             <h2 style={H2}>1. Who We Are</h2>

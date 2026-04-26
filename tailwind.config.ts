@@ -240,7 +240,19 @@ const config: Config = {
       marquee:        'marquee 28s linear infinite',
     },
 
-    extend: {},
+    extend: {
+      // Portal design system utilities used by archive/* client components.
+      colors: {
+        gold:          '#C4A24A',
+        'white-ghost': '#E8E8EE',
+        monolith:      '#141416',
+        obsidian:      '#0C0B09',
+      },
+      fontFamily: {
+        compute: ['"Space Mono"', '"Courier New"', 'monospace'],
+        legacy:  ['"Cormorant Garamond"', 'Georgia', 'serif'],
+      },
+    },
   },
 
   plugins: [

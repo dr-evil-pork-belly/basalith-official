@@ -199,13 +199,14 @@ export default function DatesClient({ archiveId }: { archiveId: string }) {
 
       {/* Header */}
       <div style={{ marginBottom: '2.5rem' }}>
-        <p style={{ fontFamily: 'monospace', fontSize: '0.62rem', letterSpacing: '0.28em', textTransform: 'uppercase', color: '#5C6166', margin: '0 0 0.5rem' }}>
-          Archive
-        </p>
-        <h1 className="font-serif" style={{ fontSize: '1.8rem', fontWeight: 700, color: '#F0EDE6', margin: '0 0 0.5rem' }}>
+        <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.52rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: '#C4A24A', margin: '0 0 14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <span style={{ display: 'block', width: '20px', height: '1px', background: '#C4A24A', flexShrink: 0 }} aria-hidden="true" />
           Important Dates
+        </p>
+        <h1 style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontWeight: 300, fontSize: 'clamp(1.8rem,3vw,2.4rem)', color: '#F0EDE6', margin: '0 0 12px', lineHeight: 1.15, letterSpacing: '-0.02em' }}>
+          Moments That Return
         </h1>
-        <p style={{ fontFamily: 'Georgia, serif', fontSize: '0.9rem', color: '#5C6166', lineHeight: 1.7, margin: 0 }}>
+        <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontWeight: 300, fontSize: '1rem', color: '#706C65', lineHeight: 1.75, margin: 0 }}>
           On these dates the archive automatically sends a curated photograph and memory to you and all contributors.
         </p>
       </div>

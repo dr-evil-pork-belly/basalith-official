@@ -60,8 +60,32 @@ const SECTIONS = [
 export default function TermsPage() {
   return (
     <>
+      <style>{`
+        [data-theme-terms] { background: var(--color-bg); }
+        [data-theme-terms] .bg-obsidian-void { background-color: var(--color-bg) !important; }
+        [data-theme-terms] .bg-obsidian-deep { background-color: var(--color-surface-alt) !important; }
+        [data-theme-terms] .bg-obsidian      { background-color: var(--color-surface) !important; }
+        [data-theme-terms] .text-text-primary   { color: var(--color-text-primary) !important; }
+        [data-theme-terms] .text-text-secondary { color: var(--color-text-secondary) !important; }
+        [data-theme-terms] .text-text-muted     { color: var(--color-text-muted) !important; }
+        [data-theme-terms] .text-amber { color: var(--color-gold) !important; }
+        [data-theme-terms] .text-amber-dim { color: var(--color-gold) !important; }
+        [data-theme-terms] .text-amber\\/20 { color: rgba(184,150,62,0.15) !important; }
+        [data-theme-terms] .border-border-amber { border-color: var(--color-gold-border) !important; }
+        [data-theme-terms] .via-border-amber { --tw-gradient-stops: transparent, var(--color-gold-border), transparent !important; }
+        [data-theme-terms] .via-amber\\/45 { --tw-gradient-stops: transparent, rgba(184,150,62,0.3), transparent !important; }
+        [data-theme-terms] div[style*="linear-gradient(160deg,#221F14"] {
+          background: var(--color-surface) !important;
+          border-color: var(--color-gold-border) !important;
+        }
+        [data-theme-terms] .eyebrow { color: var(--color-gold); }
+        [data-theme-terms] .btn-monolith-ghost {
+          color: var(--color-text-secondary) !important;
+          border-color: var(--color-border-medium) !important;
+        }
+      `}</style>
       <Nav />
-      <main>
+      <main data-theme-terms>
 
         {/* ── HERO ── */}
         <section
