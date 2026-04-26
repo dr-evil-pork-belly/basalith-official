@@ -141,7 +141,7 @@ export default function MethodPage() {
         {/* Steps */}
         <section style={{ padding: '0 clamp(24px,6vw,80px) clamp(80px,10vw,120px)', maxWidth: 'calc(var(--max-width-text) + 160px)', margin: '0 auto' }}>
           {STEPS.map(({ n, title, body }, i) => (
-            <div key={n} data-reveal style={{ display: 'grid', gridTemplateColumns: '3rem 1fr', gap: '32px', marginBottom: '56px' }}>
+            <div key={n} style={{ display: 'grid', gridTemplateColumns: '3rem 1fr', gap: '32px', marginBottom: '56px' }}>
               <div>
                 <p style={{ ...MONO, fontSize: '0.52rem', color: 'var(--color-gold)', paddingTop: '4px' }}>{n}</p>
               </div>
