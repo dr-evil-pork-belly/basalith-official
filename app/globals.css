@@ -98,6 +98,32 @@ html {
   scroll-behavior: smooth;
 }
 
+/* ── iOS zoom prevention: inputs must be 16px+ ──────────────────────────── */
+/* iOS Safari zooms in when input font-size < 16px, breaking layout.         */
+input,
+select,
+textarea {
+  font-size: max(16px, 1em) !important;
+}
+
+/* ── Safe area insets (iPhone notch / Dynamic Island) ── */
+:root {
+  --sat: env(safe-area-inset-top,    0px);
+  --sar: env(safe-area-inset-right,  0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left,   0px);
+}
+
+/* ── Mobile touch target minimum ── */
+/* Ensures interactive elements are tappable */
+.touch-target {
+  min-height: 44px;
+  min-width:  44px;
+  display:    flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* ── Body defaults — light marketing theme ── */
 body {
   font-family:              var(--font-cormorant);

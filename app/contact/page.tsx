@@ -80,6 +80,10 @@ export default function ContactPage() {
       <style>{`
         .contact-input:focus { border-color: var(--color-gold) !important; box-shadow: var(--shadow-gold) !important; }
         .contact-input::placeholder { color: var(--color-text-faint); font-style: italic; }
+        @media (max-width: 600px) {
+          form > div:last-child { flex-direction: column !important; }
+          form > div:last-child > button { width: 100% !important; }
+        }
       `}</style>
       <Nav />
       <main style={{ background: 'var(--color-bg)' }}>

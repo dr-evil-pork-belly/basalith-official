@@ -395,11 +395,31 @@ export default function PricingPage() {
       <style>{`
         .pricing-ghost-link:hover { color: var(--color-gold) !important; }
         @media (max-width: 900px) {
-          section:nth-child(4) div[style*="grid-template-columns: repeat(3"] {
+          div[style*="grid-template-columns: repeat(3, 1fr)"] {
             grid-template-columns: 1fr !important;
           }
-          section:nth-child(3) div[style*="grid-template-columns: 1.2fr"] {
+          div[style*="grid-template-columns: 1.2fr"] {
             grid-template-columns: 1fr !important;
+          }
+        }
+        @media (max-width: 768px) {
+          /* Pricing hero */
+          section[aria-label="Pricing hero"] {
+            padding-top: max(140px, calc(80px + env(safe-area-inset-top, 0px))) !important;
+          }
+          /* Founding block two-col */
+          div[style*="grid-template-columns: 1.15fr"] {
+            grid-template-columns: 1fr !important;
+            gap: 32px !important;
+          }
+          /* CTA buttons full-width */
+          section[aria-label="Pricing CTA"] div[style*="justify-content: 'center'"] {
+            flex-direction: column !important;
+          }
+          section[aria-label="Pricing CTA"] a {
+            width: 100% !important;
+            text-align: center !important;
+            box-sizing: border-box !important;
           }
         }
       `}</style>

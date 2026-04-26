@@ -761,7 +761,7 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
           </div>
 
           {/* Input area */}
-          <div style={{ borderTop: '1px solid rgba(196,162,74,0.1)', paddingTop: '1rem', marginTop: 0 }}>
+          <div style={{ borderTop: '1px solid rgba(196,162,74,0.1)', paddingTop: '1rem', marginTop: 0, paddingBottom: 'max(0px, env(safe-area-inset-bottom, 0px))' }}>
 
             {/* Voice panel — slides in above textarea */}
             {showVoicePanel && (

@@ -234,16 +234,32 @@ export default function HeroSection() {
       <style>{`
         @media (max-width: 768px) {
           section[aria-label="Basalith — Heritage archive"] {
-            grid-template-columns: 1fr;
-            grid-template-rows: 40svh auto;
+            grid-template-columns: 1fr !important;
+            grid-template-rows: 45svh auto !important;
           }
           section[aria-label="Basalith — Heritage archive"] > div:first-child {
-            order: 2;
-            padding: 48px 24px 64px !important;
+            order: 2 !important;
+            padding: 40px 24px 64px !important;
           }
           section[aria-label="Basalith — Heritage archive"] > div:last-child {
-            order: 1;
-            min-height: 40svh !important;
+            order: 1 !important;
+            min-height: 45svh !important;
+          }
+          /* CTAs stack full-width on mobile */
+          section[aria-label="Basalith — Heritage archive"] div[style*="display: 'flex'"],
+          section[aria-label="Basalith — Heritage archive"] > div > div[style*="gap: '16px'"] {
+            flex-direction: column !important;
+          }
+          section[aria-label="Basalith — Heritage archive"] a[href="/apply"],
+          section[aria-label="Basalith — Heritage archive"] a[href="/method"] {
+            width: 100% !important;
+            text-align: center !important;
+            justify-content: center !important;
+            box-sizing: border-box !important;
+          }
+          /* Smaller social proof on mobile */
+          section[aria-label="Basalith — Heritage archive"] p[style*="0.52rem"] {
+            font-size: 0.48rem !important;
           }
         }
       `}</style>

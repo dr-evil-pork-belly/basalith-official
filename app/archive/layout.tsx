@@ -77,6 +77,7 @@ const ALL_NAV = [...PRIMARY_NAV, ...CONTRIBUTE_NAV, ...MANAGE_NAV]
 export default function ArchiveLayout({ children }: { children: React.ReactNode }) {
   const pathname            = usePathname()
   const [confirmSignOut, setConfirmSignOut] = useState(false)
+  const [mobileOpen,    setMobileOpen]     = useState(false)
 
   return (
     <div style={{ minHeight: '100svh', display: 'flex', background: P }}>
@@ -137,43 +138,73 @@ export default function ArchiveLayout({ children }: { children: React.ReactNode 
       </aside>
 
       {/* Mobile top bar */}
-      <div className="md:hidden" style={{ position: 'fixed', inset: '0 0 auto 0', zIndex: 50, background: S, borderBottom: '1px solid rgba(196,162,74,0.08)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px' }}>
-          <Link href="/" style={{ ...MONO, fontSize: '0.52rem', color: T, textDecoration: 'none' }}>Basalith</Link>
-          {confirmSignOut ? (
-            <a href="/api/archive-signout" style={{ ...MONO, fontSize: '0.48rem', color: G, textDecoration: 'none' }}>Confirm</a>
-          ) : (
-            <button onClick={() => setConfirmSignOut(true)} style={{ ...MONO, fontSize: '0.48rem', color: M, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>Sign Out</button>
-          )}
-        </div>
-        <div style={{ display: 'flex', overflowX: 'auto', padding: '0 20px 12px', gap: '24px' }}>
-          {ALL_NAV.map(({ href, label: lbl }) => {
-            const active = pathname === href || pathname.startsWith(href + '/')
-            const isPrimary = PRIMARY_NAV.some(n => n.href === href)
-            return (
-              <Link
-                key={href}
-                href={href}
-                style={{
-                  ...MONO,
-                  fontSize:       isPrimary ? '0.52rem' : '0.46rem',
-                  color:          active ? T : isPrimary ? 'rgba(240,237,230,0.45)' : 'rgba(196,162,74,0.4)',
-                  textDecoration: 'none',
-                  whiteSpace:     'nowrap',
-                  flexShrink:     0,
-                  paddingBottom:  '2px',
-                  borderBottom:   active ? `1px solid ${G}` : '1px solid transparent',
-                }}
-              >
-                {lbl}
-              </Link>
-            )
-          })}
+      <div className="md:hidden" style={{ position: 'fixed', inset: '0 0 auto 0', zIndex: 50, background: S, borderBottom: '1px solid rgba(196,162,74,0.08)', paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', height: '56px' }}>
+          <Link href="/" style={{ ...MONO, fontSize: '0.52rem', color: T, textDecoration: 'none', minHeight: '44px', display: 'flex', alignItems: 'center' }}>Basalith</Link>
+          {/* Hamburger — 44px touch target */}
+          <button
+            onClick={() => setMobileOpen(o => !o)}
+            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileOpen}
+            style={{ width: '44px', height: '44px', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '5px', flexShrink: 0 }}
+          >
+            <span style={{ display: 'block', height: '1px', width: '22px', background: T, transition: 'all 250ms ease', transform: mobileOpen ? 'rotate(45deg) translate(4px, 4px)' : 'none' }} />
+            <span style={{ display: 'block', height: '1px', width: '22px', background: T, transition: 'all 250ms ease', opacity: mobileOpen ? 0 : 1 }} />
+            <span style={{ display: 'block', height: '1px', width: '22px', background: T, transition: 'all 250ms ease', transform: mobileOpen ? 'rotate(-45deg) translate(4px, -4px)' : 'none' }} />
+          </button>
         </div>
       </div>
 
+      {/* Mobile full-screen menu overlay */}
+      {mobileOpen && (
+        <div
+          className="md:hidden"
+          style={{ position: 'fixed', inset: 0, zIndex: 49, background: '#0C0B09', display: 'flex', flexDirection: 'column', paddingTop: 'calc(56px + env(safe-area-inset-top, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)', overflow: 'auto' }}
+          onClick={e => { if (e.target === e.currentTarget) setMobileOpen(false) }}
+        >
+          <nav style={{ display: 'flex', flexDirection: 'column', padding: '16px 0' }} aria-label="Archive mobile navigation">
+            {ALL_NAV.map(({ href, label: lbl }) => {
+              const active = pathname === href || pathname.startsWith(href + '/')
+              const isPrimary = PRIMARY_NAV.some(n => n.href === href)
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  onClick={() => setMobileOpen(false)}
+                  style={{
+                    ...MONO,
+                    fontSize:        isPrimary ? '0.62rem' : '0.54rem',
+                    color:           active ? G : isPrimary ? T : 'rgba(196,162,74,0.5)',
+                    textDecoration:  'none',
+                    padding:         '0 24px',
+                    minHeight:       '56px',
+                    display:         'flex',
+                    alignItems:      'center',
+                    borderLeft:      active ? `2px solid ${G}` : '2px solid transparent',
+                    background:      active ? 'rgba(196,162,74,0.06)' : 'transparent',
+                  }}
+                >
+                  {lbl}
+                </Link>
+              )
+            })}
+            <div style={{ height: '1px', background: 'rgba(196,162,74,0.06)', margin: '16px 24px' }} />
+            {confirmSignOut ? (
+              <div style={{ padding: '0 24px', display: 'flex', gap: '24px', alignItems: 'center', minHeight: '56px' }}>
+                <a href="/api/archive-signout" style={{ ...MONO, fontSize: '0.54rem', color: G, textDecoration: 'none' }}>Yes, sign out</a>
+                <button onClick={() => setConfirmSignOut(false)} style={{ ...MONO, fontSize: '0.54rem', color: M, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>Cancel</button>
+              </div>
+            ) : (
+              <button onClick={() => setConfirmSignOut(true)} style={{ ...MONO, fontSize: '0.54rem', color: M, background: 'none', border: 'none', cursor: 'pointer', padding: '0 24px', minHeight: '56px', textAlign: 'left' }}>
+                Sign Out
+              </button>
+            )}
+          </nav>
+        </div>
+      )}
+
       {/* Page content */}
-      <main className="flex-1 md:px-10 px-5 pb-16 md:mt-0 mt-[72px]" style={{ paddingTop: '40px' }}>
+      <main className="flex-1 md:px-10 px-5 pb-16 md:mt-0 mt-[56px]" style={{ paddingTop: '40px' }}>
         {children}
       </main>
 

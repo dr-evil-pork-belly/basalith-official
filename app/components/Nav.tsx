@@ -43,7 +43,10 @@ export default function Nav() {
           display:         'flex',
           alignItems:      'center',
           justifyContent:  'space-between',
-          padding:         scrolled ? '18px clamp(24px,6vw,80px)' : '28px clamp(24px,6vw,80px)',
+          paddingTop:      `max(${scrolled ? '18px' : '28px'}, calc(${scrolled ? '18px' : '28px'} + env(safe-area-inset-top, 0px)))`,
+          paddingBottom:   scrolled ? '18px' : '28px',
+          paddingLeft:     'clamp(24px,6vw,80px)',
+          paddingRight:    'clamp(24px,6vw,80px)',
           background:      scrolled ? 'rgba(250,250,248,0.96)' : 'transparent',
           backdropFilter:  scrolled ? 'blur(12px)' : 'none',
           boxShadow:       scrolled ? '0 1px 0 rgba(26,24,20,0.06)' : 'none',
@@ -130,7 +133,7 @@ export default function Nav() {
             aria-expanded={open}
             onClick={() => setOpen(!open)}
             className="md:hidden"
-            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', flexDirection: 'column', gap: '5px', width: 28, height: 28, justifyContent: 'center' }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', display: 'flex', flexDirection: 'column', gap: '5px', width: 44, height: 44, justifyContent: 'center', alignItems: 'center' }}
           >
             <span style={{ display: 'block', height: '1px', width: '100%', background: 'var(--color-text-primary)', transition: 'all 300ms ease', transform: open ? 'rotate(45deg) translate(4px, 4px)' : 'none' }} />
             <span style={{ display: 'block', height: '1px', width: '100%', background: 'var(--color-text-primary)', transition: 'all 300ms ease', opacity: open ? 0 : 1 }} />

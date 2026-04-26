@@ -154,6 +154,7 @@ export default function StorySection() {
           section[aria-label="One family"] > div[style*="grid-template-columns"] {
             grid-template-columns: 1fr !important;
             gap: 40px !important;
+            padding: 40px 24px !important;
           }
         }
       `}</style>

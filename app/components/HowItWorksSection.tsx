@@ -203,15 +203,33 @@ export default function HowItWorksSection() {
 
       <style>{`
         @media (max-width: 768px) {
-          section[aria-label="How Basalith works"] div[style*="grid-template-columns: 1fr 1fr"] {
+          /* Collapse 2-col to 1-col */
+          section[aria-label="How Basalith works"] div[style*="grid-template-columns: 1fr 1fr"],
+          section[aria-label="How Basalith works"] > div[style*="minHeight: '400px'"],
+          section[aria-label="How Basalith works"] div[style*="minHeight"] {
             grid-template-columns: 1fr !important;
+            min-height: unset !important;
           }
-          section[aria-label="How Basalith works"] div[style*="grid-template-columns: 1fr 1fr"] > div:first-child,
-          section[aria-label="How Basalith works"] div[style*="grid-template-columns: 1fr 1fr"] > div:last-child {
-            order: unset !important;
-          }
+          /* Visual block always on top */
           section[aria-label="How Basalith works"] div[aria-hidden="true"] {
-            min-height: 220px;
+            order: 1 !important;
+            min-height: 200px !important;
+          }
+          /* Text block always below */
+          section[aria-label="How Basalith works"] div[aria-hidden="true"] ~ div {
+            order: 2 !important;
+          }
+          /* Also for odd rows where text comes first in DOM */
+          section[aria-label="How Basalith works"] div:not([aria-hidden="true"]):has(~ div[aria-hidden="true"]) {
+            order: 2 !important;
+          }
+          /* Ensure inner padding on mobile */
+          section[aria-label="How Basalith works"] div[style*="justifyContent: 'center'"] {
+            padding: 32px 24px !important;
+          }
+          /* Header section */
+          section[aria-label="How Basalith works"] > div:first-child {
+            padding: 0 24px 48px !important;
           }
         }
       `}</style>

@@ -373,7 +373,7 @@ export default function GalleryClient({ archiveId }: { archiveId: string }) {
 
       {!loading && filtered.length > 0 && (
         <>
-          <div style={{ columns: '2', columnGap: '12px' }} className="md:columns-3 lg:columns-4">
+          <div style={{ columns: '2', columnGap: '12px' }} className="columns-2 md:columns-3 lg:columns-4">
             {filtered.map((item, i) => (
               <div
                 key={item.id}
@@ -393,7 +393,7 @@ export default function GalleryClient({ archiveId }: { archiveId: string }) {
                     <img
                       src={item.imageUrl}
                       alt={item.title || 'Archive photograph'}
-                      style={{ display: 'block', width: '100%', objectFit: 'cover' }}
+                      style={{ display: 'block', width: '100%', objectFit: 'cover', minHeight: '160px' }}
                     />
                     {/* Hover overlay */}
                     <div className="gallery-card-overlay">

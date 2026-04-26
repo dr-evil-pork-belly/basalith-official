@@ -167,9 +167,15 @@ export default function PhilosophySection() {
 
       <style>{`
         @media (max-width: 768px) {
+          section[aria-label="Our philosophy"] {
+            padding: 64px 24px !important;
+          }
           section[aria-label="Our philosophy"] > div > div[style*="grid-template-columns"] {
             grid-template-columns: 1fr !important;
             gap: 40px !important;
+          }
+          section[aria-label="Our philosophy"] h2 {
+            font-size: clamp(1.75rem, 7vw, 2.5rem) !important;
           }
         }
       `}</style>

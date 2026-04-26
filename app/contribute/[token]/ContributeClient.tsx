@@ -211,7 +211,7 @@ function QuestionsSection({
                   rows={4}
                   style={{
                     width:        '100%',
-                    minHeight:    '100px',
+                    minHeight:    '120px',
                     background:   '#F5F3EE',
                     border:       '1px solid rgba(26,24,20,0.08)',
                     borderRadius: '2px',

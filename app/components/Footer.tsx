@@ -199,11 +199,21 @@ export default function Footer() {
         @media (max-width: 900px) {
           footer > div:first-of-type {
             grid-template-columns: 1fr 1fr !important;
+            gap: 32px !important;
+            padding: 48px 24px !important;
           }
         }
         @media (max-width: 600px) {
           footer > div:first-of-type {
             grid-template-columns: 1fr !important;
+            gap: 32px !important;
+            padding: 48px 24px !important;
+          }
+          footer > div:last-of-type {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            padding: 20px 24px !important;
+            padding-bottom: max(20px, env(safe-area-inset-bottom, 0px)) !important;
           }
         }
       `}</style>
