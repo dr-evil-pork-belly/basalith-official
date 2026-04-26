@@ -21,9 +21,9 @@ const PILLARS = [
     n:     '03',
     title: 'The Continuation',
     body:  [
-      'Mark Zuckerberg spent $300 million building an AI version of himself.',
+      'The world\'s wealthiest people are spending billions building AI versions of themselves.',
       'Basalith does it for $3,600 a year.',
-      'Not for billionaires. For every family that deserves to keep asking questions.',
+      'Not for billionaires. For every family.',
     ],
   },
 ]

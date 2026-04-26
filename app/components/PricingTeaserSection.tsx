@@ -20,19 +20,24 @@ export default function PricingTeaserSection() {
         textAlign:  'center',
       }}
     >
-      <p
+      <div
         style={{
           fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-          fontSize:     'clamp(1.1rem, 2.5vw, 1.5rem)',
+          fontSize:     'clamp(1.1rem, 2.5vw, 1.4rem)',
           fontStyle:    'italic',
           fontWeight:   300,
-          lineHeight:   1.7,
+          lineHeight:   1.8,
           color:        'rgba(250,250,248,0.4)',
-          marginBottom: '24px',
+          marginBottom: '32px',
+          maxWidth:     '480px',
+          margin:       '0 auto 32px',
         }}
       >
-        Mark Zuckerberg spent $300 million.
-      </p>
+        <p style={{ marginBottom: '16px' }}>
+          The world&rsquo;s wealthiest people are spending billions building AI versions of themselves.
+        </p>
+        <p style={{ margin: 0 }}>Not for billionaires. For every family.</p>
+      </div>
 
       <h2
         style={{

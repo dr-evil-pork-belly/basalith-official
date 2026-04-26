@@ -156,9 +156,9 @@ export default function PricingPage() {
               margin:     '0 auto',
             }}
           >
-            <p style={{ marginBottom: '16px' }}>Mark Zuckerberg spent $300 million building an AI version of himself.</p>
-            <p style={{ marginBottom: '16px' }}>We built the same infrastructure for $3,600 a year.</p>
-            <p style={{ margin: 0 }}>Not because we cut corners. Because we believe every family deserves this.</p>
+            <p style={{ marginBottom: '16px' }}>The world&rsquo;s wealthiest people are spending billions building AI versions of themselves.</p>
+            <p style={{ marginBottom: '16px' }}>Basalith does it for $3,600 a year.</p>
+            <p style={{ margin: 0 }}>Not for billionaires. For every family.</p>
           </div>
         </section>
 
