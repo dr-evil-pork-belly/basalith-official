@@ -184,6 +184,36 @@ function QuestionsSection({
         : `The archive has ${questions.length} question${questions.length !== 1 ? 's' : ''} only you can answer.`}
       prominent
     >
+      {/* Honesty framing */}
+      <div
+        style={{
+          borderLeft:   '2px solid rgba(184,150,62,0.3)',
+          paddingLeft:  '20px',
+          marginBottom: '32px',
+          maxWidth:     '560px',
+        }}
+      >
+        <p
+          style={{
+            fontFamily:  '"Cormorant Garamond",Georgia,serif',
+            fontSize:    '1rem',
+            fontStyle:   'italic',
+            fontWeight:  300,
+            color:       '#4A4640',
+            lineHeight:  1.8,
+            margin:      0,
+          }}
+        >
+          Be honest.
+          <br /><br />
+          The most valuable thing you can contribute is the truth.
+          <br /><br />
+          Difficult memories and complicated feelings are as important as positive ones.
+          <br /><br />
+          An honest archive is one the family will recognize and trust.
+        </p>
+      </div>
+
       <div className="flex flex-col" style={{ gap: '2rem' }}>
         {questions.map(q => (
           <div key={q.id}>
@@ -361,6 +391,18 @@ function PhotoUploadSection({
         ? `您收藏中有关${subjectName}的照片。`
         : `Photographs you have of ${subjectName} from your own collection.`}
     >
+      <p style={{
+        fontFamily:    '"Space Mono","Courier New",monospace',
+        fontSize:      '0.44rem',
+        letterSpacing: '0.18em',
+        textTransform: 'uppercase' as const,
+        color:         'rgba(138,134,128,0.7)',
+        marginBottom:  '16px',
+        lineHeight:    1.7,
+      }}>
+        Any memory. Any era.<br />Positive or difficult. Everything helps.
+      </p>
+
       <div
         style={{
           border:       `1px dashed ${dragging ? 'rgba(196,162,74,0.5)' : 'rgba(255,255,255,0.1)'}`,
@@ -546,6 +588,18 @@ function MediaUploadSection({
       title={PORTAL_UI[lang === 'zh' ? 'zh' : 'en'].videosAndDocs}
       subtitle={lang === 'zh' ? '家庭录像、信件、文件——您收藏中的任何内容。' : 'Home videos, letters, documents, anything from your collection.'}
     >
+      <p style={{
+        fontFamily:    '"Space Mono","Courier New",monospace',
+        fontSize:      '0.44rem',
+        letterSpacing: '0.18em',
+        textTransform: 'uppercase' as const,
+        color:         'rgba(138,134,128,0.7)',
+        marginBottom:  '16px',
+        lineHeight:    1.7,
+      }}>
+        Any memory. Any era.<br />Positive or difficult. Everything helps.
+      </p>
+
       <div
         style={{
           border:       '1px dashed rgba(255,255,255,0.1)',
