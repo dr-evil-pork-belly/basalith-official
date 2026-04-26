@@ -4,26 +4,34 @@ import { useEffect } from 'react'
 
 export default function ScrollReveal() {
   useEffect(() => {
-    // Support both legacy .reveal/.in-view (portal) and new [data-reveal]/.revealed (marketing)
-    const els    = document.querySelectorAll<HTMLElement>('.reveal, [data-reveal]')
+    const els = document.querySelectorAll<HTMLElement>('.reveal, [data-reveal]')
+
+    const revealEl = (el: HTMLElement) => {
+      el.classList.add('in-view', 'revealed')
+      io.unobserve(el)
+    }
 
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (!entry.isIntersecting) return
-          const el = entry.target as HTMLElement
-          // Legacy system
-          el.classList.add('in-view')
-          // New system
-          el.classList.add('revealed')
-          io.unobserve(el)
+          if (entry.isIntersecting) revealEl(entry.target as HTMLElement)
         })
       },
-      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+      // threshold 0.05 + minimal negative rootMargin so elements near fold
+      // trigger reliably on all screen sizes including small iPhones
+      { threshold: 0.05, rootMargin: '0px 0px -10px 0px' }
     )
 
     els.forEach((el) => io.observe(el))
-    return () => io.disconnect()
+
+    // Hard fallback: after 2.5s reveal anything the observer missed
+    const fallback = setTimeout(() => {
+      document.querySelectorAll<HTMLElement>(
+        '.reveal:not(.in-view), [data-reveal]:not(.revealed)'
+      ).forEach(el => el.classList.add('in-view', 'revealed'))
+    }, 2500)
+
+    return () => { io.disconnect(); clearTimeout(fallback) }
   }, [])
 
   return null

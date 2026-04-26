@@ -96,6 +96,8 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 /* ── iOS zoom prevention: inputs must be 16px+ ──────────────────────────── */

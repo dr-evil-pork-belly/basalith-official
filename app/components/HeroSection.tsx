@@ -22,6 +22,7 @@ export default function HeroSection() {
     >
       {/* ── Left: Text ── */}
       <div
+        className="hero-text-col"
         style={{
           display:        'flex',
           flexDirection:  'column',
@@ -91,6 +92,7 @@ export default function HeroSection() {
 
         {/* CTAs */}
         <div
+          className="hero-ctas"
           style={{
             display:   'flex',
             gap:       '16px',
@@ -162,11 +164,14 @@ export default function HeroSection() {
       {/* ── Right: Atmospheric art ── */}
       <div
         aria-hidden="true"
+        className="hero-image-col"
         style={{
           position:   'relative',
           overflow:   'hidden',
           minHeight:  'clamp(400px, 60vh, 900px)',
-          background: '#F5F0E8',
+          background: '#EDE5D0',
+          border:     '1px solid rgba(184,150,62,0.3)',
+          boxShadow:  'inset 0 0 60px rgba(184,150,62,0.1), 0 8px 32px rgba(26,24,20,0.08)',
         }}
       >
         {/* Warm parchment base */}
@@ -175,9 +180,9 @@ export default function HeroSection() {
             position: 'absolute',
             inset:    0,
             background: [
-              'radial-gradient(ellipse at 30% 40%, rgba(184,150,62,0.15) 0%, transparent 60%)',
-              'radial-gradient(ellipse at 70% 70%, rgba(184,150,62,0.08) 0%, transparent 50%)',
-              'linear-gradient(135deg, #F5F0E8 0%, #EDE5D4 50%, #E5D9C3 100%)',
+              'radial-gradient(ellipse at 30% 40%, rgba(184,150,62,0.30) 0%, transparent 60%)',
+              'radial-gradient(ellipse at 70% 70%, rgba(184,150,62,0.18) 0%, transparent 50%)',
+              'linear-gradient(135deg, #EDE5D0 0%, #E3D8BE 50%, #D9CEAC 100%)',
             ].join(', '),
           }}
         />
@@ -199,20 +204,20 @@ export default function HeroSection() {
           preserveAspectRatio="xMidYMid slice"
           aria-hidden="true"
         >
-          <rect x="40" y="60" width="320" height="420" fill="none" stroke="rgba(184,150,62,0.25)" strokeWidth="1" />
-          <rect x="60" y="80" width="320" height="420" fill="none" stroke="rgba(184,150,62,0.15)" strokeWidth="0.5" />
-          <rect x="20" y="40" width="320" height="420" fill="none" stroke="rgba(184,150,62,0.1)"  strokeWidth="0.5" />
-          <line x1="40"  y1="200" x2="360" y2="200" stroke="rgba(184,150,62,0.10)" strokeWidth="0.5" />
-          <line x1="40"  y1="340" x2="360" y2="340" stroke="rgba(184,150,62,0.08)" strokeWidth="0.5" />
-          <circle cx="120" cy="180" r="2"   fill="rgba(184,150,62,0.30)" />
-          <circle cx="200" cy="150" r="1.5" fill="rgba(184,150,62,0.20)" />
-          <circle cx="280" cy="200" r="2.5" fill="rgba(184,150,62,0.25)" />
-          <circle cx="160" cy="280" r="1.5" fill="rgba(184,150,62,0.20)" />
-          <circle cx="240" cy="320" r="2"   fill="rgba(184,150,62,0.30)" />
-          <line x1="120" y1="180" x2="200" y2="150" stroke="rgba(184,150,62,0.10)" strokeWidth="0.5" />
-          <line x1="200" y1="150" x2="280" y2="200" stroke="rgba(184,150,62,0.10)" strokeWidth="0.5" />
-          <line x1="120" y1="180" x2="160" y2="280" stroke="rgba(184,150,62,0.10)" strokeWidth="0.5" />
-          <line x1="280" y1="200" x2="240" y2="320" stroke="rgba(184,150,62,0.10)" strokeWidth="0.5" />
+          <rect x="40" y="60" width="320" height="420" fill="none" stroke="rgba(184,150,62,0.45)" strokeWidth="1.5" />
+          <rect x="60" y="80" width="320" height="420" fill="none" stroke="rgba(184,150,62,0.30)" strokeWidth="1" />
+          <rect x="20" y="40" width="320" height="420" fill="none" stroke="rgba(184,150,62,0.20)" strokeWidth="0.75" />
+          <line x1="40"  y1="200" x2="360" y2="200" stroke="rgba(184,150,62,0.22)" strokeWidth="0.75" />
+          <line x1="40"  y1="340" x2="360" y2="340" stroke="rgba(184,150,62,0.18)" strokeWidth="0.75" />
+          <circle cx="120" cy="180" r="3"   fill="rgba(184,150,62,0.50)" />
+          <circle cx="200" cy="150" r="3"   fill="rgba(184,150,62,0.40)" />
+          <circle cx="280" cy="200" r="4"   fill="rgba(184,150,62,0.45)" />
+          <circle cx="160" cy="280" r="3"   fill="rgba(184,150,62,0.40)" />
+          <circle cx="240" cy="320" r="3"   fill="rgba(184,150,62,0.50)" />
+          <line x1="120" y1="180" x2="200" y2="150" stroke="rgba(184,150,62,0.22)" strokeWidth="0.75" />
+          <line x1="200" y1="150" x2="280" y2="200" stroke="rgba(184,150,62,0.22)" strokeWidth="0.75" />
+          <line x1="120" y1="180" x2="160" y2="280" stroke="rgba(184,150,62,0.22)" strokeWidth="0.75" />
+          <line x1="280" y1="200" x2="240" y2="320" stroke="rgba(184,150,62,0.22)" strokeWidth="0.75" />
         </svg>
 
         {/* Vignette edges */}
@@ -220,7 +225,17 @@ export default function HeroSection() {
           style={{
             position:   'absolute',
             inset:      0,
-            background: 'radial-gradient(ellipse at center, transparent 50%, rgba(245,240,232,0.4) 100%)',
+            background: 'radial-gradient(ellipse at center, transparent 40%, rgba(217,206,172,0.5) 100%)',
+          }}
+        />
+
+        {/* Inset gold frame */}
+        <div
+          style={{
+            position:      'absolute',
+            inset:         '16px',
+            border:        '1px solid rgba(184,150,62,0.4)',
+            pointerEvents: 'none',
           }}
         />
 
@@ -241,36 +256,37 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* Mobile: stack vertically */}
+      {/* Mobile: text above, image below */}
       <style>{`
-        @media (max-width: 768px) {
+        @media (max-width: 767px) {
           section[aria-label="Basalith — Heritage archive"] {
             grid-template-columns: 1fr !important;
-            grid-template-rows: 45svh auto !important;
+            grid-template-rows: auto clamp(240px, 40vh, 320px) !important;
+            min-height: unset !important;
           }
-          section[aria-label="Basalith — Heritage archive"] > div:first-child {
-            order: 2 !important;
-            padding: 40px 24px 64px !important;
-          }
-          section[aria-label="Basalith — Heritage archive"] > div:last-child {
+          .hero-text-col {
             order: 1 !important;
-            min-height: 45svh !important;
+            padding: 48px 24px 32px !important;
+            width: 100% !important;
           }
-          /* CTAs stack full-width on mobile */
-          section[aria-label="Basalith — Heritage archive"] div[style*="display: 'flex'"],
-          section[aria-label="Basalith — Heritage archive"] > div > div[style*="gap: '16px'"] {
+          .hero-image-col {
+            order: 2 !important;
+            min-height: unset !important;
+            height: clamp(240px, 40vh, 320px) !important;
+            width: 100% !important;
+          }
+          .hero-ctas {
             flex-direction: column !important;
+            gap: 12px !important;
           }
-          section[aria-label="Basalith — Heritage archive"] a[href="/apply"],
-          section[aria-label="Basalith — Heritage archive"] a[href="/method"] {
+          .hero-ctas a {
             width: 100% !important;
             text-align: center !important;
             justify-content: center !important;
             box-sizing: border-box !important;
-          }
-          /* Smaller social proof on mobile */
-          section[aria-label="Basalith — Heritage archive"] p[style*="0.52rem"] {
-            font-size: 0.48rem !important;
+            min-height: 48px !important;
+            display: flex !important;
+            align-items: center !important;
           }
         }
       `}</style>
