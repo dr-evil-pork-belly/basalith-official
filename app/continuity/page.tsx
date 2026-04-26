@@ -8,63 +8,72 @@ export const metadata: Metadata = {
 }
 
 const body: React.CSSProperties = {
-  fontFamily:   "'Cormorant Garamond', Georgia, serif",
+  fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
   fontWeight:   300,
   fontSize:     '1.05rem',
   lineHeight:   1.95,
-  color:        '#B8B4AB',
+  color:        'var(--color-text-secondary)',
   marginBottom: '1.5rem',
 }
 
 const h2style: React.CSSProperties = {
-  fontFamily:   "'Cormorant Garamond', Georgia, serif",
-  fontWeight:   700,
+  fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontWeight:   500,
   fontSize:     'clamp(1.4rem, 3vw, 1.9rem)',
-  color:        '#F0EDE6',
+  color:        'var(--color-text-primary)',
   lineHeight:   1.2,
   marginBottom: '1.5rem',
   marginTop:    '4rem',
 }
 
 const rule: React.CSSProperties = {
-  borderTop:    '1px solid rgba(196,162,74,0.15)',
-  margin:       '4rem 0',
+  height:     '1px',
+  background: 'var(--color-border)',
+  border:     'none',
+  margin:     '4rem 0',
 }
 
 export default function ContinuityPage() {
   return (
     <>
       <Nav />
-      <main style={{ background: '#0A0908' }}>
+      <main style={{ background: 'var(--color-bg)' }}>
 
         {/* ── HEADER ── */}
-        <section style={{ padding: 'clamp(7rem, 12vw, 10rem) 2rem 4rem', textAlign: 'center', background: '#0A0908' }}>
+        <section style={{ padding: 'clamp(140px,16vw,180px) clamp(24px,6vw,80px) clamp(48px,6vw,64px)', textAlign: 'center', background: 'var(--color-bg)' }}>
           <p style={{
-            fontFamily:    "'Space Mono', monospace",
-            fontSize:      '0.44rem',
-            letterSpacing: '0.4em',
+            fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+            fontSize:      'var(--text-caption)',
+            letterSpacing: '0.35em',
             textTransform: 'uppercase',
-            color:         '#C4A24A',
-            marginBottom:  '1.5rem',
+            color:         'var(--color-gold)',
+            marginBottom:  '24px',
+            display:       'flex',
+            alignItems:    'center',
+            justifyContent: 'center',
+            gap:           '12px',
           }}>
+            <span style={{ display: 'block', width: '24px', height: '1px', background: 'var(--color-gold)', flexShrink: 0 }} aria-hidden="true" />
             Continuity
+            <span style={{ display: 'block', width: '24px', height: '1px', background: 'var(--color-gold)', flexShrink: 0 }} aria-hidden="true" />
           </p>
           <h1 style={{
-            fontFamily:    "'Cormorant Garamond', Georgia, serif",
-            fontWeight:    700,
+            fontFamily:    'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+            fontWeight:    300,
             fontSize:      'clamp(2.5rem, 6vw, 4.5rem)',
-            color:         '#F0EDE6',
+            color:         'var(--color-text-primary)',
             lineHeight:    1.05,
-            letterSpacing: '-0.02em',
-            marginBottom:  '1.25rem',
+            letterSpacing: '-0.025em',
+            marginBottom:  '20px',
           }}>
             Built for centuries.<br />Not decades.
           </h1>
           <p style={{
-            fontFamily:  "'Cormorant Garamond', Georgia, serif",
+            fontFamily:  'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
             fontStyle:   'italic',
+            fontWeight:  300,
             fontSize:    '1.15rem',
-            color:       '#9DA3A8',
+            color:       'var(--color-text-muted)',
             margin:      '0 auto',
             maxWidth:    '480px',
             lineHeight:  1.7,
@@ -74,7 +83,7 @@ export default function ContinuityPage() {
         </section>
 
         {/* ── BODY ── */}
-        <section style={{ maxWidth: '720px', margin: '0 auto', padding: '2rem 2rem 8rem' }}>
+        <section style={{ maxWidth: '720px', margin: '0 auto', padding: 'clamp(40px,6vw,64px) clamp(24px,6vw,48px)' }}>
 
           {/* Section 1 */}
           <h2 style={h2style}>Every generation of AI makes your entity more accurate.</h2>
@@ -115,7 +124,7 @@ export default function ContinuityPage() {
           <p style={body}>
             Every generation starts over. They inherit the money but not the mind that made it.
           </p>
-          <p style={{ ...body, color: '#F0EDE6', fontWeight: 400 }}>
+          <p style={{ ...body, color: 'var(--color-text-primary)', fontWeight: 500 }}>
             Basalith changes that.
           </p>
           <p style={body}>
@@ -148,10 +157,10 @@ export default function ContinuityPage() {
           <a
             href="/custodianship"
             style={{
-              fontFamily:     "'Cormorant Garamond', Georgia, serif",
+              fontFamily:     'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
               fontStyle:      'italic',
               fontSize:       '0.95rem',
-              color:          'rgba(196,162,74,1)',
+              color:          'var(--color-gold)',
               textDecoration: 'none',
               display:        'inline-block',
               marginTop:      '0.5rem',
@@ -163,14 +172,17 @@ export default function ContinuityPage() {
           <div style={rule} />
 
           {/* Closing */}
-          <div style={{ textAlign: 'center', padding: '2rem 0 0', maxWidth: '600px', margin: '0 auto' }}>
+          <div style={{ background: 'var(--color-void)', padding: '64px 24px', textAlign: 'center', maxWidth: '100vw', margin: '48px -24px 0', borderRadius: 0 }}>
             <p style={{
-              fontFamily:  "'Cormorant Garamond', Georgia, serif",
-              fontStyle:   'italic',
-              fontSize:    '1.3rem',
-              color:       '#B8B4AB',
-              lineHeight:  1.85,
-              marginBottom: '2.5rem',
+              fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+              fontStyle:    'italic',
+              fontWeight:   300,
+              fontSize:     '1.3rem',
+              color:        'rgba(250,248,244,0.6)',
+              lineHeight:   1.85,
+              marginBottom: '40px',
+              maxWidth:     '560px',
+              margin:       '0 auto 40px',
             }}>
               &ldquo;In 100 years the world will be unrecognizable.<br /><br />
               But the story of how your grandmother survived something hard,
@@ -182,12 +194,12 @@ export default function ContinuityPage() {
             </p>
 
             <p style={{
-              fontFamily:    "'Space Mono', monospace",
-              fontSize:      '0.44rem',
+              fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+              fontSize:      '0.52rem',
               letterSpacing: '0.35em',
               textTransform: 'uppercase',
-              color:         '#C4A24A',
-              marginBottom:  '2.5rem',
+              color:         'var(--color-gold)',
+              marginBottom:  '40px',
             }}>
               This Is What Basalith Preserves
             </p>
@@ -196,9 +208,9 @@ export default function ContinuityPage() {
               href="/pricing"
               style={{
                 display:       'inline-block',
-                background:    'rgba(196,162,74,1)',
+                background:    'var(--color-gold)',
                 color:         '#0A0908',
-                fontFamily:    "'Space Mono', monospace",
+                fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
                 fontSize:      '0.58rem',
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',

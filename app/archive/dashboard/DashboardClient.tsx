@@ -636,8 +636,15 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
         ) : (
           <>
             <h1
-              className="font-serif font-semibold leading-[0.95] tracking-[-0.03em] mb-3"
-              style={{ fontSize: 'clamp(1.8rem,3.5vw,2.8rem)', color: '#F0F0EE' }}
+              style={{
+                fontFamily:    '"Cormorant Garamond",Georgia,serif',
+                fontSize:      'clamp(1.8rem,3.5vw,2.75rem)',
+                fontWeight:    300,
+                lineHeight:    1.1,
+                letterSpacing: '-0.025em',
+                color:         '#F0EDE6',
+                marginBottom:  '10px',
+              }}
             >
               {(() => {
                 const hour      = new Date().getHours()
@@ -646,7 +653,7 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
                 return firstName ? `${greeting}, ${firstName}.` : `${greeting}.`
               })()}
             </h1>
-            <p style={{ fontFamily: 'monospace', fontSize: '0.48rem', letterSpacing: '0.12em', color: '#5C6166' }}>
+            <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.48rem', letterSpacing: '0.12em', color: 'rgba(112,108,101,0.6)' }}>
               {(() => {
                 const n = archive?.total_photos ?? 0
                 if (n === 0)       return 'Your archive is ready for its first photographs.'
@@ -680,43 +687,53 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
       <MemoryGameCard archiveId={archiveId} />
 
       {/* ── STAT CARDS ── */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '12px', marginBottom: '40px' }} className="md:grid-cols-4">
         {loading ? (
-          Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-24" />)
+          Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} style={{ height: '96px', background: 'rgba(255,255,255,0.04)', borderRadius: '2px', animation: 'mysteryGlowPulse 1.8s ease-in-out infinite', animationDelay: `${i * 100}ms` }} />
+          ))
         ) : (
           [
-            { label: 'Labeled Photos', value: stats.total        },
-            { label: 'Current Streak', value: stats.streak       },
-            { label: 'This Month',     value: stats.thisMonth     },
+            { label: 'Photos Archived',   value: archive?.total_photos ?? stats.total },
+            { label: 'Contributors',      value: stats.contributors },
+            { label: 'Days Active',       value: Math.max(1, Math.ceil((Date.now() - new Date(archive?.last_label_date ?? Date.now()).getTime()) / 86400000)) },
+            { label: 'Labels This Month', value: stats.thisMonth },
           ].map(({ label, value }) => (
-            <div key={label} className="rounded-sm px-5 py-5 border" style={{ background: '#111112', borderColor: 'rgba(255,255,255,0.06)' }}>
-              <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#5C6166', marginBottom: '0.5rem' }}>
-                {label}
-              </p>
-              <p className="font-serif font-semibold" style={{ fontSize: '2rem', color: '#F0F0EE', lineHeight: 1 }}>
+            <div
+              key={label}
+              style={{
+                background:  '#141210',
+                border:      '1px solid rgba(196,162,74,0.08)',
+                borderTop:   '2px solid rgba(196,162,74,0.3)',
+                padding:     '20px 24px 18px',
+              }}
+            >
+              <p
+                style={{
+                  fontFamily:    '"Cormorant Garamond",Georgia,serif',
+                  fontSize:      'clamp(2rem,4vw,2.75rem)',
+                  fontWeight:    300,
+                  color:         '#C4A24A',
+                  lineHeight:    1,
+                  marginBottom:  '8px',
+                  letterSpacing: '-0.02em',
+                }}
+              >
                 {value}
               </p>
-            </div>
-          )).concat([
-            <div key="contributors" className="rounded-sm px-5 py-5 border" style={{ background: '#111112', borderColor: 'rgba(255,255,255,0.06)' }}>
-              <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#5C6166', marginBottom: '0.5rem' }}>
-                Contributors
-              </p>
-              <p className="font-serif font-semibold" style={{ fontSize: '2rem', color: '#F0F0EE', lineHeight: 1, marginBottom: '0.4rem' }}>
-                {stats.contributors}
-              </p>
-              <p className="font-serif italic" style={{ fontSize: '0.75rem', color: '#5C6166', lineHeight: 1.5 }}>
-                {contributorNames.length === 0
-                  ? 'No contributors yet.'
-                  : contributorNames.length === 1
-                  ? `${contributorNames[0]} is building your archive.`
-                  : contributorNames.length === 2
-                  ? `${contributorNames[0]} and ${contributorNames[1]} are building your archive.`
-                  : `${contributorNames[0]}, ${contributorNames[1]}, and ${contributorNames.length - 2} other${contributorNames.length - 2 !== 1 ? 's' : ''} are building your archive.`
-                }
+              <p
+                style={{
+                  fontFamily:    '"Space Mono","Courier New",monospace',
+                  fontSize:      '0.44rem',
+                  letterSpacing: '0.18em',
+                  textTransform: 'uppercase' as const,
+                  color:         'rgba(112,108,101,0.6)',
+                }}
+              >
+                {label}
               </p>
             </div>
-          ])
+          ))
         )}
       </div>
 

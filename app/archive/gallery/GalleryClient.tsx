@@ -187,11 +187,22 @@ export default function GalleryClient({ archiveId }: { archiveId: string }) {
     setSelected(null)
   }
 
-  const years   = [...new Set(items.map(i => i.year).filter(y => y !== '—'))].sort()
-  const filters = [ALL_FILTER, ...years]
+  // Group years into decades for the filter pills
+  const decades = [...new Set(
+    items.map(i => {
+      const yr = parseInt(i.year as string)
+      return isNaN(yr) ? null : `${Math.floor(yr / 10) * 10}s`
+    }).filter(Boolean)
+  )].sort() as string[]
+  const filters = [ALL_FILTER, ...decades]
 
   const filtered = items.filter(item => {
-    const matchFilter = filter === ALL_FILTER || item.year === filter
+    let matchFilter = filter === ALL_FILTER
+    if (!matchFilter) {
+      const decadeStart = parseInt(filter)
+      const yr          = parseInt(item.year as string)
+      matchFilter = !isNaN(yr) && yr >= decadeStart && yr < decadeStart + 10
+    }
     const q           = search.toLowerCase()
     const matchSearch = !q ||
       item.title?.toLowerCase().includes(q)    ||
@@ -204,9 +215,56 @@ export default function GalleryClient({ archiveId }: { archiveId: string }) {
   return (
     <div className="max-w-5xl mx-auto">
 
+      <style>{`
+        .gallery-card { position: relative; overflow: hidden; cursor: pointer; }
+        .gallery-card-overlay {
+          position: absolute; inset: 0;
+          background: rgba(10,9,8,0.75);
+          opacity: 0;
+          transition: opacity 300ms ease;
+          display: flex; flex-direction: column;
+          justify-content: flex-end;
+          padding: 16px;
+        }
+        .gallery-card:hover .gallery-card-overlay { opacity: 1; }
+        .gallery-pill {
+          border: none; cursor: pointer; padding: 6px 14px;
+          font-family: "Space Mono","Courier New",monospace;
+          font-size: 0.48rem; letter-spacing: 0.2em; text-transform: uppercase;
+          transition: all 200ms ease; background: transparent;
+        }
+        .gallery-pill-active {
+          background: rgba(196,162,74,0.12) !important;
+          color: #C4A24A !important;
+          border: 1px solid rgba(196,162,74,0.35) !important;
+        }
+        .gallery-pill-inactive {
+          color: rgba(240,237,230,0.35);
+          border: 1px solid rgba(255,255,255,0.06);
+        }
+        .gallery-pill-inactive:hover {
+          color: rgba(240,237,230,0.7);
+          border-color: rgba(255,255,255,0.12);
+        }
+        .gallery-load-more {
+          font-family: "Space Mono","Courier New",monospace;
+          font-size: 0.52rem; letter-spacing: 0.2em; text-transform: uppercase;
+          color: rgba(240,237,230,0.3); background: transparent;
+          border: 1px solid rgba(255,255,255,0.06);
+          padding: 12px 32px; cursor: pointer; transition: all 200ms ease;
+        }
+        .gallery-load-more:hover {
+          color: rgba(240,237,230,0.7);
+          border-color: rgba(255,255,255,0.15);
+        }
+      `}</style>
+
       <div className="mb-8">
-        <p className="eyebrow mb-3">Memory Gallery</p>
-        <h1 className="font-serif font-semibold leading-[0.95] tracking-[-0.03em]" style={{ fontSize: 'clamp(1.8rem,3vw,2.4rem)', color: '#F0F0EE' }}>
+        <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.52rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: '#C4A24A', display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
+          <span style={{ display: 'block', width: '20px', height: '1px', background: '#C4A24A', flexShrink: 0 }} aria-hidden="true" />
+          Memory Gallery
+        </p>
+        <h1 style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontSize: 'clamp(1.8rem,3vw,2.4rem)', fontWeight: 300, letterSpacing: '-0.025em', color: '#F0EDE6' }}>
           {loading ? '—' : `${total} ${total === 1 ? 'Memory' : 'Memories'} Archived`}
         </h1>
       </div>
@@ -246,22 +304,33 @@ export default function GalleryClient({ archiveId }: { archiveId: string }) {
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row gap-4 mb-8">
+      <div style={{ marginBottom: '28px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <input
           type="text"
-          placeholder="Search by title, person, location, year…"
+          placeholder="Search memories, people, places…"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="flex-1 focus:outline-none placeholder:text-[#3A3F44] rounded-sm border px-4 py-2.5"
-          style={{ background: '#111112', borderColor: 'rgba(255,255,255,0.08)', color: '#F0F0EE', fontSize: '0.82rem', fontFamily: 'inherit' }}
+          style={{
+            width:        '100%', maxWidth: '400px',
+            background:   '#141210', border: '1px solid rgba(196,162,74,0.12)',
+            borderRadius: '2px', outline: 'none',
+            fontFamily:   '"Cormorant Garamond",Georgia,serif',
+            fontSize:     '1rem', fontStyle: 'italic', fontWeight: 300,
+            color:        '#F0EDE6', padding: '10px 16px',
+            boxSizing:    'border-box',
+          }}
         />
-        <div className="flex gap-2 flex-wrap">
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+          <span style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.44rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(112,108,101,0.5)', marginRight: '4px' }}>
+            Decade
+          </span>
           {filters.map(f => (
-            <button key={f} onClick={() => setFilter(f)} className="rounded-sm border px-3 py-2 transition-colors duration-200"
-              style={{ fontFamily: 'monospace', fontSize: '0.55rem', letterSpacing: '0.1em', textTransform: 'uppercase' as const,
-                background:  filter === f ? 'rgba(196,162,74,0.12)' : 'transparent',
-                borderColor: filter === f ? 'rgba(196,162,74,0.4)'  : 'rgba(255,255,255,0.08)',
-                color:       filter === f ? '#F0F0EE'               : '#5C6166' }}>
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`gallery-pill ${filter === f ? 'gallery-pill-active' : 'gallery-pill-inactive'}`}
+              style={{ borderRadius: '2px' }}
+            >
               {f}
             </button>
           ))}
@@ -277,25 +346,25 @@ export default function GalleryClient({ archiveId }: { archiveId: string }) {
       )}
 
       {!loading && filtered.length === 0 && (
-        <div className="text-center py-20">
+        <div style={{ textAlign: 'center', padding: '80px 24px' }}>
           {items.length === 0 ? (
             <>
-              <p className="font-serif font-semibold" style={{ color: '#9DA3A8', fontSize: '1.1rem', marginBottom: '0.75rem' }}>
+              <div style={{ width: '40px', height: '1px', background: '#C4A24A', margin: '0 auto 32px' }} aria-hidden="true" />
+              <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontSize: '1.25rem', fontWeight: 500, color: '#F0EDE6', marginBottom: '12px' }}>
                 Your archive is empty.
               </p>
-              <p className="font-serif italic" style={{ color: '#5C6166', fontSize: '0.95rem', lineHeight: 1.7, marginBottom: '2rem', maxWidth: '420px', margin: '0 auto 2rem' }}>
-                Upload your family photographs to begin. Your family will receive one photograph by email every evening and can reply with their memories.
+              <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, color: '#706C65', lineHeight: 1.8, maxWidth: '380px', margin: '0 auto 32px' }}>
+                Upload your family photographs to begin. Every evening one photograph goes to every family member. They reply with what they remember.
               </p>
               <a
                 href="/archive/label"
-                className="inline-block font-compute text-xs tracking-widest no-underline"
-                style={{ background: '#C4A24A', color: '#0A0908', padding: '0.6rem 1.5rem' }}
+                style={{ display: 'inline-block', fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.52rem', letterSpacing: '0.25em', textTransform: 'uppercase', background: '#C4A24A', color: '#0A0908', padding: '12px 24px', textDecoration: 'none' }}
               >
-                UPLOAD YOUR FIRST PHOTOS →
+                Upload Your First Photos →
               </a>
             </>
           ) : (
-            <p className="font-serif font-light" style={{ color: '#3A3F44', fontSize: '1.1rem' }}>
+            <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontSize: '1rem', fontStyle: 'italic', color: '#5C6166' }}>
               No memories match this filter.
             </p>
           )}
@@ -304,34 +373,61 @@ export default function GalleryClient({ archiveId }: { archiveId: string }) {
 
       {!loading && filtered.length > 0 && (
         <>
-          <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+          <div style={{ columns: '2', columnGap: '12px' }} className="md:columns-3 lg:columns-4">
             {filtered.map((item, i) => (
-              <div key={item.id} className="break-inside-avoid rounded-sm border cursor-pointer transition-all duration-200"
-                style={{ background: '#111112', borderColor: 'rgba(255,255,255,0.06)', animation: `cardReveal 500ms cubic-bezier(0.16,1,0.3,1) both`, animationDelay: `${i * 40}ms` }}
-                onClick={() => setSelected(item)}>
-                {item.imageUrl && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={item.imageUrl} alt={item.title || 'Archive image'} className="w-full rounded-t-sm object-cover" style={{ maxHeight: '200px', objectFit: 'cover' }} />
-                )}
-                <div className="px-3 py-3">
-                  {!item.imageUrl && (
-                    <div className="w-full rounded-sm mb-3 flex items-center justify-center" style={{ height: '80px', background: 'rgba(255,255,255,0.03)' }}>
-                      <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.1em', textTransform: 'uppercase' as const, color: '#3A3F44' }}>No Image</p>
+              <div
+                key={item.id}
+                className="gallery-card break-inside-avoid"
+                style={{
+                  background:    '#141210',
+                  border:        '1px solid rgba(196,162,74,0.06)',
+                  marginBottom:  '12px',
+                  animation:     `cardReveal 500ms cubic-bezier(0.16,1,0.3,1) both`,
+                  animationDelay: `${Math.min(i * 40, 400)}ms`,
+                }}
+                onClick={() => setSelected(item)}
+              >
+                {item.imageUrl ? (
+                  <>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={item.imageUrl}
+                      alt={item.title || 'Archive photograph'}
+                      style={{ display: 'block', width: '100%', objectFit: 'cover' }}
+                    />
+                    {/* Hover overlay */}
+                    <div className="gallery-card-overlay">
+                      <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontSize: '0.85rem', fontStyle: 'italic', fontWeight: 300, color: '#F0EDE6', lineHeight: 1.4, marginBottom: '6px' }}>
+                        {item.title?.slice(0, 60)}
+                      </p>
+                      <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.4rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.7)' }}>
+                        {item.year}{item.location !== '—' ? ` · ${item.location}` : ''}
+                        {' '}VIEW DETAILS →
+                      </p>
                     </div>
-                  )}
-                  <p className="font-sans text-[0.72rem] font-medium leading-snug mb-1 line-clamp-2" style={{ color: '#F0F0EE' }}>{item.title}</p>
-                  <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', color: '#5C6166', letterSpacing: '0.06em' }}>
-                    {item.year}{item.location !== '—' ? ` · ${item.location}` : ''}
-                  </p>
-                </div>
+                  </>
+                ) : (
+                  <div style={{ padding: '20px 16px' }}>
+                    <div style={{ height: '60px', background: 'rgba(196,162,74,0.04)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
+                      <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.4rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(112,108,101,0.4)' }}>
+                        No Image
+                      </p>
+                    </div>
+                    <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontSize: '0.88rem', fontWeight: 300, color: '#F0EDE6', lineHeight: 1.5, marginBottom: '6px' }}>
+                      {item.title}
+                    </p>
+                    <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.42rem', color: 'rgba(112,108,101,0.6)', letterSpacing: '0.1em' }}>
+                      {item.year}{item.location !== '—' ? ` · ${item.location}` : ''}
+                    </p>
+                  </div>
+                )}
               </div>
             ))}
           </div>
 
           {page < totalPages && (
-            <div className="text-center mt-10">
-              <button onClick={loadMore} className="rounded-sm border px-6 py-3 transition-colors duration-200"
-                style={{ fontFamily: 'monospace', fontSize: '0.6rem', letterSpacing: '0.1em', textTransform: 'uppercase' as const, borderColor: 'rgba(255,255,255,0.08)', color: '#5C6166', background: 'transparent' }}>
+            <div style={{ textAlign: 'center', marginTop: '40px' }}>
+              <button onClick={loadMore} className="gallery-load-more">
                 Load More
               </button>
             </div>
@@ -340,61 +436,75 @@ export default function GalleryClient({ archiveId }: { archiveId: string }) {
       )}
 
       {selected && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4"
-          style={{ background: 'rgba(12,12,13,0.92)', backdropFilter: 'blur(8px)' }}
-          onClick={() => setSelected(null)}>
-          <div className="w-full max-w-2xl rounded-sm border overflow-hidden" style={{ background: '#111112', borderColor: 'rgba(255,255,255,0.1)' }} onClick={e => e.stopPropagation()}>
+        <div
+          style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', background: 'rgba(10,9,8,0.94)', backdropFilter: 'blur(12px)' }}
+          onClick={() => setSelected(null)}
+        >
+          <div
+            style={{ width: '100%', maxWidth: '680px', background: '#141210', border: '1px solid rgba(196,162,74,0.12)', overflow: 'hidden', maxHeight: '90svh', display: 'flex', flexDirection: 'column' }}
+            onClick={e => e.stopPropagation()}
+          >
             {selected.imageUrl && (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={selected.imageUrl} alt={selected.title} className="w-full object-cover" style={{ maxHeight: '360px', objectFit: 'cover' }} />
+              <img
+                src={selected.imageUrl}
+                alt={selected.title}
+                style={{ display: 'block', width: '100%', objectFit: 'cover', maxHeight: '400px' }}
+              />
             )}
-            <div className="px-8 py-7">
-              <div className="flex items-start justify-between gap-4 mb-5">
+            <div style={{ padding: '28px 32px', overflowY: 'auto' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', marginBottom: '20px' }}>
                 <div>
-                  <h2 className="font-serif font-semibold leading-snug mb-1" style={{ fontSize: '1.3rem', color: '#F0F0EE' }}>{selected.title}</h2>
-                  <p style={{ fontFamily: 'monospace', fontSize: '0.6rem', letterSpacing: '0.08em', color: 'rgba(196,162,74,0.7)' }}>
+                  <h2 style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontSize: '1.4rem', fontWeight: 500, color: '#F0EDE6', lineHeight: 1.25, marginBottom: '6px' }}>
+                    {selected.title}
+                  </h2>
+                  <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.5rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.6)' }}>
                     {selected.year}{selected.location !== '—' ? ` · ${selected.location}` : ''}
                   </p>
                 </div>
-                <button onClick={() => setSelected(null)} style={{ fontFamily: 'monospace', fontSize: '0.55rem', letterSpacing: '0.1em', textTransform: 'uppercase' as const, color: '#3A3F44', marginTop: '0.25rem', flexShrink: 0 }} aria-label="Close">
-                  Close
+                <button
+                  onClick={() => setSelected(null)}
+                  aria-label="Close"
+                  style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.44rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(112,108,101,0.5)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, flexShrink: 0, marginTop: '4px' }}
+                >
+                  Close ×
                 </button>
               </div>
 
               {(selected.people || selected.contributor) && (
-                <div className="grid grid-cols-2 gap-x-8 gap-y-3 mb-5">
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px 32px', marginBottom: '20px' }}>
                   {selected.people && (
                     <div>
-                      <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.12em', textTransform: 'uppercase' as const, color: '#3A3F44', marginBottom: '0.25rem' }}>People</p>
-                      <p className="font-sans text-[0.78rem]" style={{ color: '#9DA3A8' }}>{selected.people}</p>
+                      <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.44rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(112,108,101,0.5)', marginBottom: '4px' }}>People</p>
+                      <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontSize: '0.95rem', fontWeight: 300, color: '#B8B4AB' }}>{selected.people}</p>
                     </div>
                   )}
                   {selected.contributor && (
                     <div>
-                      <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.12em', textTransform: 'uppercase' as const, color: '#3A3F44', marginBottom: '0.25rem' }}>Labeled by</p>
-                      <p className="font-sans text-[0.78rem]" style={{ color: '#9DA3A8' }}>{selected.contributor}</p>
+                      <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.44rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(112,108,101,0.5)', marginBottom: '4px' }}>Labeled by</p>
+                      <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontSize: '0.95rem', fontWeight: 300, color: '#B8B4AB' }}>{selected.contributor}</p>
                     </div>
                   )}
                 </div>
               )}
 
               {selected.description && (
-                <div className="mb-5 pt-5 border-t" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-                  <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.12em', textTransform: 'uppercase' as const, color: '#3A3F44', marginBottom: '0.6rem' }}>What Was Happening</p>
-                  <p className="font-serif font-light leading-relaxed" style={{ color: '#9DA3A8', fontSize: '0.95rem' }}>{selected.description}</p>
+                <div style={{ marginBottom: '20px', paddingTop: '20px', borderTop: '1px solid rgba(196,162,74,0.06)' }}>
+                  <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.44rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(112,108,101,0.5)', marginBottom: '10px' }}>What Was Happening</p>
+                  <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontSize: '1rem', fontWeight: 300, lineHeight: 1.8, color: '#9DA3A8' }}>{selected.description}</p>
                 </div>
               )}
 
               {selected.legacyNote && (
-                <div className="mb-5 pt-4 border-t" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
-                  <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.12em', textTransform: 'uppercase' as const, color: 'rgba(196,162,74,0.4)', marginBottom: '0.6rem' }}>Legacy Note</p>
-                  <p className="font-serif font-light leading-relaxed" style={{ color: '#9DA3A8', fontSize: '0.9rem', fontStyle: 'italic' }}>{selected.legacyNote}</p>
+                <div style={{ marginBottom: '20px', paddingTop: '16px', borderTop: '1px solid rgba(196,162,74,0.04)' }}>
+                  <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.44rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.3)', marginBottom: '10px' }}>Legacy Note</p>
+                  <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontSize: '0.95rem', fontWeight: 300, fontStyle: 'italic', lineHeight: 1.8, color: '#9DA3A8' }}>{selected.legacyNote}</p>
                 </div>
               )}
 
-              <div className="flex items-center justify-between pt-4 border-t" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
-                <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', color: '#3A3F44' }}>{selected.date}</p>
-                <button onClick={() => deleteItem(selected.id, selected.source)} style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.08em', textTransform: 'uppercase' as const, color: '#3A3F44' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '16px', borderTop: '1px solid rgba(196,162,74,0.06)' }}>
+                <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.44rem', letterSpacing: '0.1em', color: 'rgba(112,108,101,0.4)' }}>{selected.date}</p>
+                <button onClick={() => deleteItem(selected.id, selected.source)} style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.44rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(112,108,101,0.4)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
                   Remove from Archive
                 </button>
               </div>

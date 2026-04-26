@@ -6,9 +6,25 @@ import Footer from '../components/Footer'
 
 const INITIAL = { fullName: '', email: '', background: '', why: '' }
 
+const SERIF: React.CSSProperties = { fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)' }
+const MONO: React.CSSProperties  = { fontFamily: 'var(--font-space-mono, "Space Mono", "Courier New", monospace)', textTransform: 'uppercase' as const, letterSpacing: '0.28em' }
+const INPUT: React.CSSProperties = {
+  width: '100%', background: 'var(--color-surface)', border: '1px solid var(--color-border)',
+  borderRadius: 'var(--radius-sm)', outline: 'none',
+  fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontSize: '1.05rem', fontWeight: 300, color: 'var(--color-text-primary)',
+  padding: '12px 16px', lineHeight: 1.5, boxSizing: 'border-box' as const,
+  transition: 'border-color 200ms ease',
+}
+const LABEL: React.CSSProperties = {
+  display: 'block', fontFamily: 'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+  fontSize: '0.52rem', letterSpacing: '0.28em', textTransform: 'uppercase' as const,
+  color: 'var(--color-text-muted)', marginBottom: '8px',
+}
+
 export default function JoinArchivistsPage() {
-  const [form, setForm]           = useState(INITIAL)
-  const [submitted, setSubmitted] = useState(false)
+  const [form, setForm]             = useState(INITIAL)
+  const [submitted, setSubmitted]   = useState(false)
   const [submitting, setSubmitting] = useState(false)
 
   function set(key: keyof typeof INITIAL) {
@@ -28,27 +44,28 @@ export default function JoinArchivistsPage() {
     setSubmitting(false)
   }
 
-  const inputCls = 'w-full bg-obsidian-deep border border-border-subtle rounded-sm px-4 py-3 font-sans text-[0.88rem] text-text-primary placeholder:text-text-muted focus:outline-none focus:border-amber/40 transition-colors duration-200'
-
   return (
     <>
+      <style>{`.jag-input:focus { border-color: var(--color-gold) !important; box-shadow: var(--shadow-gold) !important; } .jag-input::placeholder { color: var(--color-text-faint); font-style: italic; }`}</style>
       <Nav />
-      <main>
-        <section className="relative bg-obsidian-void px-8 md:px-16 pt-40 pb-32 overflow-hidden" aria-label="Join Legacy Guides">
-          <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 50% 40% at 50% 70%,rgba(196,162,74,0.06) 0%,transparent 65%)' }} aria-hidden="true" />
-          <div className="relative z-10 max-w-2xl mx-auto">
+      <main style={{ background: 'var(--color-bg)' }}>
+        <section style={{ padding: 'clamp(140px,16vw,180px) clamp(24px,6vw,80px) clamp(80px,10vw,120px)' }} aria-label="Join Legacy Guides">
+          <div style={{ maxWidth: '640px', margin: '0 auto' }}>
 
-            <p className="eyebrow mb-6">The Legacy Guide Program</p>
-            <h1 className="font-serif font-semibold text-text-primary leading-[0.92] tracking-[-0.038em] mb-8" style={{ fontSize: 'clamp(2.5rem,5vw,4.5rem)' }}>
+            <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+              <span style={{ display: 'block', width: '24px', height: '1px', background: 'var(--color-gold)', flexShrink: 0 }} aria-hidden="true" />
+              The Legacy Guide Program
+            </p>
+            <h1 style={{ ...SERIF, fontWeight: 300, fontSize: 'clamp(2.5rem,5vw,4rem)', color: 'var(--color-text-primary)', lineHeight: 1.1, letterSpacing: '-0.025em', marginBottom: '24px' }}>
               Represent Basalith<br />in Your Community.
             </h1>
 
-            <div className="font-serif font-light text-text-secondary leading-[1.85] mb-14" style={{ fontSize: '1.1rem' }}>
-              <p className="mb-5">
+            <div style={{ ...SERIF, fontWeight: 300, fontSize: '1.1rem', lineHeight: 1.85, color: 'var(--color-text-secondary)', marginBottom: '48px' }}>
+              <p style={{ marginBottom: '16px' }}>
                 Basalith works with a select group of independent professionals who help families
                 begin their archives before it is too late.
               </p>
-              <p className="mb-5">
+              <p style={{ marginBottom: '16px' }}>
                 Legacy Guides are not employees. They are trusted partners, professionals who
                 understand what Basalith builds and who it is built for.
               </p>
@@ -59,11 +76,11 @@ export default function JoinArchivistsPage() {
             </div>
 
             {submitted ? (
-              <div className="rounded-sm border px-10 py-14 text-center" style={{ background: 'rgba(196,162,74,0.04)', borderColor: 'rgba(196,162,74,0.2)' }}>
-                <p className="font-serif font-semibold text-text-primary mb-5" style={{ fontSize: '1.4rem' }}>
+              <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderTop: '2px solid var(--color-gold)', padding: '48px 40px', textAlign: 'center' }}>
+                <p style={{ ...SERIF, fontWeight: 500, fontSize: '1.4rem', color: 'var(--color-text-primary)', marginBottom: '16px' }}>
                   Your interest has been noted.
                 </p>
-                <p className="font-serif font-light text-text-secondary leading-[1.85]" style={{ fontSize: '1rem' }}>
+                <p style={{ ...SERIF, fontStyle: 'italic', fontWeight: 300, fontSize: '1rem', color: 'var(--color-text-secondary)', lineHeight: 1.85 }}>
                   We review every expression personally.
                   Accepted partners receive a complete program briefing by private invitation.
                   <br /><br />
@@ -71,21 +88,21 @@ export default function JoinArchivistsPage() {
                 </p>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '20px' }}>
                   <div>
-                    <label className="font-sans text-[0.62rem] font-bold tracking-[0.14em] uppercase text-text-muted block mb-2">Full Name</label>
-                    <input type="text" required placeholder="Your name" value={form.fullName} onChange={set('fullName')} className={inputCls} />
+                    <label style={LABEL}>Full Name</label>
+                    <input type="text" required placeholder="Your name" value={form.fullName} onChange={set('fullName')} className="jag-input" style={INPUT} />
                   </div>
                   <div>
-                    <label className="font-sans text-[0.62rem] font-bold tracking-[0.14em] uppercase text-text-muted block mb-2">Email</label>
-                    <input type="email" required placeholder="you@domain.com" value={form.email} onChange={set('email')} className={inputCls} />
+                    <label style={LABEL}>Email</label>
+                    <input type="email" required placeholder="you@domain.com" value={form.email} onChange={set('email')} className="jag-input" style={INPUT} />
                   </div>
                 </div>
 
                 <div>
-                  <label className="font-sans text-[0.62rem] font-bold tracking-[0.14em] uppercase text-text-muted block mb-2">Background</label>
-                  <select required value={form.background} onChange={set('background')} className={inputCls}>
+                  <label style={LABEL}>Background</label>
+                  <select required value={form.background} onChange={set('background')} className="jag-input" style={{ ...INPUT, cursor: 'pointer', appearance: 'none' as const }}>
                     <option value="" disabled>Select your background</option>
                     <option value="Graduate">Graduate</option>
                     <option value="Sales Pro">Sales Pro</option>
@@ -99,18 +116,22 @@ export default function JoinArchivistsPage() {
                 </div>
 
                 <div>
-                  <label className="font-sans text-[0.62rem] font-bold tracking-[0.14em] uppercase text-text-muted block mb-2">
-                    Why do you want to represent Basalith?
-                  </label>
-                  <textarea required rows={4} value={form.why} onChange={set('why')} className={inputCls + ' resize-none'} />
+                  <label style={LABEL}>Why do you want to represent Basalith?</label>
+                  <textarea required rows={4} value={form.why} onChange={set('why')} className="jag-input" style={{ ...INPUT, resize: 'none' as const, lineHeight: 1.75 }} />
                 </div>
 
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="btn-monolith-amber w-full text-center mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{
+                    ...MONO, fontSize: 'var(--text-caption)',
+                    background: submitting ? 'rgba(184,150,62,0.6)' : 'var(--color-gold)',
+                    color: 'var(--color-bg)', border: 'none', borderRadius: 'var(--radius-sm)',
+                    padding: '14px 32px', cursor: submitting ? 'not-allowed' : 'pointer',
+                    width: '100%', transition: 'background 250ms ease',
+                  }}
                 >
-                  {submitting ? 'Submitting\u2026' : 'Register Your Interest'}
+                  {submitting ? 'Submitting…' : 'Register Your Interest'}
                 </button>
               </form>
             )}

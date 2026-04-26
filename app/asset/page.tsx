@@ -8,45 +8,50 @@ export const metadata: Metadata = {
 }
 
 const eyebrow: React.CSSProperties = {
-  fontFamily:    "'Space Mono', 'Courier New', monospace",
-  fontSize:      '0.44rem',
-  letterSpacing: '0.4em',
-  color:         '#C4A24A',
+  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+  fontSize:      '0.52rem',
+  letterSpacing: '0.35em',
+  color:         'var(--color-gold)',
   textTransform: 'uppercase',
-  marginBottom:  '1rem',
+  marginBottom:  '20px',
+  display:       'flex',
+  alignItems:    'center',
+  gap:           '12px',
 }
 
 const h1: React.CSSProperties = {
-  fontFamily:   "'Cormorant Garamond', Georgia, serif",
+  fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
   fontSize:     'clamp(2rem, 5vw, 3.5rem)',
-  fontWeight:   700,
-  color:        '#F0EDE6',
-  lineHeight:   1.2,
-  marginBottom: '1rem',
+  fontWeight:   300,
+  color:        'var(--color-text-primary)',
+  lineHeight:   1.15,
+  letterSpacing: '-0.025em',
+  marginBottom: '16px',
 }
 
 const sub: React.CSSProperties = {
-  fontFamily:   "'Cormorant Garamond', Georgia, serif",
-  fontSize:     '1.1rem',
+  fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontSize:     '1.15rem',
   fontStyle:    'italic',
-  color:        '#706C65',
-  marginBottom: '4rem',
+  fontWeight:   300,
+  color:        'var(--color-text-muted)',
+  marginBottom: '48px',
 }
 
 const h2: React.CSSProperties = {
-  fontFamily:   "'Cormorant Garamond', Georgia, serif",
-  fontSize:     '1.3rem',
-  fontWeight:   700,
-  color:        '#F0EDE6',
-  marginBottom: '1.5rem',
-  marginTop:    '3rem',
+  fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontSize:     'clamp(1.3rem, 2.5vw, 1.75rem)',
+  fontWeight:   500,
+  color:        'var(--color-text-primary)',
+  marginBottom: '16px',
+  marginTop:    '40px',
 }
 
 const body: React.CSSProperties = {
-  fontFamily:   "'Cormorant Garamond', Georgia, serif",
-  fontSize:     '1rem',
+  fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontSize:     '1.05rem',
   fontWeight:   300,
-  color:        '#B8B4AB',
+  color:        'var(--color-text-secondary)',
   lineHeight:   1.9,
   marginBottom: '1.5rem',
 }
@@ -61,7 +66,7 @@ export default function AssetPage() {
   return (
     <>
       <Nav />
-      <main style={{ background: '#0A0908' }}>
+      <main style={{ background: 'var(--color-bg)' }}>
         <div style={{ maxWidth: '760px', margin: '0 auto', padding: '8rem 2rem' }}>
 
           <p style={eyebrow}>The Asset</p>

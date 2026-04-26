@@ -623,30 +623,36 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
                     </div>
                   ) : msg.role === 'user' ? (
                     /* User message — right aligned */
-                    <div className="flex flex-col items-end">
-                      <p style={{ fontFamily: 'monospace', fontSize: '0.38rem', letterSpacing: '0.12em', color: '#5C6166', marginBottom: '0.3rem', textTransform: 'uppercase' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                      <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.38rem', letterSpacing: '0.14em', color: 'rgba(112,108,101,0.5)', marginBottom: '6px', textTransform: 'uppercase' }}>
                         You
                       </p>
                       <div style={{
-                        background:   'rgba(196,162,74,0.08)',
-                        border:       '1px solid rgba(196,162,74,0.15)',
-                        borderRadius: '2px',
-                        padding:      '0.75rem 1rem',
+                        background:   'rgba(196,162,74,0.1)',
+                        border:       '1px solid rgba(196,162,74,0.18)',
+                        borderRadius: '12px 12px 2px 12px',
+                        padding:      '12px 16px',
                         maxWidth:     '80%',
                       }}>
-                        <p className="font-serif font-light" style={{ fontSize: '0.95rem', color: '#B8B4AB', lineHeight: 1.7 }}>
+                        <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontSize: '1rem', fontWeight: 300, color: '#D4CFC7', lineHeight: 1.75 }}>
                           {msg.content}
                         </p>
                       </div>
                     </div>
                   ) : (
                     /* Entity message — left aligned */
-                    <div className="flex flex-col items-start">
-                      <p style={{ fontFamily: 'monospace', fontSize: '0.38rem', letterSpacing: '0.12em', color: 'rgba(196,162,74,0.8)', marginBottom: '0.3rem', textTransform: 'uppercase' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                      <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.38rem', letterSpacing: '0.14em', color: 'rgba(196,162,74,0.6)', marginBottom: '6px', textTransform: 'uppercase' }}>
                         Your Entity
                       </p>
-                      <div style={{ borderLeft: '2px solid rgba(196,162,74,0.4)', paddingLeft: '1rem', maxWidth: '90%' }}>
-                        <p className="font-serif italic" style={{ fontSize: '1rem', color: '#E8E4DC', lineHeight: 1.8 }}>
+                      <div style={{
+                        borderLeft:   '2px solid rgba(196,162,74,0.35)',
+                        background:   'rgba(240,237,230,0.03)',
+                        borderRadius: '0 12px 12px 12px',
+                        padding:      '12px 16px 12px 18px',
+                        maxWidth:     '90%',
+                      }}>
+                        <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontSize: '1.05rem', fontStyle: 'italic', fontWeight: 300, color: '#E8E4DC', lineHeight: 1.85 }}>
                           {msg.content}
                         </p>
                       </div>

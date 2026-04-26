@@ -10,41 +10,41 @@ export const metadata: Metadata = {
 // ── shared tokens ────────────────────────────────────────────────────────────
 
 const EYEBROW: React.CSSProperties = {
-  fontFamily:    "'Space Mono', 'DM Mono', monospace",
-  fontSize:      '0.62rem',
+  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+  fontSize:      '0.52rem',
   letterSpacing: '0.28em',
   textTransform: 'uppercase',
-  color:         '#C4A24A',
+  color:         'var(--color-gold)',
   marginBottom:  '1.75rem',
   display:       'block',
 }
 
 const H1: React.CSSProperties = {
-  fontFamily:    "'Cormorant Garamond', Georgia, serif",
-  fontWeight:    700,
+  fontFamily:    'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontWeight:    300,
   fontSize:      'clamp(2.2rem, 5vw, 3.4rem)',
-  color:         '#F0EDE6',
+  color:         'var(--color-text-primary)',
   lineHeight:    1.15,
-  letterSpacing: '-0.02em',
+  letterSpacing: '-0.025em',
   marginBottom:  '2rem',
 }
 
 const H2: React.CSSProperties = {
-  fontFamily:    "'Cormorant Garamond', Georgia, serif",
-  fontWeight:    700,
+  fontFamily:    'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontWeight:    500,
   fontSize:      'clamp(1.7rem, 3.5vw, 2.4rem)',
-  color:         '#F0EDE6',
+  color:         'var(--color-text-primary)',
   lineHeight:    1.2,
   letterSpacing: '-0.02em',
   marginBottom:  '1.75rem',
 }
 
 const BODY: React.CSSProperties = {
-  fontFamily:  "'Cormorant Garamond', Georgia, serif",
-  fontWeight:  300,
-  fontSize:    '1.1rem',
-  color:       '#B8B4AB',
-  lineHeight:  1.9,
+  fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontWeight:   300,
+  fontSize:     '1.1rem',
+  color:        'var(--color-text-secondary)',
+  lineHeight:   1.9,
   marginBottom: '1.5rem',
 }
 
@@ -58,7 +58,7 @@ const GOLD_RULE: React.CSSProperties = {
 
 function Opening() {
   return (
-    <section aria-label="Opening" style={{ background: '#0A0908', padding: 'clamp(7rem,12vw,10rem) 2rem 6rem' }}>
+    <section aria-label="Opening" style={{ background: 'var(--color-bg)', padding: 'clamp(7rem,12vw,10rem) 2rem 6rem' }}>
       <div style={{ maxWidth: '680px', margin: '0 auto' }}>
         <span style={EYEBROW}>The Witness Archive</span>
 
@@ -90,7 +90,7 @@ function Opening() {
           is fully available.
         </p>
 
-        <p style={{ ...BODY, color: '#F0EDE6', fontStyle: 'italic', marginBottom: 0 }}>
+        <p style={{ ...BODY, color: 'var(--color-text-primary)', fontStyle: 'italic', marginBottom: 0 }}>
           And witnesses, it turns out, often carry things about a person
           that the person never knew about themselves.
         </p>
@@ -103,7 +103,7 @@ function Opening() {
 
 function WitnessesCarry() {
   return (
-    <section aria-label="What witnesses carry" style={{ background: '#0C0B0A', padding: '6rem 2rem' }}>
+    <section aria-label="What witnesses carry" style={{ background: 'var(--color-surface-alt)', padding: '6rem 2rem' }}>
       <div style={{ maxWidth: '680px', margin: '0 auto' }}>
         <span style={EYEBROW}>What Witnesses Carry</span>
 
@@ -139,7 +139,7 @@ function WitnessesCarry() {
           when stories are being told at gatherings that have never been told before.
         </p>
 
-        <p style={{ ...BODY, color: '#F0EDE6', fontStyle: 'italic', marginBottom: 0 }}>
+        <p style={{ ...BODY, color: 'var(--color-text-primary)', fontStyle: 'italic', marginBottom: 0 }}>
           That is the moment to begin.
         </p>
       </div>
@@ -151,7 +151,7 @@ function WitnessesCarry() {
 
 function WhatWeCanBuild() {
   return (
-    <section aria-label="What we can build" style={{ background: '#0A0908', padding: '6rem 2rem' }}>
+    <section aria-label="What we can build" style={{ background: 'var(--color-bg)', padding: '6rem 2rem' }}>
       <div style={{ maxWidth: '680px', margin: '0 auto' }}>
         <div aria-hidden="true" style={GOLD_RULE} />
 
@@ -190,7 +190,7 @@ function WhatWeCanBuild() {
 
 function MissingPiece() {
   return (
-    <section aria-label="The missing piece" style={{ background: '#0C0B0A', padding: '6rem 2rem' }}>
+    <section aria-label="The missing piece" style={{ background: 'var(--color-surface-alt)', padding: '6rem 2rem' }}>
       <div style={{ maxWidth: '680px', margin: '0 auto' }}>
         <span style={EYEBROW}>The Missing Piece</span>
 
@@ -221,7 +221,7 @@ function MissingPiece() {
           Because the witnesses saw things the subject never saw about themselves.
         </p>
 
-        <p style={{ ...BODY, color: '#F0EDE6', fontStyle: 'italic', marginBottom: 0 }}>
+        <p style={{ ...BODY, color: 'var(--color-text-primary)', fontStyle: 'italic', marginBottom: 0 }}>
           That is the witness archive. Not a lesser product. A different kind of truth.
         </p>
       </div>
@@ -266,7 +266,7 @@ const STEPS = [
 
 function TheProcess() {
   return (
-    <section aria-label="The Witness Founding process" style={{ background: '#0A0908', padding: '6rem 2rem' }}>
+    <section aria-label="The Witness Founding process" style={{ background: 'var(--color-bg)', padding: '6rem 2rem' }}>
       <div style={{ maxWidth: '680px', margin: '0 auto' }}>
         <div aria-hidden="true" style={GOLD_RULE} />
 
@@ -317,7 +317,7 @@ function TheProcess() {
 
 function Pricing() {
   return (
-    <section aria-label="Pricing" style={{ background: '#0C0B0A', padding: '6rem 2rem' }}>
+    <section aria-label="Pricing" style={{ background: 'var(--color-surface-alt)', padding: '6rem 2rem' }}>
       <div style={{ maxWidth: '680px', margin: '0 auto' }}>
         <div aria-hidden="true" style={GOLD_RULE} />
 
@@ -420,7 +420,7 @@ function Pricing() {
 
 function ClosingQuote() {
   return (
-    <section aria-label="Closing" style={{ background: '#0A0908', padding: '7rem 2rem', textAlign: 'center' }}>
+    <section aria-label="Closing" style={{ background: 'var(--color-bg)', padding: '7rem 2rem', textAlign: 'center' }}>
       <div style={{ maxWidth: '560px', margin: '0 auto' }}>
         <p style={{
           fontFamily:   "'Cormorant Garamond', Georgia, serif",

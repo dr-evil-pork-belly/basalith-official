@@ -8,30 +8,30 @@ export const metadata: Metadata = {
 }
 
 const BODY: React.CSSProperties = {
-  fontFamily:  "'Cormorant Garamond', Georgia, serif",
-  fontWeight:  300,
-  fontSize:    '1.1rem',
-  color:       '#9DA3A8',
-  lineHeight:  1.85,
+  fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontWeight:   300,
+  fontSize:     '1.1rem',
+  color:        'var(--color-text-secondary)',
+  lineHeight:   1.85,
   marginBottom: '1.5rem',
 }
 
 const H2: React.CSSProperties = {
-  fontFamily:    "'Cormorant Garamond', Georgia, serif",
-  fontWeight:    700,
+  fontFamily:    'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontWeight:    500,
   fontSize:      'clamp(1.6rem, 3vw, 2.2rem)',
-  color:         '#F0EDE6',
+  color:         'var(--color-text-primary)',
   lineHeight:    1.2,
   letterSpacing: '-0.02em',
   marginBottom:  '1.75rem',
 }
 
 const EYEBROW: React.CSSProperties = {
-  fontFamily:    "'Space Mono', 'DM Mono', monospace",
-  fontSize:      '0.58rem',
-  letterSpacing: '0.24em',
+  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+  fontSize:      '0.52rem',
+  letterSpacing: '0.28em',
   textTransform: 'uppercase' as const,
-  color:         '#C4A24A',
+  color:         'var(--color-gold)',
   display:       'block',
   marginBottom:  '1.5rem',
 }
@@ -69,10 +69,10 @@ export default function CustodianshipPage() {
   return (
     <>
       <Nav />
-      <main style={{ background: '#0A0908' }}>
+      <main style={{ background: 'var(--color-bg)' }}>
 
         {/* Opening */}
-        <section aria-label="The Reserve" style={{ padding: '10rem 2rem 5rem', background: '#0A0908' }}>
+        <section aria-label="The Reserve" style={{ padding: '10rem 2rem 5rem', background: 'var(--color-bg)' }}>
           <div style={{ maxWidth: '720px', margin: '0 auto' }}>
 
             <span style={EYEBROW}>Permanence</span>
@@ -81,7 +81,7 @@ export default function CustodianshipPage() {
               fontFamily:    "'Cormorant Garamond', Georgia, serif",
               fontWeight:    700,
               fontSize:      'clamp(2.2rem, 5vw, 3.5rem)',
-              color:         '#F0EDE6',
+              color:         'var(--color-text-primary)',
               lineHeight:    1.15,
               letterSpacing: '-0.02em',
               marginBottom:  '1.25rem',
@@ -94,7 +94,7 @@ export default function CustodianshipPage() {
               fontWeight:  300,
               fontSize:    '1.1rem',
               fontStyle:   'italic',
-              color:       '#9DA3A8',
+              color:       'var(--color-text-secondary)',
               marginBottom: '0',
             }}>
               It depends on the Reserve.
@@ -114,7 +114,7 @@ export default function CustodianshipPage() {
         </section>
 
         {/* Section 2 — Guarantees */}
-        <section aria-label="What the Reserve Guarantees" style={{ padding: '5rem 2rem', background: '#0C0B0A' }}>
+        <section aria-label="What the Reserve Guarantees" style={{ padding: '5rem 2rem', background: 'var(--color-surface-alt)' }}>
           <div style={{ maxWidth: '720px', margin: '0 auto' }}>
 
             <span style={EYEBROW}>What the Reserve Guarantees</span>
@@ -153,7 +153,7 @@ export default function CustodianshipPage() {
                     fontFamily:  "'Cormorant Garamond', Georgia, serif",
                     fontWeight:  300,
                     fontSize:    '1rem',
-                    color:       '#9DA3A8',
+                    color:       'var(--color-text-secondary)',
                     lineHeight:  1.75,
                   }}>
                     {body}
@@ -166,7 +166,7 @@ export default function CustodianshipPage() {
         </section>
 
         {/* Section 3 — Why This Matters */}
-        <section aria-label="Why This Matters" style={{ padding: '5rem 2rem', background: '#0A0908' }}>
+        <section aria-label="Why This Matters" style={{ padding: '5rem 2rem', background: 'var(--color-bg)' }}>
           <div style={{ maxWidth: '720px', margin: '0 auto' }}>
 
             <span style={EYEBROW}>Why This Matters</span>
@@ -183,7 +183,7 @@ export default function CustodianshipPage() {
         </section>
 
         {/* Section 4 — Pull quote */}
-        <section aria-label="The promise" style={{ padding: '6rem 2rem 8rem', background: '#0C0B0A', textAlign: 'center' }}>
+        <section aria-label="The promise" style={{ padding: '6rem 2rem 8rem', background: 'var(--color-surface-alt)', textAlign: 'center' }}>
           <div style={{ maxWidth: '560px', margin: '0 auto' }}>
 
             <div aria-hidden="true" style={{ height: '1px', background: 'linear-gradient(90deg, transparent, rgba(196,162,74,0.3), transparent)', marginBottom: '3.5rem' }} />

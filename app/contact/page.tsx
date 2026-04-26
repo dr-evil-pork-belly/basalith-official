@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import Nav from '../components/Nav'
+import Nav    from '../components/Nav'
 import Footer from '../components/Footer'
 
 type Intent = 'general' | 'pricing' | 'partner' | 'press'
@@ -10,14 +10,47 @@ type Status = 'idle' | 'loading' | 'success' | 'error'
 const INTENTS: { value: Intent; label: string }[] = [
   { value: 'general', label: 'General Enquiry' },
   { value: 'pricing', label: 'Pricing Question' },
-  { value: 'partner', label: 'Partner Program' },
+  { value: 'partner', label: 'Partner Program'  },
   { value: 'press',   label: 'Press'             },
 ]
 
+const SERIF: React.CSSProperties = {
+  fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+}
+const MONO: React.CSSProperties = {
+  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+  textTransform: 'uppercase' as const,
+  letterSpacing: '0.28em',
+}
+const LABEL: React.CSSProperties = {
+  display:       'block',
+  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+  fontSize:      '0.52rem',
+  letterSpacing: '0.28em',
+  textTransform: 'uppercase' as const,
+  color:         'var(--color-text-muted)',
+  marginBottom:  '8px',
+}
+const INPUT: React.CSSProperties = {
+  width:        '100%',
+  background:   'var(--color-surface)',
+  border:       '1px solid var(--color-border)',
+  borderRadius: 'var(--radius-sm)',
+  outline:      'none',
+  fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontSize:     '1.05rem',
+  fontWeight:   300,
+  color:        'var(--color-text-primary)',
+  padding:      '12px 16px',
+  lineHeight:   1.5,
+  boxSizing:    'border-box' as const,
+  transition:   'border-color 200ms ease, box-shadow 200ms ease',
+}
+
 export default function ContactPage() {
-  const [form, setForm]     = useState({ name: '', email: '', intent: '' as Intent | '', message: '' })
+  const [form,   setForm]   = useState({ name: '', email: '', intent: '' as Intent | '', message: '' })
   const [status, setStatus] = useState<Status>('idle')
-  const [error, setError]   = useState('')
+  const [error,  setError]  = useState('')
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
@@ -27,27 +60,14 @@ export default function ContactPage() {
     e.preventDefault()
     setStatus('loading')
     setError('')
-
     try {
-      const res = await fetch('/api/contact', {
+      const res  = await fetch('/api/contact', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({
-          name:    form.name,
-          email:   form.email,
-          message: form.message || undefined,
-          intent:  form.intent  || undefined,
-        }),
+        body:    JSON.stringify({ name: form.name, email: form.email, message: form.message || undefined, intent: form.intent || undefined }),
       })
-
       const data = await res.json()
-
-      if (!res.ok || !data.ok) {
-        setError(data.error ?? 'Something went wrong. Please try again.')
-        setStatus('error')
-        return
-      }
-
+      if (!res.ok || !data.ok) { setError(data.error ?? 'Something went wrong. Please try again.'); setStatus('error'); return }
       setStatus('success')
     } catch {
       setError('Network error. Please check your connection and try again.')
@@ -55,207 +75,109 @@ export default function ContactPage() {
     }
   }
 
-  const inputClass =
-    'w-full border border-border-subtle rounded-sm px-4 py-3 font-sans text-[0.95rem] text-text-primary bg-obsidian focus:outline-none focus:border-border-amber transition-colors duration-200 placeholder:text-text-muted'
-
   return (
     <>
+      <style>{`
+        .contact-input:focus { border-color: var(--color-gold) !important; box-shadow: var(--shadow-gold) !important; }
+        .contact-input::placeholder { color: var(--color-text-faint); font-style: italic; }
+      `}</style>
       <Nav />
-      <main>
+      <main style={{ background: 'var(--color-bg)' }}>
 
-        {/* ── HERO ── */}
-        <section
-          className="relative bg-obsidian-void px-8 md:px-16 pt-40 pb-20 overflow-hidden"
-          aria-label="Contact hero"
-        >
-          {/* Grid */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              backgroundImage:
-                'linear-gradient(rgba(255,255,255,0.022) 1px,transparent 1px),' +
-                'linear-gradient(90deg,rgba(255,255,255,0.022) 1px,transparent 1px)',
-              backgroundSize: '80px 80px',
-              maskImage: 'radial-gradient(ellipse 80% 80% at 50% 50%,black 20%,transparent 100%)',
-            }}
-            aria-hidden="true"
-          />
-          {/* Amber radiance */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 55%,rgba(255,179,71,0.07) 0%,transparent 65%)' }}
-            aria-hidden="true"
-          />
-
-          <div className="relative z-10 text-center max-w-2xl mx-auto">
-            <p className="eyebrow mb-6">Get In Touch</p>
-            <h1
-              className="font-serif font-semibold text-text-primary leading-[0.92] tracking-[-0.038em] mb-6"
-              style={{ fontSize: 'clamp(3rem,6vw,5rem)' }}
-            >
-              Every Legacy Begins{' '}
-              <em className="italic font-medium text-amber" style={{ fontStyle: 'italic' }}>
-                With a Conversation.
-              </em>
-            </h1>
-            <p className="font-sans font-light text-body-base text-text-secondary leading-[1.82]">
-              We are a small, deliberate team. If you are serious about building a Golden Dataset
-              for your family, we want to hear from you.
-            </p>
-          </div>
+        {/* Hero */}
+        <section style={{ padding: 'clamp(140px,16vw,180px) clamp(24px,6vw,80px) clamp(60px,8vw,80px)', textAlign: 'center' }}>
+          <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '24px' }}>
+            <span style={{ display: 'block', width: '24px', height: '1px', background: 'var(--color-gold)', flexShrink: 0 }} aria-hidden="true" />
+            Get In Touch
+            <span style={{ display: 'block', width: '24px', height: '1px', background: 'var(--color-gold)', flexShrink: 0 }} aria-hidden="true" />
+          </p>
+          <h1 style={{ ...SERIF, fontWeight: 300, fontSize: 'var(--text-h1)', color: 'var(--color-text-primary)', letterSpacing: '-0.025em', lineHeight: 1.1, marginBottom: '20px' }}>
+            Every Legacy Begins{' '}
+            <em style={{ fontStyle: 'italic', color: 'var(--color-gold)' }}>With a Conversation.</em>
+          </h1>
+          <p style={{ ...SERIF, fontStyle: 'italic', fontWeight: 300, fontSize: '1.1rem', color: 'var(--color-text-secondary)', lineHeight: 1.8, maxWidth: '440px', margin: '0 auto' }}>
+            We are a small, deliberate team. If you are serious about building an archive for your family, we want to hear from you.
+          </p>
         </section>
 
-        {/* ── FORM ── */}
-        <section
-          className="relative bg-obsidian-deep px-8 md:px-16 lg:px-24 py-20 overflow-hidden"
-          aria-label="Contact form"
-        >
-          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-border-amber to-transparent" />
+        {/* Form */}
+        <section style={{ background: 'var(--color-surface-alt)', padding: 'clamp(48px,6vw,80px) clamp(24px,6vw,80px)' }} aria-label="Contact form">
+          <div style={{ maxWidth: '520px', margin: '0 auto' }}>
 
-          <div className="max-w-xl mx-auto">
-            <div
-              className="glass-obsidian rounded-sm p-10 md:p-12"
-              style={{ boxShadow: '0 32px 64px rgba(0,0,0,0.7)' }}
-            >
-              {status === 'success' ? (
-                /* ── Success state ── */
-                <div className="text-center py-6">
-                  <div className="w-14 h-14 rounded-full bg-amber/10 border border-border-amber flex items-center justify-center mx-auto mb-7 animate-spark">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path d="M5 12l5 5L20 7" stroke="#FFB347" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </div>
-                  <p className="eyebrow mb-4">Message Received</p>
-                  <h2 className="font-serif text-[1.75rem] font-semibold text-text-primary leading-tight tracking-[-0.02em] mb-4">
-                    We&apos;ll Be In Touch.
-                  </h2>
-                  <p className="font-sans font-light text-body-base text-text-secondary leading-[1.82]">
-                    Thank you for reaching out. We respond to every message personally within 48 hours.
+            {status === 'success' ? (
+              <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderTop: '2px solid var(--color-gold)', padding: '48px 40px', textAlign: 'center' }}>
+                <div style={{ width: '40px', height: '1px', background: 'var(--color-gold)', margin: '0 auto 32px' }} aria-hidden="true" />
+                <h2 style={{ ...SERIF, fontSize: '1.75rem', fontWeight: 500, color: 'var(--color-text-primary)', marginBottom: '16px' }}>
+                  We&apos;ll Be In Touch.
+                </h2>
+                <p style={{ ...SERIF, fontStyle: 'italic', fontWeight: 300, fontSize: '1rem', color: 'var(--color-text-secondary)', lineHeight: 1.8 }}>
+                  Thank you for reaching out. We respond to every message personally within 48 hours.
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} noValidate style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderTop: '2px solid var(--color-gold-border)', padding: 'clamp(32px,5vw,48px)', display: 'flex', flexDirection: 'column', gap: '28px' }}>
+
+                <div>
+                  <h2 style={{ ...SERIF, fontSize: '1.4rem', fontWeight: 500, color: 'var(--color-text-primary)', marginBottom: '4px' }}>Send a Message</h2>
+                  <p style={{ ...SERIF, fontStyle: 'italic', fontWeight: 300, fontSize: '0.95rem', color: 'var(--color-text-muted)' }}>We respond personally within 48 hours.</p>
+                </div>
+
+                <div>
+                  <label htmlFor="c-name" style={LABEL}>Full Name <span style={{ color: 'var(--color-gold)' }}>*</span></label>
+                  <input id="c-name" name="name" type="text" value={form.name} onChange={handleChange} placeholder="Robert James Whitfield" required autoComplete="name" className="contact-input" style={INPUT} />
+                </div>
+
+                <div>
+                  <label htmlFor="c-email" style={LABEL}>Email Address <span style={{ color: 'var(--color-gold)' }}>*</span></label>
+                  <input id="c-email" name="email" type="email" value={form.email} onChange={handleChange} placeholder="robert@whitfield.com" required autoComplete="email" className="contact-input" style={INPUT} />
+                </div>
+
+                <div>
+                  <label htmlFor="c-intent" style={LABEL}>Nature of Enquiry</label>
+                  <select id="c-intent" name="intent" value={form.intent} onChange={handleChange} className="contact-input" style={{ ...INPUT, cursor: 'pointer', appearance: 'none' as const }}>
+                    <option value="" disabled>Select a topic…</option>
+                    {INTENTS.map(({ value, label }) => (
+                      <option key={value} value={value}>{label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="c-message" style={LABEL}>Message <span style={{ fontFamily: 'inherit', textTransform: 'none', letterSpacing: 0, fontSize: '0.85rem', fontStyle: 'italic', color: 'var(--color-text-faint)' }}>(optional)</span></label>
+                  <textarea id="c-message" name="message" value={form.message} onChange={handleChange} placeholder="Tell us what you have in mind…" rows={5} className="contact-input" style={{ ...INPUT, resize: 'none' as const, lineHeight: 1.75 }} />
+                </div>
+
+                {status === 'error' && error && (
+                  <p style={{ ...SERIF, fontSize: '0.9rem', fontStyle: 'italic', color: 'var(--color-text-muted)' }} role="alert">{error}</p>
+                )}
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
+                  <button
+                    type="submit"
+                    disabled={status === 'loading'}
+                    style={{
+                      ...MONO,
+                      fontSize:      'var(--text-caption)',
+                      background:    status === 'loading' ? 'rgba(184,150,62,0.6)' : 'var(--color-gold)',
+                      color:         'var(--color-bg)',
+                      border:        'none',
+                      borderRadius:  'var(--radius-sm)',
+                      padding:       '13px 28px',
+                      cursor:        status === 'loading' ? 'not-allowed' : 'pointer',
+                      transition:    'background 250ms ease',
+                    }}
+                  >
+                    {status === 'loading' ? 'Sending…' : 'Send Message →'}
+                  </button>
+                  <p style={{ ...SERIF, fontStyle: 'italic', fontWeight: 300, fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>
+                    Or email{' '}
+                    <a href="mailto:legacy@basalith.xyz" style={{ color: 'var(--color-gold)', textDecoration: 'none' }}>
+                      legacy@basalith.xyz
+                    </a>
                   </p>
                 </div>
-              ) : (
-                /* ── Form state ── */
-                <form onSubmit={handleSubmit} noValidate>
-                  <div className="mb-8">
-                    <p className="font-serif text-[1.5rem] font-semibold text-text-primary leading-tight tracking-[-0.02em] mb-1">
-                      Send a Message
-                    </p>
-                    <p className="font-sans text-[0.82rem] text-text-muted">
-                      We respond personally within 48 hours.
-                    </p>
-                  </div>
-
-                  <div className="flex flex-col gap-5">
-
-                    {/* Name */}
-                    <div>
-                      <label htmlFor="name" className="block font-sans text-[0.72rem] font-bold tracking-[0.12em] uppercase text-text-muted mb-2">
-                        Full Name <span className="text-amber">*</span>
-                      </label>
-                      <input
-                        id="name"
-                        name="name"
-                        type="text"
-                        value={form.name}
-                        onChange={handleChange}
-                        placeholder="Robert James Whitfield"
-                        required
-                        autoComplete="name"
-                        className={inputClass}
-                      />
-                    </div>
-
-                    {/* Email */}
-                    <div>
-                      <label htmlFor="email" className="block font-sans text-[0.72rem] font-bold tracking-[0.12em] uppercase text-text-muted mb-2">
-                        Email Address <span className="text-amber">*</span>
-                      </label>
-                      <input
-                        id="email"
-                        name="email"
-                        type="email"
-                        value={form.email}
-                        onChange={handleChange}
-                        placeholder="robert@whitfield.com"
-                        required
-                        autoComplete="email"
-                        className={inputClass}
-                      />
-                    </div>
-
-                    {/* Intent */}
-                    <div>
-                      <label htmlFor="intent" className="block font-sans text-[0.72rem] font-bold tracking-[0.12em] uppercase text-text-muted mb-2">
-                        Nature of Enquiry
-                      </label>
-                      <select
-                        id="intent"
-                        name="intent"
-                        value={form.intent}
-                        onChange={handleChange}
-                        className={inputClass + ' appearance-none'}
-                        style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'8\' viewBox=\'0 0 12 8\'%3E%3Cpath d=\'M1 1l5 5 5-5\' stroke=\'%235C6166\' stroke-width=\'1.5\' fill=\'none\' stroke-linecap=\'round\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center' }}
-                      >
-                        <option value="" disabled>Select a topic…</option>
-                        {INTENTS.map(({ value, label }) => (
-                          <option key={value} value={value}>{label}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* Message */}
-                    <div>
-                      <label htmlFor="message" className="block font-sans text-[0.72rem] font-bold tracking-[0.12em] uppercase text-text-muted mb-2">
-                        Message <span className="font-normal normal-case tracking-normal text-text-muted">(optional)</span>
-                      </label>
-                      <textarea
-                        id="message"
-                        name="message"
-                        value={form.message}
-                        onChange={handleChange}
-                        placeholder="Tell us what you have in mind…"
-                        rows={5}
-                        className={inputClass + ' resize-none'}
-                      />
-                    </div>
-
-                  </div>
-
-                  {/* Error message */}
-                  {status === 'error' && error && (
-                    <p className="font-sans text-[0.82rem] text-red-400 mt-5" role="alert">
-                      {error}
-                    </p>
-                  )}
-
-                  <div className="mt-8 flex items-center gap-5 flex-wrap">
-                    <button
-                      type="submit"
-                      disabled={status === 'loading'}
-                      className="btn-monolith-amber"
-                    >
-                      {status === 'loading' ? (
-                        <>
-                          <span
-                            className="inline-block w-3.5 h-3.5 rounded-full border-2 border-obsidian/40 border-t-obsidian animate-spin"
-                            aria-hidden="true"
-                          />
-                          Sending…
-                        </>
-                      ) : (
-                        'Send Message →'
-                      )}
-                    </button>
-                    <p className="font-sans text-[0.72rem] text-text-muted">
-                      Or email{' '}
-                      <a href="mailto:legacy@basalith.xyz" className="text-amber-dim hover:text-amber transition-colors duration-200">
-                        legacy@basalith.xyz
-                      </a>
-                    </p>
-                  </div>
-                </form>
-              )}
-            </div>
+              </form>
+            )}
           </div>
         </section>
 

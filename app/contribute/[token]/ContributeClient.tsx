@@ -88,18 +88,19 @@ function SectionCard({
 }) {
   return (
     <div style={{
-      background:   'rgba(196,162,74,0.03)',
-      border:       '1px solid rgba(196,162,74,0.1)',
-      borderTop:    prominent ? '2px solid rgba(196,162,74,0.45)' : '2px solid rgba(196,162,74,0.2)',
-      borderRadius: '2px',
-      padding:      '1.5rem',
-      marginBottom: '1rem',
+      background:    '#FFFFFF',
+      border:        '1px solid rgba(26,24,20,0.08)',
+      borderTop:     prominent ? '2px solid #B8963E' : '2px solid rgba(184,150,62,0.25)',
+      borderRadius:  '4px',
+      padding:       '24px',
+      marginBottom:  '16px',
+      boxShadow:     prominent ? '0 4px 16px rgba(26,24,20,0.06)' : '0 1px 3px rgba(26,24,20,0.04)',
     }}>
-      <p style={{ fontFamily: 'monospace', fontSize: '0.42rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: prominent ? 'rgba(196,162,74,0.9)' : 'rgba(196,162,74,0.7)', margin: '0 0 0.35rem' }}>
+      <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.5rem', letterSpacing: '0.28em', textTransform: 'uppercase', color: prominent ? '#B8963E' : 'rgba(138,134,128,0.8)', margin: '0 0 6px' }}>
         {title}
       </p>
       {subtitle && (
-        <p className="font-serif italic" style={{ fontSize: '0.9rem', color: '#9DA3A8', lineHeight: 1.7, marginBottom: '1.25rem' }}>
+        <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, color: '#4A4640', lineHeight: 1.7, marginBottom: '20px' }}>
           {subtitle}
         </p>
       )}
@@ -194,12 +195,12 @@ function QuestionsSection({
                 style={{ width: '100%', maxWidth: '280px', height: 'auto', borderRadius: '2px', marginBottom: '0.75rem', display: 'block' }}
               />
             )}
-            <p className="font-serif" style={{ fontWeight: 700, fontSize: '1rem', color: '#F0EDE6', lineHeight: 1.5, marginBottom: '0.75rem' }}>
+            <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontWeight: 500, fontSize: '1.05rem', color: '#1A1814', lineHeight: 1.55, marginBottom: '16px' }}>
               {q.question_text.replace(/\[subject\]/gi, subjectName)}
             </p>
             {saved[q.id] ? (
-              <p style={{ fontFamily: 'monospace', fontSize: '0.42rem', letterSpacing: '0.2em', color: 'rgba(196,162,74,0.8)' }}>
-                SAVED
+              <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.48rem', letterSpacing: '0.22em', color: '#B8963E' }}>
+                Saved ✓
               </p>
             ) : (
               <>
@@ -209,19 +210,20 @@ function QuestionsSection({
                   placeholder="Share what you remember..."
                   rows={4}
                   style={{
-                    width:         '100%',
-                    minHeight:     '100px',
-                    background:    'transparent',
-                    border:        'none',
-                    borderBottom:  '1px solid rgba(196,162,74,0.2)',
-                    color:         '#F0EDE6',
-                    fontFamily:    'Georgia, serif',
-                    fontSize:      '0.95rem',
-                    lineHeight:    1.7,
-                    padding:       '0.5rem 0',
-                    resize:        'vertical',
-                    outline:       'none',
-                    boxSizing:     'border-box',
+                    width:        '100%',
+                    minHeight:    '100px',
+                    background:   '#F5F3EE',
+                    border:       '1px solid rgba(26,24,20,0.08)',
+                    borderRadius: '2px',
+                    color:        '#1A1814',
+                    fontFamily:   '"Cormorant Garamond",Georgia,serif',
+                    fontSize:     '1.05rem',
+                    fontWeight:   300,
+                    lineHeight:   1.75,
+                    padding:      '12px 14px',
+                    resize:       'vertical',
+                    outline:      'none',
+                    boxSizing:    'border-box',
                   }}
                 />
                 <button
@@ -706,15 +708,15 @@ function PhoneCallSection({
     <SectionCard title={PORTAL_UI[lang === 'zh' ? 'zh' : 'en'].callInStories}>
       {phoneOnFile ? (
         <div>
-          <p className="font-serif" style={{ fontWeight: 700, fontSize: '1.8rem', color: '#F0EDE6', letterSpacing: '0.04em', marginBottom: '0.5rem', lineHeight: 1 }}>
+          <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontWeight: 500, fontSize: '1.8rem', color: '#1A1814', letterSpacing: '0.04em', marginBottom: '8px', lineHeight: 1 }}>
             {twilioPhone}
           </p>
-          <p className="font-serif italic" style={{ fontSize: '0.9rem', color: '#9DA3A8', lineHeight: 1.75, marginBottom: '0.75rem' }}>
+          <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontSize: '0.95rem', fontStyle: 'italic', fontWeight: 300, color: '#4A4640', lineHeight: 1.75, marginBottom: '12px' }}>
             Call this number from your registered phone. A friendly voice will guide you through a question.
             No login or password needed.
           </p>
-          <p style={{ fontFamily: 'monospace', fontSize: '0.38rem', letterSpacing: '0.14em', color: '#5C6166' }}>
-            CALL FROM YOUR REGISTERED PHONE · ANY TIME
+          <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.42rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(138,134,128,0.6)' }}>
+            Call from your registered phone · Any time
           </p>
         </div>
       ) : (
@@ -841,23 +843,28 @@ export default function ContributeClient({
   const totalContribs = photosUploaded + videosUploaded + voiceRecordings + contributor.questions_answered + contributor.photos_labelled
 
   return (
-    <div style={{ background: '#0A0908', minHeight: '100vh', color: '#F0EDE6' }}>
+    <div style={{ background: '#FAFAF8', minHeight: '100svh', color: '#1A1814' }}>
 
       {/* Header */}
-      <div style={{ textAlign: 'center', padding: '2.5rem 1.5rem 1.5rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-        <p style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.35em', textTransform: 'uppercase', color: '#C4A24A', margin: '0 0 0.75rem' }}>
+      <div style={{ textAlign: 'center', padding: 'clamp(40px,8vw,72px) 24px clamp(28px,5vw,40px)', background: '#FFFFFF', borderBottom: '1px solid rgba(26,24,20,0.06)' }}>
+        <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.52rem', letterSpacing: '0.35em', textTransform: 'uppercase', color: '#B8963E', margin: '0 0 12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+          <span style={{ display: 'block', width: '20px', height: '1px', background: '#B8963E', flexShrink: 0 }} aria-hidden="true" />
           {archive.name}
+          <span style={{ display: 'block', width: '20px', height: '1px', background: '#B8963E', flexShrink: 0 }} aria-hidden="true" />
         </p>
-        <p className="font-serif" style={{ fontWeight: 700, fontSize: '1.5rem', color: '#F0EDE6', margin: '0 0 0.4rem' }}>
+        <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontWeight: 500, fontSize: 'clamp(1.4rem,4vw,2rem)', color: '#1A1814', margin: '0 0 8px', lineHeight: 1.2 }}>
           {ui.welcome(firstName)}
         </p>
-        <p style={{ fontFamily: 'monospace', fontSize: '0.38rem', letterSpacing: '0.15em', color: '#5C6166', margin: 0 }}>
+        <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, color: '#8A8680', margin: '0 0 6px' }}>
+          You have been invited to contribute to this archive.
+        </p>
+        <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.44rem', letterSpacing: '0.15em', color: 'rgba(138,134,128,0.6)', margin: 0 }}>
           {relLabel}{totalContribs > 0 ? ` · ${ui.contributions_n(totalContribs)}` : ''}
         </p>
       </div>
 
-      {/* Thin gold rule */}
-      <div style={{ height: '1px', background: 'linear-gradient(90deg, transparent, rgba(196,162,74,0.3), transparent)', margin: '0' }} />
+      {/* Gold rule */}
+      <div style={{ height: '2px', background: 'linear-gradient(90deg, transparent, rgba(184,150,62,0.3), transparent)' }} aria-hidden="true" />
 
       {/* Content */}
       <div style={{ maxWidth: '560px', margin: '0 auto', padding: '1.5rem 1.25rem 4rem' }}>
@@ -913,11 +920,11 @@ export default function ContributeClient({
         />
 
         {/* Footer */}
-        <div style={{ textAlign: 'center', paddingTop: '2rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-          <p style={{ fontFamily: 'monospace', fontSize: '0.38rem', letterSpacing: '0.2em', color: '#3A3F44', margin: 0 }}>
-            BASALITH · XYZ
+        <div style={{ textAlign: 'center', paddingTop: '32px', borderTop: '1px solid rgba(26,24,20,0.06)' }}>
+          <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.44rem', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'rgba(138,134,128,0.5)', margin: 0 }}>
+            Basalith · Heritage Nexus Inc.
           </p>
-          <p className="font-serif italic" style={{ fontSize: '0.8rem', color: '#3A3F44', margin: '0.4rem 0 0' }}>
+          <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontSize: '0.85rem', color: 'rgba(138,134,128,0.5)', margin: '6px 0 0' }}>
             {ui.footerNote}
           </p>
         </div>
