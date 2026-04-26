@@ -2,32 +2,32 @@ import Link from 'next/link'
 
 const STEPS = [
   {
-    n:       '01',
-    title:   'The Founding Session',
-    body:    'Ninety minutes. Your family. A Senior Legacy Guide. Your first photographs. By the end of this session your archive exists, not as a promise, but as a fact.',
-    href:    '/founding-session',
-    visual:  'linear-gradient(135deg, #F5EAD5 0%, #E8D0A0 40%, #C8A06A 100%)',
+    n:     '01',
+    title: 'The Founding Session',
+    body:  'Ninety minutes. Your family. A Senior Legacy Guide. Your first photographs. By the end of this session your archive exists, not as a promise, but as a fact.',
+    href:  '/founding-session',
+    quote: 'The founding session is not an interview. It is the beginning of something that will outlast you.',
   },
   {
-    n:       '02',
-    title:   'The Archive Builds',
-    body:    'Every evening one photograph goes to every family member by email. No login. No app. They reply with what they remember. Their words go directly into the archive.',
-    href:    '/method',
-    visual:  'linear-gradient(135deg, #EAE2D5 0%, #D5C8A8 40%, #B0A080 100%)',
+    n:     '02',
+    title: 'The Archive Builds',
+    body:  'Every evening one photograph goes to every family member by email. No login. No app. They reply with what they remember. Their words go directly into the archive.',
+    href:  '/method',
+    quote: 'Every deposit teaches the entity something specific about how you think.',
   },
   {
-    n:       '03',
-    title:   'Your Family Contributes',
-    body:    'Contributors label photographs, record voice stories, and answer witness questions. Each perspective adds something no other perspective can. The archive deepens.',
-    href:    '/method',
-    visual:  'linear-gradient(135deg, #E8DDD0 0%, #D0C0A0 40%, #A89070 100%)',
+    n:     '03',
+    title: 'Your Family Contributes',
+    body:  'Contributors label photographs, record voice stories, and answer witness questions. Each perspective adds something no other perspective can. The archive deepens.',
+    href:  '/method',
+    quote: 'Contributors do not add memories. They train an AI.',
   },
   {
-    n:       '04',
-    title:   'The Entity Speaks',
-    body:    'Your AI entity is trained on everything deposited. Your grandchildren will be able to ask it how you thought about a hard decision. It answers from your archive.',
-    href:    '/asset',
-    visual:  'linear-gradient(135deg, #EDE5D8 0%, #D8C8A5 40%, #B8A078 100%)',
+    n:     '04',
+    title: 'The Entity Speaks',
+    body:  'Your AI entity is trained on everything deposited. Your grandchildren will be able to ask it how you thought about a hard decision. It answers from your archive.',
+    href:  '/asset',
+    quote: 'The more you engage the more accurate it becomes.',
   },
 ]
 
@@ -99,7 +99,7 @@ export default function HowItWorksSection() {
 
       {/* Steps — alternating layout */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
-        {STEPS.map(({ n, title, body, href, visual }, i) => {
+        {STEPS.map(({ n, title, body, href, quote }, i) => {
           const even = i % 2 === 0
           return (
             <div
@@ -111,24 +111,53 @@ export default function HowItWorksSection() {
                 minHeight:           '400px',
               }}
             >
-              {/* Visual */}
+              {/* Quote visual */}
               <div
                 aria-hidden="true"
                 style={{
-                  order:      even ? 1 : 2,
-                  background: visual,
-                  position:   'relative',
-                  overflow:   'hidden',
+                  order:          even ? 1 : 2,
+                  background:     '#F5F0E8',
+                  position:       'relative',
+                  overflow:       'hidden',
+                  display:        'flex',
+                  alignItems:     'center',
+                  justifyContent: 'center',
+                  padding:        'clamp(40px,5vw,64px) clamp(24px,5vw,48px)',
                 }}
               >
                 <div
                   style={{
-                    position:   'absolute',
-                    inset:      '20px',
-                    border:     '1px solid rgba(184,150,62,0.2)',
-                    pointerEvents: 'none',
+                    borderLeft:  '2px solid rgba(184,150,62,0.4)',
+                    paddingLeft: '28px',
+                    maxWidth:    '360px',
                   }}
-                />
+                >
+                  <p
+                    style={{
+                      fontFamily:  'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+                      fontSize:    'clamp(1.25rem, 2.5vw, 2rem)',
+                      fontWeight:  300,
+                      fontStyle:   'italic',
+                      color:       '#1A1814',
+                      lineHeight:  1.55,
+                      margin:      '0 0 20px',
+                    }}
+                  >
+                    &ldquo;{quote}&rdquo;
+                  </p>
+                  <p
+                    style={{
+                      fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+                      fontSize:      '0.52rem',
+                      letterSpacing: '0.3em',
+                      color:         'rgba(184,150,62,0.55)',
+                      margin:        0,
+                      textTransform: 'uppercase' as const,
+                    }}
+                  >
+                    The Basalith Archive
+                  </p>
+                </div>
               </div>
 
               {/* Text */}

@@ -11,41 +11,78 @@ export default function StorySection() {
       aria-label="One family"
       style={{ background: 'var(--color-bg)', overflow: 'hidden' }}
     >
-      {/* Full-width photograph */}
+      {/* Full-width family tree visualization */}
       <div
         aria-hidden="true"
         style={{
-          height:     'clamp(240px, 40vw, 560px)',
-          background: 'linear-gradient(170deg, #D4C4A0 0%, #B89870 30%, #8A6840 60%, #5A4020 100%)',
-          position:   'relative',
-          overflow:   'hidden',
+          height:         'clamp(280px, 42vw, 560px)',
+          background:     'var(--color-bg)',
+          position:       'relative',
+          overflow:       'hidden',
+          display:        'flex',
+          alignItems:     'center',
+          justifyContent: 'center',
         }}
       >
-        <div
-          style={{
-            position:   'absolute',
-            inset:      0,
-            background: 'radial-gradient(ellipse 70% 80% at 50% 40%, transparent 35%, rgba(60,30,10,0.4) 100%)',
-          }}
-        />
-        <div
-          style={{
-            position:   'absolute',
-            inset:      '20px',
-            border:     '1px solid rgba(250,235,200,0.18)',
-            pointerEvents: 'none',
-          }}
-        />
+        <svg
+          viewBox="0 0 400 300"
+          style={{ width: '100%', maxWidth: '560px', height: '100%', padding: '20px 24px' }}
+          aria-hidden="true"
+        >
+          {/* Pulse ring — Eleanor */}
+          <circle cx="200" cy="60" r="24" fill="none" stroke="rgba(184,150,62,0.45)" strokeWidth="1.5">
+            <animate attributeName="r"       from="24"  to="42" dur="2.4s" repeatCount="indefinite" />
+            <animate attributeName="opacity" from="0.5" to="0"  dur="2.4s" repeatCount="indefinite" />
+          </circle>
+
+          {/* Gen I — Eleanor */}
+          <circle cx="200" cy="60" r="24" fill="rgba(184,150,62,0.12)" stroke="#B8963E" strokeWidth="1.5" />
+          <text x="200" y="57" textAnchor="middle" fill="#B8963E"            fontSize="9"  fontFamily="var(--font-space-mono,'Space Mono',monospace)">Eleanor</text>
+          <text x="200" y="69" textAnchor="middle" fill="rgba(184,150,62,0.5)" fontSize="7" fontFamily="var(--font-space-mono,'Space Mono',monospace)">74</text>
+
+          {/* Lines to Gen II */}
+          <line x1="200" y1="84" x2="130" y2="150" stroke="rgba(184,150,62,0.3)" strokeWidth="1" />
+          <line x1="200" y1="84" x2="270" y2="150" stroke="rgba(184,150,62,0.3)" strokeWidth="1" />
+
+          {/* Gen II */}
+          <circle cx="130" cy="165" r="20" fill="rgba(184,150,62,0.08)" stroke="rgba(184,150,62,0.5)" strokeWidth="1" />
+          <text x="130" y="169" textAnchor="middle" fill="rgba(184,150,62,0.7)" fontSize="8" fontFamily="var(--font-space-mono,'Space Mono',monospace)">Patricia</text>
+
+          <circle cx="270" cy="165" r="20" fill="rgba(184,150,62,0.08)" stroke="rgba(184,150,62,0.5)" strokeWidth="1" />
+          <text x="270" y="169" textAnchor="middle" fill="rgba(184,150,62,0.7)" fontSize="8" fontFamily="var(--font-space-mono,'Space Mono',monospace)">James</text>
+
+          {/* Lines to Gen III */}
+          <line x1="130" y1="185" x2="80"  y2="248" stroke="rgba(184,150,62,0.2)" strokeWidth="0.75" />
+          <line x1="130" y1="185" x2="160" y2="248" stroke="rgba(184,150,62,0.2)" strokeWidth="0.75" />
+          <line x1="270" y1="185" x2="300" y2="248" stroke="rgba(184,150,62,0.2)" strokeWidth="0.75" />
+
+          {/* Gen III */}
+          <circle cx="80"  cy="260" r="16" fill="rgba(184,150,62,0.05)" stroke="rgba(184,150,62,0.3)" strokeWidth="1" />
+          <text x="80"  y="264" textAnchor="middle" fill="rgba(184,150,62,0.5)" fontSize="7" fontFamily="var(--font-space-mono,'Space Mono',monospace)">Emma</text>
+
+          <circle cx="160" cy="260" r="16" fill="rgba(184,150,62,0.05)" stroke="rgba(184,150,62,0.3)" strokeWidth="1" />
+          <text x="160" y="264" textAnchor="middle" fill="rgba(184,150,62,0.5)" fontSize="7" fontFamily="var(--font-space-mono,'Space Mono',monospace)">Oliver</text>
+
+          <circle cx="300" cy="260" r="16" fill="rgba(184,150,62,0.05)" stroke="rgba(184,150,62,0.3)" strokeWidth="1" />
+          <text x="300" y="264" textAnchor="middle" fill="rgba(184,150,62,0.5)" fontSize="7" fontFamily="var(--font-space-mono,'Space Mono',monospace)">Rose</text>
+
+          {/* Generation labels */}
+          <text x="368" y="64"  textAnchor="end" fill="rgba(184,150,62,0.22)" fontSize="6" fontFamily="var(--font-space-mono,'Space Mono',monospace)" letterSpacing="2">GEN I</text>
+          <text x="368" y="169" textAnchor="end" fill="rgba(184,150,62,0.18)" fontSize="6" fontFamily="var(--font-space-mono,'Space Mono',monospace)" letterSpacing="2">GEN II</text>
+          <text x="368" y="264" textAnchor="end" fill="rgba(184,150,62,0.14)" fontSize="6" fontFamily="var(--font-space-mono,'Space Mono',monospace)" letterSpacing="2">GEN III</text>
+        </svg>
+
         <p
           style={{
             position:      'absolute',
-            bottom:        '32px',
+            bottom:        '24px',
             left:          '32px',
             fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
             fontSize:      '0.45rem',
             letterSpacing: '0.3em',
             textTransform: 'uppercase' as const,
-            color:         'rgba(250,240,220,0.4)',
+            color:         'rgba(184,150,62,0.35)',
+            margin:        0,
           }}
         >
           Eleanor&rsquo;s Archive · Active since 2024
