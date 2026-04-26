@@ -191,7 +191,7 @@ export default function Footer() {
             color:         'rgba(184,150,62,0.4)',
           }}
         >
-          The asset that never leaves.
+          You never truly leave if you leave enough of yourself behind.
         </p>
       </div>
 

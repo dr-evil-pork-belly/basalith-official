@@ -3,8 +3,8 @@ import Footer from '../components/Footer'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title:       'About',
-  description: "A founder's statement. Why Basalith exists.",
+  title:       'About · Basalith',
+  description: 'We are building the infrastructure of human continuation. Not for billionaires. For every family.',
 }
 
 const SERIF: React.CSSProperties = {
@@ -49,7 +49,7 @@ export default function AboutPage() {
             </p>
 
             <h1 style={{ ...SERIF, fontWeight: 300, fontSize: 'var(--text-h1)', color: 'var(--color-text-primary)', lineHeight: 1.1, letterSpacing: '-0.025em', marginBottom: '16px', textAlign: 'center' }}>
-              The Most Valuable Thing<br />You Will Ever Own
+              We are building the infrastructure<br />of human continuation.
             </h1>
 
             <p style={{ ...SERIF, fontStyle: 'italic', fontWeight: 300, fontSize: '1.1rem', color: 'var(--color-text-muted)', textAlign: 'center', margin: '0 0 48px' }}>

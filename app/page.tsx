@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Basalith · Legacy AI',
-  description: 'The archive of a life, governed with the same seriousness as an estate. We build for legacy.',
+  title: 'Basalith · You never truly leave',
+  description: 'Basalith builds a living AI entity trained on how you specifically think. The infrastructure of human continuation. Priced for every family.',
 }
 
 import Nav                  from './components/Nav'

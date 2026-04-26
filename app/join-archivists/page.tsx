@@ -54,23 +54,28 @@ export default function JoinArchivistsPage() {
 
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
               <span style={{ display: 'block', width: '24px', height: '1px', background: 'var(--color-gold)', flexShrink: 0 }} aria-hidden="true" />
-              The Legacy Guide Program
+              Legacy Guides
             </p>
             <h1 style={{ ...SERIF, fontWeight: 300, fontSize: 'clamp(2.5rem,5vw,4rem)', color: 'var(--color-text-primary)', lineHeight: 1.1, letterSpacing: '-0.025em', marginBottom: '24px' }}>
-              Represent Basalith<br />in Your Community.
+              Help families build
+              <br />
+              what they cannot leave without.
             </h1>
 
             <div style={{ ...SERIF, fontWeight: 300, fontSize: '1.1rem', lineHeight: 1.85, color: 'var(--color-text-secondary)', marginBottom: '48px' }}>
               <p style={{ marginBottom: '16px' }}>
-                Basalith works with a select group of independent professionals who help families
-                begin their archives before it is too late.
+                Basalith builds living AI entities trained on how specific people think.
+                The families who understand what this means need to be found before it is too late.
               </p>
               <p style={{ marginBottom: '16px' }}>
-                Legacy Guides are not employees. They are trusted partners, professionals who
-                understand what Basalith builds and who it is built for.
+                Legacy Guides are the people who find them.
+              </p>
+              <p style={{ marginBottom: '16px' }}>
+                Not employees. Independent professionals who believe every family deserves
+                what Mark Zuckerberg spent $300 million building for himself.
               </p>
               <p>
-                If you believe in what we are doing and want to represent us in your community,
+                If you believe in what we are doing and want to bring it to the families in your life,
                 we would like to hear from you.
               </p>
             </div>

@@ -3,7 +3,10 @@ import Nav        from '../components/Nav'
 import Footer     from '../components/Footer'
 import PricingFAQ from '../components/PricingFAQ'
 
-export const metadata: Metadata = { title: 'Pricing' }
+export const metadata: Metadata = {
+  title: 'Pricing · Basalith',
+  description: 'The Basalith Estate begins at $2,500. The infrastructure of human continuation priced for every family.',
+}
 
 const MONO: React.CSSProperties = {
   fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
@@ -138,24 +141,25 @@ export default function PricingPage() {
               marginBottom: '24px',
             }}
           >
-            An Investment in{' '}
-            <em style={{ color: 'var(--color-gold)', fontStyle: 'italic' }}>Permanence.</em>
+            The infrastructure of continuation.{' '}
+            <em style={{ color: 'var(--color-gold)', fontStyle: 'italic' }}>Priced for every family.</em>
           </h1>
-          <p
+          <div
             style={{
               ...SERIF,
               fontSize:   '1.15rem',
               fontStyle:  'italic',
               fontWeight: 300,
-              lineHeight: 1.8,
+              lineHeight: 1.85,
               color:      'var(--color-text-secondary)',
-              maxWidth:   '520px',
+              maxWidth:   '540px',
               margin:     '0 auto',
             }}
           >
-            Basalith is priced as what it is: a generational asset under professional stewardship.
-            Not a software subscription. Not a storage plan.
-          </p>
+            <p style={{ marginBottom: '16px' }}>Mark Zuckerberg spent $300 million building an AI version of himself.</p>
+            <p style={{ marginBottom: '16px' }}>We built the same infrastructure for $3,600 a year.</p>
+            <p style={{ margin: 0 }}>Not because we cut corners. Because we believe every family deserves this.</p>
+          </div>
         </section>
 
         {/* The Founding */}

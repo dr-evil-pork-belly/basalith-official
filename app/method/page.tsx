@@ -3,8 +3,8 @@ import Footer from '../components/Footer'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title:       'The Method',
-  description: 'How the Basalith archive is built. Two directions simultaneously, from the inside out and the outside in.',
+  title:       'The Method · Basalith',
+  description: 'We are not building memory. We are building cognition. Two sources of data that together capture how a specific person actually thinks.',
 }
 
 const SERIF: React.CSSProperties = {
@@ -42,42 +42,45 @@ const RULE: React.CSSProperties = {
 const STEPS = [
   {
     n:     '01',
-    title: 'Inside looking out',
+    title: 'What you deposit',
     body:  [
-      'The archive subject deposits their own memories, wisdom, decisions, and beliefs directly. Through guided wisdom sessions, entity conversations, and structured deposits across ten dimensions of their life and thinking.',
-      'This is the data only they can provide. Their first-person account of who they are, what they learned, what they believe, and what they want their descendants to know.',
+      'The entity learns directly from you. Your voice recordings, your wisdom sessions, your entity conversations, your written deposits.',
+      'This is first-person training data. How you reason through problems. What you believe. What you learned from failure. The specific logic of how your mind works.',
+      'Every session adds depth. Every deposit teaches the entity something the people who love you could never tell it.',
     ],
   },
   {
     n:     '02',
-    title: 'Outside looking in',
+    title: 'What the people who know you observe',
     body:  [
-      'The people who know them contribute what they observed. Family members label photographs. Contributors answer witness session questions designed for their specific relationship to the subject.',
-      'A daughter sees things her father never knew were visible. A colleague remembers decisions that shaped a team. A childhood friend carries who someone was before they became who they think they are.',
+      'The people who know you see things you do not see about yourself. A daughter notices how her father handled pressure. A colleague remembers the specific way a decision was reasoned through.',
+      'Family members label photographs. Contributors answer witness questions designed for their exact relationship to you. This outside view captures cognitive patterns you would never think to deposit.',
     ],
   },
   {
     n:     '03',
-    title: 'The combination',
+    title: 'The combination builds a cognitive model',
     body:  [
-      'When inside and outside data are combined (the deposits, the witness observations, the family memories, the entity conversations) the result is the most accurate possible representation of a human life.',
-      'Not a curated version. Not a highlight reel. The actual person, as they saw themselves and as the people who loved them saw them.',
+      'Inside data plus outside data equals something neither could produce alone.',
+      'The archive becomes training data for your entity. The entity learns not just what you said but how you think. Not just your opinions but your reasoning patterns.',
+      'This is the distinction between memory and cognition. Memory stores facts. The entity understands how a specific mind works.',
     ],
   },
   {
     n:     '04',
-    title: 'The nightly photograph email',
+    title: 'The archive builds itself',
     body:  [
-      'Every evening at 9pm one photograph from the archive is sent to every active contributor. No login required. No app to open.',
-      'Contributors reply with what they remember. Their replies are parsed by AI and saved to the archive permanently. The archive builds itself around the family, without anyone having to organize a session or schedule a call.',
+      'Every evening one photograph goes to every family member by email. No login. No app. They reply with what they remember. Their words go into the archive.',
+      'The archive builds itself around the family. The entity deepens without anyone organizing a session or scheduling a call.',
+      'The longer it runs the more accurate it becomes. Start early. Give it years.',
     ],
   },
   {
     n:     '05',
     title: 'The Intelligence Layer',
     body:  [
-      'Before a single photograph reaches the labeling interface our seven-layer AI pipeline has already processed every upload. Screenshots removed. Duplicates collapsed. Photographs scored by archive value. The most emotionally resonant image in a collection of thousands surfaces first.',
-      'The family never sees the noise. They only see what matters.',
+      'Before a single photograph reaches the labeling interface our AI pipeline has already processed every upload. Screenshots removed. Duplicates collapsed. Photographs ranked by cognitive value.',
+      'The system surfaces the photographs most likely to unlock real memory. The family never sees the noise. They only see what builds the entity.',
     ],
   },
 ]
@@ -115,7 +118,9 @@ export default function MethodPage() {
               marginBottom:  '20px',
             }}
           >
-            How the archive is built.
+            We are not building memory.
+            <br />
+            We are building cognition.
           </h1>
           <p
             style={{
@@ -123,11 +128,13 @@ export default function MethodPage() {
               fontSize:  '1.2rem',
               fontStyle: 'italic',
               fontWeight: 300,
-              lineHeight: 1.7,
+              lineHeight: 1.8,
               color:     'var(--color-text-muted)',
+              maxWidth:  '520px',
             }}
           >
-            Two directions. Simultaneously. From the inside out and the outside in.
+            Two sources of data. Together they capture not just what a person did,
+            but how they actually thought.
           </p>
         </section>
 

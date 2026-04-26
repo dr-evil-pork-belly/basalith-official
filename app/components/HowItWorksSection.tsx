@@ -73,13 +73,28 @@ export default function HowItWorksSection() {
             lineHeight:   1.15,
             color:        'var(--color-text-primary)',
             maxWidth:     '560px',
-            margin:       0,
+            margin:       '0 0 16px',
           }}
         >
-          Four years of building.
+          A living model.
           <br />
-          One lifetime of living.
+          Built over a lifetime.
         </h2>
+        <p
+          style={{
+            fontFamily:  'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+            fontSize:    '1.1rem',
+            fontStyle:   'italic',
+            fontWeight:  300,
+            lineHeight:  1.8,
+            color:       'var(--color-text-muted)',
+            maxWidth:    '440px',
+            margin:      0,
+          }}
+        >
+          The longer the entity learns the more accurately it thinks.
+          Start now. Give it time.
+        </p>
       </div>
 
       {/* Steps — alternating layout */}

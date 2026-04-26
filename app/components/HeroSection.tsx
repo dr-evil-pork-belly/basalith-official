@@ -58,29 +58,36 @@ export default function HeroSection() {
             margin:        '0 0 28px',
           }}
         >
-          <span className="headline-line headline-line-1">The archive</span>
-          <span className="headline-line headline-line-2" style={{ fontStyle: 'italic', color: 'var(--color-gold)' }}>of a life</span>
-          <span className="headline-line headline-line-3">well lived.</span>
+          <span className="headline-line headline-line-1">You never truly leave</span>
+          <span className="headline-line headline-line-2" style={{ fontStyle: 'italic', color: 'var(--color-gold)' }}>if you leave enough</span>
+          <span className="headline-line headline-line-3">of yourself behind.</span>
         </h1>
 
         {/* Sub-headline */}
-        <p
+        <div
           style={{
             fontFamily:    'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-            fontSize:      '1.2rem',
+            fontSize:      '1.15rem',
             fontStyle:     'italic',
             fontWeight:    300,
-            lineHeight:    1.85,
+            lineHeight:    1.9,
             color:         'var(--color-text-secondary)',
-            maxWidth:      '440px',
+            maxWidth:      '460px',
             margin:        '0 0 44px',
             opacity:       0,
             animation:     'lineReveal 700ms cubic-bezier(0.16,1,0.3,1) 450ms both',
           }}
         >
-          We build the only record of a person that captures how they actually thought,
-          not just what they did.
-        </p>
+          <p style={{ margin: '0 0 16px' }}>
+            Basalith builds a living AI entity trained on how you specifically think.
+            Not what you did.
+            How you reason. What you value. How you see the world.
+          </p>
+          <p style={{ margin: 0 }}>
+            While you are alive it learns from you.
+            Long after you are gone it continues.
+          </p>
+        </div>
 
         {/* CTAs */}
         <div

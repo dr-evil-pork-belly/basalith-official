@@ -22,49 +22,45 @@ export default function PricingTeaserSection() {
     >
       <p
         style={{
-          ...MONO,
-          fontSize:     '0.52rem',
-          color:        'var(--color-gold)',
-          marginBottom: '32px',
-          display:      'flex',
-          alignItems:   'center',
-          justifyContent: 'center',
-          gap:          '12px',
+          fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+          fontSize:     'clamp(1.1rem, 2.5vw, 1.5rem)',
+          fontStyle:    'italic',
+          fontWeight:   300,
+          lineHeight:   1.7,
+          color:        'rgba(250,250,248,0.4)',
+          marginBottom: '24px',
         }}
       >
-        <span style={{ display: 'block', width: '24px', height: '1px', background: 'var(--color-gold)', flexShrink: 0 }} aria-hidden="true" />
-        Stewardship Pricing
-        <span style={{ display: 'block', width: '24px', height: '1px', background: 'var(--color-gold)', flexShrink: 0 }} aria-hidden="true" />
+        Mark Zuckerberg spent $300 million.
       </p>
 
       <h2
         style={{
-          fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-          fontSize:     'var(--text-h2)',
-          fontWeight:   300,
-          lineHeight:   1.3,
-          color:        'rgba(250,250,248,0.9)',
-          marginBottom: '48px',
+          fontFamily:    'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+          fontSize:      'var(--text-h2)',
+          fontWeight:    300,
+          lineHeight:    1.3,
+          color:         'rgba(250,250,248,0.9)',
+          marginBottom:  '48px',
           letterSpacing: '-0.01em',
         }}
       >
-        The Estate begins at $2,500.
+        The Basalith Estate begins at $2,500.
       </h2>
 
       <p
         style={{
           fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-          fontSize:     '1.1rem',
+          fontSize:     '1.05rem',
           fontStyle:    'italic',
           fontWeight:   300,
           lineHeight:   1.8,
-          color:        'rgba(250,250,248,0.45)',
-          maxWidth:     '480px',
+          color:        'rgba(250,250,248,0.35)',
+          maxWidth:     '420px',
           margin:       '0 auto 48px',
         }}
       >
-        Annual stewardship from $1,200. Generational preservation for families
-        who understand that memory is an asset.
+        Annual stewardship from $1,200. The same infrastructure. Built for every family.
       </p>
 
       <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>

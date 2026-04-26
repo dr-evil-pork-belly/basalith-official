@@ -1,14 +1,14 @@
 const STATS = [
-  { n: '847',    label: 'Photographs archived'   },
-  { n: '23',     label: 'Family contributors'    },
-  { n: '6',      label: 'Decades preserved'      },
+  { n: '847',   label: 'Photographs'           },
+  { n: '23',    label: 'Voice recordings'      },
+  { n: '4 yrs', label: 'Wisdom sessions'       },
 ]
 
 export default function StorySection() {
   return (
     <section
       data-reveal
-      aria-label="An archive in progress"
+      aria-label="One family"
       style={{ background: 'var(--color-bg)', overflow: 'hidden' }}
     >
       {/* Full-width photograph */}
@@ -21,16 +21,21 @@ export default function StorySection() {
           overflow:   'hidden',
         }}
       >
-        {/* Gold frame inset */}
+        <div
+          style={{
+            position:   'absolute',
+            inset:      0,
+            background: 'radial-gradient(ellipse 70% 80% at 50% 40%, transparent 35%, rgba(60,30,10,0.4) 100%)',
+          }}
+        />
         <div
           style={{
             position:   'absolute',
             inset:      '20px',
-            border:     '1px solid rgba(184,150,62,0.25)',
+            border:     '1px solid rgba(250,235,200,0.18)',
             pointerEvents: 'none',
           }}
         />
-        {/* Caption watermark */}
         <p
           style={{
             position:      'absolute',
@@ -40,7 +45,7 @@ export default function StorySection() {
             fontSize:      '0.45rem',
             letterSpacing: '0.3em',
             textTransform: 'uppercase' as const,
-            color:         'rgba(250,240,220,0.45)',
+            color:         'rgba(250,240,220,0.4)',
           }}
         >
           Eleanor&rsquo;s Archive · Active since 2024
@@ -75,20 +80,33 @@ export default function StorySection() {
             <span style={{ display: 'block', width: '24px', height: '1px', background: 'var(--color-gold)', flexShrink: 0 }} aria-hidden="true" />
             One Family
           </p>
-          <p
+          <div
             style={{
               fontFamily:  'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-              fontSize:    '1.25rem',
+              fontSize:    '1.2rem',
               fontStyle:   'italic',
               fontWeight:  300,
               lineHeight:  1.9,
               color:       'var(--color-text-secondary)',
             }}
           >
-            Eleanor&rsquo;s archive contains 847 photographs spanning six decades.
-            Her daughter Patricia has contributed 23 memories. Her grandchildren
-            know her voice. Her great-grandchildren will too.
-          </p>
+            <p style={{ marginBottom: '20px' }}>Eleanor began her archive at 74.</p>
+            <p style={{ marginBottom: '20px' }}>
+              Over three years her family contributed 847 photographs, 23 voice recordings,
+              and 4 years of weekly wisdom sessions.
+            </p>
+            <p style={{ marginBottom: '20px' }}>
+              Her entity now answers questions about difficult decisions the way Eleanor
+              actually would.
+            </p>
+            <p style={{ marginBottom: '20px' }}>
+              Not from memory. From learned cognitive patterns built over a lifetime.
+            </p>
+            <p style={{ margin: 0, color: 'var(--color-text-primary)' }}>
+              Her grandchildren call it remarkable.
+              Her great-grandchildren will call it normal.
+            </p>
+          </div>
         </div>
 
         {/* Stats */}
@@ -104,12 +122,12 @@ export default function StorySection() {
             <div key={label}>
               <p
                 style={{
-                  fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-                  fontSize:     'clamp(2rem, 4vw, 3.25rem)',
-                  fontWeight:   300,
-                  lineHeight:   1,
-                  color:        'var(--color-gold)',
-                  marginBottom: '6px',
+                  fontFamily:    'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+                  fontSize:      'clamp(2rem, 4vw, 3.25rem)',
+                  fontWeight:    300,
+                  lineHeight:    1,
+                  color:         'var(--color-gold)',
+                  marginBottom:  '6px',
                   letterSpacing: '-0.02em',
                 }}
               >
@@ -133,7 +151,7 @@ export default function StorySection() {
 
       <style>{`
         @media (max-width: 768px) {
-          section[aria-label="An archive in progress"] > div[style*="grid-template-columns"] {
+          section[aria-label="One family"] > div[style*="grid-template-columns"] {
             grid-template-columns: 1fr !important;
             gap: 40px !important;
           }
