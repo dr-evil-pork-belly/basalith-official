@@ -83,47 +83,50 @@ export async function POST(req: NextRequest) {
       console.log('[twilio/voice] lang:', lang, '— building TwiML')
 
       // Voice + greeting per language.
-      // Tagalog (tl) and Vietnamese (vi) use English neural voice with native-language text
-      // since Polly does not support those languages natively.
+      // Cantonese (yue) uses Google TTS; vi/tl use English neural with native text.
       const VOICES: Record<string, string> = {
-        en: 'Polly.Joanna-Neural',
-        zh: 'Polly.Zhiyu',
-        es: 'Polly.Lupe-Neural',
-        vi: 'Polly.Joanna-Neural',
-        tl: 'Polly.Joanna-Neural',
-        ko: 'Polly.Seoyeon-Neural',
+        en:  'Polly.Joanna-Neural',
+        zh:  'Polly.Zhiyu',
+        yue: 'Google.yue-HK-Standard-B',
+        ja:  'Polly.Mizuki-Neural',
+        es:  'Polly.Lupe-Neural',
+        vi:  'Polly.Joanna-Neural',
+        tl:  'Polly.Joanna-Neural',
+        ko:  'Polly.Seoyeon-Neural',
       }
       const voice = VOICES[lang] ?? VOICES.en
 
-      const GREETINGS: Record<string, { prompt: string; prompt2: string; noRecording: string }> = {
+      const GREETINGS: Record<string, { prompt: string; noRecording: string }> = {
         en: {
           prompt:      `Welcome, ${firstName}. Please share a memory, a story, or anything you want preserved. Speak after the tone and press any key when finished.`,
-          prompt2:     '',
           noRecording: 'We did not receive a recording. Please call back to try again. Goodbye.',
         },
         zh: {
           prompt:      `您好，${firstName}。请在提示音后说话。说完后按任意键。`,
-          prompt2:     '',
           noRecording: '未收到录音。请稍后再次拨打。再见。',
+        },
+        yue: {
+          prompt:      `你好，${firstName}。請喺提示音後講嘢。講完之後按任何掣。`,
+          noRecording: '冇收到錄音。請稍後再次致電。再見。',
+        },
+        ja: {
+          prompt:      `こんにちは、${firstName}さん。発信音の後に思い出やお話をお聞かせください。終わりましたら何かキーを押してください。`,
+          noRecording: '録音を受け取ることができませんでした。恐れ入りますが、またお電話ください。失礼いたします。',
         },
         es: {
           prompt:      `Hola, ${firstName}. Por favor comparta un recuerdo o historia después del tono. Presione cualquier tecla cuando termine.`,
-          prompt2:     '',
           noRecording: 'No recibimos una grabación. Por favor llame de nuevo. Adiós.',
         },
         vi: {
           prompt:      `Xin chào, ${firstName}. Vui lòng chia sẻ một ký ức sau tiếng bíp. Nhấn phím bất kỳ khi hoàn thành.`,
-          prompt2:     '',
           noRecording: 'Chúng tôi không nhận được bản ghi âm. Vui lòng gọi lại. Tạm biệt.',
         },
         tl: {
           prompt:      `Kumusta, ${firstName}. Mangyaring ibahagi ang isang alaala pagkatapos ng tono. Pindutin ang anumang key kapag tapos na.`,
-          prompt2:     '',
           noRecording: 'Hindi namin natanggap ang inyong rekording. Pakitawagan muli. Paalam.',
         },
         ko: {
           prompt:      `안녕하세요, ${firstName}님. 신호음 후에 추억이나 이야기를 말씀해 주세요. 완료되면 아무 키나 누르십시오.`,
-          prompt2:     '',
           noRecording: '녹음을 받지 못했습니다. 다시 전화해 주세요. 안녕히 계세요.',
         },
       }

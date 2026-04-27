@@ -4,12 +4,14 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 
 const LANGUAGES = [
-  { code: 'en', label: 'English'      },
-  { code: 'zh', label: '中文'          },
-  { code: 'es', label: 'Español'      },
-  { code: 'vi', label: 'Tiếng Việt'   },
-  { code: 'tl', label: 'Tagalog'      },
-  { code: 'ko', label: '한국어'        },
+  { code: 'en',  flag: '🇺🇸', label: 'English'         },
+  { code: 'zh',  flag: '🇨🇳', label: '中文（普通話）'   },
+  { code: 'yue', flag: '🇭🇰', label: '廣東話'           },
+  { code: 'ja',  flag: '🇯🇵', label: '日本語'           },
+  { code: 'es',  flag: '🇪🇸', label: 'Español'         },
+  { code: 'vi',  flag: '🇻🇳', label: 'Tiếng Việt'      },
+  { code: 'tl',  flag: '🇵🇭', label: 'Tagalog'         },
+  { code: 'ko',  flag: '🇰🇷', label: '한국어'           },
 ] as const
 
 type LangCode = typeof LANGUAGES[number]['code']
@@ -67,7 +69,9 @@ export default function LanguageSelector({
     textTransform: 'uppercase' as const,
   }
 
-  const currentLabel = LANGUAGES.find(l => l.code === current)?.label ?? 'EN'
+  const currentLang  = LANGUAGES.find(l => l.code === current)
+  const currentLabel = currentLang?.label ?? 'EN'
+  const currentFlag  = currentLang?.flag  ?? '🌐'
 
   return (
     <div ref={containerRef} style={{ position: 'relative' }}>
@@ -99,10 +103,7 @@ export default function LanguageSelector({
           e.currentTarget.style.color       = textColor
         }}
       >
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="10"/>
-          <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-        </svg>
+        <span aria-hidden="true" style={{ fontSize: '0.85rem', lineHeight: 1 }}>{currentFlag}</span>
         {currentLabel}
         <svg width="8" height="8" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true" style={{ opacity: 0.5, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 200ms' }}>
           <path d="M1 3l4 4 4-4"/>
@@ -125,7 +126,7 @@ export default function LanguageSelector({
             overflow:    'hidden',
           }}
         >
-          {LANGUAGES.map(({ code, label }) => {
+          {LANGUAGES.map(({ code, flag, label }) => {
             const active = current === code
             return (
               <button
@@ -149,6 +150,7 @@ export default function LanguageSelector({
                 onMouseEnter={e => { if (!active) e.currentTarget.style.background = hoverBg }}
                 onMouseLeave={e => { if (!active) e.currentTarget.style.background = 'transparent' }}
               >
+                <span aria-hidden="true" style={{ fontSize: '0.85rem', lineHeight: 1, minWidth: '16px' }}>{flag}</span>
                 <span style={{ flex: 1 }}>{label}</span>
                 {active && (
                   <span style={{ color: activeText, fontSize: '0.7rem' }}>✓</span>

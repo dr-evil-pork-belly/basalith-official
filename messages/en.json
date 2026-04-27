@@ -216,7 +216,9 @@
   "language_selector": {
     "label": "Language",
     "en": "English",
-    "zh": "中文",
+    "zh": "中文（普通話）",
+    "yue": "廣東話",
+    "ja": "日本語",
     "es": "Español",
     "vi": "Tiếng Việt",
     "tl": "Tagalog",

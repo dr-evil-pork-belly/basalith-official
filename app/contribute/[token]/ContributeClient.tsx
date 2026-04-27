@@ -92,6 +92,30 @@ const PORTAL_UI = {
     contributions_n:  (n: number) => `기여 ${n}건`,
     honesty:          '솔직하게 말씀해 주세요. 귀하가 기여할 수 있는 가장 소중한 것은 진실입니다. 어려운 기억도 긍정적인 것만큼 중요합니다.',
   },
+  yue: {
+    welcome:          (name: string) => `歡迎你，${name}。`,
+    contributions:    '你嘅貢獻',
+    addPhotos:        '上傳相片',
+    videosAndDocs:    '影片同文件',
+    recordMemory:     '錄製回憶',
+    callInStories:    '致電錄製故事',
+    questionsForYou:  '只有你先至答得到嘅問題',
+    footerNote:       '你喺呢度分享嘅所有嘢都會永久保存。',
+    contributions_n:  (n: number) => `${n} 個貢獻`,
+    honesty:          '請誠實。你能夠貢獻嘅最有價值嘅嘢就係真相。困難嘅回憶同複雜嘅感受，同積極嘅一樣重要。',
+  },
+  ja: {
+    welcome:          (name: string) => `${name}さん、ようこそ。`,
+    contributions:    'あなたのご貢献',
+    addPhotos:        '写真を追加',
+    videosAndDocs:    '動画・書類',
+    recordMemory:     '思い出を録音',
+    callInStories:    'お電話で物語を録音',
+    questionsForYou:  'あなたへのご質問',
+    footerNote:       'ここでお分かちいただいたものはすべて永久に保存されます。',
+    contributions_n:  (n: number) => `${n}件のご貢献`,
+    honesty:          '正直にお答えください。ご提供いただける最も貴重なものは真実です。辛い記憶や複雑な感情も、前向きなものと同様に大切です。',
+  },
 }
 
 type ArchiveProps = {
