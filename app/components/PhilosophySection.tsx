@@ -22,24 +22,6 @@ export default function PhilosophySection() {
     >
       <div style={{ maxWidth: '860px', margin: '0 auto' }}>
 
-        {/* Section headline */}
-        <p
-          style={{
-            fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
-            fontSize:      'var(--text-caption)',
-            letterSpacing: '0.35em',
-            textTransform: 'uppercase' as const,
-            color:         'var(--color-gold)',
-            display:       'flex',
-            alignItems:    'center',
-            gap:           '12px',
-            marginBottom:  '32px',
-          }}
-        >
-          <span style={{ display: 'block', width: '24px', height: '1px', background: 'var(--color-gold)', flexShrink: 0 }} aria-hidden="true" />
-          The Question
-        </p>
-
         <h2
           style={{
             fontFamily:    'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
@@ -48,7 +30,7 @@ export default function PhilosophySection() {
             lineHeight:    1.15,
             letterSpacing: '-0.02em',
             color:         'rgba(250,250,248,0.9)',
-            marginBottom:  '40px',
+            marginBottom:  '56px',
           }}
         >
           {t('philosophy.headline')}
@@ -57,30 +39,52 @@ export default function PhilosophySection() {
         <div
           style={{
             fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-            fontSize:     '1.15rem',
             fontWeight:   300,
             lineHeight:   1.9,
-            color:        'rgba(250,248,244,0.55)',
-            maxWidth:     '640px',
+            maxWidth:     '600px',
             marginBottom: '80px',
           }}
         >
-          <p style={{ marginBottom: '20px' }}>{t('philosophy.body_1')}</p>
-          <p style={{ marginBottom: '20px' }}>{t('philosophy.body_2')}</p>
-          <p style={{ marginBottom: '20px' }}>{t('philosophy.body_3')}</p>
-          <p style={{ margin: 0, color: 'rgba(250,248,244,0.75)', fontStyle: 'italic' }}>{t('philosophy.body_4')}</p>
+          {(['body_1','body_2','body_3'] as const).map(k => (
+            <p
+              key={k}
+              style={{
+                fontSize:      '1.15rem',
+                fontStyle:     'italic',
+                color:         'rgba(250,248,244,0.55)',
+                marginBottom:  '28px',
+                whiteSpace:    'pre-line',
+              }}
+            >
+              {t(`philosophy.${k}`)}
+            </p>
+          ))}
+          <p
+            style={{
+              fontSize:      'clamp(1.2rem, 2.5vw, 1.5rem)',
+              fontStyle:     'italic',
+              color:         'rgba(250,248,244,0.8)',
+              marginBottom:  '28px',
+              whiteSpace:    'pre-line',
+            }}
+          >
+            {t('philosophy.body_4')}
+          </p>
+          <p
+            style={{
+              fontSize:   'clamp(1.2rem, 2.5vw, 1.5rem)',
+              fontStyle:  'italic',
+              color:      'rgba(196,162,74,0.9)',
+              margin:     0,
+              whiteSpace: 'pre-line',
+            }}
+          >
+            {t('philosophy.body_5')}
+          </p>
         </div>
 
         {/* Gold divider */}
-        <div
-          aria-hidden="true"
-          style={{
-            width:      '40px',
-            height:     '1px',
-            background: 'var(--color-gold)',
-            margin:     '0 0 80px',
-          }}
-        />
+        <div aria-hidden="true" style={{ width: '40px', height: '1px', background: 'var(--color-gold)', margin: '0 0 80px' }} />
 
         {/* Three pillars */}
         <div
@@ -107,7 +111,7 @@ export default function PhilosophySection() {
               <h3
                 style={{
                   fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-                  fontSize:     '1.5rem',
+                  fontSize:     '1.4rem',
                   fontWeight:   500,
                   color:        'rgba(250,248,244,0.9)',
                   marginBottom: '20px',
@@ -118,11 +122,12 @@ export default function PhilosophySection() {
               </h3>
               <p
                 style={{
-                  fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-                  fontSize:   '1.05rem',
-                  fontWeight: 300,
-                  lineHeight: 1.8,
-                  color:      n === '03' ? 'rgba(196,162,74,0.85)' : 'rgba(250,248,244,0.55)',
+                  fontFamily:  'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+                  fontSize:    '1.05rem',
+                  fontWeight:  300,
+                  lineHeight:  1.85,
+                  color:       'rgba(250,248,244,0.45)',
+                  whiteSpace:  'pre-line',
                 }}
               >
                 {t(bodyKey)}

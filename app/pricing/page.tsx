@@ -21,7 +21,7 @@ const SERIF: React.CSSProperties = {
 const TIERS = [
   {
     name:     'The Archive',
-    tagline:  'For individuals beginning their legacy.',
+    tagline:  'The foundation. Your entity begins learning.',
     price:    '$1,200',
     period:   'per year',
     monthly:  '$100 / month equivalent',
@@ -40,7 +40,7 @@ const TIERS = [
   },
   {
     name:     'The Estate',
-    tagline:  'For families building a generational asset.',
+    tagline:  'Your entity. Your family. Your story. Everything working together.',
     price:    '$3,600',
     period:   'per year',
     monthly:  '$300 / month equivalent',
@@ -61,7 +61,7 @@ const TIERS = [
   },
   {
     name:     'The Dynasty',
-    tagline:  'For legacies that must outlast generations.',
+    tagline:  'For families building across generations.',
     price:    '$9,600',
     period:   'per year',
     monthly:  '$800 / month equivalent',
@@ -138,11 +138,12 @@ export default function PricingPage() {
               lineHeight:   1.1,
               color:        'var(--color-text-primary)',
               letterSpacing: '-0.025em',
-              marginBottom: '24px',
+              marginBottom: '32px',
             }}
           >
-            The infrastructure of continuation.{' '}
-            <em style={{ color: 'var(--color-gold)', fontStyle: 'italic' }}>Priced for every family.</em>
+            What is it worth
+            <br />
+            to never have to wonder?
           </h1>
           <div
             style={{
@@ -152,13 +153,14 @@ export default function PricingPage() {
               fontWeight: 300,
               lineHeight: 1.85,
               color:      'var(--color-text-secondary)',
-              maxWidth:   '540px',
+              maxWidth:   '480px',
               margin:     '0 auto',
             }}
           >
-            <p style={{ marginBottom: '16px' }}>The world&rsquo;s wealthiest people are spending billions building AI versions of themselves.</p>
-            <p style={{ marginBottom: '16px' }}>Basalith does it for $3,600 a year.</p>
-            <p style={{ margin: 0 }}>Not for billionaires. For every family.</p>
+            <p style={{ marginBottom: '8px' }}>We built this for families</p>
+            <p style={{ marginBottom: '24px' }}>not billionaires.</p>
+            <p style={{ marginBottom: '8px' }}>The Estate is $3,600 a year.</p>
+            <p style={{ margin: 0 }}>Less than most people spend on things that matter far less.</p>
           </div>
         </section>
 

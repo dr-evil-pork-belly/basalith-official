@@ -20,25 +20,6 @@ export default function PricingTeaserSection() {
         textAlign:  'center',
       }}
     >
-      <div
-        style={{
-          fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-          fontSize:     'clamp(1.1rem, 2.5vw, 1.4rem)',
-          fontStyle:    'italic',
-          fontWeight:   300,
-          lineHeight:   1.8,
-          color:        'rgba(250,250,248,0.4)',
-          marginBottom: '32px',
-          maxWidth:     '480px',
-          margin:       '0 auto 32px',
-        }}
-      >
-        <p style={{ marginBottom: '16px' }}>
-          The world&rsquo;s wealthiest people are spending billions building AI versions of themselves.
-        </p>
-        <p style={{ margin: 0 }}>Not for billionaires. For every family.</p>
-      </div>
-
       <h2
         style={{
           fontFamily:    'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
@@ -46,73 +27,51 @@ export default function PricingTeaserSection() {
           fontWeight:    300,
           lineHeight:    1.3,
           color:         'rgba(250,250,248,0.9)',
-          marginBottom:  '48px',
+          marginBottom:  '32px',
           letterSpacing: '-0.01em',
+          maxWidth:      '560px',
+          margin:        '0 auto 32px',
         }}
       >
-        The Basalith Estate begins at $2,500.
+        What is it worth
+        <br />
+        to never have to wonder?
       </h2>
 
-      <p
+      <div
         style={{
           fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-          fontSize:     '1.05rem',
+          fontSize:     'clamp(1.05rem, 2vw, 1.2rem)',
           fontStyle:    'italic',
           fontWeight:   300,
-          lineHeight:   1.8,
-          color:        'rgba(250,250,248,0.35)',
-          maxWidth:     '420px',
+          lineHeight:   1.85,
+          color:        'rgba(250,250,248,0.4)',
+          maxWidth:     '400px',
           margin:       '0 auto 48px',
         }}
       >
-        Annual stewardship from $1,200. The same infrastructure. Built for every family.
-      </p>
-
-      <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
-        <Link
-          href="/apply"
-          style={{
-            ...MONO,
-            display:        'inline-block',
-            color:          'var(--color-surface)',
-            textDecoration: 'none',
-            background:     'var(--color-gold)',
-            padding:        '14px 32px',
-            borderRadius:   'var(--radius-sm)',
-            transition:     'background 250ms ease',
-          }}
-          onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'var(--color-gold-light)'}
-          onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'var(--color-gold)'}
-        >
-          Begin Your Application
-        </Link>
-        <Link
-          href="/pricing"
-          style={{
-            ...MONO,
-            display:        'inline-block',
-            color:          'rgba(250,250,248,0.7)',
-            textDecoration: 'none',
-            background:     'transparent',
-            padding:        '13px 31px',
-            border:         '1px solid rgba(250,250,248,0.15)',
-            borderRadius:   'var(--radius-sm)',
-            transition:     'border-color 250ms ease, color 250ms ease',
-          }}
-          onMouseEnter={e => {
-            const el = e.currentTarget as HTMLElement
-            el.style.borderColor = 'rgba(250,250,248,0.4)'
-            el.style.color       = 'rgba(250,250,248,0.95)'
-          }}
-          onMouseLeave={e => {
-            const el = e.currentTarget as HTMLElement
-            el.style.borderColor = 'rgba(250,250,248,0.15)'
-            el.style.color       = 'rgba(250,250,248,0.7)'
-          }}
-        >
-          View Full Pricing
-        </Link>
+        <p style={{ marginBottom: '8px' }}>We built this for families</p>
+        <p style={{ marginBottom: '24px' }}>not billionaires.</p>
+        <p style={{ margin: 0, color: 'rgba(250,250,248,0.6)' }}>The Estate is $3,600 a year.</p>
       </div>
+
+      <Link
+        href="/apply"
+        style={{
+          ...MONO,
+          display:        'inline-block',
+          color:          'var(--color-surface)',
+          textDecoration: 'none',
+          background:     'var(--color-gold)',
+          padding:        '14px 32px',
+          borderRadius:   'var(--radius-sm)',
+          transition:     'background 250ms ease',
+        }}
+        onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'var(--color-gold-light)'}
+        onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'var(--color-gold)'}
+      >
+        Begin Your Application
+      </Link>
     </section>
   )
 }

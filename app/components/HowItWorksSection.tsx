@@ -51,9 +51,10 @@ export default function HowItWorksSection() {
             fontSize:     'var(--text-h1)',
             fontWeight:   300,
             lineHeight:   1.15,
-            color:        'var(--color-text-primary)',
-            maxWidth:     '560px',
-            margin:       '0 0 16px',
+            color:       'var(--color-text-primary)',
+            maxWidth:    '560px',
+            margin:      '0 0 16px',
+            whiteSpace:  'pre-line',
           }}
         >
           {t('how_it_works.headline')}
@@ -181,6 +182,7 @@ export default function HowItWorksSection() {
                     color:       'var(--color-text-secondary)',
                     marginBottom: '24px',
                     maxWidth:    '400px',
+                    whiteSpace:  'pre-line',
                   }}
                 >
                   {t(bodyKey)}

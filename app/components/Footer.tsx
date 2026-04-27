@@ -82,16 +82,17 @@ export default function Footer() {
           <p
             style={{
               fontFamily:  'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-              fontSize:    '1rem',
+              fontSize:    '0.95rem',
               fontStyle:   'italic',
               fontWeight:  300,
-              lineHeight:  1.75,
+              lineHeight:  1.9,
               color:       'rgba(250,250,248,0.4)',
-              maxWidth:    '220px',
+              maxWidth:    '240px',
               marginBottom: '28px',
+              whiteSpace:  'pre-line',
             }}
           >
-            The archive of a life, governed with the same seriousness as an estate.
+            {t('footer.tagline')}
           </p>
           <p
             style={{
@@ -187,14 +188,14 @@ export default function Footer() {
         </p>
         <p
           style={{
-            fontFamily:    'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-            fontSize:      '0.9rem',
-            fontStyle:     'italic',
-            fontWeight:    300,
-            color:         'rgba(184,150,62,0.4)',
+            fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+            fontSize:   '0.9rem',
+            fontStyle:  'italic',
+            fontWeight: 300,
+            color:      'rgba(184,150,62,0.4)',
           }}
         >
-          {t('footer.tagline')}
+          {t('footer.bottom_note')}
         </p>
       </div>
 

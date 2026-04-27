@@ -22,6 +22,15 @@ const LABEL: React.CSSProperties = {
   color: 'var(--color-text-muted)', marginBottom: '8px',
 }
 
+const P: React.CSSProperties = {
+  ...SERIF,
+  fontWeight:   300,
+  fontSize:     '1.1rem',
+  lineHeight:   1.9,
+  color:        'var(--color-text-secondary)',
+  marginBottom: '20px',
+}
+
 export default function JoinArchivistsPage() {
   const [form, setForm]             = useState(INITIAL)
   const [submitted, setSubmitted]   = useState(false)
@@ -46,60 +55,129 @@ export default function JoinArchivistsPage() {
 
   return (
     <>
-      <style>{`
-        .jag-input:focus { border-color: var(--color-gold) !important; box-shadow: var(--shadow-gold) !important; }
-        .jag-input::placeholder { color: var(--color-text-faint); font-style: italic; }
-        @media (max-width: 600px) {
-          .jag-name-email-grid { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
+      <style>{`.jag-input:focus { border-color: var(--color-gold) !important; box-shadow: var(--shadow-gold) !important; } .jag-input::placeholder { color: var(--color-text-faint); font-style: italic; }`}</style>
       <Nav />
       <main style={{ background: 'var(--color-bg)' }}>
         <section style={{ padding: 'clamp(140px,16vw,180px) clamp(24px,6vw,80px) clamp(80px,10vw,120px)' }} aria-label="Join Legacy Guides">
           <div style={{ maxWidth: '640px', margin: '0 auto' }}>
 
-            <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
-              <span style={{ display: 'block', width: '24px', height: '1px', background: 'var(--color-gold)', flexShrink: 0 }} aria-hidden="true" />
-              Legacy Guides
-            </p>
-            <h1 style={{ ...SERIF, fontWeight: 300, fontSize: 'clamp(2.5rem,5vw,4rem)', color: 'var(--color-text-primary)', lineHeight: 1.1, letterSpacing: '-0.025em', marginBottom: '24px' }}>
-              Help families build
+            <h1
+              style={{
+                ...SERIF,
+                fontWeight:    300,
+                fontSize:      'clamp(2rem,5vw,3.5rem)',
+                color:         'var(--color-text-primary)',
+                lineHeight:    1.15,
+                letterSpacing: '-0.025em',
+                marginBottom:  '56px',
+              }}
+            >
+              You will be the reason
               <br />
-              what they cannot leave without.
+              a family never has to wonder.
             </h1>
 
-            <div style={{ ...SERIF, fontWeight: 300, fontSize: '1.1rem', lineHeight: 1.85, color: 'var(--color-text-secondary)', marginBottom: '48px' }}>
-              <p style={{ marginBottom: '16px' }}>
-                Basalith builds living AI entities trained on how specific people think.
-                The families who understand what this means need to be found before it is too late.
-              </p>
-              <p style={{ marginBottom: '16px' }}>
-                Legacy Guides are the people who find them.
-              </p>
-              <p style={{ marginBottom: '16px' }}>
-                Not employees. Independent professionals who believe every family deserves
-                what Mark Zuckerberg spent $300 million building for himself.
-              </p>
-              <p>
-                If you believe in what we are doing and want to bring it to the families in your life,
-                we would like to hear from you.
-              </p>
-            </div>
+            <p style={P}>
+              The hardest conversation
+              <br />
+              is the one that starts with:
+            </p>
+
+            <p
+              style={{
+                ...SERIF,
+                fontWeight:   300,
+                fontSize:     '1.2rem',
+                fontStyle:    'italic',
+                lineHeight:   1.9,
+                color:        'var(--color-gold)',
+                marginBottom: '28px',
+              }}
+            >
+              &ldquo;I should have done this sooner.&rdquo;
+            </p>
+
+            <p style={P}>
+              A Legacy Guide begins that conversation
+              <br />
+              before it becomes regret.
+            </p>
+
+            <p style={P}>
+              You identify families who understand
+              <br />
+              what is at stake.
+              <br />
+              You sit with them.
+              <br />
+              You help them begin.
+            </p>
+
+            <div
+              aria-hidden="true"
+              style={{
+                width:        '40px',
+                height:       '1px',
+                background:   'var(--color-gold)',
+                margin:       '40px 0',
+              }}
+            />
+
+            <p
+              style={{
+                fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+                fontSize:      '0.52rem',
+                letterSpacing: '0.22em',
+                textTransform: 'uppercase' as const,
+                color:         'var(--color-text-muted)',
+                marginBottom:  '16px',
+              }}
+            >
+              The Commission
+            </p>
+
+            <p style={P}>
+              $1,000 on the founding.
+              <br />
+              8% for the life of the archive.
+            </p>
+
+            <div
+              aria-hidden="true"
+              style={{
+                width:        '40px',
+                height:       '1px',
+                background:   'var(--color-border)',
+                margin:       '40px 0',
+              }}
+            />
+
+            <p style={P}>
+              But the work is something else.
+            </p>
+
+            <p style={P}>
+              You give families something
+              <br />
+              they did not know was possible.
+              <br />
+              The chance to never have to wonder.
+            </p>
 
             {submitted ? (
-              <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderTop: '2px solid var(--color-gold)', padding: '48px 40px', textAlign: 'center' }}>
+              <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderTop: '2px solid var(--color-gold)', padding: '40px', textAlign: 'center', marginTop: '48px' }}>
                 <p style={{ ...SERIF, fontWeight: 500, fontSize: '1.4rem', color: 'var(--color-text-primary)', marginBottom: '16px' }}>
                   Your interest has been noted.
                 </p>
                 <p style={{ ...SERIF, fontStyle: 'italic', fontWeight: 300, fontSize: '1rem', color: 'var(--color-text-secondary)', lineHeight: 1.85 }}>
                   We review every expression personally.
-                  Accepted partners receive a complete program briefing by private invitation.
+                  Accepted guides receive a complete briefing by private invitation.
                   <br /><br />
                   You will hear from us if there is a fit.
                 </p>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginTop: '48px' }}>
                 <div className="jag-name-email-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '20px' }}>
                   <div>
                     <label style={LABEL}>Full Name</label>
@@ -110,7 +188,6 @@ export default function JoinArchivistsPage() {
                     <input type="email" required placeholder="you@domain.com" value={form.email} onChange={set('email')} className="jag-input" style={INPUT} />
                   </div>
                 </div>
-
                 <div>
                   <label style={LABEL}>Background</label>
                   <select required value={form.background} onChange={set('background')} className="jag-input" style={{ ...INPUT, cursor: 'pointer', appearance: 'none' as const }}>
@@ -125,12 +202,10 @@ export default function JoinArchivistsPage() {
                     <option value="Other">Other</option>
                   </select>
                 </div>
-
                 <div>
                   <label style={LABEL}>Why do you want to represent Basalith?</label>
                   <textarea required rows={4} value={form.why} onChange={set('why')} className="jag-input" style={{ ...INPUT, resize: 'none' as const, lineHeight: 1.75 }} />
                 </div>
-
                 <button
                   type="submit"
                   disabled={submitting}

@@ -124,23 +124,6 @@ export default function ApplyPage() {
             </div>
           ) : (
             <>
-              <p
-                style={{
-                  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
-                  fontSize:      'var(--text-caption)',
-                  letterSpacing: '0.35em',
-                  textTransform: 'uppercase' as const,
-                  color:         'var(--color-gold)',
-                  display:       'flex',
-                  alignItems:    'center',
-                  gap:           '12px',
-                  marginBottom:  '24px',
-                }}
-              >
-                <span style={{ display: 'block', width: '24px', height: '1px', background: 'var(--color-gold)', flexShrink: 0 }} aria-hidden="true" />
-                Request Your Founding
-              </p>
-
               <h1
                 style={{
                   ...SERIF,
@@ -149,10 +132,10 @@ export default function ApplyPage() {
                   lineHeight:    1.15,
                   color:         'var(--color-text-primary)',
                   letterSpacing: '-0.025em',
-                  marginBottom:  '20px',
+                  marginBottom:  '28px',
                 }}
               >
-                Every archive begins<br />with a conversation.
+                Begin.
               </h1>
 
               <p
@@ -161,13 +144,34 @@ export default function ApplyPage() {
                   fontSize:     '1.1rem',
                   fontStyle:    'italic',
                   fontWeight:   300,
-                  lineHeight:   1.85,
+                  lineHeight:   1.9,
+                  color:        'var(--color-text-secondary)',
+                  marginBottom: '12px',
+                }}
+              >
+                We review every application.
+                <br />
+                Not to gatekeep.
+                <br />
+                To ensure every archive
+                <br />
+                receives the attention it deserves.
+              </p>
+
+              <p
+                style={{
+                  ...SERIF,
+                  fontSize:     '1.1rem',
+                  fontStyle:    'italic',
+                  fontWeight:   300,
+                  lineHeight:   1.9,
                   color:        'var(--color-text-secondary)',
                   marginBottom: '52px',
                 }}
               >
-                Tell us a little about yourself and what brings you to Basalith.
-                We review every application personally and respond within 48 hours.
+                You will hear from a Legacy Guide
+                <br />
+                within 48 hours.
               </p>
 
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>

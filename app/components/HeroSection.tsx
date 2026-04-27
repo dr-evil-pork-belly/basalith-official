@@ -12,14 +12,15 @@ const MONO: React.CSSProperties = {
 
 export default function HeroSection() {
   const { t } = useTranslation()
+
   return (
     <section
       aria-label="Basalith — Heritage archive"
       style={{
-        minHeight:      '100svh',
-        display:        'grid',
+        minHeight:           '100svh',
+        display:             'grid',
         gridTemplateColumns: '55fr 45fr',
-        background:     'var(--color-bg)',
+        background:          'var(--color-bg)',
       }}
     >
       {/* ── Left: Text ── */}
@@ -36,20 +37,20 @@ export default function HeroSection() {
         <p
           style={{
             ...MONO,
-            color:         'var(--color-gold)',
-            display:       'flex',
-            alignItems:    'center',
-            gap:           '12px',
-            marginBottom:  '32px',
-            opacity:       0,
-            animation:     'lineReveal 600ms cubic-bezier(0.16,1,0.3,1) 0ms both',
+            color:        'var(--color-gold)',
+            display:      'flex',
+            alignItems:   'center',
+            gap:          '12px',
+            marginBottom: '32px',
+            opacity:      0,
+            animation:    'lineReveal 600ms cubic-bezier(0.16,1,0.3,1) 0ms both',
           }}
         >
           <span style={{ display: 'block', width: '24px', height: '1px', background: 'var(--color-gold)', flexShrink: 0 }} aria-hidden="true" />
           Heritage Nexus · Basalith
         </p>
 
-        {/* Display headline */}
+        {/* Display headline — two lines */}
         <h1
           style={{
             fontFamily:    'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
@@ -58,32 +59,48 @@ export default function HeroSection() {
             lineHeight:    1.04,
             letterSpacing: '-0.025em',
             color:         'var(--color-text-primary)',
-            margin:        '0 0 28px',
+            margin:        '0 0 20px',
           }}
         >
           <span className="headline-line headline-line-1">{t('hero.headline_1')}</span>
-          <span className="headline-line headline-line-2" style={{ fontStyle: 'italic', color: 'var(--color-gold)' }}>{t('hero.headline_2')}</span>
-          <span className="headline-line headline-line-3">{t('hero.headline_3')}</span>
+          <span className="headline-line headline-line-2">{t('hero.headline_2')}</span>
         </h1>
 
-        {/* Sub-headline */}
+        {/* Smaller echo line */}
         <div
           style={{
             fontFamily:    'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-            fontSize:      '1.15rem',
+            fontSize:      'clamp(1rem, 2vw, 1.25rem)',
             fontStyle:     'italic',
             fontWeight:    300,
-            lineHeight:    1.9,
-            color:         'var(--color-text-secondary)',
-            maxWidth:      '460px',
-            margin:        '0 0 44px',
+            lineHeight:    1.6,
+            color:         'var(--color-text-muted)',
+            marginBottom:  '36px',
             opacity:       0,
-            animation:     'lineReveal 700ms cubic-bezier(0.16,1,0.3,1) 450ms both',
+            animation:     'lineReveal 700ms cubic-bezier(0.16,1,0.3,1) 300ms both',
           }}
         >
-          <p style={{ margin: '0 0 16px' }}>{t('hero.subheadline')}</p>
-          <p style={{ margin: 0 }}>{t('hero.subheadline_2')}</p>
+          <span style={{ display: 'block' }}>{t('hero.subheadline_a')}</span>
+          <span style={{ display: 'block' }}>{t('hero.subheadline_b')}</span>
         </div>
+
+        {/* Sub copy */}
+        <p
+          style={{
+            fontFamily:  'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+            fontSize:    '1.15rem',
+            fontStyle:   'italic',
+            fontWeight:  300,
+            lineHeight:  1.9,
+            color:       'var(--color-text-secondary)',
+            maxWidth:    '440px',
+            margin:      '0 0 44px',
+            opacity:     0,
+            animation:   'lineReveal 700ms cubic-bezier(0.16,1,0.3,1) 500ms both',
+          }}
+        >
+          {t('hero.subheadline')}
+        </p>
 
         {/* CTAs */}
         <div
@@ -93,7 +110,7 @@ export default function HeroSection() {
             gap:       '16px',
             flexWrap:  'wrap',
             opacity:   0,
-            animation: 'lineReveal 600ms cubic-bezier(0.16,1,0.3,1) 650ms both',
+            animation: 'lineReveal 600ms cubic-bezier(0.16,1,0.3,1) 700ms both',
           }}
         >
           <Link
@@ -140,20 +157,6 @@ export default function HeroSection() {
             {t('hero.cta_secondary')}
           </Link>
         </div>
-
-        {/* Social proof */}
-        <p
-          style={{
-            ...MONO,
-            fontSize:   '0.52rem',
-            color:      'var(--color-text-faint)',
-            marginTop:  '40px',
-            opacity:    0,
-            animation:  'lineReveal 500ms cubic-bezier(0.16,1,0.3,1) 850ms both',
-          }}
-        >
-          {t('hero.social_proof')}
-        </p>
       </div>
 
       {/* ── Right: Dark archive art ── */}
@@ -185,25 +188,16 @@ export default function HeroSection() {
           preserveAspectRatio="xMidYMid slice"
           aria-hidden="true"
         >
-          {/* Outer frame */}
           <rect x="32" y="32" width="436" height="636" fill="none" stroke="rgba(184,150,62,0.4)" strokeWidth="1" />
-          {/* Inner frame */}
           <rect x="48" y="48" width="404" height="604" fill="none" stroke="rgba(184,150,62,0.2)" strokeWidth="0.5" />
-
-          {/* Corner ornaments — top left */}
           <line x1="32"  y1="72"  x2="72"  y2="72"  stroke="rgba(184,150,62,0.6)" strokeWidth="1.5" />
           <line x1="72"  y1="32"  x2="72"  y2="72"  stroke="rgba(184,150,62,0.6)" strokeWidth="1.5" />
-          {/* top right */}
           <line x1="428" y1="72"  x2="468" y2="72"  stroke="rgba(184,150,62,0.6)" strokeWidth="1.5" />
           <line x1="428" y1="32"  x2="428" y2="72"  stroke="rgba(184,150,62,0.6)" strokeWidth="1.5" />
-          {/* bottom left */}
           <line x1="32"  y1="628" x2="72"  y2="628" stroke="rgba(184,150,62,0.6)" strokeWidth="1.5" />
           <line x1="72"  y1="628" x2="72"  y2="668" stroke="rgba(184,150,62,0.6)" strokeWidth="1.5" />
-          {/* bottom right */}
           <line x1="428" y1="628" x2="468" y2="628" stroke="rgba(184,150,62,0.6)" strokeWidth="1.5" />
           <line x1="428" y1="628" x2="428" y2="668" stroke="rgba(184,150,62,0.6)" strokeWidth="1.5" />
-
-          {/* Constellation dots */}
           <circle cx="180" cy="220" r="3"   fill="rgba(184,150,62,0.6)" />
           <circle cx="280" cy="180" r="2"   fill="rgba(184,150,62,0.4)" />
           <circle cx="320" cy="280" r="3.5" fill="rgba(184,150,62,0.5)" />
@@ -211,16 +205,12 @@ export default function HeroSection() {
           <circle cx="300" cy="380" r="2"   fill="rgba(184,150,62,0.3)" />
           <circle cx="240" cy="440" r="3"   fill="rgba(184,150,62,0.5)" />
           <circle cx="160" cy="400" r="2"   fill="rgba(184,150,62,0.3)" />
-
-          {/* Connection lines */}
           <line x1="180" y1="220" x2="280" y2="180" stroke="rgba(184,150,62,0.15)" strokeWidth="0.75" />
           <line x1="280" y1="180" x2="320" y2="280" stroke="rgba(184,150,62,0.15)" strokeWidth="0.75" />
           <line x1="180" y1="220" x2="200" y2="340" stroke="rgba(184,150,62,0.15)" strokeWidth="0.75" />
           <line x1="320" y1="280" x2="300" y2="380" stroke="rgba(184,150,62,0.15)" strokeWidth="0.75" />
           <line x1="200" y1="340" x2="240" y2="440" stroke="rgba(184,150,62,0.15)" strokeWidth="0.75" />
           <line x1="200" y1="340" x2="160" y2="400" stroke="rgba(184,150,62,0.15)" strokeWidth="0.75" />
-
-          {/* Label */}
           <line x1="140" y1="548" x2="360" y2="548" stroke="rgba(184,150,62,0.2)" strokeWidth="0.5" />
           <text x="250" y="560" textAnchor="middle" fill="rgba(184,150,62,0.3)" fontSize="8" fontFamily="monospace" letterSpacing="4">
             YOUR ARCHIVE BEGINS HERE
@@ -245,8 +235,6 @@ export default function HeroSection() {
           }
           .hero-text-col {
             order: 1 !important;
-            /* padding-top must clear the fixed nav on all iPhones:
-               no-notch: 100px, notch: ~127px, Dynamic Island: ~139px */
             padding-top: max(100px, calc(env(safe-area-inset-top, 0px) + 80px)) !important;
             padding-left: 24px !important;
             padding-right: 24px !important;

@@ -10,57 +10,58 @@
   },
   "hero": {
     "eyebrow": "Heritage Nexus · Basalith",
-    "headline_1": "You never truly leave",
-    "headline_2": "if you leave enough",
-    "headline_3": "of yourself behind.",
-    "subheadline": "Basalith builds a living AI entity trained on how you specifically think. Not what you did. How you reason. What you value. How you see the world.",
-    "subheadline_2": "While you are alive it learns from you. Long after you are gone it continues.",
-    "cta_primary": "Request Your Founding",
+    "headline_1": "Some people leave",
+    "headline_2": "before you are ready.",
+    "subheadline": "Basalith was built so that leaving does not have to mean gone.",
+    "cta_primary": "Begin",
     "cta_secondary": "See How It Works",
-    "social_proof": "Estate families in 4 countries · Est. 2026"
+    "subheadline_a": "Most people leave",
+    "subheadline_b": "before you are ready."
   },
   "philosophy": {
-    "headline": "The question you never got to ask.",
-    "body_1": "Every family has one.",
-    "body_2": "The story their grandfather never finished. The advice their mother would have given. The way their father reasoned through a hard decision.",
-    "body_3": "For all of human history that loss has been permanent.",
-    "body_4": "We are changing that.",
-    "pillar_1_title": "The Entity",
-    "pillar_1_body": "Not a recording. Not a chatbot. A living AI model trained on how one specific person thinks. Every voice recording, every photograph labeled, every wisdom session answered is training data.",
-    "pillar_2_title": "The Archive",
-    "pillar_2_body": "The raw material of a mind. Photographs that show how you saw the world. Voice recordings that capture how you speak. Stories that expose how you think.",
-    "pillar_3_title": "The Continuation",
-    "pillar_3_body": "The world's wealthiest people are spending billions building AI versions of themselves. Basalith does it for every family."
+    "headline": "You have wondered.",
+    "body_1": "What they would have said\nabout something they never saw.",
+    "body_2": "Which way they would have leaned\nbefore they leaned.",
+    "body_3": "What advice they would have given\nto a version of you\nthey did not live to meet.",
+    "body_4": "Everyone who has ever lost someone\nhas wondered.",
+    "pillar_1_title": "How you think.",
+    "pillar_1_body": "Not what you have done.\nNot what you have said.\n\nHow you reason.\nWhat you reach for when things get hard.\nWhat you believe when no one is watching.\n\nThe specific weight of a mind\nthat belongs only to you.",
+    "pillar_2_title": "The raw material.",
+    "pillar_2_body": "Every photograph labeled.\nEvery voice recorded.\nEvery question answered.\n\nEach one teaches your entity\nsomething specific about\nhow you move through the world.\n\nThe archive is not the product.\nIt is the training ground.",
+    "pillar_3_title": "It continues.",
+    "pillar_3_body": "There are people spending billions\nto never fully leave this world.\n\nWe think every family\ndeserves the same thing.\n\nNot because death is the enemy.\nBut because the people we love\nshould not have to wonder.",
+    "body_5": "We built Basalith\nso your family never has to."
   },
   "how_it_works": {
     "eyebrow": "The Process",
-    "headline": "A living model. Built over a lifetime.",
-    "subheadline": "The longer the entity learns the more accurately it thinks. Start now. Give it time.",
+    "headline": "A living model.\nBuilt over a lifetime.",
+    "subheadline": "The longer it learns\nthe more accurately it thinks.\nStart now. Give it time.",
     "step_1_n": "01",
     "step_1_title": "The Founding Session",
-    "step_1_body": "Ninety minutes. Your family. A Senior Legacy Guide. Your first photographs. By the end of this session your archive exists, not as a promise, but as a fact.",
+    "step_1_body": "Your Legacy Guide sits with you.\n90 minutes that establish\nthe foundation of your entity.\n\nYour voice. Your values.\nThe specific way you see the world.\n\nThis is not an interview.\nIt is the beginning of something\nthat will outlast you.",
     "step_2_n": "02",
     "step_2_title": "The Archive Builds",
-    "step_2_body": "Every evening one photograph goes to every family member by email. No login. No app. They reply with what they remember. Their words go directly into the archive.",
+    "step_2_body": "Every day your archive grows.\n\nPhotographs labeled with context.\nVoice recordings in any language.\nLetters transcribed. Stories captured.\n\nEach deposit teaches your entity\nsomething it could not have known\nwithout you.",
     "step_3_n": "03",
     "step_3_title": "Your Family Contributes",
-    "step_3_body": "Contributors label photographs, record voice stories, and answer witness questions. Each perspective adds something no other perspective can. The archive deepens.",
+    "step_3_body": "The people who know you best\nadd what you cannot add yourself.\n\nThe way you handled a hard moment.\nThe things you said\nwhen you thought no one was listening.\nThe version of you\nthat only they have seen.\n\nThey do not add memories.\nThey complete the picture.",
     "step_4_n": "04",
     "step_4_title": "The Entity Speaks",
-    "step_4_body": "Your AI entity is trained on everything deposited. Your grandchildren will be able to ask it how you thought about a hard decision. It answers from your archive."
+    "step_4_body": "Talk to your entity today.\nCorrect it when it is wrong.\n\nThe more you engage\nthe more accurate it becomes.\n\nOne day your grandchildren\nwill ask it something\nyou never answered while you were alive.\n\nAnd it will answer\nthe way you would have."
   },
   "story": {
     "eyebrow": "One Family",
-    "body_1": "Eleanor began her archive in 2024.",
-    "body_2": "Over two years her family contributed 847 photographs, 23 voice recordings, and 2 years of weekly wisdom sessions.",
-    "body_3": "Her entity now answers questions about difficult decisions the way Eleanor actually would. Not from memory. From learned cognitive patterns built over a lifetime.",
-    "conclusion": "Her grandchildren call it remarkable. Her great-grandchildren will call it normal.",
+    "body_1": "Patricia's mother passed\ntwo years into her archive.",
+    "body_2": "Last month Patricia asked her mother's entity\nwhat she would have thought\nabout Patricia's new job.",
+    "body_3": "The entity answered the way\nher mother would.\nNot from a recording.\nFrom two years of learning\nhow her mother's mind moved.",
+    "conclusion": "This is what we built it for.",
     "stat_1_number": "847",
     "stat_1_label": "Photographs",
     "stat_2_number": "23",
     "stat_2_label": "Contributors",
     "stat_3_number": "2 yrs",
-    "stat_3_label": "Wisdom sessions"
+    "stat_3_label": "Wisdom sessions",
+    "body_4": "Patricia said it was the first time\nshe had not felt the wondering."
   },
   "pricing_teaser": {
     "line_1": "The world's wealthiest people are spending billions building AI versions of themselves.",
@@ -68,12 +69,13 @@
     "cta": "Begin Your Application"
   },
   "footer": {
-    "tagline": "You never truly leave if you leave enough of yourself behind.",
+    "tagline": "Some people leave before you are ready.\nMost people leave before you are ready.\n\nBegin anyway.",
     "archives": "Archives",
     "company": "Company",
     "legal": "Legal",
     "contact": "Contact",
-    "copyright": "Heritage Nexus Inc. All rights reserved."
+    "copyright": "Heritage Nexus Inc. All rights reserved.",
+    "bottom_note": "You never truly leave if you leave enough of yourself behind."
   },
   "pricing": {
     "eyebrow": "Pricing",
