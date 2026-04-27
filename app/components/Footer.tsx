@@ -34,7 +34,7 @@ const COLS: { heading: string; links: { label: string; href?: string }[] }[] = [
     links: [
       { label: 'hello@basalith.xyz', href: 'mailto:hello@basalith.xyz' },
       { label: 'Heritage Nexus Inc.'                                    },
-      { label: 'Glendora, California'                                   },
+      { label: 'Wilmington, Delaware'                                    },
       { label: 'Est. 2026'                                              },
     ],
   },
@@ -184,7 +184,7 @@ export default function Footer() {
         }}
       >
         <p style={{ ...MONO, fontSize: '0.46rem', color: 'rgba(250,250,248,0.2)' }}>
-          &copy; {new Date().getFullYear()} Heritage Nexus Inc. All rights reserved.
+          &copy; {new Date().getFullYear()} Heritage Nexus Inc. All rights reserved. Wilmington, Delaware.
         </p>
         <p
           style={{
