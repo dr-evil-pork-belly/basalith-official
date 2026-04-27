@@ -13,6 +13,7 @@ export default function PhilosophySection() {
 
   return (
     <section
+      id="loss"
       data-reveal
       aria-label="Our philosophy"
       style={{

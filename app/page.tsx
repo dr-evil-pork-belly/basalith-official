@@ -5,14 +5,17 @@ export const metadata: Metadata = {
   description: 'Basalith was built so that leaving does not have to mean gone. The infrastructure of human continuation. Priced for every family.',
 }
 
-import Nav                  from './components/Nav'
-import HeroSection          from './components/HeroSection'
-import PhilosophySection    from './components/PhilosophySection'
-import HowItWorksSection    from './components/HowItWorksSection'
-import StorySection         from './components/StorySection'
-import ClosingSection       from './components/ClosingSection'
+import Nav                from './components/Nav'
+import HeroSection        from './components/HeroSection'
+import DoorSelector       from './components/DoorSelector'
+import PhilosophySection  from './components/PhilosophySection'
+import LegacySection      from './components/LegacySection'
+import HowItWorksSection  from './components/HowItWorksSection'
+import StorySection       from './components/StorySection'
+import TechnologySection  from './components/TechnologySection'
+import ClosingSection     from './components/ClosingSection'
 import PricingTeaserSection from './components/PricingTeaserSection'
-import Footer               from './components/Footer'
+import Footer             from './components/Footer'
 
 export default function HomePage() {
   return (
@@ -20,9 +23,12 @@ export default function HomePage() {
       <Nav />
       <main>
         <HeroSection />
+        <DoorSelector />
         <PhilosophySection />
+        <LegacySection />
         <HowItWorksSection />
         <StorySection />
+        <TechnologySection />
         <ClosingSection />
         <PricingTeaserSection />
       </main>
