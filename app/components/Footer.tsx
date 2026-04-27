@@ -2,43 +2,40 @@
 
 import { useTranslation } from '@/app/hooks/useTranslation'
 
-const COLS = [
+const COLS: { heading: string; links: { label: string; href?: string }[] }[] = [
   {
     heading: 'Archives',
     links: [
-      { label: 'The Founding Session', href: '/founding-session' },
-      { label: 'The Method',           href: '/method'           },
-      { label: 'The Asset',            href: '/asset'            },
-      { label: 'Pricing',              href: '/pricing'          },
-      { label: 'Witness Archive',      href: '/posthumous-archive' },
+      { label: 'The Estate',       href: '/pricing'          },
+      { label: 'The Dynasty',      href: '/pricing'          },
+      { label: 'The Archive',      href: '/pricing'          },
+      { label: 'Founding Session', href: '/founding-session' },
     ],
   },
   {
     heading: 'Company',
     links: [
-      { label: 'About',            href: '/about'           },
-      { label: 'Become a Guide',   href: '/join-archivists' },
-      { label: 'Contact',          href: '/contact'         },
-      { label: 'basalith.ai',      href: 'https://basalith.ai' },
+      { label: 'About',                  href: '/about'           },
+      { label: 'The Method',             href: '/method'          },
+      { label: 'Become a Legacy Guide',  href: '/join-archivists' },
+      { label: 'Apply',                  href: '/apply'           },
     ],
   },
   {
     heading: 'Legal',
     links: [
-      { label: 'Privacy Policy',  href: '/privacy'         },
-      { label: 'Terms of Service',href: '/terms'           },
-      { label: 'Data Ownership',  href: '/data-ownership'  },
-      { label: 'Continuity',      href: '/continuity'      },
-      { label: 'Custodianship',   href: '/custodianship'   },
+      { label: 'Privacy Policy',   href: '/privacy'        },
+      { label: 'Terms of Service', href: '/terms'          },
+      { label: 'Data Ownership',   href: '/data-ownership' },
     ],
   },
   {
     heading: 'Contact',
     links: [
-      { label: 'legacy@basalith.xyz',  href: 'mailto:legacy@basalith.xyz'  },
-      { label: 'My Archive',           href: '/archive-login'              },
-      { label: 'FAQ',                  href: '/faq'                        },
-      { label: 'Apply',                href: '/apply'                      },
+      { label: 'hello@basalith.xyz', href: 'mailto:hello@basalith.xyz' },
+      { label: 'Heritage Nexus Inc.'                                    },
+      { label: 'Glendora, California'                                   },
+      { label: 'Est. 2026'                                              },
     ],
   },
 ]
@@ -142,27 +139,30 @@ export default function Footer() {
             </p>
             <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {links.map(({ label, href }) => {
-                const external = href.startsWith('http') || href.startsWith('mailto')
-                const Tag      = 'a' as const
+                const baseStyle: React.CSSProperties = {
+                  fontFamily:  'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+                  fontSize:    '0.95rem',
+                  fontWeight:  300,
+                  color:       'rgba(250,250,248,0.4)',
+                  display:     'block',
+                }
                 return (
                   <li key={label}>
-                    <Tag
-                      href={href}
-                      {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                      style={{
-                        fontFamily:     'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-                        fontSize:       '0.95rem',
-                        fontWeight:     300,
-                        color:          'rgba(250,250,248,0.4)',
-                        textDecoration: 'none',
-                        transition:     'color 200ms ease',
-                        display:        'block',
-                      }}
-                      onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = 'rgba(250,250,248,0.85)'}
-                      onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = 'rgba(250,250,248,0.4)'}
-                    >
-                      {label}
-                    </Tag>
+                    {href ? (
+                      <a
+                        href={href}
+                        {...(href.startsWith('http') || href.startsWith('mailto')
+                          ? { target: '_blank', rel: 'noopener noreferrer' }
+                          : {})}
+                        style={{ ...baseStyle, textDecoration: 'none', transition: 'color 200ms ease' }}
+                        onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = 'rgba(250,250,248,0.85)'}
+                        onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = 'rgba(250,250,248,0.4)'}
+                      >
+                        {label}
+                      </a>
+                    ) : (
+                      <span style={baseStyle}>{label}</span>
+                    )}
                   </li>
                 )
               })}
