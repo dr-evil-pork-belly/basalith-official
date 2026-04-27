@@ -1,34 +1,16 @@
-const PILLARS = [
-  {
-    n:     '01',
-    title: 'The Entity',
-    body:  [
-      'Not a recording. Not a chatbot.',
-      'A living AI model trained on how one specific person thinks.',
-      'Every voice recording, every photograph labeled, every wisdom session answered is training data. The entity learns your cognitive fingerprint. How you reason. Not just what you said.',
-    ],
-  },
-  {
-    n:     '02',
-    title: 'The Archive',
-    body:  [
-      'The raw material of a mind.',
-      'Photographs that show how you saw the world. Voice recordings that capture how you speak. Letters that reveal how you write. Stories that expose how you think.',
-      'Every deposit makes the entity more accurate. More distinctly you.',
-    ],
-  },
-  {
-    n:     '03',
-    title: 'The Continuation',
-    body:  [
-      'The world\'s wealthiest people are spending billions building AI versions of themselves.',
-      'Basalith does it for $3,600 a year.',
-      'Not for billionaires. For every family.',
-    ],
-  },
+'use client'
+
+import { useTranslation } from '@/app/hooks/useTranslation'
+
+const PILLAR_KEYS = [
+  { n: '01', titleKey: 'philosophy.pillar_1_title', bodyKey: 'philosophy.pillar_1_body' },
+  { n: '02', titleKey: 'philosophy.pillar_2_title', bodyKey: 'philosophy.pillar_2_body' },
+  { n: '03', titleKey: 'philosophy.pillar_3_title', bodyKey: 'philosophy.pillar_3_body' },
 ]
 
 export default function PhilosophySection() {
+  const { t } = useTranslation()
+
   return (
     <section
       data-reveal
@@ -60,47 +42,43 @@ export default function PhilosophySection() {
 
         <h2
           style={{
-            fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-            fontSize:     'clamp(2rem, 4vw, 3.25rem)',
-            fontWeight:   300,
-            lineHeight:   1.15,
+            fontFamily:    'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+            fontSize:      'clamp(2rem, 4vw, 3.25rem)',
+            fontWeight:    300,
+            lineHeight:    1.15,
             letterSpacing: '-0.02em',
-            color:        'rgba(250,250,248,0.9)',
-            marginBottom: '40px',
+            color:         'rgba(250,250,248,0.9)',
+            marginBottom:  '40px',
           }}
         >
-          The question you never got to ask.
+          {t('philosophy.headline')}
         </h2>
 
         <div
           style={{
-            fontFamily:  'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-            fontSize:    '1.15rem',
-            fontWeight:  300,
-            lineHeight:  1.9,
-            color:       'rgba(250,248,244,0.55)',
-            maxWidth:    '640px',
+            fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+            fontSize:     '1.15rem',
+            fontWeight:   300,
+            lineHeight:   1.9,
+            color:        'rgba(250,248,244,0.55)',
+            maxWidth:     '640px',
             marginBottom: '80px',
           }}
         >
-          <p style={{ marginBottom: '20px' }}>Every family has one.</p>
-          <p style={{ marginBottom: '20px' }}>
-            The story their grandfather never finished. The advice their mother would have given.
-            The way their father reasoned through a hard decision, the specific logic of a mind
-            that no longer exists.
-          </p>
-          <p style={{ marginBottom: '20px' }}>For all of human history that loss has been permanent.</p>
-          <p style={{ margin: 0, color: 'rgba(250,248,244,0.75)', fontStyle: 'italic' }}>We are changing that.</p>
+          <p style={{ marginBottom: '20px' }}>{t('philosophy.body_1')}</p>
+          <p style={{ marginBottom: '20px' }}>{t('philosophy.body_2')}</p>
+          <p style={{ marginBottom: '20px' }}>{t('philosophy.body_3')}</p>
+          <p style={{ margin: 0, color: 'rgba(250,248,244,0.75)', fontStyle: 'italic' }}>{t('philosophy.body_4')}</p>
         </div>
 
         {/* Gold divider */}
         <div
           aria-hidden="true"
           style={{
-            width:        '40px',
-            height:       '1px',
-            background:   'var(--color-gold)',
-            margin:       '0 0 80px',
+            width:      '40px',
+            height:     '1px',
+            background: 'var(--color-gold)',
+            margin:     '0 0 80px',
           }}
         />
 
@@ -112,7 +90,7 @@ export default function PhilosophySection() {
             gap:                 '48px',
           }}
         >
-          {PILLARS.map(({ n, title, body }) => (
+          {PILLAR_KEYS.map(({ n, titleKey, bodyKey }) => (
             <div key={n} data-reveal>
               <p
                 style={{
@@ -136,29 +114,19 @@ export default function PhilosophySection() {
                   lineHeight:   1.2,
                 }}
               >
-                {title}
+                {t(titleKey)}
               </h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {body.map((para, i) => (
-                  <p
-                    key={i}
-                    style={{
-                      fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-                      fontSize:   '1.05rem',
-                      fontWeight: 300,
-                      lineHeight: 1.8,
-                      color:      i === 0
-                        ? 'rgba(250,248,244,0.75)'
-                        : n === '03' && i === 1
-                          ? 'rgba(196,162,74,0.85)'
-                          : 'rgba(250,248,244,0.45)',
-                      fontStyle: i === 0 && n !== '03' ? 'italic' : 'normal',
-                    }}
-                  >
-                    {para}
-                  </p>
-                ))}
-              </div>
+              <p
+                style={{
+                  fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+                  fontSize:   '1.05rem',
+                  fontWeight: 300,
+                  lineHeight: 1.8,
+                  color:      n === '03' ? 'rgba(196,162,74,0.85)' : 'rgba(250,248,244,0.55)',
+                }}
+              >
+                {t(bodyKey)}
+              </p>
             </div>
           ))}
         </div>

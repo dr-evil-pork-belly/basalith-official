@@ -1,41 +1,31 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useRouter } from 'next/navigation'
+import { LOCALES, type Locale }        from '@/lib/i18n'
+import { useLang }                      from './LangProvider'
 
-const LANGUAGES = [
-  { code: 'en',  flag: '🇺🇸', label: 'English'         },
-  { code: 'zh',  flag: '🇨🇳', label: '中文（普通話）'   },
-  { code: 'yue', flag: '🇭🇰', label: '廣東話'           },
-  { code: 'ja',  flag: '🇯🇵', label: '日本語'           },
-  { code: 'es',  flag: '🇪🇸', label: 'Español'         },
-  { code: 'vi',  flag: '🇻🇳', label: 'Tiếng Việt'      },
-  { code: 'tl',  flag: '🇵🇭', label: 'Tagalog'         },
-  { code: 'ko',  flag: '🇰🇷', label: '한국어'           },
-] as const
-
-type LangCode = typeof LANGUAGES[number]['code']
-
-function getStoredLang(): LangCode {
-  if (typeof document === 'undefined') return 'en'
-  const match = document.cookie.match(/preferred_language=([^;]+)/)
-  const val   = match?.[1] ?? 'en'
-  return LANGUAGES.some(l => l.code === val) ? val as LangCode : 'en'
-}
+const LANGUAGES: { code: Locale; flag: string; label: string }[] = [
+  { code: 'en',  flag: '🇺🇸', label: 'English'       },
+  { code: 'zh',  flag: '🇨🇳', label: '中文（普通話）' },
+  { code: 'yue', flag: '🇭🇰', label: '廣東話'         },
+  { code: 'ja',  flag: '🇯🇵', label: '日本語'         },
+  { code: 'es',  flag: '🇪🇸', label: 'Español'       },
+  { code: 'vi',  flag: '🇻🇳', label: 'Tiếng Việt'    },
+  { code: 'tl',  flag: '🇵🇭', label: 'Tagalog'       },
+  { code: 'ko',  flag: '🇰🇷', label: '한국어'         },
+]
 
 export default function LanguageSelector({
   variant = 'light',
 }: {
   variant?: 'light' | 'dark'
 }) {
-  const [open,    setOpen]    = useState(false)
-  const [current, setCurrent] = useState<LangCode>('en')
-  const router    = useRef(useRouter())
-  const containerRef = useRef<HTMLDivElement>(null)
+  const serverLang   = useLang()
+  const [open, setOpen] = useState(false)
+  const containerRef    = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    setCurrent(getStoredLang())
-  }, [])
+  const current     = serverLang
+  const currentLang = LANGUAGES.find(l => l.code === current) ?? LANGUAGES[0]
 
   // Close on outside click
   useEffect(() => {
@@ -47,14 +37,13 @@ export default function LanguageSelector({
     return () => document.removeEventListener('mousedown', handler)
   }, [open])
 
-  function switchLang(code: LangCode) {
-    document.cookie = `preferred_language=${code};path=/;max-age=31536000;SameSite=Lax`
-    setCurrent(code)
+  function switchLang(code: Locale) {
+    document.cookie = `lang=${code};path=/;max-age=31536000;SameSite=Lax`
     setOpen(false)
-    router.current.refresh()
+    window.location.reload()
   }
 
-  const isLight = variant === 'light'
+  const isLight     = variant === 'light'
   const textColor   = isLight ? 'var(--color-text-muted)'    : 'rgba(240,237,230,0.6)'
   const borderColor = isLight ? 'var(--color-border-medium)' : 'rgba(255,255,255,0.12)'
   const bgColor     = isLight ? 'var(--color-surface)'       : '#1C1A17'
@@ -69,14 +58,10 @@ export default function LanguageSelector({
     textTransform: 'uppercase' as const,
   }
 
-  const currentLang  = LANGUAGES.find(l => l.code === current)
-  const currentLabel = currentLang?.label ?? 'EN'
-  const currentFlag  = currentLang?.flag  ?? '🌐'
-
   return (
     <div ref={containerRef} style={{ position: 'relative' }}>
       <button
-        aria-label={`Language: ${currentLabel}`}
+        aria-label={`Language: ${currentLang.label}`}
         aria-expanded={open}
         onClick={() => setOpen(v => !v)}
         style={{
@@ -103,9 +88,10 @@ export default function LanguageSelector({
           e.currentTarget.style.color       = textColor
         }}
       >
-        <span aria-hidden="true" style={{ fontSize: '0.85rem', lineHeight: 1 }}>{currentFlag}</span>
-        {currentLabel}
-        <svg width="8" height="8" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true" style={{ opacity: 0.5, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 200ms' }}>
+        <span aria-hidden="true" style={{ fontSize: '0.85rem', lineHeight: 1 }}>{currentLang.flag}</span>
+        {currentLang.label}
+        <svg width="8" height="8" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"
+          style={{ opacity: 0.5, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 200ms' }}>
           <path d="M1 3l4 4 4-4"/>
         </svg>
       </button>
@@ -122,7 +108,7 @@ export default function LanguageSelector({
             borderRadius: '2px',
             boxShadow:   '0 8px 24px rgba(0,0,0,0.12)',
             zIndex:      300,
-            minWidth:    '140px',
+            minWidth:    '160px',
             overflow:    'hidden',
           }}
         >
@@ -152,9 +138,7 @@ export default function LanguageSelector({
               >
                 <span aria-hidden="true" style={{ fontSize: '0.85rem', lineHeight: 1, minWidth: '16px' }}>{flag}</span>
                 <span style={{ flex: 1 }}>{label}</span>
-                {active && (
-                  <span style={{ color: activeText, fontSize: '0.7rem' }}>✓</span>
-                )}
+                {active && <span style={{ color: activeText, fontSize: '0.7rem' }}>✓</span>}
               </button>
             )
           })}

@@ -1,37 +1,17 @@
+'use client'
+
 import Link from 'next/link'
+import { useTranslation } from '@/app/hooks/useTranslation'
 
 const STEPS = [
-  {
-    n:     '01',
-    title: 'The Founding Session',
-    body:  'Ninety minutes. Your family. A Senior Legacy Guide. Your first photographs. By the end of this session your archive exists, not as a promise, but as a fact.',
-    href:  '/founding-session',
-    quote: 'The founding session is not an interview. It is the beginning of something that will outlast you.',
-  },
-  {
-    n:     '02',
-    title: 'The Archive Builds',
-    body:  'Every evening one photograph goes to every family member by email. No login. No app. They reply with what they remember. Their words go directly into the archive.',
-    href:  '/method',
-    quote: 'Every deposit teaches the entity something specific about how you think.',
-  },
-  {
-    n:     '03',
-    title: 'Your Family Contributes',
-    body:  'Contributors label photographs, record voice stories, and answer witness questions. Each perspective adds something no other perspective can. The archive deepens.',
-    href:  '/method',
-    quote: 'Contributors do not add memories. They train an AI.',
-  },
-  {
-    n:     '04',
-    title: 'The Entity Speaks',
-    body:  'Your AI entity is trained on everything deposited. Your grandchildren will be able to ask it how you thought about a hard decision. It answers from your archive.',
-    href:  '/asset',
-    quote: 'The more you engage the more accurate it becomes.',
-  },
+  { n: '01', nKey: 'how_it_works.step_1_n', titleKey: 'how_it_works.step_1_title', bodyKey: 'how_it_works.step_1_body', href: '/founding-session', quote: 'The founding session is not an interview. It is the beginning of something that will outlast you.' },
+  { n: '02', nKey: 'how_it_works.step_2_n', titleKey: 'how_it_works.step_2_title', bodyKey: 'how_it_works.step_2_body', href: '/method',          quote: 'Every deposit teaches the entity something specific about how you think.' },
+  { n: '03', nKey: 'how_it_works.step_3_n', titleKey: 'how_it_works.step_3_title', bodyKey: 'how_it_works.step_3_body', href: '/method',          quote: 'Contributors do not add memories. They train an AI.' },
+  { n: '04', nKey: 'how_it_works.step_4_n', titleKey: 'how_it_works.step_4_title', bodyKey: 'how_it_works.step_4_body', href: '/asset',           quote: 'The more you engage the more accurate it becomes.' },
 ]
 
 export default function HowItWorksSection() {
+  const { t } = useTranslation()
   return (
     <section
       aria-label="How Basalith works"
@@ -63,7 +43,7 @@ export default function HowItWorksSection() {
           }}
         >
           <span style={{ display: 'block', width: '24px', height: '1px', background: 'var(--color-gold)', flexShrink: 0 }} aria-hidden="true" />
-          The Process
+          {t('how_it_works.eyebrow')}
         </p>
         <h2
           style={{
@@ -76,9 +56,7 @@ export default function HowItWorksSection() {
             margin:       '0 0 16px',
           }}
         >
-          A living model.
-          <br />
-          Built over a lifetime.
+          {t('how_it_works.headline')}
         </h2>
         <p
           style={{
@@ -92,14 +70,13 @@ export default function HowItWorksSection() {
             margin:      0,
           }}
         >
-          The longer the entity learns the more accurately it thinks.
-          Start now. Give it time.
+          {t('how_it_works.subheadline')}
         </p>
       </div>
 
       {/* Steps — alternating layout */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
-        {STEPS.map(({ n, title, body, href, quote }, i) => {
+        {STEPS.map(({ n, nKey, titleKey, bodyKey, href, quote }, i) => {
           const even = i % 2 === 0
           return (
             <div
@@ -181,7 +158,7 @@ export default function HowItWorksSection() {
                     marginBottom:  '16px',
                   }}
                 >
-                  {n}
+                  {t(nKey)}
                 </p>
                 <h3
                   style={{
@@ -193,7 +170,7 @@ export default function HowItWorksSection() {
                     marginBottom: '16px',
                   }}
                 >
-                  {title}
+                  {t(titleKey)}
                 </h3>
                 <p
                   style={{
@@ -206,7 +183,7 @@ export default function HowItWorksSection() {
                     maxWidth:    '400px',
                   }}
                 >
-                  {body}
+                  {t(bodyKey)}
                 </p>
                 <Link
                   href={href}

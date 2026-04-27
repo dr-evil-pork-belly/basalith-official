@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslation } from '@/app/hooks/useTranslation'
+
 const COLS = [
   {
     heading: 'Archives',
@@ -49,6 +51,7 @@ const MONO: React.CSSProperties = {
 }
 
 export default function Footer() {
+  const { t } = useTranslation()
   return (
     <footer style={{ background: 'var(--color-void)' }}>
 
@@ -191,7 +194,7 @@ export default function Footer() {
             color:         'rgba(184,150,62,0.4)',
           }}
         >
-          You never truly leave if you leave enough of yourself behind.
+          {t('footer.tagline')}
         </p>
       </div>
 

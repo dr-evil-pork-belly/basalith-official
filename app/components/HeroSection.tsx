@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useTranslation } from '@/app/hooks/useTranslation'
 
 const MONO: React.CSSProperties = {
   fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
@@ -10,6 +11,7 @@ const MONO: React.CSSProperties = {
 }
 
 export default function HeroSection() {
+  const { t } = useTranslation()
   return (
     <section
       aria-label="Basalith — Heritage archive"
@@ -59,9 +61,9 @@ export default function HeroSection() {
             margin:        '0 0 28px',
           }}
         >
-          <span className="headline-line headline-line-1">You never truly leave</span>
-          <span className="headline-line headline-line-2" style={{ fontStyle: 'italic', color: 'var(--color-gold)' }}>if you leave enough</span>
-          <span className="headline-line headline-line-3">of yourself behind.</span>
+          <span className="headline-line headline-line-1">{t('hero.headline_1')}</span>
+          <span className="headline-line headline-line-2" style={{ fontStyle: 'italic', color: 'var(--color-gold)' }}>{t('hero.headline_2')}</span>
+          <span className="headline-line headline-line-3">{t('hero.headline_3')}</span>
         </h1>
 
         {/* Sub-headline */}
@@ -79,15 +81,8 @@ export default function HeroSection() {
             animation:     'lineReveal 700ms cubic-bezier(0.16,1,0.3,1) 450ms both',
           }}
         >
-          <p style={{ margin: '0 0 16px' }}>
-            Basalith builds a living AI entity trained on how you specifically think.
-            Not what you did.
-            How you reason. What you value. How you see the world.
-          </p>
-          <p style={{ margin: 0 }}>
-            While you are alive it learns from you.
-            Long after you are gone it continues.
-          </p>
+          <p style={{ margin: '0 0 16px' }}>{t('hero.subheadline')}</p>
+          <p style={{ margin: 0 }}>{t('hero.subheadline_2')}</p>
         </div>
 
         {/* CTAs */}
@@ -116,7 +111,7 @@ export default function HeroSection() {
             onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'var(--color-gold-light)'}
             onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'var(--color-gold)'}
           >
-            Request Your Founding
+            {t('hero.cta_primary')}
           </Link>
           <Link
             href="/method"
@@ -142,7 +137,7 @@ export default function HeroSection() {
               el.style.color       = 'var(--color-text-secondary)'
             }}
           >
-            See How It Works
+            {t('hero.cta_secondary')}
           </Link>
         </div>
 
@@ -157,7 +152,7 @@ export default function HeroSection() {
             animation:  'lineReveal 500ms cubic-bezier(0.16,1,0.3,1) 850ms both',
           }}
         >
-          · Estate families in 4 countries · Est. 2026
+          {t('hero.social_proof')}
         </p>
       </div>
 

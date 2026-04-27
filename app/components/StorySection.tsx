@@ -1,10 +1,15 @@
+'use client'
+
+import { useTranslation } from '@/app/hooks/useTranslation'
+
 const STATS = [
-  { n: '847',   label: 'Photographs'   },
-  { n: '23',    label: 'Contributors'  },
-  { n: '2 yrs', label: 'Wisdom sessions' },
+  { n: '847',   labelKey: 'story.stat_1_label' },
+  { n: '23',    labelKey: 'story.stat_2_label' },
+  { n: '2 yrs', labelKey: 'story.stat_3_label' },
 ]
 
 export default function StorySection() {
+  const { t } = useTranslation()
   return (
     <section
       data-reveal
@@ -127,21 +132,11 @@ export default function StorySection() {
               color:       'var(--color-text-secondary)',
             }}
           >
-            <p style={{ marginBottom: '20px' }}>Eleanor began her archive in 2024.</p>
-            <p style={{ marginBottom: '20px' }}>
-              Over two years her family contributed 847 photographs, 23 voice recordings,
-              and 2 years of weekly wisdom sessions.
-            </p>
-            <p style={{ marginBottom: '20px' }}>
-              Her entity now answers questions about difficult decisions the way Eleanor
-              actually would.
-            </p>
-            <p style={{ marginBottom: '20px' }}>
-              Not from memory. From learned cognitive patterns built over a lifetime.
-            </p>
+            <p style={{ marginBottom: '20px' }}>{t('story.body_1')}</p>
+            <p style={{ marginBottom: '20px' }}>{t('story.body_2')}</p>
+            <p style={{ marginBottom: '20px' }}>{t('story.body_3')}</p>
             <p style={{ margin: 0, color: 'var(--color-text-primary)' }}>
-              Her grandchildren call it remarkable.
-              Her great-grandchildren will call it normal.
+              {t('story.conclusion')}
             </p>
           </div>
         </div>
@@ -155,8 +150,8 @@ export default function StorySection() {
             paddingTop:    '8px',
           }}
         >
-          {STATS.map(({ n, label }) => (
-            <div key={label}>
+          {STATS.map(({ n, labelKey }) => (
+            <div key={labelKey}>
               <p
                 style={{
                   fontFamily:    'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
@@ -179,7 +174,7 @@ export default function StorySection() {
                   color:         'var(--color-text-muted)',
                 }}
               >
-                {label}
+                {t(labelKey)}
               </p>
             </div>
           ))}
