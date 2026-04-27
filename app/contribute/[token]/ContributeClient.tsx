@@ -30,6 +30,7 @@ const PORTAL_UI = {
     questionsForYou:  'Questions for you',
     footerNote:       'Everything you share here is preserved permanently.',
     contributions_n:  (n: number) => `${n} CONTRIBUTION${n !== 1 ? 'S' : ''}`,
+    honesty:          'Be honest. The most valuable thing you can contribute is the truth. Difficult memories and complicated feelings are as important as positive ones.',
   },
   zh: {
     welcome:          (name: string) => `欢迎您，${name}。`,
@@ -41,8 +42,57 @@ const PORTAL_UI = {
     questionsForYou:  '您的专属问题',
     footerNote:       '您在此分享的一切都将被永久保存。',
     contributions_n:  (n: number) => `${n} 条贡献`,
+    honesty:          '请诚实作答。您能贡献的最有价值的东西是真相。困难的记忆和复杂的感受与积极的记忆同样重要。',
   },
-} as const
+  es: {
+    welcome:          (name: string) => `Bienvenido, ${name}.`,
+    contributions:    'Sus contribuciones',
+    addPhotos:        'Agregar sus fotos',
+    videosAndDocs:    'Videos y documentos',
+    recordMemory:     'Grabar un recuerdo',
+    callInStories:    'Contar historias por teléfono',
+    questionsForYou:  'Preguntas para usted',
+    footerNote:       'Todo lo que comparte aquí se preserva permanentemente.',
+    contributions_n:  (n: number) => `${n} CONTRIBUCIÓN${n !== 1 ? 'ES' : ''}`,
+    honesty:          'Sea honesto. Lo más valioso que puede aportar es la verdad. Los recuerdos difíciles y los sentimientos complicados son tan importantes como los positivos.',
+  },
+  vi: {
+    welcome:          (name: string) => `Chào mừng, ${name}.`,
+    contributions:    'Đóng góp của bạn',
+    addPhotos:        'Thêm ảnh của bạn',
+    videosAndDocs:    'Video và tài liệu',
+    recordMemory:     'Ghi lại một ký ức',
+    callInStories:    'Kể chuyện qua điện thoại',
+    questionsForYou:  'Câu hỏi dành cho bạn',
+    footerNote:       'Mọi thứ bạn chia sẻ ở đây được lưu giữ vĩnh viễn.',
+    contributions_n:  (n: number) => `${n} ĐÓNG GÓP`,
+    honesty:          'Hãy thành thật. Điều có giá trị nhất bạn có thể đóng góp là sự thật. Những ký ức khó khăn cũng quan trọng như những ký ức tích cực.',
+  },
+  tl: {
+    welcome:          (name: string) => `Maligayang pagdating, ${name}.`,
+    contributions:    'Ang inyong mga kontribusyon',
+    addPhotos:        'Magdagdag ng mga larawan',
+    videosAndDocs:    'Mga video at dokumento',
+    recordMemory:     'Mag-record ng alaala',
+    callInStories:    'Mag-record ng kwento sa telepono',
+    questionsForYou:  'Mga tanong para sa inyo',
+    footerNote:       'Lahat ng inyong ibabahagi dito ay permanenteng maiingatan.',
+    contributions_n:  (n: number) => `${n} KONTRIBUSYON`,
+    honesty:          'Maging matapat. Ang pinakamahalagang bagay na maaari ninyong ibahagi ay ang katotohanan. Ang mahirap na mga alaala ay kasinghalaga ng mga positibo.',
+  },
+  ko: {
+    welcome:          (name: string) => `${name}님, 환영합니다.`,
+    contributions:    '귀하의 기여',
+    addPhotos:        '사진 추가',
+    videosAndDocs:    '동영상 및 문서',
+    recordMemory:     '추억 녹음',
+    callInStories:    '전화로 이야기 전달',
+    questionsForYou:  '귀하를 위한 질문',
+    footerNote:       '여기에 공유하신 모든 것은 영구적으로 보존됩니다.',
+    contributions_n:  (n: number) => `기여 ${n}건`,
+    honesty:          '솔직하게 말씀해 주세요. 귀하가 기여할 수 있는 가장 소중한 것은 진실입니다. 어려운 기억도 긍정적인 것만큼 중요합니다.',
+  },
+}
 
 type ArchiveProps = {
   id:          string
@@ -876,6 +926,8 @@ function ContributionsSection({
 
 // ── Main component ─────────────────────────────────────────────────────────────
 
+const PORTAL_LANGS = Object.keys(PORTAL_UI) as (keyof typeof PORTAL_UI)[]
+
 export default function ContributeClient({
   token,
   contributor,
@@ -889,8 +941,29 @@ export default function ContributeClient({
   const [videosUploaded,    setVideosUploaded]    = useState(contributor.videos_uploaded)
   const [voiceRecordings,   setVoiceRecordings]   = useState(contributor.voice_recordings)
 
-  const lang          = contributor.preferred_language === 'zh' ? 'zh' : 'en'
-  const ui            = PORTAL_UI[lang]
+  // displayLang: prefer cookie, fall back to contributor's server-side language
+  function getInitialLang(): keyof typeof PORTAL_UI {
+    if (typeof document !== 'undefined') {
+      const match = document.cookie.match(/preferred_language=([^;]+)/)
+      const val   = match?.[1]
+      if (val && PORTAL_LANGS.includes(val as keyof typeof PORTAL_UI)) {
+        return val as keyof typeof PORTAL_UI
+      }
+    }
+    const serverLang = contributor.preferred_language as keyof typeof PORTAL_UI
+    return PORTAL_LANGS.includes(serverLang) ? serverLang : 'en'
+  }
+  const [displayLang, setDisplayLang] = useState<keyof typeof PORTAL_UI>('en')
+  // Hydrate on client
+  useState(() => { setDisplayLang(getInitialLang()) })
+
+  function switchPortalLang(code: keyof typeof PORTAL_UI) {
+    document.cookie = `preferred_language=${code};path=/;max-age=31536000;SameSite=Lax`
+    setDisplayLang(code)
+  }
+
+  const lang = displayLang
+  const ui   = PORTAL_UI[lang]
   const firstName     = contributor.name ? contributor.name.split(' ')[0] : 'there'
   const relLabel      = RELATIONSHIP_LABELS[contributor.relationship] ?? 'Contributor'
   const subjectName   = archive.owner_name ? archive.owner_name.split(' ')[0] : 'the archive subject'
@@ -915,6 +988,34 @@ export default function ContributeClient({
         <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.44rem', letterSpacing: '0.15em', color: 'rgba(138,134,128,0.6)', margin: 0 }}>
           {relLabel}{totalContribs > 0 ? ` · ${ui.contributions_n(totalContribs)}` : ''}
         </p>
+      </div>
+
+      {/* Language switcher */}
+      <div style={{ background: '#FFFFFF', borderBottom: '1px solid rgba(26,24,20,0.06)', padding: '8px 24px', display: 'flex', justifyContent: 'flex-end' }}>
+        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+          {PORTAL_LANGS.map(code => (
+            <button
+              key={code}
+              onClick={() => switchPortalLang(code)}
+              style={{
+                fontFamily:    '"Space Mono","Courier New",monospace',
+                fontSize:      '0.42rem',
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase' as const,
+                color:         displayLang === code ? '#B8963E' : 'rgba(138,134,128,0.5)',
+                background:    displayLang === code ? 'rgba(184,150,62,0.08)' : 'transparent',
+                border:        displayLang === code ? '1px solid rgba(184,150,62,0.25)' : '1px solid transparent',
+                borderRadius:  '2px',
+                padding:       '4px 8px',
+                cursor:        'pointer',
+                minHeight:     '28px',
+                transition:    'all 150ms ease',
+              }}
+            >
+              {code.toUpperCase()}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Gold rule */}

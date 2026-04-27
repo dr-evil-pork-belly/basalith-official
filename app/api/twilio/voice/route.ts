@@ -78,52 +78,72 @@ export async function POST(req: NextRequest) {
     if (archive) {
       const firstName = xmlSafe((archive.owner_name ?? 'there').split(' ')[0])
       const action    = buildActionUrl(recordingBase, { archiveId: archive.id, isOwner: 'true' })
-      const isZh      = archive.preferred_language === 'zh'
+      const lang      = archive.preferred_language ?? 'en'
 
-      console.log('[twilio/voice] isZh final:', isZh, '— building', isZh ? 'CHINESE' : 'ENGLISH', 'TwiML')
+      console.log('[twilio/voice] lang:', lang, '— building TwiML')
 
-      let twiml: string
-
-      if (isZh) {
-        // No voice attribute for Chinese — Twilio default handles CJK better than alice.
-        twiml = `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Say voice="Polly.Zhiyu">您好，${firstName}。请在提示音后说话。说完后按任意键。</Say>
-  <Record
-    action="${action}"
-    method="POST"
-    maxLength="300"
-    finishOnKey="1234567890*#"
-    timeout="5"
-    playBeep="true"
-    transcribe="false"
-  />
-  <Say voice="Polly.Zhiyu">未收到录音。请稍后再次拨打。再见。</Say>
-  <Hangup/>
-</Response>`
-      } else {
-        twiml = `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Say voice="alice">Welcome, ${firstName}.</Say>
-  <Pause length="1"/>
-  <Say voice="alice">You are adding to your archive.</Say>
-  <Pause length="1"/>
-  <Say voice="alice">Please share a memory, a story, or anything you want preserved.</Say>
-  <Pause length="1"/>
-  <Say voice="alice">Speak after the tone. Press any key when you are finished.</Say>
-  <Record
-    action="${action}"
-    method="POST"
-    maxLength="300"
-    finishOnKey="1234567890*#"
-    timeout="5"
-    playBeep="true"
-    transcribe="false"
-  />
-  <Say voice="alice">We did not receive a recording. Please call back to try again. Goodbye.</Say>
-  <Hangup/>
-</Response>`
+      // Voice + greeting per language.
+      // Tagalog (tl) and Vietnamese (vi) use English neural voice with native-language text
+      // since Polly does not support those languages natively.
+      const VOICES: Record<string, string> = {
+        en: 'Polly.Joanna-Neural',
+        zh: 'Polly.Zhiyu',
+        es: 'Polly.Lupe-Neural',
+        vi: 'Polly.Joanna-Neural',
+        tl: 'Polly.Joanna-Neural',
+        ko: 'Polly.Seoyeon-Neural',
       }
+      const voice = VOICES[lang] ?? VOICES.en
+
+      const GREETINGS: Record<string, { prompt: string; prompt2: string; noRecording: string }> = {
+        en: {
+          prompt:      `Welcome, ${firstName}. Please share a memory, a story, or anything you want preserved. Speak after the tone and press any key when finished.`,
+          prompt2:     '',
+          noRecording: 'We did not receive a recording. Please call back to try again. Goodbye.',
+        },
+        zh: {
+          prompt:      `您好，${firstName}。请在提示音后说话。说完后按任意键。`,
+          prompt2:     '',
+          noRecording: '未收到录音。请稍后再次拨打。再见。',
+        },
+        es: {
+          prompt:      `Hola, ${firstName}. Por favor comparta un recuerdo o historia después del tono. Presione cualquier tecla cuando termine.`,
+          prompt2:     '',
+          noRecording: 'No recibimos una grabación. Por favor llame de nuevo. Adiós.',
+        },
+        vi: {
+          prompt:      `Xin chào, ${firstName}. Vui lòng chia sẻ một ký ức sau tiếng bíp. Nhấn phím bất kỳ khi hoàn thành.`,
+          prompt2:     '',
+          noRecording: 'Chúng tôi không nhận được bản ghi âm. Vui lòng gọi lại. Tạm biệt.',
+        },
+        tl: {
+          prompt:      `Kumusta, ${firstName}. Mangyaring ibahagi ang isang alaala pagkatapos ng tono. Pindutin ang anumang key kapag tapos na.`,
+          prompt2:     '',
+          noRecording: 'Hindi namin natanggap ang inyong rekording. Pakitawagan muli. Paalam.',
+        },
+        ko: {
+          prompt:      `안녕하세요, ${firstName}님. 신호음 후에 추억이나 이야기를 말씀해 주세요. 완료되면 아무 키나 누르십시오.`,
+          prompt2:     '',
+          noRecording: '녹음을 받지 못했습니다. 다시 전화해 주세요. 안녕히 계세요.',
+        },
+      }
+      const g = GREETINGS[lang] ?? GREETINGS.en
+
+      const twiml = `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="${voice}">${xmlSafe(g.prompt)}</Say>
+  <Record
+    action="${action}"
+    method="POST"
+    maxLength="300"
+    finishOnKey="1234567890*#"
+    timeout="5"
+    playBeep="true"
+    transcribe="false"
+  />
+  <Say voice="${voice}">${xmlSafe(g.noRecording)}</Say>
+  <Hangup/>
+</Response>`
 
       console.log('[twilio/voice] TwiML response:')
       console.log(twiml)

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import LanguageSelector from './LanguageSelector'
 
 const LINKS = [
   { href: '/method',     label: 'The Method'  },
@@ -91,6 +92,11 @@ export default function Nav() {
 
         {/* Right side */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          {/* Language selector — desktop */}
+          <div className="hidden md:block">
+            <LanguageSelector variant="light" />
+          </div>
+
           {/* Archive sign in */}
           <Link
             href="/archive-login"
@@ -205,6 +211,11 @@ export default function Nav() {
           >
             Request Your Founding
           </Link>
+
+          {/* Language selector — mobile menu */}
+          <div style={{ marginTop: '24px' }}>
+            <LanguageSelector variant="light" />
+          </div>
         </div>
       )}
     </>
