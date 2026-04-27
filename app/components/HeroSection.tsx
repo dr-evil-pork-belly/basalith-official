@@ -157,7 +157,7 @@ export default function HeroSection() {
             animation:  'lineReveal 500ms cubic-bezier(0.16,1,0.3,1) 850ms both',
           }}
         >
-          · Estate families in 4 countries · Founded 2024
+          · Estate families in 4 countries · Est. 2026
         </p>
       </div>
 

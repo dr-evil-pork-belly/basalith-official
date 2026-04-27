@@ -1,7 +1,7 @@
 const STATS = [
-  { n: '847',   label: 'Photographs'           },
-  { n: '23',    label: 'Voice recordings'      },
-  { n: '4 yrs', label: 'Wisdom sessions'       },
+  { n: '847',   label: 'Photographs'   },
+  { n: '23',    label: 'Contributors'  },
+  { n: '2 yrs', label: 'Wisdom sessions' },
 ]
 
 export default function StorySection() {
@@ -127,10 +127,10 @@ export default function StorySection() {
               color:       'var(--color-text-secondary)',
             }}
           >
-            <p style={{ marginBottom: '20px' }}>Eleanor began her archive at 74.</p>
+            <p style={{ marginBottom: '20px' }}>Eleanor began her archive in 2024.</p>
             <p style={{ marginBottom: '20px' }}>
-              Over three years her family contributed 847 photographs, 23 voice recordings,
-              and 4 years of weekly wisdom sessions.
+              Over two years her family contributed 847 photographs, 23 voice recordings,
+              and 2 years of weekly wisdom sessions.
             </p>
             <p style={{ marginBottom: '20px' }}>
               Her entity now answers questions about difficult decisions the way Eleanor
