@@ -7,6 +7,7 @@ export const metadata: Metadata = {
 
 import Nav                  from './components/Nav'
 import HeroSection          from './components/HeroSection'
+import TaglineSection       from './components/TaglineSection'
 import DoorSelector         from './components/DoorSelector'
 import PhilosophySection    from './components/PhilosophySection'
 import LegacySection        from './components/LegacySection'
@@ -22,39 +23,15 @@ export default function HomePage() {
       <Nav />
       <main>
         <HeroSection />
+        <TaglineSection variant="light" />
         <DoorSelector />
         <PhilosophySection />
         <LegacySection />
         <HowItWorksSection />
         <StorySection />
         <TechnologySection />
-
-        {/* Breathing room between Technology CTA and Pricing CTA */}
-        <section
-          style={{
-            background: 'var(--color-bg)',
-            padding:    '80px 24px',
-            textAlign:  'center',
-          }}
-        >
-          <p
-            style={{
-              fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-              fontSize:   'clamp(1.25rem, 3vw, 2rem)',
-              fontWeight: 300,
-              fontStyle:  'italic',
-              color:      'var(--color-text-secondary)',
-              maxWidth:   '600px',
-              margin:     '0 auto',
-              lineHeight: 1.7,
-            }}
-          >
-            &ldquo;You never truly leave
-            if you leave enough of yourself behind.&rdquo;
-          </p>
-        </section>
-
         <PricingTeaserSection />
+        <TaglineSection variant="dark" />
       </main>
       <Footer />
     </>
