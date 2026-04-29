@@ -22,11 +22,15 @@ const MOBILE_LINKS = [
 ]
 
 export default function Nav() {
-  const [scrolled, setScrolled] = useState(false)
-  const [open,     setOpen]     = useState(false)
+  const [scrolled,  setScrolled]  = useState(false)
+  const [pastHero,  setPastHero]  = useState(false)
+  const [open,      setOpen]      = useState(false)
 
   useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > 40)
+    const fn = () => {
+      setScrolled(window.scrollY > 40)
+      setPastHero(window.scrollY > window.innerHeight * 0.8)
+    }
     window.addEventListener('scroll', fn, { passive: true })
     return () => window.removeEventListener('scroll', fn)
   }, [])
@@ -43,6 +47,18 @@ export default function Nav() {
     textTransform: 'uppercase' as const,
   }
 
+  // Color tokens that flip based on which section the nav floats over
+  const wordmarkColor = pastHero ? 'var(--color-text-primary)'   : 'rgba(250,250,248,0.9)'
+  const linkColor     = pastHero ? 'var(--color-text-muted)'     : 'rgba(250,250,248,0.65)'
+  const linkHover     = pastHero ? 'var(--color-text-primary)'   : 'rgba(250,250,248,0.95)'
+
+  // Background: dark frosted over dark opening, light frosted over light sections
+  const navBg = pastHero
+    ? (scrolled ? 'rgba(250,250,248,0.96)' : 'transparent')
+    : (scrolled ? 'rgba(10,9,8,0.65)'      : 'transparent')
+
+  const navShadow = scrolled && pastHero ? '0 1px 0 rgba(26,24,20,0.06)' : 'none'
+
   return (
     <>
       <nav
@@ -58,9 +74,9 @@ export default function Nav() {
           paddingBottom:  scrolled ? '18px' : '28px',
           paddingLeft:    'clamp(24px,6vw,80px)',
           paddingRight:   'clamp(24px,6vw,80px)',
-          background:     scrolled ? 'rgba(250,250,248,0.96)' : 'transparent',
+          background:     navBg,
           backdropFilter: scrolled ? 'blur(12px)' : 'none',
-          boxShadow:      scrolled ? '0 1px 0 rgba(26,24,20,0.06)' : 'none',
+          boxShadow:      navShadow,
           transition:     'all 400ms cubic-bezier(0.16,1,0.3,1)',
         }}
       >
@@ -69,11 +85,12 @@ export default function Nav() {
           href="/"
           style={{
             ...MONO,
-            fontSize:      '0.62rem',
-            letterSpacing: '0.32em',
-            color:         'var(--color-text-primary)',
+            fontSize:       '0.62rem',
+            letterSpacing:  '0.32em',
+            color:          wordmarkColor,
             textDecoration: 'none',
-            fontWeight:    700,
+            fontWeight:     700,
+            transition:     'color 400ms ease',
           }}
         >
           Basalith
@@ -90,12 +107,12 @@ export default function Nav() {
                 href={href}
                 style={{
                   ...MONO,
-                  color:          'var(--color-text-muted)',
+                  color:          linkColor,
                   textDecoration: 'none',
                   transition:     'color 200ms ease',
                 }}
-                onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = 'var(--color-text-primary)'}
-                onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = 'var(--color-text-muted)'}
+                onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = linkHover}
+                onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = linkColor}
               >
                 {label}
               </Link>
@@ -107,7 +124,7 @@ export default function Nav() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           {/* Language selector — desktop only */}
           <div className="hidden md:block">
-            <LanguageSelector variant="light" />
+            <LanguageSelector variant={pastHero ? 'light' : 'dark'} />
           </div>
 
           {/* Client login — desktop only */}
@@ -116,12 +133,12 @@ export default function Nav() {
             className="hidden md:block"
             style={{
               ...MONO,
-              color:          'var(--color-text-muted)',
+              color:          linkColor,
               textDecoration: 'none',
               transition:     'color 200ms ease',
             }}
-            onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = 'var(--color-text-primary)'}
-            onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = 'var(--color-text-muted)'}
+            onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = linkHover}
+            onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = linkColor}
           >
             Client Login
           </Link>
@@ -153,16 +170,16 @@ export default function Nav() {
             onClick={() => setOpen(true)}
             className="md:hidden"
             style={{
-              background: 'none',
-              border:     'none',
-              cursor:     'pointer',
-              padding:    '10px',
-              width:      44,
-              height:     44,
-              display:    'flex',
-              alignItems: 'center',
+              background:     'none',
+              border:         'none',
+              cursor:         'pointer',
+              padding:        '10px',
+              width:          44,
+              height:         44,
+              display:        'flex',
+              alignItems:     'center',
               justifyContent: 'center',
-              flexShrink: 0,
+              flexShrink:     0,
             }}
           >
             <svg width="24" height="18" viewBox="0 0 24 18" fill="none" aria-hidden="true">
@@ -216,15 +233,15 @@ export default function Nav() {
               aria-label="Close menu"
               onClick={() => setOpen(false)}
               style={{
-                background: 'none',
-                border:     'none',
-                cursor:     'pointer',
-                width:      44,
-                height:     44,
-                display:    'flex',
-                alignItems: 'center',
+                background:     'none',
+                border:         'none',
+                cursor:         'pointer',
+                width:          44,
+                height:         44,
+                display:        'flex',
+                alignItems:     'center',
                 justifyContent: 'center',
-                color:      'var(--color-gold)',
+                color:          'var(--color-gold)',
               }}
             >
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">

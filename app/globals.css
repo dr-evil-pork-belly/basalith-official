@@ -212,6 +212,11 @@ body {
 .headline-line-2 { animation-delay: 150ms; }
 .headline-line-3 { animation-delay: 300ms; }
 
+@keyframes scrollBounce {
+  0%, 100% { transform: translateY(0);   opacity: 0.4; }
+  50%       { transform: translateY(6px); opacity: 0.8; }
+}
+
 /* ── Portal dark theme overrides ── */
 /* Portal pages set background inline — these keep internal elements consistent */
 
