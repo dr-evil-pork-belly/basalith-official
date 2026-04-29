@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useTranslation } from '@/app/hooks/useTranslation'
+import { useLanguage } from '@/app/context/LanguageContext'
 
 const MONO: React.CSSProperties = {
   fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
@@ -11,7 +11,7 @@ const MONO: React.CSSProperties = {
 }
 
 export default function HeroSection() {
-  const { t } = useTranslation()
+  const { t } = useLanguage()
 
   return (
     <section

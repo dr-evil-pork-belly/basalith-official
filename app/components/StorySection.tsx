@@ -1,9 +1,9 @@
 'use client'
 
-import { useTranslation } from '@/app/hooks/useTranslation'
+import { useLanguage } from '@/app/context/LanguageContext'
 
 export default function StorySection() {
-  const { t } = useTranslation()
+  const { t } = useLanguage()
 
   return (
     <section

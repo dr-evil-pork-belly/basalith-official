@@ -1,8 +1,6 @@
 import type { Metadata } from 'next'
 import { Cormorant_Garamond, Space_Mono } from 'next/font/google'
-import { cookies } from 'next/headers'
-import { LOCALES, type Locale } from '@/lib/i18n'
-import { LangProvider }          from './components/LangProvider'
+import { LanguageProvider } from './context/LanguageContext'
 import './globals.css'
 import ScrollReveal      from './components/ScrollReveal'
 import AuthErrorRedirect from './components/AuthErrorRedirect'
@@ -59,20 +57,16 @@ export const metadata: Metadata = {
   },
 }
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const cookieStore = await cookies()
-  const raw         = cookieStore.get('lang')?.value ?? 'en'
-  const locale      = (LOCALES as readonly string[]).includes(raw) ? raw as Locale : 'en'
-
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang={locale} className={`${cormorant.variable} ${spaceMono.variable}`}>
+    <html lang="en" className={`${cormorant.variable} ${spaceMono.variable}`}>
       <body>
-        <LangProvider lang={locale}>
+        <LanguageProvider>
           <div className="grain fixed inset-0 z-[9997] pointer-events-none" aria-hidden="true" />
           <AuthErrorRedirect />
           <ScrollReveal />
           {children}
-        </LangProvider>
+        </LanguageProvider>
       </body>
     </html>
   )

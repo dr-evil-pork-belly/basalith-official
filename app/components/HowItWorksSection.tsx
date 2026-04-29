@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useTranslation } from '@/app/hooks/useTranslation'
+import { useLanguage } from '@/app/context/LanguageContext'
 
 const STEPS = [
   { n: '01', nKey: 'how_it_works.step_1_n', titleKey: 'how_it_works.step_1_title', bodyKey: 'how_it_works.step_1_body', href: '/founding-session', quote: 'The founding session is not an interview. It is the beginning of something that will outlast you.' },
@@ -11,7 +11,7 @@ const STEPS = [
 ]
 
 export default function HowItWorksSection() {
-  const { t } = useTranslation()
+  const { t } = useLanguage()
   return (
     <section
       aria-label="How Basalith works"

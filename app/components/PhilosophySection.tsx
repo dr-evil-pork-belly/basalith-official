@@ -1,6 +1,6 @@
 'use client'
 
-import { useTranslation } from '@/app/hooks/useTranslation'
+import { useLanguage } from '@/app/context/LanguageContext'
 
 const PILLAR_KEYS = [
   { n: '01', titleKey: 'philosophy.pillar_1_title', bodyKey: 'philosophy.pillar_1_body' },
@@ -9,7 +9,7 @@ const PILLAR_KEYS = [
 ]
 
 export default function PhilosophySection() {
-  const { t } = useTranslation()
+  const { t } = useLanguage()
 
   return (
     <section

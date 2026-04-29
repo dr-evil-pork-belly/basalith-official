@@ -1,8 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { LOCALES, type Locale }        from '@/lib/i18n'
-import { useLang }                      from './LangProvider'
+import { useLanguage, type Locale }    from '@/app/context/LanguageContext'
 
 const LANGUAGES: { code: Locale; flag: string; label: string }[] = [
   { code: 'en',  flag: '🇺🇸', label: 'English'       },
@@ -20,12 +19,11 @@ export default function LanguageSelector({
 }: {
   variant?: 'light' | 'dark'
 }) {
-  const serverLang   = useLang()
-  const [open, setOpen] = useState(false)
-  const containerRef    = useRef<HTMLDivElement>(null)
+  const { locale, setLocale } = useLanguage()
+  const [open, setOpen]       = useState(false)
+  const containerRef          = useRef<HTMLDivElement>(null)
 
-  const current     = serverLang
-  const currentLang = LANGUAGES.find(l => l.code === current) ?? LANGUAGES[0]
+  const currentLang = LANGUAGES.find(l => l.code === locale) ?? LANGUAGES[0]
 
   // Close on outside click
   useEffect(() => {
@@ -38,9 +36,8 @@ export default function LanguageSelector({
   }, [open])
 
   function switchLang(code: Locale) {
-    document.cookie = `lang=${code};path=/;max-age=31536000;SameSite=Lax`
+    setLocale(code)   // updates context → instant re-render, no reload
     setOpen(false)
-    window.location.reload()
   }
 
   const isLight     = variant === 'light'
@@ -66,18 +63,18 @@ export default function LanguageSelector({
         onClick={() => setOpen(v => !v)}
         style={{
           ...MONO,
-          display:        'flex',
-          alignItems:     'center',
-          gap:            '6px',
-          background:     'transparent',
-          border:         `1px solid ${borderColor}`,
-          borderRadius:   '2px',
-          padding:        '7px 12px',
-          cursor:         'pointer',
-          color:          textColor,
-          minHeight:      '36px',
-          transition:     'border-color 200ms ease, color 200ms ease',
-          whiteSpace:     'nowrap',
+          display:    'flex',
+          alignItems: 'center',
+          gap:        '6px',
+          background: 'transparent',
+          border:     `1px solid ${borderColor}`,
+          borderRadius: '2px',
+          padding:    '7px 12px',
+          cursor:     'pointer',
+          color:      textColor,
+          minHeight:  '36px',
+          transition: 'border-color 200ms ease, color 200ms ease',
+          whiteSpace: 'nowrap',
         }}
         onMouseEnter={e => {
           e.currentTarget.style.borderColor = isLight ? 'var(--color-gold)' : '#C4A24A'
@@ -113,7 +110,7 @@ export default function LanguageSelector({
           }}
         >
           {LANGUAGES.map(({ code, flag, label }) => {
-            const active = current === code
+            const active = locale === code
             return (
               <button
                 key={code}
