@@ -34,8 +34,6 @@ const COLS: { heading: string; links: { label: string; href?: string }[] }[] = [
     links: [
       { label: 'hello@basalith.xyz', href: 'mailto:hello@basalith.xyz' },
       { label: 'Heritage Nexus Inc.'                                    },
-      { label: 'Wilmington, Delaware'                                    },
-      { label: 'Est. 2026'                                              },
     ],
   },
 ]

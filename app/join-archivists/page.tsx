@@ -123,23 +123,14 @@ export default function JoinArchivistsPage() {
               }}
             />
 
-            <p
-              style={{
-                fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
-                fontSize:      '0.52rem',
-                letterSpacing: '0.22em',
-                textTransform: 'uppercase' as const,
-                color:         'var(--color-text-muted)',
-                marginBottom:  '16px',
-              }}
-            >
-              The Commission
-            </p>
-
             <p style={P}>
-              $1,000 on the founding.
+              The compensation reflects the significance of the work.
               <br />
-              8% for the life of the archive.
+              A meaningful founding fee.
+              <br />
+              A monthly residual for the life of every archive you open.
+              <br />
+              Details are shared during the Legacy Guide onboarding.
             </p>
 
             <div
