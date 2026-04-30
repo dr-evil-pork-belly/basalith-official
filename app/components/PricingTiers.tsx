@@ -12,24 +12,24 @@ const SERIF: React.CSSProperties = {
   fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
 }
 
-interface Pricing { price: string; sub: string }
-
 interface Tier {
-  name:     string
-  tagline:  string
-  annual:   Pricing
-  monthly:  Pricing
-  featured: boolean
-  features: string[]
+  name:         string
+  tagline:      string
+  annualPrice:  string
+  annualSub:    string
+  monthlyPrice: string
+  featured:     boolean
+  features:     string[]
 }
 
 const TIERS: Tier[] = [
   {
-    name:    'The Archive',
-    tagline: 'The foundation.\nYour entity begins learning\nfrom day one.',
-    annual:  { price: '$1,800', sub: '$150 / month equivalent'  },
-    monthly: { price: '$180',   sub: '$2,160 / year equivalent'  },
-    featured: false,
+    name:         'The Archive',
+    tagline:      'The foundation.\nYour entity begins learning\nfrom day one.',
+    annualPrice:  '$1,800',
+    annualSub:    '$150/mo equivalent',
+    monthlyPrice: '$180',
+    featured:     false,
     features: [
       'Secure archive infrastructure',
       'Up to 5 family contributors',
@@ -43,11 +43,12 @@ const TIERS: Tier[] = [
     ],
   },
   {
-    name:    'The Estate',
-    tagline: 'Your entity. Your family.\nYour story. Everything working\ntogether to build something\nthat continues long after you are gone.',
-    annual:  { price: '$3,600', sub: '$300 / month equivalent'   },
-    monthly: { price: '$360',   sub: '$4,320 / year equivalent'  },
-    featured: true,
+    name:         'The Estate',
+    tagline:      'Your entity. Your family.\nYour story. Everything working\ntogether to build something\nthat continues long after you are gone.',
+    annualPrice:  '$3,600',
+    annualSub:    '$300/mo equivalent',
+    monthlyPrice: '$360',
+    featured:     true,
     features: [
       'Everything in The Archive',
       'Up to 15 family contributors',
@@ -64,11 +65,12 @@ const TIERS: Tier[] = [
     ],
   },
   {
-    name:    'The Dynasty',
-    tagline: 'For families building\nacross generations.',
-    annual:  { price: '$9,600', sub: '$800 / month equivalent'   },
-    monthly: { price: '$960',   sub: '$11,520 / year equivalent' },
-    featured: false,
+    name:         'The Dynasty',
+    tagline:      'For families building\nacross generations.',
+    annualPrice:  '$9,600',
+    annualSub:    '$800/mo equivalent',
+    monthlyPrice: '$960',
+    featured:     false,
     features: [
       'Everything in The Estate',
       'Unlimited contributors across generations',
@@ -95,11 +97,12 @@ function Check() {
 }
 
 export default function PricingTiers() {
-  const [annual, setAnnual] = useState(true)
+  const [billing, setBilling] = useState<'annual' | 'monthly'>('annual')
+  const isAnnual = billing === 'annual'
 
   return (
     <section
-      aria-label="Annual stewardship tiers"
+      aria-label="Stewardship tiers"
       style={{
         background: 'var(--color-surface-alt)',
         padding:    'clamp(64px,8vw,96px) clamp(24px,6vw,80px)',
@@ -136,47 +139,81 @@ export default function PricingTiers() {
           Choose Your Level of Stewardship.
         </h2>
 
-        {/* Billing toggle */}
+        {/* Founding fee — fixed above toggle */}
+        <p
+          style={{
+            ...MONO,
+            fontSize:     'var(--text-caption)',
+            color:        'var(--color-gold)',
+            marginBottom: '24px',
+          }}
+        >
+          All plans begin with a one-time Founding Session investment of $2,500
+        </p>
+
+        {/* Toggle */}
         <div
           role="group"
           aria-label="Billing frequency"
           style={{
-            display:      'inline-flex',
-            border:       '1px solid var(--color-border-medium)',
-            borderRadius: 'var(--radius-sm)',
-            overflow:     'hidden',
+            display:        'flex',
+            alignItems:     'center',
+            justifyContent: 'center',
+            gap:            '16px',
+            marginBottom:   '48px',
           }}
         >
           <button
-            onClick={() => setAnnual(true)}
-            aria-pressed={annual}
+            onClick={() => setBilling('annual')}
+            aria-pressed={isAnnual}
             style={{
-              ...MONO,
-              fontSize:   '0.5rem',
-              padding:    '11px 22px',
-              border:     'none',
-              cursor:     'pointer',
-              background: annual ? 'var(--color-gold)' : 'transparent',
-              color:      annual ? '#0A0908' : 'var(--color-text-muted)',
-              transition: 'all 220ms ease',
-              whiteSpace: 'nowrap',
+              fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+              fontSize:      '0.6rem',
+              letterSpacing: '0.25em',
+              textTransform: 'uppercase' as const,
+              padding:       '10px 24px',
+              border:        '1px solid var(--color-border-medium)',
+              borderRadius:  '2px',
+              cursor:        'pointer',
+              background:    isAnnual ? 'var(--color-void)' : 'transparent',
+              color:         isAnnual ? 'var(--color-bg)' : 'var(--color-text-secondary)',
+              transition:    'all 200ms ease',
             }}
           >
-            Annual — save 20%
+            Annual
           </button>
-          <button
-            onClick={() => setAnnual(false)}
-            aria-pressed={!annual}
+
+          <div
+            aria-hidden="true"
             style={{
-              ...MONO,
-              fontSize:   '0.5rem',
-              padding:    '11px 22px',
-              border:     'none',
-              borderLeft: '1px solid var(--color-border-medium)',
-              cursor:     'pointer',
-              background: annual ? 'transparent' : 'var(--color-gold)',
-              color:      annual ? 'var(--color-text-muted)' : '#0A0908',
-              transition: 'all 220ms ease',
+              fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+              fontSize:      '0.5rem',
+              letterSpacing: '0.2em',
+              textTransform: 'uppercase' as const,
+              color:         'var(--color-gold)',
+              padding:       '6px 12px',
+              border:        '1px solid var(--color-gold-border)',
+              borderRadius:  '2px',
+            }}
+          >
+            Save 20%
+          </div>
+
+          <button
+            onClick={() => setBilling('monthly')}
+            aria-pressed={!isAnnual}
+            style={{
+              fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+              fontSize:      '0.6rem',
+              letterSpacing: '0.25em',
+              textTransform: 'uppercase' as const,
+              padding:       '10px 24px',
+              border:        '1px solid var(--color-border-medium)',
+              borderRadius:  '2px',
+              cursor:        'pointer',
+              background:    !isAnnual ? 'var(--color-void)' : 'transparent',
+              color:         !isAnnual ? 'var(--color-bg)' : 'var(--color-text-secondary)',
+              transition:    'all 200ms ease',
             }}
           >
             Monthly
@@ -195,183 +232,208 @@ export default function PricingTiers() {
           margin:              '0 auto',
         }}
       >
-        {TIERS.map(({ name, tagline, annual: ann, monthly: mon, featured, features }) => {
-          const pricing = annual ? ann : mon
-          const period  = annual ? 'per year' : 'per month'
-          return (
-            <div
-              key={name}
-              style={{
-                background:    featured ? 'var(--color-void)' : 'var(--color-surface)',
-                border:        featured ? '1px solid rgba(184,150,62,0.35)' : '1px solid var(--color-border)',
-                borderRadius:  'var(--radius-md)',
-                padding:       '36px',
-                display:       'flex',
-                flexDirection: 'column',
-                boxShadow:     featured ? 'var(--shadow-gold)' : 'var(--shadow-sm)',
-                position:      'relative',
-              }}
-            >
-              {featured && (
-                <div
-                  aria-hidden="true"
-                  style={{
-                    position:   'absolute',
-                    top:        0,
-                    left:       '15%',
-                    right:      '15%',
-                    height:     '1px',
-                    background: 'linear-gradient(90deg,transparent,rgba(184,150,62,0.5),transparent)',
-                  }}
-                />
-              )}
-              {featured && (
-                <p style={{ ...MONO, fontSize: '0.44rem', color: 'var(--color-gold)', marginBottom: '20px' }}>
-                  Most Popular
-                </p>
-              )}
-
-              <h3
-                style={{
-                  ...SERIF,
-                  fontSize:     '1.5rem',
-                  fontWeight:   500,
-                  color:        featured ? 'rgba(250,248,244,0.9)' : 'var(--color-text-primary)',
-                  marginBottom: '6px',
-                }}
-              >
-                {name}
-              </h3>
-              <p
-                style={{
-                  ...SERIF,
-                  fontSize:     '0.9rem',
-                  fontStyle:    'italic',
-                  fontWeight:   300,
-                  color:        featured ? 'rgba(250,248,244,0.4)' : 'var(--color-text-muted)',
-                  marginBottom: '28px',
-                  lineHeight:   1.65,
-                  whiteSpace:   'pre-line',
-                }}
-              >
-                {tagline}
-              </p>
-
-              <div style={{ marginBottom: '6px' }}>
-                <span
-                  style={{
-                    ...SERIF,
-                    fontSize:      'clamp(2rem,3.5vw,2.75rem)',
-                    fontWeight:    300,
-                    color:         featured ? 'rgba(250,248,244,0.9)' : 'var(--color-text-primary)',
-                    letterSpacing: '-0.025em',
-                  }}
-                >
-                  {pricing.price}
-                </span>
-                <span
-                  style={{
-                    ...MONO,
-                    fontSize:   '0.48rem',
-                    color:      featured ? 'rgba(250,248,244,0.3)' : 'var(--color-text-muted)',
-                    marginLeft: '8px',
-                  }}
-                >
-                  {period}
-                </span>
-              </div>
-              <p
-                style={{
-                  ...MONO,
-                  fontSize:     '0.44rem',
-                  color:        featured ? 'rgba(250,248,244,0.25)' : 'var(--color-text-faint)',
-                  marginBottom: '24px',
-                }}
-              >
-                {pricing.sub}
-              </p>
-
+        {TIERS.map(({ name, tagline, annualPrice, annualSub, monthlyPrice, featured, features }) => (
+          <div
+            key={name}
+            style={{
+              background:    featured ? 'var(--color-void)' : 'var(--color-surface)',
+              border:        featured ? '1px solid rgba(184,150,62,0.35)' : '1px solid var(--color-border)',
+              borderRadius:  'var(--radius-md)',
+              padding:       '36px',
+              display:       'flex',
+              flexDirection: 'column',
+              boxShadow:     featured ? 'var(--shadow-gold)' : 'var(--shadow-sm)',
+              position:      'relative',
+            }}
+          >
+            {featured && (
               <div
+                aria-hidden="true"
                 style={{
-                  height:       '1px',
-                  background:   featured ? 'rgba(250,248,244,0.06)' : 'var(--color-border)',
-                  marginBottom: '24px',
+                  position:   'absolute',
+                  top:        0,
+                  left:       '15%',
+                  right:      '15%',
+                  height:     '1px',
+                  background: 'linear-gradient(90deg,transparent,rgba(184,150,62,0.5),transparent)',
                 }}
               />
+            )}
+            {featured && (
+              <p style={{ ...MONO, fontSize: '0.44rem', color: 'var(--color-gold)', marginBottom: '20px' }}>
+                Most Popular
+              </p>
+            )}
 
-              <ul
-                style={{
-                  listStyle:     'none',
-                  margin:        '0 0 32px',
-                  padding:       0,
-                  display:       'flex',
-                  flexDirection: 'column',
-                  gap:           '10px',
-                  flex:          1,
-                }}
-              >
-                {features.map(f => (
-                  <li key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                    <Check />
-                    <span
-                      style={{
-                        ...SERIF,
-                        fontSize:   '0.9rem',
-                        fontWeight: 300,
-                        lineHeight: 1.5,
-                        color:      featured ? 'rgba(250,248,244,0.55)' : 'var(--color-text-secondary)',
-                      }}
-                    >
-                      {f}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+            <h3
+              style={{
+                ...SERIF,
+                fontSize:     '1.5rem',
+                fontWeight:   500,
+                color:        featured ? 'rgba(250,248,244,0.9)' : 'var(--color-text-primary)',
+                marginBottom: '6px',
+              }}
+            >
+              {name}
+            </h3>
+            <p
+              style={{
+                ...SERIF,
+                fontSize:     '0.9rem',
+                fontStyle:    'italic',
+                fontWeight:   300,
+                color:        featured ? 'rgba(250,248,244,0.4)' : 'var(--color-text-muted)',
+                marginBottom: '28px',
+                lineHeight:   1.65,
+                whiteSpace:   'pre-line',
+              }}
+            >
+              {tagline}
+            </p>
 
-              <a
-                href="/apply"
-                style={{
-                  ...MONO,
-                  display:        'block',
-                  textAlign:      'center',
-                  textDecoration: 'none',
-                  padding:        '13px 24px',
-                  borderRadius:   'var(--radius-sm)',
-                  fontSize:       'var(--text-caption)',
-                  background:     featured ? 'var(--color-gold)' : 'transparent',
-                  color:          featured ? '#0A0908' : 'var(--color-text-secondary)',
-                  border:         featured ? 'none' : '1px solid var(--color-border-medium)',
-                  transition:     'all 250ms ease',
-                }}
-              >
-                Request Your Founding
-              </a>
-            </div>
-          )
-        })}
+            {/* Price */}
+            {isAnnual ? (
+              <>
+                <div
+                  style={{
+                    ...SERIF,
+                    fontSize:      'clamp(2rem,3.5vw,3rem)',
+                    fontWeight:    300,
+                    color:         'var(--color-gold)',
+                    letterSpacing: '-0.025em',
+                    lineHeight:    1,
+                    marginBottom:  '6px',
+                  }}
+                >
+                  {annualPrice}
+                </div>
+                <p
+                  style={{
+                    ...MONO,
+                    fontSize:     '0.5rem',
+                    letterSpacing: '0.2em',
+                    color:        featured ? 'rgba(250,248,244,0.3)' : 'var(--color-text-faint)',
+                    marginBottom: '24px',
+                  }}
+                >
+                  Per year · {annualSub}
+                </p>
+              </>
+            ) : (
+              <>
+                <div
+                  style={{
+                    ...SERIF,
+                    fontSize:      'clamp(2rem,3.5vw,3rem)',
+                    fontWeight:    300,
+                    color:         'var(--color-gold)',
+                    letterSpacing: '-0.025em',
+                    lineHeight:    1,
+                    marginBottom:  '6px',
+                  }}
+                >
+                  {monthlyPrice}
+                </div>
+                <p
+                  style={{
+                    ...MONO,
+                    fontSize:     '0.5rem',
+                    letterSpacing: '0.2em',
+                    color:        featured ? 'rgba(250,248,244,0.3)' : 'var(--color-text-faint)',
+                    marginBottom: '24px',
+                  }}
+                >
+                  Per month · Billed monthly
+                </p>
+              </>
+            )}
+
+            <div
+              style={{
+                height:       '1px',
+                background:   featured ? 'rgba(250,248,244,0.06)' : 'var(--color-border)',
+                marginBottom: '24px',
+              }}
+            />
+
+            <ul
+              style={{
+                listStyle:     'none',
+                margin:        '0 0 32px',
+                padding:       0,
+                display:       'flex',
+                flexDirection: 'column',
+                gap:           '10px',
+                flex:          1,
+              }}
+            >
+              {features.map(f => (
+                <li key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                  <Check />
+                  <span
+                    style={{
+                      ...SERIF,
+                      fontSize:   '0.9rem',
+                      fontWeight: 300,
+                      lineHeight: 1.5,
+                      color:      featured ? 'rgba(250,248,244,0.55)' : 'var(--color-text-secondary)',
+                    }}
+                  >
+                    {f}
+                  </span>
+                </li>
+              ))}
+            </ul>
+
+            <a
+              href="/apply"
+              style={{
+                ...MONO,
+                display:        'block',
+                textAlign:      'center',
+                textDecoration: 'none',
+                padding:        '13px 24px',
+                borderRadius:   'var(--radius-sm)',
+                fontSize:       'var(--text-caption)',
+                background:     featured ? 'var(--color-gold)' : 'transparent',
+                color:          featured ? '#0A0908' : 'var(--color-text-secondary)',
+                border:         featured ? 'none' : '1px solid var(--color-border-medium)',
+                transition:     'all 250ms ease',
+              }}
+            >
+              Request Your Founding
+            </a>
+          </div>
+        ))}
       </div>
 
-      {/* Founding fee note */}
-      <p
-        style={{
-          ...SERIF,
-          fontSize:   '0.95rem',
-          fontStyle:  'italic',
-          fontWeight: 300,
-          lineHeight: 1.8,
-          color:      'var(--color-text-muted)',
-          textAlign:  'center',
-          maxWidth:   '560px',
-          margin:     '32px auto 0',
-        }}
-      >
-        A one-time founding fee of $2,500 applies to all tiers.
-        This covers your Legacy Guide session, archive initialization,
-        and first-year entity calibration.
-      </p>
+      {/* Monthly minimum note — only shown when monthly is selected */}
+      {!isAnnual && (
+        <p
+          style={{
+            ...MONO,
+            fontSize:     '0.5rem',
+            letterSpacing: '0.2em',
+            color:        'var(--color-text-faint)',
+            textAlign:    'center',
+            marginTop:    '24px',
+          }}
+        >
+          Monthly plans require a 12-month minimum commitment.
+          Cancel anytime after month 12.
+        </p>
+      )}
 
       {/* Tax note */}
-      <div style={{ maxWidth: '640px', margin: '56px auto 0', padding: '48px 32px', background: 'var(--color-surface)', borderTop: '1px solid var(--color-border)' }}>
+      <div
+        style={{
+          maxWidth:   '640px',
+          margin:     '56px auto 0',
+          padding:    '48px 32px',
+          background: 'var(--color-surface)',
+          borderTop:  '1px solid var(--color-border)',
+        }}
+      >
         <p
           style={{
             ...MONO,

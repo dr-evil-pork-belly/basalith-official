@@ -111,7 +111,7 @@ export default function PricingPage() {
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
-              <p style={{ ...MONO, fontSize: '0.52rem', color: 'var(--color-gold)' }}>One-Time Engagement</p>
+              <p style={{ ...MONO, fontSize: '0.52rem', color: 'var(--color-gold)' }}>The Founding Session</p>
               <svg width="32" height="32" viewBox="0 0 34 34" fill="none" aria-hidden="true" style={{ opacity: 0.5 }}>
                 <polygon points="17,1 33,17 17,33 1,17" fill="none" stroke="#C4A24A" strokeWidth="1.4"/>
                 <polygon points="17,7 27,17 17,27 7,17" fill="none" stroke="#C4A24A" strokeWidth="1.1"/>
@@ -122,10 +122,24 @@ export default function PricingPage() {
             <h2 style={{ ...SERIF, fontSize: '2.25rem', fontWeight: 300, color: 'rgba(250,248,244,0.9)', marginBottom: '12px' }}>
               The Founding
             </h2>
-            <p style={{ ...SERIF, fontSize: '1.05rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.45)', lineHeight: 1.8, marginBottom: '40px', maxWidth: '600px' }}>
-              Every Basalith archive begins with The Founding, a comprehensive legal and technical engagement
-              that establishes your archive&rsquo;s permanent infrastructure. Executed once. Built to last centuries.
-            </p>
+            <div style={{ ...SERIF, fontSize: '1.05rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.45)', lineHeight: 1.8, marginBottom: '40px', maxWidth: '600px' }}>
+              <p style={{ marginBottom: '20px' }}>Every archive begins with a Founding Session.</p>
+              <p style={{ marginBottom: '20px' }}>
+                Your Legacy Guide conducts a 90-minute session that establishes
+                the foundation of your entity.
+                Your voice. Your values.
+                The specific way you see the world.
+              </p>
+              <p style={{ marginBottom: '20px' }}>
+                The one-time founding investment of $2,500 covers this session,
+                your archive initialization,
+                and your first-year entity calibration.
+              </p>
+              <p style={{ margin: 0 }}>
+                This is where your archive begins.
+                Everything that follows builds on it.
+              </p>
+            </div>
 
             <div style={{ height: '1px', background: 'rgba(196,162,74,0.15)', marginBottom: '40px' }} />
 
