@@ -6,10 +6,16 @@ type TierKey = 'Archive' | 'Estate' | 'Dynasty'
 
 const TIERS: TierKey[] = ['Archive', 'Estate', 'Dynasty']
 
-const TIER_DATA: Record<TierKey, { price: string; annual: number; residual: number }> = {
-  Archive: { price: '$1,200/yr', annual: 1200, residual: 96  },
-  Estate:  { price: '$3,600/yr', annual: 3600, residual: 288 },
-  Dynasty: { price: '$9,600/yr', annual: 9600, residual: 768 },
+const TIER_DATA: Record<TierKey, {
+  annualPrice:     string
+  monthlyPrice:    string
+  annualResidual:  number   // per client per year (8% of annual price)
+  monthlyResidual: number   // per client per month (8% of monthly price)
+  annualMonthly:   string   // annualResidual / 12, formatted
+}> = {
+  Archive: { annualPrice: '$1,800/yr', monthlyPrice: '$180/mo', annualResidual: 144,  monthlyResidual: 14.40, annualMonthly: '$12/mo'  },
+  Estate:  { annualPrice: '$3,600/yr', monthlyPrice: '$360/mo', annualResidual: 288,  monthlyResidual: 28.80, annualMonthly: '$24/mo'  },
+  Dynasty: { annualPrice: '$9,600/yr', monthlyPrice: '$960/mo', annualResidual: 768,  monthlyResidual: 76.80, annualMonthly: '$64/mo'  },
 }
 
 const RANKS = [
@@ -43,8 +49,17 @@ type ArchivistSummary = {
   rank:                  string
 }
 
-function fmt(n: number) { return '$' + Math.round(n).toLocaleString('en-US') }
-function fmtCents(cents: number) { return '$' + (cents / 100).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) }
+function fmt(n: number) {
+  return '$' + Math.round(n).toLocaleString('en-US')
+}
+
+function fmtResidual(n: number) {
+  return '$' + (n % 1 === 0 ? n.toLocaleString('en-US') : n.toFixed(2))
+}
+
+function fmtCents(cents: number) {
+  return '$' + (cents / 100).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+}
 
 function Heading({ children }: { children: React.ReactNode }) {
   return (
@@ -82,9 +97,10 @@ export default function EarningsClient({ archivistId }: { archivistId: string })
       .finally(() => setLoadingData(false))
   }, [archivistId])
 
+  // Calculator: closings/month assumed for 12 months
   const upfront        = closings * 1000
-  const annualResidual = closings * 12 * TIER_DATA[tier].residual
-  const year1Total     = Math.round(closings * 12 * 1000 + closings * TIER_DATA[tier].residual * 6.5)
+  const annualResidual = closings * 12 * TIER_DATA[tier].annualResidual
+  const year1Total     = Math.round(closings * 12 * 1000 + closings * TIER_DATA[tier].annualResidual * 6.5)
   const sprintEligible = closings >= 5
 
   const totalEarned  = commissions.filter(c => c.status === 'paid').reduce((s, c) => s + c.amount_cents, 0)
@@ -227,11 +243,13 @@ export default function EarningsClient({ archivistId }: { archivistId: string })
       <div>
         <Eyebrow>Commission Structure</Eyebrow>
         <Heading>How you earn.</Heading>
+
+        {/* Top summary cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
           {[
-            { value: '$1,000', label: 'Per Founding',   sub: 'Paid on every completed Founding engagement'       },
-            { value: '8%',     label: 'Annual Residual', sub: 'Of the annual subscription, every year, for life' },
-            { value: '$0',     label: 'To Join',         sub: 'No buy-in. No inventory. No fees.'                },
+            { value: '$1,000', label: 'Per Founding',    sub: 'Flat on every completed Founding, regardless of tier or billing' },
+            { value: '$144–$768', label: 'Annual Residual', sub: '8% of the annual subscription per client, paid yearly for life' },
+            { value: '$0',    label: 'To Join',          sub: 'No buy-in. No inventory. No fees.'                                },
           ].map(({ value, label, sub }) => (
             <div key={label} className="rounded-sm border border-border-subtle p-6" style={{ background: '#111112' }}>
               <p className="font-serif font-semibold text-text-primary mb-1" style={{ fontSize: '2rem', letterSpacing: '-0.02em', color: '#C4A24A' }}>{value}</p>
@@ -240,31 +258,59 @@ export default function EarningsClient({ archivistId }: { archivistId: string })
             </div>
           ))}
         </div>
-        <div className="rounded-sm border border-border-subtle overflow-hidden" style={{ background: '#111112' }}>
+
+        {/* Residual breakdown — annual and monthly side by side */}
+        <div className="rounded-sm border border-border-subtle overflow-hidden mb-4" style={{ background: '#111112' }}>
           <div className="px-6 py-4 border-b border-border-subtle">
-            <p className="font-sans text-[0.6rem] font-bold tracking-[0.18em] uppercase text-text-muted">Residual Breakdown by Tier</p>
+            <p className="font-sans text-[0.6rem] font-bold tracking-[0.18em] uppercase text-text-muted">Residual Breakdown by Tier and Billing</p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                  {['Tier', 'Annual Price', 'Your Residual Rate', 'Your Annual Residual'].map(h => (
-                    <th key={h} className="text-left px-6 py-3 font-sans text-[0.58rem] font-bold tracking-[0.14em] uppercase text-text-muted">{h}</th>
-                  ))}
+                  <th className="text-left px-6 py-3 font-sans text-[0.58rem] font-bold tracking-[0.14em] uppercase text-text-muted">Tier</th>
+                  <th className="text-left px-6 py-3 font-sans text-[0.58rem] font-bold tracking-[0.14em] uppercase" style={{ color: '#C4A24A' }}>Annual Price</th>
+                  <th className="text-left px-6 py-3 font-sans text-[0.58rem] font-bold tracking-[0.14em] uppercase" style={{ color: '#C4A24A' }}>Your Annual Residual</th>
+                  <th className="text-left px-6 py-3 font-sans text-[0.58rem] font-bold tracking-[0.14em] uppercase text-text-muted">Monthly Price</th>
+                  <th className="text-left px-6 py-3 font-sans text-[0.58rem] font-bold tracking-[0.14em] uppercase text-text-muted">Your Monthly Residual</th>
                 </tr>
               </thead>
               <tbody>
                 {TIERS.map((t, i) => (
                   <tr key={t} style={i < TIERS.length - 1 ? { borderBottom: '1px solid rgba(255,255,255,0.06)' } : {}}>
                     <td className="px-6 py-4 font-sans text-[0.85rem] font-semibold text-text-primary">{t}</td>
-                    <td className="px-6 py-4 font-sans text-[0.85rem] text-text-secondary">{TIER_DATA[t].price}</td>
-                    <td className="px-6 py-4 font-sans text-[0.85rem] text-text-secondary">8%</td>
-                    <td className="px-6 py-4 font-serif font-semibold" style={{ fontSize: '1rem', color: '#C4A24A' }}>{fmt(TIER_DATA[t].residual)}</td>
+                    <td className="px-6 py-4 font-sans text-[0.85rem] text-text-secondary">{TIER_DATA[t].annualPrice}</td>
+                    <td className="px-6 py-4">
+                      <span className="font-serif font-semibold" style={{ fontSize: '1rem', color: '#C4A24A' }}>
+                        {fmtResidual(TIER_DATA[t].annualResidual)}/yr
+                      </span>
+                      <span className="font-sans text-[0.72rem] text-text-muted ml-2">
+                        ({TIER_DATA[t].annualMonthly})
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 font-sans text-[0.85rem] text-text-secondary">{TIER_DATA[t].monthlyPrice}</td>
+                    <td className="px-6 py-4 font-serif font-semibold" style={{ fontSize: '1rem', color: 'rgba(196,162,74,0.65)' }}>
+                      {fmtResidual(TIER_DATA[t].monthlyResidual)}/mo
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+        </div>
+
+        {/* Monthly advantage note */}
+        <div className="rounded-sm px-6 py-5" style={{ background: 'rgba(196,162,74,0.05)', border: '1px solid rgba(196,162,74,0.18)' }}>
+          <p className="font-sans text-[0.6rem] font-bold tracking-[0.18em] uppercase mb-3" style={{ color: '#C4A24A' }}>Monthly Billing Advantage</p>
+          <p className="font-sans text-[0.82rem] text-text-secondary leading-[1.7] mb-2">
+            Monthly clients generate higher long-term residuals. An Estate client on monthly billing
+            generates <span style={{ color: '#C4A24A', fontWeight: 600 }}>$28.80/month</span> vs $24/month on annual.
+          </p>
+          <p className="font-sans text-[0.82rem] text-text-secondary leading-[1.7]">
+            Over 3 years, that is{' '}
+            <span style={{ color: '#C4A24A', fontWeight: 600 }}>$1,037 more per client.</span>{' '}
+            Offer monthly as a genuine option, not a fallback.
+          </p>
         </div>
       </div>
 
