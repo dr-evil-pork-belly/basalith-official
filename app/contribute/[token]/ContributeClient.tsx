@@ -1016,21 +1016,26 @@ function ContributorEntitySection({
   if (!hasAccess) {
     return (
       <div style={SECTION_STYLE}>
-        <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.48rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.6)', marginBottom: '1.25rem' }}>
-          The Entity Is Building
+        <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.48rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.55)', marginBottom: '1.5rem' }}>
+          {firstName}&rsquo;s Entity Is Learning
         </p>
-        <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontSize: '1.1rem', fontWeight: 300, color: '#B8B4AB', lineHeight: 1.8, marginBottom: '0.75rem', textAlign: 'center' }}>
-          {firstName}&rsquo;s entity is learning<br />
-          from everything you contribute.
+        <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontSize: '1.05rem', fontWeight: 300, color: '#9DA3A8', lineHeight: 1.85, marginBottom: '0.6rem' }}>
+          You are helping build it.
         </p>
-        <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontSize: '1.05rem', fontWeight: 300, color: '#706C65', lineHeight: 1.8, marginBottom: '0.75rem', textAlign: 'center' }}>
-          The more you add,<br />
-          the sooner you will be able<br />
-          to talk to it directly.
+        <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontSize: '1.05rem', fontWeight: 300, color: '#706C65', lineHeight: 2.0, marginBottom: '1.25rem' }}>
+          Every photograph you label<br />
+          every question you answer<br />
+          every memory you share<br />
+          teaches it something specific<br />
+          about how {firstName} thinks.
         </p>
-        <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontSize: '0.95rem', fontWeight: 300, color: 'rgba(196,162,74,0.5)', lineHeight: 1.8, textAlign: 'center', margin: 0 }}>
-          Your contributions are making it<br />
-          more accurate every day.
+        <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontSize: '1.0rem', fontWeight: 300, color: '#5C6166', lineHeight: 1.85, marginBottom: '1.25rem' }}>
+          When it is ready,<br />
+          {firstName} will invite you to talk to it.
+        </p>
+        <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontSize: '1.0rem', fontWeight: 300, color: 'rgba(196,162,74,0.45)', lineHeight: 1.85, margin: 0 }}>
+          Keep contributing.<br />
+          You are making it more accurate.
         </p>
       </div>
     )

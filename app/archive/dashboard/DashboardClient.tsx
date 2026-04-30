@@ -449,11 +449,109 @@ function MemoryGameCard({ archiveId }: { archiveId: string }) {
 type ReadinessData = {
   ready:    boolean
   score:    number
-  breakdown: { photographs: number; deposits: number; accuracyAvg: number; voiceRecordings: number }
+  breakdown: {
+    photographs: number
+    deposits: number
+    accuracyAvg: number
+    voiceRecordings: number
+    wisdomSessions: number
+  }
   missing:  string[]
   access:   'none' | 'preview' | 'open'
   previewContributorIds: string[]
   contributors: { id: string; name: string; email: string }[]
+}
+
+type MilestoneRow = {
+  id:       number
+  label:    string
+  complete: boolean
+  criteria: Record<string, number>
+}
+
+function getMilestones(b: ReadinessData['breakdown']): MilestoneRow[] {
+  return [
+    { id: 1, label: 'Foundations',              complete: b.photographs >= 10  && b.deposits >= 5,                                           criteria: { photographs: 10,  deposits: 5 } },
+    { id: 2, label: 'Taking Shape',             complete: b.photographs >= 100 && b.deposits >= 25 && b.voiceRecordings >= 1,                criteria: { photographs: 100, deposits: 25, voiceRecordings: 1  } },
+    { id: 3, label: 'Recognizable',             complete: b.photographs >= 250 && b.deposits >= 50 && b.wisdomSessions >= 5,                 criteria: { photographs: 250, deposits: 50, wisdomSessions: 5   } },
+    { id: 4, label: 'Ready to Meet Your Family', complete: b.photographs >= 500 && b.deposits >= 100 && b.voiceRecordings >= 10 && b.accuracyAvg >= 50, criteria: { photographs: 500, deposits: 100, voiceRecordings: 10, accuracyAvg: 50 } },
+  ]
+}
+
+const CRITERIA_LABELS: Record<string, string> = {
+  photographs:     'photographs processed',
+  deposits:        'deposits completed',
+  voiceRecordings: 'voice recordings',
+  wisdomSessions:  'wisdom sessions completed',
+  accuracyAvg:     '% entity accuracy',
+}
+
+const CRITERIA_LINKS: Record<string, string> = {
+  photographs:     '/archive/upload',
+  deposits:        '/archive/entity',
+  voiceRecordings: '/archive/voice',
+  wisdomSessions:  '/archive/wisdom',
+  accuracyAvg:     '/archive/entity',
+}
+
+function MilestoneItem({
+  milestone, status, breakdown,
+}: {
+  milestone: MilestoneRow
+  status: 'complete' | 'current' | 'locked'
+  breakdown: ReadinessData['breakdown']
+}) {
+  const icon = status === 'complete' ? '✓' : status === 'current' ? '◐' : '○'
+  const iconColor = status === 'complete' ? '#C4A24A' : status === 'current' ? '#9DA3A8' : '#3A3F44'
+  const labelColor = status === 'complete' ? '#C4A24A' : status === 'current' ? '#F0EDE6' : '#3A3F44'
+
+  return (
+    <div style={{ display: 'flex', gap: '0.9rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.04)', marginBottom: '0.75rem' }}>
+      <span style={{ fontFamily: 'monospace', fontSize: '0.9rem', color: iconColor, flexShrink: 0, lineHeight: 1.4 }}>{icon}</span>
+      <div style={{ flex: 1 }}>
+        <p style={{ fontFamily: 'monospace', fontSize: '0.48rem', letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: labelColor, margin: '0 0 0.35rem' }}>
+          Milestone {milestone.id} — {milestone.label}
+        </p>
+        {status === 'complete' && (
+          <p style={{ fontFamily: 'Georgia,serif', fontStyle: 'italic', fontSize: '0.82rem', color: 'rgba(196,162,74,0.6)', margin: 0 }}>Complete</p>
+        )}
+        {status === 'current' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+            {Object.entries(milestone.criteria).map(([key, target]) => {
+              const current = breakdown[key as keyof typeof breakdown] ?? 0
+              const done    = current >= target
+              const label   = CRITERIA_LABELS[key] ?? key
+              const href    = CRITERIA_LINKS[key]
+              const text    = done
+                ? `✓ ${current} of ${target} ${label}`
+                : `${current} of ${target} ${label}`
+              return (
+                <a
+                  key={key}
+                  href={done ? undefined : href}
+                  style={{
+                    fontFamily:     'Georgia,serif',
+                    fontStyle:      'italic',
+                    fontSize:       '0.82rem',
+                    color:          done ? 'rgba(196,162,74,0.5)' : '#9DA3A8',
+                    textDecoration: 'none',
+                    display:        'block',
+                  }}
+                >
+                  {text}
+                </a>
+              )
+            })}
+          </div>
+        )}
+        {status === 'locked' && (
+          <p style={{ fontFamily: 'Georgia,serif', fontStyle: 'italic', fontSize: '0.82rem', color: '#3A3F44', margin: 0 }}>
+            Unlocks after Milestone {milestone.id - 1}
+          </p>
+        )}
+      </div>
+    </div>
+  )
 }
 
 function EntityReadinessCard({ archiveId }: { archiveId: string }) {
@@ -491,114 +589,116 @@ function EntityReadinessCard({ archiveId }: { archiveId: string }) {
 
   if (loading || !data) return null
 
-  const { ready, score, missing, access, contributors } = data
-  const pct = Math.min(score, 100)
+  const { ready, access, contributors } = data
+  const bd = data.breakdown
+  const milestones = getMilestones(bd)
+  const allComplete = milestones.every(m => m.complete)
+  const currentIdx  = milestones.findIndex(m => !m.complete)
 
-  const MISSING_LINKS: Record<string, string> = {
-    'photographs':      '/archive/upload',
-    'deposits':         '/archive/entity',
-    'wisdom sessions':  '/archive/wisdom',
-    'voice recordings': '/archive/voice',
-  }
-
-  function missingLink(item: string): string {
-    for (const [key, href] of Object.entries(MISSING_LINKS)) {
-      if (item.toLowerCase().includes(key)) return href
+  // Contextual guidance based on current milestone
+  function guidanceText(): string | null {
+    if (allComplete && access === 'none') return null // replaced by activation prompt below
+    if (currentIdx === 2) { // working toward M3
+      return 'Upload more photographs from your phone. Every decade of your life makes the entity more accurate.\n\nCall 1‑888‑688‑9168 and share a memory. Voice recordings teach the entity how you speak — not just what you say.'
     }
-    return '/archive/dashboard'
+    if (currentIdx === 3) { // working toward M4
+      return 'You are close.\n\nSchedule your next wisdom session. The questions are designed to reveal how you think under pressure. Your entity needs to hear you reason through difficult things.'
+    }
+    return null
   }
 
-  const cardBorder = ready
-    ? '1px solid rgba(196,162,74,0.3)'
-    : '1px solid rgba(255,255,255,0.06)'
-  const cardTop = ready
-    ? '3px solid rgba(196,162,74,0.7)'
-    : '3px solid rgba(255,255,255,0.08)'
+  const guidance = guidanceText()
 
   return (
     <>
-      <div className="rounded-sm mb-8" style={{ background: '#111112', border: cardBorder, borderTop: cardTop }}>
-        <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-          <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.2em', textTransform: 'uppercase' as const, color: ready ? '#C4A24A' : '#5C6166', margin: 0 }}>
-            {ready ? 'Your Entity Is Ready' : 'Your Entity Is Building'}
+      <div
+        className="rounded-sm mb-8"
+        style={{
+          background: '#111112',
+          border:     allComplete ? '1px solid rgba(196,162,74,0.3)' : '1px solid rgba(255,255,255,0.06)',
+          borderTop:  allComplete ? '3px solid rgba(196,162,74,0.7)' : '3px solid rgba(255,255,255,0.08)',
+        }}
+      >
+        <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid rgba(255,255,255,0.04)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.2em', textTransform: 'uppercase' as const, color: allComplete ? '#C4A24A' : '#5C6166', margin: 0 }}>
+            Entity Progress
           </p>
-        </div>
-
-        <div style={{ padding: '1.25rem 1.5rem' }}>
-          {/* Progress bar */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-            <div style={{ flex: 1, height: '6px', background: 'rgba(255,255,255,0.06)', borderRadius: '3px', overflow: 'hidden' }}>
-              <div
-                style={{
-                  height:           '100%',
-                  width:            `${pct}%`,
-                  background:       ready ? 'rgba(196,162,74,0.8)' : 'rgba(196,162,74,0.4)',
-                  borderRadius:     '3px',
-                  transition:       'width 0.8s cubic-bezier(0.16,1,0.3,1)',
-                }}
-              />
-            </div>
-            <span style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontWeight: 600, fontSize: '1.1rem', color: ready ? '#C4A24A' : '#9DA3A8', flexShrink: 0 }}>
-              {score}/100
-            </span>
-          </div>
-
-          {!ready && missing.length > 0 && (
-            <div style={{ marginBottom: '1rem' }}>
-              <p style={{ fontFamily: 'monospace', fontSize: '0.46rem', letterSpacing: '0.1em', textTransform: 'uppercase' as const, color: '#5C6166', marginBottom: '0.5rem' }}>
-                To unlock contributor access:
-              </p>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-                {missing.map(item => (
-                  <li key={item}>
-                    <a
-                      href={missingLink(item)}
-                      style={{ fontFamily: 'Georgia,serif', fontStyle: 'italic', fontSize: '0.88rem', color: '#706C65', textDecoration: 'none' }}
-                    >
-                      · {item}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {ready && access === 'none' && (
-            <>
-              <p style={{ fontFamily: 'Georgia,serif', fontStyle: 'italic', fontSize: '0.9rem', color: '#9DA3A8', lineHeight: 1.75, margin: '0 0 1.25rem' }}>
-                Your entity has enough depth to meet your family.
-                You can now invite contributors to talk to it.
-              </p>
-              <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' as const }}>
-                <button
-                  onClick={() => { setSelectedIds([]); setShowModal(true) }}
-                  style={{ fontFamily: 'monospace', fontSize: '0.48rem', letterSpacing: '0.14em', textTransform: 'uppercase' as const, color: '#0A0908', background: '#C4A24A', border: 'none', padding: '0.55rem 1.1rem', cursor: 'pointer', borderRadius: '2px' }}
-                >
-                  Invite Select Contributors
-                </button>
-                <button
-                  onClick={() => setShowConfirm(true)}
-                  style={{ fontFamily: 'monospace', fontSize: '0.48rem', letterSpacing: '0.14em', textTransform: 'uppercase' as const, color: '#C4A24A', background: 'transparent', border: '1px solid rgba(196,162,74,0.3)', padding: '0.55rem 1.1rem', cursor: 'pointer', borderRadius: '2px' }}
-                >
-                  Open to All Contributors
-                </button>
-              </div>
-            </>
-          )}
-
-          {ready && access !== 'none' && (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' as const, gap: '0.75rem' }}>
-              <p style={{ fontFamily: 'monospace', fontSize: '0.48rem', letterSpacing: '0.12em', textTransform: 'uppercase' as const, color: '#4CAF50', margin: 0 }}>
-                {access === 'open' ? 'Open to all contributors' : `Preview — ${data.previewContributorIds.length} contributor${data.previewContributorIds.length !== 1 ? 's' : ''} invited`}
+          {access !== 'none' && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <p style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.12em', textTransform: 'uppercase' as const, color: '#4CAF50', margin: 0 }}>
+                {access === 'open' ? 'Open to all' : `${data.previewContributorIds.length} invited`}
               </p>
               <button
                 onClick={() => setAccess('disable')}
                 disabled={saving}
-                style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.12em', textTransform: 'uppercase' as const, color: '#5C6166', background: 'transparent', border: '1px solid rgba(255,255,255,0.07)', padding: '0.4rem 0.8rem', cursor: 'pointer', borderRadius: '2px' }}
+                style={{ fontFamily: 'monospace', fontSize: '0.4rem', letterSpacing: '0.1em', textTransform: 'uppercase' as const, color: '#5C6166', background: 'transparent', border: '1px solid rgba(255,255,255,0.07)', padding: '0.3rem 0.6rem', cursor: 'pointer', borderRadius: '2px' }}
               >
-                Revoke Access
+                Revoke
               </button>
             </div>
+          )}
+        </div>
+
+        <div style={{ padding: '1.25rem 1.5rem' }}>
+          {/* Milestone list */}
+          {milestones.map((m, i) => {
+            const status: 'complete' | 'current' | 'locked' =
+              m.complete               ? 'complete' :
+              i === currentIdx         ? 'current'  :
+              'locked'
+            return (
+              <MilestoneItem
+                key={m.id}
+                milestone={m}
+                status={status}
+                breakdown={bd}
+              />
+            )
+          })}
+
+          {/* Contextual guidance */}
+          {guidance && (
+            <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '2px', padding: '1rem', margin: '0.5rem 0 1rem' }}>
+              {guidance.split('\n\n').map((para, i) => (
+                <p key={i} style={{ fontFamily: 'Georgia,serif', fontStyle: 'italic', fontSize: '0.88rem', color: '#706C65', lineHeight: 1.75, margin: i > 0 ? '0.75rem 0 0' : 0 }}>
+                  {para}
+                </p>
+              ))}
+            </div>
+          )}
+
+          {/* Activation prompt — M4 complete, not yet activated */}
+          {allComplete && access === 'none' && (
+            <>
+              <div style={{ borderTop: '1px solid rgba(196,162,74,0.15)', paddingTop: '1.25rem', marginTop: '0.5rem' }}>
+                <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.2em', textTransform: 'uppercase' as const, color: '#C4A24A', marginBottom: '1rem' }}>
+                  Your Entity Is Ready to Meet Your Family.
+                </p>
+                <p style={{ fontFamily: 'Georgia,serif', fontStyle: 'italic', fontSize: '0.9rem', color: '#9DA3A8', lineHeight: 1.75, marginBottom: '0.5rem' }}>
+                  You have built something worth sharing.
+                </p>
+                <p style={{ fontFamily: 'Georgia,serif', fontStyle: 'italic', fontSize: '0.9rem', color: '#9DA3A8', lineHeight: 1.75, marginBottom: '0.5rem' }}>
+                  When you are ready you can invite your family to talk to your entity.
+                </p>
+                <p style={{ fontFamily: 'Georgia,serif', fontStyle: 'italic', fontSize: '0.9rem', color: '#706C65', lineHeight: 1.75, marginBottom: '1.25rem' }}>
+                  We recommend talking to it yourself first. Make sure it sounds like you.
+                </p>
+                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' as const }}>
+                  <button
+                    onClick={() => { setSelectedIds([]); setShowModal(true) }}
+                    style={{ fontFamily: 'monospace', fontSize: '0.48rem', letterSpacing: '0.14em', textTransform: 'uppercase' as const, color: '#0A0908', background: '#C4A24A', border: 'none', padding: '0.6rem 1.25rem', cursor: 'pointer', borderRadius: '2px' }}
+                  >
+                    Activate Contributor Access
+                  </button>
+                  <a
+                    href="/archive/entity"
+                    style={{ fontFamily: 'monospace', fontSize: '0.48rem', letterSpacing: '0.14em', textTransform: 'uppercase' as const, color: '#C4A24A', background: 'transparent', border: '1px solid rgba(196,162,74,0.3)', padding: '0.6rem 1.25rem', borderRadius: '2px', textDecoration: 'none', display: 'inline-block' }}
+                  >
+                    Talk to It First →
+                  </a>
+                </div>
+              </div>
+            </>
           )}
         </div>
       </div>
@@ -610,13 +710,13 @@ function EntityReadinessCard({ archiveId }: { archiveId: string }) {
           style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}
         >
           <div style={{ background: '#0F0F10', border: '1px solid rgba(196,162,74,0.2)', borderRadius: '4px', padding: '1.75rem', width: '100%', maxWidth: '480px' }}>
-            <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.2em', textTransform: 'uppercase' as const, color: '#C4A24A', marginBottom: '1rem' }}>
-              Invite Contributors
+            <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.2em', textTransform: 'uppercase' as const, color: '#C4A24A', marginBottom: '0.75rem' }}>
+              Activate Contributor Access
             </p>
             <p style={{ fontFamily: 'Georgia,serif', fontStyle: 'italic', fontSize: '0.9rem', color: '#9DA3A8', lineHeight: 1.7, marginBottom: '1.25rem' }}>
-              Select which contributors can talk to your entity. They will receive an invitation email.
+              Select which contributors can talk to your entity. They will receive an invitation email. You can also open it to everyone.
             </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.5rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.25rem' }}>
               {contributors.map(c => (
                 <label
                   key={c.id}
@@ -638,17 +738,25 @@ function EntityReadinessCard({ archiveId }: { archiveId: string }) {
                 <p style={{ fontFamily: 'Georgia,serif', fontStyle: 'italic', fontSize: '0.9rem', color: '#5C6166' }}>No active contributors found.</p>
               )}
             </div>
-            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
-              <button onClick={() => setShowModal(false)} style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.12em', textTransform: 'uppercase' as const, color: '#5C6166', background: 'transparent', border: '1px solid rgba(255,255,255,0.07)', padding: '0.5rem 1rem', cursor: 'pointer', borderRadius: '2px' }}>
-                Cancel
-              </button>
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' as const, justifyContent: 'space-between', alignItems: 'center' }}>
               <button
-                onClick={() => setAccess('enable_preview', selectedIds)}
-                disabled={saving || selectedIds.length === 0}
-                style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.12em', textTransform: 'uppercase' as const, color: '#0A0908', background: saving || selectedIds.length === 0 ? 'rgba(196,162,74,0.4)' : '#C4A24A', border: 'none', padding: '0.5rem 1rem', cursor: saving || selectedIds.length === 0 ? 'not-allowed' : 'pointer', borderRadius: '2px' }}
+                onClick={() => setShowConfirm(true)}
+                style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.1em', textTransform: 'uppercase' as const, color: '#706C65', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', textDecoration: 'underline' }}
               >
-                {saving ? 'Sending…' : `Invite ${selectedIds.length > 0 ? selectedIds.length : ''} Contributor${selectedIds.length !== 1 ? 's' : ''}`}
+                Open to all instead
               </button>
+              <div style={{ display: 'flex', gap: '0.6rem' }}>
+                <button onClick={() => setShowModal(false)} style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.12em', textTransform: 'uppercase' as const, color: '#5C6166', background: 'transparent', border: '1px solid rgba(255,255,255,0.07)', padding: '0.5rem 1rem', cursor: 'pointer', borderRadius: '2px' }}>
+                  Cancel
+                </button>
+                <button
+                  onClick={() => setAccess('enable_preview', selectedIds)}
+                  disabled={saving || selectedIds.length === 0}
+                  style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.12em', textTransform: 'uppercase' as const, color: '#0A0908', background: saving || selectedIds.length === 0 ? 'rgba(196,162,74,0.4)' : '#C4A24A', border: 'none', padding: '0.5rem 1rem', cursor: saving || selectedIds.length === 0 ? 'not-allowed' : 'pointer', borderRadius: '2px' }}
+                >
+                  {saving ? 'Sending…' : `Invite ${selectedIds.length > 0 ? selectedIds.length : ''} Contributor${selectedIds.length !== 1 ? 's' : ''}`}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -661,9 +769,9 @@ function EntityReadinessCard({ archiveId }: { archiveId: string }) {
           style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}
         >
           <div style={{ background: '#0F0F10', border: '1px solid rgba(196,162,74,0.2)', borderRadius: '4px', padding: '1.75rem', width: '100%', maxWidth: '420px' }}>
-            <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.2em', textTransform: 'uppercase' as const, color: '#C4A24A', marginBottom: '1rem' }}>Open to All Contributors?</p>
+            <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.2em', textTransform: 'uppercase' as const, color: '#C4A24A', marginBottom: '1rem' }}>Are you sure?</p>
             <p style={{ fontFamily: 'Georgia,serif', fontStyle: 'italic', fontSize: '0.9rem', color: '#9DA3A8', lineHeight: 1.7, marginBottom: '1.5rem' }}>
-              Every active contributor will be able to talk to your entity. You can revoke this at any time.
+              Your contributors will be able to talk to your entity. You can revoke this at any time.
             </p>
             <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
               <button onClick={() => setShowConfirm(false)} style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.12em', textTransform: 'uppercase' as const, color: '#5C6166', background: 'transparent', border: '1px solid rgba(255,255,255,0.07)', padding: '0.5rem 1rem', cursor: 'pointer', borderRadius: '2px' }}>Cancel</button>
