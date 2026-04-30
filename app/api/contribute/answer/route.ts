@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getContributorByToken, generateQuestionsForContributor } from '@/lib/contributorToken'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
+import { getPhotoUrl } from '@/lib/storage'
 
 export const dynamic = 'force-dynamic'
 
@@ -93,12 +94,9 @@ export async function POST(req: NextRequest) {
         .eq('id', nextQuestion.photograph_id)
         .maybeSingle()
       if (photo?.storage_path) {
-        const { data: signed } = await supabaseAdmin
-          .storage.from('photographs')
-          .createSignedUrl(photo.storage_path, 86400)
         nextQuestion = {
           ...nextQuestion,
-          photoUrl:        signed?.signedUrl ?? null,
+          photoUrl:        getPhotoUrl(photo.storage_path),
           ai_era_estimate: photo.ai_era_estimate ?? null,
         } as typeof nextQuestion
       }

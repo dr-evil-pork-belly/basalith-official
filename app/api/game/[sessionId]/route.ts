@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { getPhotoUrl } from '@/lib/storage'
 
 // ── GET — session details + leaderboard ───────────────────────────────────────
 
@@ -38,11 +39,7 @@ export async function GET(
       .in('id', photoIds)
 
     for (const photo of photos ?? []) {
-      const { data: signed } = await supabaseAdmin
-        .storage
-        .from('photographs')
-        .createSignedUrl(photo.storage_path, 3600)
-      if (signed?.signedUrl) photoUrls[photo.id] = signed.signedUrl
+      photoUrls[photo.id] = getPhotoUrl(photo.storage_path)
       photoMeta[photo.id] = { ai_era_estimate: photo.ai_era_estimate }
     }
 
