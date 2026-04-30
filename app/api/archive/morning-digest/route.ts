@@ -3,6 +3,7 @@ import { resend } from '@/lib/resend'
 import { NextResponse } from 'next/server'
 import { WISDOM_SESSIONS } from '@/lib/wisdomSessions'
 import { DIMENSIONS } from '@/lib/entityAccuracy'
+import { getEmailPhotoUrl } from '@/lib/photo-url'
 import { t } from '@/lib/emailTranslations'
 
 export async function POST(req: Request) {
@@ -56,11 +57,7 @@ export async function POST(req: Request) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const firstPhoto = (recentLabels[0] as any)?.photographs
     if (firstPhoto?.storage_path) {
-      const { data: signed } = await supabaseAdmin
-        .storage
-        .from('photographs')
-        .createSignedUrl(firstPhoto.storage_path, 86400)
-      photoUrl = signed?.signedUrl ?? null
+      photoUrl = await getEmailPhotoUrl(firstPhoto.storage_path)
     }
 
     // Build memories HTML

@@ -1,5 +1,6 @@
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { NextRequest, NextResponse } from 'next/server'
+import { getInAppPhotoUrl } from '@/lib/photo-url'
 
 const PAGE_SIZE = 24
 
@@ -58,15 +59,12 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  // Generate signed URLs for all photos with storage paths
+  // Generate in-app URLs (1 hour — refreshed on page reload)
   const photosWithUrls = await Promise.all(
     (data ?? []).map(async (photo) => {
       if (!photo.storage_path) return { ...photo, signedUrl: null }
-      const { data: urlData } = await supabaseAdmin
-        .storage
-        .from('photographs')
-        .createSignedUrl(photo.storage_path, 3600)
-      return { ...photo, signedUrl: urlData?.signedUrl ?? null }
+      const signedUrl = await getInAppPhotoUrl(photo.storage_path, 3600)
+      return { ...photo, signedUrl }
     })
   )
 

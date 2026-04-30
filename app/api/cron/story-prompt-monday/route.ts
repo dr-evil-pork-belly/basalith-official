@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
+import { getEmailPhotoUrl } from '@/lib/photo-url'
 
 export const dynamic = 'force-dynamic'
 
@@ -59,15 +60,8 @@ export async function GET(req: NextRequest) {
 
       const selectedPhoto = photos[0]
 
-      // 7-day signed URL — lasts through Friday reveal
-      const { data: signed } = await supabaseAdmin
-        .storage
-        .from('photographs')
-        .createSignedUrl(selectedPhoto.storage_path, 86400 * 7)
-
-      if (!signed?.signedUrl) continue
-
-      const photoUrl = signed.signedUrl
+      const photoUrl = await getEmailPhotoUrl(selectedPhoto.storage_path)
+      if (!photoUrl) continue
 
       // Mark photo as used and create session record
       await Promise.all([

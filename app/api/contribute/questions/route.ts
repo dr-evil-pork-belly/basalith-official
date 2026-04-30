@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getContributorByToken } from '@/lib/contributorToken'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { getInAppPhotoUrl } from '@/lib/photo-url'
 
 export const dynamic = 'force-dynamic'
 
@@ -31,13 +32,9 @@ export async function GET(req: NextRequest) {
           .maybeSingle()
 
         if (photo?.storage_path) {
-          const { data: signed } = await supabaseAdmin
-            .storage
-            .from('photographs')
-            .createSignedUrl(photo.storage_path, 86400)
           return {
             ...q,
-            photoUrl:       signed?.signedUrl ?? null,
+            photoUrl:        await getInAppPhotoUrl(photo.storage_path, 86400 * 7),
             ai_era_estimate: photo.ai_era_estimate ?? null,
           }
         }

@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
 import { NextResponse } from 'next/server'
+import { getEmailPhotoUrl } from '@/lib/photo-url'
 
 const anthropic = new Anthropic()
 
@@ -82,10 +83,7 @@ export async function POST(req: Request) {
     // Build signed URL (48 hours for life event)
     let photoUrl: string | null = null
     if (chosenPhoto?.storage_path) {
-      const { data: signedUrlData } = await supabaseAdmin.storage
-        .from('photographs')
-        .createSignedUrl(chosenPhoto.storage_path, 172800)
-      photoUrl = signedUrlData?.signedUrl ?? null
+      photoUrl = await getEmailPhotoUrl(chosenPhoto.storage_path)
     }
 
     // Build context for AI reflection

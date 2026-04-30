@@ -4,6 +4,7 @@ import { resend } from '@/lib/resend'
 import { PhotographEmail } from '@/emails/PhotographEmail'
 import { render } from '@react-email/render'
 import { t } from '@/lib/emailTranslations'
+import { getEmailPhotoUrl } from '@/lib/photo-url'
 
 function calculateNextSend(prefs: { cadence: string; send_time: string }): string {
   const now  = new Date()
@@ -77,12 +78,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ skipped: true, reason: 'No unsent photographs' })
     }
 
-    // 4. Get signed URL (24 hours)
-    const { data: signedUrlData } = await supabaseAdmin.storage
-      .from('photographs')
-      .createSignedUrl(photo.storage_path, 86400)
-
-    if (!signedUrlData?.signedUrl) {
+    // 4. Get photo URL — email-safe (public URL or 1-year signed)
+    const photoUrl = await getEmailPhotoUrl(photo.storage_path)
+    if (!photoUrl) {
       throw new Error('Could not generate photo URL')
     }
 
@@ -126,7 +124,7 @@ export async function POST(req: NextRequest) {
           PhotographEmail({
             archiveName:     archive.name,
             familyName:      archive.family_name,
-            photographUrl:   signedUrlData.signedUrl,
+            photographUrl:   photoUrl,
             yearEstimate:    photo.ai_era_estimate ?? null,
             subjectContext:  '',
             replyAddress,

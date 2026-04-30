@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
+import { getEmailPhotoUrl } from '@/lib/photo-url'
 
 export const dynamic = 'force-dynamic'
 
@@ -80,13 +81,7 @@ export async function GET(req: NextRequest) {
 
       if (!photo || !archive) continue
 
-      // Get a fresh signed URL for the reveal
-      const { data: signed } = await supabaseAdmin
-        .storage
-        .from('photographs')
-        .createSignedUrl(photo.storage_path, 86400)
-
-      const photoUrl = signed?.signedUrl ?? ''
+      const photoUrl = await getEmailPhotoUrl(photo.storage_path) ?? ''
 
       // Merge email replies and label contributions
       const responses: Array<{ name: string; text: string }> = [

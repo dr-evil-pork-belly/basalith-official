@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
+import { getEmailPhotoUrl } from '@/lib/photo-url'
 
 export async function POST(req: NextRequest) {
   try {
@@ -40,10 +41,7 @@ export async function POST(req: NextRequest) {
         .single()
 
       if (photo?.storage_path) {
-        const { data: signedUrlData } = await supabaseAdmin.storage
-          .from('photographs')
-          .createSignedUrl(photo.storage_path, 86400)
-        photographUrl = signedUrlData?.signedUrl ?? null
+        photographUrl = await getEmailPhotoUrl(photo.storage_path)
 
         // Create a session so reply is routed correctly
         const sessionCode = Math.random().toString(36).substring(2, 8)

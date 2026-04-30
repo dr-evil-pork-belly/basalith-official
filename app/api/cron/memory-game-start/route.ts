@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
+import { getEmailPhotoUrl } from '@/lib/photo-url'
 
 export const dynamic = 'force-dynamic'
 
@@ -161,14 +162,11 @@ export async function GET(req: NextRequest) {
 
       const selectedPhotos = photos.slice(0, 5)
 
-      // Get 3-day signed URLs for all photos
+      // Get email-safe URLs for all photos (game emails must load for days)
       const photoUrls: Record<string, string> = {}
       for (const photo of selectedPhotos) {
-        const { data: signed } = await supabaseAdmin
-          .storage
-          .from('photographs')
-          .createSignedUrl(photo.storage_path, 86400 * 3)
-        if (signed?.signedUrl) photoUrls[photo.id] = signed.signedUrl
+        const url = await getEmailPhotoUrl(photo.storage_path)
+        if (url) photoUrls[photo.id] = url
       }
 
       // Create game session
