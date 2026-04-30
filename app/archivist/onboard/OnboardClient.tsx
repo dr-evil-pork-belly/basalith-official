@@ -2,12 +2,13 @@
 
 import { useState } from 'react'
 
-type Result = {
+type SubmitResult = {
   archiveId:   string
   archiveName: string
   clientEmail: string
-  password:    string
-  magicLink?:  string
+  tierLabel:   string
+  billing:     string
+  totalDue:    number
 }
 
 const LABEL: React.CSSProperties = {
@@ -21,11 +22,11 @@ const LABEL: React.CSSProperties = {
 }
 
 const HELPER: React.CSSProperties = {
-  fontFamily:  "'Cormorant Garamond', Georgia, serif",
-  fontSize:    '0.8rem',
-  fontStyle:   'italic',
-  color:       '#3A3F44',
-  marginTop:   '0.4rem',
+  fontFamily: "'Cormorant Garamond', Georgia, serif",
+  fontSize:   '0.8rem',
+  fontStyle:  'italic',
+  color:      '#3A3F44',
+  marginTop:  '0.4rem',
 }
 
 const INPUT: React.CSSProperties = {
@@ -51,19 +52,36 @@ function Sigil() {
   )
 }
 
-export default function OnboardClient({ archivistId }: { archivistId: string }) {
-  const [linkCopied, setLinkCopied] = useState(false)
+const TIER_LABELS: Record<string, { label: string; annualPrice: string; monthlyPrice: string }> = {
+  archive: { label: 'The Archive', annualPrice: '$1,800/yr',  monthlyPrice: '$180/mo'  },
+  estate:  { label: 'The Estate',  annualPrice: '$3,600/yr',  monthlyPrice: '$360/mo'  },
+  dynasty: { label: 'The Dynasty', annualPrice: '$9,600/yr',  monthlyPrice: '$960/mo'  },
+}
 
+const FOUNDING_FEE = 2500
+const ANNUAL_PRICES:  Record<string, number> = { archive: 1800, estate: 3600, dynasty: 9600 }
+const MONTHLY_PRICES: Record<string, number> = { archive: 180,  estate: 360,  dynasty: 960  }
+
+const RELATIONSHIP_OPTIONS = [
+  { value: 'referral',              label: 'Referral'               },
+  { value: 'existing_relationship', label: 'Existing relationship'  },
+  { value: 'cold_outreach',         label: 'Cold outreach'          },
+  { value: 'family_friend',         label: 'Family friend'          },
+]
+
+export default function OnboardClient({ archivistId }: { archivistId: string }) {
   const [form, setForm] = useState({
-    familyName:  '',
-    clientName:  '',
-    clientEmail: '',
-    phone:       '',
-    tier:        'estate',
-    notes:       '',
+    familyName:       '',
+    clientName:       '',
+    clientEmail:      '',
+    phone:            '',
+    tier:             'estate',
+    billing:          'annual',
+    relationshipType: 'referral',
+    notes:            '',
   })
   const [submitting, setSubmitting] = useState(false)
-  const [result,     setResult]     = useState<Result | null>(null)
+  const [result,     setResult]     = useState<SubmitResult | null>(null)
   const [error,      setError]      = useState<string | null>(null)
 
   function set(key: keyof typeof form) {
@@ -71,34 +89,37 @@ export default function OnboardClient({ archivistId }: { archivistId: string }) 
       setForm(f => ({ ...f, [key]: e.target.value }))
   }
 
+  const tierInfo     = TIER_LABELS[form.tier] ?? TIER_LABELS.estate
+  const firstPeriod  = form.billing === 'annual'
+    ? ANNUAL_PRICES[form.tier]  ?? 3600
+    : MONTHLY_PRICES[form.tier] ?? 360
+  const totalDue = FOUNDING_FEE + firstPeriod
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setSubmitting(true)
     setError(null)
     try {
-      const res = await fetch('/api/archivist/onboard-client', {
+      const res = await fetch('/api/archivist/submit-client', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ archivistId, ...form }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Failed to initialize archive')
+      if (!res.ok) throw new Error(data.error || 'Failed to submit client')
       setResult(data)
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Unknown error')
     } finally {
       setSubmitting(false)
     }
   }
 
   function reset() {
-    setForm({ familyName: '', clientName: '', clientEmail: '', phone: '', tier: 'estate', notes: '' })
+    setForm({ familyName: '', clientName: '', clientEmail: '', phone: '', tier: 'estate', billing: 'annual', relationshipType: 'referral', notes: '' })
     setResult(null)
     setError(null)
   }
-
-  const TIER_LABELS: Record<string, string> = { archive: 'The Archive ($1,200/yr)', estate: 'The Estate ($3,600/yr)', dynasty: 'The Dynasty ($9,600/yr)' }
-  const tierLabel = TIER_LABELS[form.tier] || ''
 
   return (
     <div style={{ maxWidth: '560px' }}>
@@ -108,59 +129,45 @@ export default function OnboardClient({ archivistId }: { archivistId: string }) 
           New Client
         </p>
         <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 700, fontSize: '1.6rem', color: '#F0EDE6', lineHeight: 1.15, margin: '0 0 0.5rem' }}>
-          Initialize New Archive
+          Submit Client for Review
         </h1>
         <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '0.95rem', fontStyle: 'italic', color: '#9DA3A8', lineHeight: 1.7, margin: 0 }}>
-          Complete this form to create the client's archive and send their login credentials automatically.
+          Submit the client's details. A payment email is sent to them automatically.
+          The archive activates when their founding investment is complete.
         </p>
       </div>
 
       {result ? (
-        <div style={{ background: 'rgba(196,162,74,0.05)', border: '1px solid rgba(196,162,74,0.2)', borderTop: '2px solid rgba(196,162,74,0.6)', borderRadius: '2px', padding: '2rem', textAlign: 'center' }}>
+        <div style={{ background: 'rgba(196,162,74,0.05)', border: '1px solid rgba(196,162,74,0.2)', borderTop: '2px solid rgba(196,162,74,0.6)', borderRadius: '2px', padding: '2rem' }}>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
             <Sigil />
           </div>
-          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 700, fontSize: '1.3rem', color: '#F0EDE6', margin: '0 0 1.25rem' }}>
-            {result.archiveName} is ready.
+          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 700, fontSize: '1.3rem', color: '#F0EDE6', margin: '0 0 0.5rem', textAlign: 'center' }}>
+            {result.archiveName}
           </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginBottom: '1.5rem', textAlign: 'left', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '2px', padding: '1rem 1.25rem' }}>
+          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'italic', fontSize: '1rem', color: '#C4A24A', margin: '0 0 1.5rem', textAlign: 'center' }}>
+            Submitted. Awaiting client payment.
+          </p>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginBottom: '1.5rem', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '2px', padding: '1rem 1.25rem' }}>
             {[
-              ['CLIENT',   result.clientEmail],
-              ['TIER',     tierLabel],
-              ['PASSWORD', result.password],
-              ['STATUS',   'Login credentials sent'],
+              ['CLIENT',  result.clientEmail],
+              ['TIER',    `${result.tierLabel} — ${result.billing === 'annual' ? 'Annual' : 'Monthly'}`],
+              ['DUE',     `$${result.totalDue.toLocaleString('en-US')} (founding + first ${result.billing === 'annual' ? 'year' : 'month'})`],
+              ['STATUS',  'Payment email sent to client'],
             ].map(([k, v]) => (
               <div key={k} style={{ display: 'flex', gap: '0.75rem', alignItems: 'baseline' }}>
-                <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.38rem', letterSpacing: '0.2em', color: '#5C6166', flexShrink: 0, width: '70px' }}>{k}</span>
-                <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '0.9rem', color: k === 'PASSWORD' ? '#C4A24A' : '#B8B4AB' }}>{v}</span>
+                <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.38rem', letterSpacing: '0.2em', color: '#5C6166', flexShrink: 0, width: '60px' }}>{k}</span>
+                <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '0.9rem', color: k === 'STATUS' ? '#4CAF50' : '#B8B4AB' }}>{v}</span>
               </div>
             ))}
-            {result.magicLink && (
-              <div style={{ marginTop: '0.5rem', paddingTop: '0.5rem', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
-                  <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.38rem', letterSpacing: '0.2em', color: '#5C6166', flexShrink: 0, width: '70px', paddingTop: '0.15rem' }}>LINK</span>
-                  <div style={{ flex: 1 }}>
-                    <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '0.78rem', color: '#C4A24A', wordBreak: 'break-all', margin: '0 0 0.4rem', lineHeight: 1.5 }}>
-                      {result.magicLink}
-                    </p>
-                    <button
-                      onClick={() => {
-                        navigator.clipboard.writeText(result.magicLink!)
-                        setLinkCopied(true)
-                        setTimeout(() => setLinkCopied(false), 2000)
-                      }}
-                      style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.38rem', letterSpacing: '0.15em', textTransform: 'uppercase' as const, color: linkCopied ? '#4AC47C' : '#C4A24A', background: 'transparent', border: `1px solid ${linkCopied ? 'rgba(74,196,124,0.3)' : 'rgba(196,162,74,0.3)'}`, padding: '0.25rem 0.6rem', cursor: 'pointer' }}
-                    >
-                      {linkCopied ? 'Copied' : 'Copy Link'}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
+
           <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '0.88rem', fontStyle: 'italic', color: '#9DA3A8', lineHeight: 1.7, margin: '0 0 1.5rem' }}>
-            {result.clientEmail.split('@')[0]} has been sent their login details. Schedule their Founding Session within 24 hours.
+            Follow up within 24 hours to discuss the Founding Session.
+            The archive activates as soon as the client completes payment.
           </p>
+
           <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' as const }}>
             <a
               href="/archivist/pipeline"
@@ -172,53 +179,124 @@ export default function OnboardClient({ archivistId }: { archivistId: string }) 
               onClick={reset}
               style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.42rem', letterSpacing: '0.2em', textTransform: 'uppercase' as const, color: '#5C6166', background: 'transparent', border: '1px solid rgba(255,255,255,0.08)', padding: '0.5rem 1rem', cursor: 'pointer' }}
             >
-              Initialize Another →
+              Submit Another →
             </button>
           </div>
         </div>
       ) : (
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
 
-          <div>
-            <label style={LABEL}>Family Name</label>
-            <input type="text" required placeholder="Morrison" value={form.familyName} onChange={set('familyName')} style={INPUT} />
-            <p style={HELPER}>Used for archive name: The {form.familyName || 'Morrison'} Archive</p>
+          {/* Family + Client name */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div>
+              <label style={LABEL}>Family Name</label>
+              <input type="text" required placeholder="Morrison" value={form.familyName} onChange={set('familyName')} style={INPUT} />
+              <p style={HELPER}>The {form.familyName || 'Morrison'} Archive</p>
+            </div>
+            <div>
+              <label style={LABEL}>Client Name</label>
+              <input type="text" required placeholder="Margaret Morrison" value={form.clientName} onChange={set('clientName')} style={INPUT} />
+            </div>
           </div>
 
-          <div>
-            <label style={LABEL}>Client Name</label>
-            <input type="text" required placeholder="Margaret Morrison" value={form.clientName} onChange={set('clientName')} style={INPUT} />
+          {/* Email + Phone */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div>
+              <label style={LABEL}>Client Email</label>
+              <input type="email" required placeholder="margaret@email.com" value={form.clientEmail} onChange={set('clientEmail')} style={INPUT} />
+              <p style={HELPER}>Payment email sent here</p>
+            </div>
+            <div>
+              <label style={LABEL}>Phone (optional)</label>
+              <input type="tel" placeholder="+1 (555) 000-0000" value={form.phone} onChange={set('phone')} style={INPUT} />
+            </div>
           </div>
 
-          <div>
-            <label style={LABEL}>Client Email</label>
-            <input type="email" required placeholder="margaret@email.com" value={form.clientEmail} onChange={set('clientEmail')} style={INPUT} />
-            <p style={HELPER}>Login credentials sent here automatically</p>
-          </div>
-
-          <div>
-            <label style={LABEL}>Phone (optional)</label>
-            <input type="tel" placeholder="+1 (555) 000-0000" value={form.phone} onChange={set('phone')} style={INPUT} />
-          </div>
-
+          {/* Tier */}
           <div>
             <label style={LABEL}>Stewardship Tier</label>
             <select value={form.tier} onChange={set('tier')} style={{ ...INPUT, cursor: 'pointer' }}>
-              <option value="archive">The Archive ($1,200/year)</option>
-              <option value="estate">The Estate ($3,600/year, recommended)</option>
-              <option value="dynasty">The Dynasty ($9,600/year)</option>
+              <option value="archive">The Archive — {TIER_LABELS.archive.annualPrice} / {TIER_LABELS.archive.monthlyPrice}</option>
+              <option value="estate">The Estate — {TIER_LABELS.estate.annualPrice} / {TIER_LABELS.estate.monthlyPrice} (recommended)</option>
+              <option value="dynasty">The Dynasty — {TIER_LABELS.dynasty.annualPrice} / {TIER_LABELS.dynasty.monthlyPrice}</option>
             </select>
           </div>
 
+          {/* Billing */}
+          <div>
+            <label style={LABEL}>Billing</label>
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              {(['annual', 'monthly'] as const).map(b => (
+                <button
+                  key={b}
+                  type="button"
+                  onClick={() => setForm(f => ({ ...f, billing: b }))}
+                  style={{
+                    flex:          1,
+                    fontFamily:    "'Space Mono', monospace",
+                    fontSize:      '0.42rem',
+                    letterSpacing: '0.2em',
+                    textTransform: 'uppercase' as const,
+                    padding:       '0.6rem 1rem',
+                    border:        form.billing === b ? '1px solid rgba(196,162,74,0.6)' : '1px solid rgba(255,255,255,0.07)',
+                    background:    form.billing === b ? 'rgba(196,162,74,0.08)' : 'transparent',
+                    color:         form.billing === b ? '#C4A24A' : '#5C6166',
+                    cursor:        'pointer',
+                    transition:    'all 150ms ease',
+                  }}
+                >
+                  {b === 'annual' ? 'Annual (save 20%)' : 'Monthly'}
+                </button>
+              ))}
+            </div>
+            <p style={HELPER}>
+              {form.billing === 'annual'
+                ? `${tierInfo.label} at ${tierInfo.annualPrice}`
+                : `${tierInfo.label} at ${tierInfo.monthlyPrice}, 12-month minimum`}
+            </p>
+          </div>
+
+          {/* Relationship */}
+          <div>
+            <label style={LABEL}>Your relationship to this family</label>
+            <select value={form.relationshipType} onChange={set('relationshipType')} style={{ ...INPUT, cursor: 'pointer' }}>
+              {RELATIONSHIP_OPTIONS.map(o => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Notes */}
           <div>
             <label style={LABEL}>Notes (optional)</label>
-            <textarea rows={2} placeholder="Founding session notes, special considerations..." value={form.notes} onChange={set('notes')} style={{ ...INPUT, resize: 'none' as const }} />
+            <textarea
+              rows={3}
+              placeholder="Why this family. Any context that matters."
+              value={form.notes}
+              onChange={set('notes')}
+              style={{ ...INPUT, resize: 'none' as const }}
+            />
+          </div>
+
+          {/* Total due preview */}
+          <div style={{ background: 'rgba(196,162,74,0.04)', border: '1px solid rgba(196,162,74,0.12)', borderRadius: '2px', padding: '1rem 1.25rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+              <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.42rem', letterSpacing: '0.2em', textTransform: 'uppercase' as const, color: '#5C6166' }}>
+                Client will be invoiced
+              </span>
+              <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '1.4rem', color: '#C4A24A', letterSpacing: '-0.02em' }}>
+                ${totalDue.toLocaleString('en-US')}
+              </span>
+            </div>
+            <p style={{ ...HELPER, marginTop: '0.25rem', fontSize: '0.75rem' }}>
+              $2,500 founding fee + {form.billing === 'annual' ? 'first year' : 'first month'} ({tierInfo.label})
+            </p>
           </div>
 
           {error && (
             <div style={{ background: 'rgba(255,80,80,0.06)', border: '1px solid rgba(255,80,80,0.2)', borderRadius: '2px', padding: '0.75rem 1rem' }}>
               <p style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.52rem', color: '#9DA3A8', margin: 0 }}>
-                Failed to initialize archive: {error}
+                {error}
               </p>
             </div>
           )}
@@ -240,7 +318,7 @@ export default function OnboardClient({ archivistId }: { archivistId: string }) 
               transition:    'background 0.2s',
             }}
           >
-            {submitting ? 'Creating archive…' : 'Initialize Archive'}
+            {submitting ? 'Submitting…' : 'Submit for Review'}
           </button>
 
         </form>

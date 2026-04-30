@@ -10,12 +10,15 @@ const SPRINT_TIERS = [
 ]
 
 const STATUS_COLOR: Record<string, string> = {
-  New:       '#5C6166',
-  Contacted: '#9DA3A8',
-  Demo:      '#C4A24A',
-  Proposal:  '#FFB347',
-  Closed:    '#4CAF50',
-  Lost:      '#444',
+  New:             '#5C6166',
+  Contacted:       '#9DA3A8',
+  Demo:            '#C4A24A',
+  Proposal:        '#FFB347',
+  Closed:          '#4CAF50',
+  Lost:            '#444',
+  'Payment Pending': 'rgba(196,162,74,0.75)',
+  'Active Client': '#4CAF50',
+  Submitted:       '#9DA3A8',
 }
 
 type ArchivistRow = {
@@ -206,7 +209,10 @@ export default function DashboardClient({ archivistId }: { archivistId: string }
         { label: 'Annual Residual', value: '—', sub: 'Monthly run rate' },
       ]
 
-  const pipelineStatuses = ['New', 'Contacted', 'Demo', 'Proposal', 'Closed']
+  const pipelineStatuses      = ['New', 'Contacted', 'Demo', 'Proposal', 'Closed']
+  const submissionStatuses    = ['Payment Pending', 'Active Client']
+  const paymentPendingCount   = pipeline['Payment Pending'] ?? 0
+  const activeClientCount     = pipeline['Active Client']   ?? 0
 
   return (
     <div className="max-w-4xl">
@@ -251,6 +257,80 @@ export default function DashboardClient({ archivistId }: { archivistId: string }
         </div>
       )}
 
+      {/* ── Submission Pipeline ────────────────────────────────────────────── */}
+      {!loading && (
+        <div className="rounded-sm border mb-8" style={{ background: '#111112', borderColor: 'rgba(196,162,74,0.18)' }}>
+          <div className="px-6 py-4 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+            <p className="font-sans text-[0.6rem] font-bold tracking-[0.22em] uppercase" style={{ color: '#C4A24A' }}>
+              Client Submission Pipeline
+            </p>
+            <p className="font-sans text-[0.65rem] mt-0.5" style={{ color: '#5C6166' }}>
+              Submitted → Payment Pending → Active
+            </p>
+          </div>
+          <div className="px-6 py-5 flex flex-col sm:flex-row gap-6">
+            {/* Payment Pending */}
+            <div className="flex-1">
+              <p className="font-sans text-[0.6rem] font-bold tracking-[0.16em] uppercase mb-2" style={{ color: 'rgba(196,162,74,0.6)' }}>
+                Payment Pending
+              </p>
+              <p className="font-serif font-semibold text-text-primary mb-1" style={{ fontSize: '2.25rem', letterSpacing: '-0.025em', color: paymentPendingCount > 0 ? '#C4A24A' : '#3A3F44' }}>
+                {paymentPendingCount}
+              </p>
+              <p className="font-sans text-[0.65rem]" style={{ color: '#5C6166' }}>
+                {paymentPendingCount === 1 ? 'client awaiting payment' : 'clients awaiting payment'}
+              </p>
+            </div>
+
+            {/* Divider arrow */}
+            <div className="hidden sm:flex items-center" aria-hidden="true">
+              <span style={{ fontFamily: 'monospace', fontSize: '0.7rem', color: '#3A3F44' }}>→</span>
+            </div>
+
+            {/* Active this month */}
+            <div className="flex-1">
+              <p className="font-sans text-[0.6rem] font-bold tracking-[0.16em] uppercase mb-2" style={{ color: 'rgba(76,175,80,0.7)' }}>
+                Active Clients
+              </p>
+              <p className="font-serif font-semibold text-text-primary mb-1" style={{ fontSize: '2.25rem', letterSpacing: '-0.025em', color: activeClientCount > 0 ? '#4CAF50' : '#3A3F44' }}>
+                {activeClientCount}
+              </p>
+              <p className="font-sans text-[0.65rem]" style={{ color: '#5C6166' }}>
+                {activeClientCount === 1 ? 'archive active' : 'archives active'}
+              </p>
+            </div>
+
+            {/* CTA */}
+            <div className="flex-1 flex flex-col justify-between">
+              {paymentPendingCount > 0 && (
+                <div className="rounded-sm px-4 py-3 mb-3" style={{ background: 'rgba(196,162,74,0.05)', border: '1px solid rgba(196,162,74,0.15)' }}>
+                  <p className="font-sans text-[0.68rem]" style={{ color: '#C4A24A', lineHeight: 1.6 }}>
+                    {paymentPendingCount} client{paymentPendingCount > 1 ? 's' : ''} still need to complete payment.
+                    Follow up to unblock.
+                  </p>
+                </div>
+              )}
+              <div className="flex gap-3 flex-wrap">
+                <Link
+                  href="/archivist/onboard"
+                  className="font-sans text-[0.6rem] font-bold tracking-[0.14em] uppercase no-underline px-4 py-2 transition-all"
+                  style={{ background: '#C4A24A', color: '#0A0908' }}
+                >
+                  Submit Client
+                </Link>
+                <Link
+                  href="/archivist/pipeline"
+                  className="font-sans text-[0.6rem] font-bold tracking-[0.14em] uppercase no-underline px-4 py-2 transition-all"
+                  style={{ border: '1px solid rgba(196,162,74,0.3)', color: '#C4A24A' }}
+                >
+                  View Pipeline
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="grid md:grid-cols-3 gap-6 mb-8">
         <div className="md:col-span-2 rounded-sm border border-border-subtle" style={{ background: '#111112' }}>
           <div className="px-6 py-4 border-b border-border-subtle">
@@ -288,10 +368,17 @@ export default function DashboardClient({ archivistId }: { archivistId: string }
         <div className="rounded-sm border border-border-subtle p-6" style={{ background: '#111112' }}>
           <p className="font-sans text-[0.6rem] font-bold tracking-[0.18em] uppercase text-text-muted mb-5">Pipeline</p>
           {loading ? (
-            <div className="flex flex-col gap-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-6" />)}</div>
+            <div className="flex flex-col gap-3">{Array.from({ length: 7 }).map((_, i) => <Skeleton key={i} className="h-6" />)}</div>
           ) : (
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2">
               {pipelineStatuses.map(status => (
+                <div key={status} className="flex items-center justify-between">
+                  <span className="font-sans text-[0.72rem]" style={{ color: STATUS_COLOR[status] ?? '#5C6166' }}>{status}</span>
+                  <span className="font-serif font-semibold text-text-primary" style={{ fontSize: '1.1rem', letterSpacing: '-0.02em' }}>{pipeline[status] ?? 0}</span>
+                </div>
+              ))}
+              <div className="my-1" style={{ height: '1px', background: 'rgba(255,255,255,0.04)' }} />
+              {submissionStatuses.map(status => (
                 <div key={status} className="flex items-center justify-between">
                   <span className="font-sans text-[0.72rem]" style={{ color: STATUS_COLOR[status] ?? '#5C6166' }}>{status}</span>
                   <span className="font-serif font-semibold text-text-primary" style={{ fontSize: '1.1rem', letterSpacing: '-0.02em' }}>{pipeline[status] ?? 0}</span>
