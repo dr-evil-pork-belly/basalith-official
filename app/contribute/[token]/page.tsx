@@ -33,7 +33,7 @@ export default async function ContributePage({
 
   const { data: archive } = await admin
     .from('archives')
-    .select('id, name, family_name, owner_name, status')
+    .select('id, name, family_name, owner_name, status, contributor_entity_access, entity_preview_contributor_ids')
     .eq('id', contributor.archive_id)
     .maybeSingle()
 
@@ -62,10 +62,12 @@ export default async function ContributePage({
         preferred_language: contributor.preferred_language  ?? 'en',
       }}
       archive={{
-        id:          archive.id,
-        name:        archive.name,
-        family_name: archive.family_name,
-        owner_name:  archive.owner_name ?? '',
+        id:                             archive.id,
+        name:                           archive.name,
+        family_name:                    archive.family_name,
+        owner_name:                     archive.owner_name ?? '',
+        contributor_entity_access:      (archive.contributor_entity_access ?? 'none') as 'none' | 'preview' | 'open',
+        entity_preview_contributor_ids: archive.entity_preview_contributor_ids ?? [],
       }}
     />
   )

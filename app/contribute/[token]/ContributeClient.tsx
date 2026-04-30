@@ -119,10 +119,12 @@ const PORTAL_UI = {
 }
 
 type ArchiveProps = {
-  id:          string
-  name:        string
-  family_name: string
-  owner_name:  string
+  id:                             string
+  name:                           string
+  family_name:                    string
+  owner_name:                     string
+  contributor_entity_access:      'none' | 'preview' | 'open'
+  entity_preview_contributor_ids: string[]
 }
 
 type Question = {
@@ -948,6 +950,194 @@ function ContributionsSection({
   )
 }
 
+// ── Contributor Entity Section ─────────────────────────────────────────────────
+
+type EntityMessage = { id: string; role: 'user' | 'entity'; content: string; rating?: string }
+
+function ContributorEntitySection({
+  archiveId,
+  ownerName,
+  hasAccess,
+}: {
+  archiveId: string
+  ownerName: string
+  hasAccess: boolean
+}) {
+  const firstName = ownerName.split(' ')[0] || ownerName
+
+  const [messages,  setMessages]  = useState<EntityMessage[]>([])
+  const [input,     setInput]     = useState('')
+  const [loading,   setLoading]   = useState(false)
+  const [sessionId, setSessionId] = useState<string | undefined>(undefined)
+
+  async function send() {
+    const text = input.trim()
+    if (!text || loading) return
+    setInput('')
+    const userMsg: EntityMessage = { id: Date.now().toString(), role: 'user', content: text }
+    setMessages(prev => [...prev, userMsg])
+    setLoading(true)
+    try {
+      const res = await fetch('/api/archive/entity-chat', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          archiveId,
+          message: text,
+          sessionId,
+          conversationHistory: messages.map(m => ({ role: m.role === 'entity' ? 'assistant' : 'user', content: m.content })),
+        }),
+      })
+      const data = await res.json()
+      if (data.sessionId) setSessionId(data.sessionId)
+      if (data.response) {
+        setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: 'entity', content: data.response }])
+      }
+    } catch {}
+    setLoading(false)
+  }
+
+  async function rateMessage(msgId: string, rating: string) {
+    setMessages(prev => prev.map(m => m.id === msgId ? { ...m, rating } : m))
+    await fetch('/api/archive/entity-feedback', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ archiveId, rating }),
+    }).catch(() => {})
+  }
+
+  const SECTION_STYLE: React.CSSProperties = {
+    background:   '#0F0F10',
+    border:       '1px solid rgba(196,162,74,0.2)',
+    borderTop:    '3px solid rgba(196,162,74,0.5)',
+    borderRadius: '2px',
+    marginBottom: '24px',
+    padding:      'clamp(1.25rem,4vw,2rem)',
+  }
+
+  if (!hasAccess) {
+    return (
+      <div style={SECTION_STYLE}>
+        <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.48rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.6)', marginBottom: '1.25rem' }}>
+          The Entity Is Building
+        </p>
+        <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontSize: '1.1rem', fontWeight: 300, color: '#B8B4AB', lineHeight: 1.8, marginBottom: '0.75rem', textAlign: 'center' }}>
+          {firstName}&rsquo;s entity is learning<br />
+          from everything you contribute.
+        </p>
+        <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontSize: '1.05rem', fontWeight: 300, color: '#706C65', lineHeight: 1.8, marginBottom: '0.75rem', textAlign: 'center' }}>
+          The more you add,<br />
+          the sooner you will be able<br />
+          to talk to it directly.
+        </p>
+        <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontSize: '0.95rem', fontWeight: 300, color: 'rgba(196,162,74,0.5)', lineHeight: 1.8, textAlign: 'center', margin: 0 }}>
+          Your contributions are making it<br />
+          more accurate every day.
+        </p>
+      </div>
+    )
+  }
+
+  return (
+    <div style={SECTION_STYLE}>
+      <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.48rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#C4A24A', marginBottom: '8px' }}>
+        Talk to {firstName}&rsquo;s Entity
+      </p>
+      <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontSize: '0.9rem', color: '#706C65', lineHeight: 1.7, marginBottom: '1.5rem' }}>
+        This entity has learned from {firstName}&rsquo;s deposits, photographs, and your contributions.
+        Ask it anything.
+      </p>
+
+      {/* Conversation */}
+      {messages.length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px', maxHeight: '400px', overflowY: 'auto' }}>
+          {messages.map(msg => (
+            <div key={msg.id}>
+              <div style={{
+                display:      'flex',
+                justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start',
+              }}>
+                <div style={{
+                  maxWidth:     '80%',
+                  background:   msg.role === 'user' ? 'rgba(196,162,74,0.1)' : 'rgba(255,255,255,0.03)',
+                  border:       msg.role === 'user' ? '1px solid rgba(196,162,74,0.2)' : '1px solid rgba(255,255,255,0.06)',
+                  borderRadius: '2px',
+                  padding:      '0.65rem 0.9rem',
+                }}>
+                  <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontSize: '0.95rem', color: msg.role === 'user' ? '#D4C08A' : '#B8B4AB', lineHeight: 1.7, margin: 0 }}>
+                    {msg.content}
+                  </p>
+                </div>
+              </div>
+              {msg.role === 'entity' && !msg.rating && (
+                <div style={{ display: 'flex', gap: '0.4rem', marginTop: '4px', paddingLeft: '4px' }}>
+                  {([['accurate','✓','#4CAF50'], ['partial','~','#C4A24A'], ['inaccurate','✗','#ff6b6b']] as const).map(([r, icon, color]) => (
+                    <button key={r} onClick={() => rateMessage(msg.id, r)}
+                      style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.1em', color, background: 'transparent', border: `1px solid ${color}40`, padding: '2px 6px', cursor: 'pointer', borderRadius: '2px', opacity: 0.7 }}>
+                      {icon} {r}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {msg.role === 'entity' && msg.rating && (
+                <p style={{ fontFamily: 'monospace', fontSize: '0.42rem', letterSpacing: '0.1em', color: '#5C6166', marginTop: '4px', paddingLeft: '4px' }}>
+                  Rated: {msg.rating}
+                </p>
+              )}
+            </div>
+          ))}
+          {loading && (
+            <p style={{ fontFamily: 'monospace', fontSize: '0.46rem', letterSpacing: '0.1em', color: 'rgba(196,162,74,0.5)', animation: 'mysteryGlowPulse 1.5s ease-in-out infinite' }}>
+              {firstName.toUpperCase()} IS THINKING…
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Input */}
+      <div style={{ display: 'flex', gap: '8px' }}>
+        <textarea
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() } }}
+          placeholder={`Ask ${firstName}'s entity anything…`}
+          rows={2}
+          style={{
+            flex:       1,
+            background: 'rgba(255,255,255,0.02)',
+            border:     '1px solid rgba(255,255,255,0.07)',
+            borderRadius: '2px',
+            color:      '#F0EDE6',
+            fontFamily: '"Cormorant Garamond",Georgia,serif',
+            fontSize:   '0.95rem',
+            padding:    '0.6rem 0.75rem',
+            resize:     'none',
+            outline:    'none',
+            lineHeight: 1.5,
+          }}
+        />
+        <button
+          onClick={send}
+          disabled={loading || !input.trim()}
+          style={{
+            fontFamily:    '"Space Mono","Courier New",monospace',
+            fontSize:      '0.44rem',
+            letterSpacing: '0.2em',
+            textTransform: 'uppercase',
+            color:         '#0A0908',
+            background:    loading || !input.trim() ? 'rgba(196,162,74,0.4)' : '#C4A24A',
+            border:        'none',
+            padding:       '0 1rem',
+            cursor:        loading || !input.trim() ? 'not-allowed' : 'pointer',
+            borderRadius:  '2px',
+            flexShrink:    0,
+          }}
+        >
+          Ask
+        </button>
+      </div>
+    </div>
+  )
+}
+
 // ── Main component ─────────────────────────────────────────────────────────────
 
 const PORTAL_LANGS = Object.keys(PORTAL_UI) as (keyof typeof PORTAL_UI)[]
@@ -1096,6 +1286,17 @@ export default function ContributeClient({
           questionsAnswered={contributor.questions_answered}
           photosLabelled={contributor.photos_labelled}
           lang={lang}
+        />
+
+        {/* Entity access */}
+        <ContributorEntitySection
+          archiveId={archive.id}
+          ownerName={archive.owner_name}
+          hasAccess={
+            archive.contributor_entity_access === 'open' ||
+            (archive.contributor_entity_access === 'preview' &&
+              archive.entity_preview_contributor_ids.includes(contributor.id))
+          }
         />
 
         {/* Footer */}

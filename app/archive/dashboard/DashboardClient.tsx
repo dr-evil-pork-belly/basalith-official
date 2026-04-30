@@ -444,6 +444,242 @@ function MemoryGameCard({ archiveId }: { archiveId: string }) {
   )
 }
 
+// ── Entity Readiness Card ─────────────────────────────────────────────────────
+
+type ReadinessData = {
+  ready:    boolean
+  score:    number
+  breakdown: { photographs: number; deposits: number; accuracyAvg: number; voiceRecordings: number }
+  missing:  string[]
+  access:   'none' | 'preview' | 'open'
+  previewContributorIds: string[]
+  contributors: { id: string; name: string; email: string }[]
+}
+
+function EntityReadinessCard({ archiveId }: { archiveId: string }) {
+  const [data,        setData]        = useState<ReadinessData | null>(null)
+  const [loading,     setLoading]     = useState(true)
+  const [showModal,   setShowModal]   = useState(false)
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const [saving,      setSaving]      = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
+
+  useEffect(() => {
+    fetch(`/api/archive/entity-readiness?archiveId=${archiveId}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d) setData(d) })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [archiveId])
+
+  async function setAccess(action: 'enable_preview' | 'enable_open' | 'disable', ids?: string[]) {
+    setSaving(true)
+    try {
+      const res = await fetch('/api/archive/entity-readiness', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, contributorIds: ids }),
+      })
+      const updated = await res.json()
+      if (res.ok && data) {
+        setData({ ...data, access: updated.access, previewContributorIds: ids ?? [] })
+      }
+    } catch {}
+    setSaving(false)
+    setShowModal(false)
+    setShowConfirm(false)
+  }
+
+  if (loading || !data) return null
+
+  const { ready, score, missing, access, contributors } = data
+  const pct = Math.min(score, 100)
+
+  const MISSING_LINKS: Record<string, string> = {
+    'photographs':      '/archive/upload',
+    'deposits':         '/archive/entity',
+    'wisdom sessions':  '/archive/wisdom',
+    'voice recordings': '/archive/voice',
+  }
+
+  function missingLink(item: string): string {
+    for (const [key, href] of Object.entries(MISSING_LINKS)) {
+      if (item.toLowerCase().includes(key)) return href
+    }
+    return '/archive/dashboard'
+  }
+
+  const cardBorder = ready
+    ? '1px solid rgba(196,162,74,0.3)'
+    : '1px solid rgba(255,255,255,0.06)'
+  const cardTop = ready
+    ? '3px solid rgba(196,162,74,0.7)'
+    : '3px solid rgba(255,255,255,0.08)'
+
+  return (
+    <>
+      <div className="rounded-sm mb-8" style={{ background: '#111112', border: cardBorder, borderTop: cardTop }}>
+        <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+          <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.2em', textTransform: 'uppercase' as const, color: ready ? '#C4A24A' : '#5C6166', margin: 0 }}>
+            {ready ? 'Your Entity Is Ready' : 'Your Entity Is Building'}
+          </p>
+        </div>
+
+        <div style={{ padding: '1.25rem 1.5rem' }}>
+          {/* Progress bar */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+            <div style={{ flex: 1, height: '6px', background: 'rgba(255,255,255,0.06)', borderRadius: '3px', overflow: 'hidden' }}>
+              <div
+                style={{
+                  height:           '100%',
+                  width:            `${pct}%`,
+                  background:       ready ? 'rgba(196,162,74,0.8)' : 'rgba(196,162,74,0.4)',
+                  borderRadius:     '3px',
+                  transition:       'width 0.8s cubic-bezier(0.16,1,0.3,1)',
+                }}
+              />
+            </div>
+            <span style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontWeight: 600, fontSize: '1.1rem', color: ready ? '#C4A24A' : '#9DA3A8', flexShrink: 0 }}>
+              {score}/100
+            </span>
+          </div>
+
+          {!ready && missing.length > 0 && (
+            <div style={{ marginBottom: '1rem' }}>
+              <p style={{ fontFamily: 'monospace', fontSize: '0.46rem', letterSpacing: '0.1em', textTransform: 'uppercase' as const, color: '#5C6166', marginBottom: '0.5rem' }}>
+                To unlock contributor access:
+              </p>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                {missing.map(item => (
+                  <li key={item}>
+                    <a
+                      href={missingLink(item)}
+                      style={{ fontFamily: 'Georgia,serif', fontStyle: 'italic', fontSize: '0.88rem', color: '#706C65', textDecoration: 'none' }}
+                    >
+                      · {item}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {ready && access === 'none' && (
+            <>
+              <p style={{ fontFamily: 'Georgia,serif', fontStyle: 'italic', fontSize: '0.9rem', color: '#9DA3A8', lineHeight: 1.75, margin: '0 0 1.25rem' }}>
+                Your entity has enough depth to meet your family.
+                You can now invite contributors to talk to it.
+              </p>
+              <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' as const }}>
+                <button
+                  onClick={() => { setSelectedIds([]); setShowModal(true) }}
+                  style={{ fontFamily: 'monospace', fontSize: '0.48rem', letterSpacing: '0.14em', textTransform: 'uppercase' as const, color: '#0A0908', background: '#C4A24A', border: 'none', padding: '0.55rem 1.1rem', cursor: 'pointer', borderRadius: '2px' }}
+                >
+                  Invite Select Contributors
+                </button>
+                <button
+                  onClick={() => setShowConfirm(true)}
+                  style={{ fontFamily: 'monospace', fontSize: '0.48rem', letterSpacing: '0.14em', textTransform: 'uppercase' as const, color: '#C4A24A', background: 'transparent', border: '1px solid rgba(196,162,74,0.3)', padding: '0.55rem 1.1rem', cursor: 'pointer', borderRadius: '2px' }}
+                >
+                  Open to All Contributors
+                </button>
+              </div>
+            </>
+          )}
+
+          {ready && access !== 'none' && (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' as const, gap: '0.75rem' }}>
+              <p style={{ fontFamily: 'monospace', fontSize: '0.48rem', letterSpacing: '0.12em', textTransform: 'uppercase' as const, color: '#4CAF50', margin: 0 }}>
+                {access === 'open' ? 'Open to all contributors' : `Preview — ${data.previewContributorIds.length} contributor${data.previewContributorIds.length !== 1 ? 's' : ''} invited`}
+              </p>
+              <button
+                onClick={() => setAccess('disable')}
+                disabled={saving}
+                style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.12em', textTransform: 'uppercase' as const, color: '#5C6166', background: 'transparent', border: '1px solid rgba(255,255,255,0.07)', padding: '0.4rem 0.8rem', cursor: 'pointer', borderRadius: '2px' }}
+              >
+                Revoke Access
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Contributor selector modal */}
+      {showModal && (
+        <div
+          onClick={e => { if (e.target === e.currentTarget) setShowModal(false) }}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}
+        >
+          <div style={{ background: '#0F0F10', border: '1px solid rgba(196,162,74,0.2)', borderRadius: '4px', padding: '1.75rem', width: '100%', maxWidth: '480px' }}>
+            <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.2em', textTransform: 'uppercase' as const, color: '#C4A24A', marginBottom: '1rem' }}>
+              Invite Contributors
+            </p>
+            <p style={{ fontFamily: 'Georgia,serif', fontStyle: 'italic', fontSize: '0.9rem', color: '#9DA3A8', lineHeight: 1.7, marginBottom: '1.25rem' }}>
+              Select which contributors can talk to your entity. They will receive an invitation email.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.5rem' }}>
+              {contributors.map(c => (
+                <label
+                  key={c.id}
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', padding: '0.5rem 0.75rem', border: `1px solid ${selectedIds.includes(c.id) ? 'rgba(196,162,74,0.3)' : 'rgba(255,255,255,0.06)'}`, borderRadius: '2px' }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.includes(c.id)}
+                    onChange={e => setSelectedIds(prev => e.target.checked ? [...prev, c.id] : prev.filter(id => id !== c.id))}
+                    style={{ accentColor: '#C4A24A', width: '14px', height: '14px', flexShrink: 0 }}
+                  />
+                  <div>
+                    <p style={{ fontFamily: 'Georgia,serif', fontSize: '0.9rem', color: '#F0EDE6', margin: 0 }}>{c.name}</p>
+                    <p style={{ fontFamily: 'monospace', fontSize: '0.42rem', letterSpacing: '0.08em', color: '#5C6166', margin: 0 }}>{c.email}</p>
+                  </div>
+                </label>
+              ))}
+              {contributors.length === 0 && (
+                <p style={{ fontFamily: 'Georgia,serif', fontStyle: 'italic', fontSize: '0.9rem', color: '#5C6166' }}>No active contributors found.</p>
+              )}
+            </div>
+            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+              <button onClick={() => setShowModal(false)} style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.12em', textTransform: 'uppercase' as const, color: '#5C6166', background: 'transparent', border: '1px solid rgba(255,255,255,0.07)', padding: '0.5rem 1rem', cursor: 'pointer', borderRadius: '2px' }}>
+                Cancel
+              </button>
+              <button
+                onClick={() => setAccess('enable_preview', selectedIds)}
+                disabled={saving || selectedIds.length === 0}
+                style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.12em', textTransform: 'uppercase' as const, color: '#0A0908', background: saving || selectedIds.length === 0 ? 'rgba(196,162,74,0.4)' : '#C4A24A', border: 'none', padding: '0.5rem 1rem', cursor: saving || selectedIds.length === 0 ? 'not-allowed' : 'pointer', borderRadius: '2px' }}
+              >
+                {saving ? 'Sending…' : `Invite ${selectedIds.length > 0 ? selectedIds.length : ''} Contributor${selectedIds.length !== 1 ? 's' : ''}`}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Open-to-all confirmation */}
+      {showConfirm && (
+        <div
+          onClick={e => { if (e.target === e.currentTarget) setShowConfirm(false) }}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}
+        >
+          <div style={{ background: '#0F0F10', border: '1px solid rgba(196,162,74,0.2)', borderRadius: '4px', padding: '1.75rem', width: '100%', maxWidth: '420px' }}>
+            <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.2em', textTransform: 'uppercase' as const, color: '#C4A24A', marginBottom: '1rem' }}>Open to All Contributors?</p>
+            <p style={{ fontFamily: 'Georgia,serif', fontStyle: 'italic', fontSize: '0.9rem', color: '#9DA3A8', lineHeight: 1.7, marginBottom: '1.5rem' }}>
+              Every active contributor will be able to talk to your entity. You can revoke this at any time.
+            </p>
+            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+              <button onClick={() => setShowConfirm(false)} style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.12em', textTransform: 'uppercase' as const, color: '#5C6166', background: 'transparent', border: '1px solid rgba(255,255,255,0.07)', padding: '0.5rem 1rem', cursor: 'pointer', borderRadius: '2px' }}>Cancel</button>
+              <button onClick={() => setAccess('enable_open')} disabled={saving} style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.12em', textTransform: 'uppercase' as const, color: '#0A0908', background: saving ? 'rgba(196,162,74,0.4)' : '#C4A24A', border: 'none', padding: '0.5rem 1rem', cursor: saving ? 'not-allowed' : 'pointer', borderRadius: '2px' }}>
+                {saving ? 'Enabling…' : 'Confirm'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
+
+// ── ArchiveRow ───────────────────────────────────────────────────────���────────
+
 type ArchiveRow = {
   name:             string
   owner_name:       string | null
@@ -679,6 +915,9 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
 
       {/* ── ENTITY ACCURACY DASHBOARD ── */}
       <AccuracyDashboard archiveId={archiveId} />
+
+      {/* ── ENTITY READINESS + ACCESS ── */}
+      <EntityReadinessCard archiveId={archiveId} />
 
       {/* ── UPCOMING DATES ── */}
       <UpcomingDates archiveId={archiveId} />
