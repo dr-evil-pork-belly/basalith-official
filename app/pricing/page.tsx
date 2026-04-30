@@ -367,6 +367,44 @@ export default function PricingPage() {
           </p>
         </section>
 
+        {/* Tax note */}
+        <section style={{ background: 'var(--color-surface-alt)', padding: '48px 32px' }}>
+          <div style={{ maxWidth: '640px', margin: '0 auto' }}>
+            <p
+              style={{
+                ...MONO,
+                fontSize:     'var(--text-caption)',
+                color:        'var(--color-gold)',
+                marginBottom: '20px',
+              }}
+            >
+              A Note on Your Investment
+            </p>
+            <div
+              style={{
+                ...SERIF,
+                fontSize:   '1rem',
+                fontStyle:  'italic',
+                fontWeight: 300,
+                lineHeight: 1.8,
+                color:      'var(--color-text-secondary)',
+              }}
+            >
+              <p style={{ marginBottom: '16px' }}>
+                Many clients work with their estate attorney or CPA to explore whether
+                the annual Basalith fee qualifies as an estate planning expense.
+              </p>
+              <p style={{ marginBottom: '16px' }}>
+                We provide detailed invoicing and service descriptions to support
+                this conversation with your advisor.
+              </p>
+              <p style={{ margin: 0 }}>
+                We recommend discussing this with your tax professional.
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* FAQ */}
         <PricingFAQ />
 
