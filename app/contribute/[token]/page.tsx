@@ -19,6 +19,11 @@ export default async function ContributePage({
 
   // ── Diagnostic logging — permanent, do not remove ──────────────────────────
   console.log('[contribute] token:', token?.substring(0, 10), '| length:', token?.length)
+  console.log('[contribute] env:', {
+    supabaseUrl:        !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+    serviceRoleKeySet:  !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+    serviceRoleKeyLen:  process.env.SUPABASE_SERVICE_ROLE_KEY?.length ?? 0,
+  })
 
   const admin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

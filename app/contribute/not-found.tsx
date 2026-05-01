@@ -1,3 +1,7 @@
+// This file renders when notFound() is called anywhere under /contribute/
+// The console.log below confirms it is this file being shown, not a global 404.
+console.log('[contribute/not-found] rendering — notFound() was called in contribute route')
+
 export default function NotFound() {
   return (
     <div style={{
