@@ -17,33 +17,48 @@ export default async function ContributePage({
 }) {
   const { token } = await params
 
+  // ── Diagnostic logging — permanent, do not remove ──────────────────────────
+  console.log('[contribute] token:', token?.substring(0, 10), '| length:', token?.length)
+
   const admin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
   )
 
-  const { data: contributor } = await admin
+  // Fetch WITHOUT status filter so we can see the actual status in logs
+  const { data: contributor, error: contribError } = await admin
     .from('contributors')
     .select('*')
     .eq('access_token', token)
-    .eq('status', 'active')
     .maybeSingle()
 
-  if (!contributor) return notFound()
+  console.log('[contribute] contributor:', contributor?.id, '| status:', contributor?.status, '| error:', contribError?.message ?? null)
 
-  const { data: archive } = await admin
+  if (!contributor || contributor.status !== 'active') {
+    console.log('[contribute] notFound because:', !contributor ? 'no contributor found for token' : `contributor status is "${contributor.status}" (not active)`)
+    return notFound()
+  }
+
+  const { data: archive, error: archiveError } = await admin
     .from('archives')
     .select('id, name, family_name, owner_name, status, contributor_entity_access, entity_preview_contributor_ids')
     .eq('id', contributor.archive_id)
     .maybeSingle()
 
-  if (!archive || archive.status !== 'active') return notFound()
+  console.log('[contribute] archive:', archive?.id, '| status:', archive?.status, '| error:', archiveError?.message ?? null)
+
+  if (!archive || archive.status !== 'active') {
+    console.log('[contribute] notFound because:', !archive ? 'no archive found' : `archive status is "${archive.status}" (not active)`)
+    return notFound()
+  }
 
   // Update last accessed (non-blocking)
   void admin
     .from('contributors')
     .update({ last_accessed_at: new Date().toISOString() })
     .eq('id', contributor.id)
+
+  console.log('[contribute] rendering portal for contributor:', contributor.id)
 
   return (
     <ContributeClient
