@@ -44,9 +44,12 @@ export default async function ContributePage({
     return notFound()
   }
 
+  // Only select columns confirmed to exist in the base archives table.
+  // contributor_entity_access and entity_preview_contributor_ids are added by
+  // a pending migration — default to 'none'/[] until that migration is run.
   const { data: archive, error: archiveError } = await admin
     .from('archives')
-    .select('id, name, family_name, owner_name, status, contributor_entity_access, entity_preview_contributor_ids')
+    .select('id, name, family_name, owner_name, status')
     .eq('id', contributor.archive_id)
     .maybeSingle()
 
@@ -86,8 +89,9 @@ export default async function ContributePage({
         name:                           archive.name,
         family_name:                    archive.family_name,
         owner_name:                     archive.owner_name ?? '',
-        contributor_entity_access:      (archive.contributor_entity_access ?? 'none') as 'none' | 'preview' | 'open',
-        entity_preview_contributor_ids: archive.entity_preview_contributor_ids ?? [],
+        // Defaults until 20260430_archives_entity_access migration is run
+        contributor_entity_access:      'none' as const,
+        entity_preview_contributor_ids: [],
       }}
     />
   )
