@@ -228,5 +228,39 @@
     "ko": "한국어",
     "yue": "廣東話",
     "ja": "日本語"
+  },
+  "tagline": {
+    "quote_1": "Nunca se va del todo",
+    "quote_2": "si deja suficiente",
+    "quote_3": "de usted mismo.",
+    "scroll": "Comenzar"
+  },
+  "door": {
+    "families_loss": "Para familias que enfrentan una pérdida",
+    "intentional": "Para constructores intencionales",
+    "forward": "Para quienes piensan en el futuro"
+  },
+  "legacy": {
+    "eyebrow": "Para quienes construyen con intención",
+    "headline_1": "Sus nietos conocerán",
+    "headline_2": "una de dos versiones suyas.",
+    "body_1": "La que les contaron.",
+    "body_2": "O la que usted les dejó.",
+    "body_3": "La mayoría de las personas pasan su vida construyendo cosas.",
+    "body_4": "Muy pocos dedican tiempo a asegurarse de que perduren.",
+    "body_5": "Basalith es para ambos tipos de personas.",
+    "body_6": "Pero funciona mejor para quienes empiezan temprano.",
+    "cta": "Empiece antes de tener que hacerlo"
+  },
+  "closing": {
+    "eyebrow": "Para quienes piensan en el futuro",
+    "headline_1": "La IA más sofisticada del mundo",
+    "headline_2": "puede aprender a pensar como usted.",
+    "sub": "La pregunta es si le da suficiente material para aprender mientras todavía puede.",
+    "tagline_1": "Nunca se va del todo",
+    "tagline_2": "si deja suficiente",
+    "tagline_3": "de usted mismo.",
+    "cta": "Comenzar",
+    "price": "El Estate comienza en $2,500"
   }
 }

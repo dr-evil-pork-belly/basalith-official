@@ -225,5 +225,39 @@
     "vi": "Tiếng Việt",
     "tl": "Tagalog",
     "ko": "한국어"
+  },
+  "tagline": {
+    "quote_1": "You never truly leave",
+    "quote_2": "if you leave enough",
+    "quote_3": "of yourself behind.",
+    "scroll": "Begin"
+  },
+  "door": {
+    "families_loss": "For families facing loss",
+    "intentional": "For intentional builders",
+    "forward": "For the forward-thinking"
+  },
+  "legacy": {
+    "eyebrow": "For Those Who Build Intentionally",
+    "headline_1": "Your grandchildren will know",
+    "headline_2": "one of two versions of you.",
+    "body_1": "The one they were told about.",
+    "body_2": "Or the one you left them.",
+    "body_3": "Most people spend their lives building things.",
+    "body_4": "Very few spend any time making sure those things outlast them.",
+    "body_5": "Basalith is for both kinds of people.",
+    "body_6": "But it works best for people who begin early.",
+    "cta": "Begin Before You Have To"
+  },
+  "closing": {
+    "eyebrow": "For the forward-thinking",
+    "headline_1": "The most sophisticated AI in the world",
+    "headline_2": "can learn to think like you.",
+    "sub": "The question is whether you give it enough to learn from while you still can.",
+    "tagline_1": "You never truly leave",
+    "tagline_2": "if you leave enough",
+    "tagline_3": "of yourself behind.",
+    "cta": "Begin",
+    "price": "The Estate begins at $2,500"
   }
 }

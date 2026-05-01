@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useLanguage } from '@/app/context/LanguageContext'
 
 const MONO: React.CSSProperties = {
   fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
@@ -10,15 +11,14 @@ const MONO: React.CSSProperties = {
 }
 
 export default function LegacySection() {
+  const { t } = useLanguage()
+
   return (
     <section
       id="legacy"
       data-reveal
       aria-label="For intentional builders"
-      style={{
-        background: 'var(--color-surface-alt)',
-        overflow:   'hidden',
-      }}
+      style={{ background: 'var(--color-surface-alt)', overflow: 'hidden' }}
     >
       <div
         style={{
@@ -36,7 +36,6 @@ export default function LegacySection() {
             padding:        'clamp(64px,10vw,120px) clamp(24px,6vw,80px)',
           }}
         >
-          {/* Eyebrow */}
           <p
             style={{
               ...MONO,
@@ -48,10 +47,9 @@ export default function LegacySection() {
             }}
           >
             <span style={{ display: 'block', width: '24px', height: '1px', background: 'var(--color-gold)', flexShrink: 0 }} aria-hidden="true" />
-            For Those Who Build Intentionally
+            {t('legacy.eyebrow')}
           </p>
 
-          {/* Headline */}
           <h2
             style={{
               fontFamily:    'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
@@ -63,12 +61,11 @@ export default function LegacySection() {
               marginBottom:  '36px',
             }}
           >
-            Your grandchildren will know
+            {t('legacy.headline_1')}
             <br />
-            one of two versions of you.
+            {t('legacy.headline_2')}
           </h2>
 
-          {/* Body */}
           <div
             style={{
               fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
@@ -80,15 +77,14 @@ export default function LegacySection() {
               marginBottom: '44px',
             }}
           >
-            <p style={{ marginBottom: '14px' }}>The one they were told about.</p>
-            <p style={{ marginBottom: '28px', fontStyle: 'italic' }}>Or the one you left them.</p>
-            <p style={{ marginBottom: '14px' }}>Most people spend their lives building things.</p>
-            <p style={{ marginBottom: '28px' }}>Very few spend any time making sure those things outlast them.</p>
-            <p style={{ marginBottom: '14px' }}>Basalith is for both kinds of people.</p>
-            <p style={{ margin: 0, color: 'var(--color-text-primary)' }}>But it works best for people who begin early.</p>
+            <p style={{ marginBottom: '14px' }}>{t('legacy.body_1')}</p>
+            <p style={{ marginBottom: '28px', fontStyle: 'italic' }}>{t('legacy.body_2')}</p>
+            <p style={{ marginBottom: '14px' }}>{t('legacy.body_3')}</p>
+            <p style={{ marginBottom: '28px' }}>{t('legacy.body_4')}</p>
+            <p style={{ marginBottom: '14px' }}>{t('legacy.body_5')}</p>
+            <p style={{ margin: 0, color: 'var(--color-text-primary)' }}>{t('legacy.body_6')}</p>
           </div>
 
-          {/* CTA */}
           <div>
             <Link
               href="/apply"
@@ -114,7 +110,7 @@ export default function LegacySection() {
                 el.style.color       = 'var(--color-text-secondary)'
               }}
             >
-              Begin Before You Have To
+              {t('legacy.cta')}
             </Link>
           </div>
         </div>
@@ -125,20 +121,14 @@ export default function LegacySection() {
           style={{ position: 'relative', overflow: 'hidden', background: '#1A1510' }}
         >
           <div style={{
-            position: 'absolute',
-            inset:    0,
+            position: 'absolute', inset: 0,
             background: [
               'radial-gradient(ellipse at 40% 50%, rgba(184,150,62,0.18) 0%, transparent 60%)',
               'radial-gradient(ellipse at 80% 20%, rgba(184,150,62,0.08) 0%, transparent 50%)',
               'linear-gradient(160deg, #2A2018 0%, #1A1510 40%, #0F0D0A 100%)',
             ].join(', '),
           }} />
-          <svg
-            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
-            viewBox="0 0 400 600"
-            preserveAspectRatio="xMidYMid slice"
-            aria-hidden="true"
-          >
+          <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} viewBox="0 0 400 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
             <rect x="28" y="28" width="344" height="544" fill="none" stroke="rgba(184,150,62,0.35)" strokeWidth="1" />
             <rect x="44" y="44" width="312" height="512" fill="none" stroke="rgba(184,150,62,0.15)" strokeWidth="0.5" />
             <line x1="28"  y1="68"  x2="68"  y2="68"  stroke="rgba(184,150,62,0.55)" strokeWidth="1.5" />
@@ -161,11 +151,7 @@ export default function LegacySection() {
             <line x1="280" y1="240" x2="260" y2="340" stroke="rgba(184,150,62,0.12)" strokeWidth="0.75" />
             <line x1="160" y1="300" x2="200" y2="400" stroke="rgba(184,150,62,0.12)" strokeWidth="0.75" />
           </svg>
-          <div style={{
-            position:   'absolute',
-            inset:      0,
-            background: 'radial-gradient(ellipse at center, transparent 40%, rgba(10,9,8,0.4) 100%)',
-          }} />
+          <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at center, transparent 40%, rgba(10,9,8,0.4) 100%)' }} />
         </div>
       </div>
 

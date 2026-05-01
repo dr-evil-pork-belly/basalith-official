@@ -228,5 +228,39 @@
     "ko": "한국어",
     "yue": "廣東話",
     "ja": "日本語"
+  },
+  "tagline": {
+    "quote_1": "Hindi ka talaga aalis",
+    "quote_2": "kung mag-iiwan ka ng sapat na",
+    "quote_3": "bahagi ng iyong sarili.",
+    "scroll": "Simulan"
+  },
+  "door": {
+    "families_loss": "Para sa mga pamilyang nahaharap sa pagkawala",
+    "intentional": "Para sa mga taong nagtatayo nang may layunin",
+    "forward": "Para sa mga may malalim na pananaw"
+  },
+  "legacy": {
+    "eyebrow": "Para sa mga taong nagtatayo nang may layunin",
+    "headline_1": "Malalaman ng iyong mga apo",
+    "headline_2": "ang isa sa dalawang bersyon mo.",
+    "body_1": "Ang sinabi sa kanila tungkol sa iyo.",
+    "body_2": "O ang iniwan mo para sa kanila.",
+    "body_3": "Karamihan sa mga tao ay gumastos ng buhay sa pagtatayo ng mga bagay.",
+    "body_4": "Iilan lang ang gumagugol ng panahon upang matiyak na magtatagal ang mga ito.",
+    "body_5": "Ang Basalith ay para sa dalawang uri ng tao.",
+    "body_6": "Ngunit pinakamabuti para sa mga nagsisimula nang maaga.",
+    "cta": "Magsimula bago mo kailanganin"
+  },
+  "closing": {
+    "eyebrow": "Para sa mga may malalim na pananaw",
+    "headline_1": "Ang pinaka-sopistikadong AI sa mundo",
+    "headline_2": "ay matututo na mag-isip tulad mo.",
+    "sub": "Ang tanong ay kung bibigyan mo ito ng sapat para matuto habang maari ka pa.",
+    "tagline_1": "Hindi ka talaga aalis",
+    "tagline_2": "kung mag-iiwan ka ng sapat na",
+    "tagline_3": "bahagi ng iyong sarili.",
+    "cta": "Simulan",
+    "price": "Nagsisimula ang Estate sa $2,500"
   }
 }

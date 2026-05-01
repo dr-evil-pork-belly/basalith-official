@@ -228,5 +228,39 @@
     "ko": "한국어",
     "yue": "廣東話",
     "ja": "日本語"
+  },
+  "tagline": {
+    "quote_1": "Bạn không bao giờ thực sự rời đi",
+    "quote_2": "nếu bạn để lại đủ",
+    "quote_3": "chính mình.",
+    "scroll": "Bắt đầu"
+  },
+  "door": {
+    "families_loss": "Dành cho các gia đình đang đối mặt với mất mát",
+    "intentional": "Dành cho những người xây dựng có chủ đích",
+    "forward": "Dành cho những người nhìn xa"
+  },
+  "legacy": {
+    "eyebrow": "Dành cho những người xây dựng có chủ đích",
+    "headline_1": "Các cháu của bạn sẽ biết đến",
+    "headline_2": "một trong hai phiên bản của bạn.",
+    "body_1": "Phiên bản được kể lại cho họ nghe.",
+    "body_2": "Hoặc phiên bản bạn để lại cho họ.",
+    "body_3": "Hầu hết mọi người dành cả đời để xây dựng những thứ.",
+    "body_4": "Rất ít người dành thời gian để đảm bảo những thứ đó tồn tại lâu dài.",
+    "body_5": "Basalith dành cho cả hai loại người.",
+    "body_6": "Nhưng hoạt động tốt nhất với những người bắt đầu sớm.",
+    "cta": "Bắt đầu trước khi phải làm vậy"
+  },
+  "closing": {
+    "eyebrow": "Dành cho những người nhìn xa",
+    "headline_1": "AI tinh vi nhất thế giới",
+    "headline_2": "có thể học cách suy nghĩ như bạn.",
+    "sub": "Câu hỏi là liệu bạn có cho nó đủ thứ để học trong khi bạn còn có thể không.",
+    "tagline_1": "Bạn không bao giờ thực sự rời đi",
+    "tagline_2": "nếu bạn để lại đủ",
+    "tagline_3": "chính mình.",
+    "cta": "Bắt đầu",
+    "price": "Estate bắt đầu từ $2,500"
   }
 }
