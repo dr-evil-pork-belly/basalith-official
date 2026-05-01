@@ -17,7 +17,9 @@
     "subheadline_2": "你喺生嘅時候，佢向你學習。你離開之後好耐，佢仍然繼續。",
     "cta_primary": "申請創始會面",
     "cta_secondary": "了解運作方式",
-    "social_proof": "四個國家嘅家族檔案 · 2026年成立"
+    "social_proof": "四個國家嘅家族檔案 · 2026年成立",
+    "subheadline_a": "大多數人喺你準備好之前就離開。",
+    "subheadline_b": "Basalith 係為咗令佢哋永遠唔需要真正離開。"
   },
   "philosophy": {
     "headline": "嗰個你從未問過嘅問題。",
@@ -30,7 +32,8 @@
     "pillar_2_title": "家族檔案",
     "pillar_2_body": "心靈嘅原始素材。展現你點睇世界嘅相片。記錄你講嘢方式嘅語音。揭示你思考方式嘅故事。",
     "pillar_3_title": "生命延續",
-    "pillar_3_body": "世界上最有錢嘅人正花緊幾十億美金建立自己嘅 AI 版本。Basalith 為每個家庭做到呢件事。"
+    "pillar_3_body": "世界上最有錢嘅人正花緊幾十億美金建立自己嘅 AI 版本。Basalith 為每個家庭做到呢件事。",
+    "body_5": "我哋建立咗 Basalith，\n令你嘅家人永遠唔需要再去猜想。"
   },
   "how_it_works": {
     "eyebrow": "運作流程",
@@ -60,7 +63,8 @@
     "stat_2_number": "23",
     "stat_2_label": "位貢獻者",
     "stat_3_number": "2年",
-    "stat_3_label": "智慧問答"
+    "stat_3_label": "智慧問答",
+    "body_4": "Patricia 話，呢係佢第一次\n感受唔到嗰種疑惑。"
   },
   "pricing_teaser": {
     "line_1": "世界上最有錢嘅人正花緊幾十億美金建立自己嘅 AI 版本。",
@@ -73,7 +77,8 @@
     "company": "公司",
     "legal": "法律",
     "contact": "聯絡我們",
-    "copyright": "Heritage Nexus Inc. 版權所有。"
+    "copyright": "Heritage Nexus Inc. 版權所有。",
+    "bottom_note": "只要你留低足夠多嘅自己，你就從未真正離開。"
   },
   "pricing": {
     "eyebrow": "收費",

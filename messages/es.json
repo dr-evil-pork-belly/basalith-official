@@ -17,7 +17,9 @@
     "subheadline_2": "Mientras usted vive, aprende de usted. Mucho después de que se haya ido, continúa.",
     "cta_primary": "Solicitar su Sesión Fundacional",
     "cta_secondary": "Ver Cómo Funciona",
-    "social_proof": "Familias en 4 países · Est. 2026"
+    "social_proof": "Familias en 4 países · Est. 2026",
+    "subheadline_a": "La mayoría de las personas se van antes de que estés listo.",
+    "subheadline_b": "Basalith fue construido para que nunca tengan que irse del todo."
   },
   "philosophy": {
     "headline": "La pregunta que nunca pudo hacer.",
@@ -30,7 +32,8 @@
     "pillar_2_title": "El Archivo",
     "pillar_2_body": "La materia prima de una mente. Fotografías que muestran cómo vio el mundo. Grabaciones de voz que capturan cómo habla. Historias que revelan cómo piensa.",
     "pillar_3_title": "La Continuación",
-    "pillar_3_body": "Las personas más ricas del mundo gastan miles de millones construyendo versiones de sí mismas en IA. Basalith lo hace para cada familia."
+    "pillar_3_body": "Las personas más ricas del mundo gastan miles de millones construyendo versiones de sí mismas en IA. Basalith lo hace para cada familia.",
+    "body_5": "Construimos Basalith\npara que tu familia nunca tenga que preguntarse."
   },
   "how_it_works": {
     "eyebrow": "El Proceso",
@@ -60,7 +63,8 @@
     "stat_2_number": "23",
     "stat_2_label": "Contribuidores",
     "stat_3_number": "2 años",
-    "stat_3_label": "Sesiones de sabiduría"
+    "stat_3_label": "Sesiones de sabiduría",
+    "body_4": "Patricia dijo que fue la primera vez\nque no sintió esa incertidumbre."
   },
   "pricing_teaser": {
     "line_1": "Las personas más ricas del mundo gastan miles de millones construyendo versiones de sí mismas en IA.",
@@ -73,7 +77,8 @@
     "company": "Empresa",
     "legal": "Legal",
     "contact": "Contacto",
-    "copyright": "Heritage Nexus Inc. Todos los derechos reservados."
+    "copyright": "Heritage Nexus Inc. Todos los derechos reservados.",
+    "bottom_note": "Nunca te vas realmente si dejas suficiente de ti mismo atrás."
   },
   "pricing": {
     "eyebrow": "Precios",

@@ -17,7 +17,9 @@
     "subheadline_2": "Khi bạn còn sống, nó học từ bạn. Rất lâu sau khi bạn ra đi, nó tiếp tục.",
     "cta_primary": "Yêu cầu buổi khởi đầu",
     "cta_secondary": "Xem cách hoạt động",
-    "social_proof": "Các gia đình tại 4 quốc gia · Thành lập năm 2026"
+    "social_proof": "Các gia đình tại 4 quốc gia · Thành lập năm 2026",
+    "subheadline_a": "Hầu hết mọi người ra đi trước khi bạn chuẩn bị sẵn sàng.",
+    "subheadline_b": "Basalith được xây dựng để họ không bao giờ phải ra đi thực sự."
   },
   "philosophy": {
     "headline": "Câu hỏi bạn chưa bao giờ được hỏi.",
@@ -30,7 +32,8 @@
     "pillar_2_title": "Hồ sơ",
     "pillar_2_body": "Nguyên liệu thô của tâm trí. Những bức ảnh cho thấy bạn nhìn thế giới thế nào. Bản ghi âm giọng nói ghi lại cách bạn nói chuyện. Những câu chuyện phơi bày cách bạn suy nghĩ.",
     "pillar_3_title": "Sự tiếp nối",
-    "pillar_3_body": "Những người giàu nhất thế giới đang chi hàng tỷ đô để xây dựng phiên bản AI của chính họ. Basalith làm điều đó cho mọi gia đình."
+    "pillar_3_body": "Những người giàu nhất thế giới đang chi hàng tỷ đô để xây dựng phiên bản AI của chính họ. Basalith làm điều đó cho mọi gia đình.",
+    "body_5": "Chúng tôi xây dựng Basalith\nđể gia đình bạn không bao giờ phải tự hỏi."
   },
   "how_it_works": {
     "eyebrow": "Quy trình",
@@ -60,7 +63,8 @@
     "stat_2_number": "23",
     "stat_2_label": "Người đóng góp",
     "stat_3_number": "2 năm",
-    "stat_3_label": "Buổi chia sẻ kinh nghiệm"
+    "stat_3_label": "Buổi chia sẻ kinh nghiệm",
+    "body_4": "Patricia nói đó là lần đầu tiên\ncô ấy không cảm thấy nỗi băn khoăn đó."
   },
   "pricing_teaser": {
     "line_1": "Những người giàu nhất thế giới đang chi hàng tỷ đô để xây dựng phiên bản AI của chính họ.",
@@ -73,7 +77,8 @@
     "company": "Công ty",
     "legal": "Pháp lý",
     "contact": "Liên hệ",
-    "copyright": "Heritage Nexus Inc. Bảo lưu mọi quyền."
+    "copyright": "Heritage Nexus Inc. Bảo lưu mọi quyền.",
+    "bottom_note": "Bạn không bao giờ thực sự rời đi nếu bạn để lại đủ nhiều chính mình."
   },
   "pricing": {
     "eyebrow": "Bảng giá",

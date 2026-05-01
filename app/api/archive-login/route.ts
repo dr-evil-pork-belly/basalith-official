@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
   // ── 3. Verify archive exists and is active ────────────────────────────────
   const { data: archive } = await supabaseAdmin
     .from('archives')
-    .select('id, name, family_name, status')
+    .select('id, name, family_name, status, preferred_language')
     .eq('id', archiveId)
     .single()
 
@@ -81,5 +81,18 @@ export async function POST(req: NextRequest) {
   const response = NextResponse.json({ success: true, archiveName: archive.name })
   response.cookies.set('archive-auth', archiveId, cookieOptions)
   response.cookies.set('archive-id',   archiveId, cookieOptions)
+
+  // Set lang cookie so LanguageProvider auto-selects the owner's preferred language.
+  // Not httpOnly — must be readable by client-side JS.
+  if (archive.preferred_language && archive.preferred_language !== 'en') {
+    response.cookies.set('lang', archive.preferred_language, {
+      httpOnly: false,
+      secure:   process.env.NODE_ENV === 'production',
+      sameSite: 'lax' as const,
+      maxAge:   60 * 60 * 24 * 365,
+      path:     '/',
+    })
+  }
+
   return response
 }

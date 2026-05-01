@@ -17,7 +17,9 @@
     "subheadline_2": "当您在世时，它向您学习。在您离开之后，它继续延续。",
     "cta_primary": "申请创始会面",
     "cta_secondary": "了解运作方式",
-    "social_proof": "四个国家的家族档案 · 成立于 2026 年"
+    "social_proof": "四个国家的家族档案 · 成立于 2026 年",
+    "subheadline_a": "大多数人在你准备好之前就离开了。",
+    "subheadline_b": "Basalith 是为了让他们永远不必真正离开。"
   },
   "philosophy": {
     "headline": "那个您从未能问出口的问题。",
@@ -30,7 +32,8 @@
     "pillar_2_title": "家族档案",
     "pillar_2_body": "心灵的原始素材。展现您如何看待世界的照片。捕捉您说话方式的语音录制。揭示您思维方式的故事。",
     "pillar_3_title": "生命延续",
-    "pillar_3_body": "世界上最富有的人们正花费数十亿美元构建自己的 AI 版本。Basalith 为每个家庭实现这一目标。"
+    "pillar_3_body": "世界上最富有的人们正花费数十亿美元构建自己的 AI 版本。Basalith 为每个家庭实现这一目标。",
+    "body_5": "我们建立了 Basalith，\n让您的家人永远不必再去猜想。"
   },
   "how_it_works": {
     "eyebrow": "运作流程",
@@ -60,7 +63,8 @@
     "stat_2_number": "23",
     "stat_2_label": "位贡献者",
     "stat_3_number": "2年",
-    "stat_3_label": "智慧问答"
+    "stat_3_label": "智慧问答",
+    "body_4": "帕特里夏说，这是她第一次\n感受不到那种疑惑。"
   },
   "pricing_teaser": {
     "line_1": "世界上最富有的人们正花费数十亿美元构建自己的 AI 版本。",
@@ -73,7 +77,8 @@
     "company": "公司",
     "legal": "法律",
     "contact": "联系我们",
-    "copyright": "Heritage Nexus Inc. 版权所有。"
+    "copyright": "Heritage Nexus Inc. 版权所有。",
+    "bottom_note": "只要您留下了足够多的自己，您便从未真正离去。"
   },
   "pricing": {
     "eyebrow": "价格",

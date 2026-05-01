@@ -17,7 +17,9 @@
     "subheadline_2": "Habang kayo ay nabubuhay, natututo ito mula sa inyo. Matagal pagkatapos na kayo ay lumisan, nagpapatuloy ito.",
     "cta_primary": "Humiling ng Panimulang Sesyon",
     "cta_secondary": "Tingnan Kung Paano Ito Gumagana",
-    "social_proof": "Mga pamilya sa 4 na bansa · Itinatag noong 2026"
+    "social_proof": "Mga pamilya sa 4 na bansa · Itinatag noong 2026",
+    "subheadline_a": "Karamihan sa mga tao ay umaalis bago ka handa.",
+    "subheadline_b": "Itinayo ang Basalith para hindi sila kailangang umalis nang tunay."
   },
   "philosophy": {
     "headline": "Ang tanong na hindi ninyo naitanong.",
@@ -30,7 +32,8 @@
     "pillar_2_title": "Ang Talaan",
     "pillar_2_body": "Ang hilaw na materyales ng isip. Mga larawang nagpapakita kung paano ninyo nakita ang mundo. Mga rekording ng boses na kumukuha ng inyong paraan ng pagsasalita. Mga kwentong nagbubunyag ng inyong paraan ng pag-iisip.",
     "pillar_3_title": "Ang Pagpapatuloy",
-    "pillar_3_body": "Ang mga pinakamaykayamang tao sa mundo ay gumagastos ng bilyun-bilyon para magtayo ng kanilang AI na bersyon. Ginagawa ito ng Basalith para sa bawat pamilya."
+    "pillar_3_body": "Ang mga pinakamaykayamang tao sa mundo ay gumagastos ng bilyun-bilyon para magtayo ng kanilang AI na bersyon. Ginagawa ito ng Basalith para sa bawat pamilya.",
+    "body_5": "Itinayo namin ang Basalith\npara hindi na kailangang tanungin ng iyong pamilya."
   },
   "how_it_works": {
     "eyebrow": "Ang Proseso",
@@ -60,7 +63,8 @@
     "stat_2_number": "23",
     "stat_2_label": "Mga kontribyutor",
     "stat_3_number": "2 taon",
-    "stat_3_label": "Mga sesyon ng karunungan"
+    "stat_3_label": "Mga sesyon ng karunungan",
+    "body_4": "Sinabi ni Patricia na ito ang unang pagkakataon\nna hindi niya naramdaman ang pagtatanong."
   },
   "pricing_teaser": {
     "line_1": "Ang mga pinakamaykayamang tao sa mundo ay gumagastos ng bilyun-bilyon para magtayo ng kanilang AI na bersyon.",
@@ -73,7 +77,8 @@
     "company": "Kumpanya",
     "legal": "Legal",
     "contact": "Makipag-ugnayan",
-    "copyright": "Heritage Nexus Inc. Lahat ng karapatan ay nakalaan."
+    "copyright": "Heritage Nexus Inc. Lahat ng karapatan ay nakalaan.",
+    "bottom_note": "Hindi ka talaga aalis kung mag-iiwan ka ng sapat na bahagi ng iyong sarili."
   },
   "pricing": {
     "eyebrow": "Presyo",
