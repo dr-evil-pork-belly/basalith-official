@@ -1143,6 +1143,76 @@ function ContributorEntitySection({
   )
 }
 
+// ── Memory Map Teaser (contributor portal) ─────────────────────────────────────
+
+function MemoryMapTeaser({ token }: { token: string }) {
+  const [weakestDecade,    setWeakestDecade]    = useState<{ label: string; photoCount: number } | null>(null)
+  const [weakestDimension, setWeakestDimension] = useState<{ label: string; score: number } | null>(null)
+  const [loaded, setLoaded] = useState(false)
+
+  useEffect(() => {
+    fetch(`/api/contribute/memory-map?token=${token}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        if (!d) return
+        setWeakestDecade(d.weakestDecade     ?? null)
+        setWeakestDimension(d.weakestDimension ?? null)
+      })
+      .catch(() => {})
+      .finally(() => setLoaded(true))
+  }, [token])
+
+  if (!loaded || (!weakestDecade && !weakestDimension)) return null
+
+  function Bar({ pct, color }: { pct: number; color: string }) {
+    return (
+      <div style={{ flex: 1, height: '6px', background: 'rgba(196,162,74,0.08)', borderRadius: '2px', overflow: 'hidden' }}>
+        <div style={{ height: '100%', width: `${Math.min(pct, 100)}%`, background: color, borderRadius: '2px' }} />
+      </div>
+    )
+  }
+
+  return (
+    <div style={{ background: 'rgba(196,162,74,0.04)', border: '1px solid rgba(196,162,74,0.15)', borderRadius: '2px', padding: '1.25rem', marginBottom: '24px' }}>
+      <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.44rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.7)', marginBottom: '1rem' }}>
+        Where the Archive Needs You
+      </p>
+
+      {weakestDecade && (
+        <div style={{ marginBottom: '0.75rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
+            <span style={{ fontFamily: '"Courier New",monospace', fontSize: '0.46rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#706C65', width: '64px', flexShrink: 0 }}>
+              {weakestDecade.label}
+            </span>
+            <Bar pct={weakestDecade.photoCount * 10} color="rgba(196,162,74,0.25)" />
+            <span style={{ fontFamily: '"Courier New",monospace', fontSize: '0.42rem', color: 'rgba(196,162,74,0.4)', flexShrink: 0 }}>
+              {weakestDecade.photoCount === 0 ? 'MISSING' : `${weakestDecade.photoCount} photos`}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {weakestDimension && (
+        <div style={{ marginBottom: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ fontFamily: '"Courier New",monospace', fontSize: '0.46rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#706C65', width: '64px', flexShrink: 0 }}>
+              {weakestDimension.label}
+            </span>
+            <Bar pct={weakestDimension.score} color="rgba(196,162,74,0.25)" />
+            <span style={{ fontFamily: '"Courier New",monospace', fontSize: '0.42rem', color: 'rgba(196,162,74,0.4)', flexShrink: 0 }}>
+              {weakestDimension.score === 0 ? 'EMPTY' : `${weakestDimension.score}%`}
+            </span>
+          </div>
+        </div>
+      )}
+
+      <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontSize: '0.9rem', color: '#5C6166', lineHeight: 1.7, margin: 0 }}>
+        Do you have photographs or memories from these areas? Any detail helps.
+      </p>
+    </div>
+  )
+}
+
 // ── Main component ─────────────────────────────────────────────────────────────
 
 const PORTAL_LANGS = Object.keys(PORTAL_UI) as (keyof typeof PORTAL_UI)[]
@@ -1242,6 +1312,9 @@ export default function ContributeClient({
 
       {/* Content */}
       <div style={{ maxWidth: '560px', margin: '0 auto', padding: '1.5rem 1.25rem 4rem' }}>
+
+        {/* Where the archive needs you */}
+        <MemoryMapTeaser token={token} />
 
         {/* Questions */}
         <QuestionsSection

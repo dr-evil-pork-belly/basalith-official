@@ -21,6 +21,7 @@ const PRIMARY_NAV = [
   { href: '/archive/dashboard',    label: 'Dashboard'        },
   { href: '/archive/label',        label: 'Upload Photos'    },
   { href: '/archive/gallery',      label: 'Gallery'          },
+  { href: '/archive/memory-map',   label: 'Memory Map'       },
   { href: '/archive/entity',       label: 'My Entity'        },
   { href: '/archive/contributors', label: 'Contributors'     },
 ]

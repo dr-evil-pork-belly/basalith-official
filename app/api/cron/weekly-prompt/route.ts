@@ -5,6 +5,7 @@ import { DIMENSIONS } from '@/lib/entityAccuracy'
 import { getWeeklyPrompt, getWeeklyPromptZh, getWeekNumber } from '@/lib/weeklyPrompts'
 import { t } from '@/lib/emailTranslations'
 import { generateQuestionsForContributor } from '@/lib/contributorToken'
+import { generateRelationshipQuestion, buildQuestionSubject, buildQuestionEmail } from '@/lib/questionEngine'
 
 export const dynamic = 'force-dynamic'
 
@@ -109,10 +110,10 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  // Refresh questions for all active contributors
+  // Refresh generic questions (existing system)
   const { data: allContributors } = await supabaseAdmin
     .from('contributors')
-    .select('id, archive_id, relationship')
+    .select('id, archive_id, relationship, name, email, preferred_language, access_token')
     .eq('status', 'active')
     .not('access_token', 'is', null)
 
@@ -130,7 +131,76 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  return Response.json({ sent, total: archives.length, weekNumber, isTest, questionsRefreshed })
+  // Send personalized relationship-specific questions via Claude
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+  let questionEmailsSent = 0
+
+  // Group contributors by archive to batch archive lookups
+  const archiveIds = [...new Set((allContributors ?? []).map(c => c.archive_id))]
+  const { data: archiveRows } = await supabaseAdmin
+    .from('archives')
+    .select('id, name, owner_name')
+    .in('id', archiveIds)
+
+  const archiveMap = Object.fromEntries((archiveRows ?? []).map(a => [a.id, a]))
+
+  for (const contributor of allContributors ?? []) {
+    if (!contributor.email || !contributor.name) continue
+    const archive = archiveMap[contributor.archive_id]
+    if (!archive?.owner_name) continue
+
+    try {
+      const question = await generateRelationshipQuestion(
+        contributor.id,
+        contributor.archive_id,
+        contributor.relationship || 'other',
+        contributor.name,
+        archive.owner_name,
+        contributor.preferred_language || 'en',
+      )
+
+      if (!question) continue
+
+      // Save to contributor_questions
+      await supabaseAdmin
+        .from('contributor_questions')
+        .insert({
+          archive_id:     contributor.archive_id,
+          contributor_id: contributor.id,
+          question_text:  question,
+          question_type:  'relationship_specific',
+          status:         'pending',
+        })
+        .then(() => {})
+
+      // Send email
+      const portalUrl = `${siteUrl}/contribute/${contributor.access_token}`
+      await resend.emails.send({
+        from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
+        to:      contributor.email,
+        subject: buildQuestionSubject(archive.name, contributor.preferred_language || 'en'),
+        html:    buildQuestionEmail(
+          archive.name,
+          contributor.name.split(' ')[0],
+          question,
+          portalUrl,
+          contributor.preferred_language || 'en',
+        ),
+        headers: {
+          'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
+          'X-Entity-Ref-ID':  `basalith-cq-${contributor.id}-${Date.now()}`,
+          'Precedence':       'bulk',
+        },
+      })
+
+      questionEmailsSent++
+      console.log(`[weekly-prompt] Personalized question sent to: ${contributor.email}`)
+    } catch (err: unknown) {
+      console.error('[weekly-prompt] Personalized question failed:', contributor.id, err instanceof Error ? err.message : err)
+    }
+  }
+
+  return Response.json({ sent, total: archives.length, weekNumber, isTest, questionsRefreshed, questionEmailsSent })
 }
 
 // ── Email builder ──────────────────────────────────────────────────────────────

@@ -65,8 +65,8 @@ function fmt(cents: number) {
 // ── Cron test panel ───────────────────────────────────────────────────────────
 
 const CRON_JOBS = [
-  { label: 'Send Daily Photos',          route: '/api/cron/send-photos'            },
-  { label: 'Send Weekly Prompt',         route: '/api/cron/weekly-prompt'          },
+  { label: 'Send Daily Photos',                  route: '/api/cron/send-photos'            },
+  { label: 'Send Weekly Prompt + Questions',      route: '/api/cron/weekly-prompt'          },
   { label: 'Send Monday Mystery',        route: '/api/cron/story-prompt-monday'    },
   { label: 'Send Friday Reveal',         route: '/api/cron/story-prompt-friday'    },
   { label: 'Send Monthly Report',        route: '/api/cron/monthly-report'         },
@@ -110,7 +110,7 @@ function SystemTestsPanel() {
           System Tests
         </p>
         <p className="font-sans text-[0.65rem] mt-0.5" style={{ color: '#3A3F44' }}>
-          Each call runs with ?test=true — bypasses day/date guards
+          Each call runs with ?test=true — bypasses day/date guards. Weekly Prompt also generates personalized contributor questions via Claude.
         </p>
       </div>
       <div className="p-6 flex flex-col gap-3">
@@ -141,6 +141,17 @@ function SystemTestsPanel() {
             </div>
           )
         })}
+      </div>
+      <div className="p-6 pt-0 flex gap-3 flex-wrap border-t" style={{ borderColor: 'rgba(196,162,74,0.1)', marginTop: '4px' }}>
+        <a
+          href="/archive/memory-map"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-sans text-[0.62rem] font-medium tracking-[0.08em] uppercase px-4 py-2 rounded-sm transition-all duration-150"
+          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', color: '#9DA3A8', textDecoration: 'none' }}
+        >
+          View Memory Map →
+        </a>
       </div>
     </div>
   )
