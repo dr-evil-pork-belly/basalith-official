@@ -323,8 +323,11 @@ function isDeposit(message: string): boolean {
 }
 
 export async function POST(req: Request) {
+  console.log('=== ENTITY CHAT POST ===')
   try {
     const { archiveId, message, sessionId, conversationHistory } = await req.json()
+
+    console.log('[entity-chat] archiveId:', archiveId, '| msgLen:', message?.length, '| msgPreview:', message?.substring(0, 60))
 
     if (!archiveId || !message) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -359,7 +362,9 @@ export async function POST(req: Request) {
 
     // Auto-save statement responses as deposits + create training pair (non-fatal, fire-and-forget)
     const wasDeposit = isDeposit(message)
+    console.log('[entity-chat] wasDeposit:', wasDeposit, '| firstWord:', message.trim().split(' ')[0], '| endsWithQ:', message.trim().endsWith('?'))
     if (wasDeposit) {
+      console.log('[entity-chat] entering deposit+training IIFE')
       void (async () => {
         try {
           const { data: dep, error: depErr } = await supabaseAdmin
