@@ -357,32 +357,47 @@ export async function POST(req: Request) {
       if (error) console.warn('entity_conversations insert skipped:', error.message)
     })
 
-    // Auto-save statement responses as deposits + training pair (non-fatal)
+    // Auto-save statement responses as deposits + create training pair (non-fatal, fire-and-forget)
     const wasDeposit = isDeposit(message)
     if (wasDeposit) {
-      supabaseAdmin.from('owner_deposits').insert({
-        archive_id:     archiveId,
-        prompt:         'Entity chat deposit',
-        response:       message,
-        essence_status: 'pending',
-      }).select('id').single().then(({ data: dep, error }) => {
-        if (error) { console.warn('Auto-deposit skipped:', error.message); return }
+      void (async () => {
+        try {
+          const { data: dep, error: depErr } = await supabaseAdmin
+            .from('owner_deposits')
+            .insert({ archive_id: archiveId, prompt: 'Entity chat deposit', response: message, essence_status: 'pending' })
+            .select('id')
+            .single()
 
-        // Fetch archive info then create training pair + fire scoring event
-        void Promise.resolve(supabaseAdmin.from('archives').select('owner_name, name, preferred_language').eq('id', archiveId).single())
-          .then(({ data: arch }) => {
-            if (!arch) return
-            return createTrainingPairFromDeposit(
-              { id: dep?.id, archive_id: archiveId, prompt: 'Entity chat deposit', response: message },
-              arch.owner_name || 'Unknown',
-              arch.name,
-              arch.preferred_language || 'en',
-            ).then(pairId => {
-              if (pairId) void inngest.send({ name: 'training/pair-created', data: { trainingPairId: pairId } })
-            })
-          })
-          .catch(e => console.warn('[entity-chat] training pair failed:', e instanceof Error ? e.message : e))
-      })
+          if (depErr) {
+            console.warn('[entity-chat] deposit save failed:', depErr.message)
+            return
+          }
+
+          const { data: arch } = await supabaseAdmin
+            .from('archives')
+            .select('owner_name, name, preferred_language')
+            .eq('id', archiveId)
+            .single()
+
+          if (!arch) {
+            console.warn('[entity-chat] archive not found for training pair:', archiveId)
+            return
+          }
+
+          const pairId = await createTrainingPairFromDeposit(
+            { id: dep?.id, archive_id: archiveId, prompt: 'Entity chat deposit', response: message },
+            arch.owner_name || 'Unknown',
+            arch.name,
+            arch.preferred_language || 'en',
+          )
+
+          if (pairId) {
+            void inngest.send({ name: 'training/pair-created', data: { trainingPairId: pairId } })
+          }
+        } catch (e) {
+          console.error('[entity-chat] deposit/training error:', e instanceof Error ? e.message : e)
+        }
+      })()
     }
 
     // Track deposit usage + send memory confirmation on first use (non-blocking)

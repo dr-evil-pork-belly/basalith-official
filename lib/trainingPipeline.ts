@@ -92,6 +92,13 @@ export async function createTrainingPairFromDeposit(
   archiveName: string,
   language = 'en',
 ): Promise<string | null> {
+  console.log('[training] createTrainingPairFromDeposit called —',
+    'depositId:', deposit.id,
+    'archiveId:', deposit.archive_id,
+    'promptLen:', deposit.prompt?.length ?? 0,
+    'responseLen:', deposit.response?.length ?? 0,
+  )
+
   // Idempotency: skip if already processed
   if (deposit.id) {
     const { data: existing } = await supabaseAdmin
@@ -100,7 +107,10 @@ export async function createTrainingPairFromDeposit(
       .eq('source_id', deposit.id)
       .eq('source_type', 'deposit')
       .maybeSingle()
-    if (existing) return null
+    if (existing) {
+      console.log('[training] pair already exists for deposit', deposit.id, '— skipping')
+      return null
+    }
   }
 
   const { data, error } = await supabaseAdmin
@@ -119,9 +129,11 @@ export async function createTrainingPairFromDeposit(
     .single()
 
   if (error) {
-    console.error('[trainingPipeline] createFromDeposit failed:', error.message)
+    console.error('[training] createFromDeposit INSERT FAILED:', error.message, error.details ?? '')
     return null
   }
+
+  console.log('[training] pair created successfully — id:', data.id)
   return data.id
 }
 
