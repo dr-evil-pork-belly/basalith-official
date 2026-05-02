@@ -29,6 +29,7 @@ export async function GET(req: NextRequest) {
     commissionsRes,
     voiceRes,
     videosRes,
+    trainingPairsRes,
   ] = await Promise.allSettled([
     supabaseAdmin.from('archives').select('id, name, family_name, owner_name, owner_email, tier, status, created_at, magic_link_token'),
     supabaseAdmin.from('photographs').select('archive_id, status, created_at').order('created_at', { ascending: false }).limit(1000),
@@ -42,6 +43,7 @@ export async function GET(req: NextRequest) {
     supabaseAdmin.from('commissions').select('amount, commission_type, status, created_at'),
     supabaseAdmin.from('voice_recordings').select('archive_id, created_at').order('created_at', { ascending: false }).limit(100),
     supabaseAdmin.from('archive_videos').select('archive_id, created_at').order('created_at', { ascending: false }).limit(100),
+    supabaseAdmin.from('training_pairs').select('archive_id, included_in_training, quality_score, source_type'),
   ])
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -59,6 +61,7 @@ export async function GET(req: NextRequest) {
   const commissions   = get(commissionsRes)
   const voiceRecs     = get(voiceRes)
   const videos        = get(videosRes)
+  const trainingAll   = get(trainingPairsRes)
 
   // Archive name lookup
   const archiveNames: Record<string, string> = {}
@@ -143,6 +146,22 @@ export async function GET(req: NextRequest) {
       health = 'amber'
     }
 
+    // Training data summary for this archive
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const archiveTraining = trainingAll.filter((t: any) => t.archive_id === id)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const trainingIncluded = archiveTraining.filter((t: any) => t.included_in_training).length
+    const training = {
+      total:              archiveTraining.length,
+      included:           trainingIncluded,
+      readyForFineTuning: trainingIncluded >= 500,
+      estimatedAccuracy:
+        trainingIncluded < 50   ? 'Building' :
+        trainingIncluded < 250  ? 'Developing' :
+        trainingIncluded < 500  ? 'Approaching threshold' :
+        'Ready for fine-tuning',
+    }
+
     return {
       id,
       name:               archive.name,
@@ -163,6 +182,7 @@ export async function GET(req: NextRequest) {
       health,
       alerts,
       magicLinkToken:     archive.magic_link_token ?? null,
+      training,
     }
   })
 

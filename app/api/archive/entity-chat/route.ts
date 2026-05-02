@@ -2,6 +2,8 @@ import Anthropic from '@anthropic-ai/sdk'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { NextResponse } from 'next/server'
 import { resend } from '@/lib/resend'
+import { inngest } from '@/lib/inngest'
+import { createTrainingPairFromDeposit } from '@/lib/trainingPipeline'
 
 const anthropic = new Anthropic()
 
@@ -355,7 +357,7 @@ export async function POST(req: Request) {
       if (error) console.warn('entity_conversations insert skipped:', error.message)
     })
 
-    // Auto-save statement responses as deposits (non-fatal)
+    // Auto-save statement responses as deposits + training pair (non-fatal)
     const wasDeposit = isDeposit(message)
     if (wasDeposit) {
       supabaseAdmin.from('owner_deposits').insert({
@@ -363,8 +365,23 @@ export async function POST(req: Request) {
         prompt:         'Entity chat deposit',
         response:       message,
         essence_status: 'pending',
-      }).then(({ error }) => {
-        if (error) console.warn('Auto-deposit skipped:', error.message)
+      }).select('id').single().then(({ data: dep, error }) => {
+        if (error) { console.warn('Auto-deposit skipped:', error.message); return }
+
+        // Fetch archive info then create training pair + fire scoring event
+        void Promise.resolve(supabaseAdmin.from('archives').select('owner_name, name, preferred_language').eq('id', archiveId).single())
+          .then(({ data: arch }) => {
+            if (!arch) return
+            return createTrainingPairFromDeposit(
+              { id: dep?.id, archive_id: archiveId, prompt: 'Entity chat deposit', response: message },
+              arch.owner_name || 'Unknown',
+              arch.name,
+              arch.preferred_language || 'en',
+            ).then(pairId => {
+              if (pairId) void inngest.send({ name: 'training/pair-created', data: { trainingPairId: pairId } })
+            })
+          })
+          .catch(e => console.warn('[entity-chat] training pair failed:', e instanceof Error ? e.message : e))
       })
     }
 

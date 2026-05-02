@@ -3,6 +3,8 @@ import { getContributorByToken, generateQuestionsForContributor } from '@/lib/co
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
 import { getPhotoUrl } from '@/lib/storage'
+import { inngest } from '@/lib/inngest'
+import { createTrainingPairFromContributor } from '@/lib/trainingPipeline'
 
 export const dynamic = 'force-dynamic'
 
@@ -68,6 +70,26 @@ export async function POST(req: NextRequest) {
         .from('contributors')
         .update({ questions_answered: (contributor.questions_answered ?? 0) + 1 })
         .eq('id', contributor.id)
+    }
+
+    // Training pair from contributor answer (fire-and-forget)
+    if (archive?.owner_name && answerText.trim().length > 20) {
+      createTrainingPairFromContributor(
+        {
+          archive_id:       archiveId,
+          contributor_name: contributor.name ?? contributor.email,
+          relationship:     contributor.relationship ?? 'family member',
+          question:         question.question_text,
+          answer:           answerText.trim(),
+        },
+        archive.owner_name,
+        archive.name,
+        'en',
+      ).then(pairId => {
+        if (pairId) {
+          void inngest.send({ name: 'training/pair-created', data: { trainingPairId: pairId } })
+        }
+      }).catch(e => console.warn('[contribute/answer] training pair failed:', e instanceof Error ? e.message : e))
     }
 
     // Generate a replacement question

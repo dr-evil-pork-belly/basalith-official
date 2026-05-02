@@ -32,6 +32,12 @@ type ArchiveData = {
   health:              'green' | 'amber' | 'red'
   alerts:              AlertItem[]
   magicLinkToken:      string | null
+  training?: {
+    total:              number
+    included:           number
+    readyForFineTuning: boolean
+    estimatedAccuracy:  string
+  }
 }
 
 type ActivityItem = {
@@ -185,6 +191,49 @@ function ActionBtn({
   )
 }
 
+function BackfillButton() {
+  const [state, setState] = React.useState<'idle' | 'running' | 'done' | 'error'>('idle')
+  const [result, setResult] = React.useState('')
+  const mono: React.CSSProperties = { fontFamily: '"Space Mono","Courier New",monospace', textTransform: 'uppercase' as const, letterSpacing: '0.15em' }
+
+  async function run() {
+    setState('running')
+    try {
+      const res  = await fetch('/api/god/backfill-training', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ batchSize: 20 }) })
+      const data = await res.json()
+      setResult(`${data.created ?? 0} new pairs from ${data.processed ?? 0} deposits`)
+      setState('done')
+    } catch (e) {
+      setResult(e instanceof Error ? e.message : 'error')
+      setState('error')
+    }
+  }
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+      <button
+        onClick={run}
+        disabled={state === 'running'}
+        style={{
+          background:    state === 'done' ? 'rgba(74,196,124,0.1)' : state === 'error' ? 'rgba(196,74,74,0.1)' : 'rgba(255,255,255,0.04)',
+          border:        '1px solid rgba(255,255,255,0.07)',
+          borderRadius:  '2px',
+          padding:       '5px 12px',
+          ...mono,
+          fontSize:      '0.36rem',
+          color:         state === 'done' ? '#4AC47C' : state === 'error' ? '#C44A4A' : '#9DA3A8',
+          cursor:        state === 'running' ? 'not-allowed' : 'pointer',
+        }}
+      >
+        {state === 'running' ? 'Backfilling…' : state === 'done' ? '✓ Backfill Training' : 'Backfill Training Data'}
+      </button>
+      {result && <span style={{ ...mono, fontSize: '0.34rem', color: '#5C6166' }}>{result}</span>}
+    </div>
+  )
+}
+
+import React from 'react'
+
 function ArchiveCard({ archive, onRefresh }: { archive: ArchiveData; onRefresh: () => void }) {
   const router = useRouter()
   const [impersonating,  setImpersonating]  = useState(false)
@@ -323,6 +372,19 @@ function ArchiveCard({ archive, onRefresh }: { archive: ArchiveData; onRefresh: 
           </p>
         ))}
       </div>
+
+      {/* Training data */}
+      {archive.training && archive.training.total > 0 && (
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '0.5rem', marginBottom: '0.75rem' }}>
+          <p style={{ ...mono, fontSize: '0.36rem', color: '#C4A24A', margin: '0 0 2px', letterSpacing: '0.12em' }}>
+            TRAINING DATA
+          </p>
+          <p style={{ ...mono, fontSize: '0.36rem', color: archive.training.readyForFineTuning ? '#C4A24A' : '#5C6166', margin: '0 0 2px', letterSpacing: '0.08em' }}>
+            {archive.training.included} pairs · {archive.training.estimatedAccuracy}
+            {archive.training.readyForFineTuning ? ' ✓ READY' : ''}
+          </p>
+        </div>
+      )}
 
       {/* Archive alerts */}
       {archive.alerts.length > 0 && (
@@ -702,6 +764,39 @@ export default function GodModeClient() {
                   )
                 })}
               </div>
+
+            {/* Training pipeline controls */}
+            <div style={{
+              marginTop:    '1rem',
+              background:   'rgba(196,162,74,0.02)',
+              border:       '1px solid rgba(196,162,74,0.1)',
+              borderRadius: '2px',
+              padding:      '1rem',
+            }}>
+              <p style={{ ...mono, fontSize: '0.38rem', letterSpacing: '0.25em', color: '#C4A24A', margin: '0 0 0.75rem' }}>
+                TRAINING PIPELINE
+              </p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                <BackfillButton />
+                <a
+                  href="/api/god/export-training"
+                  style={{
+                    background:    'rgba(255,255,255,0.04)',
+                    border:        '1px solid rgba(255,255,255,0.07)',
+                    borderRadius:  '2px',
+                    padding:       '5px 12px',
+                    ...mono,
+                    fontSize:      '0.36rem',
+                    letterSpacing: '0.15em',
+                    color:         '#9DA3A8',
+                    textDecoration: 'none',
+                    display:       'inline-block',
+                  }}
+                >
+                  Export JSONL (all)
+                </a>
+              </div>
+            </div>
             </div>
           </>
         )}

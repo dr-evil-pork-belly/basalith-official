@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { calculateArchiveScore } from '@/lib/archiveScore'
 import OnboardingGuide from '@/app/components/OnboardingGuide'
+import TrainingDataCard from './TrainingDataCard'
 
 // ── Accuracy types ──────────────────────────────────────────────────────────
 type DimensionResult = {
@@ -1026,6 +1027,9 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
 
       {/* ── ENTITY READINESS + ACCESS ── */}
       <EntityReadinessCard archiveId={archiveId} />
+
+      {/* ── TRAINING DATA ── */}
+      <TrainingDataCard />
 
       {/* ── UPCOMING DATES ── */}
       <UpcomingDates archiveId={archiveId} />
