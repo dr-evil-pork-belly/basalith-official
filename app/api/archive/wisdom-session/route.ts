@@ -2,6 +2,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { NextResponse } from 'next/server'
 import { WISDOM_SESSIONS } from '@/lib/wisdomSessions'
 import { DIMENSIONS, calculateDimensionScore } from '@/lib/entityAccuracy'
+import { createTrainingPairFromDeposit } from '@/lib/trainingPipeline'
 
 // ── GET — recommended + in-progress session ────────────────────────────────
 export async function GET(req: Request) {
@@ -142,6 +143,25 @@ export async function PATCH(req: Request) {
       }).then(({ error }) => {
         if (error) console.warn('wisdom deposit skipped:', error.message)
       })
+
+      // Training pair from wisdom answer (fire-and-forget)
+      if (answer.trim().length > 20) {
+        void (async () => {
+          try {
+            const { data: arch } = await supabaseAdmin
+              .from('archives').select('owner_name, name, preferred_language').eq('id', session.archive_id).single()
+            if (!arch) return
+            await createTrainingPairFromDeposit(
+              { archive_id: session.archive_id, prompt: question.question, response: answer.trim() },
+              arch.owner_name || 'Unknown',
+              arch.name,
+              arch.preferred_language || 'en',
+            )
+          } catch (e) {
+            console.warn('[training] wisdom answer failed:', e instanceof Error ? e.message : e)
+          }
+        })()
+      }
     }
 
     const nextIndex  = questionIndex + 1

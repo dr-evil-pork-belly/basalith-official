@@ -1,6 +1,7 @@
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { inngest } from '@/lib/inngest'
 import { NextRequest, NextResponse } from 'next/server'
+import { createTrainingPairFromDeposit } from '@/lib/trainingPipeline'
 
 const MILESTONE_NUMBERS = [1, 5, 10, 25, 50, 100, 250, 500]
 
@@ -90,6 +91,26 @@ export async function POST(req: NextRequest) {
       })
 
     if (labelError) throw labelError
+
+    // ── Training pair from label (fire-and-forget, 20+ words only) ───────────
+    if (whatWasHappening && whatWasHappening.split(/\s+/).filter(Boolean).length >= 20) {
+      void (async () => {
+        try {
+          const { data: arch } = await supabaseAdmin
+            .from('archives').select('owner_name, name, preferred_language').eq('id', archiveId).single()
+          if (!arch) return
+          await createTrainingPairFromDeposit(
+            { archive_id: archiveId, prompt: 'Tell me about this photograph.', response: whatWasHappening },
+            arch.owner_name || 'Unknown',
+            arch.name,
+            arch.preferred_language || 'en',
+            'label',
+          )
+        } catch (e) {
+          console.warn('[training] label failed:', e instanceof Error ? e.message : e)
+        }
+      })()
+    }
 
     // ── 4. Upsert people ─────────────────────────────────────────────────────
     if (Array.isArray(peopleTagged) && peopleTagged.length > 0) {

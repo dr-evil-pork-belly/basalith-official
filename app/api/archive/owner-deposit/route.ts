@@ -1,5 +1,6 @@
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { NextResponse } from 'next/server'
+import { createTrainingPairFromDeposit } from '@/lib/trainingPipeline'
 
 export async function POST(req: Request) {
   try {
@@ -48,6 +49,25 @@ export async function POST(req: Request) {
       .from('archives')
       .update({ archive_score: depositScore })
       .eq('id', archiveId)
+
+    // Training pair (fire-and-forget)
+    if (response.trim().length > 20) {
+      void (async () => {
+        try {
+          const { data: arch } = await supabaseAdmin
+            .from('archives').select('owner_name, name, preferred_language').eq('id', archiveId).single()
+          if (!arch) return
+          await createTrainingPairFromDeposit(
+            { id: deposit.id, archive_id: archiveId, prompt: prompt ?? 'Archive deposit', response: response.trim() },
+            arch.owner_name || 'Unknown',
+            arch.name,
+            arch.preferred_language || 'en',
+          )
+        } catch (e) {
+          console.warn('[training] owner-deposit failed:', e instanceof Error ? e.message : e)
+        }
+      })()
+    }
 
     return NextResponse.json({ success: true, depositId: deposit.id })
 

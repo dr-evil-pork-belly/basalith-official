@@ -113,7 +113,8 @@ export async function createTrainingPairFromDeposit(
   deposit: { id?: string; archive_id: string; prompt: string; response: string },
   ownerName:   string,
   archiveName: string,
-  language = 'en',
+  language   = 'en',
+  sourceType = 'deposit',
 ): Promise<void> {
   console.log('[training] createTrainingPairFromDeposit called —',
     'depositId:', deposit.id,
@@ -133,10 +134,10 @@ export async function createTrainingPairFromDeposit(
       .from('training_pairs')
       .select('id')
       .eq('source_id', deposit.id)
-      .eq('source_type', 'deposit')
+      .eq('source_type', sourceType)
       .maybeSingle()
     if (existing) {
-      console.log('[training] pair already exists for deposit', deposit.id, '— skipping')
+      console.log('[training] pair already exists for', sourceType, deposit.id, '— skipping')
       return
     }
   }
@@ -151,7 +152,7 @@ export async function createTrainingPairFromDeposit(
     .insert({
       archive_id:           deposit.archive_id,
       source_id:            deposit.id ?? null,
-      source_type:          'deposit',
+      source_type:          sourceType,
       prompt:               deposit.prompt,
       completion:           deposit.response,
       system_prompt:        buildPersonSystemPrompt(ownerName, archiveName),
