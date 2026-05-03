@@ -787,7 +787,93 @@ function EntityReadinessCard({ archiveId }: { archiveId: string }) {
   )
 }
 
-// ── ArchiveRow ───────────────────────────────────────────────────────���────────
+// ── WeChat Connect Card ──────────────────────────────────────────────────────
+
+function WeChatConnectCard({ archiveId }: { archiveId: string }) {
+  const [code,    setCode]    = useState<string | null>(null)
+  const [linked,  setLinked]  = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [copied,  setCopied]  = useState(false)
+
+  useEffect(() => {
+    fetch(`/api/archive/wechat-link?archiveId=${archiveId}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d) { setCode(d.code); setLinked(d.linked) } })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [archiveId])
+
+  function handleCopy() {
+    if (!code) return
+    navigator.clipboard.writeText(code).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }).catch(() => {})
+  }
+
+  if (loading || !code) return null
+
+  return (
+    <div
+      className="rounded-sm mb-8"
+      style={{
+        background: '#111112',
+        border:     linked ? '1px solid rgba(196,162,74,0.2)' : '1px solid rgba(255,255,255,0.06)',
+      }}
+    >
+      <div
+        className="flex items-center justify-between px-6 py-4 border-b"
+        style={{ borderColor: 'rgba(255,255,255,0.04)' }}
+      >
+        <div className="flex items-center gap-2">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={linked ? 'rgba(196,162,74,0.8)' : 'rgba(255,255,255,0.2)'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: linked ? '#C4A24A' : '#5C6166', margin: 0 }}>
+            WeChat
+          </p>
+        </div>
+        {linked && (
+          <span style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#4CAF50' }}>
+            Connected
+          </span>
+        )}
+      </div>
+
+      <div style={{ padding: '1.25rem 1.5rem' }}>
+        {linked ? (
+          <p style={{ fontFamily: 'Georgia,serif', fontStyle: 'italic', fontSize: '0.88rem', color: '#706C65', lineHeight: 1.75, margin: 0 }}>
+            Your WeChat is connected. Send a voice message or text to deposit memories directly from WeChat.
+          </p>
+        ) : (
+          <>
+            <p style={{ fontFamily: 'Georgia,serif', fontStyle: 'italic', fontSize: '0.88rem', color: '#9DA3A8', lineHeight: 1.75, marginBottom: '1rem' }}>
+              Follow the Basalith Official Account on WeChat, then send this code to link your archive.
+            </p>
+            <div className="flex items-center gap-4 flex-wrap">
+              <div style={{ background: 'rgba(196,162,74,0.06)', border: '1px solid rgba(196,162,74,0.2)', borderRadius: '2px', padding: '0.5rem 1.25rem' }}>
+                <span style={{ fontFamily: 'monospace', fontSize: '1.5rem', letterSpacing: '0.3em', color: '#C4A24A', fontWeight: 700 }}>
+                  {code}
+                </span>
+              </div>
+              <button
+                onClick={handleCopy}
+                style={{ fontFamily: 'monospace', fontSize: '0.48rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: copied ? '#4CAF50' : '#5C6166', background: 'transparent', border: `1px solid ${copied ? 'rgba(76,175,80,0.3)' : 'rgba(255,255,255,0.08)'}`, padding: '0.5rem 0.9rem', cursor: 'pointer', borderRadius: '2px', transition: 'all 0.15s' }}
+              >
+                {copied ? '✓ Copied' : 'Copy Code'}
+              </button>
+            </div>
+            <p style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.08em', color: '#3A3F44', marginTop: '0.75rem' }}>
+              Open WeChat, follow Basalith, and send: {code}
+            </p>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ── ArchiveRow ───────────────────────────────────────────────────────────────
 
 type ArchiveRow = {
   name:             string
@@ -1036,6 +1122,9 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
 
       {/* ── MEMORY GAME ── */}
       <MemoryGameCard archiveId={archiveId} />
+
+      {/* ── WECHAT CONNECT ── */}
+      <WeChatConnectCard archiveId={archiveId} />
 
       {/* ── STAT CARDS ── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '12px', marginBottom: '40px' }} className="md:grid-cols-4">

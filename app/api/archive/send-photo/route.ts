@@ -5,6 +5,7 @@ import { PhotographEmail } from '@/emails/PhotographEmail'
 import { render } from '@react-email/render'
 import { t } from '@/lib/emailTranslations'
 import { getEmailPhotoUrl } from '@/lib/photo-url'
+import { sendWeChatPhoto } from '@/lib/wechat'
 
 function calculateNextSend(prefs: { cadence: string; send_time: string }): string {
   const now  = new Date()
@@ -152,7 +153,14 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 9. Update delivery timestamps
+    // 9. Send via WeChat if the archive owner is linked
+    if (archive.wechat_open_id) {
+      const lang = archive.preferred_language ?? 'en'
+      void sendWeChatPhoto(archive.wechat_open_id, photoUrl, archive.name, lang)
+        .catch((e: unknown) => console.error('send-photo: wechat send failed:', e instanceof Error ? e.message : e))
+    }
+
+    // 10. Update delivery timestamps
     await supabaseAdmin
       .from('email_preferences')
       .update({
