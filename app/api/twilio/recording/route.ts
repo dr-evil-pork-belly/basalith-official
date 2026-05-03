@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { inngest } from '@/lib/inngest'
 import { createTrainingPairsFromVoice } from '@/lib/trainingPipeline'
 
 export const dynamic    = 'force-dynamic'
@@ -287,13 +286,12 @@ export async function POST(req: NextRequest) {
         supabaseAdmin.from('archives').select('owner_name, name, preferred_language').eq('id', archiveId).single()
       )
       if (!arch) return
-      const ids = await createTrainingPairsFromVoice(
+      await createTrainingPairsFromVoice(
         { id: vrRow.id, archive_id: archiveId, transcript, prompt: 'Phone call recording' },
         arch.owner_name || 'Unknown',
         arch.name,
         arch.preferred_language || 'en',
       )
-      ids.forEach(pairId => { void inngest.send({ name: 'training/pair-created', data: { trainingPairId: pairId } }) })
     }).catch(e => console.warn('[twilio/recording] training pairs failed:', e instanceof Error ? e.message : e))
   }
 

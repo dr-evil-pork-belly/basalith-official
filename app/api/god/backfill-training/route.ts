@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { createTrainingPairFromDeposit, scoreAndUpdatePair } from '@/lib/trainingPipeline'
+import { createTrainingPairFromDeposit } from '@/lib/trainingPipeline'
 
 export const dynamic    = 'force-dynamic'
 export const maxDuration = 300
@@ -17,7 +17,6 @@ export async function POST(req: NextRequest) {
   const body       = await req.json().catch(() => ({}))
   const archiveId  = body.archiveId as string | undefined
   const batchSize  = Math.min(parseInt(body.batchSize || '10'), 50)
-  const scoreInline = body.scoreInline === true // slow but thorough
 
   // Fetch archives
   let archivesQuery = supabaseAdmin
@@ -47,20 +46,30 @@ export async function POST(req: NextRequest) {
 
     for (const deposit of deposits ?? []) {
       try {
-        const pairId = await createTrainingPairFromDeposit(
+        // Count pairs before insert to detect idempotency skip
+        const { count: beforeCount } = await supabaseAdmin
+          .from('training_pairs')
+          .select('id', { count: 'exact', head: true })
+          .eq('source_id', deposit.id)
+          .eq('source_type', 'deposit')
+
+        await createTrainingPairFromDeposit(
           { id: deposit.id, archive_id: archive.id, prompt: deposit.prompt, response: deposit.response },
           archive.owner_name || 'Unknown',
           archive.name,
           archive.preferred_language || 'en',
         )
 
-        if (pairId) {
+        const { count: afterCount } = await supabaseAdmin
+          .from('training_pairs')
+          .select('id', { count: 'exact', head: true })
+          .eq('source_id', deposit.id)
+          .eq('source_type', 'deposit')
+
+        if ((afterCount ?? 0) > (beforeCount ?? 0)) {
           created++
-          if (scoreInline) {
-            await scoreAndUpdatePair(pairId)
-          }
         } else {
-          skipped++ // already existed
+          skipped++
         }
         processed++
       } catch (err) {
@@ -76,7 +85,6 @@ export async function POST(req: NextRequest) {
     created,
     skipped,
     errors,
-    scoreInline,
     message: `Processed ${processed} deposits across ${archives.length} archives. ${created} new pairs created.`,
   })
 }

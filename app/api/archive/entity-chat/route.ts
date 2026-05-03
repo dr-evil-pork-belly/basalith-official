@@ -2,7 +2,6 @@ import Anthropic from '@anthropic-ai/sdk'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { NextResponse } from 'next/server'
 import { resend } from '@/lib/resend'
-import { inngest } from '@/lib/inngest'
 import { createTrainingPairFromDeposit } from '@/lib/trainingPipeline'
 
 const anthropic = new Anthropic()
@@ -389,16 +388,12 @@ export async function POST(req: Request) {
             return
           }
 
-          const pairId = await createTrainingPairFromDeposit(
+          await createTrainingPairFromDeposit(
             { id: dep?.id, archive_id: archiveId, prompt: 'Entity chat deposit', response: message },
             arch.owner_name || 'Unknown',
             arch.name,
             arch.preferred_language || 'en',
           )
-
-          if (pairId) {
-            void inngest.send({ name: 'training/pair-created', data: { trainingPairId: pairId } })
-          }
         } catch (e) {
           console.error('[entity-chat] deposit/training error:', e instanceof Error ? e.message : e)
         }

@@ -191,17 +191,18 @@ function ActionBtn({
   )
 }
 
-function BackfillButton() {
+function TrainingPipelineButton({ label, url, body }: { label: string; url: string; body: object }) {
   const [state, setState] = React.useState<'idle' | 'running' | 'done' | 'error'>('idle')
   const [result, setResult] = React.useState('')
   const mono: React.CSSProperties = { fontFamily: '"Space Mono","Courier New",monospace', textTransform: 'uppercase' as const, letterSpacing: '0.15em' }
 
   async function run() {
     setState('running')
+    setResult('')
     try {
-      const res  = await fetch('/api/god/backfill-training', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ batchSize: 20 }) })
+      const res  = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
       const data = await res.json()
-      setResult(`${data.created ?? 0} new pairs from ${data.processed ?? 0} deposits`)
+      setResult(data.message ?? JSON.stringify(data).substring(0, 80))
       setState('done')
     } catch (e) {
       setResult(e instanceof Error ? e.message : 'error')
@@ -210,26 +211,30 @@ function BackfillButton() {
   }
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' as const }}>
       <button
         onClick={run}
         disabled={state === 'running'}
         style={{
-          background:    state === 'done' ? 'rgba(74,196,124,0.1)' : state === 'error' ? 'rgba(196,74,74,0.1)' : 'rgba(255,255,255,0.04)',
-          border:        '1px solid rgba(255,255,255,0.07)',
-          borderRadius:  '2px',
-          padding:       '5px 12px',
+          background:   state === 'done' ? 'rgba(74,196,124,0.1)' : state === 'error' ? 'rgba(196,74,74,0.1)' : 'rgba(255,255,255,0.04)',
+          border:       '1px solid rgba(255,255,255,0.07)',
+          borderRadius: '2px',
+          padding:      '5px 12px',
           ...mono,
-          fontSize:      '0.36rem',
-          color:         state === 'done' ? '#4AC47C' : state === 'error' ? '#C44A4A' : '#9DA3A8',
-          cursor:        state === 'running' ? 'not-allowed' : 'pointer',
+          fontSize:     '0.36rem',
+          color:        state === 'done' ? '#4AC47C' : state === 'error' ? '#C44A4A' : '#9DA3A8',
+          cursor:       state === 'running' ? 'not-allowed' : 'pointer',
         }}
       >
-        {state === 'running' ? 'Backfilling…' : state === 'done' ? '✓ Backfill Training' : 'Backfill Training Data'}
+        {state === 'running' ? '...' : state === 'done' ? `✓ ${label}` : label}
       </button>
       {result && <span style={{ ...mono, fontSize: '0.34rem', color: '#5C6166' }}>{result}</span>}
     </div>
   )
+}
+
+function BackfillButton() {
+  return <TrainingPipelineButton label="Backfill Training Data" url="/api/god/backfill-training" body={{ batchSize: 20 }} />
 }
 
 import React from 'react'
@@ -778,6 +783,7 @@ export default function GodModeClient() {
               </p>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
                 <BackfillButton />
+                <TrainingPipelineButton label="Score Unscored Pairs" url="/api/god/score-training-pairs" body={{ limit: 50 }} />
                 <a
                   href="/api/god/export-training"
                   style={{

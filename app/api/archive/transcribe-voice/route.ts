@@ -1,6 +1,5 @@
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { NextRequest, NextResponse } from 'next/server'
-import { inngest } from '@/lib/inngest'
 import { createTrainingPairsFromVoice } from '@/lib/trainingPipeline'
 
 export const maxDuration = 60
@@ -143,7 +142,7 @@ export async function POST(req: NextRequest) {
             arch.owner_name || 'Unknown',
             arch.name,
             languageDetected || arch.preferred_language || 'en',
-          ).then(ids => { ids.forEach(pairId => { void inngest.send({ name: 'training/pair-created', data: { trainingPairId: pairId } }) }) })
+          )
         })
         .catch(e => console.warn('[transcribe-voice] training pairs failed:', e instanceof Error ? e.message : e))
     }

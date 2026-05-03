@@ -1,14 +1,8 @@
 /**
  * Training Data Pipeline
  *
- * Converts archive deposits, voice recordings, and contributor answers
- * into fine-tuning training pairs. Every pair gets scored for quality
- * and marked for inclusion above a threshold.
- *
- * Design:
- *  - createTrainingPair* functions insert instantly (no Claude call)
- *  - Scoring is deferred — callers fire 'training/pair-created' Inngest event
- *  - Backfill route processes historical deposits with inline scoring
+ * Scores every pair inline at creation — no Inngest required.
+ * Each create function: idempotency check → score → insert with scores.
  */
 
 import Anthropic from '@anthropic-ai/sdk'
@@ -84,14 +78,14 @@ Return ONLY valid JSON: {"specificity":N,"authenticity":N,"trainability":N}`,
   }
 }
 
-// ── Create functions (insert only — no scoring) ───────────────────────────────
+// ── Create from deposit ───────────────────────────────────────────────────────
 
 export async function createTrainingPairFromDeposit(
   deposit: { id?: string; archive_id: string; prompt: string; response: string },
-  ownerName:  string,
+  ownerName:   string,
   archiveName: string,
   language = 'en',
-): Promise<string | null> {
+): Promise<void> {
   console.log('[training] createTrainingPairFromDeposit called —',
     'depositId:', deposit.id,
     'archiveId:', deposit.archive_id,
@@ -99,7 +93,12 @@ export async function createTrainingPairFromDeposit(
     'responseLen:', deposit.response?.length ?? 0,
   )
 
-  // Idempotency: skip if already processed
+  if (!deposit.prompt || !deposit.response || deposit.response.length < 20) {
+    console.log('[training] skipping — response too short')
+    return
+  }
+
+  // Idempotency
   if (deposit.id) {
     const { data: existing } = await supabaseAdmin
       .from('training_pairs')
@@ -109,165 +108,127 @@ export async function createTrainingPairFromDeposit(
       .maybeSingle()
     if (existing) {
       console.log('[training] pair already exists for deposit', deposit.id, '— skipping')
-      return null
+      return
     }
   }
 
-  const { data, error } = await supabaseAdmin
+  // Score inline
+  console.log('[training] scoring pair...')
+  const scores = await scoreTrainingPair(deposit.prompt, deposit.response)
+  console.log('[training] quality score:', scores.quality_score)
+
+  const { data: inserted, error: insertError } = await supabaseAdmin
     .from('training_pairs')
     .insert({
-      archive_id:    deposit.archive_id,
-      source_id:     deposit.id ?? null,
-      source_type:   'deposit',
-      prompt:        deposit.prompt,
-      completion:    deposit.response,
-      system_prompt: buildPersonSystemPrompt(ownerName, archiveName),
+      archive_id:           deposit.archive_id,
+      source_id:            deposit.id ?? null,
+      source_type:          'deposit',
+      prompt:               deposit.prompt,
+      completion:           deposit.response,
+      system_prompt:        buildPersonSystemPrompt(ownerName, archiveName),
       language,
-      word_count:    deposit.response.split(/\s+/).filter(Boolean).length,
+      word_count:           deposit.response.split(/\s+/).filter(Boolean).length,
+      included_in_training: scores.quality_score >= QUALITY_THRESHOLD,
+      ...scores,
+      metadata:             { owner_name: ownerName, archive_name: archiveName },
     })
     .select('id')
     .single()
 
-  if (error) {
-    console.error('[training] createFromDeposit INSERT FAILED:', error.message, error.details ?? '')
-    return null
+  if (insertError) {
+    console.error('[training] INSERT FAILED:', insertError.message, insertError.details ?? '')
+    return
   }
 
-  console.log('[training] pair created successfully — id:', data.id)
-  return data.id
+  console.log('[training] pair created — id:', inserted?.id, '— quality:', scores.quality_score, '— included:', scores.quality_score >= QUALITY_THRESHOLD)
 }
+
+// ── Create from voice ─────────────────────────────────────────────────────────
 
 export async function createTrainingPairsFromVoice(
   recording: { id: string; archive_id: string; transcript: string; prompt?: string },
-  ownerName:  string,
+  ownerName:   string,
   archiveName: string,
   language = 'en',
-): Promise<string[]> {
-  if (!recording.transcript || recording.transcript.length < 50) return []
+): Promise<void> {
+  if (!recording.transcript || recording.transcript.length < 50) return
 
   // Idempotency
   const { data: existing } = await supabaseAdmin
-    .from('training_pairs')
-    .select('id')
-    .eq('source_id', recording.id)
-    .eq('source_type', 'voice')
-    .limit(1)
-  if (existing && existing.length > 0) return []
+    .from('training_pairs').select('id').eq('source_id', recording.id).eq('source_type', 'voice').limit(1)
+  if (existing && existing.length > 0) return
 
   const systemPrompt = buildPersonSystemPrompt(ownerName, archiveName)
-  const ids: string[] = []
 
-  if (recording.prompt && recording.transcript.length > 50) {
-    const { data } = await supabaseAdmin
-      .from('training_pairs')
-      .insert({
-        archive_id:    recording.archive_id,
-        source_id:     recording.id,
-        source_type:   'voice',
-        prompt:        recording.prompt,
-        completion:    recording.transcript,
-        system_prompt: systemPrompt,
-        language,
-        word_count:    recording.transcript.split(/\s+/).filter(Boolean).length,
-        metadata:      { source: 'voice_recording' },
-      })
-      .select('id')
-      .single()
-    if (data) ids.push(data.id)
-    return ids
+  if (recording.prompt) {
+    const scores = await scoreTrainingPair(recording.prompt, recording.transcript)
+    await supabaseAdmin.from('training_pairs').insert({
+      archive_id: recording.archive_id, source_id: recording.id, source_type: 'voice',
+      prompt: recording.prompt, completion: recording.transcript, system_prompt: systemPrompt,
+      language, word_count: recording.transcript.split(/\s+/).filter(Boolean).length,
+      included_in_training: scores.quality_score >= QUALITY_THRESHOLD, ...scores,
+      metadata: { source: 'voice_recording' },
+    })
+    return
   }
 
-  // Extract Q&A pairs from monologue via Claude
+  // Extract Q&A pairs from monologue
   try {
     const response = await anthropic.messages.create({
-      model:      'claude-haiku-4-5-20251001',
-      max_tokens: 800,
-      messages: [{
-        role:    'user',
-        content: `Extract 2-3 Q&A pairs from this voice recording transcript where the question is something a family member might ask and the answer comes from the transcript in first person. Return ONLY a JSON array: [{"question":"...","answer":"..."}]\n\nTRANSCRIPT:\n${recording.transcript.substring(0, 1500)}`,
-      }],
+      model: 'claude-haiku-4-5-20251001', max_tokens: 800,
+      messages: [{ role: 'user', content: `Extract 2-3 Q&A pairs from this voice recording transcript where the question is something a family member might ask and the answer comes from the transcript in first person. Return ONLY a JSON array: [{"question":"...","answer":"..."}]\n\nTRANSCRIPT:\n${recording.transcript.substring(0, 1500)}` }],
     })
 
-    const text    = response.content[0].type === 'text' ? response.content[0].text.trim() : '[]'
-    const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
-    const pairs   = JSON.parse(cleaned) as { question: string; answer: string }[]
+    const text   = response.content[0].type === 'text' ? response.content[0].text.trim() : '[]'
+    const pairs  = JSON.parse(text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()) as { question: string; answer: string }[]
 
     for (const pair of pairs) {
       if (!pair.question || !pair.answer) continue
-      const { data } = await supabaseAdmin
-        .from('training_pairs')
-        .insert({
-          archive_id:    recording.archive_id,
-          source_id:     recording.id,
-          source_type:   'voice',
-          prompt:        pair.question,
-          completion:    pair.answer,
-          system_prompt: systemPrompt,
-          language,
-          word_count:    pair.answer.split(/\s+/).filter(Boolean).length,
-          metadata:      { source: 'voice_recording', extracted_from_monologue: true },
-        })
-        .select('id')
-        .single()
-      if (data) ids.push(data.id)
+      const scores = await scoreTrainingPair(pair.question, pair.answer)
+      await supabaseAdmin.from('training_pairs').insert({
+        archive_id: recording.archive_id, source_id: recording.id, source_type: 'voice',
+        prompt: pair.question, completion: pair.answer, system_prompt: systemPrompt,
+        language, word_count: pair.answer.split(/\s+/).filter(Boolean).length,
+        included_in_training: scores.quality_score >= QUALITY_THRESHOLD, ...scores,
+        metadata: { source: 'voice_recording', extracted_from_monologue: true },
+      })
     }
   } catch (err) {
-    console.error('[trainingPipeline] voice extraction failed:', err instanceof Error ? err.message : err)
+    console.error('[training] voice extraction failed:', err instanceof Error ? err.message : err)
   }
-
-  return ids
 }
 
+// ── Create from contributor ───────────────────────────────────────────────────
+
 export async function createTrainingPairFromContributor(
-  obs: {
-    archive_id:        string
-    contributor_name:  string
-    relationship:      string
-    question:          string
-    answer:            string
-  },
-  ownerName:  string,
+  obs: { archive_id: string; contributor_name: string; relationship: string; question: string; answer: string },
+  ownerName:   string,
   archiveName: string,
   language = 'en',
-): Promise<string | null> {
+): Promise<void> {
   const prompt     = `What do people who know you say about ${obs.question.toLowerCase().replace(/\?$/, '')}?`
   const completion = `${obs.contributor_name}, who has known me as my ${obs.relationship}, once said: "${obs.answer}"`
 
-  const { data, error } = await supabaseAdmin
-    .from('training_pairs')
-    .insert({
-      archive_id:    obs.archive_id,
-      source_type:   'contributor',
-      prompt,
-      completion,
-      system_prompt: buildPersonSystemPrompt(ownerName, archiveName),
-      language,
-      word_count:    completion.split(/\s+/).filter(Boolean).length,
-      metadata:      { contributor_name: obs.contributor_name, relationship: obs.relationship, original_question: obs.question },
-    })
-    .select('id')
-    .single()
+  const scores = await scoreTrainingPair(prompt, completion)
 
-  if (error) {
-    console.error('[trainingPipeline] createFromContributor failed:', error.message)
-    return null
-  }
-  return data.id
+  const { error } = await supabaseAdmin.from('training_pairs').insert({
+    archive_id: obs.archive_id, source_type: 'contributor',
+    prompt, completion, system_prompt: buildPersonSystemPrompt(ownerName, archiveName),
+    language, word_count: completion.split(/\s+/).filter(Boolean).length,
+    included_in_training: scores.quality_score >= QUALITY_THRESHOLD, ...scores,
+    metadata: { contributor_name: obs.contributor_name, relationship: obs.relationship, original_question: obs.question },
+  })
+
+  if (error) console.error('[training] createFromContributor failed:', error.message)
 }
 
-// ── Score and update an existing pair ────────────────────────────────────────
+// ── Score existing unscored pair ──────────────────────────────────────────────
 
 export async function scoreAndUpdatePair(trainingPairId: string): Promise<void> {
   const { data: pair } = await supabaseAdmin
-    .from('training_pairs')
-    .select('prompt, completion')
-    .eq('id', trainingPairId)
-    .single()
-
+    .from('training_pairs').select('prompt, completion').eq('id', trainingPairId).single()
   if (!pair) return
-
   const scores = await scoreTrainingPair(pair.prompt, pair.completion)
-
   await supabaseAdmin
     .from('training_pairs')
     .update({ ...scores, included_in_training: scores.quality_score >= QUALITY_THRESHOLD })
@@ -278,51 +239,42 @@ export async function scoreAndUpdatePair(trainingPairId: string): Promise<void> 
 
 export async function exportTrainingData(archiveId: string): Promise<string> {
   const { data: pairs } = await supabaseAdmin
-    .from('training_pairs')
-    .select('prompt, completion, system_prompt')
-    .eq('archive_id', archiveId)
-    .eq('included_in_training', true)
-    .gte('quality_score', QUALITY_THRESHOLD)
-    .order('quality_score', { ascending: false })
+    .from('training_pairs').select('prompt, completion, system_prompt')
+    .eq('archive_id', archiveId).eq('included_in_training', true)
+    .gte('quality_score', QUALITY_THRESHOLD).order('quality_score', { ascending: false })
 
   if (!pairs?.length) return ''
 
-  return pairs
-    .map(p =>
-      JSON.stringify({
-        messages: [
-          { role: 'system',    content: p.system_prompt || 'You are a specific person. Answer as them.' },
-          { role: 'user',      content: p.prompt },
-          { role: 'assistant', content: p.completion },
-        ],
-      })
-    )
-    .join('\n')
+  return pairs.map(p => JSON.stringify({
+    messages: [
+      { role: 'system',    content: p.system_prompt || 'You are a specific person. Answer as them.' },
+      { role: 'user',      content: p.prompt },
+      { role: 'assistant', content: p.completion },
+    ],
+  })).join('\n')
 }
 
 // ── Stats ─────────────────────────────────────────────────────────────────────
 
 export async function getTrainingStats(archiveId: string): Promise<{
-  total:                number
-  included:             number
-  bySource:             Record<string, number>
-  avgQuality:           number
-  readyForFineTuning:   boolean
-  estimatedAccuracy:    string
+  total:              number
+  included:           number
+  bySource:           Record<string, number>
+  avgQuality:         number
+  readyForFineTuning: boolean
+  estimatedAccuracy:  string
 }> {
   const { data: pairs } = await supabaseAdmin
-    .from('training_pairs')
-    .select('source_type, quality_score, included_in_training')
-    .eq('archive_id', archiveId)
+    .from('training_pairs').select('source_type, quality_score, included_in_training').eq('archive_id', archiveId)
 
   if (!pairs?.length) {
     return { total: 0, included: 0, bySource: {}, avgQuality: 0, readyForFineTuning: false, estimatedAccuracy: 'No data yet' }
   }
 
-  const included     = pairs.filter(p => p.included_in_training).length
-  const bySource     = pairs.reduce<Record<string, number>>((acc, p) => { acc[p.source_type] = (acc[p.source_type] ?? 0) + 1; return acc }, {})
-  const scores       = pairs.map(p => p.quality_score).filter((s): s is number => s !== null)
-  const avgQuality   = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0
+  const included   = pairs.filter(p => p.included_in_training).length
+  const bySource   = pairs.reduce<Record<string, number>>((acc, p) => { acc[p.source_type] = (acc[p.source_type] ?? 0) + 1; return acc }, {})
+  const scores     = pairs.map(p => p.quality_score).filter((s): s is number => s !== null)
+  const avgQuality = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0
 
   const estimatedAccuracy =
     included < 50   ? 'Too early to estimate' :
