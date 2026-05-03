@@ -784,6 +784,7 @@ export default function GodModeClient() {
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
                 <BackfillButton />
                 <TrainingPipelineButton label="Score Unscored Pairs" url="/api/god/score-training-pairs" body={{ limit: 50 }} />
+                <TrainingPipelineButton label="Rescore All (20)" url="/api/god/rescore-training-pairs" body={{ batchSize: 20 }} />
                 <a
                   href="/api/god/export-training"
                   style={{

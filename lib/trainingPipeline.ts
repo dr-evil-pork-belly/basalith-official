@@ -10,7 +10,7 @@ import { supabaseAdmin } from './supabase-admin'
 
 const anthropic = new Anthropic()
 
-const QUALITY_THRESHOLD = 60
+const QUALITY_THRESHOLD = 50
 
 function buildPersonSystemPrompt(ownerName: string, archiveName: string): string {
   return `You are ${ownerName}. You think, speak, and reason exactly as ${ownerName} does.
@@ -35,22 +35,48 @@ export async function scoreTrainingPair(
 }> {
   const wordCount    = completion.split(/\s+/).filter(Boolean).length
   const length_score =
-    wordCount < 20  ? 2 :
-    wordCount < 50  ? 4 :
-    wordCount < 100 ? 6 :
+    wordCount < 10  ? 1 :
+    wordCount < 20  ? 3 :
+    wordCount < 50  ? 5 :
+    wordCount < 100 ? 7 :
     wordCount < 200 ? 8 :
     wordCount < 500 ? 9 : 10
 
   try {
     const response = await anthropic.messages.create({
       model:      'claude-haiku-4-5-20251001',
-      max_tokens: 150,
+      max_tokens: 300,
       messages: [{
         role:    'user',
-        content: `Score this AI training pair 0-10 on each dimension.
-PROMPT: ${prompt.substring(0, 200)}
-COMPLETION: ${completion.substring(0, 400)}
-Return ONLY valid JSON: {"specificity":N,"authenticity":N,"trainability":N}`,
+        content: `You are evaluating training data quality for an AI model being trained to replicate a specific person's thinking and speaking patterns.
+
+Score this training pair honestly. Be strict. Most pairs should score 3-7. Only exceptional pairs score 8-10. Short or generic responses score 1-3.
+
+PROMPT: "${prompt.substring(0, 200)}"
+
+COMPLETION: "${completion.substring(0, 400)}"
+
+WORD COUNT: ${wordCount}
+
+Score each dimension 1-10:
+
+SPECIFICITY: Does it contain specific details, names, dates, places, or personal memories?
+(1 = completely generic like "I worked hard", 5 = some personal detail, 10 = very specific: names, dates, places)
+
+AUTHENTICITY: Does it sound like a real person speaking naturally in their own voice?
+(1 = formal/generic/robotic, 5 = somewhat natural, 10 = clearly a real person's natural voice)
+
+TRAINABILITY: How much does this teach the model about how this specific person thinks, reasons, or sees the world?
+(1 = pure fact with no reasoning shown, 5 = some personality visible, 10 = clearly reveals how this person thinks)
+
+Important scoring notes:
+- Under 20 words → specificity max 3
+- Generic statements → authenticity max 4
+- Pure facts → trainability max 3
+- Scores of exactly 5 should be rare — actually evaluate and differentiate
+
+Return ONLY this JSON, no other text:
+{"specificity":<1-10>,"authenticity":<1-10>,"trainability":<1-10>,"reasoning":"<one sentence>"}`,
       }],
     })
 
@@ -58,17 +84,20 @@ Return ONLY valid JSON: {"specificity":N,"authenticity":N,"trainability":N}`,
     const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
     const scores  = JSON.parse(cleaned)
 
-    const clamp = (v: unknown) => Math.min(10, Math.max(0, Math.round(Number(v) || 5)))
+    console.log('[training] scoring reasoning:', scores.reasoning || 'none')
+
+    const clamp = (v: unknown) => Math.min(10, Math.max(1, Math.round(Number(v) || 5)))
 
     const specificity_score  = clamp(scores.specificity)
     const authenticity_score = clamp(scores.authenticity)
     const trainability_score = clamp(scores.trainability)
 
+    // Weighted formula: specificity 30% + authenticity 25% + trainability 30% + length 15%
     const quality_score = Math.round(
-      specificity_score  * 2.5 +
+      specificity_score  * 3.0 +
       authenticity_score * 2.5 +
-      trainability_score * 2.5 +
-      length_score       * 2.5,
+      trainability_score * 3.0 +
+      length_score       * 1.5,
     )
 
     return { quality_score, specificity_score, authenticity_score, trainability_score, length_score }
