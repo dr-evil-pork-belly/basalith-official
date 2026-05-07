@@ -2,7 +2,21 @@
 
 import { useState, useEffect, useCallback } from 'react'
 
-type Status = 'New' | 'Contacted' | 'Demo' | 'Proposal' | 'Closed' | 'Lost'
+const C = {
+  bg:      '#0A0908',
+  surface: '#111110',
+  border:  'rgba(255,255,255,0.06)',
+  gold:    '#C4A24A',
+  text:    '#F0EDE6',
+  muted:   '#9DA3A8',
+  dim:     '#5C6166',
+  ghost:   '#3A3F44',
+  green:   '#4CAF50',
+  yellow:  '#FFC107',
+  red:     '#E57373',
+}
+
+type Status = 'New' | 'Contacted' | 'Demo' | 'Proposal' | 'Closed' | 'Lost' | 'Payment Pending' | 'Active Client'
 type Tier   = '' | 'Archive' | 'Estate' | 'Dynasty'
 
 type Prospect = {
@@ -11,194 +25,301 @@ type Prospect = {
   contact:      string
   status:       Status
   tier:         Tier
-  last_contact: string
-  next_action:  string
-  notes:        string
+  last_contact: string | null
+  next_action:  string | null
+  notes:        string | null
+  updated_at:   string
   created_at:   string
 }
 
-const STATUSES: Status[] = ['New', 'Contacted', 'Demo', 'Proposal', 'Closed', 'Lost']
-const TIERS:   Tier[]    = ['', 'Archive', 'Estate', 'Dynasty']
+const STAGES: Status[] = ['New', 'Contacted', 'Demo', 'Proposal', 'Payment Pending', 'Active Client']
 
-const STATUS_COLOR: Record<Status, string> = {
-  New:       '#5C6166',
-  Contacted: '#9DA3A8',
-  Demo:      '#C4A24A',
-  Proposal:  '#FFB347',
-  Closed:    '#4CAF50',
-  Lost:      '#444',
+const STAGE_COLOR: Record<string, string> = {
+  'New':             C.dim,
+  'Contacted':       C.muted,
+  'Demo':            C.gold,
+  'Proposal':        C.gold,
+  'Payment Pending': C.yellow,
+  'Active Client':   C.green,
+  'Closed':          C.green,
+  'Lost':            C.red,
 }
 
-const EMPTY_FORM = {
-  name: '', contact: '', status: 'New' as Status, tier: '' as Tier,
-  last_contact: '', next_action: '', notes: '',
+const TIER_LABEL: Record<string, string> = {
+  Archive: 'Archive · $1,800/yr',
+  Estate:  'Estate · $3,600/yr',
+  Dynasty: 'Dynasty · $9,600/yr',
 }
 
-export default function PipelineClient({ archivistId }: { archivistId: string }) {
-  const [prospects, setProspects] = useState<Prospect[]>([])
-  const [filter,    setFilter]    = useState<Status | 'all'>('all')
-  const [adding,    setAdding]    = useState(false)
-  const [saving,    setSaving]    = useState(false)
-  const [form,      setForm]      = useState(EMPTY_FORM)
-  const [loading,   setLoading]   = useState(true)
+function daysSince(dateStr: string | null): number {
+  if (!dateStr) return 999
+  return Math.floor((Date.now() - new Date(dateStr).getTime()) / 86_400_000)
+}
 
-  const loadProspects = useCallback(async () => {
-    try {
-      const res = await fetch(`/api/archivist/prospects?archivistId=${archivistId}`)
-      if (!res.ok) throw new Error('API error')
-      const data = await res.json()
-      setProspects(data.prospects ?? [])
-    } catch {
-      setProspects([])
-    } finally {
-      setLoading(false)
-    }
-  }, [archivistId])
+function healthColor(days: number): string {
+  if (days <= 7)  return C.green
+  if (days <= 21) return C.gold
+  return C.red
+}
 
-  useEffect(() => { loadProspects() }, [loadProspects])
+// ── Card ──────────────────────────────────────────────────────────────────────
 
-  function setField(key: keyof typeof EMPTY_FORM) {
-    return (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
-      setForm(f => ({ ...f, [key]: e.target.value }))
-  }
+function ProspectCard({
+  prospect, onEdit, onAdvance,
+}: {
+  prospect: Prospect
+  onEdit:    (p: Prospect) => void
+  onAdvance: (id: string, toStatus: Status) => void
+}) {
+  const days    = daysSince(prospect.updated_at)
+  const stageIdx = STAGES.indexOf(prospect.status)
+  const next    = stageIdx >= 0 && stageIdx < STAGES.length - 1 ? STAGES[stageIdx + 1] : null
 
-  async function addProspect() {
-    if (!form.name.trim()) return
+  return (
+    <div
+      style={{ background: C.surface, border: `1px solid ${C.border}`, padding: '14px', borderLeft: `2px solid ${STAGE_COLOR[prospect.status] ?? C.dim}`, cursor: 'pointer', transition: 'border-color 0.12s' }}
+      onClick={() => onEdit(prospect)}
+    >
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', marginBottom: '6px' }}>
+        <p style={{ fontFamily: 'Georgia, serif', fontSize: '0.9rem', color: C.text, lineHeight: 1.3 }}>{prospect.name}</p>
+        <span style={{ fontFamily: 'Courier New, monospace', fontSize: '0.52rem', letterSpacing: '0.1em', color: healthColor(days), flexShrink: 0 }}>{days}d</span>
+      </div>
+      {prospect.tier && (
+        <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.55rem', letterSpacing: '0.1em', color: C.gold, marginBottom: '4px' }}>{prospect.tier}</p>
+      )}
+      {prospect.next_action && (
+        <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: '0.8rem', color: C.muted, lineHeight: 1.4, marginBottom: '8px' }}>{prospect.next_action}</p>
+      )}
+      {next && prospect.status !== 'Active Client' && (
+        <button
+          onClick={e => { e.stopPropagation(); onAdvance(prospect.id, next) }}
+          style={{ fontFamily: 'Courier New, monospace', fontSize: '0.52rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: C.dim, background: 'transparent', border: `1px solid ${C.border}`, padding: '4px 8px', cursor: 'pointer' }}
+        >
+          → {next}
+        </button>
+      )}
+    </div>
+  )
+}
+
+// ── Edit modal ────────────────────────────────────────────────────────────────
+
+function EditModal({
+  prospect, archivistId, onSave, onClose, onDelete,
+}: {
+  prospect:    Prospect | null
+  archivistId: string
+  onSave:      (p: Prospect) => void
+  onClose:     () => void
+  onDelete:    (id: string) => void
+}) {
+  const [form,   setForm]   = useState<Partial<Prospect>>({})
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    setForm(prospect ?? { status: 'New', tier: '', name: '', contact: '', next_action: '', notes: '' })
+  }, [prospect])
+
+  const isNew = !prospect?.id
+
+  async function handleSave() {
     setSaving(true)
     try {
-      const res = await fetch('/api/archivist/prospects', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ ...form, archivistId }),
+      const method = isNew ? 'POST' : 'PATCH'
+      const body   = isNew
+        ? { archivistId, ...form }
+        : { id: prospect?.id, ...form }
+      const res    = await fetch('/api/archivist/prospects', {
+        method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
       })
-      if (!res.ok) throw new Error('Save failed')
       const data = await res.json()
-      setProspects(prev => [data.prospect, ...prev])
-      setForm(EMPTY_FORM)
-      setAdding(false)
-    } catch {
-      // keep form open on error
+      if (res.ok) onSave(data)
     } finally {
       setSaving(false)
     }
   }
 
-  async function updateStatus(id: string, status: Status) {
-    setProspects(prev => prev.map(p => p.id === id ? { ...p, status } : p))
-    await fetch('/api/archivist/prospects', {
-      method:  'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ id, status, archivistId }),
-    })
+  async function handleDelete() {
+    if (!prospect?.id) return
+    if (!confirm('Remove this prospect?')) return
+    await fetch('/api/archivist/prospects', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: prospect.id }) })
+    onDelete(prospect.id)
   }
 
-  async function deleteProspect(id: string) {
-    setProspects(prev => prev.filter(p => p.id !== id))
-    await fetch(`/api/archivist/prospects?id=${id}&archivistId=${archivistId}`, { method: 'DELETE' })
-  }
-
-  const filtered = filter === 'all' ? prospects : prospects.filter(p => p.status === filter)
-
-  const inputCls = 'bg-obsidian-deep border border-border-subtle rounded-sm px-3 py-2 font-sans text-[0.82rem] text-text-primary placeholder:text-text-muted focus:outline-none focus:border-amber/40 transition-colors duration-200 w-full'
+  const inputStyle = { width: '100%', background: '#0A0908', border: `1px solid rgba(255,255,255,0.1)`, color: C.text, fontFamily: 'Georgia, serif', fontSize: '0.9rem', padding: '10px 12px', boxSizing: 'border-box' as const }
+  const labelStyle = { fontFamily: 'Courier New, monospace', fontSize: '0.58rem', letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: C.dim, display: 'block', marginBottom: '6px' }
 
   return (
-    <div className="max-w-5xl">
+    <div onClick={e => e.target === e.currentTarget && onClose()} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
+      <div style={{ background: '#111110', border: `1px solid ${C.border}`, padding: '28px', width: '100%', maxWidth: '520px', maxHeight: '90vh', overflowY: 'auto' }}>
+        <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.6rem', letterSpacing: '0.24em', textTransform: 'uppercase', color: C.gold, marginBottom: '20px' }}>
+          {isNew ? 'Add Prospect' : 'Edit Prospect'}
+        </p>
 
-      <div className="flex items-start justify-between gap-4 mb-8 flex-wrap">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {[
+            { key: 'name',        label: 'Client Name',   type: 'text' },
+            { key: 'contact',     label: 'Email / Phone', type: 'text' },
+            { key: 'next_action', label: 'Next Action',   type: 'text' },
+            { key: 'notes',       label: 'Notes',         type: 'textarea' },
+          ].map(({ key, label, type }) => (
+            <div key={key}>
+              <label style={labelStyle}>{label}</label>
+              {type === 'textarea' ? (
+                <textarea value={(form as Record<string, string>)[key] ?? ''} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))} style={{ ...inputStyle, minHeight: '80px', resize: 'vertical' }} />
+              ) : (
+                <input type="text" value={(form as Record<string, string>)[key] ?? ''} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))} style={inputStyle} />
+              )}
+            </div>
+          ))}
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div>
+              <label style={labelStyle}>Status</label>
+              <select value={form.status ?? 'New'} onChange={e => setForm(f => ({ ...f, status: e.target.value as Status }))} style={{ ...inputStyle }}>
+                {[...STAGES, 'Lost'].map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={labelStyle}>Tier</label>
+              <select value={form.tier ?? ''} onChange={e => setForm(f => ({ ...f, tier: e.target.value as Tier }))} style={{ ...inputStyle }}>
+                <option value="">— Select —</option>
+                {['Archive', 'Estate', 'Dynasty'].map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', gap: '10px', marginTop: '24px', justifyContent: 'space-between' }}>
+          {!isNew && (
+            <button onClick={handleDelete} style={{ fontFamily: 'Courier New, monospace', fontSize: '0.58rem', color: C.red, background: 'transparent', border: `1px solid rgba(229,115,115,0.2)`, padding: '8px 14px', cursor: 'pointer' }}>Delete</button>
+          )}
+          <div style={{ display: 'flex', gap: '10px', marginLeft: 'auto' }}>
+            <button onClick={onClose} style={{ fontFamily: 'Courier New, monospace', fontSize: '0.58rem', color: C.dim, background: 'transparent', border: `1px solid ${C.border}`, padding: '8px 14px', cursor: 'pointer' }}>Cancel</button>
+            <button onClick={handleSave} disabled={saving} style={{ fontFamily: 'Courier New, monospace', fontSize: '0.58rem', color: '#0A0908', background: saving ? 'rgba(196,162,74,0.5)' : C.gold, border: 'none', padding: '8px 18px', cursor: 'pointer' }}>
+              {saving ? 'Saving…' : 'Save'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── Main ──────────────────────────────────────────────────────────────────────
+
+export default function PipelineClient({ archivistId }: { archivistId: string }) {
+  const [prospects, setProspects] = useState<Prospect[]>([])
+  const [loading,   setLoading]   = useState(true)
+  const [editing,   setEditing]   = useState<Prospect | null | 'new'>('__unset__' as unknown as null)
+  const [filter,    setFilter]    = useState<Status | 'all'>('all')
+
+  const load = useCallback(async () => {
+    const res  = await fetch(`/api/archivist/prospects?archivistId=${archivistId}`)
+    const data = await res.json()
+    setProspects(data.prospects ?? data ?? [])
+    setLoading(false)
+  }, [archivistId])
+
+  useEffect(() => { load() }, [load])
+  useEffect(() => { setEditing(null) }, []) // init to null after mount
+
+  async function handleAdvance(id: string, toStatus: Status) {
+    await fetch('/api/archivist/prospects', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, status: toStatus }) })
+    setProspects(prev => prev.map(p => p.id === id ? { ...p, status: toStatus } : p))
+  }
+
+  function handleSave(saved: Prospect) {
+    setProspects(prev => {
+      const idx = prev.findIndex(p => p.id === saved.id)
+      if (idx >= 0) { const n = [...prev]; n[idx] = saved; return n }
+      return [saved, ...prev]
+    })
+    setEditing(null)
+  }
+
+  function handleDelete(id: string) {
+    setProspects(prev => prev.filter(p => p.id !== id))
+    setEditing(null)
+  }
+
+  const filtered  = filter === 'all' ? prospects : prospects.filter(p => p.status === filter)
+  const byStage   = STAGES.reduce<Record<string, Prospect[]>>((acc, s) => ({ ...acc, [s]: filtered.filter(p => p.status === s) }), {})
+  const lostCount = prospects.filter(p => p.status === 'Lost').length
+
+  return (
+    <div style={{ padding: 'clamp(24px,5vw,48px)' }}>
+
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
-          <p className="font-sans text-[0.62rem] font-bold tracking-[0.2em] uppercase mb-2" style={{ color: '#C4A24A' }}>Pipeline</p>
-          <h1 className="font-serif font-semibold text-text-primary tracking-[-0.025em]" style={{ fontSize: 'clamp(1.8rem,3vw,2.5rem)' }}>
-            My Prospects
-          </h1>
+          <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.58rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: C.dim, marginBottom: '6px' }}>My Practice</p>
+          <h1 style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.4rem,2.5vw,1.9rem)', fontWeight: 300, color: C.text }}>CRM Pipeline</h1>
         </div>
-        <button onClick={() => setAdding(true)} className="btn-monolith-amber flex-shrink-0">+ Add Prospect</button>
-      </div>
-
-      <div className="flex gap-2 flex-wrap mb-6">
-        {(['all', ...STATUSES] as const).map(s => (
-          <button key={s} onClick={() => setFilter(s)} className="font-sans text-[0.68rem] font-medium tracking-[0.06em] rounded-sm px-3 py-1.5 border transition-all duration-150"
-            style={filter === s
-              ? { background: '#C4A24A', borderColor: '#C4A24A', color: '#0C0C0D' }
-              : { background: 'transparent', borderColor: 'rgba(255,255,255,0.08)', color: '#5C6166' }}>
-            {s === 'all' ? 'All' : s}
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <select value={filter} onChange={e => setFilter(e.target.value as typeof filter)} style={{ fontFamily: 'Courier New, monospace', fontSize: '0.62rem', letterSpacing: '0.08em', background: C.surface, border: `1px solid ${C.border}`, color: C.muted, padding: '8px 12px' }}>
+            <option value="all">All Stages</option>
+            {[...STAGES, 'Lost'].map(s => <option key={s} value={s}>{s}</option>)}
+          </select>
+          <button onClick={() => setEditing({} as Prospect)} style={{ fontFamily: 'Courier New, monospace', fontSize: '0.62rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#0A0908', background: C.gold, border: 'none', padding: '8px 16px', cursor: 'pointer' }}>
+            + Add Prospect
           </button>
-        ))}
+        </div>
       </div>
 
-      {adding && (
-        <div className="rounded-sm border px-6 py-6 mb-6" style={{ background: '#111112', borderColor: 'rgba(196,162,74,0.15)' }}>
-          <p className="font-sans text-[0.62rem] font-bold tracking-[0.18em] uppercase mb-5" style={{ color: 'rgba(196,162,74,0.7)' }}>New Prospect</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
-            <input className={inputCls} placeholder="Name"                      value={form.name}         onChange={setField('name')}         />
-            <input className={inputCls} placeholder="Contact (email / phone)"   value={form.contact}      onChange={setField('contact')}      />
-            <input className={inputCls} placeholder="Next action"               value={form.next_action}  onChange={setField('next_action')}  />
-            <select className={inputCls} value={form.status} onChange={setField('status')}>
-              {STATUSES.map(s => <option key={s} value={s} style={{ background: '#111112' }}>{s}</option>)}
-            </select>
-            <select className={inputCls} value={form.tier} onChange={setField('tier')}>
-              <option value="" style={{ background: '#111112' }}>Tier unknown</option>
-              {TIERS.filter(Boolean).map(t => <option key={t} value={t} style={{ background: '#111112' }}>{t}</option>)}
-            </select>
-            <input className={inputCls} type="date" value={form.last_contact} onChange={setField('last_contact')} />
+      {/* Summary row */}
+      <div style={{ display: 'flex', gap: '12px', marginBottom: '28px', flexWrap: 'wrap' }}>
+        {STAGES.map(stage => {
+          const count = byStage[stage]?.length ?? 0
+          return (
+            <div key={stage} style={{ background: C.surface, border: `1px solid ${count > 0 ? STAGE_COLOR[stage] + '30' : C.border}`, padding: '10px 16px', cursor: 'pointer' }} onClick={() => setFilter(filter === stage ? 'all' : stage as Status)}>
+              <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.55rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: C.ghost, marginBottom: '3px' }}>{stage}</p>
+              <p style={{ fontFamily: 'Georgia, serif', fontSize: '1.2rem', fontWeight: 300, color: count > 0 ? (STAGE_COLOR[stage] ?? C.text) : C.ghost }}>{count}</p>
+            </div>
+          )
+        })}
+        {lostCount > 0 && (
+          <div style={{ background: C.surface, border: `1px solid ${C.border}`, padding: '10px 16px', opacity: 0.5 }}>
+            <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.55rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: C.ghost, marginBottom: '3px' }}>Lost</p>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: '1.2rem', fontWeight: 300, color: C.ghost }}>{lostCount}</p>
           </div>
-          <textarea className={inputCls + ' resize-none mb-4'} rows={2} placeholder="Notes (optional)" value={form.notes} onChange={setField('notes')} />
-          <div className="flex gap-3">
-            <button onClick={addProspect} disabled={saving} className="btn-monolith-amber disabled:opacity-50">{saving ? 'Saving…' : 'Save Prospect'}</button>
-            <button onClick={() => { setAdding(false); setForm(EMPTY_FORM) }} className="btn-monolith-ghost">Cancel</button>
-          </div>
-        </div>
-      )}
+        )}
+      </div>
 
-      {loading && (
-        <div className="rounded-sm border border-border-subtle px-6 py-14 text-center" style={{ background: '#111112' }}>
-          <p className="font-serif italic text-text-muted" style={{ fontSize: '0.95rem' }}>Loading pipeline…</p>
-        </div>
-      )}
-
-      {!loading && filtered.length === 0 && (
-        <div className="rounded-sm border border-border-subtle px-6 py-14 text-center" style={{ background: '#111112' }}>
-          <p className="font-serif italic text-text-muted" style={{ fontSize: '0.95rem' }}>
-            {prospects.length === 0 ? 'No prospects yet. Add your first one above.' : 'No prospects match this filter.'}
-          </p>
-        </div>
-      )}
-
-      {!loading && filtered.length > 0 && (
-        <div className="rounded-sm border border-border-subtle overflow-hidden" style={{ background: '#111112' }}>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                  {['Name', 'Contact', 'Status', 'Tier', 'Last Contact', 'Next Action', ''].map(h => (
-                    <th key={h} className="text-left px-4 py-3 font-sans text-[0.56rem] font-bold tracking-[0.14em] uppercase text-text-muted whitespace-nowrap">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map(({ id, name, contact, status, tier, last_contact, next_action }, i) => (
-                  <tr key={id} style={i < filtered.length - 1 ? { borderBottom: '1px solid rgba(255,255,255,0.06)' } : {}}>
-                    <td className="px-4 py-3 font-sans text-[0.82rem] font-medium text-text-primary whitespace-nowrap">{name}</td>
-                    <td className="px-4 py-3 font-sans text-[0.78rem] text-text-muted">{contact || '—'}</td>
-                    <td className="px-4 py-3">
-                      <select value={status} onChange={e => updateStatus(id, e.target.value as Status)}
-                        className="bg-transparent font-sans text-[0.72rem] font-medium cursor-pointer outline-none" style={{ color: STATUS_COLOR[status] }}>
-                        {STATUSES.map(s => <option key={s} value={s} style={{ background: '#111112', color: '#9DA3A8' }}>{s}</option>)}
-                      </select>
-                    </td>
-                    <td className="px-4 py-3 font-sans text-[0.78rem] text-text-muted">{tier || '—'}</td>
-                    <td className="px-4 py-3 font-sans text-[0.75rem] text-text-muted whitespace-nowrap">{last_contact || '—'}</td>
-                    <td className="px-4 py-3 font-sans text-[0.78rem] text-text-secondary">{next_action || '—'}</td>
-                    <td className="px-4 py-3">
-                      <button onClick={() => deleteProspect(id)} className="font-sans text-[0.65rem] text-text-muted transition-colors duration-150" aria-label={`Remove ${name}`}>×</button>
-                    </td>
-                  </tr>
+      {loading ? (
+        <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.65rem', letterSpacing: '0.2em', color: C.dim }}>Loading…</p>
+      ) : (
+        /* Kanban board */
+        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${STAGES.length}, minmax(180px, 1fr))`, gap: '12px', overflowX: 'auto' }}>
+          {STAGES.map(stage => (
+            <div key={stage}>
+              <div style={{ padding: '10px 0', marginBottom: '10px', borderBottom: `2px solid ${STAGE_COLOR[stage] ?? C.border}` }}>
+                <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.6rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: STAGE_COLOR[stage] ?? C.dim }}>
+                  {stage} <span style={{ color: C.ghost }}>({byStage[stage]?.length ?? 0})</span>
+                </p>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {(byStage[stage] ?? []).map(p => (
+                  <ProspectCard key={p.id} prospect={p} onEdit={setEditing} onAdvance={handleAdvance} />
                 ))}
-              </tbody>
-            </table>
-          </div>
+                {(byStage[stage]?.length ?? 0) === 0 && (
+                  <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.58rem', color: C.ghost, padding: '12px 0' }}>None</p>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
+      {editing !== null && editing !== ('__unset__' as unknown as null) && (
+        <EditModal
+          prospect={editing === ({} as Prospect) ? null : editing as Prospect}
+          archivistId={archivistId}
+          onSave={handleSave}
+          onClose={() => setEditing(null)}
+          onDelete={handleDelete}
+        />
+      )}
     </div>
   )
 }

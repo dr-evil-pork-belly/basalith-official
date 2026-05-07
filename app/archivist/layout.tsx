@@ -4,131 +4,172 @@ import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 
 const NAV = [
-  { label: 'Dashboard',   href: '/archivist/dashboard'   },
-  { label: 'My Pipeline', href: '/archivist/pipeline'    },
-  { label: 'Earnings',    href: '/archivist/earnings'    },
-  { label: 'Leaderboard', href: '/archivist/leaderboard' },
-  { label: 'Training',    href: '/archivist/training'    },
-  { label: 'Resources',   href: '/archivist/resources'   },
+  { label: 'Dashboard',     href: '/archivist/dashboard',      icon: '⬡' },
+  { label: 'My Practice',   href: '/archivist/pipeline',       icon: '◈' },
+  { label: 'Earnings',      href: '/archivist/earnings',       icon: '◇' },
+  { label: 'Marketing',     href: '/archivist/marketing',      icon: '◻' },
+  { label: 'Certification', href: '/archivist/certification',  icon: '◎' },
+  { label: 'Settings',      href: '/archivist/settings',       icon: '⚙' },
 ]
 
 export default function ArchivistLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: '#0C0C0D' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', background: '#0A0908' }}>
 
-      {/* Top header */}
-      <header
-        className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-b border-border-subtle"
-        style={{ background: '#111112' }}
+      {/* ── Left Sidebar ── */}
+      <aside
+        className="hidden md:flex"
+        style={{
+          width:       '220px',
+          flexShrink:  0,
+          background:  '#0F0E0D',
+          borderRight: '1px solid rgba(255,255,255,0.06)',
+          display:     'flex',
+          flexDirection: 'column',
+        }}
       >
-        <Link
-          href="/"
-          className="font-sans text-[0.75rem] font-bold tracking-[0.24em] uppercase text-text-primary no-underline inline-flex items-baseline gap-0"
-        >
-          Basalith
-          <span style={{ color: 'rgba(196,162,74,0.5)', margin: '0 0.3em' }} aria-hidden="true">&middot;</span>
-          <span style={{ fontStyle: 'italic', fontWeight: 300, color: 'var(--text-muted)', fontSize: '0.85em', textTransform: 'lowercase', letterSpacing: '0.08em' }}>xyz</span>
-        </Link>
-        <span
-          className="font-sans font-bold tracking-[0.22em] uppercase"
-          style={{ fontSize: '0.55rem', color: '#C4A24A' }}
-        >
-          Legacy Guide Portal
-        </span>
-      </header>
-
-      <div className="flex flex-1 overflow-hidden">
-
-        {/* Sidebar — desktop */}
-        <aside
-          className="hidden md:flex flex-shrink-0 flex-col w-52 border-r border-border-subtle"
-          style={{ background: '#111112' }}
-        >
-          <nav className="flex-1 py-6 px-3 flex flex-col gap-0.5">
-            <a
-              href="/archivist/onboard"
-              className="flex items-center justify-center font-sans text-[0.72rem] font-bold tracking-[0.12em] uppercase no-underline mb-4 py-2.5 px-3 rounded-sm transition-all duration-150"
-              style={{ background: '#C4A24A', color: '#0A0908' }}
-            >
-              + New Client
-            </a>
-            {NAV.map(({ label, href }) => {
-              const active = pathname === href
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  className="flex items-center font-sans text-[0.75rem] font-medium tracking-[0.04em] px-3 py-2.5 rounded-sm no-underline transition-all duration-150"
-                  style={{
-                    color:       active ? '#F0F0EE' : '#5C6166',
-                    background:  active ? 'rgba(255,255,255,0.05)' : 'transparent',
-                    borderLeft:  `2px solid ${active ? '#C4A24A' : 'transparent'}`,
-                    paddingLeft: '10px',
-                  }}
-                >
-                  {label}
-                </Link>
-              )
-            })}
-          </nav>
-          <div className="px-3 py-5 border-t border-border-subtle">
-            <a
-              href="/api/archivist-signout"
-              className="flex items-center font-sans text-[0.72rem] text-text-muted hover:text-text-secondary tracking-[0.04em] no-underline transition-colors duration-200 px-3 py-2"
-            >
-              Sign Out
-            </a>
-          </div>
-        </aside>
-
-        {/* Mobile nav strip */}
-        <div className="flex flex-col flex-1 overflow-hidden">
-          <nav
-            className="md:hidden flex-shrink-0 overflow-x-auto border-b border-border-subtle"
-            style={{ background: '#111112' }}
-          >
-            <div className="flex gap-0 min-w-max">
-              <a
-                href="/archivist/onboard"
-                className="font-sans text-[0.68rem] font-bold tracking-[0.06em] px-4 py-3 no-underline flex-shrink-0"
-                style={{ color: '#C4A24A', borderBottom: '2px solid rgba(196,162,74,0.5)' }}
-              >
-                + New Client
-              </a>
-              {NAV.map(({ label, href }) => {
-                const active = pathname === href
-                return (
-                  <Link
-                    key={href}
-                    href={href}
-                    className="font-sans text-[0.68rem] font-medium tracking-[0.06em] px-4 py-3 no-underline flex-shrink-0 transition-colors duration-150"
-                    style={{
-                      color:        active ? '#F0F0EE' : '#5C6166',
-                      borderBottom: `2px solid ${active ? '#C4A24A' : 'transparent'}`,
-                    }}
-                  >
-                    {label}
-                  </Link>
-                )
-              })}
-              <a
-                href="/api/archivist-signout"
-                className="font-sans text-[0.68rem] tracking-[0.06em] px-4 py-3 no-underline flex-shrink-0 transition-colors duration-150"
-                style={{ color: '#5C6166', borderBottom: '2px solid transparent' }}
-              >
-                Sign Out
-              </a>
-            </div>
-          </nav>
-
-          <main className="flex-1 overflow-auto p-6 md:p-10">
-            {children}
-          </main>
+        {/* Wordmark */}
+        <div style={{ padding: '28px 20px 24px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+          <Link href="/" style={{ textDecoration: 'none', display: 'block' }}>
+            <p style={{
+              fontFamily:    'Courier New, monospace',
+              fontSize:      '0.65rem',
+              letterSpacing: '0.32em',
+              textTransform: 'uppercase',
+              color:         '#C4A24A',
+              fontWeight:    700,
+            }}>
+              Basalith
+            </p>
+            <p style={{
+              fontFamily:    'Courier New, monospace',
+              fontSize:      '0.52rem',
+              letterSpacing: '0.2em',
+              textTransform: 'uppercase',
+              color:         'rgba(255,255,255,0.18)',
+              marginTop:     '3px',
+            }}>
+              Guide Portal
+            </p>
+          </Link>
         </div>
 
+        {/* New Client CTA */}
+        <div style={{ padding: '16px 16px 8px' }}>
+          <Link
+            href="/archivist/onboard"
+            style={{
+              display:       'block',
+              textAlign:     'center',
+              fontFamily:    'Courier New, monospace',
+              fontSize:      '0.62rem',
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              color:         '#0A0908',
+              background:    '#C4A24A',
+              padding:       '10px 12px',
+              textDecoration: 'none',
+              fontWeight:    700,
+            }}
+          >
+            + New Client
+          </Link>
+        </div>
+
+        {/* Navigation */}
+        <nav style={{ flex: 1, padding: '8px 12px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+          {NAV.map(({ label, href, icon }) => {
+            const active = pathname?.startsWith(href)
+            return (
+              <Link
+                key={href}
+                href={href}
+                style={{
+                  display:       'flex',
+                  alignItems:    'center',
+                  gap:           '10px',
+                  fontFamily:    'Courier New, monospace',
+                  fontSize:      '0.7rem',
+                  letterSpacing: '0.06em',
+                  color:         active ? '#F0EDE6' : '#5C6166',
+                  background:    active ? 'rgba(196,162,74,0.08)' : 'transparent',
+                  borderLeft:    `2px solid ${active ? '#C4A24A' : 'transparent'}`,
+                  padding:       '9px 10px',
+                  textDecoration: 'none',
+                  transition:    'all 0.12s',
+                }}
+              >
+                <span style={{ fontSize: '0.9rem', opacity: active ? 1 : 0.4 }}>{icon}</span>
+                {label}
+              </Link>
+            )
+          })}
+        </nav>
+
+        {/* Sign Out */}
+        <div style={{ padding: '16px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+          <a
+            href="/api/archivist-signout"
+            style={{
+              display:       'block',
+              fontFamily:    'Courier New, monospace',
+              fontSize:      '0.62rem',
+              letterSpacing: '0.08em',
+              color:         '#3A3F44',
+              textDecoration: 'none',
+              padding:       '6px 10px',
+            }}
+          >
+            Sign Out →
+          </a>
+        </div>
+      </aside>
+
+      {/* ── Mobile top nav ── */}
+      <div className="md:hidden" style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50 }}>
+        <div style={{ background: '#0F0E0D', borderBottom: '1px solid rgba(255,255,255,0.06)', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.65rem', letterSpacing: '0.28em', color: '#C4A24A', fontWeight: 700 }}>BASALITH</p>
+          <Link href="/archivist/onboard" style={{ fontFamily: 'Courier New, monospace', fontSize: '0.6rem', letterSpacing: '0.12em', color: '#0A0908', background: '#C4A24A', padding: '6px 12px', textDecoration: 'none' }}>
+            + New
+          </Link>
+        </div>
+        <nav style={{ background: '#0F0E0D', borderBottom: '1px solid rgba(255,255,255,0.04)', overflowX: 'auto', display: 'flex', gap: 0 }}>
+          {NAV.map(({ label, href }) => {
+            const active = pathname?.startsWith(href)
+            return (
+              <Link
+                key={href}
+                href={href}
+                style={{
+                  fontFamily:    'Courier New, monospace',
+                  fontSize:      '0.6rem',
+                  letterSpacing: '0.06em',
+                  color:         active ? '#F0EDE6' : '#5C6166',
+                  borderBottom:  `2px solid ${active ? '#C4A24A' : 'transparent'}`,
+                  padding:       '10px 14px',
+                  textDecoration: 'none',
+                  whiteSpace:    'nowrap',
+                  flexShrink:    0,
+                }}
+              >
+                {label}
+              </Link>
+            )
+          })}
+        </nav>
       </div>
+
+      {/* ── Main content ── */}
+      <main
+        className="flex-1 overflow-auto"
+        style={{ paddingTop: 0 }}
+      >
+        <div className="md:hidden" style={{ height: '88px' }} />
+        {children}
+      </main>
+
     </div>
   )
 }

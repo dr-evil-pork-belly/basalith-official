@@ -1,470 +1,226 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 
-const SPRINT_TIERS = [
-  { threshold: 5,  bonus: '$500'   },
-  { threshold: 10, bonus: '$1,500' },
-  { threshold: 20, bonus: '$4,000' },
-]
-
-const STATUS_COLOR: Record<string, string> = {
-  New:             '#5C6166',
-  Contacted:       '#9DA3A8',
-  Demo:            '#C4A24A',
-  Proposal:        '#FFB347',
-  Closed:          '#4CAF50',
-  Lost:            '#444',
-  'Payment Pending': 'rgba(196,162,74,0.75)',
-  'Active Client': '#4CAF50',
-  Submitted:       '#9DA3A8',
+const C = {
+  bg:      '#0A0908',
+  surface: '#111110',
+  border:  'rgba(255,255,255,0.06)',
+  gold:    '#C4A24A',
+  text:    '#F0EDE6',
+  muted:   '#9DA3A8',
+  dim:     '#5C6166',
+  ghost:   '#3A3F44',
+  green:   '#4CAF50',
+  red:     '#E57373',
 }
 
-type ArchivistRow = {
-  id:                    string
-  name:                  string
-  rank:                  string
-  total_closings:        number
-  this_month_closings:   number
-  sprint_closings:       number
-  residual_income_cents: number
+const RESIDUAL_RATES = { archive: 12, estate: 24, dynasty: 64 }
+
+function calculateProjection(
+  currentArchives: number,
+  avgTier:         'archive' | 'estate' | 'dynasty',
+  monthlyClosings: number,
+  retentionRate:   number,
+): { year: number; monthly: number }[] {
+  const rate   = RESIDUAL_RATES[avgTier]
+  const points = []
+  let archives = currentArchives
+  for (let month = 0; month <= 120; month++) {
+    if (month > 0) archives = archives * retentionRate + monthlyClosings
+    if (month % 12 === 0) points.push({ year: month / 12, monthly: Math.round(archives * rate) })
+  }
+  return points
 }
 
-type TodayAction = {
-  id:          string
-  name:        string
-  status:      string
-  next_action: string
-  tier:        string
-}
-
-type LeaderRow = {
-  id:                    string
-  name:                  string
-  rank:                  string
-  this_month_closings:   number
-  total_closings:        number
-  top_tier:              string
-  residual_income_cents: number
-}
-
-type Commission = {
-  id:           string
-  created_at:   string
-  type:         string
-  amount_cents: number
-  status:       string
-  description:  string
-}
-
-function fmt(cents: number) {
-  return '$' + Math.round(cents / 100).toLocaleString('en-US')
-}
-
-// ── Cron test panel ───────────────────────────────────────────────────────────
-
-const CRON_JOBS = [
-  { label: 'Send Daily Photos',                  route: '/api/cron/send-photos'            },
-  { label: 'Send Weekly Prompt + Questions',      route: '/api/cron/weekly-prompt'          },
-  { label: 'Send Monday Mystery',        route: '/api/cron/story-prompt-monday'    },
-  { label: 'Send Friday Reveal',         route: '/api/cron/story-prompt-friday'    },
-  { label: 'Send Monthly Report',        route: '/api/cron/monthly-report'         },
-  { label: 'Send Gratitude Note',        route: '/api/cron/gratitude-note'         },
-  { label: 'Send Memory Game Start',     route: '/api/cron/memory-game-start'      },
-  { label: 'Send Memory Game Reminder',  route: '/api/cron/memory-game-reminder'   },
-  { label: 'Send Memory Game Summary',          route: '/api/cron/memory-game-summary'  },
-  { label: 'Refresh Contributor Questions',      route: '/api/cron/weekly-prompt'        },
-  { label: 'Send Daily Reflection',             route: '/api/cron/daily-reflection'     },
-] as const
-
-type CronState = 'idle' | 'running' | 'ok' | 'error'
-
-function SystemTestsPanel() {
-  const [states,   setStates]   = useState<Record<string, CronState>>({})
-  const [messages, setMessages] = useState<Record<string, string>>({})
-
-  const run = useCallback(async (route: string) => {
-    setStates(s  => ({ ...s, [route]: 'running' }))
-    setMessages(m => ({ ...m, [route]: '' }))
-    try {
-      const res  = await fetch('/api/admin/test-cron', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ cronRoute: route }),
-      })
-      const envelope = await res.json()
-      const isErr = !res.ok || !!envelope.error
-      setStates(s  => ({ ...s, [route]: isErr ? 'error' : 'ok' }))
-      setMessages(m => ({ ...m, [route]: JSON.stringify(envelope, null, 2) }))
-    } catch (err: any) {
-      setStates(s  => ({ ...s, [route]: 'error' }))
-      setMessages(m => ({ ...m, [route]: JSON.stringify({ fetchError: err.message }) }))
-    }
-  }, [])
+function ProjectionChart({ activeClients, monthlyMRR }: { activeClients: number; monthlyMRR: number }) {
+  const avgRate  = monthlyMRR / Math.max(activeClients, 1)
+  const avgTier: 'archive' | 'estate' | 'dynasty' = avgRate >= 50 ? 'dynasty' : avgRate >= 20 ? 'estate' : 'archive'
+  const monthly  = Math.max(activeClients / 12, 0.5)
+  const data     = calculateProjection(activeClients, avgTier, monthly, 0.85)
+  const year5    = data.find(d => d.year === 5)?.monthly  ?? 0
+  const year10   = data.find(d => d.year === 10)?.monthly ?? 0
 
   return (
-    <div className="rounded-sm border mb-8" style={{ background: '#111112', borderColor: 'rgba(196,162,74,0.18)' }}>
-      <div className="px-6 py-4 border-b" style={{ borderColor: 'rgba(196,162,74,0.12)' }}>
-        <p className="font-sans text-[0.6rem] font-bold tracking-[0.22em] uppercase" style={{ color: 'rgba(196,162,74,0.7)' }}>
-          System Tests
-        </p>
-        <p className="font-sans text-[0.65rem] mt-0.5" style={{ color: '#3A3F44' }}>
-          Each call runs with ?test=true — bypasses day/date guards. Weekly Prompt also generates personalized contributor questions via Claude.
-        </p>
+    <div style={{ background: C.surface, border: `1px solid ${C.border}`, padding: '28px', marginBottom: '24px' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
+        <div>
+          <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.58rem', letterSpacing: '0.28em', textTransform: 'uppercase', color: C.dim, marginBottom: '6px' }}>Residual Projection</p>
+          <p style={{ fontFamily: 'Georgia, serif', fontSize: '1.8rem', fontWeight: 300, color: C.gold }}>
+            ${monthlyMRR.toLocaleString()}<span style={{ fontSize: '0.9rem', color: C.dim }}>/mo now</span>
+          </p>
+        </div>
+        <div style={{ display: 'flex', gap: '24px' }}>
+          {[{ label: 'Year 5', val: year5 }, { label: 'Year 10', val: year10 }].map(({ label, val }) => (
+            <div key={label} style={{ textAlign: 'right' }}>
+              <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.55rem', letterSpacing: '0.2em', color: C.ghost, marginBottom: '3px' }}>{label}</p>
+              <p style={{ fontFamily: 'Georgia, serif', fontSize: '1.1rem', fontWeight: 300, color: C.muted }}>${val.toLocaleString()}/mo</p>
+            </div>
+          ))}
+        </div>
       </div>
-      <div className="p-6 flex flex-col gap-3">
-        {CRON_JOBS.map(({ label, route }) => {
-          const state = states[route] ?? 'idle'
-          const msg   = messages[route] ?? ''
+      <div style={{ height: '180px', marginBottom: '16px' }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={data} margin={{ top: 4, right: 4, bottom: 4, left: 0 }}>
+            <XAxis dataKey="year" tick={{ fontFamily: 'Courier New, monospace', fontSize: 10, fill: C.dim }} tickFormatter={v => `Yr ${v}`} axisLine={{ stroke: C.border }} tickLine={false} />
+            <YAxis tick={{ fontFamily: 'Courier New, monospace', fontSize: 10, fill: C.dim }} tickFormatter={v => `$${v >= 1000 ? `${(v/1000).toFixed(0)}k` : v}`} axisLine={false} tickLine={false} width={48} />
+            <Tooltip contentStyle={{ background: C.surface, border: `1px solid ${C.border}`, fontFamily: 'Courier New, monospace', fontSize: '0.7rem', color: C.text }} formatter={(val) => [`$${Number(val).toLocaleString()}/mo`, 'Residual']} labelFormatter={l => `Year ${l}`} />
+            <Line type="monotone" dataKey="monthly" stroke={C.gold} strokeWidth={2} dot={false} />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+      <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.58rem', color: C.ghost, lineHeight: 1.6 }}>
+        Based on {activeClients} active archives · 85% annual retention · ~{monthly.toFixed(1)} new closings/month projected
+      </p>
+    </div>
+  )
+}
+
+function StatCard({ label, value, caption, color }: { label: string; value: string; caption?: string; color?: string }) {
+  return (
+    <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderTop: `2px solid ${color ?? C.gold}`, padding: '20px 24px' }}>
+      <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.55rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: C.dim, marginBottom: '8px' }}>{label}</p>
+      <p style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.6rem,3vw,2.2rem)', fontWeight: 300, color: color ?? C.gold, lineHeight: 1 }}>{value}</p>
+      {caption && <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.55rem', letterSpacing: '0.08em', color: C.ghost, marginTop: '6px' }}>{caption}</p>}
+    </div>
+  )
+}
+
+const STAGES = ['New', 'Contacted', 'Demo', 'Proposal', 'Active Client']
+
+function PipelineStrip({ prospects }: { prospects: Array<{ id: string; name: string; status: string; tier: string }> }) {
+  const by: Record<string, typeof prospects> = {}
+  for (const p of prospects) { if (!by[p.status]) by[p.status] = []; by[p.status].push(p) }
+
+  return (
+    <div style={{ background: C.surface, border: `1px solid ${C.border}`, marginBottom: '24px' }}>
+      <div style={{ padding: '16px 20px', borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.6rem', letterSpacing: '0.24em', textTransform: 'uppercase', color: C.dim }}>My Practice</p>
+        <Link href="/archivist/pipeline" style={{ fontFamily: 'Courier New, monospace', fontSize: '0.58rem', color: C.gold, textDecoration: 'none' }}>Full Pipeline →</Link>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${STAGES.length}, 1fr)`, gap: '1px', background: C.border }}>
+        {STAGES.map(stage => {
+          const items = by[stage] ?? []
           return (
-            <div key={route} className="flex items-start gap-4">
-              <button
-                onClick={() => run(route)}
-                disabled={state === 'running'}
-                className="shrink-0 font-sans text-[0.62rem] font-medium tracking-[0.08em] uppercase px-4 py-2 rounded-sm transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{
-                  background:  state === 'ok' ? 'rgba(76,175,80,0.12)' : state === 'error' ? 'rgba(255,80,80,0.08)' : 'rgba(255,255,255,0.04)',
-                  border:      `1px solid ${state === 'ok' ? 'rgba(76,175,80,0.3)' : state === 'error' ? 'rgba(255,80,80,0.2)' : 'rgba(255,255,255,0.07)'}`,
-                  color:       state === 'ok' ? '#4CAF50' : state === 'error' ? '#ff6b6b' : '#9DA3A8',
-                  minWidth:    '190px',
-                  textAlign:   'left',
-                }}
-              >
-                {state === 'running' ? '⟳ Running…' : state === 'ok' ? '✓ ' + label : state === 'error' ? '✗ ' + label : label}
-              </button>
-              {msg && (
-                <pre className="text-[0.6rem] leading-relaxed mt-1 overflow-x-auto max-w-md whitespace-pre-wrap" style={{ color: state === 'error' ? '#ff6b6b' : '#5C6166', fontFamily: 'monospace' }}>
-                  {msg}
-                </pre>
-              )}
+            <div key={stage} style={{ background: C.surface, padding: '14px 12px' }}>
+              <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.55rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: C.ghost, marginBottom: '8px' }}>{stage}</p>
+              <p style={{ fontFamily: 'Georgia, serif', fontSize: '1.4rem', fontWeight: 300, color: stage === 'Active Client' ? C.green : C.text, marginBottom: '6px' }}>{items.length}</p>
+              {items.slice(0, 2).map(p => (
+                <p key={p.id} style={{ fontFamily: 'Courier New, monospace', fontSize: '0.6rem', color: C.dim, marginBottom: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</p>
+              ))}
+              {items.length > 2 && <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.55rem', color: C.ghost }}>+{items.length - 2} more</p>}
             </div>
           )
         })}
-      </div>
-      <div className="p-6 pt-0 flex gap-3 flex-wrap border-t" style={{ borderColor: 'rgba(196,162,74,0.1)', marginTop: '4px' }}>
-        <a
-          href="/archive/memory-map"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-sans text-[0.62rem] font-medium tracking-[0.08em] uppercase px-4 py-2 rounded-sm transition-all duration-150"
-          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', color: '#9DA3A8', textDecoration: 'none' }}
-        >
-          View Memory Map →
-        </a>
       </div>
     </div>
   )
 }
 
-// ── Skeleton ───────────────────────────────────────────────────────────────────
-
-function Skeleton({ className }: { className?: string }) {
+function RecentCommissions({ commissions }: { commissions: Array<{ id: string; created_at: string; description: string; amount_cents: number; status: string }> }) {
+  if (!commissions.length) return null
   return (
-    <div className={`rounded-sm ${className ?? ''}`}
-      style={{ background: 'rgba(255,255,255,0.04)', animation: 'mysteryGlowPulse 1.8s ease-in-out infinite' }} />
+    <div style={{ background: C.surface, border: `1px solid ${C.border}` }}>
+      <div style={{ padding: '16px 20px', borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.6rem', letterSpacing: '0.24em', textTransform: 'uppercase', color: C.dim }}>Recent Commissions</p>
+        <Link href="/archivist/earnings" style={{ fontFamily: 'Courier New, monospace', fontSize: '0.58rem', color: C.gold, textDecoration: 'none' }}>All Earnings →</Link>
+      </div>
+      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <tbody>
+          {commissions.slice(0, 6).map((c, i, arr) => (
+            <tr key={c.id} style={{ borderBottom: i < arr.length - 1 ? `1px solid ${C.border}` : 'none' }}>
+              <td style={{ padding: '12px 20px', fontFamily: 'Courier New, monospace', fontSize: '0.62rem', color: C.dim, whiteSpace: 'nowrap' }}>{new Date(c.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</td>
+              <td style={{ padding: '12px 8px', fontFamily: 'Georgia, serif', fontSize: '0.9rem', color: C.muted }}>{c.description ?? 'Commission'}</td>
+              <td style={{ padding: '12px 8px', fontFamily: 'Courier New, monospace', fontSize: '0.65rem', color: c.status === 'paid' ? C.green : C.gold, textAlign: 'right', whiteSpace: 'nowrap' }}>${((c.amount_cents ?? 0) / 100).toLocaleString()}</td>
+              <td style={{ padding: '12px 20px', fontFamily: 'Courier New, monospace', fontSize: '0.55rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: c.status === 'paid' ? C.green : C.dim }}>{c.status}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   )
 }
 
 export default function DashboardClient({ archivistId }: { archivistId: string }) {
-  const [loading,     setLoading]     = useState(true)
-  const [archivist,   setArchivist]   = useState<ArchivistRow | null>(null)
-  const [pipeline,    setPipeline]    = useState<Record<string, number>>({})
-  const [actions,     setActions]     = useState<TodayAction[]>([])
-  const [leaderboard, setLeaderboard] = useState<LeaderRow[]>([])
-  const [commissions, setCommissions] = useState<Commission[]>([])
-  const [myRank,      setMyRank]      = useState<number | null>(null)
-  const [showDebug,   setShowDebug]   = useState(false)
+  const [data,    setData]    = useState<Record<string, unknown> | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    setShowDebug(params.get('debug') === 'true' || process.env.NODE_ENV === 'development')
-  }, [])
+    fetch(`/api/archivist/dashboard?id=${archivistId}`)
+      .then(r => r.json())
+      .then(d => setData(d))
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [archivistId])
 
-  useEffect(() => { fetchFromDB() }, [])
-
-  async function fetchFromDB() {
-    try {
-      const res = await fetch(`/api/archivist/dashboard?id=${archivistId}`)
-      if (!res.ok) throw new Error('API error')
-      const data = await res.json()
-
-      setArchivist(data.archivist)
-      setPipeline(data.pipelineCounts ?? {})
-      setActions(data.todaysActions ?? [])
-      setLeaderboard(data.leaderboard ?? [])
-      setCommissions(data.commissions ?? [])
-
-      const rank = (data.leaderboard ?? []).findIndex((r: LeaderRow) => r.id === data.archivist?.id)
-      setMyRank(rank >= 0 ? rank + 1 : null)
-    } catch {
-      // show empty state
-    } finally {
-      setLoading(false)
-    }
+  if (loading) {
+    return (
+      <div style={{ padding: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '400px' }}>
+        <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.65rem', letterSpacing: '0.24em', color: C.dim }}>Loading…</p>
+      </div>
+    )
   }
 
-  const sprintCount = archivist?.sprint_closings ?? 0
-  const nextSprint  = SPRINT_TIERS.find(t => sprintCount < t.threshold) ?? SPRINT_TIERS[SPRINT_TIERS.length - 1]
-  const sprintPct   = Math.min(100, Math.round((sprintCount / nextSprint.threshold) * 100))
+  const archivist     = (data?.archivist   as Record<string, unknown>) ?? {}
+  const metrics       = (data?.metrics     as Record<string, number>)  ?? {}
+  const prospects     = (data?.prospects   as Array<Record<string, string>>) ?? []
+  const commissions   = (data?.commissions as Array<Record<string, unknown>>) ?? []
+  const certification = (data?.certification as Record<string, unknown>) ?? {}
 
-  const statCards = archivist
-    ? [
-        { label: 'Total Closings',  value: archivist.total_closings,      sub: 'All time' },
-        { label: 'This Month',      value: archivist.this_month_closings,  sub: 'Current period' },
-        { label: 'Annual Residual', value: fmt(archivist.residual_income_cents), sub: 'Monthly run rate: ' + fmt(Math.round(archivist.residual_income_cents / 12)) },
-      ]
-    : [
-        { label: 'Total Closings',  value: '—', sub: 'All time'       },
-        { label: 'This Month',      value: '—', sub: 'Current period' },
-        { label: 'Annual Residual', value: '—', sub: 'Monthly run rate' },
-      ]
+  const certified    = certification?.certified_at != null || archivist?.certification_status === 'certified'
+  const qualityColor = (metrics.qualityScore ?? 0) >= 70 ? C.green : (metrics.qualityScore ?? 0) >= 50 ? C.gold : C.red
+  const monthlyMRR   = Math.round(((metrics.residualMRRCents ?? 0) / 100))
 
-  const pipelineStatuses      = ['New', 'Contacted', 'Demo', 'Proposal', 'Closed']
-  const submissionStatuses    = ['Payment Pending', 'Active Client']
-  const paymentPendingCount   = pipeline['Payment Pending'] ?? 0
-  const activeClientCount     = pipeline['Active Client']   ?? 0
+  const h        = new Date().getHours()
+  const greeting = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening'
+  const firstName = String(archivist?.name ?? '').split(' ')[0]
 
   return (
-    <div className="max-w-4xl">
+    <div style={{ padding: 'clamp(24px,5vw,48px)', maxWidth: '1100px' }}>
 
-      <div className="mb-10">
-        <p className="font-sans text-[0.62rem] font-bold tracking-[0.2em] uppercase mb-2" style={{ color: '#C4A24A' }}>Welcome back</p>
-        {loading ? <Skeleton className="h-8 w-64 mb-1" /> : (
-          <h1 className="font-serif font-semibold text-text-primary tracking-[-0.025em]" style={{ fontSize: 'clamp(1.8rem,3vw,2.5rem)' }}>
-            {archivist?.name ?? 'Legacy Guide Dashboard'}
-          </h1>
-        )}
-        {archivist && (
-          <p className="font-sans text-[0.65rem] mt-1" style={{ color: '#5C6166' }}>
-            {archivist.rank}{myRank !== null ? ` · #${myRank} on leaderboard` : ''}
-          </p>
-        )}
+      <div style={{ marginBottom: '32px' }}>
+        <h1 style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.4rem,2.5vw,1.9rem)', fontWeight: 300, color: C.text }}>
+          {greeting}{firstName ? `, ${firstName}.` : '.'}
+        </h1>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        {loading
-          ? Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-24" />)
-          : statCards.map(({ label, value, sub }) => (
-              <div key={label} className="rounded-sm border border-border-subtle px-6 py-5" style={{ background: '#111112' }}>
-                <p className="font-sans text-[0.6rem] font-bold tracking-[0.18em] uppercase text-text-muted mb-3">{label}</p>
-                <p className="font-serif font-semibold text-text-primary mb-1" style={{ fontSize: '2rem', letterSpacing: '-0.02em' }}>{value}</p>
-                <p className="font-sans text-[0.68rem] text-text-muted">{sub}</p>
-              </div>
-            ))
-        }
-      </div>
-
-      {!loading && archivist && (
-        <div className="rounded-sm border border-border-subtle px-6 py-5 mb-8" style={{ background: '#111112' }}>
-          <div className="flex items-baseline justify-between mb-3">
-            <p className="font-sans text-[0.6rem] font-bold tracking-[0.18em] uppercase text-text-muted">Sprint Progress · This Month</p>
-            <p className="font-sans text-[0.68rem]" style={{ color: '#C4A24A' }}>Next bonus: {nextSprint.bonus} at {nextSprint.threshold} closings</p>
+      {/* Certification alert */}
+      {!certified && (
+        <div style={{ background: 'rgba(229,115,115,0.04)', border: '1px solid rgba(229,115,115,0.15)', borderLeft: '3px solid rgba(229,115,115,0.4)', padding: '16px 20px', marginBottom: '28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
+          <div>
+            <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.6rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: C.red, marginBottom: '4px' }}>Certification Required</p>
+            <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: '0.9rem', color: C.muted }}>Complete your certification to unlock full dashboard access and commission tracking.</p>
           </div>
-          <div className="h-1.5 rounded-full mb-2" style={{ background: 'rgba(255,255,255,0.06)' }}>
-            <div className="h-1.5 rounded-full transition-all duration-700" style={{ width: `${sprintPct}%`, background: 'rgba(196,162,74,0.8)' }} />
-          </div>
-          <p className="font-sans text-[0.65rem]" style={{ color: '#5C6166' }}>{sprintCount} / {nextSprint.threshold} closings this month</p>
+          <Link href="/archivist/certification" style={{ fontFamily: 'Courier New, monospace', fontSize: '0.62rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#0A0908', background: C.gold, padding: '10px 20px', textDecoration: 'none', whiteSpace: 'nowrap' }}>
+            Begin Certification →
+          </Link>
         </div>
       )}
 
-      {/* ── Submission Pipeline ────────────────────────────────────────────── */}
-      {!loading && (
-        <div className="rounded-sm border mb-8" style={{ background: '#111112', borderColor: 'rgba(196,162,74,0.18)' }}>
-          <div className="px-6 py-4 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-            <p className="font-sans text-[0.6rem] font-bold tracking-[0.22em] uppercase" style={{ color: '#C4A24A' }}>
-              Client Submission Pipeline
-            </p>
-            <p className="font-sans text-[0.65rem] mt-0.5" style={{ color: '#5C6166' }}>
-              Submitted → Payment Pending → Active
-            </p>
-          </div>
-          <div className="px-6 py-5 flex flex-col sm:flex-row gap-6">
-            {/* Payment Pending */}
-            <div className="flex-1">
-              <p className="font-sans text-[0.6rem] font-bold tracking-[0.16em] uppercase mb-2" style={{ color: 'rgba(196,162,74,0.6)' }}>
-                Payment Pending
-              </p>
-              <p className="font-serif font-semibold text-text-primary mb-1" style={{ fontSize: '2.25rem', letterSpacing: '-0.025em', color: paymentPendingCount > 0 ? '#C4A24A' : '#3A3F44' }}>
-                {paymentPendingCount}
-              </p>
-              <p className="font-sans text-[0.65rem]" style={{ color: '#5C6166' }}>
-                {paymentPendingCount === 1 ? 'client awaiting payment' : 'clients awaiting payment'}
-              </p>
-            </div>
-
-            {/* Divider arrow */}
-            <div className="hidden sm:flex items-center" aria-hidden="true">
-              <span style={{ fontFamily: 'monospace', fontSize: '0.7rem', color: '#3A3F44' }}>→</span>
-            </div>
-
-            {/* Active this month */}
-            <div className="flex-1">
-              <p className="font-sans text-[0.6rem] font-bold tracking-[0.16em] uppercase mb-2" style={{ color: 'rgba(76,175,80,0.7)' }}>
-                Active Clients
-              </p>
-              <p className="font-serif font-semibold text-text-primary mb-1" style={{ fontSize: '2.25rem', letterSpacing: '-0.025em', color: activeClientCount > 0 ? '#4CAF50' : '#3A3F44' }}>
-                {activeClientCount}
-              </p>
-              <p className="font-sans text-[0.65rem]" style={{ color: '#5C6166' }}>
-                {activeClientCount === 1 ? 'archive active' : 'archives active'}
-              </p>
-            </div>
-
-            {/* CTA */}
-            <div className="flex-1 flex flex-col justify-between">
-              {paymentPendingCount > 0 && (
-                <div className="rounded-sm px-4 py-3 mb-3" style={{ background: 'rgba(196,162,74,0.05)', border: '1px solid rgba(196,162,74,0.15)' }}>
-                  <p className="font-sans text-[0.68rem]" style={{ color: '#C4A24A', lineHeight: 1.6 }}>
-                    {paymentPendingCount} client{paymentPendingCount > 1 ? 's' : ''} still need to complete payment.
-                    Follow up to unblock.
-                  </p>
-                </div>
-              )}
-              <div className="flex gap-3 flex-wrap">
-                <Link
-                  href="/archivist/onboard"
-                  className="font-sans text-[0.6rem] font-bold tracking-[0.14em] uppercase no-underline px-4 py-2 transition-all"
-                  style={{ background: '#C4A24A', color: '#0A0908' }}
-                >
-                  Submit Client
-                </Link>
-                <Link
-                  href="/archivist/pipeline"
-                  className="font-sans text-[0.6rem] font-bold tracking-[0.14em] uppercase no-underline px-4 py-2 transition-all"
-                  style={{ border: '1px solid rgba(196,162,74,0.3)', color: '#C4A24A' }}
-                >
-                  View Pipeline
-                </Link>
-              </div>
-            </div>
-          </div>
+      {certified && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px', paddingBottom: '20px', borderBottom: `1px solid ${C.border}` }}>
+          <span style={{ fontFamily: 'Courier New, monospace', fontSize: '0.55rem', letterSpacing: '0.28em', textTransform: 'uppercase', color: C.gold, background: 'rgba(196,162,74,0.08)', border: '1px solid rgba(196,162,74,0.2)', padding: '4px 10px' }}>✓ Certified Legacy Guide</span>
         </div>
       )}
 
-      <div className="grid md:grid-cols-3 gap-6 mb-8">
-        <div className="md:col-span-2 rounded-sm border border-border-subtle" style={{ background: '#111112' }}>
-          <div className="px-6 py-4 border-b border-border-subtle">
-            <p className="font-sans text-[0.62rem] font-bold tracking-[0.18em] uppercase text-text-muted">Follow-up Actions</p>
-          </div>
-          {loading ? (
-            <div className="flex flex-col gap-0">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="px-6 py-3 border-b border-border-subtle last:border-0">
-                  <Skeleton className="h-3 w-3/4 mb-2" /><Skeleton className="h-2 w-1/3" />
-                </div>
-              ))}
-            </div>
-          ) : actions.length === 0 ? (
-            <div className="px-6 py-10 text-center">
-              <p className="font-serif italic text-text-muted" style={{ fontSize: '0.95rem' }}>No pending actions. Add prospects to your pipeline.</p>
-            </div>
-          ) : (
-            <ul>
-              {actions.map(a => (
-                <li key={a.id} className="px-6 py-3 flex items-start justify-between gap-4 border-b border-border-subtle last:border-0">
-                  <div className="min-w-0">
-                    <p className="font-sans text-[0.8rem] font-medium text-text-primary truncate">{a.name}</p>
-                    <p className="font-sans text-[0.68rem] mt-0.5 text-text-muted">{a.next_action}</p>
-                  </div>
-                  <span className="font-sans text-[0.62rem] font-medium tracking-[0.06em] uppercase shrink-0 mt-0.5" style={{ color: STATUS_COLOR[a.status] ?? '#5C6166' }}>
-                    {a.status}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-        <div className="rounded-sm border border-border-subtle p-6" style={{ background: '#111112' }}>
-          <p className="font-sans text-[0.6rem] font-bold tracking-[0.18em] uppercase text-text-muted mb-5">Pipeline</p>
-          {loading ? (
-            <div className="flex flex-col gap-3">{Array.from({ length: 7 }).map((_, i) => <Skeleton key={i} className="h-6" />)}</div>
-          ) : (
-            <div className="flex flex-col gap-2">
-              {pipelineStatuses.map(status => (
-                <div key={status} className="flex items-center justify-between">
-                  <span className="font-sans text-[0.72rem]" style={{ color: STATUS_COLOR[status] ?? '#5C6166' }}>{status}</span>
-                  <span className="font-serif font-semibold text-text-primary" style={{ fontSize: '1.1rem', letterSpacing: '-0.02em' }}>{pipeline[status] ?? 0}</span>
-                </div>
-              ))}
-              <div className="my-1" style={{ height: '1px', background: 'rgba(255,255,255,0.04)' }} />
-              {submissionStatuses.map(status => (
-                <div key={status} className="flex items-center justify-between">
-                  <span className="font-sans text-[0.72rem]" style={{ color: STATUS_COLOR[status] ?? '#5C6166' }}>{status}</span>
-                  <span className="font-serif font-semibold text-text-primary" style={{ fontSize: '1.1rem', letterSpacing: '-0.02em' }}>{pipeline[status] ?? 0}</span>
-                </div>
-              ))}
-            </div>
-          )}
-          <div className="mt-5 pt-4 border-t border-border-subtle">
-            <Link href="/archivist/pipeline" className="font-sans text-[0.68rem] font-medium no-underline transition-colors duration-150" style={{ color: '#C4A24A' }}>
-              Manage Pipeline →
-            </Link>
-          </div>
-        </div>
+      {/* Stat cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '12px', marginBottom: '28px' }}>
+        <StatCard label="Active Clients" value={String(metrics.activeClients ?? 0)} caption="archives generating residuals" />
+        <StatCard label="This Month"     value={`$${((metrics.thisMonthCents ?? 0) / 100).toLocaleString()}`} caption="founding commissions" />
+        <StatCard label="Residual MRR"   value={`$${monthlyMRR.toLocaleString()}`} caption="/ month recurring" />
+        <StatCard label="Quality Score"  value={`${Math.round(metrics.qualityScore ?? 0)}`} caption="archive health average" color={qualityColor} />
       </div>
 
-      {!loading && leaderboard.length > 0 && (
-        <div className="rounded-sm border border-border-subtle mb-8" style={{ background: '#111112' }}>
-          <div className="px-6 py-4 border-b border-border-subtle flex items-center justify-between">
-            <p className="font-sans text-[0.62rem] font-bold tracking-[0.18em] uppercase text-text-muted">Leaderboard</p>
-            <Link href="/archivist/leaderboard" className="font-sans text-[0.62rem] no-underline" style={{ color: '#5C6166' }}>View all →</Link>
-          </div>
-          <table className="w-full">
-            <tbody>
-              {leaderboard.slice(0, 5).map((row, i) => (
-                <tr key={row.id} style={i < Math.min(leaderboard.length, 5) - 1 ? { borderBottom: '1px solid rgba(255,255,255,0.04)' } : {}}>
-                  <td className="px-5 py-3 w-8">
-                    <span className="font-serif font-semibold" style={{ fontSize: '1rem', color: i === 0 ? '#C4A24A' : '#3A3F44', letterSpacing: '-0.02em' }}>{i + 1}</span>
-                  </td>
-                  <td className="px-2 py-3">
-                    <p className="font-sans text-[0.8rem] font-medium" style={{ color: row.id === archivist?.id ? '#C4A24A' : '#F0F0EE' }}>
-                      {row.name} {row.id === archivist?.id ? '(you)' : ''}
-                    </p>
-                    <p className="font-sans text-[0.62rem] text-text-muted">{row.rank}</p>
-                  </td>
-                  <td className="px-5 py-3 text-right">
-                    <p className="font-sans text-[0.78rem] font-medium text-text-secondary">{row.this_month_closings} this mo.</p>
-                    <p className="font-sans text-[0.62rem] text-text-muted">{row.total_closings} total</p>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      {/* Residual projection chart — only for certified guides */}
+      {certified && <ProjectionChart activeClients={metrics.activeClients ?? 0} monthlyMRR={monthlyMRR} />}
 
-      {!loading && commissions.length > 0 && (
-        <div className="rounded-sm border border-border-subtle mb-8" style={{ background: '#111112' }}>
-          <div className="px-6 py-4 border-b border-border-subtle flex items-center justify-between">
-            <p className="font-sans text-[0.62rem] font-bold tracking-[0.18em] uppercase text-text-muted">Recent Commissions</p>
-            <Link href="/archivist/earnings" className="font-sans text-[0.62rem] no-underline" style={{ color: '#5C6166' }}>View all →</Link>
-          </div>
-          <ul>
-            {commissions.slice(0, 5).map((c, i) => (
-              <li key={c.id} className="px-6 py-3 flex items-center justify-between gap-4"
-                style={i < Math.min(commissions.length, 5) - 1 ? { borderBottom: '1px solid rgba(255,255,255,0.04)' } : {}}>
-                <div className="min-w-0">
-                  <p className="font-sans text-[0.78rem] text-text-primary truncate">{c.description || c.type}</p>
-                  <p className="font-sans text-[0.62rem] mt-0.5 capitalize" style={{ color: c.status === 'paid' ? '#4CAF50' : '#9DA3A8' }}>{c.status}</p>
-                </div>
-                <p className="font-serif font-semibold shrink-0" style={{ fontSize: '1rem', letterSpacing: '-0.02em', color: '#C4A24A' }}>
-                  {'$' + Math.round(c.amount_cents / 100).toLocaleString('en-US')}
-                </p>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      {/* Pipeline strip */}
+      <PipelineStrip prospects={prospects as Array<{ id: string; name: string; status: string; tier: string }>} />
 
-      {showDebug && <SystemTestsPanel />}
-
-      <div className="flex flex-wrap gap-3">
-        <Link href="/archivist/pipeline"    className="btn-monolith-amber">View Pipeline →</Link>
-        <Link href="/archivist/earnings"    className="btn-monolith-ghost">Earnings &amp; Commissions</Link>
-        <Link href="/archivist/leaderboard" className="btn-monolith-ghost">Leaderboard</Link>
-      </div>
+      {/* Recent commissions */}
+      <RecentCommissions commissions={commissions as Array<{ id: string; created_at: string; description: string; amount_cents: number; status: string }>} />
 
     </div>
   )

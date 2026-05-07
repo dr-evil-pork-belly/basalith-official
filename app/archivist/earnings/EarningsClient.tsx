@@ -2,389 +2,227 @@
 
 import { useState, useEffect } from 'react'
 
-type TierKey = 'Archive' | 'Estate' | 'Dynasty'
-
-const TIERS: TierKey[] = ['Archive', 'Estate', 'Dynasty']
-
-const TIER_DATA: Record<TierKey, {
-  annualPrice:     string
-  monthlyPrice:    string
-  annualResidual:  number   // per client per year (8% of annual price)
-  monthlyResidual: number   // per client per month (8% of monthly price)
-  annualMonthly:   string   // annualResidual / 12, formatted
-}> = {
-  Archive: { annualPrice: '$1,800/yr', monthlyPrice: '$180/mo', annualResidual: 144,  monthlyResidual: 14.40, annualMonthly: '$12/mo'  },
-  Estate:  { annualPrice: '$3,600/yr', monthlyPrice: '$360/mo', annualResidual: 288,  monthlyResidual: 28.80, annualMonthly: '$24/mo'  },
-  Dynasty: { annualPrice: '$9,600/yr', monthlyPrice: '$960/mo', annualResidual: 768,  monthlyResidual: 76.80, annualMonthly: '$64/mo'  },
+const C = {
+  surface: '#111110', border: 'rgba(255,255,255,0.06)',
+  gold: '#C4A24A', text: '#F0EDE6', muted: '#9DA3A8', dim: '#5C6166', ghost: '#3A3F44',
+  green: '#4CAF50', red: '#E57373',
 }
 
-const RANKS = [
-  { title: 'Provisional Legacy Guide', range: '0–2',   rate: '40%',  override: '—',  notes: 'Demo account, training access'                       },
-  { title: 'Active Legacy Guide',      range: '3–9',   rate: '40%',  override: '—',  notes: 'Sprint eligible, leaderboard access'                 },
-  { title: 'Senior Legacy Guide',      range: '10–24', rate: '40%',  override: '2%', notes: 'Priority support, proposal builder, recruit override' },
-  { title: 'Master Legacy Guide',      range: '25–49', rate: '40%',  override: '2%', notes: 'Sovereign Gathering, Council access'                 },
-  { title: 'Sovereign Legacy Guide',   range: '50+',   rate: '27%',  override: '2%', notes: 'Founding Council, direct founder access'             },
-]
-
-const SPRINTS = [
-  { trigger: '5 closings/month',  bonus: '$500'   },
-  { trigger: '10 closings/month', bonus: '$1,500' },
-  { trigger: '20 closings/month', bonus: '$4,000' },
-  { trigger: '#1 on leaderboard', bonus: '$2,500' },
-]
-
-type CommissionRow = {
-  id:           string
-  created_at:   string
-  type:         string
-  amount_cents: number
-  status:       string
-  description:  string
+type Commission = {
+  id: string; created_at: string; description: string | null
+  amount_cents: number; status: string; type: string
 }
 
-type ArchivistSummary = {
-  total_closings:        number
-  this_month_closings:   number
-  residual_income_cents: number
-  rank:                  string
-}
+type Prospect = { id: string; name: string; status: string; tier: string }
 
-function fmt(n: number) {
-  return '$' + Math.round(n).toLocaleString('en-US')
-}
+const RESIDUAL_MONTHLY: Record<string, number> = { archive: 12, estate: 24, dynasty: 64 }
 
-function fmtResidual(n: number) {
-  return '$' + (n % 1 === 0 ? n.toLocaleString('en-US') : n.toFixed(2))
-}
-
-function fmtCents(cents: number) {
-  return '$' + (cents / 100).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
-}
-
-function Heading({ children }: { children: React.ReactNode }) {
-  return (
-    <h2 className="font-serif font-semibold text-text-primary tracking-[-0.025em] mb-6" style={{ fontSize: 'clamp(1.5rem,3vw,2rem)' }}>
-      {children}
-    </h2>
-  )
-}
-
-function Eyebrow({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="font-sans text-[0.58rem] font-bold tracking-[0.22em] uppercase mb-3" style={{ color: '#C4A24A' }}>{children}</p>
-  )
+const TIER_TIER: Record<string, { annual: number; monthly: number }> = {
+  Archive: { annual: 1800, monthly: 180 },
+  Estate:  { annual: 3600, monthly: 360 },
+  Dynasty: { annual: 9600, monthly: 960 },
 }
 
 export default function EarningsClient({ archivistId }: { archivistId: string }) {
-  const [closings,    setClosings]    = useState(5)
-  const [tier,        setTier]        = useState<TierKey>('Estate')
-  const [archivist,   setArchivist]   = useState<ArchivistSummary | null>(null)
-  const [commissions, setCommissions] = useState<CommissionRow[]>([])
-  const [loadingData, setLoadingData] = useState(true)
+  const [commissions, setCommissions] = useState<Commission[]>([])
+  const [prospects,   setProspects]   = useState<Prospect[]>([])
+  const [archivist,   setArchivist]   = useState<Record<string, unknown>>({})
+  const [loading,     setLoading]     = useState(true)
+  const [tab,         setTab]         = useState<'founding' | 'residuals'>('founding')
 
   useEffect(() => {
-    fetch(`/api/archivist/dashboard?id=${archivistId}`)
-      .then(r => r.ok ? r.json() : null)
-      .then(data => {
-        if (!data) return
-        setArchivist(data.archivist)
-        setCommissions(data.commissions ?? [])
-        if (data.archivist?.this_month_closings > 0) {
-          setClosings(data.archivist.this_month_closings)
-        }
-      })
-      .catch(() => {})
-      .finally(() => setLoadingData(false))
+    Promise.all([
+      fetch(`/api/archivist/dashboard?id=${archivistId}`).then(r => r.json()),
+    ]).then(([dash]) => {
+      setCommissions(dash.commissions ?? [])
+      setProspects(dash.prospects ?? [])
+      setArchivist(dash.archivist ?? {})
+    }).catch(() => {})
+    .finally(() => setLoading(false))
   }, [archivistId])
 
-  // Calculator: closings/month assumed for 12 months
-  const upfront        = closings * 1000
-  const annualResidual = closings * 12 * TIER_DATA[tier].annualResidual
-  const year1Total     = Math.round(closings * 12 * 1000 + closings * TIER_DATA[tier].annualResidual * 6.5)
-  const sprintEligible = closings >= 5
+  if (loading) return <div style={{ padding: '48px' }}><p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.65rem', color: C.dim }}>Loading…</p></div>
 
-  const totalEarned  = commissions.filter(c => c.status === 'paid').reduce((s, c) => s + c.amount_cents, 0)
-  const totalPending = commissions.filter(c => c.status === 'pending').reduce((s, c) => s + c.amount_cents, 0)
+  // ── Founding commissions ─────────────────────────────────────────────────────
+  const founding      = commissions.filter(c => c.type?.includes('founding') || !c.type)
+  const now           = new Date()
+  const monthStart    = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
+  const qStart        = new Date(now.getFullYear(), Math.floor(now.getMonth() / 3) * 3, 1).toISOString()
+  const thisMonth     = founding.filter(c => c.created_at >= monthStart).reduce((s, c) => s + (c.amount_cents ?? 0), 0)
+  const thisQuarter   = founding.filter(c => c.created_at >= qStart).reduce((s, c) => s + (c.amount_cents ?? 0), 0)
+  const allTime       = founding.reduce((s, c) => s + (c.amount_cents ?? 0), 0)
+
+  // ── Stewardship residuals ────────────────────────────────────────────────────
+  const activeClients = prospects.filter(p => p.status === 'Active Client')
+  const monthlyMRR    = activeClients.reduce((sum, p) => {
+    const t = (p.tier ?? '').toLowerCase()
+    return sum + (RESIDUAL_MONTHLY[t] ?? 24)
+  }, 0)
+  const annualResidual = monthlyMRR * 12
+
+  // ── Tier info ────────────────────────────────────────────────────────────────
+  const totalClosings  = Number(archivist?.total_closings ?? 0)
+  const qualityScore   = Number(archivist?.quality_score ?? 0)
+  const certified      = archivist?.certification_status === 'certified'
+
+  // Next tier threshold
+  const nextTierReqs = [
+    { label: '25+ active archives', done: activeClients.length >= 25, current: activeClients.length, target: 25 },
+    { label: 'Quality score above 75', done: qualityScore >= 75, current: Math.round(qualityScore), target: 75 },
+    { label: '85% client retention', done: Number(archivist?.client_retention_rate ?? 0) >= 85, current: Math.round(Number(archivist?.client_retention_rate ?? 0)), target: 85 },
+  ]
+
+  function fmt(cents: number) { return `$${(cents / 100).toLocaleString()}` }
+
+  const TabBtn = ({ id, label }: { id: typeof tab; label: string }) => (
+    <button
+      onClick={() => setTab(id)}
+      style={{ fontFamily: 'Courier New, monospace', fontSize: '0.62rem', letterSpacing: '0.14em', textTransform: 'uppercase', padding: '10px 20px', background: tab === id ? C.gold : 'transparent', color: tab === id ? '#0A0908' : C.dim, border: `1px solid ${tab === id ? C.gold : C.border}`, cursor: 'pointer' }}
+    >{label}</button>
+  )
 
   return (
-    <div className="max-w-4xl flex flex-col gap-16">
+    <div style={{ padding: 'clamp(24px,5vw,48px)', maxWidth: '900px' }}>
 
-      <div>
-        <p className="font-sans text-[0.62rem] font-bold tracking-[0.2em] uppercase mb-2" style={{ color: '#C4A24A' }}>Your Earnings</p>
-        <h1 className="font-serif font-semibold text-text-primary tracking-[-0.025em]" style={{ fontSize: 'clamp(1.8rem,3vw,2.5rem)' }}>
-          Commission &amp; Residual Structure
-        </h1>
+      <div style={{ marginBottom: '32px' }}>
+        <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.58rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: C.dim, marginBottom: '6px' }}>Earnings</p>
+        <h1 style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.4rem,2.5vw,1.9rem)', fontWeight: 300, color: C.text }}>Your Practice Income</h1>
       </div>
 
-      {/* ── REAL EARNINGS SUMMARY ── */}
-      {!loadingData && archivist && (
+      {/* Annual projection callout */}
+      <div style={{ background: 'rgba(196,162,74,0.06)', border: '1px solid rgba(196,162,74,0.25)', borderTop: '3px solid #C4A24A', padding: '24px 28px', marginBottom: '28px', display: 'flex', alignItems: 'center', gap: '32px', flexWrap: 'wrap' }}>
         <div>
-          <Eyebrow>Your Summary</Eyebrow>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-            {[
-              { label: 'Total Earned',    value: fmtCents(totalEarned),                     sub: 'All paid commissions' },
-              { label: 'Pending',         value: fmtCents(totalPending),                    sub: 'Awaiting payment cycle' },
-              { label: 'Annual Residual', value: fmtCents(archivist.residual_income_cents), sub: 'Current run rate' },
-              { label: 'Total Closings',  value: String(archivist.total_closings),           sub: archivist.rank },
-            ].map(({ label, value, sub }) => (
-              <div key={label} className="rounded-sm border border-border-subtle px-5 py-5" style={{ background: '#111112' }}>
-                <p className="font-sans text-[0.58rem] font-bold tracking-[0.16em] uppercase text-text-muted mb-2">{label}</p>
-                <p className="font-serif font-semibold" style={{ fontSize: '1.6rem', letterSpacing: '-0.025em', color: '#C4A24A' }}>{value}</p>
-                <p className="font-sans text-[0.62rem] text-text-muted mt-1">{sub}</p>
+          <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.58rem', letterSpacing: '0.24em', textTransform: 'uppercase', color: C.dim, marginBottom: '6px' }}>Annual Stewardship Income</p>
+          <p style={{ fontFamily: 'Georgia, serif', fontSize: '2.2rem', fontWeight: 300, color: C.gold, lineHeight: 1 }}>
+            ${annualResidual.toLocaleString()}
+          </p>
+          <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.58rem', color: C.ghost, marginTop: '6px' }}>
+            {activeClients.length} active {activeClients.length === 1 ? 'archive' : 'archives'} · ${monthlyMRR}/month
+          </p>
+        </div>
+        <div style={{ borderLeft: `1px solid rgba(196,162,74,0.2)`, paddingLeft: '32px' }}>
+          <div style={{ display: 'flex', gap: '28px' }}>
+            <div>
+              <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.55rem', color: C.ghost, marginBottom: '4px' }}>This Month</p>
+              <p style={{ fontFamily: 'Georgia, serif', fontSize: '1.3rem', fontWeight: 300, color: C.text }}>{fmt(thisMonth)}</p>
+            </div>
+            <div>
+              <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.55rem', color: C.ghost, marginBottom: '4px' }}>All Time</p>
+              <p style={{ fontFamily: 'Georgia, serif', fontSize: '1.3rem', fontWeight: 300, color: C.text }}>{fmt(allTime)}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Commission tier */}
+      <div style={{ background: C.surface, border: `1px solid ${C.border}`, padding: '20px 24px', marginBottom: '28px', display: 'flex', gap: '32px', flexWrap: 'wrap' }}>
+        <div>
+          <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.55rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: certified ? C.gold : C.dim, marginBottom: '8px' }}>
+            {certified ? 'Certified Guide' : 'Uncertified'}
+          </p>
+          <p style={{ fontFamily: 'Georgia, serif', fontSize: '0.95rem', color: C.muted }}>Founding: <span style={{ color: C.gold }}>$1,000</span> per archive</p>
+          <p style={{ fontFamily: 'Georgia, serif', fontSize: '0.95rem', color: C.muted }}>Residual: <span style={{ color: C.gold }}>8%</span> annually</p>
+        </div>
+        {certified && (
+          <div style={{ borderLeft: `1px solid ${C.border}`, paddingLeft: '32px', flex: 1 }}>
+            <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.55rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: C.ghost, marginBottom: '12px' }}>Next Tier: Senior Guide</p>
+            {nextTierReqs.map(req => (
+              <div key={req.label} style={{ marginBottom: '10px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                  <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.6rem', color: req.done ? C.green : C.muted }}>{req.done ? '✓ ' : ''}{req.label}</p>
+                  <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.6rem', color: C.dim }}>{req.current}/{req.target}</p>
+                </div>
+                <div style={{ height: '3px', background: 'rgba(255,255,255,0.06)', borderRadius: '2px' }}>
+                  <div style={{ height: '100%', width: `${Math.min((req.current / req.target) * 100, 100)}%`, background: req.done ? C.green : C.gold, borderRadius: '2px', transition: 'width 0.6s ease' }} />
+                </div>
               </div>
             ))}
           </div>
+        )}
+      </div>
 
-          {commissions.length > 0 && (
-            <div className="rounded-sm border border-border-subtle overflow-hidden" style={{ background: '#111112' }}>
-              <div className="px-6 py-4 border-b border-border-subtle">
-                <p className="font-sans text-[0.6rem] font-bold tracking-[0.18em] uppercase text-text-muted">Commission History</p>
+      {/* Tabs */}
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
+        <TabBtn id="founding"  label="Founding Commissions" />
+        <TabBtn id="residuals" label="Stewardship Residuals" />
+      </div>
+
+      {/* Founding commissions table */}
+      {tab === 'founding' && (
+        <div style={{ background: C.surface, border: `1px solid ${C.border}` }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr 80px 80px', borderBottom: `1px solid ${C.border}` }}>
+            {['Date', 'Client', 'Amount', 'Status'].map(h => (
+              <div key={h} style={{ padding: '10px 16px' }}>
+                <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.55rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: C.ghost }}>{h}</p>
               </div>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                      {['Date', 'Description', 'Type', 'Amount', 'Status'].map(h => (
-                        <th key={h} className="text-left px-5 py-3 font-sans text-[0.58rem] font-bold tracking-[0.14em] uppercase text-text-muted">{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {commissions.map((c, i) => (
-                      <tr key={c.id} style={i < commissions.length - 1 ? { borderBottom: '1px solid rgba(255,255,255,0.04)' } : {}}>
-                        <td className="px-5 py-3 font-sans text-[0.72rem] text-text-muted whitespace-nowrap">
-                          {new Date(c.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                        </td>
-                        <td className="px-5 py-3 font-sans text-[0.78rem] text-text-secondary">{c.description || '—'}</td>
-                        <td className="px-5 py-3">
-                          <span className="font-sans text-[0.62rem] font-bold tracking-[0.08em] uppercase px-2 py-0.5 rounded-sm capitalize" style={{ background: 'rgba(255,255,255,0.05)', color: '#9DA3A8' }}>
-                            {c.type}
-                          </span>
-                        </td>
-                        <td className="px-5 py-3 font-serif font-semibold" style={{ fontSize: '1rem', color: '#C4A24A', letterSpacing: '-0.02em' }}>
-                          {fmtCents(c.amount_cents)}
-                        </td>
-                        <td className="px-5 py-3 font-sans text-[0.72rem] capitalize" style={{ color: c.status === 'paid' ? '#4CAF50' : '#9DA3A8' }}>
-                          {c.status}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+            ))}
+          </div>
+          {founding.length === 0 && (
+            <p style={{ padding: '24px', fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: '0.9rem', color: C.ghost }}>No founding commissions yet.</p>
           )}
+          {founding.map((c, i) => (
+            <div key={c.id} style={{ display: 'grid', gridTemplateColumns: '100px 1fr 80px 80px', borderBottom: i < founding.length - 1 ? `1px solid ${C.border}` : 'none' }}>
+              <div style={{ padding: '12px 16px' }}><p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.62rem', color: C.dim }}>{new Date(c.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p></div>
+              <div style={{ padding: '12px 16px' }}><p style={{ fontFamily: 'Georgia, serif', fontSize: '0.9rem', color: C.muted }}>{c.description ?? 'Founding commission'}</p></div>
+              <div style={{ padding: '12px 16px', textAlign: 'right' }}><p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.65rem', color: C.gold }}>{fmt(c.amount_cents)}</p></div>
+              <div style={{ padding: '12px 16px' }}><p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.55rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: c.status === 'paid' ? C.green : C.dim }}>{c.status}</p></div>
+            </div>
+          ))}
+          {/* Totals */}
+          <div style={{ borderTop: `1px solid ${C.border}`, padding: '14px 16px', display: 'flex', justifyContent: 'flex-end', gap: '32px' }}>
+            {[{ label: 'This Month', val: thisMonth }, { label: 'This Quarter', val: thisQuarter }, { label: 'All Time', val: allTime }].map(({ label, val }) => (
+              <div key={label} style={{ textAlign: 'right' }}>
+                <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.55rem', color: C.ghost, marginBottom: '3px' }}>{label}</p>
+                <p style={{ fontFamily: 'Georgia, serif', fontSize: '1rem', color: C.gold }}>{fmt(val)}</p>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
-      {/* ── CALCULATOR ── */}
-      <div>
-        <Eyebrow>Earnings Calculator</Eyebrow>
-        <Heading>The math is straightforward.</Heading>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="rounded-sm border border-border-subtle p-7" style={{ background: '#111112' }}>
-            <div className="mb-7">
-              <div className="flex items-baseline justify-between mb-4">
-                <label className="font-sans text-[0.65rem] font-bold tracking-[0.14em] uppercase text-text-muted">Closings per month</label>
-                <span className="font-serif font-semibold text-text-primary" style={{ fontSize: '1.6rem', letterSpacing: '-0.02em' }}>{closings}</span>
-              </div>
-              <input type="range" min={1} max={20} value={closings} onChange={e => setClosings(Number(e.target.value))} className="range-amber" aria-label="Closings per month" />
-              <div className="flex justify-between mt-1.5">
-                <span className="font-sans text-[0.58rem] text-text-muted">1</span>
-                <span className="font-sans text-[0.58rem] text-text-muted">20</span>
-              </div>
-            </div>
-            <div>
-              <p className="font-sans text-[0.65rem] font-bold tracking-[0.14em] uppercase text-text-muted mb-3">Subscription tier sold</p>
-              <div className="flex gap-2">
-                {TIERS.map(t => (
-                  <button key={t} onClick={() => setTier(t)} className="flex-1 rounded-sm py-2.5 font-sans text-[0.72rem] font-medium tracking-[0.04em] transition-all duration-150 border"
-                    style={tier === t
-                      ? { background: '#C4A24A', borderColor: '#C4A24A', color: '#0C0C0D' }
-                      : { background: 'transparent', borderColor: 'rgba(196,162,74,0.22)', color: '#5C6166' }}>
-                    {t}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-5">
-            <div>
-              <p className="font-sans text-[0.62rem] font-bold tracking-[0.14em] uppercase text-text-muted mb-1">Month 1 Earnings</p>
-              <p className="font-serif font-semibold text-text-primary" style={{ fontSize: 'clamp(2rem,4vw,3rem)', letterSpacing: '-0.03em' }}>{fmt(upfront)}</p>
-            </div>
-            <div className="h-px bg-white/[0.06]" />
-            <div className="flex flex-col gap-3">
-              {[
-                { label: 'Upfront commissions (this month)', value: fmt(upfront),        suffix: ''    },
-                { label: 'Annual residual after 12 months',  value: fmt(annualResidual), suffix: '/yr' },
-                { label: 'Projected year 1 total',           value: fmt(year1Total),     suffix: ''    },
-              ].map(({ label, value, suffix }) => (
-                <div key={label} className="flex items-baseline justify-between gap-4">
-                  <span className="font-sans text-[0.78rem] text-text-muted">{label}</span>
-                  <span className="font-serif font-medium text-text-primary text-[1rem] flex-shrink-0">{value}{suffix}</span>
+      {/* Stewardship residuals */}
+      {tab === 'residuals' && (
+        <div>
+          <div style={{ background: C.surface, border: `1px solid ${C.border}`, marginBottom: '12px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 80px 100px', borderBottom: `1px solid ${C.border}` }}>
+              {['Archive', 'Tier', 'Monthly'].map(h => (
+                <div key={h} style={{ padding: '10px 16px' }}>
+                  <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.55rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: C.ghost }}>{h}</p>
                 </div>
               ))}
             </div>
-            {sprintEligible && (
-              <div className="rounded-sm px-4 py-3 flex items-center gap-3" style={{ background: 'rgba(196,162,74,0.06)', border: '1px solid rgba(196,162,74,0.2)' }}>
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                  <path d="M2.5 7l3 3L11.5 4" stroke="#C4A24A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                <p className="font-sans text-[0.78rem]" style={{ color: '#C4A24A' }}>Sprint bonus eligible: +$500 to +$4,000</p>
+            {activeClients.length === 0 && (
+              <p style={{ padding: '24px', fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: '0.9rem', color: C.ghost }}>No active archives yet.</p>
+            )}
+            {activeClients.map((p, i) => {
+              const tierKey = p.tier as keyof typeof RESIDUAL_MONTHLY
+              const monthly = RESIDUAL_MONTHLY[(p.tier ?? '').toLowerCase()] ?? 24
+              return (
+                <div key={p.id} style={{ display: 'grid', gridTemplateColumns: '1fr 80px 100px', borderBottom: i < activeClients.length - 1 ? `1px solid ${C.border}` : 'none' }}>
+                  <div style={{ padding: '12px 16px' }}><p style={{ fontFamily: 'Georgia, serif', fontSize: '0.9rem', color: C.muted }}>{p.name}</p></div>
+                  <div style={{ padding: '12px 16px' }}><p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.6rem', color: C.dim }}>{p.tier || '—'}</p></div>
+                  <div style={{ padding: '12px 16px', textAlign: 'right' }}><p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.65rem', color: C.gold }}>${monthly}/mo</p></div>
+                </div>
+              )
+            })}
+            {activeClients.length > 0 && (
+              <div style={{ borderTop: `1px solid ${C.border}`, padding: '14px 16px', display: 'flex', justifyContent: 'flex-end', gap: '24px' }}>
+                <div style={{ textAlign: 'right' }}>
+                  <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.55rem', color: C.ghost, marginBottom: '3px' }}>Total Monthly</p>
+                  <p style={{ fontFamily: 'Georgia, serif', fontSize: '1.1rem', color: C.gold }}>${monthlyMRR}/mo</p>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.55rem', color: C.ghost, marginBottom: '3px' }}>Annual</p>
+                  <p style={{ fontFamily: 'Georgia, serif', fontSize: '1.1rem', color: C.gold }}>${annualResidual.toLocaleString()}/yr</p>
+                </div>
               </div>
             )}
           </div>
-        </div>
-      </div>
-
-      {/* ── COMMISSION OVERVIEW ── */}
-      <div>
-        <Eyebrow>Commission Structure</Eyebrow>
-        <Heading>How you earn.</Heading>
-
-        {/* Top summary cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-          {[
-            { value: '$1,000', label: 'Per Founding',    sub: 'Flat on every completed Founding, regardless of tier or billing' },
-            { value: '$144–$768', label: 'Annual Residual', sub: '8% of the annual subscription per client, paid yearly for life' },
-            { value: '$0',    label: 'To Join',          sub: 'No buy-in. No inventory. No fees.'                                },
-          ].map(({ value, label, sub }) => (
-            <div key={label} className="rounded-sm border border-border-subtle p-6" style={{ background: '#111112' }}>
-              <p className="font-serif font-semibold text-text-primary mb-1" style={{ fontSize: '2rem', letterSpacing: '-0.02em', color: '#C4A24A' }}>{value}</p>
-              <p className="font-sans text-[0.7rem] font-bold tracking-[0.12em] uppercase text-text-primary mb-2">{label}</p>
-              <p className="font-sans text-[0.75rem] text-text-muted leading-[1.6]">{sub}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Residual breakdown — annual and monthly side by side */}
-        <div className="rounded-sm border border-border-subtle overflow-hidden mb-4" style={{ background: '#111112' }}>
-          <div className="px-6 py-4 border-b border-border-subtle">
-            <p className="font-sans text-[0.6rem] font-bold tracking-[0.18em] uppercase text-text-muted">Residual Breakdown by Tier and Billing</p>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                  <th className="text-left px-6 py-3 font-sans text-[0.58rem] font-bold tracking-[0.14em] uppercase text-text-muted">Tier</th>
-                  <th className="text-left px-6 py-3 font-sans text-[0.58rem] font-bold tracking-[0.14em] uppercase" style={{ color: '#C4A24A' }}>Annual Price</th>
-                  <th className="text-left px-6 py-3 font-sans text-[0.58rem] font-bold tracking-[0.14em] uppercase" style={{ color: '#C4A24A' }}>Your Annual Residual</th>
-                  <th className="text-left px-6 py-3 font-sans text-[0.58rem] font-bold tracking-[0.14em] uppercase text-text-muted">Monthly Price</th>
-                  <th className="text-left px-6 py-3 font-sans text-[0.58rem] font-bold tracking-[0.14em] uppercase text-text-muted">Your Monthly Residual</th>
-                </tr>
-              </thead>
-              <tbody>
-                {TIERS.map((t, i) => (
-                  <tr key={t} style={i < TIERS.length - 1 ? { borderBottom: '1px solid rgba(255,255,255,0.06)' } : {}}>
-                    <td className="px-6 py-4 font-sans text-[0.85rem] font-semibold text-text-primary">{t}</td>
-                    <td className="px-6 py-4 font-sans text-[0.85rem] text-text-secondary">{TIER_DATA[t].annualPrice}</td>
-                    <td className="px-6 py-4">
-                      <span className="font-serif font-semibold" style={{ fontSize: '1rem', color: '#C4A24A' }}>
-                        {fmtResidual(TIER_DATA[t].annualResidual)}/yr
-                      </span>
-                      <span className="font-sans text-[0.72rem] text-text-muted ml-2">
-                        ({TIER_DATA[t].annualMonthly})
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 font-sans text-[0.85rem] text-text-secondary">{TIER_DATA[t].monthlyPrice}</td>
-                    <td className="px-6 py-4 font-serif font-semibold" style={{ fontSize: '1rem', color: 'rgba(196,162,74,0.65)' }}>
-                      {fmtResidual(TIER_DATA[t].monthlyResidual)}/mo
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Monthly advantage note */}
-        <div className="rounded-sm px-6 py-5" style={{ background: 'rgba(196,162,74,0.05)', border: '1px solid rgba(196,162,74,0.18)' }}>
-          <p className="font-sans text-[0.6rem] font-bold tracking-[0.18em] uppercase mb-3" style={{ color: '#C4A24A' }}>Monthly Billing Advantage</p>
-          <p className="font-sans text-[0.82rem] text-text-secondary leading-[1.7] mb-2">
-            Monthly clients generate higher long-term residuals. An Estate client on monthly billing
-            generates <span style={{ color: '#C4A24A', fontWeight: 600 }}>$28.80/month</span> vs $24/month on annual.
-          </p>
-          <p className="font-sans text-[0.82rem] text-text-secondary leading-[1.7]">
-            Over 3 years, that is{' '}
-            <span style={{ color: '#C4A24A', fontWeight: 600 }}>$1,037 more per client.</span>{' '}
-            Offer monthly as a genuine option, not a fallback.
+          <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: '0.85rem', color: C.ghost, lineHeight: 1.6 }}>
+            Residuals are paid on the 1st of each month for all archives active on the last day of the previous month.
           </p>
         </div>
-      </div>
-
-      {/* ── SPRINT BONUSES ── */}
-      <div>
-        <Eyebrow>Sprint Bonuses</Eyebrow>
-        <Heading>The game within the game.</Heading>
-        <div className="rounded-sm border border-border-subtle overflow-hidden mb-4" style={{ background: '#111112' }}>
-          {SPRINTS.map(({ trigger, bonus }, i) => (
-            <div key={trigger} className="flex items-center justify-between px-6 py-4" style={i < SPRINTS.length - 1 ? { borderBottom: '1px solid rgba(255,255,255,0.06)' } : {}}>
-              <span className="font-sans text-[0.85rem] text-text-secondary">{trigger}</span>
-              <span className="font-serif font-semibold" style={{ fontSize: '1.1rem', color: '#C4A24A', letterSpacing: '-0.02em' }}>+{bonus}</span>
-            </div>
-          ))}
-        </div>
-        <p className="font-serif italic text-text-muted" style={{ fontSize: '0.88rem' }}>Sprint bonuses are paid in addition to all standard commissions and residuals.</p>
-      </div>
-
-      {/* ── RANKS ── */}
-      <div>
-        <Eyebrow>Rank Structure</Eyebrow>
-        <Heading>Every activation moves you forward.</Heading>
-        <div className="rounded-sm border border-border-subtle overflow-hidden" style={{ background: '#111112' }}>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                  {['Rank', 'Activations', 'Commission', 'Override', 'Unlocks'].map(h => (
-                    <th key={h} className="text-left px-5 py-3 font-sans text-[0.58rem] font-bold tracking-[0.14em] uppercase text-text-muted whitespace-nowrap">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {RANKS.map(({ title, range, rate, override, notes }, i) => (
-                  <tr key={title} style={i < RANKS.length - 1 ? { borderBottom: '1px solid rgba(255,255,255,0.06)' } : {}}>
-                    <td className="px-5 py-4 font-sans text-[0.78rem] font-semibold text-text-primary whitespace-nowrap">{title}</td>
-                    <td className="px-5 py-4 font-sans text-[0.78rem] text-text-secondary">{range}</td>
-                    <td className="px-5 py-4 font-sans text-[0.78rem] font-semibold" style={{ color: '#C4A24A' }}>{rate}</td>
-                    <td className="px-5 py-4 font-sans text-[0.78rem] text-text-secondary">{override}</td>
-                    <td className="px-5 py-4 font-sans text-[0.75rem] text-text-muted leading-[1.6]">{notes}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      {/* ── PAYMENT SCHEDULE ── */}
-      <div>
-        <Eyebrow>Payment Schedule</Eyebrow>
-        <Heading>When you get paid.</Heading>
-        <div className="rounded-sm border border-border-subtle p-8" style={{ background: '#111112' }}>
-          <div className="flex flex-col gap-5">
-            {[
-              { label: 'Founding commissions', detail: 'Paid within 5 business days of Founding completion and payment clearance.'                  },
-              { label: 'Monthly residuals',     detail: 'Paid on the 15th of each month for all active accounts from the prior period.'             },
-              { label: 'Sprint bonuses',        detail: "Paid with the following month's residual cycle after sprint verification."                 },
-              { label: 'Override commissions',  detail: 'Paid monthly with residuals. Requires Senior Legacy Guide rank or above.'                 },
-            ].map(({ label, detail }) => (
-              <div key={label} className="flex gap-4">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="flex-shrink-0 mt-0.5" aria-hidden="true">
-                  <path d="M2.5 7l3 3L11.5 4" stroke="#C4A24A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                <div>
-                  <p className="font-sans text-[0.82rem] font-semibold text-text-primary mb-0.5">{label}</p>
-                  <p className="font-sans text-[0.78rem] text-text-muted leading-[1.6]">{detail}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
+      )}
     </div>
   )
 }
