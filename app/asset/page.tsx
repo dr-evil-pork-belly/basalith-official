@@ -154,7 +154,7 @@ export default function AssetPage() {
                 marginBottom:   '1.5rem',
               }}
             >
-              Meet Eleanor on basalith.ai →
+              Explore the AI Presence → basalith.ai
             </a>
             <a
               href="/pricing"

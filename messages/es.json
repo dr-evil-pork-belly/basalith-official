@@ -53,18 +53,11 @@
     "step_4_body": "Su entidad de IA se entrena con todo lo depositado. Sus nietos podrán preguntarle cómo pensaba ante una decisión difícil. Responde desde su archivo."
   },
   "story": {
-    "eyebrow": "Una Familia",
-    "body_1": "Eleanor comenzó su archivo en 2024.",
-    "body_2": "Durante dos años, su familia aportó 847 fotografías, 23 grabaciones de voz y 2 años de sesiones semanales de sabiduría.",
-    "body_3": "Su entidad ahora responde preguntas sobre decisiones difíciles tal como Eleanor lo haría. No desde la memoria. Desde patrones cognitivos aprendidos a lo largo de una vida.",
-    "conclusion": "Sus nietos lo llaman extraordinario. Sus bisnietos lo llamarán normal.",
-    "stat_1_number": "847",
-    "stat_1_label": "Fotografías",
-    "stat_2_number": "23",
-    "stat_2_label": "Contribuidores",
-    "stat_3_number": "2 años",
-    "stat_3_label": "Sesiones de sabiduría",
-    "body_4": "Patricia dijo que fue la primera vez\nque no sintió esa incertidumbre."
+    "founder_p1": "Construí Basalith porque no estoy listo.",
+    "founder_p2": "No para mi madre.\nNo para mi padre.\nNo para los amigos que ya he perdido\nantes de comprender lo que significa perder.",
+    "founder_p3": "He visto partir a la gente.\nAlgunos de repente. Otros poco a poco.\nNinguno en el momento\nque yo habría elegido.",
+    "founder_p4": "El archivo que estoy construyendo para mi madre\nes la demostración real.\n\nNo está terminado.\nNunca estará terminado.\nEse es el punto.",
+    "founder_attribution": "David Ha\nFundador, Basalith · 2026"
   },
   "pricing_teaser": {
     "line_1": "Las personas más ricas del mundo gastan miles de millones construyendo versiones de sí mismas en IA.",
