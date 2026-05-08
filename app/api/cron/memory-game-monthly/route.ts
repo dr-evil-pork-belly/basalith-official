@@ -4,14 +4,14 @@ import { resend } from '@/lib/resend'
 import { generateGameScenario } from '@/lib/memoryGameScenarios'
 import { createTrainingPairFromDeposit } from '@/lib/trainingPipeline'
 
-export const dynamic    = 'force-dynamic'
+export const dynamic     = 'force-dynamic'
 export const maxDuration = 120
 
 const REVEAL_DAYS = 7
 
 function validateCronAuth(req: NextRequest): boolean {
-  const p       = new URL(req.url).searchParams
-  const secret  = req.headers.get('authorization')?.replace('Bearer ', '') ?? p.get('secret') ?? ''
+  const p        = new URL(req.url).searchParams
+  const secret   = req.headers.get('authorization')?.replace('Bearer ', '') ?? p.get('secret') ?? ''
   const expected = process.env.CRON_SECRET ?? ''
   return !!expected && secret === expected
 }
@@ -25,59 +25,109 @@ export async function GET(req: NextRequest) {
   const isTest = searchParams.get('test') === 'true'
   const force  = searchParams.get('force') === 'true'
 
-  // Only run on the 1st of each month
   if (!isTest && !force && new Date().getDate() !== 1) {
     return NextResponse.json({ skipped: true, reason: 'Not the 1st of the month' })
   }
 
-  const { data: archives } = await supabaseAdmin
+  // ── Step 1: fetch archives ──────────────────────────────────────────────────
+  const { data: archives, error: archivesErr } = await supabaseAdmin
     .from('archives')
     .select('id, name, family_name, owner_name, owner_email')
     .eq('status', 'active')
 
+  console.log('[memory-game] starting — archives found:', archives?.length ?? 0,
+    archivesErr ? 'ERROR: ' + archivesErr.message : '')
+
+  if (archivesErr) {
+    console.error('[memory-game] archives query failed:', archivesErr.message)
+    return NextResponse.json({ error: archivesErr.message }, { status: 500 })
+  }
+
   let started = 0
+  const skipped: { id: string; name: string; reason: string }[] = []
 
   for (const archive of archives ?? []) {
+    console.log('[memory-game] processing:', archive.id, archive.name)
+
     try {
-      const { data: contributors } = await supabaseAdmin
+      // ── Step 2: fetch contributors ────────────────────────────────────────
+      const { data: contributors, error: contribErr } = await supabaseAdmin
         .from('contributors')
-        .select('id, email, name, preferred_language, access_token')
+        .select('id, email, name, preferred_language, access_token, status')
         .eq('archive_id', archive.id)
-        .eq('status', 'active')
 
-      if (!contributors?.length) continue
+      const activeContributors = (contributors ?? []).filter(c => c.status === 'active')
 
-      const scenario  = await generateGameScenario(archive.id, archive.owner_name ?? archive.name)
-      const revealAt  = new Date(Date.now() + REVEAL_DAYS * 86_400_000).toISOString()
+      console.log('[memory-game] contributors for', archive.name, '—',
+        'total:', contributors?.length ?? 0,
+        'active:', activeContributors.length,
+        contribErr ? 'ERROR: ' + contribErr.message : '',
+        contributors?.map(c => `${c.name}(${c.status})`).join(', ') ?? 'none')
 
-      const { data: session, error: sessionErr } = await supabaseAdmin
-        .from('memory_game_sessions')
-        .insert({
-          archive_id:    archive.id,
-          game_type:     'story',
-          scenario_text: scenario.text,
-          scenario_type: scenario.type,
-          dimension:     scenario.dimension,
-          status:        'active',
-          reveal_at:     revealAt,
-          // photo_game required fields — nullable for story mode
-          closes_at:     revealAt,
-          metadata:      { templateId: scenario.templateId },
-        })
-        .select('id')
-        .single()
-
-      if (sessionErr || !session) {
-        console.error('[memory-game-monthly] session insert failed:', sessionErr?.message)
+      // Do NOT skip if no active contributors — create the session anyway.
+      // The owner email is sufficient for a game to run.
+      if (!archive.owner_email && activeContributors.length === 0) {
+        console.log('[memory-game] skipping', archive.name, '— no owner email and no contributors')
+        skipped.push({ id: archive.id, name: archive.name, reason: 'no_recipients' })
         continue
       }
 
+      // ── Step 3: generate scenario ──────────────────────────────────────────
+      console.log('[memory-game] generating scenario for:', archive.name)
+
+      let scenario: Awaited<ReturnType<typeof generateGameScenario>>
+      try {
+        scenario = await generateGameScenario(archive.id, archive.owner_name ?? archive.name)
+        console.log('[memory-game] scenario generated:', scenario?.text?.substring(0, 80))
+      } catch (scenErr: unknown) {
+        console.error('[memory-game] scenario generation failed for', archive.name, ':', scenErr instanceof Error ? scenErr.message : scenErr)
+        skipped.push({ id: archive.id, name: archive.name, reason: 'scenario_failed' })
+        continue
+      }
+
+      if (!scenario) {
+        console.error('[memory-game] scenario is null for:', archive.name)
+        skipped.push({ id: archive.id, name: archive.name, reason: 'scenario_null' })
+        continue
+      }
+
+      // ── Step 4: insert session ─────────────────────────────────────────────
+      const revealAt = new Date(Date.now() + REVEAL_DAYS * 86_400_000).toISOString()
+
+      const insertPayload = {
+        archive_id:    archive.id,
+        game_type:     'story',
+        scenario_text: scenario.text,
+        scenario_type: scenario.type,
+        dimension:     scenario.dimension,
+        status:        'active',
+        reveal_at:     revealAt,
+        closes_at:     revealAt,   // kept for backward compat with existing photo-game schema
+        metadata:      { templateId: scenario.templateId },
+      }
+
+      console.log('[memory-game] inserting session for:', archive.name, '— payload keys:', Object.keys(insertPayload).join(', '))
+
+      const { data: session, error: sessionErr } = await supabaseAdmin
+        .from('memory_game_sessions')
+        .insert(insertPayload)
+        .select('id')
+        .single()
+
+      console.log('[memory-game] insert result — id:', session?.id ?? 'null', 'error:', sessionErr?.message ?? 'none')
+
+      if (sessionErr || !session) {
+        console.error('[memory-game] session insert failed for', archive.name, ':', sessionErr?.message, sessionErr?.details ?? '', sessionErr?.hint ?? '')
+        skipped.push({ id: archive.id, name: archive.name, reason: `insert_failed: ${sessionErr?.message}` })
+        continue
+      }
+
+      // ── Step 5: send emails ────────────────────────────────────────────────
       const revealDateStr = new Date(revealAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
       const siteUrl       = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
 
-      // Send to all contributors + archive owner
       const recipients: { email: string; name: string; token: string | null; lang: string }[] = [
-        ...contributors.map(c => ({
+        ...activeContributors.map(c => ({
           email: c.email,
           name:  c.name ?? c.email,
           token: c.access_token ?? null,
@@ -89,6 +139,9 @@ export async function GET(req: NextRequest) {
         recipients.push({ email: archive.owner_email, name: archive.owner_name ?? 'Owner', token: null, lang: 'en' })
       }
 
+      console.log('[memory-game] sending to', recipients.length, 'recipients for', archive.name)
+
+      let emailsSent = 0
       for (const r of recipients) {
         try {
           const portalUrl = r.token ? `${siteUrl}/contribute/${r.token}` : `${siteUrl}/archive/dashboard`
@@ -111,18 +164,24 @@ export async function GET(req: NextRequest) {
               'Precedence':       'bulk',
             },
           })
+          emailsSent++
         } catch (emailErr) {
-          console.error('[memory-game-monthly] email failed for', r.email, emailErr instanceof Error ? emailErr.message : emailErr)
+          console.error('[memory-game] email failed for', r.email, ':', emailErr instanceof Error ? emailErr.message : emailErr)
         }
       }
 
+      console.log('[memory-game] started game for', archive.name, '— session:', session.id, '— emails sent:', emailsSent)
       started++
+
     } catch (err: unknown) {
-      console.error('[memory-game-monthly] archive error:', archive.id, err instanceof Error ? err.message : err)
+      console.error('[memory-game] unexpected error for archive', archive.id, archive.name, ':', err instanceof Error ? err.message : err)
+      skipped.push({ id: archive.id, name: archive.name, reason: `unexpected: ${err instanceof Error ? err.message : 'unknown'}` })
     }
   }
 
-  return NextResponse.json({ started, total: archives?.length ?? 0 })
+  console.log('[memory-game] complete — started:', started, 'skipped:', skipped.length)
+
+  return NextResponse.json({ started, total: archives?.length ?? 0, skipped })
 }
 
 // ── Check for sessions to reveal (called nightly) ─────────────────────────────
@@ -139,41 +198,39 @@ export async function POST(req: NextRequest) {
     .eq('status', 'active')
     .lte('reveal_at', now)
 
+  console.log('[memory-game-reveal] sessions due for reveal:', toReveal?.length ?? 0)
+
   if (!toReveal?.length) return NextResponse.json({ revealed: 0 })
 
   let revealed = 0
 
   for (const session of toReveal) {
     try {
-      // Get all responses
       const { data: responses } = await supabaseAdmin
         .from('memory_game_responses')
         .select('id, response_text, contributor_id, is_owner')
         .eq('session_id', session.id)
 
-      if (!responses?.length) {
-        // No responses — just close
-        await supabaseAdmin
-          .from('memory_game_sessions')
-          .update({ status: 'revealed' })
-          .eq('id', session.id)
-        continue
-      }
+      console.log('[memory-game-reveal] session', session.id, '— responses:', responses?.length ?? 0)
 
-      // Mark session as revealed
+      // Mark as revealed regardless of whether there are responses
       await supabaseAdmin
         .from('memory_game_sessions')
         .update({ status: 'revealed' })
         .eq('id', session.id)
 
-      // Get archive + contributors
+      if (!responses?.length) {
+        console.log('[memory-game-reveal] no responses for session', session.id, '— closing silently')
+        continue
+      }
+
       const { data: archive } = await supabaseAdmin
         .from('archives')
         .select('id, name, family_name, owner_name, owner_email')
         .eq('id', session.archive_id)
         .single()
 
-      if (!archive) continue
+      if (!archive) { console.error('[memory-game-reveal] archive not found for session', session.id); continue }
 
       const { data: contributors } = await supabaseAdmin
         .from('contributors')
@@ -183,15 +240,9 @@ export async function POST(req: NextRequest) {
 
       const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
 
-      // Send reveal email to all participants
       const allRecipients = [
-        ...(contributors ?? []).map(c => ({
-          email: c.email,
-          name:  c.name ?? c.email,
-          token: c.access_token,
-          lang:  c.preferred_language ?? 'en',
-        })),
-        ...(archive.owner_email ? [{ email: archive.owner_email, name: archive.owner_name ?? 'Owner', token: null, lang: 'en' }] : []),
+        ...(contributors ?? []).map(c => ({ email: c.email, name: c.name ?? c.email, token: c.access_token, lang: c.preferred_language ?? 'en' })),
+        ...(archive.owner_email ? [{ email: archive.owner_email, name: archive.owner_name ?? 'Owner', token: null as string | null, lang: 'en' }] : []),
       ]
 
       for (const r of allRecipients) {
@@ -201,56 +252,32 @@ export async function POST(req: NextRequest) {
             from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
             to:      r.email,
             subject: `Memory game answers revealed · ${archive.name}`,
-            html:    buildRevealEmail(
-              r.name.split(' ')[0],
-              archive.name,
-              session.scenario_text,
-              responses.map(r => r.response_text),
-              portalUrl,
-              r.lang,
-            ),
-            headers: {
-              'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
-              'X-Entity-Ref-ID':  `basalith-reveal-${session.id}-${r.email}`,
-              'Precedence':       'bulk',
-            },
+            html:    buildRevealEmail(r.name.split(' ')[0], archive.name, session.scenario_text, responses.map(r => r.response_text), portalUrl, r.lang),
+            headers: { 'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>', 'X-Entity-Ref-ID': `basalith-reveal-${session.id}-${r.email}`, 'Precedence': 'bulk' },
           })
         } catch {}
       }
 
-      // Create training pairs from all responses (fire-and-forget)
+      // Training pairs (fire-and-forget)
       void (async () => {
         try {
-          const { data: arch } = await supabaseAdmin
-            .from('archives')
-            .select('owner_name, name, preferred_language')
-            .eq('id', session.archive_id)
-            .single()
+          const { data: arch } = await supabaseAdmin.from('archives').select('owner_name, name, preferred_language').eq('id', session.archive_id).single()
           if (!arch) return
-
           for (const resp of responses) {
             if (resp.response_text.length < 30) continue
             await createTrainingPairFromDeposit(
-              {
-                id:         resp.id,
-                archive_id: session.archive_id,
-                prompt:     session.scenario_text,
-                response:   resp.response_text,
-              },
-              arch.owner_name ?? 'Unknown',
-              arch.name,
-              arch.preferred_language ?? 'en',
-              'game_response',
+              { id: resp.id, archive_id: session.archive_id, prompt: session.scenario_text, response: resp.response_text },
+              arch.owner_name ?? 'Unknown', arch.name, arch.preferred_language ?? 'en', 'game_response',
             )
           }
         } catch (e) {
-          console.warn('[memory-game-monthly] training pairs failed:', e instanceof Error ? e.message : e)
+          console.warn('[memory-game-reveal] training pairs failed:', e instanceof Error ? e.message : e)
         }
       })()
 
       revealed++
     } catch (err: unknown) {
-      console.error('[memory-game-monthly] reveal error:', session.id, err instanceof Error ? err.message : err)
+      console.error('[memory-game-reveal] error for session', session.id, ':', err instanceof Error ? err.message : err)
     }
   }
 
@@ -259,17 +286,8 @@ export async function POST(req: NextRequest) {
 
 // ── Email builders ─────────────────────────────────────────────────────────────
 
-function buildGameStartEmail(
-  firstName:    string,
-  archiveName:  string,
-  scenarioText: string,
-  revealDate:   string,
-  portalUrl:    string,
-  sessionId:    string,
-  lang:         string,
-): string {
+function buildGameStartEmail(firstName: string, archiveName: string, scenarioText: string, revealDate: string, portalUrl: string, sessionId: string, lang: string): string {
   const submitUrl = `${portalUrl}?game=${sessionId}`
-
   return `<!DOCTYPE html>
 <html>
 <body style="background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:600px;margin:0 auto;padding:0">
@@ -295,19 +313,8 @@ function buildGameStartEmail(
 </html>`
 }
 
-function buildRevealEmail(
-  firstName:    string,
-  archiveName:  string,
-  scenarioText: string,
-  answers:      string[],
-  portalUrl:    string,
-  lang:         string,
-): string {
-  const answerCards = answers.map(a => `
-    <div style="border:1px solid rgba(196,162,74,0.2);padding:20px 24px;margin-bottom:12px;background:rgba(196,162,74,0.03)">
-      <p style="font-family:Georgia,serif;font-size:16px;font-weight:300;color:#F0EDE6;line-height:1.75;margin:0;font-style:italic">${a.replace(/</g, '&lt;')}</p>
-    </div>`).join('')
-
+function buildRevealEmail(firstName: string, archiveName: string, scenarioText: string, answers: string[], portalUrl: string, lang: string): string {
+  const answerCards = answers.map(a => `<div style="border:1px solid rgba(196,162,74,0.2);padding:20px 24px;margin-bottom:12px;background:rgba(196,162,74,0.03)"><p style="font-family:Georgia,serif;font-size:16px;font-weight:300;color:#F0EDE6;line-height:1.75;margin:0;font-style:italic">${a.replace(/</g, '&lt;')}</p></div>`).join('')
   return `<!DOCTYPE html>
 <html>
 <body style="background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:600px;margin:0 auto;padding:0">
@@ -318,9 +325,7 @@ function buildRevealEmail(
   <div style="padding:32px">
     <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#B8B4AB;margin:0 0 8px">${firstName},</p>
     <p style="font-family:Georgia,serif;font-size:22px;font-weight:300;color:#F0EDE6;margin:0 0 8px;line-height:1.4">The question was:</p>
-    <div style="border-left:3px solid rgba(196,162,74,0.3);padding:16px 20px;margin:0 0 32px">
-      <p style="font-family:Georgia,serif;font-size:18px;font-weight:300;color:#C4A24A;line-height:1.6;margin:0;font-style:italic">${scenarioText}</p>
-    </div>
+    <div style="border-left:3px solid rgba(196,162,74,0.3);padding:16px 20px;margin:0 0 32px"><p style="font-family:Georgia,serif;font-size:18px;font-weight:300;color:#C4A24A;line-height:1.6;margin:0;font-style:italic">${scenarioText}</p></div>
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#5C6166;margin:0 0 20px">${answers.length} ANSWER${answers.length !== 1 ? 'S' : ''} — NAMES NOT SHOWN</p>
     ${answerCards}
     <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#706C65;line-height:1.8;margin:28px 0">Which answer surprised you most? Reply and tell us why.</p>
