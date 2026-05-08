@@ -26,9 +26,10 @@ export async function GET(req: NextRequest) {
   }
 
   const isTest = new URL(req.url).searchParams.get('test') === 'true'
+  const force  = new URL(req.url).searchParams.get('force') === 'true'
 
-  // Only run on Mondays (skip check in test mode)
-  if (!isTest) {
+  // Only run on Mondays (skip check in test/force mode)
+  if (!isTest && !force) {
     const day = new Date().getDay() // 1 = Monday
     if (day !== 1) {
       return Response.json({ skipped: true, reason: 'Not Monday' })

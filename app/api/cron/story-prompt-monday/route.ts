@@ -19,12 +19,13 @@ export async function GET(req: NextRequest) {
   const headerSecret = authHeader.replace('Bearer ', '')
   const expected     = process.env.CRON_SECRET || ''
   const isTest       = searchParams.get('test') === 'true'
+  const force        = searchParams.get('force') === 'true'
 
   if (!expected || (headerSecret !== expected && secretParam !== expected)) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  if (!isTest && new Date().getDay() !== 1) {
+  if (!isTest && !force && new Date().getDay() !== 1) {
     return Response.json({ skipped: true, reason: 'Not Monday' })
   }
 

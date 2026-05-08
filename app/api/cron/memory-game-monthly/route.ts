@@ -23,9 +23,10 @@ export async function GET(req: NextRequest) {
 
   const { searchParams } = new URL(req.url)
   const isTest = searchParams.get('test') === 'true'
+  const force  = searchParams.get('force') === 'true'
 
   // Only run on the 1st of each month
-  if (!isTest && new Date().getDate() !== 1) {
+  if (!isTest && !force && new Date().getDate() !== 1) {
     return NextResponse.json({ skipped: true, reason: 'Not the 1st of the month' })
   }
 
