@@ -7,57 +7,56 @@ import { t } from '@/lib/emailTranslations'
 import { getEmailPhotoUrl } from '@/lib/photo-url'
 import { sendWeChatPhoto } from '@/lib/wechat'
 
+// ── Cadence helpers ───────────────────────────────────────────────────────────
+
 function calculateNextSend(prefs: { cadence: string; send_time: string }): string {
   const now  = new Date()
   const next = new Date(now)
-
-  if (prefs.cadence === 'daily') {
-    next.setDate(next.getDate() + 1)
-  } else if (prefs.cadence === 'three_weekly') {
-    next.setDate(next.getDate() + 2)
-  } else if (prefs.cadence === 'weekly') {
-    next.setDate(next.getDate() + 7)
-  } else {
-    next.setDate(next.getDate() + 1)
-  }
-
+  if (prefs.cadence === 'daily')         next.setDate(next.getDate() + 1)
+  else if (prefs.cadence === 'three_weekly') next.setDate(next.getDate() + 2)
+  else if (prefs.cadence === 'weekly')   next.setDate(next.getDate() + 7)
+  else                                   next.setDate(next.getDate() + 1)
   const [hours, minutes] = prefs.send_time.split(':')
   next.setHours(parseInt(hours), parseInt(minutes), 0, 0)
-
   return next.toISOString()
 }
 
-async function getExcludedPhotoIds(
-  archiveId:     string,
-  contributorId: string,
-  contributorName:  string | null,
-  contributorEmail: string,
-): Promise<string[]> {
-  // Photos this contributor has already been sent
-  const [{ data: sentRows }, { data: labeledRows }] = await Promise.all([
-    supabaseAdmin
-      .from('contributor_photo_sends')
-      .select('photograph_id')
-      .eq('contributor_id', contributorId),
+// ── All-photos-sent notification ──────────────────────────────────────────────
 
-    // Photos this contributor has already labeled — match by name or email
-    supabaseAdmin
-      .from('labels')
-      .select('photograph_id')
-      .eq('archive_id', archiveId)
-      .or(
-        [
-          contributorName  ? `labelled_by.eq.${contributorName}` : null,
-          `labelled_by.eq.${contributorEmail}`,
-        ].filter(Boolean).join(',')
-      ),
-  ])
-
-  return [
-    ...(sentRows   ?? []).map((r: { photograph_id: string }) => r.photograph_id),
-    ...(labeledRows ?? []).map((r: { photograph_id: string }) => r.photograph_id),
-  ].filter(Boolean)
+function buildAllPhotosSentEmail(
+  archiveName:     string,
+  contributorName: string,
+): string {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+  return `<!DOCTYPE html>
+<html>
+<body style="background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:600px;margin:0 auto;padding:0">
+  <div style="padding:32px">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 24px">
+      ${archiveName.toUpperCase()}
+    </p>
+    <h2 style="font-family:Georgia,serif;font-size:22px;font-weight:300;color:#F0EDE6;margin:0 0 16px;line-height:1.4">
+      ${contributorName} has seen all your photographs.
+    </h2>
+    <p style="font-family:Georgia,serif;font-size:16px;font-weight:300;font-style:italic;color:#B8B4AB;line-height:1.8;margin:0 0 24px">
+      Every photograph in your archive has been sent to ${contributorName}.
+      To continue the daily photograph series, upload more photographs to your archive.
+    </p>
+    <p style="font-family:Georgia,serif;font-size:15px;font-weight:300;font-style:italic;color:#706C65;line-height:1.8;margin:0 0 32px">
+      Each new photograph is an opportunity for ${contributorName} to share
+      a memory you may not have heard. Old family albums, photographs from
+      other relatives, and digitised prints all make excellent archive additions.
+    </p>
+    <a href="${siteUrl}/archive/label"
+      style="display:inline-block;background:#C4A24A;color:#0A0908;font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;text-decoration:none;padding:14px 28px">
+      UPLOAD MORE PHOTOGRAPHS →
+    </a>
+  </div>
+</body>
+</html>`
 }
+
+// ── Main handler ──────────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
   try {
@@ -84,78 +83,110 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ skipped: true, reason: 'No active contributors' })
     }
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
-    let sentCount = 0
-    let firstPhotoSent: Record<string, unknown> | null = null
-    let firstSession: Record<string, unknown> | null = null
-    const exhaustedContributors: string[] = []
+    const siteUrl   = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+    let sentCount   = 0
+    let firstSentPhoto: Record<string, unknown> | null = null
+    const exhausted: string[] = []
 
-    // 3. Process each contributor individually — each gets their own next unsent photo
+    // 3. Process each contributor individually
     for (const contributor of contributors) {
-      try {
-        // Get photo IDs this contributor has already seen (sent or labeled)
-        const excludedIds = await getExcludedPhotoIds(
-          archiveId,
-          contributor.id,
-          contributor.name ?? null,
-          contributor.email,
-        )
 
-        // Select the next photo for this contributor
-        let photoQuery = supabaseAdmin
+      // ── 3A. Get photo IDs already sent to this contributor ──────────────────
+      const { data: sentRows } = await supabaseAdmin
+        .from('contributor_photo_sends')
+        .select('photograph_id')
+        .eq('contributor_id', contributor.id)
+
+      const sentPhotoIds = (sentRows ?? []).map(r => r.photograph_id).filter(Boolean)
+
+      // ── 3B. Select next unlabelled photo not yet sent ───────────────────────
+      let photoQuery = supabaseAdmin
+        .from('photographs')
+        .select('*')
+        .eq('archive_id', archiveId)
+        .eq('status', 'unlabelled')
+        .order('created_at', { ascending: true })
+        .limit(1)
+
+      if (sentPhotoIds.length > 0) {
+        photoQuery = photoQuery.not('id', 'in', `(${sentPhotoIds.join(',')})`)
+      }
+
+      let { data: photoData } = await photoQuery
+      let photo = photoData?.[0] ?? null
+
+      // ── 3C. Fallback: any unsent photo (labelled or not) ────────────────────
+      if (!photo) {
+        let anyQuery = supabaseAdmin
           .from('photographs')
           .select('*')
           .eq('archive_id', archiveId)
-          .eq('is_best_in_cluster', true)
-          .order('priority_score', { ascending: false })
+          .order('created_at', { ascending: true })
           .limit(1)
 
-        if (excludedIds.length > 0) {
-          photoQuery = photoQuery.not('id', 'in', `(${excludedIds.join(',')})`)
+        if (sentPhotoIds.length > 0) {
+          anyQuery = anyQuery.not('id', 'in', `(${sentPhotoIds.join(',')})`)
         }
 
-        const { data: photos } = await photoQuery
-        const photo = photos?.[0]
+        const { data: anyPhotoData } = await anyQuery
+        photo = anyPhotoData?.[0] ?? null
 
         if (!photo) {
-          // This contributor has seen all available photos — track and continue
-          exhaustedContributors.push(contributor.name ?? contributor.email)
-          console.log(`send-photo: ${contributor.email} has seen all photos in archive ${archiveId}`)
+          // All photos have been sent to this contributor
+          console.log('[send-photos] all photos sent to:', contributor.name, '— notifying owner')
+          exhausted.push(contributor.name ?? contributor.email)
+
+          if (archive.owner_email) {
+            void (async () => {
+              try {
+                await resend.emails.send({
+                  from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
+                  to:      archive.owner_email,
+                  subject: `${contributor.name ?? contributor.email} has seen all your photographs`,
+                  html:    buildAllPhotosSentEmail(archive.name, contributor.name ?? contributor.email),
+                })
+              } catch (e) {
+                console.error('[send-photos] exhaustion email failed:', e instanceof Error ? e.message : e)
+              }
+            })()
+          }
           continue
         }
+      }
 
-        // Get photo URL
-        const photoUrl = await getEmailPhotoUrl(photo.storage_path)
-        if (!photoUrl) {
-          console.error(`send-photo: could not generate URL for photo ${photo.id}`)
-          continue
-        }
+      // ── 3D. Generate photo URL ──────────────────────────────────────────────
+      const photoUrl = await getEmailPhotoUrl(photo.storage_path)
+      if (!photoUrl) {
+        console.error(`[send-photos] could not generate URL for photo ${photo.id}`)
+        continue
+      }
 
-        // Build unique reply address per contributor
-        const sessionCode  = Math.random().toString(36).substring(2, 8)
-        const familySlug   = archive.family_name.toLowerCase().replace(/\s+/g, '-')
-        const replyDomain  = process.env.RESEND_REPLY_DOMAIN ?? 'zoibrenae.resend.app'
-        const replyAddress = `${familySlug}-${sessionCode}@${replyDomain}`
+      // ── 3E. Build unique reply address per contributor ──────────────────────
+      const sessionCode  = Math.random().toString(36).substring(2, 8)
+      const familySlug   = archive.family_name.toLowerCase().replace(/\s+/g, '-')
+      const replyDomain  = process.env.RESEND_REPLY_DOMAIN ?? 'zoibrenae.resend.app'
+      const replyAddress = `${familySlug}-${sessionCode}@${replyDomain}`
 
-        const yearStr      = photo.ai_era_estimate ? ` · ${photo.ai_era_estimate}` : ''
-        const lang         = (contributor as { preferred_language?: string }).preferred_language ?? 'en'
+      const yearStr = photo.ai_era_estimate ? ` · ${photo.ai_era_estimate}` : ''
+      const lang    = (contributor as { preferred_language?: string }).preferred_language ?? 'en'
 
-        // Create session record for this contributor's send (enables reply matching)
-        const { data: session } = await supabaseAdmin
-          .from('email_sessions')
-          .insert({
-            archive_id:          archiveId,
-            photograph_id:       photo.id,
-            sent_at:             new Date().toISOString(),
-            reply_window_closes: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
-            recipients:          [contributor.email],
-            subject_line:        `${archive.name}${yearStr} · ${t('doYouKnowThisMoment', lang)}`,
-            reply_address:       replyAddress,
-          })
-          .select()
-          .single()
+      // ── 3F. Create session record ───────────────────────────────────────────
+      const { data: session } = await supabaseAdmin
+        .from('email_sessions')
+        .insert({
+          archive_id:          archiveId,
+          photograph_id:       photo.id,
+          sent_at:             new Date().toISOString(),
+          reply_window_closes: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
+          recipients:          [contributor.email],
+          subject_line:        `${archive.name}${yearStr} · ${t('doYouKnowThisMoment', lang)}`,
+          reply_address:       replyAddress,
+        })
+        .select()
+        .single()
 
-        // Send email
+      // ── 3G. Send email ──────────────────────────────────────────────────────
+      try {
         const portalUrl = contributor.access_token
           ? `${siteUrl}/contribute/${contributor.access_token}`
           : null
@@ -187,64 +218,76 @@ export async function POST(req: NextRequest) {
             'Precedence':       'bulk',
           },
         })
+      } catch (emailErr: unknown) {
+        console.error(`[send-photos] email failed for ${contributor.email}:`, emailErr instanceof Error ? emailErr.message : emailErr)
+        continue
+      }
 
-        // Record the send — ON CONFLICT DO NOTHING keeps it idempotent
+      // ── 3H. Record the send — idempotent via unique index ───────────────────
+      try {
         await supabaseAdmin
           .from('contributor_photo_sends')
-          .upsert(
-            {
-              archive_id:     archiveId,
-              contributor_id: contributor.id,
-              photograph_id:  photo.id,
-              sent_at:        new Date().toISOString(),
-            },
-            { onConflict: 'contributor_id,photograph_id', ignoreDuplicates: true }
-          )
-
-        sentCount++
-        if (!firstPhotoSent) { firstPhotoSent = photo; firstSession = session }
-
-      } catch (contribErr: unknown) {
-        console.error(
-          `send-photo: failed for contributor ${contributor.email}:`,
-          contribErr instanceof Error ? contribErr.message : contribErr
-        )
-      }
-    }
-
-    // 4. Notify archive owner if any contributors have exhausted all photos
-    if (exhaustedContributors.length > 0 && archive.owner_email) {
-      void (async () => {
-        try {
-          const names = exhaustedContributors.join(', ')
-          await resend.emails.send({
-            from:    `Basalith <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
-            to:      archive.owner_email,
-            subject: `${archive.name} · Upload more photographs`,
-            html:    `<p style="font-family:Georgia,serif;font-size:16px;color:#333;line-height:1.7">
-              ${names} ${exhaustedContributors.length === 1 ? 'has' : 'have'} seen all the photographs in your archive.<br><br>
-              Upload more photographs to continue the daily series.
-            </p>
-            <p><a href="${siteUrl}/archive/label" style="font-family:monospace;font-size:13px;color:#C4A24A">Upload photographs →</a></p>`,
+          .insert({
+            archive_id:     archiveId,
+            contributor_id: contributor.id,
+            photograph_id:  photo.id,
+            sent_at:        new Date().toISOString(),
           })
-        } catch (e) {
-          console.error('send-photo: exhaustion notification failed:', e instanceof Error ? e.message : e)
-        }
-      })()
+      } catch {
+        // Unique constraint violation = already recorded — safe to ignore
+      }
+
+      sentCount++
+      if (!firstSentPhoto) firstSentPhoto = photo
     }
 
-    // 5. Send via WeChat if the archive owner is linked (uses first photo sent)
-    if (firstPhotoSent && archive.wechat_open_id) {
-      const lang = archive.preferred_language ?? 'en'
-      const photoUrl = await getEmailPhotoUrl((firstPhotoSent as { storage_path: string }).storage_path).catch(() => null)
-      if (photoUrl) {
-        void sendWeChatPhoto(archive.wechat_open_id, photoUrl, archive.name, lang)
-          .catch((e: unknown) => console.error('send-photo: wechat send failed:', e instanceof Error ? e.message : e))
+    if (sentCount === 0 && exhausted.length === 0) {
+      return NextResponse.json({ skipped: true, reason: 'No photos available for any contributor' })
+    }
+
+    // 4. WeChat send for archive owner (uses first photo sent this batch)
+    if (firstSentPhoto && archive.wechat_open_id) {
+      const wechatUrl = await getEmailPhotoUrl((firstSentPhoto as { storage_path: string }).storage_path).catch(() => null)
+      if (wechatUrl) {
+        void sendWeChatPhoto(archive.wechat_open_id, wechatUrl, archive.name, archive.preferred_language ?? 'en')
+          .catch((e: unknown) => console.error('[send-photos] wechat failed:', e instanceof Error ? e.message : e))
       }
     }
 
-    if (sentCount === 0 && exhaustedContributors.length === 0) {
-      return NextResponse.json({ skipped: true, reason: 'No photos available' })
+    // 5. Owner daily photo — select their next unsent photo and record it
+    if (archive.owner_email && firstSentPhoto) {
+      try {
+        const { data: ownerSentRows } = await supabaseAdmin
+          .from('owner_photo_sends')
+          .select('photograph_id')
+          .eq('archive_id', archiveId)
+
+        const ownerSentIds = (ownerSentRows ?? []).map(r => r.photograph_id).filter(Boolean)
+
+        let ownerQuery = supabaseAdmin
+          .from('photographs')
+          .select('*')
+          .eq('archive_id', archiveId)
+          .eq('status', 'unlabelled')
+          .order('created_at', { ascending: true })
+          .limit(1)
+
+        if (ownerSentIds.length > 0) {
+          ownerQuery = ownerQuery.not('id', 'in', `(${ownerSentIds.join(',')})`)
+        }
+
+        const { data: ownerPhotoData } = await ownerQuery
+        const ownerPhoto = ownerPhotoData?.[0] ?? null
+
+        if (ownerPhoto) {
+          await supabaseAdmin
+            .from('owner_photo_sends')
+            .insert({ archive_id: archiveId, photograph_id: ownerPhoto.id, sent_at: new Date().toISOString() })
+        }
+      } catch (e) {
+        // Non-fatal — owner tracking is supplementary
+        console.warn('[send-photos] owner_photo_sends failed:', e instanceof Error ? e.message : e)
+      }
     }
 
     // 6. Update delivery timestamps
@@ -257,16 +300,15 @@ export async function POST(req: NextRequest) {
       .eq('archive_id', archiveId)
 
     return NextResponse.json({
-      success:              true,
-      recipientCount:       sentCount,
-      exhaustedContributors,
-      photographId:         (firstPhotoSent as { id: string } | null)?.id ?? null,
-      sessionId:            (firstSession as { id: string } | null)?.id  ?? null,
+      success:      true,
+      recipientCount: sentCount,
+      exhausted,
+      photographId: (firstSentPhoto as { id: string } | null)?.id ?? null,
     })
 
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Unknown error'
-    console.error('send-photo error:', msg)
+    console.error('[send-photos] error:', msg)
     return NextResponse.json({ error: msg }, { status: 500 })
   }
 }

@@ -409,16 +409,24 @@ function ArchiveCard({ archive, onRefresh }: { archive: ArchiveData; onRefresh: 
           <p style={{ ...mono, fontSize: '0.36rem', color: '#5C6166', margin: '0 0 4px', letterSpacing: '0.12em' }}>
             PHOTO COVERAGE
           </p>
-          {photoStats.map(c => (
-            <div key={c.contributorId} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '3px' }}>
-              {c.exhausted && (
-                <span style={{ fontSize: '0.7rem' }}>⚠</span>
-              )}
-              <p style={{ ...mono, fontSize: '0.34rem', letterSpacing: '0.08em', color: c.exhausted ? '#E57373' : '#706C65', margin: 0, flex: 1 }}>
-                {c.name} — {c.sent} sent · {c.responded} replied · {c.exhausted ? 'ALL SEEN' : `${c.remaining} remaining`}
-              </p>
-            </div>
-          ))}
+          {photoStats.map(c => {
+            const isExhausted = c.exhausted
+            const isLow       = !isExhausted && c.remaining < 10
+            const rowColor    = isExhausted ? '#E57373' : isLow ? '#C4A24A' : '#706C65'
+            const icon        = isExhausted ? '🚨' : isLow ? '⚠' : null
+            return (
+              <div key={c.contributorId} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '3px' }}>
+                {icon && <span style={{ fontSize: '0.6rem' }}>{icon}</span>}
+                <p style={{ ...mono, fontSize: '0.34rem', letterSpacing: '0.08em', color: rowColor, margin: 0, flex: 1 }}>
+                  {c.name} — {c.sent} sent · {c.responded} replied · {
+                    isExhausted ? 'EXHAUSTED — owner notified'
+                    : isLow     ? `${c.remaining} remaining — upload more`
+                    : `${c.remaining} remaining`
+                  }
+                </p>
+              </div>
+            )
+          })}
         </div>
       )}
 
