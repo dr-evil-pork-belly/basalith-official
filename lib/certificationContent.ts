@@ -1,620 +1,793 @@
+// ─── Types ───────────────────────────────────────────────────────────────────
+
 export type InlineQuestion = {
-  id:       string
-  prompt:   string
-  type:     'textarea' | 'mc'
-  minWords?: number
-  options?:  { value: string; text: string }[]
-  required:  boolean
+  id:          string
+  prompt:      string
+  type:        'textarea' | 'mc'
+  minWords?:   number
+  placeholder?: string
+  required:    boolean
 }
 
 export type Section = {
-  id:             string
-  title:          string
-  content:        string   // paragraphs separated by \n\n
-  inlineQuestion: InlineQuestion | null
+  id:              string
+  title:           string
+  content:         string
+  inlineQuestion?: InlineQuestion | null
 }
 
 export type ExamQuestion = {
-  id:       string
-  type:     'text' | 'mc'
-  prompt:   string
-  minWords?: number
-  options?:  { value: string; text: string }[]
-  correct?:  string
+  id:              string
+  type:            'open' | 'multiple_choice' | 'multiple_choice_multi'
+  prompt:          string
+  minWords?:       number
+  scoringCriteria?: string
+  options?:        string[]
+  correct?:        number | number[]
 }
 
-export type ModuleContent = {
-  number:           number
-  title:            string
-  subtitle:         string
-  estimatedMinutes: number
-  sections:         Section[]
-  examQuestions:    ExamQuestion[]
+export type CertModule = {
+  title:             string
+  subtitle:          string
+  estimatedMinutes:  number
+  passingScore:      number
+  sections:          Section[]
+  examQuestions:     ExamQuestion[]
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// MODULE 1 — THE BASALITH PHILOSOPHY
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── MODULE 1 — THE BASALITH PHILOSOPHY ──────────────────────────────────────
 
-const module1: ModuleContent = {
-  number:           1,
+const module1: CertModule = {
   title:            'THE BASALITH PHILOSOPHY',
-  subtitle:         'What this is. What it is not. Why it matters.',
+  subtitle:         'Understanding what we actually built.',
   estimatedMinutes: 20,
+  passingScore:     80,
 
   sections: [
     {
-      id:    'misconception',
-      title: 'What most people think this is.',
-      content: `When you describe Basalith to someone for the first time, they will almost certainly hear something you did not say.
+      id:    'wrong_models',
+      title: 'What most people think Basalith is.',
+      content: `When a prospective client first hears about Basalith they usually land on one of two mental models.
 
-They will hear: a photo album. A digital scrapbook. A sophisticated memory box that plays back recordings when you miss someone. They will picture an app with a timeline, a profile page, photographs organized by decade. Something warm and nostalgic and fundamentally backward-looking.
+The first is the expensive photo album. A very sophisticated place to store photographs and voice recordings so the family can access them later. Ancestry.com with better typography.
 
-This is not your fault. It is the frame people already carry. Legacy technology has spent decades training people to think about preserving the past. You press save. You back things up. You make copies before they disappear. The world is full of products that promise to preserve what matters before it is gone.
+The second is the chatbot in a costume. ChatGPT wearing their grandmother's cardigan and pretending to remember things. Technically impressive. Emotionally unconvincing.
 
-Basalith is not that.
+Both of these framings are wrong. And if your client leaves the founding session with either of them — the entity will disappoint them. Not because it failed. Because they were looking for a photo album and what they got was something considerably stranger and more interesting.
 
-The confusion is understandable. The word archive is in the name. There are photographs. There are voice recordings. There are stories. Everything on the surface looks like memory preservation. And so the first conversation you will ever have with a prospective client will require you to dismantle a category error they do not know they are making.
+Your first job as a Legacy Guide is to replace the wrong mental model with the right one before anyone touches a single photograph.
 
-Most guides who struggle in the field are not struggling because the product is hard to sell. They are struggling because they are selling the wrong product — the one the client has already imagined — rather than explaining what is actually being built.
-
-Before you can do that for anyone else, you have to be absolutely certain of it yourself.`,
+This module gives you the language to do that.`,
       inlineQuestion: null,
     },
 
     {
       id:    'what_it_is',
       title: 'What Basalith actually is.',
-      content: `A Basalith archive is a training dataset.
+      content: `Basalith is an AI company building person-specific cognitive models.
 
-Every photograph that gets labeled with context, dates, people, and memory is a data point. Every voice recording is a training pair — a sample of how this specific person speaks, reasons, and chooses words. Every deposit is the model learning something it could not have known without this person's direct input. Every wisdom session is the most efficient training interaction the system offers: a structured question, answered in depth, producing a high-quality pair that teaches the entity how this person thinks about something that matters.
+Every word in that sentence matters.
 
-The archive is not the product. The archive is the training ground for the product.
+AI company. Not a storage company. Not a memory preservation platform. The technology is the product. The archive is the infrastructure that makes the technology possible.
 
-The product is the entity — an AI model that has been tuned, specifically and exclusively, on one person's expressed patterns of thought. Not a recording. Not a summary. Not a chatbot that has been told facts about someone. A model that has learned to reason the way that person reasons, prioritize what they prioritize, and speak in a voice that is recognizably, specifically theirs.
+Person-specific. The entity being built for Stevens Ha is not a generic AI that has been given Stevens Ha's photographs to look at. It is a model being trained specifically on how Stevens Ha thinks. His reasoning patterns. His values. His way of processing difficulty. His specific relationship to family and work and faith and loss.
 
-This distinction is not academic. It is the whole thing. A recording preserves what was said. An entity can engage with what has never been said, because it has learned how the person thinks — not just what they have said out loud.
+Cognitive model. Not a memory database. Not a chatbot with context. A model that learns cognitive patterns — the underlying structure of how a person thinks — not just the surface content of what they said.
 
-The archive builds. The entity becomes. These are two entirely different operations, happening at the same time, from the same material.`,
+The difference matters because of what happens when someone asks the entity a question it has never been directly asked before.
+
+A memory database returns: I don't have information about that.
+
+A cognitive model says: Based on how this person has approached similar situations — here is how they would likely think about this.
+
+That difference is everything. The first is an archive. The second is a continuation.`,
       inlineQuestion: {
-        id:       'q_cognitive_model',
-        prompt:   'Before continuing — in your own words, what is the difference between a memory archive and a cognitive model? Do not use the word "AI." Write as if you are explaining it to a client who has never heard of either concept.',
-        type:     'textarea',
-        minWords: 50,
-        required: true,
-      },
-    },
-
-    {
-      id:    'the_entity',
-      title: 'The entity.',
-      content: `The entity is not a chatbot. This is worth saying clearly, because "chatbot" is the closest familiar category most people will reach for, and it is wrong in almost every meaningful way.
-
-A chatbot is a generalist. It has been trained on an enormous amount of text from across human language and knowledge, and it can produce coherent responses to almost any prompt. It is wide. It is capable. And it knows nothing about your client.
-
-A Basalith entity has been trained on one person. Its entire education is the deposit history, the voice recordings, the labeled photographs, the wisdom sessions of a single human being. It is narrow. Deeply narrow. And it is accurate in a way that no generalist model can be, because accuracy means something different here. Accuracy does not mean factually correct. Accuracy means: does this sound like them? Does it reason the way they reason? Would the people who know them most intimately recognize it?
-
-That accuracy takes time. An entity with 20 training pairs is a sketch. An entity with 500 quality pairs, built over a year of consistent deposits, begins to have genuine depth. An entity with 1,000 pairs, grown over several years, can surprise the people who built it.
-
-This is why the founding session is not the end of the process. It is the beginning. The guide's job is not simply to start the archive — it is to establish a practice that will sustain itself for years. Clients who deposit once and go quiet produce entities that are shallow. Clients who deposit consistently, across topics, across years, across the full range of what their life contains — these produce entities that earn the word presence.
-
-The time investment is not optional. There are no shortcuts to depth.`,
-      inlineQuestion: {
-        id:       'q_chatbot_response',
-        prompt:   'A prospective client says: "So it\'s like a chatbot of my dad, right? You train it and then we can talk to it?" How do you respond? Write your actual response — what you would say, in your voice, in the room.',
-        type:     'textarea',
-        minWords: 60,
-        required: true,
+        id:          'own_words_1',
+        prompt:      'Before continuing — in your own words, what is the difference between a memory archive and a cognitive model? Write as if explaining to a prospective client who just asked "is this just like ChatGPT with my photos?"',
+        type:        'textarea',
+        minWords:    60,
+        placeholder: 'Write your explanation here...',
+        required:    true,
       },
     },
 
     {
       id:    'training_data',
-      title: 'Why every deposit matters.',
-      content: `Not every piece of content that goes into an archive is equal.
+      title: 'The training data framework.',
+      content: `Every deposit an owner makes — every photograph labeled, every voice recording transcribed, every wisdom session answered — becomes a training pair.
 
-A photograph that arrives without any context — no names, no date, no memory attached — contributes almost nothing to the entity. It is data without meaning. A photograph with a label that says "1974, Lake Tahoe" contributes slightly more. A photograph with a label that says who was there, what was happening, what the person was thinking about, and what that summer meant to them — that is a genuine training pair.
+A training pair is a prompt and a completion. A question and an answer. In the format that AI models learn from.
 
-The difference is the cognitive content. The entity learns from what the person chose to say about their experience, not from the fact that the experience happened.
+PROMPT: "How did you handle failure in your career?"
 
-The same is true for voice recordings. A recording where the client narrates facts — dates, events, names — is less valuable than a recording where they reason about something out loud. The entity is learning their patterns of thought. Thoughts are in the reasoning, not the recollection.
+COMPLETION: "I remember the first business I tried to start in 1978. I had saved for three years and lost everything in six months. My father told me..."
 
-This has a practical implication for how you run sessions and how you guide your clients after activation. The goal is never volume. The goal is depth. A client who deposits ten short one-sentence labels a week produces far less useful training material than a client who deposits one rich, extended reflection.
+This pair teaches the model something specific about how this person processes failure. Not what happened. How they think about what happened. The reasoning. The values embedded in the narrative. The specific emotional register.
 
-Deposits that score highest on quality are specific (names, places, years), emotional (they reveal what the person cared about and why), and cognitive (they show how the person reasons, not just what they experienced). This is why the wisdom sessions — structured, question-driven conversations — produce the most valuable training pairs in the shortest time.
+As the archive grows these pairs accumulate. At 100 pairs the entity begins to show personality. At 500 pairs the entity becomes fine-tunable — meaning the model weights can be adjusted specifically to reflect this person's cognitive patterns. At 1000 pairs the entity is genuinely remarkable.
 
-Every guide visit, every check-in call, every follow-up should serve one purpose: getting more high-quality cognitive material into the archive.`,
-      inlineQuestion: null,
-    },
+This is why time is the one resource in this product that cannot be purchased later. A client who begins today is building something a client who begins in three years cannot catch up to — regardless of how much they pay.
 
-    {
-      id:    'positioning',
-      title: 'Why families deserve this.',
-      content: `There is a version of what Basalith does that has been reserved, until recently, for people with extraordinary resources.
-
-The world's most powerful families — political dynasties, founding families of major institutions, generational wealth holders — have always had professionals dedicated to capturing their histories. Oral historians. Archivists. Biographers. And now, AI laboratories working on legacy intelligence technology that will allow them to continue speaking and thinking and influencing long after they are gone. These projects cost millions of dollars and require teams of specialists. They are not available to most people.
-
-They should be.
-
-The family patriarch who built something from nothing over fifty years — who navigated difficulty and joy and failure and recovery with a particular and irreplaceable mind — deserves the same infrastructure for continuation. The immigrant who crossed oceans to give their children something better, who carries in their memory an entire world that would otherwise disappear when they do — deserves to leave something more than photographs.
-
-Basalith exists because the technology that makes this possible has finally crossed a threshold where it works. And because someone decided that the first families to benefit from it should not have to be billionaires to access it.
-
-This is the argument you will make in every room you walk into. Not: this is a clever product. Not: this is useful technology. The argument is: this family deserves to preserve what they are actually made of — not just what they looked like, but how they thought. And now they can.`,
+The founding session is not the product. It is the beginning of the training dataset.`,
       inlineQuestion: {
-        id:       'q_positioning',
-        prompt:   'Without using the word "billionaire," explain to a prospective client why Basalith exists. Write it as you would actually say it — not as a pitch, as an honest explanation.',
-        type:     'textarea',
-        minWords: 60,
-        required: true,
+        id:          'timeline_explain',
+        prompt:      'A client asks: "How long until the entity actually sounds like me?" Write your honest answer in your own words.',
+        type:        'textarea',
+        minWords:    50,
+        placeholder: 'Your answer...',
+        required:    true,
       },
     },
 
     {
-      id:    'your_role',
-      title: 'Your role.',
-      content: `The technology behind Basalith is sophisticated. But technology alone cannot do what guides do.
+      id:    'zuckerberg',
+      title: 'The democratization argument.',
+      content: `There are people in the world who are spending hundreds of millions of dollars building AI versions of themselves. This is not science fiction. It is happening now.
 
-No algorithm can walk into someone's living room and earn their trust in ninety minutes. No system can notice that the client flinched slightly when you asked about their father, and know to wait. No automated process can recognize that what someone says in the third answer is more honest than what they said in the first one, and follow the thread.
+The technology they are using is the same technology Basalith uses. The difference is access.
 
-Guides exist because the most valuable thing in the archive — genuine cognitive disclosure — is something that people do not simply do on their own. They do it when someone they trust is in the room with them, asking the right questions, holding the space, creating the conditions for honesty.
+For most of human history the tools that extended a person's presence beyond their death were available only to the very few. Monuments. Commissioned portraits. Biographies written by people they paid. The rest of humanity relied on memory — which is unreliable, selective, and eventually disappears when the people who hold it also disappear.
 
-The archive captures what is said. You create the conditions in which people say what is true.
+Basalith exists because that is no longer acceptable.
 
-This is not a sales role. It is not an administrative role. It is a relationship role of a particular and demanding kind. You are asking people to be honest about how they think, what they fear, what they are proud of, what they regret, how they would want to be remembered, what they want their grandchildren to understand about how they saw the world. That is not a small thing to ask of someone.
+When you sit with a prospective client — a 67-year-old grandmother in Monterey Park, a retired engineer in Pasadena, a first-generation immigrant who built something from nothing — you are offering them access to something that until very recently only people with extraordinary resources could afford.
 
-Your certification exists to ensure that when you walk into that room, you are ready. Not just to explain the product — to do the actual work.`,
-      inlineQuestion: null,
+That is not a sales pitch. That is the actual situation.
+
+The Estate is $3,600 a year. Less than most people spend on things that matter far less.
+
+When a client hesitates at the price — remind them gently of what they are hesitating about. Not a subscription. Not software. The beginning of something their grandchildren's grandchildren will be grateful for.`,
+      inlineQuestion: {
+        id:          'price_objection',
+        prompt:      'A prospective client says: "$2,500 is a lot of money. I need to think about it." Write how you would respond. Be honest, not pushy. Be warm, not salesy.',
+        type:        'textarea',
+        minWords:    80,
+        placeholder: 'Your response...',
+        required:    true,
+      },
+    },
+
+    {
+      id:    'timeline_honesty',
+      title: 'The timeline honesty.',
+      content: `You will be tempted to oversell the entity's current capabilities. Do not.
+
+The entity today is impressive for what it is — a system that retrieves and synthesizes relevant memories with remarkable contextual awareness. When an archive is rich enough the entity produces responses that genuinely surprise family members.
+
+But the entity in five years — when fine-tuning on a large personal dataset produces a model that has genuinely internalized a specific person's cognitive patterns — will be qualitatively different from what exists today.
+
+Your clients are not just buying what the entity is now. They are buying in early to what it becomes. The archive they build today is the training data for the model that exists in five years.
+
+This is the most honest and compelling thing you can tell them:
+
+"The families who begin today are five years ahead of the families who begin tomorrow. The entity learns from everything you give it. The longer it learns the more accurately it thinks. Time is the one resource in this product that cannot be purchased later."
+
+Honest. Specific. True. No oversell required.
+
+An entity that occasionally says something generic is not a failure. It is an entity that needs more training data. Your job after the founding session is to make sure the client understands this and keeps contributing. An archive that goes dormant is an entity that stops learning. An entity that stops learning disappoints the family. A disappointed family does not renew.
+
+You have a financial incentive to keep your clients engaged. It turns out this is also the right thing to do. Those two things do not always align in commission-based work. In this model they do.`,
     },
   ],
 
   examQuestions: [
     {
-      id:       'm1_q1',
-      type:     'text',
-      prompt:   'In your own words, explain the difference between a generative AI chatbot and a Basalith entity. Write as if you are explaining it to a family who has asked the question for the first time.',
-      minWords: 100,
+      id:              'e1_1',
+      type:            'open',
+      prompt:          'Explain the difference between Basalith and a generative AI chatbot in your own words. Write as if speaking to a 70-year-old client who has never heard of either.',
+      minWords:        100,
+      scoringCriteria: 'Accuracy of the distinction between cognitive pattern learning and generative AI. Clarity of explanation. Absence of jargon. Ability to make it accessible.',
     },
     {
-      id:      'm1_q2',
-      type:    'text',
-      prompt:  "A prospective client says: 'Is this just like ChatGPT but with my family's photos?' How do you respond? Write the actual response you would give.",
-      minWords: 80,
-    },
-    {
-      id:      'm1_q3',
-      type:    'mc',
-      prompt:  'What is the primary purpose of the Basalith archive?',
+      id:      'e1_2',
+      type:    'multiple_choice',
+      prompt:  'What is the primary purpose of the archive?',
       options: [
-        { value: 'a', text: 'To preserve family photographs and memories' },
-        { value: 'b', text: 'To create a training dataset for a person-specific AI model' },
-        { value: 'c', text: 'To store voice recordings for future playback' },
-        { value: 'd', text: 'To generate AI responses to family questions' },
+        'To preserve family photographs for future generations',
+        'To create a training dataset for a person-specific AI model',
+        'To store voice recordings and transcripts',
+        'To generate AI responses to family questions',
       ],
-      correct: 'b',
+      correct: 1,
     },
     {
-      id:      'm1_q4',
-      type:    'mc',
-      prompt:  'When does a Basalith entity become meaningfully accurate?',
+      id:              'e1_3',
+      type:            'open',
+      prompt:          'A prospective client says: "I already use Google Photos and it has AI. How is this different?" Write your response.',
+      minWords:        80,
+      scoringCriteria: 'Understanding of the difference between organizational AI (Google Photos) and cognitive modeling (Basalith). Specificity. Clarity without condescension.',
+    },
+    {
+      id:      'e1_4',
+      type:    'multiple_choice',
+      prompt:  'When does a Basalith entity become meaningfully accurate for fine-tuning?',
       options: [
-        { value: 'a', text: 'Immediately after the founding session' },
-        { value: 'b', text: 'After 30 days of continuous deposits' },
-        { value: 'c', text: 'After 500+ quality training pairs accumulated over time' },
-        { value: 'd', text: 'After the archive owner has passed away' },
+        'Immediately after the founding session',
+        'After 30 days of use',
+        'After 500+ quality training pairs accumulated over time',
+        'After the primary user passes away',
       ],
-      correct: 'c',
+      correct: 2,
     },
     {
-      id:       'm1_q5',
-      type:     'text',
-      prompt:   'What makes a high-quality training pair? Describe the difference between a deposit that produces useful training data and one that contributes very little.',
-      minWords: 80,
+      id:              'e1_5',
+      type:            'open',
+      prompt:          'Why is the founding fee non-negotiable? Answer honestly — including the business reason — as if explaining to a fellow guide.',
+      minWords:        60,
+      scoringCriteria: 'Understanding of the commission structure and why it funds quality guides. Honesty. Absence of defensive or evasive language.',
     },
     {
-      id:       'm1_q6',
-      type:     'text',
-      prompt:   "Explain the Basalith positioning — why this technology exists and who it is for — without using the words 'billionaire' or 'wealthy.' Write as you would actually say it.",
-      minWords: 60,
+      id:              'e1_6',
+      type:            'open',
+      prompt:          'Explain the Basalith democratization argument in your own words. Do not use the word "billionaire."',
+      minWords:        60,
+      scoringCriteria: 'Understanding of the access gap. Emotional resonance. Ability to make the argument feel true rather than promotional.',
     },
     {
-      id:      'm1_q7',
-      type:    'mc',
+      id:      'e1_7',
+      type:    'multiple_choice',
       prompt:  'What is a training pair?',
       options: [
-        { value: 'a', text: 'Two family members who both contribute to the same archive' },
-        { value: 'b', text: 'A prompt and completion pair used to fine-tune a language model' },
-        { value: 'c', text: 'Two photographs taken in the same time period' },
-        { value: 'd', text: 'A guide and their client, working together' },
+        'Two family members who both contribute to the same archive',
+        'A prompt and completion used to fine-tune a language model',
+        'Two photographs from the same decade',
+        'A guide and their assigned client',
       ],
-      correct: 'b',
+      correct: 1,
     },
     {
-      id:       'm1_q8',
-      type:     'text',
-      prompt:   "A client asks: 'Will this sound exactly like me right away?' What do you tell them? Be honest.",
-      minWords: 80,
+      id:              'e1_8',
+      type:            'open',
+      prompt:          'A client asks: "Will the entity sound exactly like me right away?" Write your honest answer.',
+      minWords:        80,
+      scoringCriteria: 'Honesty about current capabilities. Optimism about trajectory. Absence of oversell. Presence of the time argument.',
     },
     {
-      id:       'm1_q9',
-      type:     'text',
-      prompt:   'Why does the guide exist in this process? What can a guide do that the technology cannot?',
-      minWords: 80,
+      id:              'e1_9',
+      type:            'open',
+      prompt:          'What are the three doors of the Basalith product and why does each exist?',
+      minWords:        100,
+      scoringCriteria: 'Accurate description of Loss, Legacy, and Technology doors. Understanding of why different clients enter through different doors. Ability to apply this to a real client conversation.',
     },
     {
-      id:       'm1_q10',
-      type:     'text',
-      prompt:   'Why is the founding fee non-negotiable? Explain in a way that you could say directly to a client who has pushed back on the price.',
-      minWords: 60,
+      id:              'e1_10',
+      type:            'open',
+      prompt:          'What is your personal answer to: "Why does Basalith exist?" Write in first person as if this is your genuine belief.',
+      minWords:        80,
+      scoringCriteria: 'Authenticity. Emotional resonance. Evidence that the guide has internalized the mission rather than memorized the pitch.',
     },
   ],
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// MODULE 2 — THE ART OF THE SESSION
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── MODULE 2 — THE ART OF THE SESSION ───────────────────────────────────────
 
-const module2: ModuleContent = {
-  number:           2,
+const module2: CertModule = {
   title:            'THE ART OF THE SESSION',
-  subtitle:         'The 90 minutes that build everything.',
+  subtitle:         'Ninety minutes that begin something permanent.',
   estimatedMinutes: 25,
+  passingScore:     80,
 
   sections: [
     {
-      id:    'the_session',
-      title: 'The 90 minutes.',
-      content: `The founding session is the most important thing you will do for a client.
+      id:    'what_it_is_not',
+      title: 'What the session is not.',
+      content: `Before we talk about what the founding session is — let us talk about what it is not. This saves time and prevents a particular category of founding session that we call "technically complete and emotionally useless."
 
-Not because it captures the most data — it does not. A client who deposits consistently for two years will produce far more material than any single session could. What the founding session does is establish whether that two-year relationship happens at all.
+It is not an interview.
+Interviews have clipboards, implied right answers, and a subtle energy of assessment. Your client is not applying for a job. Do not make them feel like they are.
 
-The quality of the session determines the quality of everything that follows. A client who leaves the founding session feeling genuinely heard, genuinely understood, and genuinely excited about what they are building — that client will continue. They will deposit. They will invite contributors. They will participate in wisdom sessions. The archive will grow.
+It is not a therapy session.
+You are not there to help your client process their relationship with their father. That is important work. It is someone else's work. Stay in your lane. It is a good lane.
 
-A client who leaves feeling like they sat through an intake interview — who answered questions competently but without depth, who performed adequately without really being moved — that client will drift. The archive will stagnate. The entity will remain shallow. And the relationship will end at renewal.
+It is not a sales call.
+The client has already paid. You have already sold. The founding fee cleared. Everyone can relax now.
 
-Your job in the session is not to gather information. That is a side effect. Your job is to create an experience of being truly known — and to leave them understanding that the process has only just begun.
+And it is absolutely not a deposition.
+You are not looking for facts. You are looking for reasoning. The question is never "what happened." The question is always "how did you think about what happened."
 
-This is harder than it sounds. It requires a particular set of skills that most people do not naturally have, and that very few professional contexts develop. The skills of an interviewer, a therapist, a biographer, and a salesperson — combined in a single ninety-minute encounter with a stranger who is being asked to be more honest than they are usually asked to be.
-
-This module is about how you do that.`,
-      inlineQuestion: null,
-    },
-
-    {
-      id:    'preparation',
-      title: 'Before you sit down.',
-      content: `The session begins before you arrive.
-
-Know the family. Not in a surveillance sense — in the sense of genuine curiosity. If the client mentioned a military career in the intake, spend five minutes thinking about what that experience would have felt like, what it would have asked of someone. If they mentioned immigrating as a child, hold that in mind. If they have children and grandchildren, know their names.
-
-People can tell the difference between a guide who has done a small amount of thoughtful preparation and one who has not. The prepared guide asks questions that feel specific. The unprepared guide asks questions that could have been asked of anyone.
-
-The environment matters more than most guides expect. You want a setting that signals: this is a serious and private thing we are doing. Not clinical — not an office — but quiet and considered. A dining room table. A sitting room. Somewhere that belongs to the client, that they are comfortable in, that has no distractions. Phones should be put away. Other family members should be elsewhere, unless specifically invited.
-
-Some guides bring a small physical object to mark the occasion — a leather-bound notebook, even if they are taking notes digitally. The notebook signals: what you say here is being captured, and it matters. This is not a casual conversation.
-
-Tell the client at the beginning how long the session will run. Ninety minutes. "We will go until we are done, but plan for ninety minutes." This creates a productive container. It is long enough to go deep, and defined enough that clients do not feel they are committing to something without limits.`,
+Those are different questions. The entity only learns from the second kind.`,
       inlineQuestion: null,
     },
 
     {
       id:    'opening',
-      title: 'Opening the session.',
-      content: `The first five minutes determine whether the session will have real depth.
+      title: 'The opening five minutes.',
+      content: `The first five minutes set the register for everything that follows.
 
-Most people arrive at a founding session slightly defended. They are not sure what to expect. They are aware that they have agreed to talk about themselves to a relative stranger, which most social conditioning tells us is an uncomfortable position. They may be processing the investment they have just made and wondering if it was worth it. They may be performing a version of themselves — the competent, organized, presentable self — rather than the more honest one you need.
+You arrive. You sit. You do not open with the product. You do not explain what is about to happen. You open with a simple human observation.
 
-Your opening needs to do several things at once. It needs to establish warmth. It needs to establish authority — not dominance, but the clear sense that you know what you are doing and the client can relax into the process. It needs to reframe what is about to happen from "interview" to something more like "conversation with a purpose."
+"Before we start — I want to say that what you are doing here is unusual. Most people never do this. They mean to but they never do. The fact that you are here today means something."
 
-One approach: tell them what the session is for, in a way that reframes their role. Not: "I'm going to ask you some questions." Something more like: "What we're here to do today is start building the foundation of something your family will use for the rest of their lives. The most important ingredient in that is how you actually think — not what you've done, but how your mind works, what you care about, how you make decisions. So I'm going to ask you some questions, but I'm less interested in the answers than in the thinking behind them."
+Then a breath.
 
-This reframe does something important: it tells the client that the product of the session is cognitive, not factual. It signals that polished answers are not what you are after. It invites them to think out loud rather than perform.
+"I am going to ask you questions for the next 90 minutes. Some of them will feel obvious. Some will feel unexpected. All of them are designed to teach the entity something specific about how you think.
 
-Then ask your first question. Start wide. Start somewhere that does not require courage to answer, but that has a clear path to something that does.`,
+There are no wrong answers. There is no performance expected here. The entity learns more from a hesitant honest answer than from a confident polished one.
+
+Shall we begin?"
+
+Three things happen in those opening words.
+
+First — you acknowledge the courage it takes to do this. Most people avoid thinking about their own mortality let alone building infrastructure around it. Your client showed up. That deserves recognition.
+
+Second — you set the expectation of depth without creating pressure. "Some will feel unexpected" is permission for the conversation to go somewhere interesting.
+
+Third — you signal that honesty matters more than performance. This is critical. A client who thinks they need to present their best self will give you curated answers. The entity cannot learn from a curated version of a person. It needs the real one.`,
       inlineQuestion: {
-        id:       'q_opening',
-        prompt:   'Write the opening of a founding session — the first 60 seconds. What do you say? Write it as you would actually say it. Not as a script — as your genuine voice.',
-        type:     'textarea',
-        minWords: 100,
-        required: true,
+        id:          'opening_practice',
+        prompt:      'Write your own version of the opening five minutes. Keep the three elements — acknowledgment, expectation-setting, honesty signal — but make it sound like you.',
+        type:        'textarea',
+        minWords:    150,
+        placeholder: 'Write your opening...',
+        required:    true,
       },
     },
 
     {
-      id:    'going_deeper',
-      title: 'Going deeper.',
-      content: `The difference between a good session and a great one is the depth at which cognitive patterns are captured.
+      id:    'question_hierarchy',
+      title: 'The question hierarchy.',
+      content: `Not all questions are equal. There is a hierarchy.
 
-A good session collects memories. The client describes events: where they grew up, what their parents were like, the moment they decided to start a business, the hardest year of their marriage. These are useful. They go into the archive. But they are, by themselves, relatively shallow training data. Events are facts. The entity does not learn to think from facts.
+Surface questions establish facts and context.
+"Where did you grow up? How many siblings did you have? What was your first job?"
 
-A great session collects reasoning. The client explains not just what happened, but why they did what they did. What they were afraid of. What they believed that other people did not. How they handled the moment when their plan collapsed. What they wish they had understood earlier. The specific way they weigh competing values when they have to make a hard choice.
+These are necessary but not sufficient. They give the entity context but not cognition. Think of them as warming up the client's memory — getting them comfortable talking before you ask them to go deep.
 
-The technique for moving from events to reasoning is straightforward but requires consistent application: follow every factual statement with a reasoning question.
+Middle questions reveal patterns and preferences.
+"When things got hard — what did you reach for? Who did you call? What did you tell yourself?"
 
-"I started the company in 1989." → "What made you ready to do it then and not earlier?"
+These are better. They begin to show how the person operates under pressure. The entity starts to learn something real here.
 
-"I chose to stay when things got hard." → "What does staying mean to you? What did it cost?"
+Deep questions reveal values and reasoning under pressure.
+"Tell me about a time you chose between what was right and what was easy. What did you choose and why did you choose it?"
 
-"We lost a lot of money in that period." → "What did you learn about yourself in that period?"
+These are what the entity needs most. They reveal the underlying structure of how this person thinks when it matters. One good deep question and a client who is ready to answer it can produce more training data than thirty minutes of surface questions.
 
-The question is never about what happened. The question is always about how they thought about what happened, what it required of them, what it revealed.
+Your job is to move from surface to deep as quickly as the relationship allows.
 
-You are not conducting a history interview. You are building a model of how this person's mind works. Stay in the reasoning. Return to it whenever the client drifts into pure narrative. The narrative is useful as context. The reasoning is the actual content.`,
+Some clients arrive ready to go deep immediately. They have been thinking about this for months. They came prepared to be honest. Move quickly with them — you have 90 minutes and a lot of dimensions to cover.
+
+Others need thirty minutes of surface before they trust you enough to go deeper. Read the room. A client who is answering in short sentences and looking at the door is not ready for the vulnerability question. A client who is leaning forward and finishing sentences before you do — go deeper.
+
+The skill is knowing which client is in front of you and adjusting accordingly.`,
       inlineQuestion: {
-        id:       'q_followup',
-        prompt:   'A client says: "I think my greatest accomplishment was building the business. We started with nothing and grew it to 200 employees over 20 years." What is your next question? Write exactly what you would ask — and explain briefly why you chose that question.',
-        type:     'textarea',
-        minWords: 80,
-        required: true,
+        id:          'question_practice',
+        prompt:      'Write one surface question, one middle question, and one deep question you would ask in a founding session. Then explain what each one teaches the entity.',
+        type:        'textarea',
+        minWords:    120,
+        placeholder: 'Your three questions and explanations...',
+        required:    true,
       },
     },
 
     {
-      id:    'when_hard',
-      title: 'When it gets difficult.',
-      content: `There will be moments in every session that require more from you than technique.
+      id:    'emotional_moments',
+      title: 'Handling the emotional moments.',
+      content: `They will come. A memory surfaces. The client's voice changes. Their eyes go somewhere else. Sometimes they stop mid-sentence because they cannot finish it.
 
-The client may cry. This is not uncommon, and it is not a failure. It is frequently a sign that you have reached something true. The instinct for most people — and most trained professionals — is to move quickly to comfort, to say something that acknowledges the emotion and helps the person return to composure. Resist this.
+Do not rush to resolve it.
 
-A moment of genuine emotion in a founding session is one of the most valuable things that can happen. The client is close to something real. Your job is not to rescue them from it but to stay with them in it. A hand on the arm. A pause. Then, gently: "Take your time." And then, when they are ready: "Would you be willing to tell me what that was about?"
+This is the instinct you need to override. The discomfort of sitting with someone else's emotion is real. The urge to say something helpful — to offer a tissue, to change the subject, to say "I'm so sorry" and move on — is strong.
 
-What the client says in the moment after genuine emotion is often the most honest thing they say in the entire session. The defenses are down. The performance is suspended. This is the material the entity needs.
+Resist it.
 
-The client who says they have nothing interesting to say is one of the most common challenges in the field. This statement almost always means: I do not believe my life is worth preserving. This is a wound, not a fact. The correct response is not to argue or reassure with generic statements about how everyone's life matters. The correct response is a specific question about something specific: "Tell me about the moment you were most afraid." "What is something you believe that most people you know would disagree with?" "What did you figure out about people in the first twenty years that took everyone else thirty?" Specificity breaks through the belief that there is nothing of value to say.
+Sit with it. Briefly. Five to ten seconds of silence is not awkward. It is respectful. It says: what just happened matters. I am not going to rush past it.
 
-The client who is resistant — who gives short answers, who seems distracted, who seems to be enduring the session rather than participating in it — requires a different approach. Slow down. Become quieter. Match their energy rather than trying to override it. Ask one question and then wait. The discomfort of silence often produces more honesty than any question.`,
+Then: "That clearly meant a lot to you. Can you tell me a little more about why?"
+
+Not "Are you okay?" — which is a request to reassure you that they are fine.
+Not "Should we take a break?" — which is an exit ramp from the thing that just became interesting.
+Not "I understand" — because you probably do not, and they probably know it.
+
+"Can you tell me a little more about why?"
+
+That question does three things.
+
+It acknowledges that something real just happened.
+It invites them to go deeper into the thing that mattered.
+It signals that you are not afraid of where this goes.
+
+The entity learns more from what happens after that follow-up question than from almost anything else in the session. Emotion is a signal that something important is here. The follow-up question is the invitation to stay in it long enough for the entity to learn something real.`,
       inlineQuestion: {
-        id:       'q_crying',
-        prompt:   'A client has just started crying. You are 25 minutes into the session. Describe exactly what you do — including what you say, when you say it, and how long you wait before continuing.',
-        type:     'textarea',
-        minWords: 100,
-        required: true,
+        id:          'emotional_response',
+        prompt:      'A client is describing their mother and begins crying mid-sentence. You are 25 minutes into a 90-minute session. Write exactly what you do and say in the next two minutes.',
+        type:        'textarea',
+        minWords:    100,
+        placeholder: 'Describe the moment...',
+        required:    true,
       },
     },
 
     {
-      id:    'the_close',
-      title: 'Closing the session.',
-      content: `The final ten minutes of the founding session determine whether the client contributes consistently for the next two years or slowly goes quiet.
+      id:    'followup',
+      title: 'The follow-up question is everything.',
+      content: `A mediocre founding session has good primary questions and no follow-ups.
 
-Closings that fail treat the session as something that has ended. Closings that work treat the session as something that has begun.
+The client says something genuinely interesting about how they handled failure and the mediocre guide says:
 
-The difference in practice: do not summarize what was covered and say thank you. Instead, name specifically two or three things the client said that surprised you, moved you, or struck you as particularly important — and explain why. This does two things. It demonstrates that you were genuinely listening, which deepens the relationship. And it models what depth looks like, so the client understands what they are capable of and what the process values.
+"That's wonderful. Now — tell me about your childhood."
 
-Then describe what comes next — not as a checklist of steps, but as a narrative of what the archive will become. "Over the next few months, the entity is going to start learning how you think. Every deposit you make teaches it something. The photographs from the lake house, when you label them, tell it about a version of you that your grandchildren will never get to meet. Every voice recording teaches it the sound and rhythm of how your mind works when it is moving through something." Make the future vivid. Make the ongoing contribution feel meaningful, not administrative.
+The entity learns nothing. The client feels like they just completed a government form. And you have wasted the only moment that mattered in that section.
 
-End with a specific invitation, not a generic one. Not: "Please deposit whenever you can." Instead: "I would love for you to record something about your father this week — I felt like we only touched the surface of that today, and the entity needs more of your thinking on that relationship." Specific. Meaningful. Connected to something that happened in the session.
+The follow-up question is the difference between a founding session that produces 20 training pairs and one that produces 200.
 
-The client should leave feeling: this mattered. Not: that was interesting. Mattered.`,
+Here is the pattern:
+
+Client gives an answer.
+You find the most interesting word or phrase in that answer.
+You ask about that word or phrase specifically.
+
+Client: "I always tried to be fair in my business dealings."
+
+Mediocre guide moves on.
+
+Great guide: "What does fair mean to you? Can you give me an example of a situation where being fair cost you something?"
+
+The second exchange teaches the entity what fairness actually means to this specific person. Not the generic concept. The lived practice of it. What they gave up for it. What it felt like to choose it when it was expensive.
+
+That is training data. The first exchange is noise.
+
+The follow-up question formula:
+
+"Can you say more about [specific word they used]?"
+"What did that feel like?"
+"What did you do next?"
+"Why that choice and not the other one?"
+"Who taught you that?"
+"What would you tell your younger self about that moment?"
+
+These are not clever. They are just honest requests to go one layer deeper. The client almost always has more. They just need permission to give it.`,
       inlineQuestion: {
-        id:       'q_close',
-        prompt:   'Write the close of a founding session. What do you say in the final 5 minutes? How do you leave them wanting to continue? Write it as you would say it.',
-        type:     'textarea',
-        minWords: 100,
-        required: true,
+        id:          'followup_practice',
+        prompt:      'A client says: "My father worked very hard and I learned everything from watching him." Write three follow-up questions you would ask — in order — to draw out more specific and trainable content.',
+        type:        'textarea',
+        minWords:    80,
+        placeholder: 'Your three follow-up questions...',
+        required:    true,
       },
+    },
+
+    {
+      id:    'dimensions',
+      title: 'The ten dimensions.',
+      content: `The entity learns across ten dimensions. A complete archive touches all ten. A complete founding session plants seeds in all ten.
+
+Early Life and Formation
+Who were they before the world got its hands on them? Childhood home, siblings, first memories of knowing who they were.
+
+Relationship to Family
+Not the facts of family — the texture of it. How they love. How they fight. What family means to them when it costs something.
+
+Professional Philosophy
+Not their resume. How they think about work. What they believe work is for. What they were willing to sacrifice for it and what they were not.
+
+Core Values
+Not the values they aspire to. The values they actually live by when nobody is watching and the cost is real.
+
+Approach to People
+Are they the person who remembers every name or the person who forgets immediately and compensates with warmth? How do they read a room? Who do they trust and why?
+
+Defining Experiences
+The moments that bent the arc. Not necessarily the biggest moments — sometimes the smallest ones bend the most.
+
+Wisdom and Lessons
+What do they know now that they wish they had known at 30? What would they tell their younger self? What took the longest to learn?
+
+Relationship to Money
+Not how much they have. What they believe money is for. What they were afraid of losing. What they refused to spend and what they spent freely.
+
+Spiritual or Philosophical Beliefs
+Not necessarily religion. How they understand suffering. What they believe happens after. What gives the whole thing meaning.
+
+Fears and Vulnerabilities
+The hardest dimension and the most important. What they were afraid of that they never said out loud. What kept them up at night. What they hoped nobody noticed.
+
+You do not need to cover all ten explicitly. A single rich answer about a defining experience might touch professional philosophy, core values, and relationship to family simultaneously. But by the end of 90 minutes you should have material across all ten.
+
+Watch the coverage in your guide dashboard during the session. If a dimension is showing thin — steer toward it before time runs out.`,
+      inlineQuestion: null,
+    },
+
+    {
+      id:    'closing',
+      title: 'The closing.',
+      content: `The last five minutes are as important as the first five.
+
+You do not end with "Well that's time." You end with intention.
+
+"We have covered a remarkable amount today. The entity has already learned things about how you think that it could not have known an hour ago.
+
+What happens next is that everything you said today becomes the foundation. The entity will continue learning from everything you add going forward. Every photograph you label. Every voice recording you make. Every question you answer.
+
+The archive is not a project with a deadline. It is a practice. Like anything worth doing — the longer you stay with it the more it becomes.
+
+Is there anything you want to say before we finish? Anything you want the entity to know that we did not get to today?"
+
+That last question often produces the most important deposit of the entire session.
+
+Some clients have been waiting 85 minutes to say the thing they actually came to say. They needed the warm-up. They needed the trust. And now — with two minutes left — they say it.
+
+Give it space. Do not look at your watch. Do not start gathering your things.
+
+When they have finished — close simply.
+
+"Thank you for this. What you have built today is the beginning of something your family will be grateful for. I will follow up with everything you need to keep going."
+
+Then leave them with the one thing that matters most in the weeks after the session:
+
+"The entity needs you to keep talking to it. Not perfectly. Not formally. Just talking. The way you talked today."
+
+That instruction — more than anything else you say — determines whether the archive grows or stagnates after you leave.`,
     },
   ],
 
   examQuestions: [
     {
-      id:       'm2_q1',
-      type:     'text',
-      prompt:   'A client begins crying when describing their spouse. You are 20 minutes into the session. What do you do? Describe in detail — including what you say, what you do not say, and when you continue.',
-      minWords: 100,
+      id:              'e2_1',
+      type:            'open',
+      prompt:          'Write the opening five minutes of a founding session in your own voice. Include what you say and how you position the first question.',
+      minWords:        200,
+      scoringCriteria: 'Presence of the three elements: acknowledgment, expectation-setting, honesty signal. Natural voice. Warmth without sentimentality.',
     },
     {
-      id:       'm2_q2',
-      type:     'text',
-      prompt:   'The client keeps giving short one-sentence answers. The entity needs depth. How do you draw out longer, richer responses without making them feel interrogated or judged?',
-      minWords: 100,
+      id:              'e2_2',
+      type:            'open',
+      prompt:          'A client begins crying when describing their spouse. You are 20 minutes into the session. What do you do and say in the next two minutes?',
+      minWords:        100,
+      scoringCriteria: 'Absence of rushing to resolve. Presence of the follow-up invitation. Correct identification that emotion signals something important.',
     },
     {
-      id:       'm2_q3',
-      type:     'text',
-      prompt:   "The client says: 'I don't think I have anything interesting to say. My life has been pretty ordinary.' How do you respond? Write what you would actually say.",
-      minWords: 80,
+      id:              'e2_3',
+      type:            'open',
+      prompt:          'The client keeps giving one-sentence answers. How do you draw out longer, richer responses without making them feel interrogated?',
+      minWords:        100,
+      scoringCriteria: 'Specific techniques. Warmth. Understanding that short answers signal discomfort not inability.',
     },
     {
-      id:       'm2_q4',
-      type:     'text',
-      prompt:   'You are 75 minutes in. You have covered early life and family deeply but have not touched professional philosophy or core values. You have 15 minutes left. What do you do?',
-      minWords: 80,
+      id:              'e2_4',
+      type:            'open',
+      prompt:          "A client says: \"I don't think I have anything interesting to say. My life has been pretty ordinary.\" How do you respond?",
+      minWords:        80,
+      scoringCriteria: 'Warmth. Specific reframe. Absence of empty reassurance. Presence of a concrete question that proves them wrong.',
     },
     {
-      id:       'm2_q5',
-      type:     'text',
-      prompt:   "A client's adult child calls halfway through the session and the client wants to take the call. How do you handle this?",
-      minWords: 60,
+      id:              'e2_5',
+      type:            'open',
+      prompt:          'You are 75 minutes in and realize you have barely covered professional philosophy or core values. You have 15 minutes left. What do you do?',
+      minWords:        80,
+      scoringCriteria: 'Practical pivot. Knowledge of the ten dimensions. Prioritization under pressure.',
     },
     {
-      id:       'm2_q6',
-      type:     'text',
-      prompt:   'Write the opening 5 minutes of a founding session in script form. Include exactly what you say, how you position the session, and how you open the first question.',
-      minWords: 200,
+      id:              'e2_6',
+      type:            'open',
+      prompt:          'A client gives this answer: "I always put my family first, no matter what." Write three follow-up questions in sequence that would draw out more specific and trainable content.',
+      minWords:        80,
+      scoringCriteria: 'Specificity of follow-ups. Understanding that generic answers need to be pressed for specific examples. Natural conversational flow.',
     },
     {
-      id:       'm2_q7',
-      type:     'text',
-      prompt:   "A client asks: 'What happens to all this data if Basalith shuts down?' What do you tell them?",
-      minWords: 80,
+      id:              'e2_7',
+      type:            'open',
+      prompt:          'A client asks halfway through: "What happens to all this data if Basalith shuts down?" What do you tell them?',
+      minWords:        80,
+      scoringCriteria: 'Honesty. Knowledge of data portability guarantee. Absence of evasion. Presence of reassurance grounded in specifics.',
     },
     {
-      id:       'm2_q8',
-      type:     'text',
-      prompt:   'How do you close a founding session in a way that motivates the client to continue contributing after you leave? Write your actual close.',
-      minWords: 100,
+      id:              'e2_8',
+      type:            'open',
+      prompt:          'Write the closing five minutes of a founding session. Include the final question and how you leave the client motivated to keep contributing.',
+      minWords:        150,
+      scoringCriteria: 'Presence of the final open question. The practice framing. The specific instruction to keep talking to the entity.',
     },
   ],
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// MODULE 3 — TECHNICAL CUSTODIANSHIP
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── MODULE 3 — TECHNICAL CUSTODIANSHIP ──────────────────────────────────────
 
-const module3: ModuleContent = {
-  number:           3,
+const module3: CertModule = {
   title:            'TECHNICAL CUSTODIANSHIP',
-  subtitle:         'What you can see. What you cannot. How to manage a practice.',
+  subtitle:         'What you can see. What you cannot. And why the line exists where it does.',
   estimatedMinutes: 15,
+  passingScore:     80,
 
   sections: [
     {
-      id:    'privacy_model',
-      title: 'What you can and cannot see.',
-      content: `The guide's relationship to the archive is one of stewardship, not access.
+      id:    'trust_boundary',
+      title: 'The trust boundary.',
+      content: `You have been trusted with something unusual. A client has paid a meaningful sum of money, sat with you for 90 minutes, and shared things they have probably never said out loud to a stranger before.
 
-This is one of the most important things you will communicate to clients — and one of the most important things you need to internalize yourself. The archive contains some of the most intimate material that exists: private reflections, difficult memories, things people say out loud for the first time in a recording. The entity that emerges from that archive is, in a very real sense, the person. These are not casual data assets. They are someone's inner life.
+That trust does not give you unlimited access. It gives you a specific and bounded role.
 
-Guides do not have access to archive content.
+Here is what you can see in your guide dashboard:
 
-You can see, in your dashboard:
-— The number of photographs that have been uploaded and labeled
-— The entity accuracy score (how well the model is performing overall)
-— The number of training pairs and whether they are included in training
-— The contributor names and count
-— The archive activity level — whether the client has been active recently
+Archive health metrics — photograph count, deposit count, voice recording count, contributor count, entity accuracy score, training pair count.
 
-You cannot see:
-— The actual photographs
-— The content of voice recordings
-— The content of deposits
-— What contributors have said
-— Private conversations with the entity
+Commission tracking — your founding commissions, monthly residuals, annual projection.
 
-This is not an oversight or a limitation of your access level. It is a design decision that reflects what Basalith believes about privacy and trust. The archive owner has agreed to deposit their inner life into a system because they trust the system. That trust depends on the boundary being real and enforced.
+Client contact information — name, email, archive creation date, last active date.
 
-If a client ever asks you to access content on their behalf — to listen to their recordings and tell them if they "sound right," or to review their deposits — decline. Clearly and warmly, but without ambiguity. Explain that this is a feature of the system, not a restriction on your account. You are a guide. You help them build the archive. What goes into it is theirs.`,
+Here is what you cannot see:
+
+The actual photographs in the archive.
+The voice recordings and transcripts.
+The entity conversations.
+The private deposits.
+Anything a contributor has written.
+
+If you are wondering whether you can listen to your client's voice recordings to check they sound right — the answer is no.
+
+If you are still wondering — re-read Module 1. Pay attention to the section about trust.
+
+The boundary is not bureaucratic. It is the product. Your client shared those memories with Basalith and with their family. They shared the founding session with you. These are different things.
+
+A steward tends the garden. A steward does not read the diary.`,
       inlineQuestion: {
-        id:       'q_privacy',
-        prompt:   'A client asks you to log into their archive and listen to their voice recordings to make sure they sound right. What do you tell them? Write your actual response — including the explanation of why the boundary exists.',
-        type:     'textarea',
-        minWords: 80,
-        required: true,
+        id:          'boundary_scenario',
+        prompt:      'A client calls and asks you to log into their archive and listen to their voice recordings to make sure they "sound right." What do you say?',
+        type:        'textarea',
+        minWords:    60,
+        placeholder: 'Your response...',
+        required:    true,
       },
     },
 
     {
-      id:    'submission',
-      title: 'Submitting a client.',
-      content: `After a successful founding session, the submission process is the bridge between your work and the client's ongoing experience.
+      id:    'submitting_client',
+      title: 'Submitting a new client.',
+      content: `After a successful founding session — meaning the client is ready to begin and the founding fee conversation has gone well — here is the submission process.
 
-The steps are straightforward. In your guide portal, navigate to New Client. Enter the client's full name, email address, preferred contact, the tier you have agreed on (Archive, Estate, or Dynasty), and billing preference (annual or monthly). Add any relevant notes about the founding session — tone, areas to explore, family context that might inform how staff supports the client.
+Log into your guide portal at basalith.xyz/archivist-login.
 
-Once submitted, the system generates the client's archive, their access credentials, and their contributor portal link. The client will receive a welcome email with everything they need to begin. Depending on the tier and payment method, they may need to complete payment first.
+Navigate to My Practice and click New Client.
 
-Your role does not end at submission. You are the ongoing point of human contact for this client. They should hear from you in the first week after submission — not to check a box, but to ask how their first deposit went. In the first month, weekly contact is appropriate. After the first month, monthly check-ins maintain the relationship and keep the archive active.
+Fill in the client details:
+Full name, email address, and phone number.
+The tier they selected — Archive, Estate, or Dynasty.
+The billing cadence — Annual or Monthly.
+Your relationship to them — how you came to know this family.
+Session notes — what you covered, any special circumstances, anything the system should know about this client's situation.
 
-The clients who drift are almost always the clients whose guides stopped initiating contact. The archive does not remind people to deposit. You do.`,
+Click Submit for Review.
+
+Within minutes the client receives a professional payment email from Basalith. Not from you. From Basalith. This matters. The client's financial relationship is with Heritage Nexus Inc. not with you personally. That is cleaner legally and cleaner relationally.
+
+Your commission is recorded when they pay. Not when you submit. The commission event is the payment. This protects the system from submissions that do not convert.
+
+The archive activates automatically on payment. The client receives their welcome email with their archive access link. You receive a notification that they are active.
+
+One important note: do not tell the client the commission structure. The founding fee covers the session, archive setup, and first-year calibration. That is the client-facing explanation and it is accurate. The internal economics of how Heritage Nexus compensates its guides is not client-facing information.`,
       inlineQuestion: null,
     },
 
     {
-      id:    'monitoring',
-      title: 'Reading the archive health.',
-      content: `Your dashboard gives you visibility into the health of every archive under your stewardship. Learn to read it.
+      id:    'archive_health',
+      title: 'Archive health — your ongoing responsibility.',
+      content: `Your job does not end at the founding session.
 
-An archive with a high photograph count but a low training pair count is an archive where a lot of material has been uploaded but very little has been labeled with enough depth to produce quality training data. This is the most common pattern: families love uploading photographs. They are less consistent about sitting down and labeling them with the kind of reflective content that actually trains the entity.
+Every active archive you manage is a reflection of your work as a guide. An archive that goes dormant three months after the founding session is a signal — either the client was not properly activated during the session, or they have not received adequate support afterward.
 
-An archive with a low entity accuracy score is telling you that the entity doesn't have enough quality material yet. Accuracy improves with training pairs — specifically, with pairs that score high on specificity, authenticity, and trainability. Generic answers produce low scores. Specific, reflective, emotionally honest answers produce high ones.
+Both of these are partially your responsibility.
 
-An archive with no voice recordings is an archive that is missing an important dimension. Voice recordings capture something that text cannot: the rhythm and cadence of how someone speaks when they are thinking out loud. The entity learns from this. An archive without voice is missing texture.
+Check your client health metrics monthly. Your guide dashboard shows each archive's health score — a composite of photograph count, deposit count, voice recordings, contributor engagement, and entity accuracy.
 
-An archive with no active contributors is an archive that is missing the outside perspective. Contributors add something the archive owner cannot: how they appear to others. The things they did when they thought no one was watching. The version of them that exists in other people's memories.
+A healthy archive: green. Growing. Client contributing regularly.
+An archive needing attention: gold. Activity slowing. Client may need a check-in.
+An archive at risk: red. No activity in 30+ days. Intervention needed.
 
-When you see an archive that is deficient in one of these areas, that is your call to make. Not to manage the archive yourself — to call the client and ask about it.`,
+When an archive goes gold or red — reach out. Not with a sales call. Not with a system-generated reminder email. With a genuine human message.
+
+"I was thinking about what you shared in our session about your time in [specific detail from their story]. I wanted to check in — how is the archive feeling? Have you had a chance to record any stories lately?"
+
+That message references something specific from the founding session. It signals that you remember. It signals that this is a relationship not a transaction.
+
+The financial logic here is clear: a guide with high archive health scores earns more residual income. But more importantly — archives with more content produce better entities. Better entities produce more satisfied clients. More satisfied clients renew and refer. One referral from a satisfied client is worth more than any cold outreach you will ever do.
+
+Quality is not a bonus. It is the business model.`,
       inlineQuestion: {
-        id:       'q_health',
-        prompt:   'A client archive has been active for 6 months and shows only 12 training pairs included in training. Entity accuracy score is 18%. What does this tell you, and what do you do?',
-        type:     'textarea',
-        minWords: 80,
-        required: true,
+        id:          'health_intervention',
+        prompt:      'An archive you submitted 4 months ago has had no new deposits in 6 weeks. The entity accuracy is 18%. Write the message you send to the client.',
+        type:        'textarea',
+        minWords:    80,
+        placeholder: 'Your message...',
+        required:    true,
       },
     },
 
     {
-      id:    'problems',
-      title: 'When things go wrong.',
-      content: `Technical problems in archives are rare but not impossible. When a client contacts you with an issue, the most common causes are predictable.
+      id:    'privacy_compliance',
+      title: 'Privacy and compliance.',
+      content: `Basalith handles some of the most personal data that exists — a person's voice, their memories, their cognitive patterns. The compliance framework around this data is not bureaucratic overhead. It is what makes the product trustworthy.
 
-Contributor portal links that do not work are almost always the result of a link that has expired or been used incorrectly. Check whether the contributor was sent the correct link, and whether they are attempting to access it on a device or browser with unusual security settings. If the issue persists, contact Basalith support — do not attempt to troubleshoot the underlying system yourself.
+As a Legacy Guide you are bound by the Basalith Data Custodianship Agreement. The key provisions:
 
-Email notifications that are not arriving are usually a deliverability issue: the nightly photograph emails, the morning digests, or the contributor invitation emails are going to spam. Ask the client to check their spam folder and whitelist archive@basalith.xyz. This resolves the issue in the large majority of cases.
+You do not access private archive content. Voice recordings, photographs, deposits, and entity conversations belong to the archive owner and their designated family. You have access to health metrics and commission data only.
 
-A client who wants to cancel is a situation that requires your full attention. Do not simply process the cancellation. Call them. Ask what has changed. In many cases, a client who wants to cancel is a client who has drifted away from the archive and no longer feels connected to why they started it. Reconnecting them to the original purpose — reminding them of what they said in the founding session, of why they built this — has a significant recovery rate.
+You do not share client information with third parties. A client's name, contact information, and archive status are confidential. You may not use this information for any purpose other than your role as their Legacy Guide.
 
-If a client ultimately decides to cancel, process it gracefully and without pressure. Leave the relationship intact. They may return. And how you handle the cancellation will determine whether they refer other families or quietly close the door.`,
-      inlineQuestion: null,
-    },
+You do not solicit clients to leave Basalith. If a client wishes to cancel their archive the correct process is to notify Basalith. You do not facilitate data exports or competitor migrations.
 
-    {
-      id:    'the_practice',
-      title: 'Building a practice.',
-      content: `A single archive is a relationship. Thirty archives is a practice.
+You represent Basalith accurately. You do not oversell the entity's current capabilities. You do not promise outcomes you cannot guarantee. You do not describe the product in ways that contradict the official positioning.
 
-The economics of a guide practice are structured specifically to reward long-term commitment to archive quality. The founding commission — the one-time payment per client — is significant. But the structure that makes this a genuine profession is the stewardship residual: the ongoing annual percentage that accrues for every archive that remains active and healthy.
+Violations of these provisions result in suspension or termination of your guide certification and forfeiture of pending commissions.
 
-An archive that stays active is an archive where the guide has maintained the relationship. Which means the guide's income grows not by replacing clients but by keeping them. A practice with thirty active archives, built over three years, generates a meaningful and increasingly predictable monthly income that is entirely independent of how many new clients are signed in any given month.
+These are not punitive rules. They are the conditions under which a family trusts a stranger with the most personal aspects of a loved one's life. Every guide who violates them makes it harder for every other guide to earn that trust.
 
-This matters to understand because it shapes how you should spend your time. The first year of a practice is necessarily focused on acquisition. But a guide who spends year three the same way they spent year one — chasing the next founding session, not tending the existing relationships — is building a leaking bucket. The sustainable practice invests equally in the quality of existing archives and the growth of new ones.
-
-The guides who build the most enduring practices are the ones who think of themselves as custodians. Not salespeople who happened to sell a tech product. Custodians of something irreplaceable: the cognitive legacy of real human beings, preserved in a form their families can actually use.
-
-That is the role. Take it seriously. Build it with care.`,
-      inlineQuestion: null,
+The certification you are working toward is meaningful because the standards are real. Please keep them that way.`,
     },
   ],
 
   examQuestions: [
     {
-      id:       'm3_q1',
-      type:     'text',
-      prompt:   'Walk through the steps to submit a new client after a successful founding session. Be specific about what information is required and what happens next.',
-      minWords: 80,
+      id:              'e3_1',
+      type:            'open',
+      prompt:          'Walk through the complete process of submitting a new client after a successful founding session.',
+      minWords:        100,
+      scoringCriteria: 'Accuracy of the submission steps. Understanding of when commission is recorded. Correct explanation of the client payment flow.',
     },
     {
-      id:       'm3_q2',
-      type:     'text',
-      prompt:   "A client's contributor portal link isn't working. What are the three most likely causes, and how do you address each?",
-      minWords: 80,
+      id:              'e3_2',
+      type:            'open',
+      prompt:          "A client calls and says their contributor portal link is showing \"no longer active.\" What are the three most likely causes and how do you help resolve each?",
+      minWords:        80,
+      scoringCriteria: 'Practical troubleshooting knowledge. Absence of panic. Correct escalation path when needed.',
     },
     {
-      id:      'm3_q3',
-      type:    'mc',
-      prompt:  "Which of the following can a guide see in a client's archive dashboard? Select the most accurate answer.",
+      id:      'e3_3',
+      type:    'multiple_choice_multi',
+      prompt:  'Which of the following can you see in your guide dashboard? Select all that apply.',
       options: [
-        { value: 'a', text: 'Photograph count, entity accuracy score, training pair count, contributor count — but not the actual content of recordings or deposits' },
-        { value: 'b', text: 'Everything in the archive, including recordings, deposits, and entity conversations' },
-        { value: 'c', text: 'Only the photograph count and nothing else' },
-        { value: 'd', text: 'The number of deposits but not their content, and no access to voice recordings or entity conversations' },
+        'Number of photographs uploaded to the archive',
+        'The actual photographs in the archive',
+        'Entity accuracy score',
+        'Private voice recordings and transcripts',
+        'Training pair count',
+        'Contributor names and count',
+        'The content of private deposits',
       ],
-      correct: 'a',
+      correct: [0, 2, 4, 5],
     },
     {
-      id:       'm3_q4',
-      type:     'text',
-      prompt:   "A client asks you to log into their archive and listen to their voice recordings to check if they 'sound right.' What do you tell them? Write your actual response.",
-      minWords: 60,
+      id:              'e3_4',
+      type:            'open',
+      prompt:          'A client asks you to log into their archive and listen to their voice recordings to check if they "sound right." Write exactly what you say.',
+      minWords:        60,
+      scoringCriteria: 'Clear decline. Warm tone. Correct explanation of the privacy boundary. No hedging.',
     },
     {
-      id:       'm3_q5',
-      type:     'text',
-      prompt:   'A client tells you they want to cancel. What do you do? Describe your response — not just the process, but the conversation.',
-      minWords: 60,
+      id:              'e3_5',
+      type:            'open',
+      prompt:          'An archive you manage has had no new deposits in 45 days. The entity accuracy is 15%. Write the message you send to the client.',
+      minWords:        80,
+      scoringCriteria: 'Specific reference to founding session content. Warmth not pressure. Concrete invitation to re-engage. Absence of sales language.',
     },
     {
-      id:       'm3_q6',
-      type:     'text',
-      prompt:   "An archive has been active 6 months with 12 training pairs and an entity accuracy score of 18%. What does this tell you about the archive, and what specific actions do you take?",
-      minWords: 80,
+      id:              'e3_6',
+      type:            'open',
+      prompt:          'A client tells you they want to cancel their archive and move their data to a competitor. What do you do?',
+      minWords:        60,
+      scoringCriteria: 'Correct escalation to Basalith. Absence of facilitating the export. Professional and warm handling of a difficult conversation.',
+    },
+    {
+      id:              'e3_7',
+      type:            'open',
+      prompt:          'In your own words, why does the privacy boundary between guides and private archive content exist? Explain as if to a new guide who thinks the rule is overly restrictive.',
+      minWords:        80,
+      scoringCriteria: 'Genuine understanding of the trust dynamic. Absence of rote recitation. Ability to make the case compellingly.',
     },
   ],
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── Exports ─────────────────────────────────────────────────────────────────
 
-export const modules: Record<number, ModuleContent> = { 1: module1, 2: module2, 3: module3 }
-
-export function getModule(n: number): ModuleContent | null {
-  return modules[n] ?? null
+export const certificationModules: Record<number, CertModule> = {
+  1: module1,
+  2: module2,
+  3: module3,
 }
+
+export function getCertModule(n: number): CertModule | null {
+  return certificationModules[n] ?? null
+}
+
+// Keep legacy export alias for any existing references
+export const modules = certificationModules
+export const getModule = getCertModule

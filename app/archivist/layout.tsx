@@ -2,6 +2,32 @@
 
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
+import { useState, useEffect } from 'react'
+
+type CertStatus = { status: 'uncertified' | 'in_progress' | 'certified'; module: number }
+
+function useCertStatus() {
+  const [cert, setCert] = useState<CertStatus | null>(null)
+
+  useEffect(() => {
+    // Read archivistId from the archivist-id cookie (not httpOnly — set for client access)
+    const id = document.cookie.split(';').map(c => c.trim()).find(c => c.startsWith('archivist-id='))?.split('=')[1]
+    if (!id) return
+
+    fetch(`/api/archivist/certification?archivistId=${id}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (!data) return
+        if (data.certified_at) { setCert({ status: 'certified', module: 3 }); return }
+        const m = data.module_3_status === 'available' || data.module_3_status === 'in_progress' ? 3
+                : data.module_2_status === 'available' || data.module_2_status === 'in_progress' ? 2 : 1
+        setCert({ status: 'in_progress', module: m })
+      })
+      .catch(() => {})
+  }, [])
+
+  return cert
+}
 
 const NAV = [
   { label: 'Dashboard',     href: '/archivist/dashboard',      icon: '⬡' },
@@ -14,6 +40,7 @@ const NAV = [
 
 export default function ArchivistLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const cert     = useCertStatus()
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', background: '#0A0908' }}>
@@ -55,6 +82,26 @@ export default function ArchivistLayout({ children }: { children: React.ReactNod
             </p>
           </Link>
         </div>
+
+        {/* Certification status indicator */}
+        {cert && (
+          <Link
+            href="/archivist/certification"
+            style={{ display: 'block', padding: '10px 16px 8px', borderBottom: '1px solid rgba(255,255,255,0.04)', textDecoration: 'none' }}
+          >
+            {cert.status === 'certified' ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+                <span style={{ color: '#C4A24A', fontSize: '0.7rem' }}>◆</span>
+                <span style={{ fontFamily: 'Courier New, monospace', fontSize: '0.5rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#C4A24A' }}>Certified Guide</span>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+                <span style={{ display: 'inline-block', width: '6px', height: '6px', borderRadius: '50%', background: '#C4A24A', animation: 'sidebarPulse 2s ease-in-out infinite' }} />
+                <span style={{ fontFamily: 'Courier New, monospace', fontSize: '0.5rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#C4A24A' }}>Module {cert.module} of 3</span>
+              </div>
+            )}
+          </Link>
+        )}
 
         {/* New Client CTA */}
         <div style={{ padding: '16px 16px 8px' }}>
@@ -126,6 +173,8 @@ export default function ArchivistLayout({ children }: { children: React.ReactNod
           </a>
         </div>
       </aside>
+
+      <style>{`@keyframes sidebarPulse { 0%,100%{opacity:1} 50%{opacity:0.4} }`}</style>
 
       {/* ── Mobile top nav ── */}
       <div className="md:hidden" style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50 }}>
