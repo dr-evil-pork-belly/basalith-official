@@ -60,6 +60,19 @@ export async function GET(req: NextRequest) {
     // Non-fatal
   }
 
+  // Check for story game sessions due for reveal (runs nightly)
+  try {
+    await fetch(`${siteUrl}/api/cron/memory-game-monthly`, {
+      method:  'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': `Bearer ${process.env.CRON_SECRET}`,
+      },
+    })
+  } catch {
+    // Non-fatal
+  }
+
   // Send daily digest to archive owners who had activity in last 24 hours
   // (Combined with photo send since Hobby plan allows one cron)
   const since = new Date()

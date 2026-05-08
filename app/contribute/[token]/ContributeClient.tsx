@@ -138,6 +138,146 @@ type Question = {
 
 type UploadStatus = 'idle' | 'uploading' | 'success' | 'error'
 
+// ── Story Game Section ─────────────────────────────────────────────────────────
+
+type StoryGame = {
+  id:             string
+  scenarioText:   string
+  status:         'active' | 'revealed'
+  revealAt:       string
+  responseCount:  number
+  alreadyAnswered: boolean
+  revealedAnswers: string[] | null
+}
+
+function StoryGameSection({
+  archiveId,
+  contributorId,
+  ownerName,
+  lang,
+}: {
+  archiveId:     string
+  contributorId: string
+  ownerName:     string
+  lang:          string
+}) {
+  const [game,      setGame]      = useState<StoryGame | null | 'none'>('none')
+  const [answer,    setAnswer]    = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
+
+  useEffect(() => {
+    fetch(`/api/game/story?archiveId=${archiveId}&contributorId=${contributorId}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => setGame(d?.session ?? null))
+      .catch(() => setGame(null))
+  }, [archiveId, contributorId])
+
+  async function handleSubmit() {
+    if (!answer.trim() || submitting || typeof game !== 'object' || !game) return
+    setSubmitting(true)
+    try {
+      const res = await fetch('/api/game/story', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ archiveId, contributorId, responseText: answer.trim() }),
+      })
+      if (res.ok) {
+        setSubmitted(true)
+        setGame(prev => prev && typeof prev === 'object' ? { ...prev, alreadyAnswered: true, responseCount: prev.responseCount + 1 } : prev)
+      }
+    } catch {}
+    setSubmitting(false)
+  }
+
+  if (game === 'none' || game === null) return null
+
+  const ownerFirst  = ownerName.split(' ')[0]
+  const revealDate  = typeof game === 'object' ? new Date(game.revealAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric' }) : ''
+
+  const ui = {
+    en:  { title: 'Remember When', badge: 'Monthly Game', prompt: 'Your answer', submitted: 'Submitted — answers revealed on', responded: (n: number) => `${n} answer${n !== 1 ? 's' : ''} submitted so far`, revealTitle: 'Answers', cta: 'SUBMIT YOUR ANSWER', noAnswer: 'Write your answer…' },
+    yue: { title: '你還記得嗎', badge: '每月遊戲', prompt: '你嘅回答', submitted: '已提交 — 答案將於以下日期公開：', responded: (n: number) => `已有 ${n} 個答案`, revealTitle: '所有答案', cta: '提交你嘅回答', noAnswer: '寫下你嘅回答…' },
+    zh:  { title: '你还记得吗', badge: '每月游戏', prompt: '您的回答', submitted: '已提交 — 答案将于以下日期公开：', responded: (n: number) => `已有 ${n} 个答案`, revealTitle: '所有答案', cta: '提交您的回答', noAnswer: '写下您的回答…' },
+  }
+  const t = (ui as Record<string, typeof ui.en>)[lang] ?? ui.en
+
+  if (typeof game !== 'object') return null
+
+  return (
+    <div style={{ marginBottom: '1.75rem' }}>
+      <div style={{ background: '#FFFFFF', border: '1px solid rgba(26,24,20,0.08)', borderTop: '2px solid #B8963E', borderRadius: '2px', overflow: 'hidden' }}>
+        {/* Header */}
+        <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid rgba(26,24,20,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div>
+            <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontSize: '1.15rem', fontWeight: 700, color: '#1A1814', margin: 0 }}>{t.title}</p>
+          </div>
+          <span style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.42rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#B8963E', background: 'rgba(184,150,62,0.08)', padding: '3px 8px' }}>{t.badge}</span>
+        </div>
+
+        <div style={{ padding: '1.25rem' }}>
+          {/* Scenario */}
+          <div style={{ borderLeft: '3px solid rgba(184,150,62,0.4)', padding: '14px 18px', marginBottom: '20px', background: 'rgba(184,150,62,0.04)' }}>
+            <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontSize: '1.2rem', fontStyle: 'italic', fontWeight: 300, color: '#1A1814', lineHeight: 1.7, margin: 0 }}>
+              {game.scenarioText}
+            </p>
+          </div>
+
+          {/* Status line */}
+          {game.status === 'active' && (
+            <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.44rem', letterSpacing: '0.12em', color: '#8A8680', marginBottom: '16px' }}>
+              {t.responded(game.responseCount)} · answers revealed {revealDate}
+            </p>
+          )}
+
+          {/* Active — answer input or submitted state */}
+          {game.status === 'active' && !game.alreadyAnswered && !submitted && (
+            <>
+              <textarea
+                value={answer}
+                onChange={e => setAnswer(e.target.value)}
+                placeholder={t.noAnswer}
+                style={{ width: '100%', minHeight: '100px', padding: '12px', fontFamily: '"Cormorant Garamond",Georgia,serif', fontSize: '1rem', lineHeight: 1.65, color: '#1A1814', background: '#FAFAF8', border: '1px solid rgba(26,24,20,0.12)', borderRadius: '2px', resize: 'vertical', boxSizing: 'border-box', marginBottom: '12px' }}
+              />
+              <button
+                onClick={handleSubmit}
+                disabled={!answer.trim() || submitting}
+                style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.52rem', letterSpacing: '0.2em', textTransform: 'uppercase', background: answer.trim() && !submitting ? '#B8963E' : 'rgba(184,150,62,0.3)', color: '#FFFFFF', border: 'none', padding: '12px 24px', cursor: answer.trim() ? 'pointer' : 'not-allowed' }}
+              >
+                {submitting ? '…' : t.cta}
+              </button>
+            </>
+          )}
+
+          {(game.alreadyAnswered || submitted) && game.status === 'active' && (
+            <div style={{ padding: '14px 18px', background: 'rgba(184,150,62,0.06)', border: '1px solid rgba(184,150,62,0.2)', borderRadius: '2px' }}>
+              <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.48rem', letterSpacing: '0.14em', color: '#B8963E', margin: 0 }}>
+                ✓ {t.submitted} {revealDate}
+              </p>
+            </div>
+          )}
+
+          {/* Revealed — show all answers */}
+          {game.status === 'revealed' && game.revealedAnswers && (
+            <>
+              <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.44rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#B8963E', marginBottom: '16px' }}>
+                {t.revealTitle} · {game.revealedAnswers.length}
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {game.revealedAnswers.map((a, i) => (
+                  <div key={i} style={{ border: '1px solid rgba(184,150,62,0.2)', padding: '14px 18px', background: 'rgba(184,150,62,0.02)' }}>
+                    <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontSize: '1rem', fontStyle: 'italic', color: '#1A1814', lineHeight: 1.7, margin: 0 }}>{a}</p>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 const RELATIONSHIP_LABELS: Record<string, string> = {
   daughter:        'Daughter',
   son:             'Son',
@@ -1315,6 +1455,14 @@ export default function ContributeClient({
 
         {/* Where the archive needs you */}
         <MemoryMapTeaser token={token} />
+
+        {/* Monthly memory game */}
+        <StoryGameSection
+          archiveId={archive.id}
+          contributorId={contributor.id}
+          ownerName={archive.owner_name}
+          lang={lang}
+        />
 
         {/* Questions */}
         <QuestionsSection
