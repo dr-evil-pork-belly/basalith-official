@@ -42,6 +42,17 @@ export async function POST(req: NextRequest) {
         labelled_by:        contributor.name ?? contributor.email,
         created_at:         now,
       })
+
+      // Mark photo as responded in contributor_photo_sends (non-fatal)
+      void (async () => {
+        try {
+          await supabaseAdmin
+            .from('contributor_photo_sends')
+            .update({ responded: true, responded_at: now })
+            .eq('contributor_id', contributor.id)
+            .eq('photograph_id', question.photograph_id)
+        } catch {}
+      })()
     }
 
     // Save as owner_deposit so entity learns from it

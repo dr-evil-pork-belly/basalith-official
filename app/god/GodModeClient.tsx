@@ -239,6 +239,8 @@ function BackfillButton() {
 
 import React from 'react'
 
+type PhotoStatRow = { contributorId: string; name: string; sent: number; responded: number; remaining: number; exhausted: boolean }
+
 function ArchiveCard({ archive, onRefresh }: { archive: ArchiveData; onRefresh: () => void }) {
   const router = useRouter()
   const [impersonating,  setImpersonating]  = useState(false)
@@ -248,6 +250,16 @@ function ArchiveCard({ archive, onRefresh }: { archive: ArchiveData; onRefresh: 
   const [sendingLink,    setSendingLink]    = useState(false)
   const [linkEmailState, setLinkEmailState] = useState<'idle' | 'done' | 'error'>('idle')
   const [emailStatus,    setEmailStatus]    = useState<'idle' | 'sending' | 'sent' | 'failed'>('idle')
+  const [photoStats,     setPhotoStats]     = useState<PhotoStatRow[] | null>(null)
+
+  useEffect(() => {
+    if (archive.contributorCount > 0) {
+      fetch(`/api/god/photo-stats?archiveId=${archive.id}`)
+        .then(r => r.ok ? r.json() : null)
+        .then(d => { if (d?.contributors) setPhotoStats(d.contributors) })
+        .catch(() => {})
+    }
+  }, [archive.id, archive.contributorCount])
 
   async function handleImpersonate() {
     setImpersonating(true)
@@ -388,6 +400,25 @@ function ArchiveCard({ archive, onRefresh }: { archive: ArchiveData; onRefresh: 
             {archive.training.included} pairs · {archive.training.estimatedAccuracy}
             {archive.training.readyForFineTuning ? ' ✓ READY' : ''}
           </p>
+        </div>
+      )}
+
+      {/* Contributor photo coverage */}
+      {photoStats && photoStats.length > 0 && (
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '0.5rem', marginBottom: '0.75rem' }}>
+          <p style={{ ...mono, fontSize: '0.36rem', color: '#5C6166', margin: '0 0 4px', letterSpacing: '0.12em' }}>
+            PHOTO COVERAGE
+          </p>
+          {photoStats.map(c => (
+            <div key={c.contributorId} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '3px' }}>
+              {c.exhausted && (
+                <span style={{ fontSize: '0.7rem' }}>⚠</span>
+              )}
+              <p style={{ ...mono, fontSize: '0.34rem', letterSpacing: '0.08em', color: c.exhausted ? '#E57373' : '#706C65', margin: 0, flex: 1 }}>
+                {c.name} — {c.sent} sent · {c.responded} replied · {c.exhausted ? 'ALL SEEN' : `${c.remaining} remaining`}
+              </p>
+            </div>
+          ))}
         </div>
       )}
 

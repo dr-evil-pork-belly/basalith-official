@@ -263,6 +263,27 @@ export async function POST(req: Request) {
           }
         }
 
+        // Mark photo as responded in contributor_photo_sends (non-fatal)
+        if (matchedSession.photograph_id && fromEmail) {
+          void (async () => {
+            try {
+              const { data: contrib } = await supabaseAdmin
+                .from('contributors')
+                .select('id')
+                .eq('archive_id', matchedSession.archive_id)
+                .or(`email.eq.${fromEmail},name.eq.${fromName}`)
+                .maybeSingle()
+              if (contrib?.id) {
+                await supabaseAdmin
+                  .from('contributor_photo_sends')
+                  .update({ responded: true, responded_at: new Date().toISOString() })
+                  .eq('contributor_id', contrib.id)
+                  .eq('photograph_id', matchedSession.photograph_id)
+              }
+            } catch {}
+          })()
+        }
+
         // Increment session reply count
         await supabaseAdmin
           .from('email_sessions')
