@@ -315,7 +315,7 @@ export default function ExamClient({
               {mod.title}
             </h1>
             <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '1.0rem', color: C.dim, lineHeight: 1.8 }}>
-              {mod.examQuestions.length} questions. Passing score: {mod.passingScore}. Open-text answers are graded by Claude on understanding, clarity, and the ability to explain concepts to a real family. Specific answers score higher than generic ones.
+              {mod.examQuestions.length} questions. Passing score: {mod.passingScore}. Open-text answers are evaluated by our AI on understanding, clarity, and the ability to explain concepts to a real family. Specific answers score higher than generic ones.
             </p>
           </div>
         )}
@@ -327,7 +327,7 @@ export default function ExamClient({
               Grading your answers…
             </p>
             <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '0.95rem', color: C.dim }}>
-              Claude is reading your responses. This takes about 30 seconds.
+              Your responses are being evaluated. This takes about 30 seconds.
             </p>
           </div>
         )}

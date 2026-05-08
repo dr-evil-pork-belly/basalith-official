@@ -160,7 +160,7 @@ Your clients are not just buying what the entity is now. They are buying in earl
 
 This is the most honest and compelling thing you can tell them:
 
-"The families who begin today are five years ahead of the families who begin tomorrow. The entity learns from everything you give it. The longer it learns the more accurately it thinks. Time is the one resource in this product that cannot be purchased later."
+"The families who begin today are five years ahead of the families who begin in five years. The entity learns from everything you give it. The longer it learns the more accurately it thinks. Time is the one resource in this product that cannot be purchased later."
 
 Honest. Specific. True. No oversell required.
 

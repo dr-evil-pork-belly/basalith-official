@@ -258,7 +258,7 @@ export default function CertificationClient({ archivistId }: { archivistId: stri
       {/* Footer note */}
       {!allPassed && !loading && (
         <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '0.88rem', color: C.ghost, lineHeight: 1.8, marginTop: '28px' }}>
-          Each module unlocks the next after passing the exam. Passing score is 80 or above. Open-text answers are graded by Claude on understanding, clarity, and the ability to explain concepts to a real family.
+          Each module unlocks the next after passing the exam. Passing score is 80 or above. Open-text answers are evaluated by our AI on understanding, clarity, and the ability to explain concepts to a real family.
         </p>
       )}
     </div>
