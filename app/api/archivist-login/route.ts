@@ -1,7 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { checkRateLimit, getClientIP } from '@/lib/apiSecurity'
 
 export async function POST(req: NextRequest) {
+  // ── Rate limiting ───────────────────────────────────────────────────────────
+  const ip    = getClientIP(req)
+  const limit = checkRateLimit(`archivist-login:${ip}`, 10, 15 * 60 * 1000)
+  if (!limit.allowed) {
+    return NextResponse.json({ success: false, error: 'Too many attempts. Try again in 15 minutes.' }, { status: 429 })
+  }
+
   let password: string
   try {
     const body = await req.json()
@@ -44,9 +52,9 @@ export async function POST(req: NextRequest) {
 
   const cookieOptions = {
     httpOnly: true,
-    secure:   process.env.NODE_ENV === 'production',
-    sameSite: 'lax' as const,
-    maxAge:   60 * 60 * 24 * 30,
+    secure:   true,
+    sameSite: 'strict' as const,
+    maxAge:   60 * 60 * 24 * 7, // 7 days
     path:     '/',
   }
 

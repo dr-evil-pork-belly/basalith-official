@@ -1,9 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { getArchivistSession } from '@/lib/apiSecurity'
 
 export async function GET(req: NextRequest) {
+  // ── Verify the session cookie matches the requested archivistId (IDOR guard)
+  const session = await getArchivistSession()
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
   const archivistId = req.nextUrl.searchParams.get('id')
   if (!archivistId) return NextResponse.json({ error: 'archivistId required' }, { status: 400 })
+
+  if (archivistId !== session.archivistId) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
 
   const [
     { data: archivist,   error: archivistErr },

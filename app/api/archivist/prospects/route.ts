@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { getArchivistSession } from '@/lib/apiSecurity'
 
 // GET /api/archivist/prospects
 export async function GET(req: NextRequest) {
-  const archivistId = req.nextUrl.searchParams.get('archivistId')
+  const session = await getArchivistSession()
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  // Ignore any archivistId from query params — always use the authenticated session
+  const archivistId = session.archivistId
   if (!archivistId) return NextResponse.json({ error: 'No archivist ID' }, { status: 400 })
 
   const { data, error } = await supabaseAdmin
@@ -18,9 +23,12 @@ export async function GET(req: NextRequest) {
 
 // POST /api/archivist/prospects
 export async function POST(req: NextRequest) {
+  const session = await getArchivistSession()
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
   const body = await req.json()
-  const archivistId: string | null = body.archivistId ?? null
-  if (!archivistId) return NextResponse.json({ error: 'No archivist ID' }, { status: 400 })
+  // Always use session archivistId — ignore body.archivistId
+  const archivistId = session.archivistId
 
   const { name, contact, status, tier, last_contact, next_action, notes } = body
 
@@ -49,9 +57,11 @@ export async function POST(req: NextRequest) {
 
 // PATCH /api/archivist/prospects
 export async function PATCH(req: NextRequest) {
+  const session = await getArchivistSession()
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
   const body = await req.json()
-  const archivistId: string | null = body.archivistId ?? null
-  if (!archivistId) return NextResponse.json({ error: 'No archivist ID' }, { status: 400 })
+  const archivistId = session.archivistId
 
   const { id, archivistId: _aid, ...updates } = body
 
@@ -77,10 +87,12 @@ export async function PATCH(req: NextRequest) {
   return NextResponse.json({ prospect: data })
 }
 
-// DELETE /api/archivist/prospects?id=xxx&archivistId=xxx
+// DELETE /api/archivist/prospects?id=xxx
 export async function DELETE(req: NextRequest) {
-  const archivistId = req.nextUrl.searchParams.get('archivistId')
-  if (!archivistId) return NextResponse.json({ error: 'No archivist ID' }, { status: 400 })
+  const session = await getArchivistSession()
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const archivistId = session.archivistId
 
   const id = req.nextUrl.searchParams.get('id')
   if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 })

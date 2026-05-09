@@ -1,9 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import bcrypt from 'bcryptjs'
+import { checkRateLimit, getClientIP } from '@/lib/apiSecurity'
 
 export async function POST(req: NextRequest) {
-  const { password } = await req.json()
+  // ── Rate limiting — max 10 attempts per IP per 15 minutes ─────────────────
+  const ip    = getClientIP(req)
+  const limit = checkRateLimit(`archive-login:${ip}`, 10, 15 * 60 * 1000)
+
+  if (!limit.allowed) {
+    return NextResponse.json(
+      { error: 'Too many login attempts. Please try again in 15 minutes.' },
+      { status: 429 }
+    )
+  }
+
+  let password: string
+  try {
+    const body = await req.json()
+    password   = body.password
+  } catch {
+    return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
+  }
 
   if (!password) {
     return NextResponse.json({ error: 'Password required' }, { status: 400 })
@@ -17,21 +35,16 @@ export async function POST(req: NextRequest) {
     .select('archive_id, password_hash')
     .eq('is_active', true)
 
-  console.log('[archive-login] Total credentials in DB:', allCredentials?.length ?? 0)
-  console.log('[archive-login] Password prefix:', password.substring(0, 4) + '...')
-
-  if (allCredentials && allCredentials.length > 0) {
+  if (allCredentials?.length) {
     for (const cred of allCredentials) {
-      console.log('[archive-login] Checking credential for archive:', cred.archive_id, '| hash prefix:', cred.password_hash.substring(0, 10))
       const matches = await bcrypt.compare(password, cred.password_hash)
       if (matches) {
         archiveId = cred.archive_id
-        // Update last_used non-blocking
-        supabaseAdmin
+        // Update last_used — non-blocking
+        void supabaseAdmin
           .from('archive_credentials')
           .update({ last_used_at: new Date().toISOString() })
           .eq('archive_id', cred.archive_id)
-          .then(() => {})
         break
       }
     }
@@ -52,29 +65,26 @@ export async function POST(req: NextRequest) {
   }
 
   if (!archiveId) {
-    return NextResponse.json({ error: 'Invalid password' }, { status: 401 })
+    // Generic message — don't reveal whether ID or password was wrong
+    return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
   }
 
-  // ── 3. Verify archive exists and is active ────────────────────────────────
+  // ── 3. Verify archive is active ────────────────────────────────────────────
   const { data: archive } = await supabaseAdmin
     .from('archives')
     .select('id, name, family_name, status, preferred_language')
     .eq('id', archiveId)
     .single()
 
-  if (!archive) {
-    return NextResponse.json({ error: 'Archive not found' }, { status: 404 })
-  }
-
-  if (archive.status && archive.status !== 'active') {
-    return NextResponse.json({ error: 'Archive is not active' }, { status: 403 })
+  if (!archive || (archive.status && archive.status !== 'active')) {
+    return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
   }
 
   const cookieOptions = {
     httpOnly: true,
-    secure:   process.env.NODE_ENV === 'production',
-    sameSite: 'lax' as const,
-    maxAge:   60 * 60 * 24 * 7,
+    secure:   true,            // always — even in dev; mirrors prod behaviour
+    sameSite: 'strict' as const,
+    maxAge:   60 * 60 * 24 * 7, // 7 days
     path:     '/',
   }
 
@@ -82,13 +92,11 @@ export async function POST(req: NextRequest) {
   response.cookies.set('archive-auth', archiveId, cookieOptions)
   response.cookies.set('archive-id',   archiveId, cookieOptions)
 
-  // Set lang cookie so LanguageProvider auto-selects the owner's preferred language.
-  // Not httpOnly — must be readable by client-side JS.
   if (archive.preferred_language && archive.preferred_language !== 'en') {
     response.cookies.set('lang', archive.preferred_language, {
       httpOnly: false,
-      secure:   process.env.NODE_ENV === 'production',
-      sameSite: 'lax' as const,
+      secure:   true,
+      sameSite: 'strict' as const,
       maxAge:   60 * 60 * 24 * 365,
       path:     '/',
     })

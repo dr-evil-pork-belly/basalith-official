@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic'
 export async function GET(req: NextRequest) {
   const token = new URL(req.url).searchParams.get('token')
 
-  if (!token) {
+  if (!token || token.length < 32) {
     return NextResponse.redirect(new URL('/archive-login?error=invalid', req.url))
   }
 
@@ -21,27 +21,31 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(new URL('/archive-login?error=invalid', req.url))
   }
 
+  // ── Invalidate the token immediately — magic links are one-time use ────────
+  await supabaseAdmin
+    .from('archives')
+    .update({ magic_link_token: null, magic_link_created_at: null })
+    .eq('id', archive.id)
+
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
-  const res = NextResponse.redirect(new URL('/archive/dashboard', siteUrl))
+  const res     = NextResponse.redirect(new URL('/archive/dashboard', siteUrl))
 
   const cookieOpts = {
     httpOnly: true,
     secure:   true,
-    sameSite: 'lax' as const,
-    maxAge:   60 * 60 * 24 * 30,
+    sameSite: 'strict' as const,
+    maxAge:   60 * 60 * 24 * 7, // 7 days — not 30; magic links should create shorter sessions
     path:     '/',
   }
 
-  res.cookies.set('archive-auth', 'true',      cookieOpts)
-  res.cookies.set('archive-id',   archive.id,  cookieOpts)
+  res.cookies.set('archive-auth', 'true',     cookieOpts)
+  res.cookies.set('archive-id',   archive.id, cookieOpts)
 
-  // Set lang cookie so LanguageProvider auto-selects the owner's preferred language.
-  // Not httpOnly — must be readable by client-side JS.
   if (archive.preferred_language && archive.preferred_language !== 'en') {
     res.cookies.set('lang', archive.preferred_language, {
       httpOnly: false,
       secure:   true,
-      sameSite: 'lax' as const,
+      sameSite: 'strict' as const,
       maxAge:   60 * 60 * 24 * 365,
       path:     '/',
     })
