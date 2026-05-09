@@ -26,7 +26,7 @@ export async function POST(req: Request) {
 
     const { data: recentLabels } = await supabaseAdmin
       .from('labels')
-      .select('*, photographs(storage_path, ai_era_estimate)')
+      .select('*, photographs(id, storage_path, ai_era_estimate)')
       .eq('archive_id', archiveId)
       .gte('created_at', since.toISOString())
       .order('created_at', { ascending: false })
@@ -52,13 +52,10 @@ export async function POST(req: Request) {
 
     const topDecade = decades?.sort((a, b) => b.photo_count - a.photo_count)[0]
 
-    // Signed URL for first photograph
-    let photoUrl: string | null = null
+    // Permanent proxy URL for email — never expires
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const firstPhoto = (recentLabels[0] as any)?.photographs
-    if (firstPhoto?.storage_path) {
-      photoUrl = await getEmailPhotoUrl(firstPhoto.storage_path)
-    }
+    const photoUrl: string | null = firstPhoto?.id ? getEmailPhotoUrl(firstPhoto.id) : null
 
     // Build memories HTML
     const memoriesHtml = recentLabels.map(label => {

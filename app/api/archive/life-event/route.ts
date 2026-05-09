@@ -80,11 +80,8 @@ export async function POST(req: Request) {
       if (eraMatch) chosenPhoto = eraMatch
     }
 
-    // Build signed URL (48 hours for life event)
-    let photoUrl: string | null = null
-    if (chosenPhoto?.storage_path) {
-      photoUrl = await getEmailPhotoUrl(chosenPhoto.storage_path)
-    }
+    // Permanent proxy URL — never expires, works for the life of the email
+    const photoUrl: string | null = chosenPhoto?.id ? getEmailPhotoUrl(chosenPhoto.id) : null
 
     // Build context for AI reflection
     const { data: recentDeposits } = await supabaseAdmin

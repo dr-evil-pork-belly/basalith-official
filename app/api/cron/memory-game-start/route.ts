@@ -162,11 +162,10 @@ export async function GET(req: NextRequest) {
 
       const selectedPhotos = photos.slice(0, 5)
 
-      // Get email-safe URLs for all photos (game emails must load for days)
+      // Permanent proxy URLs — never expire, work for the life of the email
       const photoUrls: Record<string, string> = {}
       for (const photo of selectedPhotos) {
-        const url = await getEmailPhotoUrl(photo.storage_path)
-        if (url) photoUrls[photo.id] = url
+        photoUrls[photo.id] = getEmailPhotoUrl(photo.id)
       }
 
       // Create game session

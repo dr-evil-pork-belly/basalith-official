@@ -150,8 +150,7 @@ export async function GET(req: NextRequest) {
           const selectedPhoto = photos?.[0]
           if (!selectedPhoto) continue
 
-          const photoUrl = await getEmailPhotoUrl(selectedPhoto.storage_path)
-          if (!photoUrl) continue
+          const photoUrl = getEmailPhotoUrl(selectedPhoto.id)
 
           await Promise.all([
             supabaseAdmin

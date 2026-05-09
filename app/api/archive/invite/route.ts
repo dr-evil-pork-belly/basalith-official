@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
         .single()
 
       if (photo?.storage_path) {
-        photographUrl = await getEmailPhotoUrl(photo.storage_path)
+        photographUrl = getEmailPhotoUrl(photographId)  // proxy URL — never expires
 
         // Create a session so reply is routed correctly
         const sessionCode = Math.random().toString(36).substring(2, 8)

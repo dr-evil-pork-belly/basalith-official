@@ -81,7 +81,7 @@ export async function GET(req: NextRequest) {
 
       if (!photo || !archive) continue
 
-      const photoUrl = await getEmailPhotoUrl(photo.storage_path) ?? ''
+      const photoUrl = getEmailPhotoUrl(photo.id)
 
       // Merge email replies and label contributions
       const responses: Array<{ name: string; text: string }> = [

@@ -154,12 +154,8 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // ── 3D. Generate photo URL ──────────────────────────────────────────────
-      const photoUrl = await getEmailPhotoUrl(photo.storage_path)
-      if (!photoUrl) {
-        console.error(`[send-photos] could not generate URL for photo ${photo.id}`)
-        continue
-      }
+      // ── 3D. Photo URL — permanent proxy, never expires ─────────────────────
+      const photoUrl = getEmailPhotoUrl(photo.id)
 
       // ── 3E. Build unique reply address per contributor ──────────────────────
       const sessionCode  = Math.random().toString(36).substring(2, 8)
@@ -247,7 +243,7 @@ export async function POST(req: NextRequest) {
 
     // 4. WeChat send for archive owner (uses first photo sent this batch)
     if (firstSentPhoto && archive.wechat_open_id) {
-      const wechatUrl = await getEmailPhotoUrl((firstSentPhoto as { storage_path: string }).storage_path).catch(() => null)
+      const wechatUrl = getEmailPhotoUrl((firstSentPhoto as { id: string }).id)
       if (wechatUrl) {
         void sendWeChatPhoto(archive.wechat_open_id, wechatUrl, archive.name, archive.preferred_language ?? 'en')
           .catch((e: unknown) => console.error('[send-photos] wechat failed:', e instanceof Error ? e.message : e))
