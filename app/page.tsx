@@ -8,10 +8,8 @@ export const metadata: Metadata = {
 import Nav               from './components/Nav'
 import TaglineOpening    from './components/TaglineOpening'
 import HeroSection       from './components/HeroSection'
-import DoorSelector      from './components/DoorSelector'
 import PhilosophySection from './components/PhilosophySection'
-import LegacySection     from './components/LegacySection'
-import HowItWorksSection from './components/HowItWorksSection'
+import TechnologySection from './components/TechnologySection'
 import ClosingSection    from './components/ClosingSection'
 import Footer            from './components/Footer'
 
@@ -22,10 +20,8 @@ export default function HomePage() {
       <main>
         <TaglineOpening />
         <HeroSection />
-        <DoorSelector />
         <PhilosophySection />
-        <LegacySection />
-        <HowItWorksSection />
+        <TechnologySection />
         <ClosingSection />
       </main>
       <Footer />

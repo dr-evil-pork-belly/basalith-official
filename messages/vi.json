@@ -35,23 +35,6 @@
     "pillar_3_body": "Những người giàu nhất thế giới đang chi hàng tỷ đô để xây dựng phiên bản AI của chính họ. Basalith làm điều đó cho mọi gia đình.",
     "body_5": "Chúng tôi xây dựng Basalith\nđể gia đình bạn không bao giờ phải tự hỏi."
   },
-  "how_it_works": {
-    "eyebrow": "Quy trình",
-    "headline": "Một mô hình sống. Được xây dựng trong suốt cuộc đời.",
-    "subheadline": "Thực thể học càng nhiều thì tư duy càng chính xác. Bắt đầu ngay bây giờ. Hãy cho nó thời gian.",
-    "step_1_n": "01",
-    "step_1_title": "Buổi khởi đầu",
-    "step_1_body": "Chín mươi phút. Gia đình bạn. Một Hướng dẫn viên Di sản cấp cao. Những bức ảnh đầu tiên. Khi kết thúc buổi này, hồ sơ của bạn đã tồn tại, không phải như lời hứa mà như một thực tế.",
-    "step_2_n": "02",
-    "step_2_title": "Hồ sơ được xây dựng",
-    "step_2_body": "Mỗi buổi tối, một bức ảnh được gửi qua email đến mỗi thành viên trong gia đình. Không cần đăng nhập. Không cần ứng dụng. Họ trả lời với những gì họ nhớ. Những lời đó đi thẳng vào hồ sơ.",
-    "step_3_n": "03",
-    "step_3_title": "Gia đình đóng góp",
-    "step_3_body": "Người đóng góp gắn nhãn ảnh, ghi âm câu chuyện và trả lời câu hỏi nhân chứng. Mỗi góc nhìn bổ sung điều mà không góc nhìn nào khác có thể. Hồ sơ ngày càng sâu sắc hơn.",
-    "step_4_n": "04",
-    "step_4_title": "Thực thể nói",
-    "step_4_body": "Thực thể AI của bạn được đào tạo trên tất cả những gì đã lưu trữ. Con cháu của bạn sẽ có thể hỏi nó cách bạn suy nghĩ về một quyết định khó khăn. Nó trả lời từ hồ sơ của bạn."
-  },
   "pricing_teaser": {
     "line_1": "Những người giàu nhất thế giới đang chi hàng tỷ đô để xây dựng phiên bản AI của chính họ.",
     "line_2": "Hồ sơ gia đình Basalith bắt đầu từ $2,500.",
@@ -220,23 +203,6 @@
     "quote_2": "nếu bạn để lại đủ",
     "quote_3": "chính mình.",
     "scroll": "Bắt đầu"
-  },
-  "door": {
-    "families_loss": "Dành cho các gia đình đang đối mặt với mất mát",
-    "intentional": "Dành cho những người xây dựng có chủ đích",
-    "forward": "Dành cho những người nhìn xa"
-  },
-  "legacy": {
-    "eyebrow": "Dành cho những người xây dựng có chủ đích",
-    "headline_1": "Các cháu của bạn sẽ biết đến",
-    "headline_2": "một trong hai phiên bản của bạn.",
-    "body_1": "Phiên bản được kể lại cho họ nghe.",
-    "body_2": "Hoặc phiên bản bạn để lại cho họ.",
-    "body_3": "Hầu hết mọi người dành cả đời để xây dựng những thứ.",
-    "body_4": "Rất ít người dành thời gian để đảm bảo những thứ đó tồn tại lâu dài.",
-    "body_5": "Basalith dành cho cả hai loại người.",
-    "body_6": "Nhưng hoạt động tốt nhất với những người bắt đầu sớm.",
-    "cta": "Bắt đầu trước khi phải làm vậy"
   },
   "closing": {
     "eyebrow": "Dành cho những người nhìn xa",
