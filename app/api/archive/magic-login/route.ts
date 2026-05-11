@@ -12,13 +12,26 @@ export async function GET(req: NextRequest) {
 
   const { data: archive } = await supabaseAdmin
     .from('archives')
-    .select('id, status, preferred_language')
+    .select('id, status, preferred_language, magic_link_created_at')
     .eq('magic_link_token', token)
     .eq('status', 'active')
     .maybeSingle()
 
   if (!archive) {
     return NextResponse.redirect(new URL('/archive-login?error=invalid', req.url))
+  }
+
+  // ── Reject tokens older than 24 hours ─────────────────────────────────────
+  const createdAt = archive.magic_link_created_at
+    ? new Date(archive.magic_link_created_at).getTime()
+    : 0
+  const tokenAgeMs = Date.now() - createdAt
+  if (tokenAgeMs > 24 * 60 * 60 * 1000) {
+    await supabaseAdmin
+      .from('archives')
+      .update({ magic_link_token: null, magic_link_created_at: null })
+      .eq('id', archive.id)
+    return NextResponse.redirect(new URL('/archive-login?error=expired', req.url))
   }
 
   // ── Invalidate the token immediately — magic links are one-time use ────────

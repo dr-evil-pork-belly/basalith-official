@@ -12,7 +12,6 @@ import DoorSelector      from './components/DoorSelector'
 import PhilosophySection from './components/PhilosophySection'
 import LegacySection     from './components/LegacySection'
 import HowItWorksSection from './components/HowItWorksSection'
-import StorySection      from './components/StorySection'
 import ClosingSection    from './components/ClosingSection'
 import Footer            from './components/Footer'
 
@@ -27,7 +26,6 @@ export default function HomePage() {
         <PhilosophySection />
         <LegacySection />
         <HowItWorksSection />
-        <StorySection />
         <ClosingSection />
       </main>
       <Footer />

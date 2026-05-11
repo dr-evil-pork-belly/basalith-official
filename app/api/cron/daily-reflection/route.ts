@@ -80,7 +80,16 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  return Response.json({ sent, total: archives?.length ?? 0, dayOfYear })
+  // ── Nightly cleanup: clear magic link tokens older than 24 hours ──────────
+  const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+  const { data: clearedRows } = await supabaseAdmin
+    .from('archives')
+    .update({ magic_link_token: null, magic_link_created_at: null })
+    .lt('magic_link_created_at', cutoff)
+    .not('magic_link_token', 'is', null)
+    .select('id')
+
+  return Response.json({ sent, total: archives?.length ?? 0, dayOfYear, magicLinksCleared: clearedRows?.length ?? 0 })
 }
 
 function buildDailyReflectionEmail(
