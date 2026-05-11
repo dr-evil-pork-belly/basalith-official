@@ -324,13 +324,71 @@ function isDeposit(message: string): boolean {
 export async function POST(req: Request) {
   console.log('=== ENTITY CHAT POST ===')
   try {
-    const { archiveId, message, sessionId, conversationHistory } = await req.json()
+    const body = await req.json()
+    const { message, sessionId, conversationHistory } = body
+    const requestedArchiveId: string | undefined = body.archiveId
 
-    console.log('[entity-chat] archiveId:', archiveId, '| msgLen:', message?.length, '| msgPreview:', message?.substring(0, 60))
-
-    if (!archiveId || !message) {
+    if (!message) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
+
+    // ── Step 1: Resolve caller identity ───────────────────────────────────────
+    // Try owner cookie first, then contributor token from header or body.
+    const { cookies } = await import('next/headers')
+    const cookieStore      = await cookies()
+    const sessionArchiveId = cookieStore.get('archive-id')?.value
+
+    const authHeader        = (req as import('next/server').NextRequest).headers.get('authorization')
+    const contributorToken  = authHeader?.replace('Bearer ', '') || body.contributorToken
+
+    let authorizedArchiveId: string | null = null
+    let callerType: 'owner' | 'contributor' | null = null
+
+    if (sessionArchiveId) {
+      authorizedArchiveId = sessionArchiveId
+      callerType          = 'owner'
+    } else if (contributorToken) {
+      const { data: contributor } = await supabaseAdmin
+        .from('contributors')
+        .select('archive_id, status')
+        .eq('access_token', contributorToken)
+        .eq('status', 'active')
+        .maybeSingle()
+
+      if (contributor) {
+        authorizedArchiveId = contributor.archive_id
+        callerType          = 'contributor'
+      }
+    }
+
+    if (!authorizedArchiveId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // ── Step 2: IDOR guard — requested archiveId must match authorized ─────────
+    if (requestedArchiveId && requestedArchiveId !== authorizedArchiveId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    const archiveId = authorizedArchiveId
+
+    // ── Step 3: Contributor access check ──────────────────────────────────────
+    if (callerType === 'contributor') {
+      const { data: archiveAccess } = await supabaseAdmin
+        .from('archives')
+        .select('contributor_entity_access')
+        .eq('id', archiveId)
+        .single()
+
+      if (!archiveAccess || archiveAccess.contributor_entity_access === 'none') {
+        return NextResponse.json(
+          { error: 'Entity access not yet available for contributors' },
+          { status: 403 }
+        )
+      }
+    }
+
+    console.log('[entity-chat] archiveId:', archiveId, '| caller:', callerType, '| msgLen:', message?.length, '| msgPreview:', message?.substring(0, 60))
 
     const { systemPrompt, usedDepositIds } = await buildEntitySystemPrompt(archiveId, message)
 
