@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import LanguageSelector from './LanguageSelector'
 
 const DESKTOP_LINKS = [
@@ -22,6 +23,9 @@ const MOBILE_LINKS = [
 ]
 
 export default function Nav() {
+  const pathname  = usePathname()
+  const isHome    = pathname === '/'
+
   const [scrolled,  setScrolled]  = useState(false)
   const [pastHero,  setPastHero]  = useState(false)
   const [open,      setOpen]      = useState(false)
@@ -31,6 +35,7 @@ export default function Nav() {
       setScrolled(window.scrollY > 40)
       setPastHero(window.scrollY > window.innerHeight * 0.8)
     }
+    fn() // run once on mount so SSR matches client
     window.addEventListener('scroll', fn, { passive: true })
     return () => window.removeEventListener('scroll', fn)
   }, [])
@@ -47,17 +52,23 @@ export default function Nav() {
     textTransform: 'uppercase' as const,
   }
 
-  // Color tokens that flip based on which section the nav floats over
-  const wordmarkColor = pastHero ? 'var(--color-text-primary)'   : 'rgba(250,250,248,0.9)'
-  const linkColor     = pastHero ? 'var(--color-text-muted)'     : 'rgba(250,250,248,0.65)'
-  const linkHover     = pastHero ? 'var(--color-text-primary)'   : 'rgba(250,250,248,0.95)'
+  // On homepage: use light text over the dark opening section, switch to dark after pastHero.
+  // On all other pages: always dark text regardless of scroll position.
+  const useLightText  = isHome && !pastHero
 
-  // Background: dark frosted over dark opening, light frosted over light sections
-  const navBg = pastHero
-    ? (scrolled ? 'rgba(250,250,248,0.96)' : 'transparent')
-    : (scrolled ? 'rgba(10,9,8,0.65)'      : 'transparent')
+  const wordmarkColor = useLightText ? 'rgba(250,250,248,0.9)'  : 'var(--color-text-primary)'
+  const linkColor     = useLightText ? 'rgba(250,250,248,0.65)' : 'var(--color-text-muted)'
+  const linkHover     = useLightText ? 'rgba(250,250,248,0.95)' : 'var(--color-text-primary)'
 
-  const navShadow = scrolled && pastHero ? '0 1px 0 rgba(26,24,20,0.06)' : 'none'
+  // On homepage: transparent dark bg → light frosted after pastHero.
+  // On other pages: always light frosted (opaque enough to be readable).
+  const navBg = isHome
+    ? (pastHero
+        ? (scrolled ? 'rgba(250,250,248,0.96)' : 'transparent')
+        : (scrolled ? 'rgba(10,9,8,0.65)'      : 'transparent'))
+    : (scrolled ? 'rgba(250,250,248,0.97)' : 'rgba(250,250,248,0.94)')
+
+  const navShadow = (!isHome || (scrolled && pastHero)) ? '0 1px 0 rgba(26,24,20,0.06)' : 'none'
 
   return (
     <>
@@ -124,7 +135,7 @@ export default function Nav() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           {/* Language selector — desktop only */}
           <div className="hidden md:block">
-            <LanguageSelector variant={pastHero ? 'light' : 'dark'} />
+            <LanguageSelector variant={useLightText ? 'dark' : 'light'} />
           </div>
 
           {/* Client login — desktop only */}
