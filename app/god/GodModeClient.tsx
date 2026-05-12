@@ -99,17 +99,28 @@ const HEALTH_BORDER = {
 }
 
 const CRON_BUTTONS = [
-  { label: 'DAILY PHOTOS',      route: 'send-photos' },
-  { label: 'WEEKLY PROMPT',     route: 'weekly-prompt' },
-  { label: 'MONDAY MYSTERY',    route: 'story-prompt-monday' },
-  { label: 'FRIDAY REVEAL',     route: 'story-prompt-friday' },
-  { label: 'MONTHLY REPORT',    route: 'monthly-report' },
-  { label: 'GRATITUDE NOTE',    route: 'gratitude-note' },
-  { label: 'MEMORY GAME',       route: 'memory-game' },
-  { label: 'GAME REMINDER',     route: 'memory-game-reminder' },
-  { label: 'GAME SUMMARY',      route: 'memory-game-summary' },
-  { label: 'DAILY REFLECTION',  route: 'daily-reflection' },
-  { label: 'PAUSE REMINDER',    route: 'pause-reminder' },
+  // Daily
+  { label: 'DAILY PHOTOS',        route: 'send-photos',            group: 'daily'     },
+  { label: 'DAILY REFLECTION',    route: 'daily-reflection',       group: 'daily'     },
+  { label: 'ANNIVERSARIES',       route: 'anniversary-triggers',   group: 'daily'     },
+  { label: 'ANNUAL PREVIEW',      route: 'annual-preview',         group: 'daily'     },
+  // Weekly
+  { label: 'WEEKLY PROMPT',       route: 'weekly-prompt',          group: 'weekly'    },
+  { label: 'MONDAY MYSTERY',      route: 'story-prompt-monday',    group: 'weekly'    },
+  { label: 'FRIDAY REVEAL',       route: 'story-prompt-friday',    group: 'weekly'    },
+  { label: 'FAMILY REACTIONS',    route: 'family-reactions',       group: 'weekly'    },
+  // Monthly
+  { label: 'MONTHLY REPORT',      route: 'monthly-report',         group: 'monthly'   },
+  { label: 'MONTHLY ACCURACY',    route: 'monthly-accuracy',       group: 'monthly'   },
+  { label: 'CONTRIBUTOR MIRROR',  route: 'contributor-mirror',     group: 'monthly'   },
+  { label: 'COLD STORAGE PING',   route: 'cold-storage-ping',      group: 'monthly'   },
+  { label: 'GRATITUDE NOTE',      route: 'gratitude-note',         group: 'monthly'   },
+  { label: 'MEMORY GAME',         route: 'memory-game',            group: 'monthly'   },
+  { label: 'GAME REMINDER',       route: 'memory-game-reminder',   group: 'monthly'   },
+  { label: 'GAME SUMMARY',        route: 'memory-game-summary',    group: 'monthly'   },
+  { label: 'PAUSE REMINDER',      route: 'pause-reminder',         group: 'monthly'   },
+  // Quarterly / Annual
+  { label: 'ENTITY LETTER',       route: 'entity-letter',          group: 'quarterly' },
 ]
 
 // ── Action handler ─────────────────────────────────────────────────────────────
@@ -872,30 +883,41 @@ export default function GodModeClient() {
               <p style={{ ...mono, fontSize: '0.38rem', letterSpacing: '0.25em', color: '#C4A24A', margin: '0 0 0.75rem' }}>
                 CRON CONTROL
               </p>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
-                {CRON_BUTTONS.map(({ label, route }) => {
-                  const state = triggerStates[route]
-                  return (
-                    <button
-                      key={route}
-                      onClick={() => handleTrigger(route)}
-                      style={{
-                        background:    state === '...' ? 'rgba(196,162,74,0.15)' : state?.includes('✓') ? 'rgba(74,196,124,0.1)' : state?.includes('✗') ? 'rgba(196,74,74,0.1)' : 'rgba(255,255,255,0.04)',
-                        border:        '1px solid rgba(255,255,255,0.07)',
-                        borderRadius:  '2px',
-                        padding:       '5px 12px',
-                        ...mono,
-                        fontSize:      '0.36rem',
-                        letterSpacing: '0.15em',
-                        color:         state?.includes('✓') ? '#4AC47C' : state?.includes('✗') ? '#C44A4A' : '#9DA3A8',
-                        cursor:        'pointer',
-                      }}
-                    >
-                      {state || label}
-                    </button>
-                  )
-                })}
-              </div>
+              {(['daily', 'weekly', 'monthly', 'quarterly'] as const).map(group => {
+                const buttons = CRON_BUTTONS.filter(b => b.group === group)
+                if (!buttons.length) return null
+                return (
+                  <div key={group} style={{ marginBottom: '0.75rem' }}>
+                    <p style={{ ...mono, fontSize: '0.32rem', letterSpacing: '0.15em', color: '#3A3F44', margin: '0 0 0.4rem' }}>
+                      {group.toUpperCase()}
+                    </p>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
+                      {buttons.map(({ label, route }) => {
+                        const state = triggerStates[route]
+                        return (
+                          <button
+                            key={route}
+                            onClick={() => handleTrigger(route)}
+                            style={{
+                              background:    state === '...' ? 'rgba(196,162,74,0.15)' : state?.includes('✓') ? 'rgba(74,196,124,0.1)' : state?.includes('✗') ? 'rgba(196,74,74,0.1)' : 'rgba(255,255,255,0.04)',
+                              border:        '1px solid rgba(255,255,255,0.07)',
+                              borderRadius:  '2px',
+                              padding:       '5px 12px',
+                              ...mono,
+                              fontSize:      '0.36rem',
+                              letterSpacing: '0.15em',
+                              color:         state?.includes('✓') ? '#4AC47C' : state?.includes('✗') ? '#C44A4A' : '#9DA3A8',
+                              cursor:        'pointer',
+                            }}
+                          >
+                            {state || label}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )
+              })}
 
             {/* Scheduled deletion processing */}
             {(() => {
