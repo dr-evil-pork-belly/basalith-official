@@ -6,9 +6,9 @@ import Footer        from '../../components/Footer'
 import BeginProgress from '../../components/BeginProgress'
 
 const TIERS = [
-  { name: 'The Archive',  tagline: 'For individuals beginning their Golden Dataset.',       price: '$1,200', monthly: '$100 / month equivalent', founding: '$2,500 one-time founding fee' },
-  { name: 'The Estate',   tagline: 'Full family archive with legal integration.',            price: '$3,600', monthly: '$300 / month equivalent', founding: '$2,500 one-time founding fee', featured: true },
-  { name: 'The Dynasty',  tagline: 'Multi-generational governance for serious legacies.',   price: '$9,600', monthly: '$800 / month equivalent', founding: '$2,500 one-time founding fee' },
+  { name: 'Active',  tagline: 'The full archive experience. Weekly prompts, nightly emails, entity chat, contributor network.', price: '$3,600', monthly: '$360 / month', founding: '$2,500 one-time founding fee', featured: true },
+  { name: 'Resting', tagline: 'Your archive preserved and waiting. No emails. No prompts. Data safe until you return.',          price: '$600',   monthly: '$60 / month',  founding: '$2,500 one-time founding fee' },
+  { name: 'Legacy',  tagline: 'After the primary user passes. Family entity access. One-time payment.',                          price: '$2,500', monthly: 'One-time',      founding: 'No recurring billing' },
 ]
 
 function TierPageContent() {

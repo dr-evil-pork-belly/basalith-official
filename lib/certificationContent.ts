@@ -134,7 +134,17 @@ When you sit with a prospective client — a 67-year-old grandmother in Monterey
 
 That is not a sales pitch. That is the actual situation.
 
-The Estate is $3,600 a year. Less than most people spend on things that matter far less.
+Basalith has three tiers that map to three moments in a family's relationship with the archive.
+
+Active — while the primary user is alive and engaged. Full features. Weekly prompts. Nightly photograph emails. Entity chat. Contributor network. $3,600 a year.
+
+Resting — when life demands a pause. Data preserved. Login active. Entity accessible. No automated emails or prompts. $600 a year. Everything intact until they return.
+
+Legacy — after the primary user passes. Family entity access continues. Contributors can still add memories. The archive continues its purpose. $2,500 one-time.
+
+Most families begin Active and remain there. Some move to Resting during difficult periods and return when life allows. Legacy activates when the primary user is gone.
+
+Active is $3,600 a year. Less than most people spend on things that matter far less.
 
 When a client hesitates at the price — remind them gently of what they are hesitating about. Not a subscription. Not software. The beginning of something their grandchildren's grandchildren will be grateful for.`,
       inlineQuestion: {
@@ -641,7 +651,7 @@ Navigate to My Practice and click New Client.
 
 Fill in the client details:
 Full name, email address, and phone number.
-The tier they selected — Archive, Estate, or Dynasty.
+The tier they selected — Active, Resting, or Legacy.
 The billing cadence — Annual or Monthly.
 Your relationship to them — how you came to know this family.
 Session notes — what you covered, any special circumstances, anything the system should know about this client's situation.

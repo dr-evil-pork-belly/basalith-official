@@ -6,7 +6,7 @@ import PricingTiers from '../components/PricingTiers'
 
 export const metadata: Metadata = {
   title: 'Pricing · Basalith',
-  description: 'The Basalith Estate begins at $3,600 per year. The infrastructure of human continuation priced for every family.',
+  description: 'Three moments. One archive. Active at $3,600/year. Resting at $600/year. Legacy at $2,500 one-time.',
 }
 
 const MONO: React.CSSProperties = {
@@ -69,9 +69,9 @@ export default function PricingPage() {
               marginBottom:  '32px',
             }}
           >
-            What is it worth
+            Three moments.
             <br />
-            to never have to wonder?
+            One archive.
           </h1>
           <div
             style={{
@@ -85,10 +85,9 @@ export default function PricingPage() {
               margin:     '0 auto',
             }}
           >
-            <p style={{ marginBottom: '8px' }}>We built this for families</p>
-            <p style={{ marginBottom: '24px' }}>not billionaires.</p>
-            <p style={{ marginBottom: '8px' }}>Choose annual for the best value</p>
-            <p style={{ margin: 0 }}>or monthly for flexibility.</p>
+            <p style={{ marginBottom: '8px' }}>Most families move through all three.</p>
+            <p style={{ marginBottom: '24px' }}>Begin active. Rest when life demands it.</p>
+            <p style={{ margin: 0 }}>Leave something permanent.</p>
           </div>
         </section>
 

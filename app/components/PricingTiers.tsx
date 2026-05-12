@@ -13,77 +13,85 @@ const SERIF: React.CSSProperties = {
 }
 
 interface Tier {
+  id:           'active' | 'resting' | 'legacy'
+  eyebrow:      string
   name:         string
-  tagline:      string
   annualPrice:  string
   annualSub:    string
   monthlyPrice: string
+  oneTime?:     boolean
+  description:  string
   featured:     boolean
   features:     string[]
+  cta:          string
+  ctaHref:      string
+  note:         string
 }
 
 const TIERS: Tier[] = [
   {
-    name:         'The Archive',
-    tagline:      'The foundation.\nYour entity begins learning\nfrom day one.',
-    annualPrice:  '$1,800',
-    annualSub:    '$150/mo equivalent',
-    monthlyPrice: '$180',
-    featured:     false,
+    id:          'active',
+    eyebrow:     'While You Are Building',
+    name:        'Active',
+    annualPrice: '$3,600',
+    annualSub:   '$300/mo equivalent',
+    monthlyPrice:'$360',
+    description: 'The full archive experience.\nYour entity learns every week.\nYour family stays connected.\nYour story keeps growing.',
+    featured:    true,
     features: [
-      'Secure archive infrastructure',
-      'Up to 5 family contributors',
-      'Unlimited photograph deposits',
-      'Voice, photo, and journal labeling',
-      'Nightly photograph email to contributors',
-      'Digital Clone, foundational access',
-      'Annual AI model updates',
-      'Data portability guarantee',
-      'Custodianship Reserve coverage',
+      'Weekly story prompts',
+      'Nightly photograph emails',
+      'Entity chat — full access',
+      'Contributor network',
+      'Memory game (monthly)',
+      'Annual accuracy report',
+      'Quarterly entity letter',
+      'All supported languages',
     ],
+    cta:     'Begin Your Archive',
+    ctaHref: '/apply',
+    note:    'One-time founding fee of $2,500',
   },
   {
-    name:         'The Estate',
-    tagline:      'Your entity. Your family.\nYour story. Everything working\ntogether to build something\nthat continues long after you are gone.',
-    annualPrice:  '$3,600',
-    annualSub:    '$300/mo equivalent',
-    monthlyPrice: '$360',
-    featured:     true,
+    id:          'resting',
+    eyebrow:     'When Life Gets in the Way',
+    name:        'Resting',
+    annualPrice: '$600',
+    annualSub:   '$50/mo equivalent',
+    monthlyPrice:'$60',
+    description: 'Your archive preserved and waiting.\nNo emails. No prompts.\nJust your data — safe and intact —\nuntil you are ready to return.',
+    featured:    false,
     features: [
-      'Everything in The Archive',
-      'Up to 15 family contributors',
-      'Digital Clone, full conversational access',
-      'Will and trust integration',
-      'Bequest language prepared',
-      'Dedicated Custodian designation',
-      'Annual estate compatibility review',
-      'Priority curation support',
-      'basalith.ai entity priority access',
-      'Quarterly Provenance Report',
-      'Family access tiers',
-      '48-hour support response',
+      'All data preserved permanently',
+      'Login access maintained',
+      'Entity accessible',
+      'Reactivate anytime',
+      'No commitment to return',
     ],
+    cta:     'Learn About Resting',
+    ctaHref: '/apply',
+    note:    'Available to Active members who need to step back.',
   },
   {
-    name:         'The Dynasty',
-    tagline:      'For families building\nacross generations.',
-    annualPrice:  '$9,600',
-    annualSub:    '$800/mo equivalent',
-    monthlyPrice: '$960',
-    featured:     false,
+    id:          'legacy',
+    eyebrow:     'After They Are Gone',
+    name:        'Legacy',
+    annualPrice: '$2,500',
+    annualSub:   'one-time',
+    monthlyPrice:'$2,500',
+    oneTime:     true,
+    description: 'The archive continues.\nFamily members can talk to the entity.\nContributors can still add memories.\nThe person you built this for\nremains present.',
+    featured:    false,
     features: [
-      'Everything in The Estate',
-      'Unlimited contributors across generations',
-      'Full Family Trust legal instrument',
-      'Multi-generational access tiers',
-      'Dedicated Archive Manager. One person, not a ticket queue.',
-      'Concierge onboarding. Dedicated support from day one.',
-      'Annual in-person estate review',
-      'First access to new AI generations',
-      'Custom Digital Clone interaction boundaries',
-      'Dedicated Legacy Guide permanently assigned',
-      'Designed for generational continuity',
+      'Full family entity access',
+      'Contributor portal remains active',
+      'Entity continues learning from family contributions',
+      'No recurring billing',
+      'Permanent family access',
     ],
+    cta:     'Ask Your Legacy Guide',
+    ctaHref: '/apply',
+    note:    'Arranged through your Legacy Guide or estate.',
   },
 ]
 
@@ -102,7 +110,7 @@ export default function PricingTiers() {
 
   return (
     <section
-      aria-label="Stewardship tiers"
+      aria-label="Pricing tiers"
       style={{
         background: 'var(--color-surface-alt)',
         padding:    'clamp(64px,8vw,96px) clamp(24px,6vw,80px)',
@@ -123,9 +131,10 @@ export default function PricingTiers() {
           }}
         >
           <span style={{ width: '24px', height: '1px', background: 'var(--color-gold)', display: 'block', flexShrink: 0 }} aria-hidden="true" />
-          Annual Stewardship
+          Three Moments. One Archive.
           <span style={{ width: '24px', height: '1px', background: 'var(--color-gold)', display: 'block', flexShrink: 0 }} aria-hidden="true" />
         </p>
+
         <h2
           style={{
             ...SERIF,
@@ -133,35 +142,36 @@ export default function PricingTiers() {
             fontWeight:    300,
             color:         'var(--color-text-primary)',
             letterSpacing: '-0.02em',
-            marginBottom:  '32px',
+            marginBottom:  '16px',
           }}
         >
-          Choose Your Level of Stewardship.
+          Most families move through all three.
         </h2>
 
-        {/* Founding fee — fixed above toggle */}
         <p
           style={{
-            ...MONO,
-            fontSize:     'var(--text-caption)',
-            color:        'var(--color-gold)',
-            marginBottom: '24px',
+            ...SERIF,
+            fontSize:   '1.05rem',
+            fontStyle:  'italic',
+            fontWeight: 300,
+            lineHeight: 1.8,
+            color:      'var(--color-text-secondary)',
+            marginBottom: '32px',
           }}
         >
+          Begin active. Rest when life demands it. Leave something permanent.
+        </p>
+
+        {/* Founding fee */}
+        <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '24px' }}>
           All plans begin with a one-time Founding Session investment of $2,500
         </p>
 
-        {/* Toggle */}
+        {/* Toggle — Annual / Monthly (Active + Resting only) */}
         <div
           role="group"
           aria-label="Billing frequency"
-          style={{
-            display:        'flex',
-            alignItems:     'center',
-            justifyContent: 'center',
-            gap:            '16px',
-            marginBottom:   '48px',
-          }}
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px', marginBottom: '48px' }}
         >
           <button
             onClick={() => setBilling('annual')}
@@ -182,7 +192,6 @@ export default function PricingTiers() {
           >
             Annual
           </button>
-
           <div
             aria-hidden="true"
             style={{
@@ -198,7 +207,6 @@ export default function PricingTiers() {
           >
             Save 20%
           </div>
-
           <button
             onClick={() => setBilling('monthly')}
             aria-pressed={!isAnnual}
@@ -232,9 +240,9 @@ export default function PricingTiers() {
           margin:              '0 auto',
         }}
       >
-        {TIERS.map(({ name, tagline, annualPrice, annualSub, monthlyPrice, featured, features }) => (
+        {TIERS.map(({ id, eyebrow, name, annualPrice, annualSub, monthlyPrice, oneTime, description, featured, features, cta, ctaHref, note }) => (
           <div
-            key={name}
+            key={id}
             style={{
               background:    featured ? 'var(--color-void)' : 'var(--color-surface)',
               border:        featured ? '1px solid rgba(184,150,62,0.35)' : '1px solid var(--color-border)',
@@ -259,23 +267,26 @@ export default function PricingTiers() {
                 }}
               />
             )}
-            {featured && (
-              <p style={{ ...MONO, fontSize: '0.44rem', color: 'var(--color-gold)', marginBottom: '20px' }}>
-                Most Popular
-              </p>
-            )}
 
+            {/* Eyebrow */}
+            <p style={{ ...MONO, fontSize: '0.42rem', color: 'var(--color-gold)', marginBottom: '16px' }}>
+              {eyebrow}
+            </p>
+
+            {/* Name */}
             <h3
               style={{
                 ...SERIF,
                 fontSize:     '1.5rem',
                 fontWeight:   500,
                 color:        featured ? 'rgba(250,248,244,0.9)' : 'var(--color-text-primary)',
-                marginBottom: '6px',
+                marginBottom: '16px',
               }}
             >
               {name}
             </h3>
+
+            {/* Description */}
             <p
               style={{
                 ...SERIF,
@@ -288,11 +299,11 @@ export default function PricingTiers() {
                 whiteSpace:   'pre-line',
               }}
             >
-              {tagline}
+              {description}
             </p>
 
             {/* Price */}
-            {isAnnual ? (
+            {oneTime ? (
               <>
                 <div
                   style={{
@@ -305,88 +316,49 @@ export default function PricingTiers() {
                     marginBottom:  '6px',
                   }}
                 >
+                  $2,500
+                </div>
+                <p style={{ ...MONO, fontSize: '0.5rem', letterSpacing: '0.2em', color: 'var(--color-text-faint)', marginBottom: '24px' }}>
+                  One-time · No recurring billing
+                </p>
+              </>
+            ) : isAnnual ? (
+              <>
+                <div style={{ ...SERIF, fontSize: 'clamp(2rem,3.5vw,3rem)', fontWeight: 300, color: 'var(--color-gold)', letterSpacing: '-0.025em', lineHeight: 1, marginBottom: '6px' }}>
                   {annualPrice}
                 </div>
-                <p
-                  style={{
-                    ...MONO,
-                    fontSize:     '0.5rem',
-                    letterSpacing: '0.2em',
-                    color:        featured ? 'rgba(250,248,244,0.3)' : 'var(--color-text-faint)',
-                    marginBottom: '24px',
-                  }}
-                >
+                <p style={{ ...MONO, fontSize: '0.5rem', letterSpacing: '0.2em', color: featured ? 'rgba(250,248,244,0.3)' : 'var(--color-text-faint)', marginBottom: '24px' }}>
                   Per year · {annualSub}
                 </p>
               </>
             ) : (
               <>
-                <div
-                  style={{
-                    ...SERIF,
-                    fontSize:      'clamp(2rem,3.5vw,3rem)',
-                    fontWeight:    300,
-                    color:         'var(--color-gold)',
-                    letterSpacing: '-0.025em',
-                    lineHeight:    1,
-                    marginBottom:  '6px',
-                  }}
-                >
+                <div style={{ ...SERIF, fontSize: 'clamp(2rem,3.5vw,3rem)', fontWeight: 300, color: 'var(--color-gold)', letterSpacing: '-0.025em', lineHeight: 1, marginBottom: '6px' }}>
                   {monthlyPrice}
                 </div>
-                <p
-                  style={{
-                    ...MONO,
-                    fontSize:     '0.5rem',
-                    letterSpacing: '0.2em',
-                    color:        featured ? 'rgba(250,248,244,0.3)' : 'var(--color-text-faint)',
-                    marginBottom: '24px',
-                  }}
-                >
+                <p style={{ ...MONO, fontSize: '0.5rem', letterSpacing: '0.2em', color: featured ? 'rgba(250,248,244,0.3)' : 'var(--color-text-faint)', marginBottom: '24px' }}>
                   Per month · Billed monthly
                 </p>
               </>
             )}
 
-            <div
-              style={{
-                height:       '1px',
-                background:   featured ? 'rgba(250,248,244,0.06)' : 'var(--color-border)',
-                marginBottom: '24px',
-              }}
-            />
+            <div style={{ height: '1px', background: featured ? 'rgba(250,248,244,0.06)' : 'var(--color-border)', marginBottom: '24px' }} />
 
-            <ul
-              style={{
-                listStyle:     'none',
-                margin:        '0 0 32px',
-                padding:       0,
-                display:       'flex',
-                flexDirection: 'column',
-                gap:           '10px',
-                flex:          1,
-              }}
-            >
+            {/* Features */}
+            <ul style={{ listStyle: 'none', margin: '0 0 32px', padding: 0, display: 'flex', flexDirection: 'column', gap: '10px', flex: 1 }}>
               {features.map(f => (
                 <li key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
                   <Check />
-                  <span
-                    style={{
-                      ...SERIF,
-                      fontSize:   '0.9rem',
-                      fontWeight: 300,
-                      lineHeight: 1.5,
-                      color:      featured ? 'rgba(250,248,244,0.55)' : 'var(--color-text-secondary)',
-                    }}
-                  >
+                  <span style={{ ...SERIF, fontSize: '0.9rem', fontWeight: 300, lineHeight: 1.5, color: featured ? 'rgba(250,248,244,0.55)' : 'var(--color-text-secondary)' }}>
                     {f}
                   </span>
                 </li>
               ))}
             </ul>
 
+            {/* CTA */}
             <a
-              href="/apply"
+              href={ctaHref}
               style={{
                 ...MONO,
                 display:        'block',
@@ -399,61 +371,33 @@ export default function PricingTiers() {
                 color:          featured ? '#0A0908' : 'var(--color-text-secondary)',
                 border:         featured ? 'none' : '1px solid var(--color-border-medium)',
                 transition:     'all 250ms ease',
+                marginBottom:   '12px',
               }}
             >
-              Request Your Founding
+              {cta}
             </a>
+
+            {/* Note */}
+            <p style={{ ...SERIF, fontSize: '0.78rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--color-text-faint)', textAlign: 'center', lineHeight: 1.5 }}>
+              {note}
+            </p>
           </div>
         ))}
       </div>
 
-      {/* Monthly minimum note — only shown when monthly is selected */}
+      {/* Monthly minimum note */}
       {!isAnnual && (
-        <p
-          style={{
-            ...MONO,
-            fontSize:     '0.5rem',
-            letterSpacing: '0.2em',
-            color:        'var(--color-text-faint)',
-            textAlign:    'center',
-            marginTop:    '24px',
-          }}
-        >
-          Monthly plans require a 12-month minimum commitment.
-          Cancel anytime after month 12.
+        <p style={{ ...MONO, fontSize: '0.5rem', letterSpacing: '0.2em', color: 'var(--color-text-faint)', textAlign: 'center', marginTop: '24px' }}>
+          Monthly plans require a 12-month minimum commitment. Cancel anytime after month 12.
         </p>
       )}
 
       {/* Tax note */}
-      <div
-        style={{
-          maxWidth:   '640px',
-          margin:     '56px auto 0',
-          padding:    '48px 32px',
-          background: 'var(--color-surface)',
-          borderTop:  '1px solid var(--color-border)',
-        }}
-      >
-        <p
-          style={{
-            ...MONO,
-            fontSize:     'var(--text-caption)',
-            color:        'var(--color-gold)',
-            marginBottom: '20px',
-          }}
-        >
+      <div style={{ maxWidth: '640px', margin: '56px auto 0', padding: '48px 32px', background: 'var(--color-surface)', borderTop: '1px solid var(--color-border)' }}>
+        <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '20px' }}>
           A Note on Your Investment
         </p>
-        <div
-          style={{
-            ...SERIF,
-            fontSize:   '1rem',
-            fontStyle:  'italic',
-            fontWeight: 300,
-            lineHeight: 1.8,
-            color:      'var(--color-text-secondary)',
-          }}
-        >
+        <div style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-secondary)' }}>
           <p style={{ marginBottom: '16px' }}>
             Many clients work with their estate attorney or CPA to explore whether
             the annual Basalith fee qualifies as an estate planning expense.
@@ -470,9 +414,7 @@ export default function PricingTiers() {
 
       <style>{`
         @media (max-width: 900px) {
-          .pricing-grid {
-            grid-template-columns: 1fr !important;
-          }
+          .pricing-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
     </section>

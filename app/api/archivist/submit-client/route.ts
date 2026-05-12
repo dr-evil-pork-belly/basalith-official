@@ -19,10 +19,14 @@ function generateClientPassword(familyName: string): string {
   return `${clean}${new Date().getFullYear()}${suffix}!`
 }
 
-const TIER_PRICES: Record<string, { annual: number; monthly: number; label: string }> = {
-  archive: { annual: 1800,  monthly: 180,  label: 'The Archive'  },
-  estate:  { annual: 3600,  monthly: 360,  label: 'The Estate'   },
-  dynasty: { annual: 9600,  monthly: 960,  label: 'The Dynasty'  },
+const TIER_PRICES: Record<string, { annual: number; monthly: number; label: string; oneTime?: boolean }> = {
+  active:  { annual: 3600, monthly: 360, label: 'Active'  },
+  resting: { annual: 600,  monthly: 60,  label: 'Resting' },
+  legacy:  { annual: 2500, monthly: 0,   label: 'Legacy', oneTime: true },
+  // Legacy aliases for any existing records
+  archive: { annual: 3600, monthly: 360, label: 'Active' },
+  estate:  { annual: 3600, monthly: 360, label: 'Active' },
+  dynasty: { annual: 3600, monthly: 360, label: 'Active' },
 }
 
 const FOUNDING_FEE = 2500
@@ -233,10 +237,12 @@ export async function POST(req: NextRequest) {
 
     // ── 6. Build payment URL ──────────────────────────────────────────────────
     const siteUrl    = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
-    const tierData   = TIER_PRICES[tier] ?? TIER_PRICES.estate
-    const tierLabel  = tierData.label
-    const firstPeriod = billing === 'annual' ? tierData.annual : tierData.monthly
-    const totalDue   = FOUNDING_FEE + firstPeriod
+    const tierData    = TIER_PRICES[tier] ?? TIER_PRICES.active
+    const tierLabel   = tierData.label
+    const firstPeriod = tierData.oneTime
+      ? tierData.annual
+      : billing === 'annual' ? tierData.annual : tierData.monthly
+    const totalDue    = FOUNDING_FEE + firstPeriod
 
     // If STRIPE_PAYMENT_LINK_URL is configured, use it; otherwise fall back to pricing page.
     // Wire Stripe checkout session creation here once STRIPE_SECRET_KEY is set.

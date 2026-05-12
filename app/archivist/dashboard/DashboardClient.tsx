@@ -17,11 +17,11 @@ const C = {
   red:     '#E57373',
 }
 
-const RESIDUAL_RATES = { archive: 12, estate: 24, dynasty: 64 }
+const RESIDUAL_RATES = { active: 24, resting: 4, legacy: 0 }
 
 function calculateProjection(
   currentArchives: number,
-  avgTier:         'archive' | 'estate' | 'dynasty',
+  avgTier:         'active' | 'resting' | 'legacy',
   monthlyClosings: number,
   retentionRate:   number,
 ): { year: number; monthly: number }[] {
@@ -37,7 +37,7 @@ function calculateProjection(
 
 function ProjectionChart({ activeClients, monthlyMRR }: { activeClients: number; monthlyMRR: number }) {
   const avgRate  = monthlyMRR / Math.max(activeClients, 1)
-  const avgTier: 'archive' | 'estate' | 'dynasty' = avgRate >= 50 ? 'dynasty' : avgRate >= 20 ? 'estate' : 'archive'
+  const avgTier: 'active' | 'resting' | 'legacy' = avgRate >= 20 ? 'active' : avgRate >= 4 ? 'resting' : 'active'
   const monthly  = Math.max(activeClients / 12, 0.5)
   const data     = calculateProjection(activeClients, avgTier, monthly, 0.85)
   const year5    = data.find(d => d.year === 5)?.monthly  ?? 0

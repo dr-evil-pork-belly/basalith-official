@@ -7,9 +7,9 @@ import BeginProgress from '../../components/BeginProgress'
 import { supabase }  from '../../../lib/supabase'
 
 const TIER_PRICES: Record<string, string> = {
-  'The Archive': '$1,200 / year',
-  'The Estate':  '$3,600 / year',
-  'The Dynasty': '$9,600 / year',
+  'Active':  '$3,600 / year',
+  'Resting': '$600 / year',
+  'Legacy':  '$2,500 one-time',
 }
 
 export default function ReviewPage() {

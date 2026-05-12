@@ -52,15 +52,15 @@ function Sigil() {
   )
 }
 
-const TIER_LABELS: Record<string, { label: string; annualPrice: string; monthlyPrice: string }> = {
-  archive: { label: 'The Archive', annualPrice: '$1,800/yr',  monthlyPrice: '$180/mo'  },
-  estate:  { label: 'The Estate',  annualPrice: '$3,600/yr',  monthlyPrice: '$360/mo'  },
-  dynasty: { label: 'The Dynasty', annualPrice: '$9,600/yr',  monthlyPrice: '$960/mo'  },
+const TIER_LABELS: Record<string, { label: string; annualPrice: string; monthlyPrice: string; oneTime?: boolean; note?: string }> = {
+  active:  { label: 'Active',  annualPrice: '$3,600/yr', monthlyPrice: '$360/mo' },
+  resting: { label: 'Resting', annualPrice: '$600/yr',   monthlyPrice: '$60/mo',  note: 'For clients who want to preserve data without full engagement features.' },
+  legacy:  { label: 'Legacy',  annualPrice: '$2,500',    monthlyPrice: '$2,500',  oneTime: true, note: 'For families of someone who has passed. One-time payment.' },
 }
 
 const FOUNDING_FEE = 2500
-const ANNUAL_PRICES:  Record<string, number> = { archive: 1800, estate: 3600, dynasty: 9600 }
-const MONTHLY_PRICES: Record<string, number> = { archive: 180,  estate: 360,  dynasty: 960  }
+const ANNUAL_PRICES:  Record<string, number> = { active: 3600, resting: 600, legacy: 2500 }
+const MONTHLY_PRICES: Record<string, number> = { active: 360,  resting: 60,  legacy: 0    }
 
 const RELATIONSHIP_OPTIONS = [
   { value: 'referral',              label: 'Referral'               },
@@ -75,7 +75,7 @@ export default function OnboardClient({ archivistId }: { archivistId: string }) 
     clientName:       '',
     clientEmail:      '',
     phone:            '',
-    tier:             'estate',
+    tier:             'active',
     billing:          'annual',
     relationshipType: 'referral',
     notes:            '',
@@ -89,10 +89,13 @@ export default function OnboardClient({ archivistId }: { archivistId: string }) 
       setForm(f => ({ ...f, [key]: e.target.value }))
   }
 
-  const tierInfo     = TIER_LABELS[form.tier] ?? TIER_LABELS.estate
-  const firstPeriod  = form.billing === 'annual'
-    ? ANNUAL_PRICES[form.tier]  ?? 3600
-    : MONTHLY_PRICES[form.tier] ?? 360
+  const tierInfo     = TIER_LABELS[form.tier] ?? TIER_LABELS.active
+  const isLegacy     = form.tier === 'legacy'
+  const firstPeriod  = isLegacy
+    ? ANNUAL_PRICES.legacy
+    : form.billing === 'annual'
+      ? ANNUAL_PRICES[form.tier]  ?? 3600
+      : MONTHLY_PRICES[form.tier] ?? 360
   const totalDue = FOUNDING_FEE + firstPeriod
 
   async function handleSubmit(e: React.FormEvent) {
@@ -116,7 +119,7 @@ export default function OnboardClient({ archivistId }: { archivistId: string }) 
   }
 
   function reset() {
-    setForm({ familyName: '', clientName: '', clientEmail: '', phone: '', tier: 'estate', billing: 'annual', relationshipType: 'referral', notes: '' })
+    setForm({ familyName: '', clientName: '', clientEmail: '', phone: '', tier: 'active', billing: 'annual', relationshipType: 'referral', notes: '' })
     setResult(null)
     setError(null)
   }
@@ -216,45 +219,50 @@ export default function OnboardClient({ archivistId }: { archivistId: string }) 
           <div>
             <label style={LABEL}>Stewardship Tier</label>
             <select value={form.tier} onChange={set('tier')} style={{ ...INPUT, cursor: 'pointer' }}>
-              <option value="archive">The Archive — {TIER_LABELS.archive.annualPrice} / {TIER_LABELS.archive.monthlyPrice}</option>
-              <option value="estate">The Estate — {TIER_LABELS.estate.annualPrice} / {TIER_LABELS.estate.monthlyPrice} (recommended)</option>
-              <option value="dynasty">The Dynasty — {TIER_LABELS.dynasty.annualPrice} / {TIER_LABELS.dynasty.monthlyPrice}</option>
+              <option value="active">Active — {TIER_LABELS.active.annualPrice} / {TIER_LABELS.active.monthlyPrice}</option>
+              <option value="resting">Resting — {TIER_LABELS.resting.annualPrice} / {TIER_LABELS.resting.monthlyPrice}</option>
+              <option value="legacy">Legacy — {TIER_LABELS.legacy.annualPrice} one-time</option>
             </select>
+            {tierInfo.note && (
+              <p style={HELPER}>{tierInfo.note}</p>
+            )}
           </div>
 
-          {/* Billing */}
-          <div>
-            <label style={LABEL}>Billing</label>
-            <div style={{ display: 'flex', gap: '0.75rem' }}>
-              {(['annual', 'monthly'] as const).map(b => (
-                <button
-                  key={b}
-                  type="button"
-                  onClick={() => setForm(f => ({ ...f, billing: b }))}
-                  style={{
-                    flex:          1,
-                    fontFamily:    "'Space Mono', monospace",
-                    fontSize:      '0.42rem',
-                    letterSpacing: '0.2em',
-                    textTransform: 'uppercase' as const,
-                    padding:       '0.6rem 1rem',
-                    border:        form.billing === b ? '1px solid rgba(196,162,74,0.6)' : '1px solid rgba(255,255,255,0.07)',
-                    background:    form.billing === b ? 'rgba(196,162,74,0.08)' : 'transparent',
-                    color:         form.billing === b ? '#C4A24A' : '#5C6166',
-                    cursor:        'pointer',
-                    transition:    'all 150ms ease',
-                  }}
-                >
-                  {b === 'annual' ? 'Annual (save 20%)' : 'Monthly'}
-                </button>
-              ))}
+          {/* Billing — hidden for Legacy (always one-time) */}
+          {!isLegacy && (
+            <div>
+              <label style={LABEL}>Billing</label>
+              <div style={{ display: 'flex', gap: '0.75rem' }}>
+                {(['annual', 'monthly'] as const).map(b => (
+                  <button
+                    key={b}
+                    type="button"
+                    onClick={() => setForm(f => ({ ...f, billing: b }))}
+                    style={{
+                      flex:          1,
+                      fontFamily:    "'Space Mono', monospace",
+                      fontSize:      '0.42rem',
+                      letterSpacing: '0.2em',
+                      textTransform: 'uppercase' as const,
+                      padding:       '0.6rem 1rem',
+                      border:        form.billing === b ? '1px solid rgba(196,162,74,0.6)' : '1px solid rgba(255,255,255,0.07)',
+                      background:    form.billing === b ? 'rgba(196,162,74,0.08)' : 'transparent',
+                      color:         form.billing === b ? '#C4A24A' : '#5C6166',
+                      cursor:        'pointer',
+                      transition:    'all 150ms ease',
+                    }}
+                  >
+                    {b === 'annual' ? 'Annual (save 20%)' : 'Monthly'}
+                  </button>
+                ))}
+              </div>
+              <p style={HELPER}>
+                {form.billing === 'annual'
+                  ? `${tierInfo.label} at ${tierInfo.annualPrice}`
+                  : `${tierInfo.label} at ${tierInfo.monthlyPrice}, 12-month minimum`}
+              </p>
             </div>
-            <p style={HELPER}>
-              {form.billing === 'annual'
-                ? `${tierInfo.label} at ${tierInfo.annualPrice}`
-                : `${tierInfo.label} at ${tierInfo.monthlyPrice}, 12-month minimum`}
-            </p>
-          </div>
+          )}
 
           {/* Relationship */}
           <div>
@@ -289,7 +297,9 @@ export default function OnboardClient({ archivistId }: { archivistId: string }) 
               </span>
             </div>
             <p style={{ ...HELPER, marginTop: '0.25rem', fontSize: '0.75rem' }}>
-              $2,500 founding fee + {form.billing === 'annual' ? 'first year' : 'first month'} ({tierInfo.label})
+              {isLegacy
+                ? `$2,500 founding fee + $2,500 Legacy (one-time)`
+                : `$2,500 founding fee + ${form.billing === 'annual' ? 'first year' : 'first month'} (${tierInfo.label})`}
             </p>
           </div>
 
