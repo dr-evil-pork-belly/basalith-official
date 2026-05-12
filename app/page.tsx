@@ -9,7 +9,6 @@ import Nav               from './components/Nav'
 import TaglineOpening    from './components/TaglineOpening'
 import HeroSection       from './components/HeroSection'
 import PhilosophySection from './components/PhilosophySection'
-import TechnologySection from './components/TechnologySection'
 import ClosingSection    from './components/ClosingSection'
 import Footer            from './components/Footer'
 
@@ -21,7 +20,6 @@ export default function HomePage() {
         <TaglineOpening />
         <HeroSection />
         <PhilosophySection />
-        <TechnologySection />
         <ClosingSection />
       </main>
       <Footer />
