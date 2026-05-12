@@ -70,7 +70,7 @@ export async function POST(req: Request) {
 
   <hr style="border:none;border-top:1px solid rgba(240,237,230,0.06);margin:32px 0">
 
-  <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830;line-height:1.8;margin:0">
+  <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:0">
     BASALITH &middot; XYZ<br>${archiveName} &middot; Generation I
   </p>
 

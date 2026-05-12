@@ -317,7 +317,7 @@ function buildContributorInviteEmail({
     ` : ''}
 
     <div style="border-top:1px solid rgba(240,237,230,0.06);padding-top:24px">
-      <a href="${siteUrl}" style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830;text-decoration:none">
+      <a href="${siteUrl}" style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;text-decoration:none">
         BASALITH · XYZ
       </a>
     </div>

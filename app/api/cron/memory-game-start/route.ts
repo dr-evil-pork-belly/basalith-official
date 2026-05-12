@@ -60,7 +60,7 @@ function buildGameStartEmail(
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">
       THE ${familyName.toUpperCase()} ARCHIVE
     </p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830;margin:0">
+    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0">
       WEEKLY MEMORY GAME · ${dateStr}
     </p>
   </div>
@@ -86,13 +86,13 @@ function buildGameStartEmail(
       style="display:inline-block;font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#0A0908;background:#C4A24A;text-decoration:none;padding:10px 24px;border-radius:2px">
       PLAY NOW →
     </a>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:rgba(196,162,74,0.5);margin:20px 0 0">
+    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#A08A52;margin:20px 0 0">
       CLOSES ${closingTime.toUpperCase()}
     </p>
   </div>
 
   <div style="padding:0 32px 32px;border-top:1px solid rgba(240,237,230,0.06)">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830;line-height:1.8;margin:20px 0 0">
+    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:20px 0 0">
       BASALITH · XYZ<br>
       The ${familyName} Archive<br>
       Memory game every Wednesday.

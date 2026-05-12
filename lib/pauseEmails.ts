@@ -6,7 +6,7 @@ const BASE_STYLES = {
   eyebrow:    "font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;text-transform:uppercase;margin:0 0 16px",
   goldBtn:    "display:inline-block;font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;text-decoration:none;color:#0A0908;background:#C4A24A;padding:12px 28px",
   ghostBtn:   "display:inline-block;font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;text-decoration:none;color:#C4A24A;border:1px solid rgba(196,162,74,0.4);padding:12px 28px",
-  footer:     "font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830;line-height:1.8;margin:0",
+  footer:     "font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:0",
 }
 
 function wrap(archiveName: string, bodyHtml: string): string {

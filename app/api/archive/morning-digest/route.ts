@@ -225,7 +225,7 @@ export async function POST(req: Request) {
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#C4A24A;text-transform:uppercase;margin:0 0 4px">
       ${archiveName.toUpperCase()}
     </p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830;margin:0">
+    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0">
       ${dateStr.toUpperCase()}
     </p>
   </div>
@@ -272,7 +272,7 @@ export async function POST(req: Request) {
   </div>
 
   <div style="padding:0 32px 32px;border-top:1px solid rgba(240,237,230,0.06)">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830;line-height:1.8;margin:24px 0 0">
+    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:24px 0 0">
       BASALITH &middot; XYZ<br>
       ${archiveName} &middot; Generation I<br>
       ${lang === 'zh' ? '您的档案每天都在成长。' : 'Your archive grows every day.'}

@@ -114,7 +114,7 @@ function buildDailyReflectionEmail(
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">
       ${archiveName.toUpperCase()}
     </p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830;margin:0">
+    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0">
       今日问题 · ${dateStr}
     </p>
   </div>
@@ -150,7 +150,7 @@ function buildDailyReflectionEmail(
       </p>
     </div>
 
-    <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#3A3830;margin:0 0 16px;text-align:center">
+    <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#5C6166;margin:0 0 16px;text-align:center">
       或者
     </p>
 
@@ -164,7 +164,7 @@ function buildDailyReflectionEmail(
     </div>
 
     <div style="border-top:1px solid rgba(240,237,230,0.06);padding-top:20px;text-align:center">
-      <p style="font-family:Georgia,serif;font-size:13px;font-style:italic;color:#3A3830;margin:0">
+      <p style="font-family:Georgia,serif;font-size:13px;font-style:italic;color:#5C6166;margin:0">
         您的故事值得被永远保存。
       </p>
     </div>
@@ -172,7 +172,7 @@ function buildDailyReflectionEmail(
   </div>
 
   <div style="padding:0 32px 32px">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830;line-height:1.8;margin:0">
+    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:0">
       BASALITH · XYZ<br>${archiveName}<br>Heritage Nexus Inc.
     </p>
   </div>
@@ -189,7 +189,7 @@ function buildDailyReflectionEmail(
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">
       ${archiveName.toUpperCase()}
     </p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830;margin:0">
+    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0">
       TODAY'S QUESTION · ${dateStr.toUpperCase()}
     </p>
   </div>
@@ -227,7 +227,7 @@ function buildDailyReflectionEmail(
     </p>
 
     <div style="border-top:1px solid rgba(240,237,230,0.06);padding-top:20px;text-align:center;margin-top:24px">
-      <p style="font-family:Georgia,serif;font-size:13px;font-style:italic;color:#3A3830;margin:0">
+      <p style="font-family:Georgia,serif;font-size:13px;font-style:italic;color:#5C6166;margin:0">
         Your stories are worth keeping.
       </p>
     </div>
@@ -235,7 +235,7 @@ function buildDailyReflectionEmail(
   </div>
 
   <div style="padding:0 32px 32px">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830;line-height:1.8;margin:0">
+    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:0">
       BASALITH · XYZ<br>${archiveName}<br>Heritage Nexus Inc.
     </p>
   </div>

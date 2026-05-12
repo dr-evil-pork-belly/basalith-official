@@ -163,7 +163,7 @@ export async function GET(req: NextRequest) {
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">
       THE ${(archive.family_name ?? archive.name).toUpperCase()} ARCHIVE
     </p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830;margin:0 0 24px">
+    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0 0 24px">
       WEEKLY MEMORY GAME · SUMMARY · ${weekDate.toUpperCase()}
     </p>
 
@@ -227,7 +227,7 @@ export async function GET(req: NextRequest) {
   </div>
 
   <div style="padding:0 32px 32px;border-top:1px solid rgba(240,237,230,0.06)">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830;line-height:1.8;margin:20px 0 0">
+    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:20px 0 0">
       BASALITH · XYZ<br>
       The ${archive.family_name ?? archive.name} Archive
     </p>

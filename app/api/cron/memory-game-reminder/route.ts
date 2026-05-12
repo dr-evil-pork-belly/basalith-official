@@ -109,7 +109,7 @@ export async function GET(req: NextRequest) {
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">
       THE ${(archive.family_name ?? archive.name).toUpperCase()} ARCHIVE
     </p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830;margin:0 0 24px">
+    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0 0 24px">
       MEMORY GAME · CLOSING ${hoursLeft <= 3 ? 'SOON' : 'TODAY'}
     </p>
 
@@ -138,14 +138,14 @@ export async function GET(req: NextRequest) {
     </p>
     ${leaderboardHtml}
     <div style="display:flex;align-items:center;gap:12px;margin-top:4px">
-      <span style="font-family:'Courier New',monospace;font-size:11px;color:rgba(196,162,74,0.6);min-width:120px">You</span>
+      <span style="font-family:'Courier New',monospace;font-size:11px;color:#C4A24A;min-width:120px">You</span>
       <div style="width:4px;height:6px;background:rgba(255,255,255,0.08);border-radius:2px"></div>
-      <span style="font-family:'Courier New',monospace;font-size:10px;color:#3A3830">0</span>
+      <span style="font-family:'Courier New',monospace;font-size:10px;color:#5C6166">0</span>
     </div>
   </div>` : ''}
 
   <div style="padding:0 32px 32px;border-top:1px solid rgba(240,237,230,0.06)">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830;line-height:1.8;margin:20px 0 0">
+    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:20px 0 0">
       BASALITH · XYZ<br>
       The ${archive.family_name ?? archive.name} Archive
     </p>

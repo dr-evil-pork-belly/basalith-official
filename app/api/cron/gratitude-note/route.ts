@@ -173,7 +173,7 @@ function buildGratitudeEmail(
 
   <div style="padding:40px">
 
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:rgba(196,162,74,0.5);margin:0 0 32px">
+    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#A08A52;margin:0 0 32px">
       ${contributionCount} ${contributionCount === 1 ? 'MEMORY' : 'MEMORIES'} THIS MONTH
     </p>
 
@@ -184,10 +184,10 @@ function buildGratitudeEmail(
     </div>
 
     <div style="border-top:1px solid rgba(240,237,230,0.06);padding-top:24px">
-      <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#3A3830;margin:0 0 16px">
+      <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#5C6166;margin:0 0 16px">
         ${lang === 'zh' ? '您的回忆已永久保存在档案中。' : 'Your memories are preserved in this archive permanently.'}
       </p>
-      <a href="${siteUrl}" style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830;text-decoration:none">
+      <a href="${siteUrl}" style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;text-decoration:none">
         BASALITH · XYZ
       </a>
     </div>

@@ -147,7 +147,7 @@ function buildFridayEmail(
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">
       THE ${familyName.toUpperCase()} ARCHIVE
     </p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830;margin:0">
+    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0">
       FRIDAY REVEAL · ${dateStr}
     </p>
   </div>
@@ -189,7 +189,7 @@ function buildFridayEmail(
       <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#706C65;margin:0 0 8px">
         ${eraEstimate ? `Our AI estimates this photograph is from ${eraEstimate}.` : 'This photograph has been added to your archive.'}
       </p>
-      <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#3A3830;margin:0">
+      <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#5C6166;margin:0">
         These memories are now permanently preserved in The ${familyName} Archive.
       </p>
     </div>
@@ -204,7 +204,7 @@ function buildFridayEmail(
   </div>
 
   <div style="padding:0 32px 32px;border-top:1px solid rgba(240,237,230,0.06)">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830;line-height:1.8;margin:20px 0 0">
+    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:20px 0 0">
       BASALITH · XYZ<br>
       The ${familyName} Archive<br>
       New mystery every Monday.

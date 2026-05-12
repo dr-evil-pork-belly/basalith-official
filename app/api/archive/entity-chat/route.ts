@@ -495,18 +495,18 @@ export async function POST(req: Request) {
               headers: { 'X-Entity-Ref-ID': `basalith-mc-${deposit.id}`, 'Precedence': 'bulk' },
               html: `<!DOCTYPE html><html><body style="background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:600px;margin:0 auto;padding:32px">
 <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">${archive.name.toUpperCase()}</p>
-<p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830;margin:0 0 24px">YOUR MEMORY WAS USED</p>
+<p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0 0 24px">YOUR MEMORY WAS USED</p>
 <p style="font-size:17px;font-weight:300;color:#B8B4AB;margin:0 0 8px">${firstName},</p>
 <p style="font-size:17px;font-weight:300;color:#F0EDE6;margin:0 0 8px;line-height:1.7">Something you contributed to ${ownerFirst}'s archive was just used by the entity.</p>
 <p style="font-size:15px;font-style:italic;color:#706C65;margin:0 0 32px;line-height:1.7">Someone asked ${ownerFirst}'s entity about "${depositPrompt}." The entity answered using your words.</p>
 <div style="border-left:3px solid rgba(196,162,74,0.4);padding:20px 24px;margin:0 0 32px;background:rgba(196,162,74,0.04)">
-  <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:rgba(196,162,74,0.6);margin:0 0 12px">YOUR CONTRIBUTION</p>
+  <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#C4A24A;margin:0 0 12px">YOUR CONTRIBUTION</p>
   <p style="font-size:15px;font-weight:300;font-style:italic;color:#B8B4AB;line-height:1.8;margin:0">&ldquo;${preview}&hellip;&rdquo;</p>
 </div>
 <p style="font-size:15px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 32px">Your words are speaking for ${ownerFirst}.<br/>Keep contributing. The more you add, the more accurately the entity represents them.</p>
 <a href="${portalUrl}" style="display:inline-block;background:#C4A24A;color:#0A0908;font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;text-decoration:none;padding:14px 28px;border-radius:2px">ADD MORE MEMORIES →</a>
 <hr style="border:none;border-top:1px solid rgba(240,237,230,0.06);margin:32px 0">
-<p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830">BASALITH · XYZ<br>${archive.name}</p>
+<p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166">BASALITH · XYZ<br>${archive.name}</p>
 </body></html>`,
             })
           }

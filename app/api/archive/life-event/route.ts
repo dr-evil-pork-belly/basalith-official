@@ -146,7 +146,7 @@ Context from the archive owner's own words: ${depositContext || 'No context avai
     const photoBlock = photoUrl ? `
   <div style="margin:24px 0">
     <img src="${photoUrl}" alt="${archiveName}" style="width:100%;max-width:540px;display:block;border-radius:2px;filter:sepia(0.08)" />
-    ${chosenPhoto?.primary_label ? `<p style="font-family:'Courier New',monospace;font-size:9px;letter-spacing:2px;color:#3A3830;margin:8px 0 0;text-transform:uppercase">${chosenPhoto.primary_label}</p>` : ''}
+    ${chosenPhoto?.primary_label ? `<p style="font-family:'Courier New',monospace;font-size:9px;letter-spacing:2px;color:#5C6166;margin:8px 0 0;text-transform:uppercase">${chosenPhoto.primary_label}</p>` : ''}
   </div>` : ''
 
     const html = `<body style="background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:600px;margin:0 auto;padding:0">
@@ -179,7 +179,7 @@ Context from the archive owner's own words: ${depositContext || 'No context avai
   </div>
 
   <div style="padding:24px 32px;border-top:1px solid rgba(240,237,230,0.06)">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830;line-height:1.8;margin:0">
+    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:0">
       BASALITH &middot; XYZ<br>
       ${archiveName} &middot; Generation I
     </p>
