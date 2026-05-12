@@ -46,11 +46,14 @@ export async function GET(req: NextRequest) {
   const activeCount = pipelineCounts['Active Client'] ?? 0
 
   // Residual MRR
-  const RESIDUAL_MONTHLY: Record<string, number> = { archive: 1200, estate: 2400, dynasty: 6400 } // cents
+  const RESIDUAL_MONTHLY: Record<string, number> = {
+    active: 2000, resting: 400, legacy: 800,
+    archive: 2000, estate: 2000, dynasty: 2000, // old tier aliases
+  } // cents
   const activeProspects    = (prospects ?? []).filter(p => p.status === 'Active Client')
   const residualMRRCents   = activeProspects.reduce((sum, p) => {
     const tier = (p.tier ?? '').toLowerCase()
-    return sum + (RESIDUAL_MONTHLY[tier] ?? 2400)
+    return sum + (RESIDUAL_MONTHLY[tier] ?? 2000)
   }, 0)
 
   // Quality score from archivist table

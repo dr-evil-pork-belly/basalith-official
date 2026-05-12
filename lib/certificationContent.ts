@@ -140,7 +140,7 @@ Active — while the primary user is alive and engaged. Full features. Weekly pr
 
 Resting — when life demands a pause. Data preserved. Login active. Entity accessible. No automated emails or prompts. $600 a year. Everything intact until they return.
 
-Legacy — after the primary user passes. Family entity access continues. Contributors can still add memories. The archive continues its purpose. $2,500 one-time.
+Legacy — after the primary user passes. Family entity access continues and the entity keeps growing with every AI advancement. Every new model generation makes the presence more accurate. $1,200/year billed to the estate or family. Annual billing only — less friction for a grieving family than monthly billing.
 
 Most families begin Active and remain there. Some move to Resting during difficult periods and return when life allows. Legacy activates when the primary user is gone.
 

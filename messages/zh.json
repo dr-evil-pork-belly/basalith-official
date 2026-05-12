@@ -67,11 +67,12 @@
     "tier_2_description": "您的档案被保存并等待。没有电子邮件。没有提示。只是您的数据——安全完整——直到您准备好回来。",
     "tier_3_name": "遗产",
     "tier_3_eyebrow": "在他们离去之后",
-    "tier_3_price": "$2,500",
-    "tier_3_price_type": "一次性",
-    "tier_3_description": "档案继续。家庭成员可以与实体交谈。您为之建立这一切的人仍然存在。",
+    "tier_3_price": "$1,200",
+    "tier_3_price_type": "每年",
+    "tier_3_description": "档案继续。随着AI的进步，您所爱之人的实体也随之进步。每一代新模型都使存在更加准确。",
     "cta": "开始您的档案",
-    "founding_note": "所有方案均适用$2,500一次性创始费用。"
+    "founding_note": "所有方案均适用$2,500一次性创始费用。",
+    "tier_3_price_note": "每年向遗产或家庭计费"
   },
   "dashboard": {
     "greeting_morning": "早上好",

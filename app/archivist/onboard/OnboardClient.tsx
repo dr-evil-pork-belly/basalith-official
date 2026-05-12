@@ -55,11 +55,11 @@ function Sigil() {
 const TIER_LABELS: Record<string, { label: string; annualPrice: string; monthlyPrice: string; oneTime?: boolean; note?: string }> = {
   active:  { label: 'Active',  annualPrice: '$3,600/yr', monthlyPrice: '$360/mo' },
   resting: { label: 'Resting', annualPrice: '$600/yr',   monthlyPrice: '$60/mo',  note: 'For clients who want to preserve data without full engagement features.' },
-  legacy:  { label: 'Legacy',  annualPrice: '$2,500',    monthlyPrice: '$2,500',  oneTime: true, note: 'For families of someone who has passed. One-time payment.' },
+  legacy:  { label: 'Legacy',  annualPrice: '$1,200/yr', monthlyPrice: '$1,200/yr', note: 'For families of someone who has passed. Annual billing only — billed to estate or family.' },
 }
 
 const FOUNDING_FEE = 2500
-const ANNUAL_PRICES:  Record<string, number> = { active: 3600, resting: 600, legacy: 2500 }
+const ANNUAL_PRICES:  Record<string, number> = { active: 3600, resting: 600, legacy: 1200 }
 const MONTHLY_PRICES: Record<string, number> = { active: 360,  resting: 60,  legacy: 0    }
 
 const RELATIONSHIP_OPTIONS = [
@@ -221,14 +221,14 @@ export default function OnboardClient({ archivistId }: { archivistId: string }) 
             <select value={form.tier} onChange={set('tier')} style={{ ...INPUT, cursor: 'pointer' }}>
               <option value="active">Active — {TIER_LABELS.active.annualPrice} / {TIER_LABELS.active.monthlyPrice}</option>
               <option value="resting">Resting — {TIER_LABELS.resting.annualPrice} / {TIER_LABELS.resting.monthlyPrice}</option>
-              <option value="legacy">Legacy — {TIER_LABELS.legacy.annualPrice} one-time</option>
+              <option value="legacy">Legacy — {TIER_LABELS.legacy.annualPrice} annual</option>
             </select>
             {tierInfo.note && (
               <p style={HELPER}>{tierInfo.note}</p>
             )}
           </div>
 
-          {/* Billing — hidden for Legacy (always one-time) */}
+          {/* Billing — hidden for Legacy (always annual) */}
           {!isLegacy && (
             <div>
               <label style={LABEL}>Billing</label>
@@ -298,7 +298,7 @@ export default function OnboardClient({ archivistId }: { archivistId: string }) 
             </div>
             <p style={{ ...HELPER, marginTop: '0.25rem', fontSize: '0.75rem' }}>
               {isLegacy
-                ? `$2,500 founding fee + $2,500 Legacy (one-time)`
+                ? `$2,500 founding fee + $1,200/year Legacy (annual, billed to estate or family)`
                 : `$2,500 founding fee + ${form.billing === 'annual' ? 'first year' : 'first month'} (${tierInfo.label})`}
             </p>
           </div>

@@ -4,9 +4,13 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 export const maxDuration = 300
 
 const RESIDUAL_MONTHLY_CENTS: Record<string, number> = {
-  archive: 1200,   // $12
-  estate:  2400,   // $24
-  dynasty: 6400,   // $64
+  active:  2000,   // $20 (8% of $3,600/yr = $288/yr = $24/mo; use $20 to be conservative)
+  resting: 400,    // $4  (8% of $600/yr = $48/yr = $4/mo)
+  legacy:  800,    // $8  (8% of $1,200/yr = $96/yr = $8/mo)
+  // Old tier aliases
+  archive: 2000,
+  estate:  2000,
+  dynasty: 2000,
 }
 
 function validateCronAuth(req: NextRequest): boolean {

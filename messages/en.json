@@ -64,11 +64,12 @@
     "tier_2_description": "Your archive preserved and waiting. No emails. No prompts. Just your data — safe and intact — until you are ready to return.",
     "tier_3_name": "Legacy",
     "tier_3_eyebrow": "AFTER THEY ARE GONE",
-    "tier_3_price": "$2,500",
-    "tier_3_price_type": "one-time",
-    "tier_3_description": "The archive continues. Family members can talk to the entity. The person you built this for remains present.",
+    "tier_3_price": "$1,200",
+    "tier_3_price_type": "per year",
+    "tier_3_description": "The entity continues. As AI advances your loved one's entity advances with it. Every new model generation makes the presence more accurate.",
     "cta": "Begin Your Archive",
-    "founding_note": "One-time founding fee of $2,500 applies to all tiers."
+    "founding_note": "One-time founding fee of $2,500 applies to all tiers.",
+    "tier_3_price_note": "billed annually to estate or family"
   },
   "dashboard": {
     "greeting_morning": "Good morning",

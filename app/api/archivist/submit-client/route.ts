@@ -19,11 +19,11 @@ function generateClientPassword(familyName: string): string {
   return `${clean}${new Date().getFullYear()}${suffix}!`
 }
 
-const TIER_PRICES: Record<string, { annual: number; monthly: number; label: string; oneTime?: boolean }> = {
+const TIER_PRICES: Record<string, { annual: number; monthly: number; label: string; annualOnly?: boolean }> = {
   active:  { annual: 3600, monthly: 360, label: 'Active'  },
   resting: { annual: 600,  monthly: 60,  label: 'Resting' },
-  legacy:  { annual: 2500, monthly: 0,   label: 'Legacy', oneTime: true },
-  // Legacy aliases for any existing records
+  legacy:  { annual: 1200, monthly: 0,   label: 'Legacy', annualOnly: true },
+  // Old tier aliases
   archive: { annual: 3600, monthly: 360, label: 'Active' },
   estate:  { annual: 3600, monthly: 360, label: 'Active' },
   dynasty: { annual: 3600, monthly: 360, label: 'Active' },
@@ -239,7 +239,7 @@ export async function POST(req: NextRequest) {
     const siteUrl    = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
     const tierData    = TIER_PRICES[tier] ?? TIER_PRICES.active
     const tierLabel   = tierData.label
-    const firstPeriod = tierData.oneTime
+    const firstPeriod = tierData.annualOnly
       ? tierData.annual
       : billing === 'annual' ? tierData.annual : tierData.monthly
     const totalDue    = FOUNDING_FEE + firstPeriod

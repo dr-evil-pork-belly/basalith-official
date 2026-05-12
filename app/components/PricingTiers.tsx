@@ -19,7 +19,7 @@ interface Tier {
   annualPrice:  string
   annualSub:    string
   monthlyPrice: string
-  oneTime?:     boolean
+  annualOnly?:  boolean
   description:  string
   featured:     boolean
   features:     string[]
@@ -76,22 +76,24 @@ const TIERS: Tier[] = [
     id:          'legacy',
     eyebrow:     'After They Are Gone',
     name:        'Legacy',
-    annualPrice: '$2,500',
-    annualSub:   'one-time',
-    monthlyPrice:'$2,500',
-    oneTime:     true,
-    description: 'The archive continues.\nFamily members can talk to the entity.\nContributors can still add memories.\nThe person you built this for\nremains present.',
+    annualPrice: '$1,200',
+    annualSub:   'billed to estate or family',
+    monthlyPrice:'$1,200',
+    annualOnly:  true,
+    description: 'The entity continues.\n\nAs AI advances your loved one\'s entity advances with it. Every new model generation makes the presence more accurate. Every contributor who adds a memory makes it more complete.',
     featured:    false,
     features: [
-      'Full family entity access',
-      'Contributor portal remains active',
-      'Entity continues learning from family contributions',
-      'No recurring billing',
-      'Permanent family access',
+      'Entity updated with every new AI model generation',
+      'Full family contributor access',
+      'New capability integration as technology advances',
+      'Annual entity report to family',
+      'Archive storage and security',
+      'Generational access — forever',
+      'No features removed at death',
     ],
     cta:     'Ask Your Legacy Guide',
     ctaHref: '/apply',
-    note:    'Arranged through your Legacy Guide or estate.',
+    note:    'Arranged through your Legacy Guide or estate. Annual billing only.',
   },
 ]
 
@@ -240,7 +242,7 @@ export default function PricingTiers() {
           margin:              '0 auto',
         }}
       >
-        {TIERS.map(({ id, eyebrow, name, annualPrice, annualSub, monthlyPrice, oneTime, description, featured, features, cta, ctaHref, note }) => (
+        {TIERS.map(({ id, eyebrow, name, annualPrice, annualSub, monthlyPrice, annualOnly, description, featured, features, cta, ctaHref, note }) => (
           <div
             key={id}
             style={{
@@ -303,26 +305,7 @@ export default function PricingTiers() {
             </p>
 
             {/* Price */}
-            {oneTime ? (
-              <>
-                <div
-                  style={{
-                    ...SERIF,
-                    fontSize:      'clamp(2rem,3.5vw,3rem)',
-                    fontWeight:    300,
-                    color:         'var(--color-gold)',
-                    letterSpacing: '-0.025em',
-                    lineHeight:    1,
-                    marginBottom:  '6px',
-                  }}
-                >
-                  $2,500
-                </div>
-                <p style={{ ...MONO, fontSize: '0.5rem', letterSpacing: '0.2em', color: 'var(--color-text-faint)', marginBottom: '24px' }}>
-                  One-time · No recurring billing
-                </p>
-              </>
-            ) : isAnnual ? (
+            {(isAnnual || annualOnly) ? (
               <>
                 <div style={{ ...SERIF, fontSize: 'clamp(2rem,3.5vw,3rem)', fontWeight: 300, color: 'var(--color-gold)', letterSpacing: '-0.025em', lineHeight: 1, marginBottom: '6px' }}>
                   {annualPrice}

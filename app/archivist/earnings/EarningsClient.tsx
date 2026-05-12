@@ -15,7 +15,10 @@ type Commission = {
 
 type Prospect = { id: string; name: string; status: string; tier: string }
 
-const RESIDUAL_MONTHLY: Record<string, number> = { archive: 12, estate: 24, dynasty: 64 }
+const RESIDUAL_MONTHLY: Record<string, number> = {
+  active: 20, resting: 4, legacy: 8,
+  archive: 20, estate: 20, dynasty: 20, // old tier aliases
+}
 
 const TIER_TIER: Record<string, { annual: number; monthly: number }> = {
   Archive: { annual: 1800, monthly: 180 },
@@ -218,9 +221,19 @@ export default function EarningsClient({ archivistId }: { archivistId: string })
               </div>
             )}
           </div>
-          <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: '0.85rem', color: C.ghost, lineHeight: 1.6 }}>
+          <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: '0.85rem', color: C.dim, lineHeight: 1.6, marginBottom: '12px' }}>
             Residuals are paid on the 1st of each month for all archives active on the last day of the previous month.
           </p>
+          <div style={{ background: 'rgba(196,162,74,0.04)', border: '1px solid rgba(196,162,74,0.12)', padding: '16px 20px' }}>
+            <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.42rem', letterSpacing: '0.18em', color: C.gold, marginBottom: '8px' }}>
+              LEGACY RESIDUALS
+            </p>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: '0.85rem', color: C.muted, lineHeight: 1.7, margin: 0 }}>
+              Legacy archives generate $96/year in residuals ($8/month).
+              A family that maintains Legacy status for 20 years generates $1,920 in residuals from one client.
+              The Legacy conversation is worth having correctly.
+            </p>
+          </div>
         </div>
       )}
     </div>

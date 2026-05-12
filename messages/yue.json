@@ -67,11 +67,12 @@
     "tier_2_description": "您的檔案被保存並等待。沒有電子郵件。沒有提示。只是您的數據——安全完整——直到您準備好回來。",
     "tier_3_name": "遺產",
     "tier_3_eyebrow": "在他們離去之後",
-    "tier_3_price": "$2,500",
-    "tier_3_price_type": "一次性",
-    "tier_3_description": "檔案繼續。家庭成員可以與實體交談。您為之建立這一切的人仍然存在。",
+    "tier_3_price": "$1,200",
+    "tier_3_price_type": "每年",
+    "tier_3_description": "檔案繼續。隨著AI的進步，您所愛之人的實體也隨之進步。每一代新模型都使存在更加準確。",
     "cta": "開始您的檔案",
-    "founding_note": "所有方案均適用$2,500一次性創始費用。"
+    "founding_note": "所有方案均適用$2,500一次性創始費用。",
+    "tier_3_price_note": "每年向遺產或家庭收費"
   },
   "dashboard": {
     "greeting_morning": "早晨",

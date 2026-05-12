@@ -67,11 +67,12 @@
     "tier_2_description": "Ang iyong archive ay napanatili at naghihintay. Walang mga email. Walang mga prompt. Ang iyong data lamang — ligtas at buo — hanggang sa handa kang bumalik.",
     "tier_3_name": "Pamana",
     "tier_3_eyebrow": "PAGKATAPOS NILANG LUMAYO",
-    "tier_3_price": "$2,500",
-    "tier_3_price_type": "isang beses",
-    "tier_3_description": "Ang archive ay nagpapatuloy. Ang mga miyembro ng pamilya ay maaaring makipag-usap sa entidad. Ang taong itinayo mo ito para sa kanya ay nananatiling naroroon.",
+    "tier_3_price": "$1,200",
+    "tier_3_price_type": "bawat taon",
+    "tier_3_description": "Ang archive ay nagpapatuloy. Habang umuusad ang AI, umuusad din ang entidad ng iyong mahal sa buhay. Bawat bagong henerasyong modelo ay nagpapahusay ng presensya.",
     "cta": "Simulan ang Iyong Archive",
-    "founding_note": "Ang isang beses na founding fee na $2,500 ay naaangkop sa lahat ng tier."
+    "founding_note": "Ang isang beses na founding fee na $2,500 ay naaangkop sa lahat ng tier.",
+    "tier_3_price_note": "sinisingil taon-taon sa ari-arian o pamilya"
   },
   "dashboard": {
     "greeting_morning": "Magandang umaga",

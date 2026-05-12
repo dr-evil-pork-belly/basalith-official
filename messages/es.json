@@ -67,11 +67,12 @@
     "tier_2_description": "Su archivo preservado y esperando. Sin correos. Sin avisos. Solo sus datos — seguros e intactos — hasta que esté listo para regresar.",
     "tier_3_name": "Legado",
     "tier_3_eyebrow": "DESPUÉS DE QUE SE HAYAN IDO",
-    "tier_3_price": "$2,500",
-    "tier_3_price_type": "pago único",
-    "tier_3_description": "El archivo continúa. Los miembros de la familia pueden hablar con la entidad. La persona para quien construyó esto permanece presente.",
+    "tier_3_price": "$1,200",
+    "tier_3_price_type": "por año",
+    "tier_3_description": "El archivo continúa. A medida que la IA avanza, la entidad de su ser querido también avanza. Cada nueva generación de modelos hace la presencia más precisa.",
     "cta": "Comience Su Archivo",
-    "founding_note": "Tarifa de fundación única de $2,500 aplica a todos los planes."
+    "founding_note": "Tarifa de fundación única de $2,500 aplica a todos los planes.",
+    "tier_3_price_note": "facturado anualmente al patrimonio o familia"
   },
   "dashboard": {
     "greeting_morning": "Buenos días",

@@ -67,11 +67,12 @@
     "tier_2_description": "Kho lưu trữ của bạn được bảo quản và chờ đợi. Không có email. Không có gợi ý. Chỉ là dữ liệu của bạn — an toàn và nguyên vẹn — cho đến khi bạn sẵn sàng trở lại.",
     "tier_3_name": "Di sản",
     "tier_3_eyebrow": "SAU KHI HỌ ĐÃ RA ĐI",
-    "tier_3_price": "$2,500",
-    "tier_3_price_type": "một lần",
-    "tier_3_description": "Kho lưu trữ tiếp tục. Các thành viên trong gia đình có thể nói chuyện với thực thể. Người mà bạn xây dựng điều này vẫn hiện diện.",
+    "tier_3_price": "$1,200",
+    "tier_3_price_type": "mỗi năm",
+    "tier_3_description": "Kho lưu trữ tiếp tục. Khi AI tiến bộ, thực thể của người thân bạn cũng tiến bộ theo. Mỗi thế hệ mô hình mới làm cho sự hiện diện chính xác hơn.",
     "cta": "Bắt đầu Kho lưu trữ của bạn",
-    "founding_note": "Phí thành lập một lần $2,500 áp dụng cho tất cả các gói."
+    "founding_note": "Phí thành lập một lần $2,500 áp dụng cho tất cả các gói.",
+    "tier_3_price_note": "thanh toán hàng năm cho gia đình hoặc di sản"
   },
   "dashboard": {
     "greeting_morning": "Chào buổi sáng",
