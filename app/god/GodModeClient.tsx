@@ -31,7 +31,10 @@ type ArchiveData = {
   entityDepth:         number
   health:              'green' | 'amber' | 'red'
   alerts:              AlertItem[]
-  magicLinkToken:      string | null
+  magicLinkToken:            string | null
+  pausedAt:                  string | null
+  scheduledDeletionAt:       string | null
+  terminationRequestedAt:    string | null
   training?: {
     total:              number
     included:           number
@@ -96,16 +99,17 @@ const HEALTH_BORDER = {
 }
 
 const CRON_BUTTONS = [
-  { label: 'DAILY PHOTOS',       route: 'send-photos' },
-  { label: 'WEEKLY PROMPT',      route: 'weekly-prompt' },
-  { label: 'MONDAY MYSTERY',     route: 'story-prompt-monday' },
-  { label: 'FRIDAY REVEAL',      route: 'story-prompt-friday' },
-  { label: 'MONTHLY REPORT',     route: 'monthly-report' },
-  { label: 'GRATITUDE NOTE',     route: 'gratitude-note' },
-  { label: 'MEMORY GAME',        route: 'memory-game' },
-  { label: 'GAME REMINDER',      route: 'memory-game-reminder' },
-  { label: 'GAME SUMMARY',       route: 'memory-game-summary' },
-  { label: 'DAILY REFLECTION',  route: 'daily-reflection'    },
+  { label: 'DAILY PHOTOS',      route: 'send-photos' },
+  { label: 'WEEKLY PROMPT',     route: 'weekly-prompt' },
+  { label: 'MONDAY MYSTERY',    route: 'story-prompt-monday' },
+  { label: 'FRIDAY REVEAL',     route: 'story-prompt-friday' },
+  { label: 'MONTHLY REPORT',    route: 'monthly-report' },
+  { label: 'GRATITUDE NOTE',    route: 'gratitude-note' },
+  { label: 'MEMORY GAME',       route: 'memory-game' },
+  { label: 'GAME REMINDER',     route: 'memory-game-reminder' },
+  { label: 'GAME SUMMARY',      route: 'memory-game-summary' },
+  { label: 'DAILY REFLECTION',  route: 'daily-reflection' },
+  { label: 'PAUSE REMINDER',    route: 'pause-reminder' },
 ]
 
 // ── Action handler ─────────────────────────────────────────────────────────────
@@ -237,6 +241,65 @@ function BackfillButton() {
   return <TrainingPipelineButton label="Backfill Training Data" url="/api/god/backfill-training" body={{ batchSize: 20 }} />
 }
 
+function ScheduledDeletionsPanel({ archives, onRefresh }: { archives: ArchiveData[]; onRefresh: () => void }) {
+  const [confirmed, setConfirmed] = React.useState<string | null>(null)
+  const [deleting, setDeleting]   = React.useState<string | null>(null)
+  const [results,  setResults]    = React.useState<Record<string, 'done' | 'error'>>({})
+
+  async function processDeletion(archiveId: string) {
+    if (confirmed !== archiveId) { setConfirmed(archiveId); return }
+    setDeleting(archiveId)
+    try {
+      const res = await fetch('/api/god/trigger', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ route: `delete-archive?archiveId=${archiveId}` }),
+      })
+      setResults(prev => ({ ...prev, [archiveId]: res.ok ? 'done' : 'error' }))
+      if (res.ok) onRefresh()
+    } catch {
+      setResults(prev => ({ ...prev, [archiveId]: 'error' }))
+    }
+    setDeleting(null)
+    setConfirmed(null)
+  }
+
+  return (
+    <div style={{ marginTop: '0.75rem', background: 'rgba(196,74,74,0.06)', border: '1px solid rgba(196,74,74,0.3)', borderRadius: '2px', padding: '0.75rem 1rem' }}>
+      <p style={{ ...mono, fontSize: '0.38rem', letterSpacing: '0.2em', color: '#C44A4A', margin: '0 0 0.6rem' }}>
+        ⚠ {archives.length} ARCHIVE{archives.length !== 1 ? 'S' : ''} PAST SCHEDULED DELETION DATE
+      </p>
+      {archives.map(a => (
+        <div key={a.id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
+          <p style={{ ...mono, fontSize: '0.36rem', color: '#9DA3A8', letterSpacing: '0.08em', flex: 1, margin: 0 }}>
+            {a.name.toUpperCase()} · {a.ownerEmail} · del {a.scheduledDeletionAt ? new Date(a.scheduledDeletionAt).toLocaleDateString() : '?'}
+          </p>
+          <button
+            onClick={() => processDeletion(a.id)}
+            disabled={deleting === a.id}
+            style={{
+              background:    confirmed === a.id ? 'rgba(196,74,74,0.3)' : 'rgba(196,74,74,0.1)',
+              border:        '1px solid rgba(196,74,74,0.4)',
+              borderRadius:  '2px',
+              padding:       '3px 10px',
+              ...mono,
+              fontSize:      '0.34rem',
+              letterSpacing: '0.12em',
+              color:         results[a.id] === 'done' ? '#4AC47C' : results[a.id] === 'error' ? '#C44A4A' : '#C44A4A',
+              cursor:        deleting === a.id ? 'not-allowed' : 'pointer',
+            }}
+          >
+            {deleting === a.id ? '...' : results[a.id] === 'done' ? 'DELETED' : results[a.id] === 'error' ? 'FAILED' : confirmed === a.id ? 'CONFIRM DELETE' : 'PROCESS DELETION'}
+          </button>
+        </div>
+      ))}
+      <p style={{ ...mono, fontSize: '0.32rem', color: '#5C6166', letterSpacing: '0.08em', margin: '0.5rem 0 0' }}>
+        Click once to confirm. Click again to permanently delete. This cannot be undone.
+      </p>
+    </div>
+  )
+}
+
 import React from 'react'
 
 type PhotoStatRow = { contributorId: string; name: string; sent: number; responded: number; remaining: number; exhausted: boolean }
@@ -339,9 +402,20 @@ function ArchiveCard({ archive, onRefresh }: { archive: ArchiveData; onRefresh: 
     setTimeout(() => setLinkEmailState('idle'), 3000)
   }
 
-  const borderColor = HEALTH_BORDER[archive.health]
+  const isTerminated = !!archive.terminationRequestedAt
+  const isPaused     = archive.status === 'paused'
+  const borderColor  = isTerminated
+    ? '#C44A4A'
+    : isPaused
+      ? '#C4A24A'
+      : HEALTH_BORDER[archive.health]
+
   const lastEmailLabel = archive.lastEmailSent ? timeAgo(archive.lastEmailSent) + ' ago' : 'never'
   const unlabeled = archive.photoCount - archive.labeledPhotoCount
+
+  const pausedDays = archive.pausedAt
+    ? Math.round((Date.now() - new Date(archive.pausedAt).getTime()) / (1000 * 60 * 60 * 24))
+    : null
 
   return (
     <div style={{
@@ -361,17 +435,31 @@ function ArchiveCard({ archive, onRefresh }: { archive: ArchiveData; onRefresh: 
             {archive.ownerName} · {archive.ownerEmail}
           </p>
         </div>
-        <span style={{
-          ...mono, fontSize: '0.34rem', letterSpacing: '0.15em',
-          color: '#C4A24A', background: 'rgba(196,162,74,0.08)',
-          padding: '2px 8px', borderRadius: '2px',
-        }}>
-          {archive.tier.toUpperCase()}
-        </span>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+          <span style={{
+            ...mono, fontSize: '0.34rem', letterSpacing: '0.15em',
+            color: '#C4A24A', background: 'rgba(196,162,74,0.08)',
+            padding: '2px 8px', borderRadius: '2px',
+          }}>
+            {archive.tier.toUpperCase()}
+          </span>
+          {isPaused && (
+            <span style={{ ...mono, fontSize: '0.32rem', letterSpacing: '0.12em', color: '#C4A24A', background: 'rgba(196,162,74,0.12)', padding: '2px 6px', borderRadius: '2px' }}>
+              PAUSED {pausedDays}d AGO
+            </span>
+          )}
+          {isTerminated && (
+            <span style={{ ...mono, fontSize: '0.32rem', letterSpacing: '0.12em', color: '#C44A4A', background: 'rgba(196,74,74,0.1)', padding: '2px 6px', borderRadius: '2px' }}>
+              TERMINATION {archive.scheduledDeletionAt ? `· DEL ${new Date(archive.scheduledDeletionAt).toLocaleDateString()}` : 'PENDING'}
+            </span>
+          )}
+        </div>
       </div>
 
       <p style={{ ...mono, fontSize: '0.36rem', color: '#5C6166', margin: '0 0 0.75rem', letterSpacing: '0.1em' }}>
         DAY {archive.daysSinceCreated} SINCE FOUNDING
+        {isPaused && <span style={{ color: '#C4A24A' }}> · STATUS: PAUSED</span>}
+        {isTerminated && <span style={{ color: '#C44A4A' }}> · DELETION SCHEDULED</span>}
       </p>
 
       {/* Stats */}
@@ -808,6 +896,15 @@ export default function GodModeClient() {
                   )
                 })}
               </div>
+
+            {/* Scheduled deletion processing */}
+            {(() => {
+              const pending = (data?.archives ?? []).filter(a => a.scheduledDeletionAt && new Date(a.scheduledDeletionAt) <= new Date())
+              if (pending.length === 0) return null
+              return (
+                <ScheduledDeletionsPanel archives={pending} onRefresh={fetchData} />
+              )
+            })()}
 
             {/* Training pipeline controls */}
             <div style={{

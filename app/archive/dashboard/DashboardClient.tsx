@@ -883,6 +883,8 @@ type ArchiveRow = {
   current_streak:   number
   longest_streak:   number
   last_label_date:  string | null
+  status:           string
+  paused_at:        string | null
 }
 
 type DecadeRow = {
@@ -1096,6 +1098,57 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
           </>
         )}
       </div>
+
+      {/* ── PAUSED ARCHIVE BANNER ── */}
+      {!loading && archive?.status === 'paused' && (
+        <div style={{
+          background:   'rgba(196,162,74,0.06)',
+          border:       '1px solid rgba(196,162,74,0.3)',
+          borderLeft:   '3px solid #C4A24A',
+          borderRadius: '2px',
+          padding:      '20px 24px',
+          marginBottom: '32px',
+        }}>
+          <p style={{
+            fontFamily:    '"Cormorant Garamond", Georgia, serif',
+            fontSize:      '1.1rem',
+            fontWeight:    500,
+            color:         '#F0EDE6',
+            marginBottom:  '8px',
+          }}>
+            Your archive is paused.
+          </p>
+          <p style={{
+            fontFamily:   '"Cormorant Garamond", Georgia, serif',
+            fontSize:      '0.95rem',
+            fontWeight:    300,
+            fontStyle:     'italic',
+            lineHeight:    1.7,
+            color:         'rgba(250,250,248,0.55)',
+            marginBottom:  '16px',
+          }}>
+            Your data is safe. Everything you have built is exactly as you left it.
+            Resume your archive to continue adding memories and receiving photographs.
+          </p>
+          <a
+            href="/resume"
+            style={{
+              display:        'inline-block',
+              fontFamily:     '"Space Mono","Courier New",monospace',
+              fontSize:       '0.44rem',
+              letterSpacing:  '0.2em',
+              textTransform:  'uppercase',
+              color:          '#0A0908',
+              background:     '#C4A24A',
+              textDecoration: 'none',
+              padding:        '10px 20px',
+              borderRadius:   '2px',
+            }}
+          >
+            Resume Now →
+          </a>
+        </div>
+      )}
 
       {/* ── ONBOARDING GUIDE (first-time users) ── */}
       {!loading && (

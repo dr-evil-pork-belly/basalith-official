@@ -16,6 +16,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
+import {
+  buildPaymentFailedEmail,
+  buildPaymentFailedSubject,
+  buildArchivePausedEmail,
+  buildWelcomeBackEmail,
+} from '@/lib/pauseEmails'
 
 function buildGuideActivationEmail(
   guideName:   string,
@@ -160,17 +166,101 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // ── Stripe checkout.session.completed ──────────────────────────────────────
+    // ── Stripe event dispatch ──────────────────────────────────────────────────
     if (!archiveId) {
-      // When STRIPE_WEBHOOK_SECRET is set, signature verification goes here.
-      // For now, parse the event and extract archiveId from metadata.
+      let event: { type: string; data: { object: Record<string, unknown> } }
       try {
-        const event = JSON.parse(body)
-        if (event.type === 'checkout.session.completed') {
-          archiveId = event.data?.object?.metadata?.archiveId ?? null
-        }
+        event = JSON.parse(body)
       } catch {
         return NextResponse.json({ error: 'Invalid payload' }, { status: 400 })
+      }
+
+      // ── invoice.payment_failed — send friendly payment email, don't pause ──
+      if (event.type === 'invoice.payment_failed') {
+        const invoice = event.data.object as Record<string, any>
+        const { data: archive } = await supabaseAdmin
+          .from('archives')
+          .select('id, name, owner_email, owner_name, preferred_language, status')
+          .eq('stripe_subscription_id', invoice.subscription as string)
+          .maybeSingle()
+
+        if (archive && archive.status === 'active') {
+          const firstName = archive.owner_name?.split(' ')[0] ?? 'there'
+          const lang      = archive.preferred_language ?? 'en'
+          try {
+            await resend.emails.send({
+              from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
+              to:      archive.owner_email,
+              subject: buildPaymentFailedSubject(archive.name, lang),
+              html:    buildPaymentFailedEmail(firstName, archive.name, invoice.hosted_invoice_url as string ?? '', lang),
+              headers: {
+                'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
+                'X-Entity-Ref-ID':  `basalith-payment-failed-${archive.id}-${Date.now()}`,
+                'Precedence':       'bulk',
+              },
+            })
+          } catch (e) {
+            console.error('[webhook] payment_failed email error:', e)
+          }
+        }
+        return NextResponse.json({ ok: true, handled: 'invoice.payment_failed' })
+      }
+
+      // ── customer.subscription.deleted — pause archive ──────────────────────
+      if (event.type === 'customer.subscription.deleted') {
+        const sub = event.data.object as Record<string, any>
+        const { data: archive } = await supabaseAdmin
+          .from('archives')
+          .select('id, name, owner_email, owner_name, preferred_language, status')
+          .eq('stripe_subscription_id', sub.id as string)
+          .maybeSingle()
+
+        if (archive && archive.status === 'active') {
+          await supabaseAdmin
+            .from('archives')
+            .update({
+              status:       'paused',
+              paused_at:    new Date().toISOString(),
+              pause_reason: 'payment_failed',
+            })
+            .eq('id', archive.id)
+
+          const firstName = archive.owner_name?.split(' ')[0] ?? 'there'
+          const lang      = archive.preferred_language ?? 'en'
+          try {
+            await resend.emails.send({
+              from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
+              to:      archive.owner_email,
+              subject: `Your archive is preserved · ${archive.name}`,
+              html:    buildArchivePausedEmail(firstName, archive.name, lang),
+              headers: {
+                'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
+                'X-Entity-Ref-ID':  `basalith-paused-${archive.id}-${Date.now()}`,
+                'Precedence':       'bulk',
+              },
+            })
+          } catch (e) {
+            console.error('[webhook] paused email error:', e)
+          }
+        }
+        return NextResponse.json({ ok: true, handled: 'customer.subscription.deleted' })
+      }
+
+      // ── checkout.session.completed — activate or re-activate archive ────────
+      if (event.type === 'checkout.session.completed') {
+        archiveId = (event.data.object as Record<string, any>)?.metadata?.archiveId ?? null
+        // Store subscription ID for future webhook lookups
+        const session = event.data.object as Record<string, any>
+        if (archiveId && session.subscription) {
+          await supabaseAdmin
+            .from('archives')
+            .update({
+              stripe_subscription_id: session.subscription as string,
+              stripe_customer_id:     (session.customer as string) ?? null,
+            })
+            .eq('id', archiveId)
+            .then(() => {})
+        }
       }
     }
 
@@ -181,7 +271,7 @@ export async function POST(req: NextRequest) {
     // ── Fetch archive ──────────────────────────────────────────────────────────
     const { data: archive, error: archiveError } = await supabaseAdmin
       .from('archives')
-      .select('id, name, family_name, owner_email, owner_name, tier, billing, submitted_by, magic_link_token, status')
+      .select('id, name, family_name, owner_email, owner_name, tier, billing, submitted_by, magic_link_token, status, preferred_language, resume_count')
       .eq('id', archiveId)
       .single()
 
@@ -194,10 +284,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true, alreadyActive: true })
     }
 
-    // ── Activate archive ───────────────────────────────────────────────────────
+    const isResume = archive.status === 'paused'
+
+    // ── Activate (or re-activate) archive ─────────────────────────────────────
     await supabaseAdmin
       .from('archives')
-      .update({ status: 'active' })
+      .update({
+        status:     'active',
+        paused_at:  null,
+        ...(isResume ? { resume_count: (archive as any).resume_count + 1 } : {}),
+      })
       .eq('id', archiveId)
 
     // ── Activate credentials ───────────────────────────────────────────────────
@@ -302,27 +398,46 @@ export async function POST(req: NextRequest) {
       console.error('[webhook] Admin activation email failed:', e)
     }
 
-    // ── Email client: welcome with credentials ────────────────────────────────
-    try {
-      await resend.emails.send({
-        from:    `The ${familyName} Archive <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
-        to:      archive.owner_email,
-        subject: `Welcome to Basalith. The ${familyName} Archive is ready.`,
-        headers: {
-          'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
-          'X-Entity-Ref-ID':  `basalith-client-act-${archiveId}`,
-          'Precedence':       'bulk',
-        },
-        html: buildClientWelcomeEmail(
-          familyName, firstName, archivist?.name ?? 'your Legacy Guide',
-          newPassword, magicLinkUrl, tierLabel,
-        ),
-      })
-    } catch (e) {
-      console.error('[webhook] Client welcome email failed:', e)
+    // ── Email client: welcome back (resume) or new welcome ───────────────────
+    if (isResume) {
+      try {
+        const lang = archive.preferred_language ?? 'en'
+        await resend.emails.send({
+          from:    `The ${familyName} Archive <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
+          to:      archive.owner_email,
+          subject: `Your archive is reactivated · The ${familyName} Archive`,
+          headers: {
+            'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
+            'X-Entity-Ref-ID':  `basalith-client-resume-${archiveId}`,
+            'Precedence':       'bulk',
+          },
+          html: buildWelcomeBackEmail(firstName, archive.name ?? `The ${familyName} Archive`, lang),
+        })
+      } catch (e) {
+        console.error('[webhook] Client welcome-back email failed:', e)
+      }
+    } else {
+      try {
+        await resend.emails.send({
+          from:    `The ${familyName} Archive <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
+          to:      archive.owner_email,
+          subject: `Welcome to Basalith. The ${familyName} Archive is ready.`,
+          headers: {
+            'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
+            'X-Entity-Ref-ID':  `basalith-client-act-${archiveId}`,
+            'Precedence':       'bulk',
+          },
+          html: buildClientWelcomeEmail(
+            familyName, firstName, archivist?.name ?? 'your Legacy Guide',
+            newPassword, magicLinkUrl, tierLabel,
+          ),
+        })
+      } catch (e) {
+        console.error('[webhook] Client welcome email failed:', e)
+      }
     }
 
-    return NextResponse.json({ ok: true, archiveId, activated: true })
+    return NextResponse.json({ ok: true, archiveId, activated: true, resumed: isResume })
 
   } catch (error: unknown) {
     console.error('[stripe/webhook]', error)
