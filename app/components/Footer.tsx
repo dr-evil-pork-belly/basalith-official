@@ -6,9 +6,9 @@ const COLS: { heading: string; links: { label: string; href?: string }[] }[] = [
   {
     heading: 'Archives',
     links: [
-      { label: 'The Estate',       href: '/pricing'          },
-      { label: 'The Dynasty',      href: '/pricing'          },
-      { label: 'The Archive',      href: '/pricing'          },
+      { label: 'Active',           href: '/pricing'          },
+      { label: 'Resting',          href: '/pricing'          },
+      { label: 'Legacy',           href: '/pricing'          },
       { label: 'Founding Session', href: '/founding-session' },
     ],
   },
@@ -65,29 +65,14 @@ export default function Footer() {
           <p
             style={{
               ...MONO,
-              fontSize:     '0.62rem',
+              fontSize:      '0.62rem',
               letterSpacing: '0.3em',
               color:         'rgba(250,250,248,0.9)',
-              marginBottom:  '14px',
+              marginBottom:  '28px',
               fontWeight:    700,
             }}
           >
             Basalith
-          </p>
-          <p
-            style={{
-              fontFamily:  'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-              fontSize:    '0.95rem',
-              fontStyle:   'italic',
-              fontWeight:  300,
-              lineHeight:  1.9,
-              color:       'rgba(250,250,248,0.4)',
-              maxWidth:    '240px',
-              marginBottom: '28px',
-              whiteSpace:  'pre-line',
-            }}
-          >
-            {t('footer.tagline')}
           </p>
           <p
             style={{
@@ -138,11 +123,11 @@ export default function Footer() {
             <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {links.map(({ label, href }) => {
                 const baseStyle: React.CSSProperties = {
-                  fontFamily:  'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-                  fontSize:    '0.95rem',
-                  fontWeight:  300,
-                  color:       'rgba(250,250,248,0.4)',
-                  display:     'block',
+                  fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+                  fontSize:   '0.95rem',
+                  fontWeight: 300,
+                  color:      'rgba(250,250,248,0.4)',
+                  display:    'block',
                 }
                 return (
                   <li key={label}>
@@ -169,31 +154,40 @@ export default function Footer() {
         ))}
       </div>
 
-      {/* Bottom bar */}
+      {/* Divider + centered tagline */}
       <div
         style={{
-          display:         'flex',
-          justifyContent:  'space-between',
-          alignItems:      'center',
-          padding:         '20px clamp(24px,6vw,80px)',
-          borderTop:       '1px solid rgba(250,250,248,0.04)',
-          flexWrap:        'wrap',
-          gap:             '12px',
+          borderTop:  '1px solid rgba(250,250,248,0.04)',
+          padding:    '32px 24px 0',
+          textAlign:  'center',
         }}
       >
-        <p style={{ ...MONO, fontSize: '0.46rem', color: 'rgba(250,250,248,0.2)' }}>
-          &copy; {new Date().getFullYear()} Heritage Nexus Inc. All rights reserved. Wilmington, Delaware.
-        </p>
         <p
           style={{
-            fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-            fontSize:   '0.9rem',
-            fontStyle:  'italic',
-            fontWeight: 300,
-            color:      'rgba(184,150,62,0.4)',
+            fontFamily:  'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+            fontSize:    'clamp(0.9rem, 2vw, 1.1rem)',
+            fontStyle:   'italic',
+            fontWeight:  300,
+            lineHeight:  1.7,
+            color:       'var(--color-text-muted)',
+            maxWidth:    '480px',
+            margin:      '0 auto',
+            whiteSpace:  'pre-line',
           }}
         >
-          {t('footer.bottom_note')}
+          {t('footer.tagline')}
+        </p>
+      </div>
+
+      {/* Copyright */}
+      <div
+        style={{
+          padding:    '20px clamp(24px,6vw,80px)',
+          textAlign:  'center',
+        }}
+      >
+        <p style={{ ...MONO, fontSize: '0.44rem', color: 'rgba(250,250,248,0.18)' }}>
+          &copy; {new Date().getFullYear()} Heritage Nexus Inc. All rights reserved. Wilmington, Delaware.
         </p>
       </div>
 
@@ -210,12 +204,6 @@ export default function Footer() {
             grid-template-columns: 1fr !important;
             gap: 32px !important;
             padding: 48px 24px !important;
-          }
-          footer > div:last-of-type {
-            flex-direction: column !important;
-            align-items: flex-start !important;
-            padding: 20px 24px !important;
-            padding-bottom: max(20px, env(safe-area-inset-bottom, 0px)) !important;
           }
         }
       `}</style>
