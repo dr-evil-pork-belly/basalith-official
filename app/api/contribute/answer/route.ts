@@ -4,6 +4,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
 import { getPhotoUrl } from '@/lib/storage'
 import { createTrainingPairFromContributor } from '@/lib/trainingPipeline'
+import { triggerMemoryChain } from '@/lib/memoryChain'
 
 export const dynamic = 'force-dynamic'
 
@@ -183,6 +184,17 @@ export async function POST(req: NextRequest) {
           'Precedence':       'bulk',
         },
       }).catch(() => {})
+    }
+
+    // Trigger memory chain if answer is substantial (fire-and-forget)
+    if (answerText.trim().length > 50 && archive?.owner_name) {
+      triggerMemoryChain(
+        archiveId,
+        contributor.id as string,
+        question.question_text,
+        answerText.trim(),
+        archive.owner_name,
+      ).catch(() => {})
     }
 
     return NextResponse.json({ success: true, nextQuestion })

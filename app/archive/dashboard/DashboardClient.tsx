@@ -963,6 +963,131 @@ function timeAgo(isoStr: string): string {
   return new Date(isoStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
+// ── Random Thought Capture ────────────────────────────────────────────────────
+
+function RandomThoughtCapture({ archiveId }: { archiveId: string }) {
+  const [open,   setOpen]   = useState(false)
+  const [text,   setText]   = useState('')
+  const [saving, setSaving] = useState(false)
+  const [saved,  setSaved]  = useState(false)
+
+  async function handleSave() {
+    if (!text.trim() || text.length < 5) return
+    setSaving(true)
+    try {
+      await fetch('/api/archive/random-thought', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ thought: text, source: 'random_thought' }),
+      })
+      setSaved(true)
+      setText('')
+      setTimeout(() => { setSaved(false); setOpen(false) }, 2000)
+    } catch {}
+    setSaving(false)
+  }
+
+  if (!open) {
+    return (
+      <button
+        onClick={() => setOpen(true)}
+        style={{
+          width:           '100%',
+          background:      'rgba(196,162,74,0.05)',
+          border:          '1px dashed rgba(196,162,74,0.25)',
+          borderRadius:    '4px',
+          padding:         '14px 20px',
+          cursor:          'pointer',
+          fontFamily:      '"Space Mono","Courier New",monospace',
+          fontSize:        '0.42rem',
+          letterSpacing:   '0.28em',
+          textTransform:   'uppercase' as const,
+          color:           'rgba(196,162,74,0.55)',
+          textAlign:       'left' as const,
+          marginBottom:    '24px',
+          display:         'flex',
+          alignItems:      'center',
+          gap:             '10px',
+          transition:      'border-color 200ms, color 200ms',
+        }}
+        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(196,162,74,0.5)'; (e.currentTarget as HTMLButtonElement).style.color = '#C4A24A' }}
+        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(196,162,74,0.25)'; (e.currentTarget as HTMLButtonElement).style.color = 'rgba(196,162,74,0.55)' }}
+      >
+        <span style={{ fontSize: '1rem', opacity: 0.7 }}>💭</span>
+        Something just came to mind? Capture it.
+      </button>
+    )
+  }
+
+  return (
+    <div style={{ background: 'rgba(196,162,74,0.05)', border: '1px solid rgba(196,162,74,0.25)', borderRadius: '4px', padding: '20px 24px', marginBottom: '24px' }}>
+      <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.42rem', letterSpacing: '0.28em', textTransform: 'uppercase' as const, color: '#C4A24A', marginBottom: '12px' }}>
+        Capture This Thought
+      </p>
+      <textarea
+        value={text}
+        onChange={e => setText(e.target.value)}
+        placeholder="Whatever is on your mind. A memory. A thought. Something you want to remember. No minimum. No format."
+        autoFocus
+        rows={4}
+        style={{
+          width:       '100%',
+          background:  'rgba(196,162,74,0.04)',
+          border:      '1px solid rgba(196,162,74,0.18)',
+          borderRadius:'2px',
+          padding:     '12px 16px',
+          fontFamily:  '"Cormorant Garamond",Georgia,serif',
+          fontSize:    '1rem',
+          color:       '#F0EDE6',
+          lineHeight:  1.7,
+          resize:      'vertical' as const,
+          outline:     'none',
+          boxSizing:   'border-box' as const,
+        }}
+      />
+      <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
+        <button
+          onClick={handleSave}
+          disabled={saving || text.length < 5}
+          style={{
+            background:    saved ? '#4A8A4A' : '#C4A24A',
+            color:         '#0A0908',
+            border:        'none',
+            borderRadius:  '2px',
+            padding:       '10px 20px',
+            fontFamily:    '"Space Mono","Courier New",monospace',
+            fontSize:      '0.42rem',
+            letterSpacing: '0.25em',
+            textTransform: 'uppercase' as const,
+            cursor:        saving ? 'not-allowed' : 'pointer',
+            opacity:       text.length < 5 ? 0.5 : 1,
+            transition:    'background 200ms',
+          }}
+        >
+          {saved ? '✓ Saved' : saving ? 'Saving...' : 'Save This Thought'}
+        </button>
+        <button
+          onClick={() => { setOpen(false); setText('') }}
+          style={{
+            background:    'transparent',
+            color:         '#706C65',
+            border:        '1px solid rgba(240,237,230,0.1)',
+            borderRadius:  '2px',
+            padding:       '10px 20px',
+            fontFamily:    '"Space Mono","Courier New",monospace',
+            fontSize:      '0.42rem',
+            letterSpacing: '0.2em',
+            textTransform: 'uppercase' as const,
+            cursor:        'pointer',
+          }}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export default function DashboardClient({ archiveId }: { archiveId: string }) {
   const [loading,              setLoading]              = useState(true)
   const [archive,              setArchive]              = useState<ArchiveRow | null>(null)
@@ -1148,6 +1273,11 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
             Resume Now →
           </a>
         </div>
+      )}
+
+      {/* ── RANDOM THOUGHT CAPTURE ── */}
+      {!loading && archive?.status !== 'paused' && (
+        <RandomThoughtCapture archiveId={archiveId} />
       )}
 
       {/* ── ONBOARDING GUIDE (first-time users) ── */}

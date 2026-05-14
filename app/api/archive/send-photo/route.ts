@@ -6,6 +6,7 @@ import { render } from '@react-email/render'
 import { t } from '@/lib/emailTranslations'
 import { getEmailPhotoUrl } from '@/lib/photo-url'
 import { sendWeChatPhoto } from '@/lib/wechat'
+import { getTodaysSpark } from '@/lib/dailySparks'
 
 // ── Cadence helpers ───────────────────────────────────────────────────────────
 
@@ -51,6 +52,53 @@ function buildAllPhotosSentEmail(
       style="display:inline-block;background:#C4A24A;color:#0A0908;font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;text-decoration:none;padding:14px 28px">
       UPLOAD MORE PHOTOGRAPHS →
     </a>
+  </div>
+</body>
+</html>`
+}
+
+// ── Spark-only email (no photos left) ────────────────────────────────────────
+
+function buildSparkOnlyEmail(
+  archiveName:   string,
+  contributorName: string,
+  sparkText:     string,
+  portalUrl:     string | null,
+  lang:          string,
+): string {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+  const subjectLabels: Record<string, string> = {
+    en:  'A question from the archive',
+    zh:  '来自档案的问题',
+    yue: '檔案嘅問題',
+    ja:  'アーカイブからの質問',
+    es:  'Una pregunta del archivo',
+    ko:  '아카이브의 질문',
+    vi:  'Câu hỏi từ kho lưu trữ',
+    tl:  'Tanong mula sa archive',
+  }
+  const label = subjectLabels[lang] ?? subjectLabels.en
+  return `<!DOCTYPE html>
+<html>
+<body style="background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:600px;margin:0 auto;padding:0">
+  <div style="padding:32px 32px 0">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">${archiveName.toUpperCase()}</p>
+    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0">${label.toUpperCase()}</p>
+  </div>
+  <div style="padding:32px">
+    <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#B8B4AB;margin:0 0 32px">${contributorName.split(' ')[0]},</p>
+    <div style="border-left:3px solid rgba(196,162,74,0.5);padding:24px 28px;background:rgba(196,162,74,0.04);margin:0 0 32px">
+      <p style="font-family:Georgia,serif;font-size:20px;font-weight:300;font-style:italic;color:#F0EDE6;line-height:1.7;margin:0">${sparkText}</p>
+    </div>
+    <p style="font-family:Georgia,serif;font-size:15px;font-weight:300;font-style:italic;color:#706C65;line-height:1.8;margin:0 0 24px">
+      Reply to this email with your answer, or visit your portal to record a voice note instead.
+    </p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      ${portalUrl ? `<a href="${portalUrl}" style="display:inline-block;background:#C4A24A;color:#0A0908;font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;text-decoration:none;padding:12px 24px;border-radius:2px">ANSWER BY VOICE →</a>` : ''}
+    </div>
+  </div>
+  <div style="padding:16px 32px 32px;border-top:1px solid rgba(240,237,230,0.06)">
+    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:0">BASALITH · XYZ<br>${archiveName}<br>Heritage Nexus Inc.</p>
   </div>
 </body>
 </html>`
@@ -132,23 +180,47 @@ export async function POST(req: NextRequest) {
         photo = anyPhotoData?.[0] ?? null
 
         if (!photo) {
-          // All photos have been sent to this contributor
-          console.log('[send-photos] all photos sent to:', contributor.name, '— notifying owner')
+          // All photos have been sent to this contributor — send spark-only email instead
+          console.log('[send-photos] all photos sent to:', contributor.name, '— sending spark')
           exhausted.push(contributor.name ?? contributor.email)
 
-          if (archive.owner_email) {
-            void (async () => {
-              try {
-                await resend.emails.send({
-                  from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
-                  to:      archive.owner_email,
-                  subject: `${contributor.name ?? contributor.email} has seen all your photographs`,
-                  html:    buildAllPhotosSentEmail(archive.name, contributor.name ?? contributor.email),
-                })
-              } catch (e) {
-                console.error('[send-photos] exhaustion email failed:', e instanceof Error ? e.message : e)
+          const contribLang2 = (contributor as { preferred_language?: string }).preferred_language ?? 'en'
+          const spark = getTodaysSpark(true, archive.owner_name ?? '')
+          if (spark) {
+            const sparkPortalUrl = contributor.access_token
+              ? `${siteUrl}/contribute/${contributor.access_token}`
+              : null
+            try {
+              const subjectLabels: Record<string, string> = {
+                en: 'A question from the archive', zh: '来自档案的问题',
+                yue: '檔案嘅問題', ja: 'アーカイブからの質問',
+                es: 'Una pregunta del archivo', ko: '아카이브의 질문',
               }
-            })()
+              await resend.emails.send({
+                from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
+                to:      contributor.email,
+                subject: `${subjectLabels[contribLang2] ?? subjectLabels.en} · ${archive.name}`,
+                html:    buildSparkOnlyEmail(archive.name, contributor.name ?? '', spark.text, sparkPortalUrl, contribLang2),
+                headers: {
+                  'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
+                  'X-Entity-Ref-ID':  `basalith-spark-${archiveId}-${contributor.id}-${Date.now()}`,
+                  'Precedence':       'bulk',
+                },
+              })
+              sentCount++
+            } catch (e) {
+              console.error('[send-photos] spark email failed:', e instanceof Error ? e.message : e)
+            }
+          }
+
+          // Also notify owner that this contributor has seen all photos
+          if (archive.owner_email) {
+            resend.emails.send({
+              from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
+              to:      archive.owner_email,
+              subject: `${contributor.name ?? contributor.email} has seen all your photographs`,
+              html:    buildAllPhotosSentEmail(archive.name, contributor.name ?? contributor.email),
+            }).catch(() => {})
           }
           continue
         }
@@ -183,9 +255,10 @@ export async function POST(req: NextRequest) {
 
       // ── 3G. Send email ──────────────────────────────────────────────────────
       try {
-        const portalUrl = contributor.access_token
+        const portalUrl   = contributor.access_token
           ? `${siteUrl}/contribute/${contributor.access_token}`
           : null
+        const todaysSpark = getTodaysSpark(true, archive.owner_name ?? '')
 
         const emailHtml = await render(
           PhotographEmail({
@@ -199,6 +272,7 @@ export async function POST(req: NextRequest) {
             sessionId:       session?.id ?? '',
             portalUrl,
             lang,
+            sparkQuestion:   todaysSpark?.text ?? null,
           })
         )
 

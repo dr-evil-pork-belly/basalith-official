@@ -16,6 +16,7 @@ interface PhotographEmailProps {
   sessionId:       string
   portalUrl?:      string | null
   lang?:           string
+  sparkQuestion?:  string | null  // Daily Spark appended below photo
 }
 
 export function PhotographEmail({
@@ -24,6 +25,7 @@ export function PhotographEmail({
   yearEstimate,
   portalUrl,
   lang = 'en',
+  sparkQuestion,
 }: PhotographEmailProps) {
   return (
     <Html>
@@ -130,6 +132,49 @@ export function PhotographEmail({
               }}>
                 {t('visitPortal', lang)}
               </a>
+            </Section>
+          )}
+
+          {sparkQuestion && (
+            <Section style={{ padding: '0 32px 8px' }}>
+              <Hr style={{ border: 'none', borderTop: '1px solid rgba(196,162,74,0.2)', margin: '0 0 20px' }} />
+              <Text style={{
+                fontFamily:    'Courier New, monospace',
+                fontSize:      '9px',
+                letterSpacing: '3px',
+                color:         '#C4A24A',
+                textTransform: 'uppercase' as const,
+                margin:        '0 0 12px',
+              }}>
+                While You Are Here
+              </Text>
+              <Text style={{
+                fontFamily: 'Georgia, serif',
+                fontSize:   '18px',
+                fontStyle:  'italic',
+                fontWeight: 300,
+                color:      '#F0EDE6',
+                lineHeight: '1.7',
+                margin:     '0 0 20px',
+                borderLeft: '3px solid rgba(196,162,74,0.5)',
+                paddingLeft:'16px',
+              }}>
+                {sparkQuestion}
+              </Text>
+              {portalUrl && (
+                <a href={portalUrl} style={{
+                  display:        'inline-block',
+                  fontFamily:     'Courier New, monospace',
+                  fontSize:       '10px',
+                  letterSpacing:  '2px',
+                  color:          '#0A0908',
+                  background:     '#C4A24A',
+                  textDecoration: 'none',
+                  padding:        '10px 20px',
+                }}>
+                  Answer This →
+                </a>
+              )}
             </Section>
           )}
 
