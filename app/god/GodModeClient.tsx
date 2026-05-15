@@ -275,13 +275,20 @@ function VoiceCloneButton({ archiveId, hasVoice, voiceId, samplesCount }: { arch
   }
 
   if (hasVoice) {
-    return <p style={{ ...mono, fontSize: '0.32rem', color: '#4AC47C', letterSpacing: '0.1em', margin: 0 }}>🎙 VOICE CLONED · {voiceId?.slice(0, 12)}…</p>
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+        <p style={{ ...mono, fontSize: '0.32rem', color: '#4AC47C', letterSpacing: '0.1em', margin: 0 }}>🎙 VOICE CLONED · {voiceId?.slice(0, 12)}…</p>
+        <button onClick={setup} disabled={state === 'running'} style={{ ...mono, fontSize: '0.3rem', letterSpacing: '0.1em', background: state === 'done' ? 'rgba(74,196,124,0.1)' : state === 'error' ? 'rgba(196,74,74,0.1)' : 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '2px', padding: '2px 6px', color: state === 'done' ? '#4AC47C' : state === 'error' ? '#C44A4A' : '#5C6166', cursor: 'pointer' }}>
+          {state === 'running' ? '...' : result || 'RECREATE →'}
+        </button>
+      </div>
+    )
   }
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
       <p style={{ ...mono, fontSize: '0.32rem', color: '#5C6166', margin: 0, letterSpacing: '0.08em' }}>
-        🎙 {samplesCount < 3 ? `NO VOICE CLONE (${samplesCount} samples < 3 needed)` : `${samplesCount} SAMPLES — READY TO CLONE`}
+        🎙 {samplesCount < 3 ? `NO VOICE CLONE (${samplesCount}/3 samples)` : `${samplesCount} SAMPLES — READY TO CLONE`}
       </p>
       {samplesCount >= 3 && (
         <button onClick={setup} disabled={state === 'running'} style={{ ...mono, fontSize: '0.32rem', letterSpacing: '0.1em', background: state === 'done' ? 'rgba(74,196,124,0.1)' : state === 'error' ? 'rgba(196,74,74,0.1)' : 'rgba(196,162,74,0.08)', border: '1px solid rgba(196,162,74,0.2)', borderRadius: '2px', padding: '2px 8px', color: state === 'done' ? '#4AC47C' : state === 'error' ? '#C44A4A' : '#C4A24A', cursor: 'pointer' }}>

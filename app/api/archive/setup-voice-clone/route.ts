@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
 
   if (!archive) return NextResponse.json({ error: 'Archive not found' }, { status: 404 })
 
-  // Fetch recordings, deduplicate by storage_path before downloading
+  // Prefer longer recordings (60s+) for better clone quality; fall back to 30s+
   const { data: rawRecordings } = await supabaseAdmin
     .from('voice_recordings')
     .select('id, storage_path, duration_seconds')
@@ -51,19 +51,29 @@ export async function POST(req: NextRequest) {
     .order('duration_seconds', { ascending: false })
     .limit(20)
 
-  // Deduplicate by storage_path so the same file is never included twice
-  const recordings = (rawRecordings ?? []).filter(
+  const deduped = (rawRecordings ?? []).filter(
     (rec, index, self) => index === self.findIndex(r => r.storage_path === rec.storage_path)
-  ).slice(0, 5)
+  )
+
+  // Try 60s+ first; fall back to 30s+ if fewer than 3 qualify
+  const longRecordings  = deduped.filter(r => r.duration_seconds >= 60)
+  const recordings      = (longRecordings.length >= 3 ? longRecordings : deduped).slice(0, 5)
+
+  const qualityNote = longRecordings.length >= 3
+    ? `${longRecordings.length} recordings ≥60s available — using highest quality`
+    : `Only ${longRecordings.length} recordings ≥60s; falling back to 30s+ threshold`
+
+  console.log('[voice-clone]', qualityNote)
 
   if (recordings.length < 3) {
     return NextResponse.json({
       error:           'Need at least 3 unique voice recordings of 30+ seconds each.',
       recordingsFound: recordings.length,
+      qualityNote,
     }, { status: 400 })
   }
 
-  // Download audio — skip any that fail or produce duplicate content
+  // Download audio — deduplicate by content size
   const audioBuffers: Buffer[] = []
   const seenSizes = new Set<number>()
 
@@ -74,7 +84,6 @@ export async function POST(req: NextRequest) {
       continue
     }
     const buf = Buffer.from(await data.arrayBuffer())
-    // Skip if we've already got a buffer of this exact size (duplicate content guard)
     if (seenSizes.has(buf.length)) {
       console.warn('[voice-clone] skipping duplicate-size buffer:', buf.length)
       continue
@@ -90,18 +99,28 @@ export async function POST(req: NextRequest) {
     }, { status: 500 })
   }
 
-  // Build File objects with unique timestamped names so ElevenLabs never sees duplicate filenames
   const ts    = Date.now()
   const files = audioBuffers.map((buf, i) =>
     new File([new Uint8Array(buf)], `voice_sample_${i}_${ts}.mp3`, { type: 'audio/mpeg' })
   )
 
-  const ownerName = archive.owner_name ?? archive.name
+  const ownerName       = archive.owner_name ?? archive.name
+  const existingVoiceId = archive.elevenlabs_voice_id
 
   console.log('[voice-clone] uploading', files.length, 'samples for', ownerName, 'archiveId:', archiveId)
 
   try {
     const client = new ElevenLabsClient({ apiKey })
+
+    // Delete existing clone before recreating — allows quality improvement as more recordings accumulate
+    if (existingVoiceId) {
+      try {
+        await client.voices.delete(existingVoiceId)
+        console.log('[voice-clone] deleted existing voice:', existingVoiceId)
+      } catch (delErr: any) {
+        console.warn('[voice-clone] delete failed, continuing anyway:', delErr.message)
+      }
+    }
 
     const voice = await client.voices.add({
       name:        `${ownerName} Basalith`,
@@ -117,7 +136,13 @@ export async function POST(req: NextRequest) {
       voice_samples_count: files.length,
     }).eq('id', archiveId)
 
-    return NextResponse.json({ success: true, voiceId: voice.voice_id, samplesUsed: files.length })
+    return NextResponse.json({
+      success:     true,
+      voiceId:     voice.voice_id,
+      samplesUsed: files.length,
+      qualityNote,
+      replaced:    !!existingVoiceId,
+    })
   } catch (err: any) {
     console.error('[voice-clone] ElevenLabs error:', err.message || err)
     return NextResponse.json({
