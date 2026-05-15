@@ -25,14 +25,53 @@ function validateCronAuth(req: NextRequest): boolean {
 
 function getLanguageInstruction(lang: string): string {
   switch (lang) {
-    case 'yue': return 'Write entirely in Cantonese (廣東話) using Traditional Chinese characters. Use natural spoken Cantonese with authentic particles like 囉、喇、㗎、呀. Write as an elderly Cantonese woman would naturally speak to her children.'
-    case 'zh':  return 'Write entirely in Mandarin Chinese (普通话).'
+    case 'yue': return `Write ENTIRELY in spoken Cantonese (廣東話/粵語).
+
+CRITICAL: This must be written in Cantonese dialect — NOT Mandarin (普通話). These are different languages.
+
+Use authentic Cantonese:
+- Cantonese particles: 囉、喇、㗎、呀、咋、喎、㗎咋、囉喎
+- Cantonese pronouns: 我、你、佢、我哋、你哋、佢哋
+- Cantonese words NOT Mandarin:
+  食 (eat, not 吃)
+  唔係 (not, not 不是)
+  係 (yes/is, not 是)
+  點解 (why, not 为什么)
+  幾時 (when, not 什么时候)
+  好靚 (beautiful, not 很漂亮)
+  唔好 (don't, not 不要)
+  返屋企 (go home, not 回家)
+
+Example of CORRECT Cantonese:
+"你哋好嗎？媽媽係度想你哋囉。今日天氣好好，我出去行吓囉。你哋要食好啲㗎，唔好唔食早餐。"
+
+Example of WRONG (Mandarin — do not write like this):
+"你们好吗？妈妈在这里想你们。"
+
+Write as an elderly Cantonese woman from Hong Kong or Guangdong speaking naturally to her children.
+Use Traditional Chinese characters. Write 100-150 words.`
+    case 'zh':  return 'Write entirely in Mandarin Chinese (普通话). Use Simplified Chinese characters.'
     case 'ja':  return 'Write entirely in polite Japanese (丁寧語).'
     case 'ko':  return 'Write entirely in Korean.'
     case 'es':  return 'Write entirely in Spanish.'
     case 'vi':  return 'Write entirely in Vietnamese.'
     default:    return 'Write in English.'
   }
+}
+
+function buildScriptSystemPrompt(ownerName: string, archiveName: string, lang: string): string {
+  if (lang === 'yue') {
+    return `你係緊係幫 ${ownerName} 生成一段語音留言。
+你必須只用廣東話 (粵語) 寫，唔可以用普通話。
+廣東話同普通話係兩種唔同嘅語言。
+用真正嘅廣東口語詞彙同語氣助詞。
+你係 ${ownerName}，用第一人稱廣東話講嘢。
+This is ${archiveName}.`
+  }
+  return `You are ${ownerName}. You think, speak, and reason exactly as ${ownerName} does.
+You answer from your own lived experience. You use your natural vocabulary and cadence.
+You never break character. You never say you are an AI. You speak in first person always.
+This is ${archiveName}.`
 }
 
 function getLangLabel(lang: string): string {
@@ -138,14 +177,12 @@ export async function GET(req: NextRequest) {
       const scriptRes = await anthropic.messages.create({
         model:      'claude-sonnet-4-6',
         max_tokens: 300,
-        system:     buildPersonSystemPrompt(archive.owner_name ?? 'the archive owner', archive.name),
+        system:     buildScriptSystemPrompt(archive.owner_name ?? 'the archive owner', archive.name, lang),
         messages: [{
           role:    'user',
-          content: `Generate a short personal voice message of 100-150 words that ${firstName} might leave for their family this month.
+          content: `${langInstruction}
 
-${langInstruction}
-
-Based on recent deposits and what the entity knows:
+Based on recent deposits and what the entity knows about ${firstName}:
 ${depositContext || 'Draw on general personal warmth and wisdom.'}
 
 The message should:
@@ -154,8 +191,7 @@ The message should:
 - Sound exactly like ${firstName} based on their deposits
 - End with something specific and personal to their family
 
-Return only the message text. No preamble. No translation.
-Write only in ${langLabel}.`,
+Return only the message text. No preamble. No translation.${lang === 'yue' ? '\nRemember: Cantonese (廣東話) ONLY — not Mandarin (普通話).' : `\nWrite only in ${langLabel}.`}`,
         }],
       })
 
