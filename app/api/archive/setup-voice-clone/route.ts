@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
 
   const { data: archive } = await supabaseAdmin
     .from('archives')
-    .select('owner_name, name, elevenlabs_voice_id')
+    .select('owner_name, name, elevenlabs_voice_id, preferred_language')
     .eq('id', archiveId)
     .single()
 
@@ -136,12 +136,17 @@ export async function POST(req: NextRequest) {
       voice_samples_count: files.length,
     }).eq('id', archiveId)
 
+    const lang    = archive.preferred_language ?? 'en'
+    const isChinese = lang === 'yue' || lang === 'zh'
     return NextResponse.json({
       success:     true,
       voiceId:     voice.voice_id,
       samplesUsed: files.length,
       qualityNote,
       replaced:    !!existingVoiceId,
+      warning: isChinese
+        ? 'For best Cantonese pronunciation quality ask the archive owner to record directly in the portal (not via phone call). Portal recordings are higher quality than phone recordings. More direct portal recordings will improve pronunciation accuracy.'
+        : null,
     })
   } catch (err: any) {
     console.error('[voice-clone] ElevenLabs error:', err.message || err)

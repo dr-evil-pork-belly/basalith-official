@@ -299,6 +299,65 @@ function VoiceCloneButton({ archiveId, hasVoice, voiceId, samplesCount }: { arch
   )
 }
 
+function VoiceTestButton({ archiveId }: { archiveId: string }) {
+  const [open,    setOpen]    = React.useState(false)
+  const [text,    setText]    = React.useState('')
+  const [state,   setState]   = React.useState<'idle'|'running'|'done'|'error'>('idle')
+  const [audioUrl, setAudioUrl] = React.useState<string | null>(null)
+  const [errMsg,  setErrMsg]  = React.useState('')
+
+  async function runTest() {
+    if (!text.trim()) return
+    setState('running'); setAudioUrl(null); setErrMsg('')
+    try {
+      const res  = await fetch('/api/archive/test-voice', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ archiveId, testText: text }),
+      })
+      const data = await res.json()
+      if (res.ok && data.audioUrl) { setState('done'); setAudioUrl(data.audioUrl) }
+      else { setState('error'); setErrMsg(data.detail ?? data.error ?? 'failed') }
+    } catch { setState('error'); setErrMsg('network error') }
+  }
+
+  if (!open) {
+    return (
+      <button onClick={() => setOpen(true)} style={{ ...mono, fontSize: '0.3rem', letterSpacing: '0.1em', background: 'transparent', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '2px', padding: '2px 6px', color: '#5C6166', cursor: 'pointer' }}>
+        TEST VOICE
+      </button>
+    )
+  }
+
+  return (
+    <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '2px', padding: '0.5rem 0.6rem' }}>
+      <p style={{ ...mono, fontSize: '0.3rem', color: '#5C6166', margin: '0 0 0.3rem', letterSpacing: '0.12em' }}>TEST VOICE</p>
+      <textarea
+        value={text}
+        onChange={e => setText(e.target.value)}
+        placeholder="Enter test text in archive's language…"
+        rows={2}
+        style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '2px', padding: '4px 6px', fontFamily: 'Georgia, serif', fontSize: '0.75rem', color: '#F0EDE6', resize: 'vertical' as const, outline: 'none', boxSizing: 'border-box' as const, marginBottom: '0.3rem' }}
+      />
+      <div style={{ display: 'flex', gap: '0.3rem', alignItems: 'center', flexWrap: 'wrap' }}>
+        <button onClick={runTest} disabled={state === 'running' || !text.trim()} style={{ ...mono, fontSize: '0.3rem', letterSpacing: '0.1em', background: '#C4A24A', color: '#0A0908', border: 'none', borderRadius: '2px', padding: '3px 8px', cursor: 'pointer', opacity: (!text.trim() || state === 'running') ? 0.5 : 1 }}>
+          {state === 'running' ? '...' : 'GENERATE'}
+        </button>
+        <button onClick={() => { setOpen(false); setAudioUrl(null); setText(''); setState('idle') }} style={{ ...mono, fontSize: '0.3rem', letterSpacing: '0.08em', background: 'transparent', color: '#5C6166', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '2px', padding: '3px 6px', cursor: 'pointer' }}>
+          CLOSE
+        </button>
+        {state === 'done' && audioUrl && (
+          <a href={audioUrl} target="_blank" rel="noopener noreferrer" style={{ ...mono, fontSize: '0.3rem', color: '#4AC47C', letterSpacing: '0.08em' }}>▶ LISTEN</a>
+        )}
+        {state === 'error' && <p style={{ ...mono, fontSize: '0.3rem', color: '#C44A4A', margin: 0, letterSpacing: '0.06em' }}>{errMsg}</p>}
+      </div>
+      {state === 'done' && audioUrl && (
+        <audio src={audioUrl} controls style={{ width: '100%', marginTop: '0.4rem', height: '28px' }} />
+      )}
+    </div>
+  )
+}
+
 function ScheduledDeletionsPanel({ archives, onRefresh }: { archives: ArchiveData[]; onRefresh: () => void }) {
   const [confirmed, setConfirmed] = React.useState<string | null>(null)
   const [deleting, setDeleting]   = React.useState<string | null>(null)
@@ -666,6 +725,11 @@ function ArchiveCard({ archive, onRefresh }: { archive: ArchiveData; onRefresh: 
       {/* Voice clone status */}
       <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '0.5rem', marginTop: '0.5rem' }}>
         <VoiceCloneButton archiveId={archive.id} hasVoice={!!archive.elevenlabsVoiceId} voiceId={archive.elevenlabsVoiceId} samplesCount={archive.voiceSamplesCount} />
+        {archive.elevenlabsVoiceId && (
+          <div style={{ marginTop: '0.4rem' }}>
+            <VoiceTestButton archiveId={archive.id} />
+          </div>
+        )}
       </div>
     </div>
   )

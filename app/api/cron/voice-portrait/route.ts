@@ -200,18 +200,25 @@ Return only the message text. No preamble. No translation.${lang === 'yue' ? '\n
 
       console.log(`[voice-portrait] ${archive.name} — lang:${lang}, script length:${scriptText.length}`)
 
-      // Generate audio with language-aware settings
-      const audioStream = await client.textToSpeech.convert(archive.elevenlabs_voice_id!, {
-        text:           scriptText,
-        model_id:       'eleven_multilingual_v2',
-        language_code:  getElevenLabsLangCode(lang),
+      // Generate audio — omit language_code for Chinese variants (zh/yue) so the
+      // voice clone's own phonetics determine pronunciation rather than forcing 'zh'
+      // which ElevenLabs maps to Mandarin regardless of Cantonese training samples.
+      const ttsOptions: Record<string, unknown> = {
+        text:     scriptText,
+        model_id: 'eleven_multilingual_v2',
         voice_settings: {
-          stability:          0.5,
-          similarity_boost:   0.85,  // Higher for cloned voice fidelity
-          style:              0.2,
-          use_speaker_boost:  true,
+          stability:         0.5,
+          similarity_boost:  0.85,
+          style:             0.2,
+          use_speaker_boost: true,
         },
-      })
+      }
+      if (lang !== 'zh' && lang !== 'yue') {
+        ttsOptions.language_code = getElevenLabsLangCode(lang)
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const audioStream = await client.textToSpeech.convert(archive.elevenlabs_voice_id!, ttsOptions as any)
 
       // Collect stream into buffer
       const chunks: Uint8Array[] = []
