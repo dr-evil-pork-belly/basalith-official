@@ -3,6 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
 import { getEmailPhotoUrl } from '@/lib/photo-url'
 import { getNextStoryPrompt, getWeakestDimensions } from '@/lib/storyPrompts'
+import { createEmailReplySession, buildReplyAddress } from '@/lib/emailReplySessions'
 
 export const dynamic = 'force-dynamic'
 
@@ -105,14 +106,23 @@ export async function GET(req: NextRequest) {
             continue
           }
 
-          const lang     = contributor.preferred_language ?? 'en'
+          const lang      = contributor.preferred_language ?? 'en'
           const portalUrl = contributor.access_token
             ? `${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'}/contribute/${contributor.access_token}`
             : process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
 
+          // Create reply session so contributor can answer by email
+          const replyToken = await createEmailReplySession({
+            archiveId:     archive.id,
+            contributorId: contributor.id,
+            emailType:     'story_prompt',
+            promptId:      prompt.promptId,
+          })
+
           await resend.emails.send({
             from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
             to:      contributor.email,
+            replyTo: buildReplyAddress(replyToken),
             subject: buildStoryPromptSubject(archive.name, lang),
             html:    buildStoryPromptEmail(
               contributor.name?.split(' ')[0] ?? contributor.name ?? 'Hello',
@@ -237,13 +247,13 @@ function buildStoryPromptEmail(
   portalUrl:     string,
   lang:          string,
 ): string {
-  const l: Record<string, { greeting: string; intro: string; cta: string; footer: string }> = {
-    en:  { greeting: `${firstName},`, intro: 'A memory only you can share.', cta: 'SHARE THIS MEMORY →', footer: 'Reply to this email or visit your portal to share your memory by voice or text.' },
-    zh:  { greeting: `${firstName}，`, intro: '一个只有您能分享的记忆。', cta: '分享这个记忆 →', footer: '请回复此邮件或访问您的贡献者页面。' },
-    yue: { greeting: `${firstName}，`, intro: '一個只有你能分享嘅記憶。', cta: '分享呢個記憶 →', footer: '請回覆此電郵或訪問你嘅貢獻者頁面。' },
-    ja:  { greeting: `${firstName}さん、`, intro: 'あなただけが共有できる記憶。', cta: 'この記憶を共有する →', footer: 'このメールに返信するか、ポータルをご訪問ください。' },
-    es:  { greeting: `${firstName},`, intro: 'Un recuerdo que solo tú puedes compartir.', cta: 'COMPARTE ESTE RECUERDO →', footer: 'Responde a este correo o visita tu portal.' },
-    vi:  { greeting: `${firstName},`, intro: 'Một ký ức chỉ bạn mới có thể chia sẻ.', cta: 'CHIA SẺ KÝ ỨC NÀY →', footer: 'Trả lời email này hoặc truy cập cổng thông tin của bạn.' },
+  const l: Record<string, { greeting: string; intro: string; replyLabel: string; replyNote: string; voiceCta: string }> = {
+    en:  { greeting: `${firstName},`, intro: 'A memory only you can share.', replyLabel: 'Just reply to this email.', replyNote: 'No login. No portal. Just your words sent back to us.', voiceCta: 'Or record a voice note →' },
+    zh:  { greeting: `${firstName}，`, intro: '一个只有您能分享的记忆。', replyLabel: '直接回复此邮件即可。', replyNote: '无需登录。无需访问页面。', voiceCta: '或录制语音留言 →' },
+    yue: { greeting: `${firstName}，`, intro: '一個只有你能分享嘅記憶。', replyLabel: '直接回覆此電郵即可。', replyNote: '唔需要登入。唔需要訪問頁面。', voiceCta: '或錄製語音留言 →' },
+    ja:  { greeting: `${firstName}さん、`, intro: 'あなただけが共有できる記憶。', replyLabel: 'このメールに返信するだけです。', replyNote: 'ログイン不要。ポータル不要。', voiceCta: 'または音声で録音する →' },
+    es:  { greeting: `${firstName},`, intro: 'Un recuerdo que solo tú puedes compartir.', replyLabel: 'Solo responde este correo.', replyNote: 'Sin inicio de sesión. Sin portal.', voiceCta: 'O graba una nota de voz →' },
+    vi:  { greeting: `${firstName},`, intro: 'Một ký ức chỉ bạn mới có thể chia sẻ.', replyLabel: 'Chỉ cần trả lời email này.', replyNote: 'Không cần đăng nhập. Không cần cổng thông tin.', voiceCta: 'Hoặc ghi chú giọng nói →' },
   }
   const ui = l[lang] ?? l.en
 
@@ -257,11 +267,12 @@ function buildStoryPromptEmail(
   <div style="padding:32px">
     <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#B8B4AB;margin:0 0 24px">${ui.greeting}</p>
     <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#F0EDE6;line-height:1.7;margin:0 0 32px">${ui.intro}</p>
-    <div style="border-left:3px solid rgba(196,162,74,0.5);padding:24px 28px;margin:0 0 40px;background:rgba(196,162,74,0.04)">
+    <div style="border-left:3px solid rgba(196,162,74,0.5);padding:24px 28px;margin:0 0 32px;background:rgba(196,162,74,0.04)">
       <p style="font-family:Georgia,serif;font-size:20px;font-weight:300;color:#F0EDE6;line-height:1.7;margin:0;font-style:italic">${promptText}</p>
     </div>
-    <p style="font-family:Georgia,serif;font-size:15px;font-weight:300;font-style:italic;color:#706C65;line-height:1.8;margin:0 0 32px">${ui.footer}</p>
-    <a href="${portalUrl}" style="display:inline-block;background:#C4A24A;color:#0A0908;font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;text-decoration:none;padding:14px 28px">${ui.cta}</a>
+    <p style="font-family:Georgia,serif;font-size:18px;font-weight:300;color:#F0EDE6;line-height:1.7;margin:0 0 8px;text-align:center">${ui.replyLabel}</p>
+    <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#706C65;line-height:1.7;margin:0 0 28px;text-align:center">${ui.replyNote}</p>
+    <a href="${portalUrl}" style="display:inline-block;background:transparent;color:#C4A24A;border:1px solid rgba(196,162,74,0.3);font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;text-decoration:none;padding:10px 20px">${ui.voiceCta}</a>
   </div>
   <div style="padding:0 32px 32px;border-top:1px solid rgba(240,237,230,0.06);margin-top:16px">
     <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:20px 0 0">BASALITH · XYZ<br>${archiveName}</p>

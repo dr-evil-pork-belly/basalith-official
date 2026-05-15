@@ -7,6 +7,7 @@ import { t } from '@/lib/emailTranslations'
 import { getEmailPhotoUrl } from '@/lib/photo-url'
 import { sendWeChatPhoto } from '@/lib/wechat'
 import { getTodaysSpark } from '@/lib/dailySparks'
+import { createEmailReplySession, buildReplyAddress } from '@/lib/emailReplySessions'
 
 // ── Cadence helpers ───────────────────────────────────────────────────────────
 
@@ -90,12 +91,13 @@ function buildSparkOnlyEmail(
     <div style="border-left:3px solid rgba(196,162,74,0.5);padding:24px 28px;background:rgba(196,162,74,0.04);margin:0 0 32px">
       <p style="font-family:Georgia,serif;font-size:20px;font-weight:300;font-style:italic;color:#F0EDE6;line-height:1.7;margin:0">${sparkText}</p>
     </div>
-    <p style="font-family:Georgia,serif;font-size:15px;font-weight:300;font-style:italic;color:#706C65;line-height:1.8;margin:0 0 24px">
-      Reply to this email with your answer, or visit your portal to record a voice note instead.
+    <p style="font-family:Georgia,serif;font-size:18px;font-weight:300;color:#F0EDE6;line-height:1.7;margin:0 0 8px;text-align:center">
+      Just reply to this email.
     </p>
-    <div style="display:flex;gap:12px;flex-wrap:wrap">
-      ${portalUrl ? `<a href="${portalUrl}" style="display:inline-block;background:#C4A24A;color:#0A0908;font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;text-decoration:none;padding:12px 24px;border-radius:2px">ANSWER BY VOICE →</a>` : ''}
-    </div>
+    <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#706C65;line-height:1.7;margin:0 0 24px;text-align:center">
+      No login. No portal. Just your words sent back to us.
+    </p>
+    ${portalUrl ? `<a href="${portalUrl}" style="display:inline-block;background:transparent;color:#C4A24A;border:1px solid rgba(196,162,74,0.3);font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;text-decoration:none;padding:10px 20px">Or record a voice note →</a>` : ''}
   </div>
   <div style="padding:16px 32px 32px;border-top:1px solid rgba(240,237,230,0.06)">
     <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:0">BASALITH · XYZ<br>${archiveName}<br>Heritage Nexus Inc.</p>
@@ -191,6 +193,12 @@ export async function POST(req: NextRequest) {
               ? `${siteUrl}/contribute/${contributor.access_token}`
               : null
             try {
+              const sparkToken = await createEmailReplySession({
+                archiveId:     archiveId,
+                contributorId: contributor.id,
+                emailType:     'spark',
+                sparkId:       spark.id,
+              })
               const subjectLabels: Record<string, string> = {
                 en: 'A question from the archive', zh: '来自档案的问题',
                 yue: '檔案嘅問題', ja: 'アーカイブからの質問',
@@ -199,6 +207,7 @@ export async function POST(req: NextRequest) {
               await resend.emails.send({
                 from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
                 to:      contributor.email,
+                replyTo: buildReplyAddress(sparkToken),
                 subject: `${subjectLabels[contribLang2] ?? subjectLabels.en} · ${archive.name}`,
                 html:    buildSparkOnlyEmail(archive.name, contributor.name ?? '', spark.text, sparkPortalUrl, contribLang2),
                 headers: {
