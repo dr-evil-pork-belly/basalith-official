@@ -162,6 +162,7 @@ export async function POST(req: NextRequest) {
       billing = 'annual',
       relationshipType,
       notes,
+      birthYear,
     } = await req.json()
 
     if (!archivistId || !familyName || !clientEmail || !tier) {
@@ -198,6 +199,8 @@ export async function POST(req: NextRequest) {
         relationship_type:    relationshipType || null,
         guide_notes:          notes || null,
         submitted_by:         archivistId,
+        owner_birth_year:     birthYear ? parseInt(birthYear) : null,
+        owner_birth_decade:   birthYear ? Math.floor(parseInt(birthYear) / 10) * 10 : null,
         generation:           'Generation I',
         status:               'pending_payment',
         magic_link_token:     magicLinkToken,

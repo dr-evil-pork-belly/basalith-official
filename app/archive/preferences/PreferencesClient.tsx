@@ -2,6 +2,52 @@
 
 import { useState, useEffect } from 'react'
 
+function BirthYearSection({ archiveId }: { archiveId: string }) {
+  const [year,   setYear]   = useState('')
+  const [saving, setSaving] = useState(false)
+  const [saved,  setSaved]  = useState(false)
+  const [error,  setError]  = useState('')
+
+  useEffect(() => {
+    fetch(`/api/archive/dashboard?archiveId=${archiveId}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.archive?.owner_birth_year) setYear(String(d.archive.owner_birth_year)) })
+      .catch(() => {})
+  }, [archiveId])
+
+  async function save() {
+    if (!year || isNaN(parseInt(year))) { setError('Enter a valid year'); return }
+    setSaving(true); setError('')
+    const res = await fetch('/api/archive/update-profile', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ birthYear: parseInt(year) }),
+    })
+    setSaving(false)
+    if (res.ok) { setSaved(true); setTimeout(() => setSaved(false), 2000) }
+    else { const d = await res.json(); setError(d.error ?? 'Failed') }
+  }
+
+  return (
+    <div className="rounded-sm border border-[rgba(255,255,255,0.06)] px-6 py-6 mb-4" style={{ background: '#111112' }}>
+      <p className="font-sans text-[0.6rem] font-bold tracking-[0.18em] uppercase text-[#5C6166] mb-2">Birth Year</p>
+      <p className="font-sans text-[0.75rem] mb-4" style={{ color: '#5C6166' }}>
+        Used to personalize your life timeline with accurate age ranges per decade.
+      </p>
+      <div className="flex items-center gap-4 flex-wrap">
+        <input
+          type="number" min={1900} max={new Date().getFullYear()}
+          placeholder="e.g. 1949" value={year} onChange={e => setYear(e.target.value)}
+          className="bg-[#0C0C0D] border border-[rgba(255,255,255,0.08)] rounded-sm px-3 py-2 font-mono text-[0.85rem] text-[#F0F0EE] focus:outline-none focus:border-[rgba(196,162,74,0.4)] w-32"
+        />
+        <button onClick={save} disabled={saving} className="btn-monolith-ghost disabled:opacity-50">
+          {saving ? 'Saving…' : saved ? 'Saved ✓' : 'Save'}
+        </button>
+        {error && <p className="font-sans text-[0.72rem]" style={{ color: '#E57373' }}>{error}</p>}
+      </div>
+    </div>
+  )
+}
+
 const CADENCES = [
   { value: 'daily',        label: 'Daily',              sub: 'One photograph every evening' },
   { value: 'three_weekly', label: 'Three times a week', sub: 'Monday, Wednesday, Friday' },
@@ -217,6 +263,9 @@ export default function PreferencesClient({ archiveId }: { archiveId: string }) 
           <p className="font-sans text-[0.72rem]" style={{ color: '#4CAF50' }}>Preferences updated.</p>
         )}
       </div>
+
+      {/* Birth Year */}
+      <BirthYearSection archiveId={archiveId} />
 
       {/* Check replies */}
       <div className="rounded-sm border border-[rgba(255,255,255,0.06)] px-6 py-6 mb-4" style={{ background: '#111112' }}>

@@ -80,6 +80,7 @@ export default function OnboardClient({ archivistId }: { archivistId: string }) 
     relationshipType: 'referral',
     notes:            '',
   })
+  const [birthYear, setBirthYear] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [result,     setResult]     = useState<SubmitResult | null>(null)
   const [error,      setError]      = useState<string | null>(null)
@@ -106,7 +107,7 @@ export default function OnboardClient({ archivistId }: { archivistId: string }) 
       const res = await fetch('/api/archivist/submit-client', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ archivistId, ...form }),
+        body:    JSON.stringify({ archivistId, ...form, birthYear: birthYear ? parseInt(birthYear) : null }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed to submit client')
@@ -120,6 +121,7 @@ export default function OnboardClient({ archivistId }: { archivistId: string }) 
 
   function reset() {
     setForm({ familyName: '', clientName: '', clientEmail: '', phone: '', tier: 'active', billing: 'annual', relationshipType: 'referral', notes: '' })
+    setBirthYear('')
     setResult(null)
     setError(null)
   }
@@ -272,6 +274,21 @@ export default function OnboardClient({ archivistId }: { archivistId: string }) 
                 <option key={o.value} value={o.value}>{o.label}</option>
               ))}
             </select>
+          </div>
+
+          {/* Birth Year */}
+          <div>
+            <label style={LABEL}>Birth Year (optional)</label>
+            <input
+              type="number"
+              min={1900}
+              max={new Date().getFullYear()}
+              placeholder="e.g. 1949"
+              value={birthYear}
+              onChange={e => setBirthYear(e.target.value)}
+              style={{ ...INPUT, fontFamily: "'Space Mono', monospace", fontSize: '0.6rem' }}
+            />
+            <p style={HELPER}>Used to build the life timeline. Optional but recommended.</p>
           </div>
 
           {/* Notes */}
