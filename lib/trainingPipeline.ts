@@ -110,11 +110,11 @@ Return ONLY this JSON, no other text:
 // ── Create from deposit ───────────────────────────────────────────────────────
 
 export async function createTrainingPairFromDeposit(
-  deposit: { id?: string; archive_id: string; prompt: string; response: string },
+  deposit: { id?: string; archive_id: string; prompt: string; response: string; source_type?: string },
   ownerName:   string,
   archiveName: string,
   language   = 'en',
-  sourceType = 'deposit',
+  sourceType = deposit.source_type ?? 'deposit',
 ): Promise<void> {
   console.log('[training] createTrainingPairFromDeposit called —',
     'depositId:', deposit.id,

@@ -21,6 +21,7 @@ export async function POST(req: Request) {
         archive_id:     archiveId,
         prompt:         'Accuracy correction',
         response:       correction.trim(),
+        source_type:    'entity_chat',
         essence_status: 'pending',
       })
     }

@@ -211,6 +211,7 @@ export async function POST(req: NextRequest) {
             archive_id:     archiveId,
             prompt:         'Phone call deposit',
             response:       depositText,
+            source_type:    'phone_call',
             essence_status: 'pending',
           })
           .select()
@@ -227,6 +228,7 @@ export async function POST(req: NextRequest) {
             archive_id:     archiveId,
             prompt:         'Phone call recording',
             response:       depositText,
+            source_type:    'phone_call',
             essence_status: 'pending',
           })
           .select('id')

@@ -139,6 +139,7 @@ export async function PATCH(req: Request) {
         archive_id:     session.archive_id,
         prompt:         question.question,
         response:       answer.trim(),
+        source_type:    'wisdom',
         essence_status: 'pending',
       }).then(({ error }) => {
         if (error) console.warn('wisdom deposit skipped:', error.message)

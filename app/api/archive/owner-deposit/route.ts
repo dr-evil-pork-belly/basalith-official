@@ -17,6 +17,7 @@ export async function POST(req: Request) {
         photograph_id: photographId ?? null,
         prompt:        prompt ?? null,
         response:      response.trim(),
+        source_type:   'deposit',
         essence_status: 'pending',
       })
       .select()

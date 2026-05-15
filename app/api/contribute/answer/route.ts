@@ -58,10 +58,11 @@ export async function POST(req: NextRequest) {
 
     // Save as owner_deposit so entity learns from it
     await supabaseAdmin.from('owner_deposits').insert({
-      archive_id: archiveId,
-      prompt:     question.question_text,
-      response:   answerText.trim(),
-      created_at: now,
+      archive_id:  archiveId,
+      prompt:      question.question_text,
+      response:    answerText.trim(),
+      source_type: 'contributor',
+      created_at:  now,
     })
 
     // Mark question answered
