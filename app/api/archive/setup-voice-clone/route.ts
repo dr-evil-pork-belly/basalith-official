@@ -6,16 +6,31 @@ import { ElevenLabsClient } from 'elevenlabs'
 export const dynamic   = 'force-dynamic'
 export const maxDuration = 60
 
-async function getArchiveId(req: NextRequest): Promise<string | null> {
-  // God Mode call includes archive-id query param; owner cookie also works
-  const qp = new URL(req.url).searchParams.get('archiveId')
-  if (qp) return qp
-  const cookieStore = await cookies()
-  return cookieStore.get('archive-id')?.value ?? null
-}
-
 export async function POST(req: NextRequest) {
-  const archiveId = await getArchiveId(req)
+  const cookieStore = await cookies()
+
+  // Accept body for auth resolution (don't consume stream twice)
+  let bodyArchiveId: string | null = null
+  try {
+    const body = await req.json()
+    bodyArchiveId = body.archiveId ?? null
+  } catch {}
+
+  // Auth: god-mode cookie OR owner archive-id cookie
+  const godAuth   = cookieStore.get('god-mode-auth')?.value
+  const expected  = process.env.GOD_MODE_PASSWORD || process.env.CRON_SECRET || ''
+  const isGodMode = !!expected && godAuth === expected
+  const ownerArchiveId = cookieStore.get('archive-id')?.value ?? null
+
+  // God Mode: archiveId must come from body
+  // Owner: archiveId must match their session cookie
+  let archiveId: string | null = null
+  if (isGodMode && bodyArchiveId) {
+    archiveId = bodyArchiveId
+  } else if (ownerArchiveId) {
+    archiveId = ownerArchiveId
+  }
+
   if (!archiveId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const apiKey = process.env.ELEVENLABS_API_KEY

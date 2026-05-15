@@ -262,7 +262,11 @@ function VoiceCloneButton({ archiveId, hasVoice, voiceId, samplesCount }: { arch
   async function setup() {
     setState('running')
     try {
-      const res = await fetch(`/api/archive/setup-voice-clone?archiveId=${archiveId}`, { method: 'POST' })
+      const res = await fetch('/api/archive/setup-voice-clone', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ archiveId }),
+      })
       const data = await res.json()
       if (res.ok) { setState('done'); setResult(`✓ voice_id: ${data.voiceId?.slice(0, 12)}…`) }
       else { setState('error'); setResult(data.error ?? 'failed') }
