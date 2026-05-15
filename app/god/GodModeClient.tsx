@@ -35,6 +35,8 @@ type ArchiveData = {
   pausedAt:                  string | null
   scheduledDeletionAt:       string | null
   terminationRequestedAt:    string | null
+  elevenlabsVoiceId:         string | null
+  voiceSamplesCount:         number
   training?: {
     total:              number
     included:           number
@@ -121,6 +123,7 @@ const CRON_BUTTONS = [
   { label: 'PAUSE REMINDER',      route: 'pause-reminder',         group: 'monthly'   },
   // Quarterly / Annual
   { label: 'ENTITY LETTER',       route: 'entity-letter',          group: 'quarterly' },
+  { label: 'VOICE PORTRAIT',      route: 'voice-portrait',         group: 'quarterly' },
 ]
 
 // ── Action handler ─────────────────────────────────────────────────────────────
@@ -250,6 +253,39 @@ function TrainingPipelineButton({ label, url, body }: { label: string; url: stri
 
 function BackfillButton() {
   return <TrainingPipelineButton label="Backfill Training Data" url="/api/god/backfill-training" body={{ batchSize: 20 }} />
+}
+
+function VoiceCloneButton({ archiveId, hasVoice, voiceId, samplesCount }: { archiveId: string; hasVoice: boolean; voiceId: string | null; samplesCount: number }) {
+  const [state, setState] = React.useState<'idle'|'running'|'done'|'error'>('idle')
+  const [result, setResult] = React.useState('')
+
+  async function setup() {
+    setState('running')
+    try {
+      const res = await fetch(`/api/archive/setup-voice-clone?archiveId=${archiveId}`, { method: 'POST' })
+      const data = await res.json()
+      if (res.ok) { setState('done'); setResult(`✓ voice_id: ${data.voiceId?.slice(0, 12)}…`) }
+      else { setState('error'); setResult(data.error ?? 'failed') }
+    } catch { setState('error'); setResult('error') }
+    setTimeout(() => { setState('idle'); setResult('') }, 4000)
+  }
+
+  if (hasVoice) {
+    return <p style={{ ...mono, fontSize: '0.32rem', color: '#4AC47C', letterSpacing: '0.1em', margin: 0 }}>🎙 VOICE CLONED · {voiceId?.slice(0, 12)}…</p>
+  }
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+      <p style={{ ...mono, fontSize: '0.32rem', color: '#5C6166', margin: 0, letterSpacing: '0.08em' }}>
+        🎙 {samplesCount < 3 ? `NO VOICE CLONE (${samplesCount} samples < 3 needed)` : `${samplesCount} SAMPLES — READY TO CLONE`}
+      </p>
+      {samplesCount >= 3 && (
+        <button onClick={setup} disabled={state === 'running'} style={{ ...mono, fontSize: '0.32rem', letterSpacing: '0.1em', background: state === 'done' ? 'rgba(74,196,124,0.1)' : state === 'error' ? 'rgba(196,74,74,0.1)' : 'rgba(196,162,74,0.08)', border: '1px solid rgba(196,162,74,0.2)', borderRadius: '2px', padding: '2px 8px', color: state === 'done' ? '#4AC47C' : state === 'error' ? '#C44A4A' : '#C4A24A', cursor: 'pointer' }}>
+          {state === 'running' ? '...' : result || 'SETUP CLONE'}
+        </button>
+      )}
+    </div>
+  )
 }
 
 function ScheduledDeletionsPanel({ archives, onRefresh }: { archives: ArchiveData[]; onRefresh: () => void }) {
@@ -614,6 +650,11 @@ function ArchiveCard({ archive, onRefresh }: { archive: ArchiveData; onRefresh: 
           onClick={() => handleEmail('entity_intro')}
           small
         />
+      </div>
+
+      {/* Voice clone status */}
+      <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '0.5rem', marginTop: '0.5rem' }}>
+        <VoiceCloneButton archiveId={archive.id} hasVoice={!!archive.elevenlabsVoiceId} voiceId={archive.elevenlabsVoiceId} samplesCount={archive.voiceSamplesCount} />
       </div>
     </div>
   )

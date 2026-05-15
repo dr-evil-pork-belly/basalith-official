@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
     videosRes,
     trainingPairsRes,
   ] = await Promise.allSettled([
-    supabaseAdmin.from('archives').select('id, name, family_name, owner_name, owner_email, tier, status, created_at, magic_link_token, paused_at, scheduled_deletion_at, termination_requested_at'),
+    supabaseAdmin.from('archives').select('id, name, family_name, owner_name, owner_email, tier, status, created_at, magic_link_token, paused_at, scheduled_deletion_at, termination_requested_at, elevenlabs_voice_id, voice_samples_count'),
     supabaseAdmin.from('photographs').select('archive_id, status, created_at').order('created_at', { ascending: false }).limit(1000),
     supabaseAdmin.from('contributors').select('archive_id, status, name, created_at'),
     supabaseAdmin.from('owner_deposits').select('archive_id, created_at'),
@@ -185,6 +185,8 @@ export async function GET(req: NextRequest) {
       pausedAt:                 archive.paused_at ?? null,
       scheduledDeletionAt:      archive.scheduled_deletion_at ?? null,
       terminationRequestedAt:   archive.termination_requested_at ?? null,
+      elevenlabsVoiceId:        archive.elevenlabs_voice_id ?? null,
+      voiceSamplesCount:        archive.voice_samples_count ?? 0,
       training,
     }
   })

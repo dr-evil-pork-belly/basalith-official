@@ -18,12 +18,14 @@ const MONO: React.CSSProperties = {
 }
 
 const PRIMARY_NAV = [
-  { href: '/archive/dashboard',    label: 'Dashboard'        },
-  { href: '/archive/label',        label: 'Upload Photos'    },
-  { href: '/archive/gallery',      label: 'Gallery'          },
-  { href: '/archive/memory-map',   label: 'Memory Map'       },
-  { href: '/archive/entity',       label: 'My Entity'        },
-  { href: '/archive/contributors', label: 'Contributors'     },
+  { href: '/archive/dashboard',         label: 'Dashboard'        },
+  { href: '/archive/label',             label: 'Upload Photos'    },
+  { href: '/archive/gallery',           label: 'Gallery'          },
+  { href: '/archive/timeline',          label: 'Life Timeline'    },
+  { href: '/archive/memory-map',        label: 'Memory Map'       },
+  { href: '/archive/entity',            label: 'My Entity'        },
+  { href: '/archive/wisdom-exchange',   label: 'Wisdom Exchange'  },
+  { href: '/archive/contributors',      label: 'Contributors'     },
 ]
 
 const CONTRIBUTE_NAV = [
