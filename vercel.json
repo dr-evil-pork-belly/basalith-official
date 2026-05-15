@@ -12,44 +12,68 @@
   },
   "crons": [
     {
-      "path": "/api/cron/send-photos",
+      "path": "/api/cron/send-photos?secret=basalith-cron-2026-secure",
       "schedule": "0 21 * * *"
     },
     {
-      "path": "/api/cron/weekly-prompt",
+      "path": "/api/cron/daily-reflection?secret=basalith-cron-2026-secure",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/anniversary-triggers?secret=basalith-cron-2026-secure",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/annual-preview?secret=basalith-cron-2026-secure",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/weekly-prompt?secret=basalith-cron-2026-secure",
       "schedule": "0 8 * * 1"
     },
     {
-      "path": "/api/cron/story-prompt-monday",
+      "path": "/api/cron/story-prompt-monday?secret=basalith-cron-2026-secure",
       "schedule": "0 9 * * 1"
     },
     {
-      "path": "/api/cron/story-prompt-friday",
-      "schedule": "0 9 * * 5"
-    },
-    {
-      "path": "/api/cron/monthly-report",
-      "schedule": "0 9 1 * *"
-    },
-    {
-      "path": "/api/cron/gratitude-note",
-      "schedule": "0 9 2 * *"
-    },
-    {
-      "path": "/api/cron/memory-game-start",
+      "path": "/api/cron/memory-game-start?secret=basalith-cron-2026-secure",
       "schedule": "0 9 * * 3"
     },
     {
-      "path": "/api/cron/memory-game-reminder",
+      "path": "/api/cron/story-prompt-friday?secret=basalith-cron-2026-secure",
       "schedule": "0 9 * * 5"
     },
     {
-      "path": "/api/cron/memory-game-summary",
+      "path": "/api/cron/memory-game-reminder?secret=basalith-cron-2026-secure",
+      "schedule": "0 9 * * 5"
+    },
+    {
+      "path": "/api/cron/memory-game-summary?secret=basalith-cron-2026-secure",
       "schedule": "0 18 * * 5"
     },
     {
-      "path": "/api/cron/daily-reflection",
-      "schedule": "0 8 * * *"
+      "path": "/api/cron/monthly-report?secret=basalith-cron-2026-secure",
+      "schedule": "0 9 1 * *"
+    },
+    {
+      "path": "/api/cron/monthly-accuracy?secret=basalith-cron-2026-secure",
+      "schedule": "0 9 1 * *"
+    },
+    {
+      "path": "/api/cron/contributor-mirror?secret=basalith-cron-2026-secure",
+      "schedule": "0 10 1 * *"
+    },
+    {
+      "path": "/api/cron/memory-game-monthly?secret=basalith-cron-2026-secure",
+      "schedule": "0 11 1 * *"
+    },
+    {
+      "path": "/api/cron/gratitude-note?secret=basalith-cron-2026-secure",
+      "schedule": "0 9 2 * *"
+    },
+    {
+      "path": "/api/cron/entity-letter?secret=basalith-cron-2026-secure",
+      "schedule": "0 9 1 1,4,7,10 *"
     }
   ]
 }
