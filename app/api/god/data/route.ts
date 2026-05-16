@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
     supabaseAdmin.from('labels').select('archive_id, labelled_by, created_at').order('created_at', { ascending: false }).limit(100),
     supabaseAdmin.from('prospects').select('stage, tier_sold, status, created_at'),
     supabaseAdmin.from('commissions').select('amount, commission_type, status, created_at'),
-    supabaseAdmin.from('voice_recordings').select('archive_id, created_at').order('created_at', { ascending: false }).limit(100),
+    supabaseAdmin.from('voice_recordings').select('archive_id, created_at, transcript_status, duration_seconds').order('created_at', { ascending: false }).limit(500),
     supabaseAdmin.from('archive_videos').select('archive_id, created_at').order('created_at', { ascending: false }).limit(100),
     supabaseAdmin.from('training_pairs').select('archive_id, included_in_training, quality_score, source_type'),
   ])
@@ -67,6 +67,17 @@ export async function GET(req: NextRequest) {
   const archiveNames: Record<string, string> = {}
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   for (const a of archives) archiveNames[a.id] = a.name
+
+  // Live voice sample count — qualifying recordings per archive
+  // (transcript_status=complete AND duration_seconds>=30)
+  // Used instead of the cached column so God Mode always shows truth
+  const liveVoiceCount: Record<string, number> = {}
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  for (const vr of voiceRecs) {
+    if (vr.transcript_status === 'complete' && (vr.duration_seconds ?? 0) >= 30) {
+      liveVoiceCount[vr.archive_id] = (liveVoiceCount[vr.archive_id] ?? 0) + 1
+    }
+  }
 
   // Build per-archive data
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -186,7 +197,8 @@ export async function GET(req: NextRequest) {
       scheduledDeletionAt:      archive.scheduled_deletion_at ?? null,
       terminationRequestedAt:   archive.termination_requested_at ?? null,
       elevenlabsVoiceId:        archive.elevenlabs_voice_id ?? null,
-      voiceSamplesCount:        archive.voice_samples_count ?? 0,
+      // Prefer live count over cached column — trigger keeps them in sync but live is authoritative
+      voiceSamplesCount:        liveVoiceCount[id] ?? archive.voice_samples_count ?? 0,
       training,
     }
   })
