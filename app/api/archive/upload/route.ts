@@ -40,9 +40,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
     }
 
-    // 10 MB limit
-    if (file.size > 10 * 1024 * 1024) {
-      return NextResponse.json({ error: 'File too large (max 10 MB)' }, { status: 413 })
+    // 50 MB limit — accommodates iPhone HEIC and large JPEGs
+    const sizeMB = (file.size / (1024 * 1024)).toFixed(1)
+    console.log('[upload] file:', file.name, '| type:', file.type, '| size:', sizeMB + 'MB')
+    if (file.size > 50 * 1024 * 1024) {
+      return NextResponse.json({ error: 'File too large (max 50 MB)' }, { status: 413 })
     }
 
     // Determine extension from MIME or filename
