@@ -333,12 +333,14 @@ export async function POST(req: Request) {
     }
 
     // ── Step 1: Resolve caller identity ───────────────────────────────────────
-    // Try owner cookie first, then contributor token from header or body.
+    // Priority: owner cookie → x-archive-id header (mobile) → contributor bearer token
     const { cookies } = await import('next/headers')
     const cookieStore      = await cookies()
     const sessionArchiveId = cookieStore.get('archive-id')?.value
 
-    const authHeader        = (req as import('next/server').NextRequest).headers.get('authorization')
+    const nextReq           = req as import('next/server').NextRequest
+    const mobileArchiveId   = nextReq.headers.get('x-archive-id')
+    const authHeader        = nextReq.headers.get('authorization')
     const contributorToken  = authHeader?.replace('Bearer ', '') || body.contributorToken
 
     let authorizedArchiveId: string | null = null
@@ -347,6 +349,17 @@ export async function POST(req: Request) {
     if (sessionArchiveId) {
       authorizedArchiveId = sessionArchiveId
       callerType          = 'owner'
+    } else if (mobileArchiveId) {
+      // Validate the archive exists and is active before trusting the header
+      const { data: mobileArchive } = await supabaseAdmin
+        .from('archives')
+        .select('id, status')
+        .eq('id', mobileArchiveId)
+        .maybeSingle()
+      if (mobileArchive && (!mobileArchive.status || mobileArchive.status === 'active')) {
+        authorizedArchiveId = mobileArchiveId
+        callerType          = 'owner'
+      }
     } else if (contributorToken) {
       const { data: contributor } = await supabaseAdmin
         .from('contributors')
@@ -360,6 +373,8 @@ export async function POST(req: Request) {
         callerType          = 'contributor'
       }
     }
+
+    console.log('[entity-chat] mobile:', mobileArchiveId ? 'yes' : 'no', '| authorized:', authorizedArchiveId?.substring(0, 8))
 
     if (!authorizedArchiveId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
