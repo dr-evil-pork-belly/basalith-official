@@ -37,8 +37,9 @@ export async function GET(req: NextRequest) {
 
     supabaseAdmin
       .from('photographs')
-      .select('id, status')
-      .eq('archive_id', archiveId),
+      .select('id, status, storage_path, ai_era_estimate')
+      .eq('archive_id', archiveId)
+      .order('created_at', { ascending: false }),
 
     supabaseAdmin
       .from('owner_deposits')
@@ -60,12 +61,16 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Archive not found' }, { status: 404 })
   }
 
+  const photos   = photographs.data ?? []
+  const topPhoto = photos.find(p => p.storage_path) ?? null
+  console.log('[dashboard] photos:', photos.length, '| topPhoto:', topPhoto?.id ?? 'none')
+
   return NextResponse.json({
     archive:             archive.data,
     decades:             decades.data       ?? [],
     recentLabels:        recentLabels.data  ?? [],
     contributors:        contributors.data  ?? [],
-    photographs:         photographs.data   ?? [],
+    photographs:         photos,
     ownerDeposits:       ownerDeposits.data ?? [],
     entityConversations: entityConvos.count ?? 0,
     significantDates:    significantDates.count ?? 0,
