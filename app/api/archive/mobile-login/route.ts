@@ -2,68 +2,63 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import bcrypt from 'bcryptjs'
 
-// Mobile-friendly login — returns archiveId + archive metadata in JSON body.
-// The mobile app stores archiveId in SecureStore and passes it as a param.
+// Mobile login — email + password, looks up archive by owner_email then checks
+// archive_credentials for that specific archive. No credential scanning.
 
 export async function POST(req: NextRequest) {
-  const { password } = await req.json()
+  const { email, password } = await req.json()
 
-  if (!password) {
-    return NextResponse.json({ error: 'Password required' }, { status: 400 })
+  if (!email || !password) {
+    return NextResponse.json({ error: 'Email and password required' }, { status: 400 })
   }
 
-  let archiveId: string | null = null
-
-  // Check Supabase hashed credentials
-  const { data: allCredentials } = await supabaseAdmin
-    .from('archive_credentials')
-    .select('archive_id, password_hash')
-    .eq('is_active', true)
-
-  if (allCredentials?.length) {
-    for (const cred of allCredentials) {
-      const matches = await bcrypt.compare(password, cred.password_hash)
-      if (matches) {
-        archiveId = cred.archive_id
-        supabaseAdmin
-          .from('archive_credentials')
-          .update({ last_used_at: new Date().toISOString() })
-          .eq('archive_id', cred.archive_id)
-          .then(() => {})
-        break
-      }
-    }
-  }
-
-  // Fall back to env var credentials
-  if (!archiveId) {
-    const credMap = process.env.ARCHIVE_CREDENTIALS ?? ''
-    for (const pair of credMap.split(',')) {
-      const [p, id] = pair.split(':')
-      if (p?.trim() === password) { archiveId = id?.trim() ?? null; break }
-    }
-  }
-
-  if (!archiveId) {
-    return NextResponse.json({ error: 'Invalid password' }, { status: 401 })
-  }
-
+  // Find archive by owner email
   const { data: archive } = await supabaseAdmin
     .from('archives')
     .select('id, name, family_name, owner_name, status, preferred_language')
-    .eq('id', archiveId)
-    .single()
+    .eq('owner_email', email.toLowerCase().trim())
+    .maybeSingle()
 
-  if (!archive || (archive.status && archive.status !== 'active')) {
-    return NextResponse.json({ error: 'Archive not found or inactive' }, { status: 403 })
+  if (!archive) {
+    return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
   }
 
-  return NextResponse.json({
+  if (archive.status && archive.status !== 'active') {
+    return NextResponse.json({ error: 'Archive is not active' }, { status: 403 })
+  }
+
+  // Check credential for this archive
+  const { data: credential } = await supabaseAdmin
+    .from('archive_credentials')
+    .select('password_hash')
+    .eq('archive_id', archive.id)
+    .eq('is_active', true)
+    .maybeSingle()
+
+  if (!credential) {
+    return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
+  }
+
+  const valid = await bcrypt.compare(password, credential.password_hash)
+  if (!valid) {
+    return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
+  }
+
+  // Update last_used_at (non-blocking)
+  supabaseAdmin
+    .from('archive_credentials')
+    .update({ last_used_at: new Date().toISOString() })
+    .eq('archive_id', archive.id)
+    .then(() => {})
+
+  const payload = {
     success:           true,
     archiveId:         archive.id,
     archiveName:       archive.name,
     familyName:        archive.family_name,
     ownerName:         archive.owner_name,
     preferredLanguage: archive.preferred_language ?? 'en',
-  })
+  }
+  console.log('[mobile-login] returning:', { archiveId: archive.id, preferredLanguage: payload.preferredLanguage })
+  return NextResponse.json(payload)
 }
