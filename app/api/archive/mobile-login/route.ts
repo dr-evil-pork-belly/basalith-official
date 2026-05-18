@@ -51,14 +51,18 @@ export async function POST(req: NextRequest) {
     .eq('archive_id', archive.id)
     .then(() => {})
 
+  console.log('[mobile-login] archive:', archive.name, 'preferred_language:', archive.preferred_language)
+
+  const preferredLanguage = archive.preferred_language || 'en'
+
   const payload = {
     success:           true,
     archiveId:         archive.id,
     archiveName:       archive.name,
     familyName:        archive.family_name,
     ownerName:         archive.owner_name,
-    preferredLanguage: archive.preferred_language ?? 'en',
+    preferredLanguage,
   }
-  console.log('[mobile-login] returning:', { archiveId: archive.id, preferredLanguage: payload.preferredLanguage })
+  console.log('[mobile-login] response:', JSON.stringify(payload))
   return NextResponse.json(payload)
 }
