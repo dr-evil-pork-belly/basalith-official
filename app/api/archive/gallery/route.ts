@@ -6,10 +6,6 @@ import { getArchiveSession } from '@/lib/apiSecurity'
 const PAGE_SIZE = 24
 
 export async function GET(req: NextRequest) {
-  // Ownership check: session archiveId must match the requested archiveId
-  const session = await getArchiveSession()
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
   const { searchParams } = new URL(req.url)
   const archiveId = searchParams.get('archiveId')
   const decade    = searchParams.get('decade')   || null
@@ -19,8 +15,20 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'archiveId required' }, { status: 400 })
   }
 
-  if (archiveId !== session.archiveId) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  // Auth: portal session cookie OR mobile x-archive-id header
+  const mobileId = req.headers.get('x-archive-id')
+  if (mobileId) {
+    // Mobile path: validate archiveId matches the header
+    if (mobileId !== archiveId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+  } else {
+    // Portal path: require full session
+    const session = await getArchiveSession()
+    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (archiveId !== session.archiveId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
   }
 
   // Build query
@@ -31,6 +39,7 @@ export async function GET(req: NextRequest) {
       created_at,
       storage_path,
       original_name,
+      ai_era_estimate,
       status,
       priority_score,
       labels (
@@ -45,7 +54,7 @@ export async function GET(req: NextRequest) {
       )
     `, { count: 'exact' })
     .eq('archive_id', archiveId)
-    .in('status', ['unlabelled', 'labelled', 'needs_review'])
+    .in('status', ['unlabelled', 'labelled', 'needs_review', 'pending', 'complete'])
     .order('priority_score', { ascending: false })
     .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1)
 
