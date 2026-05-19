@@ -4,21 +4,23 @@ import { useLanguage } from '@/app/context/LanguageContext'
 
 const COLS: { heading: string; links: { label: string; href?: string }[] }[] = [
   {
-    heading: 'Archives',
+    heading: 'Plans',
     links: [
       { label: 'Active',           href: '/pricing'          },
       { label: 'Resting',          href: '/pricing'          },
       { label: 'Legacy',           href: '/pricing'          },
+      { label: 'Succession',       href: '/succession'       },
       { label: 'Founding Session', href: '/founding-session' },
     ],
   },
   {
     heading: 'Company',
     links: [
-      { label: 'About',                  href: '/about'           },
-      { label: 'The Method',             href: '/method'          },
-      { label: 'Become a Legacy Guide',  href: '/join-archivists' },
-      { label: 'Apply',                  href: '/apply'           },
+      { label: 'About',                 href: '/about'           },
+      { label: 'The Method',            href: '/method'          },
+      { label: 'For Business',          href: '/succession'      },
+      { label: 'Become a Legacy Guide', href: '/join-archivists' },
+      { label: 'Apply',                 href: '/apply'           },
     ],
   },
   {
@@ -76,35 +78,17 @@ export default function Footer() {
           </p>
           <p
             style={{
-              ...MONO,
-              fontSize:     '0.46rem',
-              color:        'rgba(250,250,248,0.2)',
-              marginBottom: '10px',
+              fontFamily:  'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+              fontSize:    '0.9rem',
+              fontStyle:   'italic',
+              fontWeight:  300,
+              lineHeight:  1.7,
+              color:       'rgba(250,250,248,0.3)',
+              maxWidth:    '220px',
             }}
           >
-            The Basalith Ecosystem
+            The infrastructure of human continuation.
           </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            {['basalith.life', 'basalith.ai'].map(domain => (
-              <a
-                key={domain}
-                href={`https://${domain}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  ...MONO,
-                  fontSize:       '0.48rem',
-                  color:          'rgba(184,150,62,0.5)',
-                  textDecoration: 'none',
-                  transition:     'color 200ms ease',
-                }}
-                onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = 'var(--color-gold)'}
-                onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = 'rgba(184,150,62,0.5)'}
-              >
-                {domain} →
-              </a>
-            ))}
-          </div>
         </div>
 
         {/* Link columns */}
@@ -154,38 +138,44 @@ export default function Footer() {
         ))}
       </div>
 
-      {/* Divider + centered tagline */}
+      {/* Tagline */}
       <div
         style={{
-          borderTop:  '1px solid rgba(250,250,248,0.04)',
-          padding:    '32px 24px 0',
-          textAlign:  'center',
+          borderTop: '1px solid rgba(250,250,248,0.04)',
+          padding:   '32px 24px 0',
+          textAlign: 'center',
         }}
       >
         <p
           style={{
-            fontFamily:  'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-            fontSize:    'clamp(0.9rem, 2vw, 1.1rem)',
-            fontStyle:   'italic',
-            fontWeight:  300,
-            lineHeight:  1.7,
-            color:       'var(--color-text-muted)',
-            maxWidth:    '480px',
-            margin:      '0 auto',
-            whiteSpace:  'pre-line',
+            fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+            fontSize:   'clamp(0.9rem, 2vw, 1.1rem)',
+            fontStyle:  'italic',
+            fontWeight: 300,
+            lineHeight: 1.7,
+            color:      'var(--color-text-muted)',
+            margin:     0,
           }}
         >
-          {t('footer.tagline')}
+          You never truly leave
+        </p>
+        <p
+          style={{
+            fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+            fontSize:   'clamp(0.9rem, 2vw, 1.1rem)',
+            fontStyle:  'italic',
+            fontWeight: 300,
+            lineHeight: 1.7,
+            color:      'var(--color-text-muted)',
+            margin:     0,
+          }}
+        >
+          if you leave enough of yourself behind.
         </p>
       </div>
 
       {/* Copyright */}
-      <div
-        style={{
-          padding:    '20px clamp(24px,6vw,80px)',
-          textAlign:  'center',
-        }}
-      >
+      <div style={{ padding: '20px clamp(24px,6vw,80px)', textAlign: 'center' }}>
         <p style={{ ...MONO, fontSize: '0.44rem', color: 'rgba(250,250,248,0.18)' }}>
           &copy; {new Date().getFullYear()} Heritage Nexus Inc. All rights reserved. Wilmington, Delaware.
         </p>
