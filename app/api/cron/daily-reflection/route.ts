@@ -99,7 +99,7 @@ function buildDailyReflectionEmail(
   phoneNumber:  string,
   lang:         string,
 ): string {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
   const dateStr = new Date().toLocaleDateString(
     lang === 'zh' ? 'zh-CN' : 'en-US',
     { month: 'long', day: 'numeric' },

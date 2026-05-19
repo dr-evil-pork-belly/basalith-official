@@ -82,7 +82,7 @@ export async function GET(req: NextRequest) {
     .eq('status', 'active')
     .not('owner_email', 'is', null)
 
-  const siteUrl    = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+  const siteUrl    = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
   const sevenDays  = new Date(Date.now() - 7  * 24 * 60 * 60 * 1000).toISOString()
   const fourteenDays = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString()
   let sent = 0

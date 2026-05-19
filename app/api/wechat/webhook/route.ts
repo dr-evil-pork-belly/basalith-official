@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
   if (msgType === 'event' && event === 'subscribe') {
     const welcomeText = archive
       ? `Welcome back to ${archive.name}. Send a voice message or text to add a memory to your archive.`
-      : `Welcome to Basalith. To connect this account to your family archive, reply with your 6-character link code. Find it at basalith.xyz on your archive dashboard.`
+      : `Welcome to Basalith. To connect this account to your family archive, reply with your 6-character link code. Find it at basalith.ai on your archive dashboard.`
     return xmlResponse(buildTextReply(fromUser, toUser, welcomeText))
   }
 
@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
           .maybeSingle()
 
         if (!linked) {
-          return xmlResponse(buildTextReply(fromUser, toUser, `Code not recognised. Check your link code at basalith.xyz and try again.`))
+          return xmlResponse(buildTextReply(fromUser, toUser, `Code not recognised. Check your link code at basalith.ai and try again.`))
         }
 
         await supabaseAdmin
@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
         return xmlResponse(buildTextReply(fromUser, toUser, `Linked to ${linked.name}. You can now send voice messages and memories directly here.`))
       }
 
-      return xmlResponse(buildTextReply(fromUser, toUser, `To link your archive, reply with your 6-character link code from basalith.xyz`))
+      return xmlResponse(buildTextReply(fromUser, toUser, `To link your archive, reply with your 6-character link code from basalith.ai`))
     }
 
     if (!archiveId) return new Response('success')
@@ -118,7 +118,7 @@ export async function POST(req: NextRequest) {
   // ── Voice messages ─────────────────────────────────────────────────────────
   if (msgType === 'voice') {
     if (!isLinked || !archiveId) {
-      return xmlResponse(buildTextReply(fromUser, toUser, `To link your archive, reply with your 6-character link code from basalith.xyz`))
+      return xmlResponse(buildTextReply(fromUser, toUser, `To link your archive, reply with your 6-character link code from basalith.ai`))
     }
 
     const recognition = (msg.Recognition?.[0] ?? '').trim()
@@ -134,9 +134,9 @@ export async function POST(req: NextRequest) {
   // ── Image messages ─────────────────────────────────────────────────────────
   if (msgType === 'image') {
     if (!isLinked) {
-      return xmlResponse(buildTextReply(fromUser, toUser, `To link your archive, reply with your 6-character link code from basalith.xyz`))
+      return xmlResponse(buildTextReply(fromUser, toUser, `To link your archive, reply with your 6-character link code from basalith.ai`))
     }
-    return xmlResponse(buildTextReply(fromUser, toUser, 'Photo received. Visit basalith.xyz to add memories to your archive.'))
+    return xmlResponse(buildTextReply(fromUser, toUser, 'Photo received. Visit basalith.ai to add memories to your archive.'))
   }
 
   // Unhandled — return empty success so WeChat does not show an error

@@ -30,7 +30,7 @@ function buildGuideActivationEmail(
   tierLabel:   string,
   archiveId:   string,
 ): string {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
   return `<!DOCTYPE html>
 <html>
 <body style="background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:600px;margin:0 auto;padding:32px">
@@ -102,7 +102,7 @@ function buildClientWelcomeEmail(
   magicLinkUrl: string,
   tierLabel:    string,
 ): string {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
   return `<!DOCTYPE html>
 <html>
 <body style="background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:600px;margin:0 auto;padding:32px">
@@ -348,7 +348,7 @@ export async function POST(req: NextRequest) {
       .eq('is_active', true)
       .single()
 
-    const siteUrl      = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+    const siteUrl      = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
     const magicLinkUrl = `${siteUrl}/api/archive/magic-login?token=${archive.magic_link_token}`
     const tierNames: Record<string, string> = { archive: 'The Archive', estate: 'The Estate', dynasty: 'The Dynasty' }
     const tierLabel    = tierNames[archive.tier] ?? 'The Estate'

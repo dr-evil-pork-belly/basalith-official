@@ -106,7 +106,7 @@ export async function GET(req: NextRequest) {
         (pid: string) => !photoContribCount[pid]
       )
 
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
 
       const maxCount = leaderboard[0]?.[1] ?? 1
       const leaderboardHtml = leaderboard.map(([name, count], i) => {

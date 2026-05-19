@@ -239,7 +239,7 @@ export async function POST(req: NextRequest) {
       .then(() => {})
 
     // ── 6. Build payment URL ──────────────────────────────────────────────────
-    const siteUrl    = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+    const siteUrl    = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
     const tierData    = TIER_PRICES[tier] ?? TIER_PRICES.active
     const tierLabel   = tierData.label
     const firstPeriod = tierData.annualOnly

@@ -101,7 +101,7 @@ Return only the question text.`,
     const followUpText = res.content[0].type === 'text' ? res.content[0].text.trim() : null
     if (!followUpText) return
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
 
     for (const contributor of others) {
       const portalUrl = contributor.access_token

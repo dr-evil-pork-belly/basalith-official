@@ -132,7 +132,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Notify owner
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
     if (archive?.owner_email && entityResponse) {
       resend.emails.send({
         from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,

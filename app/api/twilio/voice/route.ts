@@ -13,7 +13,7 @@ function validateTwilioRequest(req: NextRequest, params: Record<string, string>)
   if (!authToken) return true // dev: skip validation
 
   const signature = req.headers.get('X-Twilio-Signature') ?? ''
-  const url       = `${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'}/api/twilio/voice`
+  const url       = `${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'}/api/twilio/voice`
   return twilio.validateRequest(authToken, signature, url, params)
 }
 
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
       return twimlResponse(`<?xml version="1.0" encoding="UTF-8"?><Response><Hangup/></Response>`)
     }
 
-    const siteUrl      = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+    const siteUrl      = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
     const recordingBase = `${siteUrl}/api/twilio/recording`
 
     // ── 1. Check archives table (owner) ──────────────────────────────────────────

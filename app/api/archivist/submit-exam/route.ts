@@ -71,7 +71,7 @@ async function sendCertificationEmail(archivist: { name: string; email: string }
   <div style="border-left:3px solid #C4A24A;padding:20px 24px;margin-bottom:36px">
     <p style="font-size:16px;color:#F0EDE6;line-height:1.9;margin:0">Find the families who are not ready to lose someone.<br>Sit with them.<br>Help them begin.<br><br>That is the work.</p>
   </div>
-  <a href="https://basalith.xyz/archivist/dashboard" style="display:inline-block;background:#C4A24A;color:#0A0908;font-family:'Courier New',monospace;font-size:12px;letter-spacing:0.2em;text-transform:uppercase;padding:16px 32px;text-decoration:none;margin-bottom:40px">OPEN YOUR DASHBOARD →</a>
+  <a href="https://basalith.ai/archivist/dashboard" style="display:inline-block;background:#C4A24A;color:#0A0908;font-family:'Courier New',monospace;font-size:12px;letter-spacing:0.2em;text-transform:uppercase;padding:16px 32px;text-decoration:none;margin-bottom:40px">OPEN YOUR DASHBOARD →</a>
   <p style="font-size:15px;color:#5C6166;line-height:1.8;margin:0">David Ha<br>Founder, Basalith<br>Heritage Nexus Inc.</p>
 </div>
 </body>

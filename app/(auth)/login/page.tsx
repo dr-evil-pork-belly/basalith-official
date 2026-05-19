@@ -26,7 +26,7 @@ function LoginForm() {
     setError('')
 
     const origin = process.env.NEXT_PUBLIC_APP_URL ||
-      (typeof window !== 'undefined' ? window.location.origin : 'https://www.basalith.xyz')
+      (typeof window !== 'undefined' ? window.location.origin : 'https://www.basalith.ai')
 
     const supabase = createClient()
     const { error: otpError } = await supabase.auth.signInWithOtp({

@@ -173,7 +173,7 @@ function buildMonthlyReportEmail({
   weakestDimensions:     Array<{ dimension: string; accuracy_score: number }>
   lang?:                 string
 }): string {
-  const siteUrl    = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+  const siteUrl    = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
   const hasActivity = newPhotos > 0 || newLabels > 0 || newDeposits > 0
   const depthLabel  = getDepthLabel(overallScore, lang)
 

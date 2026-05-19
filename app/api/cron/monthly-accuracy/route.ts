@@ -156,7 +156,7 @@ export async function GET(req: NextRequest) {
     .eq('status', 'active')
     .not('owner_email', 'is', null)
 
-  const siteUrl   = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+  const siteUrl   = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
   const calMonth  = `${new Date().getUTCFullYear()}-${String(new Date().getUTCMonth() + 1).padStart(2, '0')}`
   let sent = 0
   const skipped: string[] = []

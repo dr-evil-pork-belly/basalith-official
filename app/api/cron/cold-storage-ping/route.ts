@@ -78,7 +78,7 @@ export async function GET(req: NextRequest) {
   const DAY_MS  = 24 * 60 * 60 * 1000
   const WINDOW  = 3 * DAY_MS
   const MILESTONES = [90, 180, 270]
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
   let sent = 0
   const skipped: string[] = []
 

@@ -150,7 +150,7 @@ async function notifyOwnerOnCompletion(
     </p>
   </div>` : ''
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
 
   await resend.emails.send({
     from:    `${archiveName} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,

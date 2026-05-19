@@ -42,7 +42,7 @@ export async function POST(req: Request) {
 
     if (sessionErr) throw sessionErr
 
-    const baseUrl    = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+    const baseUrl    = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
     const sessionUrl = `${baseUrl}/witness/${session.id}`
 
     // Fetch archive name

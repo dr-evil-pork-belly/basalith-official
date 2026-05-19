@@ -16,7 +16,7 @@ function buildGameStartEmail(
   contributorCount: number,
   closesAt:         Date
 ): string {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
 
   const closingTime = closesAt.toLocaleDateString('en-US', {
     weekday: 'long',

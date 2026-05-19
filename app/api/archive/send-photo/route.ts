@@ -29,7 +29,7 @@ function buildAllPhotosSentEmail(
   archiveName:     string,
   contributorName: string,
 ): string {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
   return `<!DOCTYPE html>
 <html>
 <body style="background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:600px;margin:0 auto;padding:0">
@@ -67,7 +67,7 @@ function buildSparkOnlyEmail(
   portalUrl:     string | null,
   lang:          string,
 ): string {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
   const subjectLabels: Record<string, string> = {
     en:  'A question from the archive',
     zh:  '来自档案的问题',
@@ -133,7 +133,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ skipped: true, reason: 'No active contributors' })
     }
 
-    const siteUrl   = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+    const siteUrl   = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
     let sentCount   = 0
     let firstSentPhoto: Record<string, unknown> | null = null
     const exhausted: string[] = []

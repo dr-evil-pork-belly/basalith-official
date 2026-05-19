@@ -36,7 +36,7 @@ export async function POST(req: Request) {
     const photographId  = label.photograph_id
     const archiveName   = archive.name || 'Your Archive'
     const ownerFirst    = archive.owner_name?.split(' ')[0] || 'there'
-    const depositUrl    = `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://basalith.xyz'}/archive/deposit?photographId=${photographId}`
+    const depositUrl    = `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://basalith.ai'}/archive/deposit?photographId=${photographId}`
 
     await resend.emails.send({
       from:    `${archiveName} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,

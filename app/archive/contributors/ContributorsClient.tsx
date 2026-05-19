@@ -208,7 +208,7 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
 
   function portalUrl(token: string | null) {
     if (!token) return null
-    const base = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+    const base = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
     return `${base}/contribute/${token}`
   }
 

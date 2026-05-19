@@ -133,7 +133,7 @@ export async function GET(req: NextRequest) {
   }
 
   // Send personalized relationship-specific questions via Claude
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
   let questionEmailsSent = 0
 
   // Group contributors by archive to batch archive lookups
@@ -226,7 +226,7 @@ function buildWeeklyPromptEmail({
   weekNumber:       number
   lang?:            string
 }): string {
-  const siteUrl    = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+  const siteUrl    = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
   const dateLocale = lang === 'zh' ? 'zh-CN' : 'en-US'
   const dateStr    = new Date().toLocaleDateString(dateLocale, { month: 'long', day: 'numeric', year: 'numeric' }).toUpperCase()
   const depthLabel = getDepthLabel(overallScore, lang)

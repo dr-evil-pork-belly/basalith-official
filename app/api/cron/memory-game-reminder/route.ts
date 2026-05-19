@@ -81,7 +81,7 @@ export async function GET(req: NextRequest) {
       const topName  = leaderboard[0]?.[0] ?? ''
       const topCount = leaderboard[0]?.[1] ?? 0
 
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
       const closesAt = new Date(session.closes_at)
       const hoursLeft = Math.max(0, Math.round((closesAt.getTime() - now.getTime()) / 3600000))
 

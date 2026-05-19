@@ -108,8 +108,8 @@ export async function GET(req: NextRequest) {
 
           const lang      = contributor.preferred_language ?? 'en'
           const portalUrl = contributor.access_token
-            ? `${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'}/contribute/${contributor.access_token}`
-            : process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+            ? `${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'}/contribute/${contributor.access_token}`
+            : process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
 
           // Create reply session so contributor can answer by email
           const replyToken = await createEmailReplySession({

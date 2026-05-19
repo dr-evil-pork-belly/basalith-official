@@ -160,7 +160,7 @@ export async function POST(req: Request) {
 
       const session = WISDOM_SESSIONS[recommended]
       if (session) {
-        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
         wisdomSessionHtml = `
   <div style="margin:32px 0;padding:24px 32px;border-left:3px solid rgba(196,162,74,0.6);background:rgba(196,162,74,0.04)">
     <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;text-transform:uppercase;margin:0 0 12px">
@@ -191,7 +191,7 @@ export async function POST(req: Request) {
         .eq('archive_id', archiveId)
 
       if ((voiceCount ?? 0) < 3) {
-        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
         voiceNudgeHtml = `
   <div style="margin:32px 0;padding:24px 32px;border-left:3px solid rgba(196,162,74,0.3);background:rgba(196,162,74,0.03)">
     <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#706C65;text-transform:uppercase;margin:0 0 12px">

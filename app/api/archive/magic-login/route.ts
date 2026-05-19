@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
     .update({ magic_link_token: null, magic_link_created_at: null })
     .eq('id', archive.id)
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
   const res     = NextResponse.redirect(new URL('/archive/dashboard', siteUrl))
 
   const cookieOpts = {

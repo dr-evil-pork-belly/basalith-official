@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid route' }, { status: 400 })
   }
 
-  const siteUrl    = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+  const siteUrl    = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
   const cronSecret = process.env.CRON_SECRET ?? ''
 
   if (!cronSecret) {

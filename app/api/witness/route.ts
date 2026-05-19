@@ -33,7 +33,7 @@ export async function POST(req: Request) {
 
     if (error) throw error
 
-    const baseUrl    = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+    const baseUrl    = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
     const sessionUrl = `${baseUrl}/witness/${data.id}`
 
     return NextResponse.json({ sessionId: data.id, sessionUrl })

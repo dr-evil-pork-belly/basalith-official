@@ -138,7 +138,7 @@ export async function GET(req: NextRequest) {
 
   const client  = new ElevenLabsClient({ apiKey })
   const month   = new Date().toISOString().substring(0, 7)
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
 
   const { data: archives } = await supabaseAdmin
     .from('archives')

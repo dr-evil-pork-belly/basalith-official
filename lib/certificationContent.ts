@@ -645,7 +645,7 @@ A steward tends the garden. A steward does not read the diary.`,
       title: 'Submitting a new client.',
       content: `After a successful founding session — meaning the client is ready to begin and the founding fee conversation has gone well — here is the submission process.
 
-Log into your guide portal at basalith.xyz/archivist-login.
+Log into your guide portal at basalith.ai/archivist-login.
 
 Navigate to My Practice and click New Client.
 

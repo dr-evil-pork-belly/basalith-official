@@ -27,7 +27,7 @@ function buildWelcomeEmail(
   archivistName: string,
   magicLinkUrl:  string | null,
 ): string {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
   return `<!DOCTYPE html>
 <html>
 <body style="background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:600px;margin:0 auto;padding:32px">
@@ -182,7 +182,7 @@ export async function POST(req: NextRequest) {
     const tierNames: Record<string, string> = { archive: 'The Archive', estate: 'The Estate', dynasty: 'The Dynasty' }
     const tierName = tierNames[tier] || 'The Estate'
     const firstName = (clientName || familyName).split(' ')[0]
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
     const magicLinkUrl = `${siteUrl}/api/archive/magic-login?token=${magicLinkToken}`
 
     try {

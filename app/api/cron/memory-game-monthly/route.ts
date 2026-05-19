@@ -124,7 +124,7 @@ export async function GET(req: NextRequest) {
 
       // ── Step 5: send emails ────────────────────────────────────────────────
       const revealDateStr = new Date(revealAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
-      const siteUrl       = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+      const siteUrl       = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
 
       const recipients: { email: string; name: string; token: string | null; lang: string }[] = [
         ...activeContributors.map(c => ({
@@ -238,7 +238,7 @@ export async function POST(req: NextRequest) {
         .eq('archive_id', session.archive_id)
         .eq('status', 'active')
 
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
 
       const allRecipients = [
         ...(contributors ?? []).map(c => ({ email: c.email, name: c.name ?? c.email, token: c.access_token, lang: c.preferred_language ?? 'en' })),

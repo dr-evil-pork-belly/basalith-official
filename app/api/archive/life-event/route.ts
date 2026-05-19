@@ -130,7 +130,7 @@ Context from the archive owner's own words: ${depositContext || 'No context avai
     }
     const subject = subjectMap[dateRow.date_type] ?? `${dateRow.person_name} · ${archive.name}`
 
-    const baseUrl  = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+    const baseUrl  = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
     const archiveName = archive.name || 'The Family Archive'
 
     const yearsBlock = yearsAgo ? `

@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Archive not found or no owner email' }, { status: 404 })
     }
 
-    const siteUrl   = process.env.NEXT_PUBLIC_SITE_URL   ?? 'https://basalith.xyz'
+    const siteUrl   = process.env.NEXT_PUBLIC_SITE_URL   ?? 'https://basalith.ai'
     const fromEmail = process.env.RESEND_FROM_EMAIL       ?? 'archive@basalith.xyz'
     const firstName = archive.owner_name?.split(' ')[0]   ?? 'there'
 

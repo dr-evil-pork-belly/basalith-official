@@ -312,7 +312,7 @@ export async function POST(req: NextRequest) {
   }
 
   // ── Return TwiML (always — Twilio is waiting) ─────────────────────────────────
-  const siteUrl      = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+  const siteUrl      = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
   const continueBase = `${siteUrl}/api/twilio/continue`
 
   const continueUrl = isOwner

@@ -1,4 +1,4 @@
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
 
 const BASE_STYLES = {
   body:       'background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:600px;margin:0 auto;padding:0',

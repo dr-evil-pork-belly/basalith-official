@@ -57,7 +57,7 @@ export async function POST(req: Request) {
   </blockquote>
   ` : ''}
 
-  <a href="${process.env.NEXT_PUBLIC_APP_URL ?? 'https://basalith.xyz'}/archive/gallery"
+  <a href="${process.env.NEXT_PUBLIC_APP_URL ?? 'https://basalith.ai'}/archive/gallery"
     style="display:inline-block;font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#C4A24A;text-decoration:none;border:1px solid rgba(196,162,74,0.3);padding:10px 20px">
     VIEW IN ARCHIVE &rarr;
   </a>

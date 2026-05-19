@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     template: '%s · Basalith',
   },
   description: 'The archive of a life, governed with the same seriousness as an estate. We build for legacy.',
-  metadataBase: new URL('https://basalith.xyz'),
+  metadataBase: new URL('https://basalith.ai'),
   manifest:    '/site.webmanifest',
   icons: {
     icon: [
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
   openGraph: {
     title:       'Basalith',
     description: 'The archive of a life, governed with the same seriousness as an estate.',
-    url:         'https://basalith.xyz',
+    url:         'https://basalith.ai',
     siteName:    'Basalith',
     images:      [{ url: '/icon-512x512.png' }],
   },

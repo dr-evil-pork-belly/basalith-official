@@ -344,7 +344,7 @@ function MemoryGameCard({ archiveId }: { archiveId: string }) {
 
   if (loading) return null
 
-  const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://basalith.xyz'
+  const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://basalith.ai'
 
   function handleCopyLink() {
     if (!session) return

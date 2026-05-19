@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
 
     // Notify archive owner
     if (archive?.owner_email) {
-      const siteUrl   = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+      const siteUrl   = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
       const fromEmail = process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'
       const mediaLabel = isVideo ? 'a video' : 'a document'
 

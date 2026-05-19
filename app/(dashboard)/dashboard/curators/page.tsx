@@ -39,7 +39,7 @@ function ClearanceBadge({ clearance }: { clearance: string }) {
   )
 }
 
-const INVITE_BASE = 'https://www.basalith.xyz/join?token='
+const INVITE_BASE = 'https://www.basalith.ai/join?token='
 
 function CopyLinkButton({ token }: { token: string }) {
   const [copied, setCopied] = useState(false)

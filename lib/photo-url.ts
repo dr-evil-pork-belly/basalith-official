@@ -1,6 +1,6 @@
 import { supabaseAdmin } from './supabase-admin'
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
 
 /**
  * Returns a permanent proxy URL for a photograph by ID.

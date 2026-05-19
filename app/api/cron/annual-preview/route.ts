@@ -130,7 +130,7 @@ export async function GET(req: NextRequest) {
   const thisYear = now.getUTCFullYear()
   const todayM   = now.getUTCMonth() + 1
   const todayD   = now.getUTCDate()
-  const siteUrl  = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+  const siteUrl  = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
   let sent = 0
   const skipped: string[] = []
 

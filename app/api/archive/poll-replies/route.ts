@@ -249,7 +249,7 @@ export async function POST(req: Request) {
         // Trigger contribution alert to archive owner
         if (savedLabel?.id) {
           try {
-            const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://basalith.xyz'
+            const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://basalith.ai'
             await fetch(`${siteUrl}/api/archive/contribution-alert`, {
               method:  'POST',
               headers: { 'Content-Type': 'application/json' },

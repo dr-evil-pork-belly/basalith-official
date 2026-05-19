@@ -480,7 +480,7 @@ function ArchiveCard({ archive, onRefresh }: { archive: ArchiveData; onRefresh: 
 
   function handleCopyLink() {
     if (!archive.magicLinkToken) return
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
     const url = `${siteUrl}/api/archive/magic-login?token=${archive.magicLinkToken}`
     navigator.clipboard.writeText(url).then(() => {
       setLinkCopied(true)

@@ -136,7 +136,7 @@ export async function POST(req: NextRequest) {
         .eq('archive_id', archiveId)
         .in('id', contributorIds)
 
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
 
       for (const c of invitedContribs ?? []) {
         const portalUrl = c.access_token

@@ -181,7 +181,7 @@ export async function POST(req: NextRequest) {
 
     if (emailSession) {
       // Forward to existing receive-reply handler logic
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
       await fetch(`${siteUrl}/api/archive/receive-reply`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },

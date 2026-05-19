@@ -490,7 +490,7 @@ export async function POST(req: Request) {
             .eq('times_accessed', 1)
             .not('contributor_id', 'is', null)
 
-          const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+          const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
 
           for (const deposit of firstUse ?? []) {
             const [{ data: contributor }, { data: archive }] = await Promise.all([

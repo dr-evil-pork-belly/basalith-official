@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
 
       if (archive && data?.email) {
         const firstName = data.name?.split(' ')[0] || 'there'
-        const siteUrl   = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+        const siteUrl   = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
         const fromEmail = process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'
         const portalUrl = portalToken ? `${siteUrl}/contribute/${portalToken}` : null
 
@@ -147,7 +147,7 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: 'Archive not found' }, { status: 404 })
     }
 
-    const siteUrl   = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+    const siteUrl   = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
     const fromEmail = process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'
     const firstName = contributor.name?.split(' ')[0] || 'there'
     const portalUrl = contributor.access_token ? `${siteUrl}/contribute/${contributor.access_token}` : null

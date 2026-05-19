@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
   const formData = await req.formData()
   const digit    = formData.get('Digits') as string | null
 
-  const siteUrl      = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.xyz'
+  const siteUrl      = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
   const recordingBase = `${siteUrl}/api/twilio/recording`
 
   const { data: archiveLang } = await supabaseAdmin
