@@ -9,6 +9,7 @@ export const dynamic = 'force-dynamic'
 export async function GET(req: NextRequest) {
   const archiveId = new URL(req.url).searchParams.get('archiveId')
 
+  console.log('[dashboard-mobile] archiveId:', archiveId || 'NOT RECEIVED')
   if (!archiveId) {
     return NextResponse.json({ error: 'archiveId required' }, { status: 400 })
   }

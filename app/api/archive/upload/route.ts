@@ -15,6 +15,7 @@ export async function POST(req: NextRequest) {
       req.headers.get('x-archive-id') ||
       cookieStore.get('archive-id')?.value
 
+    console.log('[upload] archiveId header:', req.headers.get('x-archive-id') || 'NOT RECEIVED', '| resolved:', archiveId?.substring(0, 8) ?? 'NONE')
     if (!archiveId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
