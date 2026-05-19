@@ -6,7 +6,8 @@
     "asset": "遺産資産",
     "apply": "アーカイブを始める",
     "signin": "マイアーカイブ",
-    "language": "言語"
+    "language": "言語",
+    "for_business": "For Business"
   },
   "hero": {
     "eyebrow": "Heritage Nexus · Basalith",
@@ -16,7 +17,7 @@
     "subheadline": "Basalithは、あなた固有の思考方法に合わせて訓練された生きたAIエンティティを構築します。何をされたかではなく、どのように考えるか、何を大切にされるか、世界をどのようにご覧になるか、その全てです。",
     "subheadline_2": "ご存命の間は、あなたから学び続けます。旅立たれた後も、ずっと続いていきます。",
     "cta_primary": "創設セッションを申し込む",
-    "cta_secondary": "仕組みを見る",
+    "cta_secondary": "For Business",
     "social_proof": "4か国のご家族 · 2026年設立",
     "subheadline_a": "ほとんどの人は、あなたの準備ができる前に旅立ちます。",
     "subheadline_b": "Basalithは、その別れを本当の別れにしないために作られました。"
@@ -33,7 +34,8 @@
     "pillar_2_body": "心の原材料。あなたが世界をどのようにご覧になっていたかを示す写真。お話しになり方を捉えた音声録音。ものの考え方が滲み出る物語。",
     "pillar_3_title": "継続",
     "pillar_3_body": "世界でもっとも豊かな人々は、自分自身のAIバージョンを構築するために何十億ドルもの費用を投じています。Basalithは、すべてのご家族のためにそれを実現します。",
-    "body_5": "私たちはBasalithを作りました。\nあなたの家族が迷わないために。"
+    "body_5": "私たちはBasalithを作りました。\nあなたの家族が迷わないために。",
+    "eyebrow": "WHAT BASALITH PRESERVES"
   },
   "pricing_teaser": {
     "line_1": "世界でもっとも豊かな人々は、自分自身のAIバージョンを構築するために何十億ドルもの費用を投じています。",
@@ -219,5 +221,16 @@
     "tagline_3": "残しておけば。",
     "cta": "始める",
     "price": "エステートは $2,500 から"
+  },
+  "two_paths": {
+    "eyebrow": "WHO BASALITH IS FOR",
+    "legacy_eyebrow": "LEGACY",
+    "legacy_headline": "Your parents know things they have never written down.",
+    "legacy_body": "Your children will spend years trying to understand how they thought. Basalith gives them the answer while there is still time to get it right.",
+    "legacy_cta": "Begin Your Archive",
+    "succession_eyebrow": "SUCCESSION",
+    "succession_headline": "Your founder built this with a way of thinking that exists nowhere in your documentation.",
+    "succession_body": "When they step back that thinking goes with them. Unless you build a Basalith.",
+    "succession_cta": "Learn About Succession"
   }
 }

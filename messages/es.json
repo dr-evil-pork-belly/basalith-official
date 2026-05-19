@@ -6,7 +6,8 @@
     "asset": "El Legado",
     "apply": "Comenzar su Archivo",
     "signin": "Mi Archivo",
-    "language": "Idioma"
+    "language": "Idioma",
+    "for_business": "For Business"
   },
   "hero": {
     "eyebrow": "Heritage Nexus · Basalith",
@@ -16,7 +17,7 @@
     "subheadline": "Basalith construye una entidad de inteligencia artificial entrenada específicamente en su forma de pensar. No lo que hizo. Cómo razona. Qué valora. Cómo ve el mundo.",
     "subheadline_2": "Mientras usted vive, aprende de usted. Mucho después de que se haya ido, continúa.",
     "cta_primary": "Solicitar su Sesión Fundacional",
-    "cta_secondary": "Ver Cómo Funciona",
+    "cta_secondary": "For Business",
     "social_proof": "Familias en 4 países · Est. 2026",
     "subheadline_a": "La mayoría de las personas se van antes de que estés listo.",
     "subheadline_b": "Basalith fue construido para que nunca tengan que irse del todo."
@@ -33,7 +34,8 @@
     "pillar_2_body": "La materia prima de una mente. Fotografías que muestran cómo vio el mundo. Grabaciones de voz que capturan cómo habla. Historias que revelan cómo piensa.",
     "pillar_3_title": "La Continuación",
     "pillar_3_body": "Las personas más ricas del mundo gastan miles de millones construyendo versiones de sí mismas en IA. Basalith lo hace para cada familia.",
-    "body_5": "Construimos Basalith\npara que tu familia nunca tenga que preguntarse."
+    "body_5": "Construimos Basalith\npara que tu familia nunca tenga que preguntarse.",
+    "eyebrow": "WHAT BASALITH PRESERVES"
   },
   "pricing_teaser": {
     "line_1": "Las personas más ricas del mundo gastan miles de millones construyendo versiones de sí mismas en IA.",
@@ -219,5 +221,16 @@
     "tagline_3": "de usted mismo.",
     "cta": "Comenzar",
     "price": "El Estate comienza en $2,500"
+  },
+  "two_paths": {
+    "eyebrow": "WHO BASALITH IS FOR",
+    "legacy_eyebrow": "LEGACY",
+    "legacy_headline": "Your parents know things they have never written down.",
+    "legacy_body": "Your children will spend years trying to understand how they thought. Basalith gives them the answer while there is still time to get it right.",
+    "legacy_cta": "Begin Your Archive",
+    "succession_eyebrow": "SUCCESSION",
+    "succession_headline": "Your founder built this with a way of thinking that exists nowhere in your documentation.",
+    "succession_body": "When they step back that thinking goes with them. Unless you build a Basalith.",
+    "succession_cta": "Learn About Succession"
   }
 }

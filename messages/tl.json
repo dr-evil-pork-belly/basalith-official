@@ -6,7 +6,8 @@
     "asset": "Ang Pamana",
     "apply": "Simulan ang Inyong Talaan",
     "signin": "Ang Aking Talaan",
-    "language": "Wika"
+    "language": "Wika",
+    "for_business": "For Business"
   },
   "hero": {
     "eyebrow": "Heritage Nexus · Basalith",
@@ -16,7 +17,7 @@
     "subheadline": "Ang Basalith ay nagtatayo ng isang buhay na AI entity na sinanay nang partikular sa inyong paraan ng pag-iisip. Hindi ang inyong mga nagawa. Kundi kung paano kayo nagbibigay-katwiran, kung ano ang inyong pinahahalagahan, kung paano ninyo tinitingnan ang mundo.",
     "subheadline_2": "Habang kayo ay nabubuhay, natututo ito mula sa inyo. Matagal pagkatapos na kayo ay lumisan, nagpapatuloy ito.",
     "cta_primary": "Humiling ng Panimulang Sesyon",
-    "cta_secondary": "Tingnan Kung Paano Ito Gumagana",
+    "cta_secondary": "For Business",
     "social_proof": "Mga pamilya sa 4 na bansa · Itinatag noong 2026",
     "subheadline_a": "Karamihan sa mga tao ay umaalis bago ka handa.",
     "subheadline_b": "Itinayo ang Basalith para hindi sila kailangang umalis nang tunay."
@@ -33,7 +34,8 @@
     "pillar_2_body": "Ang hilaw na materyales ng isip. Mga larawang nagpapakita kung paano ninyo nakita ang mundo. Mga rekording ng boses na kumukuha ng inyong paraan ng pagsasalita. Mga kwentong nagbubunyag ng inyong paraan ng pag-iisip.",
     "pillar_3_title": "Ang Pagpapatuloy",
     "pillar_3_body": "Ang mga pinakamaykayamang tao sa mundo ay gumagastos ng bilyun-bilyon para magtayo ng kanilang AI na bersyon. Ginagawa ito ng Basalith para sa bawat pamilya.",
-    "body_5": "Itinayo namin ang Basalith\npara hindi na kailangang tanungin ng iyong pamilya."
+    "body_5": "Itinayo namin ang Basalith\npara hindi na kailangang tanungin ng iyong pamilya.",
+    "eyebrow": "WHAT BASALITH PRESERVES"
   },
   "pricing_teaser": {
     "line_1": "Ang mga pinakamaykayamang tao sa mundo ay gumagastos ng bilyun-bilyon para magtayo ng kanilang AI na bersyon.",
@@ -219,5 +221,16 @@
     "tagline_3": "bahagi ng iyong sarili.",
     "cta": "Simulan",
     "price": "Nagsisimula ang Estate sa $2,500"
+  },
+  "two_paths": {
+    "eyebrow": "WHO BASALITH IS FOR",
+    "legacy_eyebrow": "LEGACY",
+    "legacy_headline": "Your parents know things they have never written down.",
+    "legacy_body": "Your children will spend years trying to understand how they thought. Basalith gives them the answer while there is still time to get it right.",
+    "legacy_cta": "Begin Your Archive",
+    "succession_eyebrow": "SUCCESSION",
+    "succession_headline": "Your founder built this with a way of thinking that exists nowhere in your documentation.",
+    "succession_body": "When they step back that thinking goes with them. Unless you build a Basalith.",
+    "succession_cta": "Learn About Succession"
   }
 }

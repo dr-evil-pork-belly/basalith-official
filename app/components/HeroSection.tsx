@@ -131,7 +131,7 @@ export default function HeroSection() {
             {t('hero.cta_primary')}
           </Link>
           <Link
-            href="/method"
+            href="/succession"
             style={{
               ...MONO,
               display:        'inline-block',

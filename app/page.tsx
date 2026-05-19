@@ -1,14 +1,15 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Basalith · Some people leave before you are ready.',
-  description: 'Basalith was built so that leaving does not have to mean gone. The infrastructure of human continuation. Priced for every family.',
+  title: 'Basalith · The way you think is irreplaceable.',
+  description: 'Basalith builds a living cognitive entity from the way you think, decide, and see the world. For families preserving a legacy. For businesses preserving a founder.',
 }
 
 import Nav               from './components/Nav'
 import TaglineOpening    from './components/TaglineOpening'
 import HeroSection       from './components/HeroSection'
 import PhilosophySection from './components/PhilosophySection'
+import TwoPathsSection   from './components/TwoPathsSection'
 import ClosingSection    from './components/ClosingSection'
 import Footer            from './components/Footer'
 
@@ -20,6 +21,7 @@ export default function HomePage() {
         <TaglineOpening />
         <HeroSection />
         <PhilosophySection />
+        <TwoPathsSection />
         <ClosingSection />
       </main>
       <Footer />

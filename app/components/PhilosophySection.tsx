@@ -22,6 +22,19 @@ export default function PhilosophySection() {
     >
       <div style={{ maxWidth: '860px', margin: '0 auto' }}>
 
+        {t('philosophy.eyebrow') && (
+          <p style={{
+            fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+            fontSize:      '0.52rem',
+            letterSpacing: '0.3em',
+            textTransform: 'uppercase' as const,
+            color:         'var(--color-gold)',
+            marginBottom:  '24px',
+          }}>
+            {t('philosophy.eyebrow')}
+          </p>
+        )}
+
         <h2
           style={{
             fontFamily:    'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',

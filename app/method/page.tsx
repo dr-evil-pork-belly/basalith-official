@@ -175,6 +175,39 @@ export default function MethodPage() {
           </div>
         </section>
 
+        {/* B2B section */}
+        <section style={{ padding: 'clamp(80px,12vw,140px) clamp(24px,6vw,80px)', background: 'var(--color-void)' }}>
+          <div style={{ maxWidth: '700px' }}>
+            <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '24px' }}>
+              Beyond Legacy
+            </p>
+            <h2 style={{ ...H2, color: 'rgba(250,250,248,0.9)', marginTop: 0 }}>
+              A succession tool for the knowledge that cannot be documented.
+            </h2>
+            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)', marginBottom: '24px' }}>
+              Basalith began as a legacy product for families who wanted to preserve how someone thought before they were gone.
+              We discovered the same problem exists in every business where one person carries the institutional knowledge that built the company.
+            </p>
+            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)', marginBottom: '24px' }}>
+              The founder who knows which customers to walk away from.
+              The executive whose pattern recognition has saved the company three times.
+              The partner whose judgment about people has never been wrong.
+            </p>
+            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)', marginBottom: '24px' }}>
+              When they leave that knowledge leaves.
+            </p>
+            <p style={{ fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)', fontSize: '1.15rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: 'rgba(184,150,62,0.9)', marginBottom: '36px' }}>
+              Basalith keeps it.
+            </p>
+            <a
+              href="/succession"
+              style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px', border: '1px solid rgba(184,150,62,0.4)', padding: '12px 24px' }}
+            >
+              Basalith for Business <span aria-hidden="true">→</span>
+            </a>
+          </div>
+        </section>
+
       </main>
       <Footer />
     </>

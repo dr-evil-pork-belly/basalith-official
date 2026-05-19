@@ -202,6 +202,58 @@ export default function PricingPage() {
           </p>
         </section>
 
+        {/* B2B — Succession */}
+        <section style={{ background: 'var(--color-bg)', padding: 'clamp(80px,12vw,140px) clamp(24px,6vw,80px)' }}>
+          <div style={{ maxWidth: '700px', margin: '0 auto' }}>
+            <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '16px' }}>For Business</p>
+            <h2 style={{ ...SERIF, fontSize: 'clamp(2rem,4vw,3rem)', fontWeight: 300, lineHeight: 1.1, color: 'var(--color-text-primary)', marginBottom: '16px' }}>
+              Succession Pricing
+            </h2>
+            <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: 'var(--color-text-secondary)', marginBottom: '48px' }}>
+              For SME founders and key knowledge holders.
+            </p>
+
+            <div style={{ border: '1px solid rgba(184,150,62,0.35)', padding: 'clamp(32px,5vw,52px)', background: 'rgba(184,150,62,0.03)', marginBottom: '24px' }}>
+              <p style={{ ...MONO, fontSize: '0.48rem', color: 'var(--color-gold)', marginBottom: '16px' }}>Succession</p>
+              <p style={{ ...SERIF, fontSize: 'clamp(2.5rem,5vw,3.2rem)', fontWeight: 300, color: 'var(--color-text-primary)', lineHeight: 1, marginBottom: '4px' }}>$12,000</p>
+              <p style={{ ...MONO, fontSize: '0.44rem', color: 'var(--color-text-muted)', marginBottom: '8px' }}>per year</p>
+              <p style={{ ...SERIF, fontSize: '0.95rem', fontStyle: 'italic', color: 'var(--color-gold)', marginBottom: '28px' }}>+ $5,000 founding session (one-time)</p>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 20px', marginBottom: '32px' }}>
+                {[
+                  'Extended 3-hour founding session',
+                  'Business decision framework capture',
+                  '20+ scenario training library',
+                  'Successor access portal',
+                  'Quarterly calibration sessions',
+                  'Annual entity accuracy report',
+                  'Board-level reporting',
+                  'Priority support',
+                ].map(f => (
+                  <p key={f} style={{ ...MONO, fontSize: '0.43rem', color: 'var(--color-text-muted)', margin: 0 }}>&#10003; {f}</p>
+                ))}
+              </div>
+              <a
+                href="/apply?type=succession"
+                style={{ ...MONO, fontSize: 'var(--text-caption)', display: 'block', textAlign: 'center', textDecoration: 'none', background: 'var(--color-gold)', color: '#0A0908', padding: '14px 32px' }}
+              >
+                Talk to us about Succession
+              </a>
+            </div>
+
+            <p style={{ ...SERIF, fontSize: '0.95rem', fontStyle: 'italic', color: 'var(--color-text-muted)', marginBottom: '40px' }}>
+              After transition: $3,600/year. Institutional access continues for the successor.
+            </p>
+
+            <p style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', color: 'var(--color-text-secondary)', lineHeight: 1.85 }}>
+              Not sure which is right for you?
+              Every archive starts with a conversation with a Legacy Guide.
+            </p>
+            <a href="/apply" style={{ ...MONO, fontSize: 'var(--text-caption)', display: 'inline-block', marginTop: '20px', textDecoration: 'none', color: 'var(--color-gold)', border: '1px solid var(--color-gold)', padding: '12px 28px' }}>
+              Speak to a Guide &rarr;
+            </a>
+          </div>
+        </section>
+
       </main>
       <Footer />
 

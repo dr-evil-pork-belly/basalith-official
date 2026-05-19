@@ -6,14 +6,15 @@ import { usePathname } from 'next/navigation'
 import LanguageSelector from './LanguageSelector'
 
 const DESKTOP_LINKS = [
-  { href: '/method',     label: 'The Method' },
-  { href: '/asset',      label: 'The Asset'  },
-  { href: '/pricing',    label: 'Pricing'    },
-  { href: '/about',      label: 'About'      },
+  { href: '/method',      label: 'The Method'  },
+  { href: '/pricing',     label: 'Pricing'     },
+  { href: '/succession',  label: 'For Business'},
+  { href: '/about',       label: 'About'       },
 ]
 
 const MOBILE_LINKS = [
   { href: '/pricing',         label: 'Pricing'               },
+  { href: '/succession',      label: 'For Business'          },
   { href: '/about',           label: 'About'                 },
   { href: '/method',          label: 'The Method'            },
   { href: '/founding-session',label: 'Founding Session'      },

@@ -6,7 +6,8 @@
     "asset": "遺產資產",
     "apply": "開始你嘅檔案",
     "signin": "我嘅檔案",
-    "language": "語言"
+    "language": "語言",
+    "for_business": "For Business"
   },
   "hero": {
     "eyebrow": "Heritage Nexus · Basalith",
@@ -16,7 +17,7 @@
     "subheadline": "Basalith 為你建立一個活生生嘅 AI 分身，係根據你獨特嘅思考方式訓練㗎。唔係你做過咩，而係你點樣推理、你珍視咩、你點睇呢個世界。",
     "subheadline_2": "你喺生嘅時候，佢向你學習。你離開之後好耐，佢仍然繼續。",
     "cta_primary": "申請創始會面",
-    "cta_secondary": "了解運作方式",
+    "cta_secondary": "For Business",
     "social_proof": "四個國家嘅家族檔案 · 2026年成立",
     "subheadline_a": "大多數人喺你準備好之前就離開。",
     "subheadline_b": "Basalith 係為咗令佢哋永遠唔需要真正離開。"
@@ -33,7 +34,8 @@
     "pillar_2_body": "心靈嘅原始素材。展現你點睇世界嘅相片。記錄你講嘢方式嘅語音。揭示你思考方式嘅故事。",
     "pillar_3_title": "生命延續",
     "pillar_3_body": "世界上最有錢嘅人正花緊幾十億美金建立自己嘅 AI 版本。Basalith 為每個家庭做到呢件事。",
-    "body_5": "我哋建立咗 Basalith，\n令你嘅家人永遠唔需要再去猜想。"
+    "body_5": "我哋建立咗 Basalith，\n令你嘅家人永遠唔需要再去猜想。",
+    "eyebrow": "WHAT BASALITH PRESERVES"
   },
   "pricing_teaser": {
     "line_1": "世界上最有錢嘅人正花緊幾十億美金建立自己嘅 AI 版本。",
@@ -219,5 +221,16 @@
     "tagline_3": "足夠嘅自己。",
     "cta": "開始",
     "price": "庄園檔案起價 $2,500"
+  },
+  "two_paths": {
+    "eyebrow": "WHO BASALITH IS FOR",
+    "legacy_eyebrow": "LEGACY",
+    "legacy_headline": "Your parents know things they have never written down.",
+    "legacy_body": "Your children will spend years trying to understand how they thought. Basalith gives them the answer while there is still time to get it right.",
+    "legacy_cta": "Begin Your Archive",
+    "succession_eyebrow": "SUCCESSION",
+    "succession_headline": "Your founder built this with a way of thinking that exists nowhere in your documentation.",
+    "succession_body": "When they step back that thinking goes with them. Unless you build a Basalith.",
+    "succession_cta": "Learn About Succession"
   }
 }

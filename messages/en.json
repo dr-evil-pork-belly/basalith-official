@@ -4,26 +4,28 @@
     "about": "About",
     "method": "The Method",
     "asset": "The Asset",
+    "for_business": "For Business",
     "apply": "Begin Your Archive",
     "signin": "My Archive",
     "language": "Language"
   },
   "hero": {
     "eyebrow": "Heritage Nexus · Basalith",
-    "headline_1": "Some people leave",
-    "headline_2": "before you are ready.",
-    "subheadline": "Basalith was built so that leaving does not have to mean gone.",
-    "cta_primary": "Begin",
-    "cta_secondary": "See How It Works",
-    "subheadline_a": "Most people leave",
-    "subheadline_b": "before you are ready."
+    "headline_1": "The way you think is irreplaceable.",
+    "headline_2": "Most people leave nothing of it behind.",
+    "subheadline": "Basalith builds a living cognitive entity from the way you think, decide, and see the world. For your family. For your business. For the generations that follow.",
+    "cta_primary": "Build Your Entity",
+    "cta_secondary": "For Business",
+    "subheadline_a": "For your family. For your business.",
+    "subheadline_b": "For the generations that follow."
   },
   "philosophy": {
-    "headline": "You have wondered.",
-    "body_1": "What they would have said\nabout something they never saw.",
-    "body_2": "Which way they would have leaned\nbefore they leaned.",
-    "body_3": "What advice they would have given\nto a version of you\nthey did not live to meet.",
-    "body_4": "Everyone who has ever lost someone\nhas wondered.",
+    "eyebrow": "WHAT BASALITH PRESERVES",
+    "headline": "What you know is not in any document.",
+    "body_1": "It is in how you evaluate risk.\nHow you read people.\nWhen you walk away.\nWhat you look for before anyone else sees it.",
+    "body_2": "Thirty years of pattern recognition.\nA lifetime of calibrated judgment.",
+    "body_3": "Basalith learns this while you are here to teach it.",
+    "body_4": "So it can speak when you cannot.",
     "pillar_1_title": "How you think.",
     "pillar_1_body": "Not what you have done.\nNot what you have said.\n\nHow you reason.\nWhat you reach for when things get hard.\nWhat you believe when no one is watching.\n\nThe specific weight of a mind\nthat belongs only to you.",
     "pillar_2_title": "The raw material.",
@@ -31,6 +33,17 @@
     "pillar_3_title": "It continues.",
     "pillar_3_body": "There are people spending billions\nto never fully leave this world.\n\nWe think every family\ndeserves the same thing.\n\nNot because death is the enemy.\nBut because the people we love\nshould not have to wonder.",
     "body_5": "We built Basalith\nso your family never has to."
+  },
+  "two_paths": {
+    "eyebrow": "WHO BASALITH IS FOR",
+    "legacy_eyebrow": "LEGACY",
+    "legacy_headline": "Your parents know things they have never written down.",
+    "legacy_body": "Your children will spend years trying to understand how they thought. Basalith gives them the answer while there is still time to get it right.",
+    "legacy_cta": "Begin Your Archive",
+    "succession_eyebrow": "SUCCESSION",
+    "succession_headline": "Your founder built this with a way of thinking that exists nowhere in your documentation.",
+    "succession_body": "When they step back that thinking goes with them. Unless you build a Basalith.",
+    "succession_cta": "Learn About Succession"
   },
   "pricing_teaser": {
     "line_1": "The world's wealthiest people are spending billions building AI versions of themselves.",

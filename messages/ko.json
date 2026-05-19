@@ -6,7 +6,8 @@
     "asset": "유산 자산",
     "apply": "기록 시작하기",
     "signin": "내 기록",
-    "language": "언어"
+    "language": "언어",
+    "for_business": "For Business"
   },
   "hero": {
     "eyebrow": "Heritage Nexus · Basalith",
@@ -16,7 +17,7 @@
     "subheadline": "Basalith는 귀하의 고유한 사고방식에 맞게 훈련된 살아있는 AI 실체를 구축합니다. 무엇을 하셨는지가 아닙니다. 어떻게 추론하시는지, 무엇을 소중히 여기시는지, 세상을 어떻게 바라보시는지입니다.",
     "subheadline_2": "살아계시는 동안 배우고, 떠나신 훨씬 후에도 계속됩니다.",
     "cta_primary": "창립 세션 신청하기",
-    "cta_secondary": "작동 방식 보기",
+    "cta_secondary": "For Business",
     "social_proof": "4개국의 가족 기록 · 2026년 설립",
     "subheadline_a": "대부분의 사람들은 당신이 준비되기 전에 떠납니다.",
     "subheadline_b": "Basalith는 그들이 진정으로 떠나지 않아도 되도록 만들어졌습니다."
@@ -33,7 +34,8 @@
     "pillar_2_body": "정신의 원재료. 귀하가 세상을 어떻게 바라보았는지 보여주는 사진들. 귀하가 어떻게 말씀하시는지 담은 음성 녹음. 귀하가 어떻게 생각하시는지 드러내는 이야기들.",
     "pillar_3_title": "계속",
     "pillar_3_body": "세계에서 가장 부유한 사람들은 자신의 AI 버전을 만들기 위해 수십억을 씁니다. Basalith는 모든 가족을 위해 그것을 합니다.",
-    "body_5": "우리는 Basalith를 만들었습니다.\n당신의 가족이 궁금해하지 않아도 되도록."
+    "body_5": "우리는 Basalith를 만들었습니다.\n당신의 가족이 궁금해하지 않아도 되도록.",
+    "eyebrow": "WHAT BASALITH PRESERVES"
   },
   "pricing_teaser": {
     "line_1": "세계에서 가장 부유한 사람들은 자신의 AI 버전을 만들기 위해 수십억을 씁니다.",
@@ -219,5 +221,16 @@
     "tagline_3": "남겨두기만 한다면.",
     "cta": "시작하기",
     "price": "Estate는 $2,500부터"
+  },
+  "two_paths": {
+    "eyebrow": "WHO BASALITH IS FOR",
+    "legacy_eyebrow": "LEGACY",
+    "legacy_headline": "Your parents know things they have never written down.",
+    "legacy_body": "Your children will spend years trying to understand how they thought. Basalith gives them the answer while there is still time to get it right.",
+    "legacy_cta": "Begin Your Archive",
+    "succession_eyebrow": "SUCCESSION",
+    "succession_headline": "Your founder built this with a way of thinking that exists nowhere in your documentation.",
+    "succession_body": "When they step back that thinking goes with them. Unless you build a Basalith.",
+    "succession_cta": "Learn About Succession"
   }
 }
