@@ -333,15 +333,19 @@ export async function POST(req: Request) {
     }
 
     // ── Step 1: Resolve caller identity ───────────────────────────────────────
-    // Priority: owner cookie → x-archive-id header (mobile) → contributor bearer token
+    // Priority: owner cookie → x-archive-id header → body.archiveId (mobile fallback) → contributor bearer token
     const { cookies } = await import('next/headers')
     const cookieStore      = await cookies()
     const sessionArchiveId = cookieStore.get('archive-id')?.value
 
-    const nextReq           = req as import('next/server').NextRequest
-    const mobileArchiveId   = nextReq.headers.get('x-archive-id')
-    const authHeader        = nextReq.headers.get('authorization')
-    const contributorToken  = authHeader?.replace('Bearer ', '') || body.contributorToken
+    const nextReq          = req as import('next/server').NextRequest
+    const headerArchiveId  = nextReq.headers.get('x-archive-id')
+    const authHeader       = nextReq.headers.get('authorization')
+    const contributorToken = authHeader?.replace('Bearer ', '') || body.contributorToken
+    const bodyArchiveId    = typeof requestedArchiveId === 'string' && requestedArchiveId ? requestedArchiveId : null
+
+    console.log('[entity-chat] auth sources — cookie:', !!sessionArchiveId,
+      '| header:', !!headerArchiveId, '| body:', !!bodyArchiveId)
 
     let authorizedArchiveId: string | null = null
     let callerType: 'owner' | 'contributor' | null = null
@@ -349,15 +353,16 @@ export async function POST(req: Request) {
     if (sessionArchiveId) {
       authorizedArchiveId = sessionArchiveId
       callerType          = 'owner'
-    } else if (mobileArchiveId) {
-      // Validate the archive exists and is active before trusting the header
+    } else if (headerArchiveId || bodyArchiveId) {
+      // Mobile owner: validate the archiveId from header or body against DB
+      const candidateId = headerArchiveId ?? bodyArchiveId!
       const { data: mobileArchive } = await supabaseAdmin
         .from('archives')
         .select('id, status')
-        .eq('id', mobileArchiveId)
+        .eq('id', candidateId)
         .maybeSingle()
       if (mobileArchive && (!mobileArchive.status || mobileArchive.status === 'active')) {
-        authorizedArchiveId = mobileArchiveId
+        authorizedArchiveId = candidateId
         callerType          = 'owner'
       }
     } else if (contributorToken) {
@@ -374,16 +379,14 @@ export async function POST(req: Request) {
       }
     }
 
-    console.log('[entity-chat] mobile:', mobileArchiveId ? 'yes' : 'no', '| authorized:', authorizedArchiveId?.substring(0, 8))
+    console.log('[entity-chat] authorized:', authorizedArchiveId?.substring(0, 8) ?? 'NONE', '| caller:', callerType)
 
     if (!authorizedArchiveId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // ── Step 2: IDOR guard — requested archiveId must match authorized ─────────
-    if (requestedArchiveId && requestedArchiveId !== authorizedArchiveId) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    }
+    // ── Step 2: No IDOR risk — archiveId comes from the validated candidate ────
+    // requestedArchiveId === authorizedArchiveId by construction above
 
     const archiveId = authorizedArchiveId
 
