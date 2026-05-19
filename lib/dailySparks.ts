@@ -86,17 +86,14 @@ function applyName(text: string, ownerName: string): string {
 
 // Returns today's spark for a given context, rotated by day of year.
 // Same spark for all archives on the same day (intentional — creates shared rhythm).
+// dayOfWeek field on sparks is informational only — not used as a filter,
+// because filtering causes null returns on non-matching days.
 export function getTodaysSpark(isContributor: boolean, ownerName = ''): DailySpark | null {
-  const today     = new Date()
-  const dayOfWeek = today.getDay()
   const dayOfYear = getDayOfYear()
 
-  const candidates = dailySparks.filter(s => {
-    if (isContributor  && s.category !== 'contributor') return false
-    if (!isContributor && s.category === 'contributor') return false
-    if (s.dayOfWeek !== undefined && s.dayOfWeek !== dayOfWeek) return false
-    return true
-  })
+  const candidates = dailySparks.filter(s =>
+    isContributor ? s.category === 'contributor' : s.category !== 'contributor'
+  )
 
   if (!candidates.length) return null
   const spark = candidates[dayOfYear % candidates.length]

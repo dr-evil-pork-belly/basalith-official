@@ -4,10 +4,13 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 export const dynamic = 'force-dynamic'
 
 export async function GET(req: NextRequest) {
-  const archiveId = new URL(req.url).searchParams.get('archiveId')
+  const archiveId =
+    req.headers.get('x-archive-id') ||
+    new URL(req.url).searchParams.get('archiveId')
+
   if (!archiveId) return NextResponse.json({ error: 'archiveId required' }, { status: 400 })
 
-  // Recent labels from contributors (not owner)
+  // Labels from contributors (not owner) — no date restriction
   const { data: labels } = await supabaseAdmin
     .from('labels')
     .select('id, what_was_happening, labelled_by, created_at, photograph_id')
@@ -17,13 +20,17 @@ export async function GET(req: NextRequest) {
     .order('created_at', { ascending: false })
     .limit(10)
 
-  // Recent wisdom exchange answers
+  // Wisdom exchange answers — no date restriction
   const { data: exchanges } = await supabaseAdmin
     .from('wisdom_exchanges')
     .select('id, question, entity_response, created_at, contributors(name)')
     .eq('archive_id', archiveId)
     .order('created_at', { ascending: false })
     .limit(5)
+
+  console.log('[activity] archiveId:', archiveId.substring(0, 8),
+    '| labels:', labels?.length ?? 0,
+    '| exchanges:', exchanges?.length ?? 0)
 
   const activities = [
     ...(labels ?? []).map((l: any) => ({
