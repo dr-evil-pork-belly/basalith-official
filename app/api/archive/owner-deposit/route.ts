@@ -1,13 +1,28 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { NextResponse } from 'next/server'
 import { createTrainingPairFromDeposit } from '@/lib/trainingPipeline'
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const { archiveId, photographId, prompt, response } = await req.json()
+    const body = await req.json()
+    const { photographId, prompt, response, source_type } = body
 
-    if (!archiveId || !response?.trim()) {
-      return NextResponse.json({ error: 'archiveId and response required' }, { status: 400 })
+    // Auth: cookie (portal) OR x-archive-id header OR body.archiveId (mobile)
+    const cookieStore    = await cookies()
+    const cookieId       = cookieStore.get('archive-id')?.value
+    const headerId       = req.headers.get('x-archive-id')
+    const bodyArchiveId  = typeof body.archiveId === 'string' ? body.archiveId : null
+    const archiveId      = cookieId || headerId || bodyArchiveId
+
+    console.log('[owner-deposit] auth — cookie:', !!cookieId, '| header:', !!headerId, '| body:', !!bodyArchiveId, '| resolved:', archiveId?.substring(0, 8) ?? 'NONE')
+
+    if (!archiveId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    if (!response?.trim()) {
+      return NextResponse.json({ error: 'response required' }, { status: 400 })
     }
 
     const { data: deposit, error } = await supabaseAdmin
@@ -17,41 +32,39 @@ export async function POST(req: Request) {
         photograph_id: photographId ?? null,
         prompt:        prompt ?? null,
         response:      response.trim(),
-        source_type:   'deposit',
-        essence_status: 'pending',
+        source_type:   source_type ?? 'deposit',
       })
       .select()
       .single()
 
     if (error) throw error
 
-    // If tied to a photograph, also save as a primary label
+    // Label primary photo if tied to one
     if (photographId) {
       await supabaseAdmin.from('labels').insert({
-        photograph_id:    photographId,
-        archive_id:       archiveId,
-        labelled_by:      'Archive Owner',
-        what_was_happening: response.trim(),
-        is_primary_label: true,
+        photograph_id:       photographId,
+        archive_id:          archiveId,
+        labelled_by:         'Archive Owner',
+        what_was_happening:  response.trim(),
+        is_primary_label:    true,
         essence_feed_status: 'pending',
+      }).then(({ error: labelErr }) => {
+        if (labelErr) console.warn('[owner-deposit] label insert failed:', labelErr.message)
       })
     }
 
-    // Count total owner deposits for score update
-    const { count } = await supabaseAdmin
-      .from('owner_deposits')
-      .select('*', { count: 'exact', head: true })
-      .eq('archive_id', archiveId)
+    // Non-fatal archive stat update
+    void Promise.resolve(
+      supabaseAdmin
+        .from('owner_deposits')
+        .select('*', { count: 'exact', head: true })
+        .eq('archive_id', archiveId)
+    ).then(({ count }) => {
+      const score = Math.min((count ?? 0) * 2, 25)
+      return supabaseAdmin.from('archives').update({ archive_score: score }).eq('id', archiveId)
+    }).catch(e => console.warn('[owner-deposit] score update skipped:', e instanceof Error ? e.message : e))
 
-    const depositScore = Math.min((count ?? 0) * 2, 25)
-
-    // Partial score update (just the deposit component)
-    await supabaseAdmin
-      .from('archives')
-      .update({ archive_score: depositScore })
-      .eq('id', archiveId)
-
-    // Training pair (fire-and-forget)
+    // Training pair — fire-and-forget
     if (response.trim().length > 20) {
       void (async () => {
         try {
@@ -65,7 +78,7 @@ export async function POST(req: Request) {
             arch.preferred_language || 'en',
           )
         } catch (e) {
-          console.warn('[training] owner-deposit failed:', e instanceof Error ? e.message : e)
+          console.warn('[owner-deposit] training pair failed:', e instanceof Error ? e.message : e)
         }
       })()
     }
@@ -74,7 +87,7 @@ export async function POST(req: Request) {
 
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Unknown error'
-    console.error('Owner deposit error:', msg)
+    console.error('[owner-deposit] error:', msg)
     return NextResponse.json({ error: msg }, { status: 500 })
   }
 }
