@@ -47,6 +47,32 @@ const SECTIONS = [
   },
   {
     num:   '05',
+    title: 'Intellectual Property',
+    body: [
+      'Your archive content — including all deposits, voice recordings, photographs, training pairs, and the cognitive reference model derived from them — remains your intellectual property at all times. Heritage Nexus Inc. claims no intellectual property rights over your archive content.',
+      'You grant Heritage Nexus Inc. a limited license to process your archive content solely for the purpose of operating and improving your specific archive. This license does not extend to using your content to train general models, sharing with other users, or commercializing in any form.',
+      'Your training pairs, entity conversations, and voice data are your property. You may export them at any time in open formats. You may use them with any compatible platform.',
+    ],
+  },
+  {
+    num:   '06',
+    title: 'Death and Succession',
+    body: [
+      'Upon your death your archive transfers to your designated heirs or estate. Your archive is treated as a private digital asset for the purposes of estate administration.',
+      'Heritage Nexus Inc. will work with your estate to facilitate archive transfer, continued access under the Legacy tier, or complete data export and deletion as directed by your estate.',
+      'Heritage Nexus Inc. does not acquire any rights to your archive data upon your death. We are the custodian. Your heirs are the beneficiaries.',
+    ],
+  },
+  {
+    num:   '07',
+    title: 'Company Dissolution',
+    body: [
+      'In the event Heritage Nexus Inc. ceases operations: (a) Users will receive a minimum of 90 days advance notice where circumstances permit. (b) Complete data export will be made available to all users during the notice period. (c) Archive data will not be sold to third parties as part of any dissolution, acquisition, or bankruptcy proceeding without explicit user consent. (d) Any acquiring entity must agree to honor these same commitments as a condition of acquiring Heritage Nexus Inc. assets.',
+      'These commitments are not merely contractual. We are building technical export infrastructure to ensure they are enforceable independent of corporate continuity.',
+    ],
+  },
+  {
+    num:   '09',
     title: 'Governing Law',
     body: [
       `These Terms of Service are governed by and construed in accordance with the laws of the State of ${GOVERNING_STATE}, United States of America, without regard to its conflict of law provisions.`,

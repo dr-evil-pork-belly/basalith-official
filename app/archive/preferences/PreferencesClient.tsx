@@ -166,6 +166,32 @@ export default function PreferencesClient({ archiveId }: { archiveId: string }) 
     }
   }
 
+  const [exporting, setExporting] = useState(false)
+  const [exportMsg, setExportMsg] = useState<string | null>(null)
+
+  async function handleExport() {
+    setExporting(true)
+    setExportMsg(null)
+    try {
+      const res = await fetch('/api/archive/export')
+      if (!res.ok) { setExportMsg('Export failed. Please try again.'); return }
+      const blob = await res.blob()
+      const url  = URL.createObjectURL(blob)
+      const a    = document.createElement('a')
+      const date = new Date().toISOString().substring(0, 10)
+      a.href     = url
+      a.download = `basalith-archive-${date}.zip`
+      a.click()
+      URL.revokeObjectURL(url)
+      setExportMsg('Download started.')
+      setTimeout(() => setExportMsg(null), 5000)
+    } catch {
+      setExportMsg('Export failed. Please try again.')
+    } finally {
+      setExporting(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="max-w-2xl">
@@ -301,17 +327,45 @@ export default function PreferencesClient({ archiveId }: { archiveId: string }) 
           Useful for testing and first impressions.
         </p>
         <div className="flex items-center gap-4 flex-wrap">
-          <button
-            onClick={sendTest}
-            disabled={sending}
-            className="btn-monolith-ghost disabled:opacity-50"
-          >
+          <button onClick={sendTest} disabled={sending} className="btn-monolith-ghost disabled:opacity-50">
             {sending ? 'Sending…' : 'Send Now →'}
           </button>
           {testMsg && (
             <p className="font-sans text-[0.72rem]" style={{ color: testMsg.startsWith('Sent') ? '#4CAF50' : '#9DA3A8' }}>
               {testMsg}
             </p>
+          )}
+        </div>
+      </div>
+
+      {/* Data export */}
+      <div className="mt-10 mb-4">
+        <p className="font-sans text-[0.62rem] font-bold tracking-[0.2em] uppercase mb-1" style={{ color: '#C4A24A' }}>Your Data</p>
+        <h2 className="font-serif font-semibold text-[#F0F0EE]" style={{ fontSize: 'clamp(1.4rem,2.5vw,1.9rem)' }}>
+          Download Your Archive
+        </h2>
+        <p className="font-sans text-[0.75rem] mt-2" style={{ color: '#5C6166' }}>
+          You own your archive completely. Download everything at any time.
+        </p>
+      </div>
+
+      <div className="rounded-sm border border-[rgba(255,255,255,0.06)] px-6 py-6" style={{ background: '#111112' }}>
+        <p className="font-sans text-[0.6rem] font-bold tracking-[0.18em] uppercase text-[#5C6166] mb-2">Complete Archive Export</p>
+        <p className="font-sans text-[0.75rem] mb-5" style={{ color: '#5C6166' }}>
+          Your export includes all deposits, training pairs, voice recordings, photographs, significant dates,
+          and conversation history in open formats (JSON, signed URLs). Download links in the export expire after 24 hours.
+        </p>
+        <div className="flex items-center gap-4 flex-wrap">
+          <button
+            onClick={handleExport}
+            disabled={exporting}
+            className="btn-monolith-ghost disabled:opacity-50"
+            style={{ borderColor: 'rgba(196,162,74,0.4)', color: '#C4A24A' }}
+          >
+            {exporting ? 'Generating…' : 'Download Complete Archive →'}
+          </button>
+          {exportMsg && (
+            <p className="font-sans text-[0.72rem]" style={{ color: '#9DA3A8' }}>{exportMsg}</p>
           )}
         </div>
       </div>

@@ -28,6 +28,7 @@ const COLS: { heading: string; links: { label: string; href?: string }[] }[] = [
     links: [
       { label: 'Privacy Policy',   href: '/privacy'        },
       { label: 'Terms of Service', href: '/terms'          },
+      { label: 'Security',         href: '/security'       },
       { label: 'Data Ownership',   href: '/data-ownership' },
     ],
   },

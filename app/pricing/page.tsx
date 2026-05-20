@@ -28,6 +28,13 @@ const FOUNDING_DELIVERABLES = [
   { n: '06', title: 'Custodian Designation',         desc: "Your archive's legal custodian assigned and documented with formal estate standing." },
 ]
 
+const TRUST_BADGES = [
+  { icon: '🔒', label: 'AES-256 encrypted' },
+  { icon: '📦', label: 'Full data export anytime' },
+  { icon: '🚫', label: 'Never used to train other models' },
+  { icon: '👤', label: 'You own your data' },
+]
+
 export default function PricingPage() {
   return (
     <>
@@ -90,6 +97,30 @@ export default function PricingPage() {
             <p style={{ margin: 0 }}>Leave something permanent.</p>
           </div>
         </section>
+
+        {/* Trust badges */}
+        <div style={{
+          display:        'flex',
+          justifyContent: 'center',
+          flexWrap:       'wrap',
+          gap:            '12px 32px',
+          padding:        '0 clamp(24px,6vw,80px) clamp(48px,6vw,72px)',
+        }}>
+          {TRUST_BADGES.map(b => (
+            <span key={b.label} style={{
+              fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+              fontSize:      '0.48rem',
+              letterSpacing: '0.15em',
+              textTransform: 'uppercase' as const,
+              color:         'var(--color-text-faint)',
+              display:       'flex',
+              alignItems:    'center',
+              gap:           '6px',
+            }}>
+              <span>{b.icon}</span>{b.label}
+            </span>
+          ))}
+        </div>
 
         {/* The Founding */}
         <section

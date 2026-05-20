@@ -196,6 +196,40 @@ export default function PrivacyPage() {
             <h2 style={H2}>11. Contact</h2>
             <p style={BODY}>Questions about this policy: <a href="mailto:privacy@basalith.xyz" style={{ color: '#C4A24A', textDecoration: 'none' }}>privacy@basalith.xyz</a></p>
 
+            {/* Ownership section */}
+            <div aria-hidden="true" style={{ height: '1px', background: 'var(--color-border)', margin: '48px 0' }} />
+
+            <h2 style={{ ...H2, marginTop: 0 }}>Your Data. Your Archive. Your Heirs.</h2>
+
+            <h3 style={{ ...H2, fontSize: '1.1rem', marginTop: '32px', color: 'var(--color-text-primary)' }}>Ownership After Death</h3>
+            <p style={BODY}>Your archive is your property. It does not become ours when you die.</p>
+            <p style={BODY}>Upon your death your archive transfers to your designated heirs or estate exactly as you would transfer any other private asset.</p>
+            <p style={BODY}>Heritage Nexus Inc. does not acquire any rights to your archive data upon your death. Your cognitive reference model — the training pairs, deposits, voice recordings, and photographs — is a private digital asset that belongs to your estate.</p>
+            <p style={{ ...BODY, fontStyle: 'italic' }}>We are the custodian. You are the owner. Your heirs are the beneficiaries. We are never the inheritor.</p>
+
+            <h3 style={{ ...H2, fontSize: '1.1rem', marginTop: '32px', color: 'var(--color-text-primary)' }}>Company Dissolution</h3>
+            <p style={BODY}>If Heritage Nexus Inc. ceases operations for any reason:</p>
+            <ul style={{ paddingLeft: 0, margin: '0 0 12px' }}>
+              {[
+                'You will receive 90 days advance notice where possible.',
+                'During that period you can download your complete archive in full — all training pairs, deposits, voice recordings, and photographs in standard open formats (JSON, MP3, JPEG).',
+                'Your archive data will never be sold to a third party as part of any asset sale, acquisition, or bankruptcy proceeding.',
+                'If we are acquired, the acquiring entity must honor these same commitments as a condition of the acquisition.',
+              ].map(item => (
+                <li key={item} style={LI}>
+                  <span style={{ color: 'rgba(196,162,74,0.5)', marginRight: '0.5rem' }}>·</span>{item}
+                </li>
+              ))}
+            </ul>
+            <p style={BODY}>We are building the data export functionality to ensure this commitment is technically enforceable, not just contractually stated.</p>
+
+            <h3 style={{ ...H2, fontSize: '1.1rem', marginTop: '32px', color: 'var(--color-text-primary)' }}>Data Use for Training</h3>
+            <p style={BODY}>Your archive data is never used to train models for other users. Not now. Not ever.</p>
+            <p style={BODY}>Each archive is a closed system. What you deposit trains your entity. It does not train anyone else&rsquo;s entity. It does not train Basalith&rsquo;s general models. It does not leave your archive.</p>
+            <p style={BODY}>The Anthropic API, which powers entity responses, does not train on API submissions by default. Their data usage policy is available at <a href="https://anthropic.com/legal/privacy" style={{ color: '#C4A24A', textDecoration: 'none' }} target="_blank" rel="noopener noreferrer">anthropic.com/legal/privacy</a>.</p>
+
+            <p style={{ ...BODY, marginTop: '32px' }}>For security questions: <a href="mailto:security@basalith.ai" style={{ color: '#C4A24A', textDecoration: 'none' }}>security@basalith.ai</a></p>
+
           </div>
         </section>
       </main>
