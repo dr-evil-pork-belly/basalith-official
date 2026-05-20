@@ -9,7 +9,7 @@ const SECTIONS = [
       'When you submit an archive application through our onboarding flow, we collect your full name, email address, phone number (optional), and your selected service tier.',
       'When you submit a message through our contact form, we collect your name, email address, the nature of your enquiry, and any message content you choose to provide.',
       'We do not collect payment card data directly. All payment processing is handled by Stripe, who operates under their own privacy and security frameworks.',
-      'We do not use tracking pixels, third-party analytics scripts, or behavioural advertising tools on this site.',
+      'We do not use tracking pixels, third-party analytics scripts, or behavioral advertising tools on this site.',
     ],
   },
   {
@@ -17,7 +17,7 @@ const SECTIONS = [
     title: 'How It Is Stored',
     body: [
       'All data submitted through this site is stored in Supabase, a managed database platform operating on servers located in the United States. Data is encrypted at rest and in transit using industry-standard protocols.',
-      'Archive and subscriber data held in connection with active service agreements is stored in accordance with the terms of your Sovereignty Charter, which governs retention, access, and portability independently of this policy.',
+      'Archive and subscriber data held in connection with active service agreements is stored in accordance with the terms of your Basalith agreement, which governs retention, access, and portability independently of this policy.',
       'We do not store data on personal devices or unmanaged infrastructure.',
     ],
   },
@@ -37,7 +37,7 @@ const SECTIONS = [
     body: [
       'Pre-signup enquiry data, including archive applications and contact form submissions, is retained for as long as is necessary to manage your enquiry and maintain a record of our correspondence.',
       'If your enquiry does not result in an active service agreement, we will delete your submission data within 24 months of your last interaction with us, or immediately upon a verified deletion request.',
-      'Data associated with active Basalith archives is governed by your Sovereignty Charter and the terms of your service agreement, which take precedence over this policy in respect of archive content.',
+      'Data associated with active Basalith archives is governed by your Basalith agreement and the terms of your service agreement, which take precedence over this policy in respect of archive content.',
     ],
   },
   {
@@ -46,7 +46,7 @@ const SECTIONS = [
     body: [
       'You may request the deletion of any personal data we hold about you at any time by sending an email to privacy@basalith.xyz from the address associated with your submission.',
       'We will confirm receipt within 5 business days and complete the deletion within 30 days, unless we are legally required to retain the data for a longer period.',
-      'Deletion of enquiry data does not affect active service agreements, which are governed by your Sovereignty Charter.',
+      'Deletion of enquiry data does not affect active service agreements, which are governed by your Basalith agreement.',
     ],
   },
   {

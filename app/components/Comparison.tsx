@@ -11,7 +11,7 @@ const WARM: { key: string; lead: string; rest: string; sub?: string }[] = [
   { key: 'Who Labels',         lead: 'Your family and chosen circle,', rest: ' the only people in the world who know what your data actually means.', sub: 'Testimony, not statistics.' },
   { key: 'Context Depth',      lead: 'Full biographical provenance.', rest: ' Every item carries the story of what it was, who was there, and why it mattered.' },
   { key: 'Emotional Accuracy', lead: 'High.', rest: ' Emotion is contributed by those who felt it, not inferred by those who never knew you.' },
-  { key: 'Ownership',          lead: 'Yours. Legally and structurally.', rest: ' Your Golden Dataset is a portable, transferable estate asset from day one.' },
+  { key: 'Ownership',          lead: 'Yours. Legally and structurally.', rest: ' Your your archive is a portable, transferable estate asset from day one.' },
   { key: 'Lifespan',           lead: 'Generational.', rest: ' Governed by your Family Trust. Not subject to platform decisions.' },
   { key: 'Inheritability',     lead: 'Full legal transfer.', rest: ' Named in your Will or Trust as a formal estate bequest.' },
 ]

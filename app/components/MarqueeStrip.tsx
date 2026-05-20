@@ -1,5 +1,5 @@
 const ITEMS = [
-  'Golden Dataset', 'Emotional Fidelity', 'Family-Labeled',
+  'your archive', 'Emotional Fidelity', 'Family-Labeled',
   'Legacy AI', 'Digital Clone', 'Family Trust',
   'Identity Preservation', 'The Asset That Never Leaves',
 ]

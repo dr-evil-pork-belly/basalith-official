@@ -13,7 +13,7 @@ const ITEMS: Item[] = [
     a: <>
       The Founding is a one-time setup investment covering the full onboarding process: archive architecture,
       legal framework review, and your initial Essence Mapping session. It is paid once at the start of your
-      relationship with Basalith. Your annual stewardship plan begins after The Founding is complete.
+      relationship with Basalith. Your annual plan begins after The Founding is complete.
       {' '}<a href="/founding-session" style={{ color: '#C4A24A', textDecoration: 'none' }}>
         Learn more about what happens in your Founding session →
       </a>
@@ -52,19 +52,6 @@ const ITEMS: Item[] = [
       your specific memories. It is not a simulation. It is not a chatbot. It is the most faithful
       preservation of who you were, built from everything you chose to deposit. The richer the archive,
       the richer the entity.`,
-  },
-  {
-    q: 'Is this the same as Character.ai or other AI chat products?',
-    a: `No. Character.ai creates fictional entertainment personas. Basalith builds verified, legally
-      documented archives of real human lives with estate standing, generational access, and professional
-      stewardship. The comparison is like calling a family trust the same as a piggy bank because they
-      both hold value. The surface similarity is real. Everything underneath is different.`,
-  },
-  {
-    q: 'Can I upgrade my stewardship tier?',
-    a: `Yes, at any time. Upgrades take effect at your next renewal date. Your archive content, contributors,
-      and entity are fully preserved across all tiers. Upgrading unlocks additional features and
-      stewardship services, it does not require any re-initialization.`,
   },
 ]
 

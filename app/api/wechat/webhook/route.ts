@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
           .maybeSingle()
 
         if (!linked) {
-          return xmlResponse(buildTextReply(fromUser, toUser, `Code not recognised. Check your link code at basalith.ai and try again.`))
+          return xmlResponse(buildTextReply(fromUser, toUser, `Code not recognized. Check your link code at basalith.ai and try again.`))
         }
 
         await supabaseAdmin

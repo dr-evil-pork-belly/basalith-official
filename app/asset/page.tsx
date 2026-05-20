@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title:       'The Asset',
-  description: 'The Golden Dataset, the Digital Clone, the legal archive. The most valuable thing you own is not on your balance sheet.',
+  description: 'The your archive, the Digital Clone, the legal archive. The most valuable thing you own is not on your balance sheet.',
 }
 
 const eyebrow: React.CSSProperties = {
@@ -80,7 +80,7 @@ export default function AssetPage() {
 
           <div style={divider} />
 
-          <h2 style={h2}>The Golden Dataset.</h2>
+          <h2 style={h2}>The your archive.</h2>
           <p style={body}>
             Every photograph labeled by the people who were present when it was taken. Every story
             preserved in the voice of the person who lived it. Every decade of a life documented
@@ -94,7 +94,7 @@ export default function AssetPage() {
 
           <h2 style={h2}>The Digital Clone.</h2>
           <p style={body}>
-            An AI entity trained on the Golden Dataset. It speaks in the patterns of the person
+            An AI entity trained on the your archive. It speaks in the patterns of the person
             it was built from. It carries their documented opinions, their specific memories,
             their particular way of thinking about the world.
           </p>
@@ -130,7 +130,7 @@ export default function AssetPage() {
           </p>
           <p style={body}>
             The archive can be named in a will. It can be inherited. The Custodian can grant and
-            revoke access, manage stewardship tiers, and ensure the archive continues for the
+            revoke access, manage plans, and ensure the archive continues for the
             generations that follow.
           </p>
           <p style={body}>This is what makes Basalith an estate instrument and not a subscription service.</p>

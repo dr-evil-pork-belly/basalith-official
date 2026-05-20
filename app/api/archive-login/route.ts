@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
 
   const cookieOptions = {
     httpOnly: true,
-    secure:   true,            // always — even in dev; mirrors prod behaviour
+    secure:   true,            // always — even in dev; mirrors prod behavior
     sameSite: 'strict' as const,
     maxAge:   60 * 60 * 24 * 7, // 7 days
     path:     '/',

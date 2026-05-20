@@ -9,7 +9,7 @@ const PHASES = [
   {
     phase:  'Phase Two',
     title:  'Essence\nMapping',
-    desc:   'Your Golden Dataset reaches sufficient depth. The first model is trained. Your Digital Clone becomes queryable, for you, during your lifetime.',
+    desc:   'Your your archive reaches sufficient depth. The first model is trained. Your Digital Clone becomes queryable, for you, during your lifetime.',
     year:   'Year 2–5',
     active: true,
   },
@@ -43,7 +43,7 @@ const CARDS = [
   {
     num: '03',
     title: 'Model Agnosticism',
-    desc: 'Your Golden Dataset is not locked to any AI model. As the field advances, your archive powers whatever AI exists in 2050, 2075, or 2100. You are building the source material. The tools will keep improving.',
+    desc: 'Your your archive is not locked to any AI model. As the field advances, your archive powers whatever AI exists in 2050, 2075, or 2100. You are building the source material. The tools will keep improving.',
   },
 ]
 
@@ -113,7 +113,7 @@ export default function ContinuityPillar() {
           to Living Intelligence.
         </h2>
         <p className="font-sans font-light text-body-base text-text-secondary leading-[1.82]">
-          The Golden Dataset does not sit still. It evolves, trained on new contributions,
+          The your archive does not sit still. It evolves, trained on new contributions,
           refined by your family's testimony, powered by whatever AI exists in the year
           your grandchildren ask it a question.
         </p>

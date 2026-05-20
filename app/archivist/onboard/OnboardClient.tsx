@@ -219,7 +219,7 @@ export default function OnboardClient({ archivistId }: { archivistId: string }) 
 
           {/* Tier */}
           <div>
-            <label style={LABEL}>Stewardship Tier</label>
+            <label style={LABEL}>Plan</label>
             <select value={form.tier} onChange={set('tier')} style={{ ...INPUT, cursor: 'pointer' }}>
               <option value="active">Active — {TIER_LABELS.active.annualPrice} / {TIER_LABELS.active.monthlyPrice}</option>
               <option value="resting">Resting — {TIER_LABELS.resting.annualPrice} / {TIER_LABELS.resting.monthlyPrice}</option>

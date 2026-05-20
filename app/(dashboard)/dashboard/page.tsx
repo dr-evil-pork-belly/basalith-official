@@ -226,7 +226,7 @@ export default async function DashboardPage() {
             <StatCard
               label="Essence Complete"
               value={`${vault.essence_percent ?? 0}%`}
-              sub="Golden Dataset depth"
+              sub="Archive depth"
               accent
             />
             <StorageStatCard

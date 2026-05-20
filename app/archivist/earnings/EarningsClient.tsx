@@ -95,7 +95,7 @@ export default function EarningsClient({ archivistId }: { archivistId: string })
       {/* Annual projection callout */}
       <div style={{ background: 'rgba(196,162,74,0.06)', border: '1px solid rgba(196,162,74,0.25)', borderTop: '3px solid #C4A24A', padding: '24px 28px', marginBottom: '28px', display: 'flex', alignItems: 'center', gap: '32px', flexWrap: 'wrap' }}>
         <div>
-          <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.58rem', letterSpacing: '0.24em', textTransform: 'uppercase', color: C.dim, marginBottom: '6px' }}>Annual Stewardship Income</p>
+          <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.58rem', letterSpacing: '0.24em', textTransform: 'uppercase', color: C.dim, marginBottom: '6px' }}>Annual Recurring Income</p>
           <p style={{ fontFamily: 'Georgia, serif', fontSize: '2.2rem', fontWeight: 300, color: C.gold, lineHeight: 1 }}>
             ${annualResidual.toLocaleString()}
           </p>
@@ -147,7 +147,7 @@ export default function EarningsClient({ archivistId }: { archivistId: string })
       {/* Tabs */}
       <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
         <TabBtn id="founding"  label="Founding Commissions" />
-        <TabBtn id="residuals" label="Stewardship Residuals" />
+        <TabBtn id="residuals" label="Recurring Income" />
       </div>
 
       {/* Founding commissions table */}

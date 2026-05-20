@@ -2,7 +2,7 @@ const STEPS = [
   {
     num: '01',
     title: 'Name It In Your Will',
-    desc: 'Your attorney designates your Golden Dataset as a formal estate asset using our standardized bequest language. Compatible with US and international frameworks.',
+    desc: 'Your attorney designates your your archive as a formal estate asset using our standardized bequest language. Compatible with US and international frameworks.',
   },
   {
     num: '02',
@@ -127,7 +127,7 @@ export default function AssetPillar() {
           <br />Inheritance.
         </h2>
         <p className="font-sans font-light text-body-base text-text-secondary leading-[1.82] mb-4">
-          A Basalith Golden Dataset is not a subscription service that evaporates when
+          A Basalith your archive is not a subscription service that evaporates when
           you stop paying. It is a structured digital asset, classified, documented,
           and governed from the moment of creation.
         </p>

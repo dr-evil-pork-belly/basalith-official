@@ -221,7 +221,7 @@ export default function CustodianshipPage() {
                 padding:        '0.85rem 1.75rem',
               }}
             >
-              View stewardship plans →
+              View plans →
             </a>
 
           </div>
