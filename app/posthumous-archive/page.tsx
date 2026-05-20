@@ -345,10 +345,10 @@ function Pricing() {
           </p>
         </div>
 
-        {/* Part 2 — Ongoing Stewardship */}
+        {/* Part 2 — Ongoing Care */}
         <div style={{ border: '1px solid rgba(255,255,255,0.06)', borderRadius: '2px', padding: '2.5rem', marginBottom: '2.5rem' }}>
           <p style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.44rem', letterSpacing: '0.28em', textTransform: 'uppercase', color: '#C4A24A', marginBottom: '1rem' }}>
-            Witness Archive Stewardship
+            Witness Archive
           </p>
           <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 700, fontSize: '2.5rem', color: '#F0EDE6', lineHeight: 1, marginBottom: '0.4rem' }}>
             $3,600 <span style={{ fontSize: '1.2rem', fontWeight: 300 }}>/ year</span>
@@ -357,7 +357,7 @@ function Pricing() {
             $300 / month equivalent
           </p>
           <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'italic', fontSize: '0.85rem', color: '#9DA3A8', lineHeight: 1.65, marginBottom: '1.5rem' }}>
-            Full Estate tier stewardship, the same infrastructure as any active Basalith archive.
+            Full Estate tier access, the same infrastructure as any active Basalith archive.
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginBottom: '1.5rem' }}>
             {[
@@ -380,7 +380,7 @@ function Pricing() {
             ))}
           </div>
           <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'italic', fontSize: '0.85rem', color: '#5C6166', lineHeight: 1.75, margin: 0 }}>
-            Stewardship begins after The Witness Founding is complete. Renews annually.
+            Archive begins after The Witness Founding is complete. Renews annually.
             Cancel at any time. Archive accessible for 90 days after cancellation.
           </p>
         </div>

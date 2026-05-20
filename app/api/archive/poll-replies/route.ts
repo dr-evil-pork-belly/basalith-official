@@ -92,7 +92,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ processed: 0, message: 'No active email sessions found' })
     }
 
-    // Normalise keys to lowercase for case-insensitive matching
+    // Normalize keys to lowercase for case-insensitive matching
     const sessionMap: Record<string, typeof sessions[number]> = {}
     for (const session of sessions) {
       if (session.reply_address) {

@@ -120,7 +120,7 @@ export default function PrivacyPage() {
                 'Build and maintain your family archive',
                 'Train your personal AI entity on your authorized archive content only',
                 'Send photograph emails and digest notifications to contributors you have designated',
-                'Process payments for your stewardship plan',
+                'Process payments for your plan',
                 'Communicate with you about your archive',
                 'Improve our services',
               ].map((item) => (
@@ -157,7 +157,7 @@ export default function PrivacyPage() {
 
             {/* 6 */}
             <h2 style={H2}>6. Data Retention</h2>
-            <p style={BODY}>Your archive is retained for the duration of your stewardship plan plus a minimum of 24 months following any cancellation to allow for data export.</p>
+            <p style={BODY}>Your archive is retained for the duration of your plan plus a minimum of 24 months following any cancellation to allow for data export.</p>
             <p style={BODY}>The Data Custodianship Reserve ensures archive continuity beyond the life of Basalith as a company. <a href="/custodianship" style={{ color: '#C4A24A', textDecoration: 'none' }}>Learn more about the Reserve →</a></p>
 
             {/* 7 */}

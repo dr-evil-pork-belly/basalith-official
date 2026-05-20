@@ -55,7 +55,7 @@ export default function EarningsClient({ archivistId }: { archivistId: string })
   const thisQuarter   = founding.filter(c => c.created_at >= qStart).reduce((s, c) => s + (c.amount_cents ?? 0), 0)
   const allTime       = founding.reduce((s, c) => s + (c.amount_cents ?? 0), 0)
 
-  // ── Stewardship residuals ────────────────────────────────────────────────────
+  // ── Recurring income ─────────────────────────────────────────────────────────
   const activeClients = prospects.filter(p => p.status === 'Active Client')
   const monthlyMRR    = activeClients.reduce((sum, p) => {
     const t = (p.tier ?? '').toLowerCase()
@@ -183,7 +183,7 @@ export default function EarningsClient({ archivistId }: { archivistId: string })
         </div>
       )}
 
-      {/* Stewardship residuals */}
+      {/* Recurring income */}
       {tab === 'residuals' && (
         <div>
           <div style={{ background: C.surface, border: `1px solid ${C.border}`, marginBottom: '12px' }}>

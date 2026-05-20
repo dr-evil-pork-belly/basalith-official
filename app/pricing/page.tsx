@@ -62,7 +62,7 @@ export default function PricingPage() {
             }}
           >
             <span style={{ width: '24px', height: '1px', background: 'var(--color-gold)', display: 'block', flexShrink: 0 }} aria-hidden="true" />
-            Stewardship Pricing
+            Pricing
             <span style={{ width: '24px', height: '1px', background: 'var(--color-gold)', display: 'block', flexShrink: 0 }} aria-hidden="true" />
           </p>
           <h1
@@ -191,7 +191,7 @@ export default function PricingPage() {
                   <p style={{ ...SERIF, fontSize: '3.5rem', fontWeight: 300, color: 'rgba(250,248,244,0.9)', lineHeight: 1, letterSpacing: '-0.02em', marginBottom: '8px' }}>$2,500</p>
                   <p style={{ ...MONO, fontSize: '0.48rem', color: 'var(--color-gold)', marginBottom: '16px' }}>One-Time Engagement Fee</p>
                   <p style={{ ...SERIF, fontSize: '0.88rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.3)', lineHeight: 1.7 }}>
-                    Required for all new archives. Annual stewardship selected separately.
+                    Required for all new archives. Annual plan selected separately.
                     Executed by a Senior Legacy Guide assigned to your family.
                   </p>
                 </div>
