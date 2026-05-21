@@ -126,7 +126,7 @@ export default function AssetPage() {
           <p style={body}>
             The Basalith archive is not a cloud storage account. It is a legal asset documented
             in your estate plan with a designated Custodian who has formal standing to govern it
-            after your death or incapacity.
+            after your passing or incapacity.
           </p>
           <p style={body}>
             The archive can be named in a will. It can be inherited. The Custodian can grant and

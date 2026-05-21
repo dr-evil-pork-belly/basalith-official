@@ -74,7 +74,7 @@ const TIERS: Tier[] = [
   },
   {
     id:          'legacy',
-    eyebrow:     'After They Are Gone',
+    eyebrow:     'The Archive Continues',
     name:        'Legacy',
     annualPrice: '$1,200',
     annualSub:   'billed to estate or family',
@@ -89,7 +89,7 @@ const TIERS: Tier[] = [
       'Annual entity report to family',
       'Archive storage and security',
       'Generational access — forever',
-      'No features removed at death',
+      'Archive and entity continue for your heirs',
     ],
     cta:     'Ask Your Legacy Guide',
     ctaHref: '/apply',

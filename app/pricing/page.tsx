@@ -219,9 +219,9 @@ export default function PricingPage() {
             <em style={{ fontStyle: 'italic', color: 'var(--color-gold)' }}>For Everyone.</em>
           </h2>
           <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: 'rgba(250,248,244,0.4)', maxWidth: '480px', margin: '0 auto 40px' }}>
-            It is for the rare few who understand that memory is an asset,
-            and that leaving it unarchived is a choice with consequences
-            their family will live with long after they are gone.
+            It is for the rare few who understand that what they know
+            and how they think is a legacy — and that leaving it uncaptured
+            is a choice their family will feel for generations.
           </p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
             <a href="/apply" style={{ ...MONO, fontSize: 'var(--text-caption)', display: 'inline-block', textDecoration: 'none', background: 'var(--color-gold)', color: '#0A0908', padding: '14px 32px', borderRadius: 'var(--radius-sm)' }}>
