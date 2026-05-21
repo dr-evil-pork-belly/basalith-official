@@ -107,6 +107,32 @@ export default function FoundingSessionPage() {
           </a>
         </section>
 
+        {/* Contributor network */}
+        <section
+          style={{
+            maxWidth: '640px',
+            margin:   '0 auto',
+            padding:  '0 clamp(24px,6vw,48px) clamp(64px,8vw,80px)',
+          }}
+        >
+          <div
+            aria-hidden="true"
+            style={{ width: '40px', height: '1px', background: 'var(--color-gold)', margin: '0 0 40px' }}
+          />
+          <p style={{ ...P }}>
+            The contributor network works because the friction is near zero.
+          </p>
+          <p style={{ ...P }}>
+            Your contributors never need to log in, remember a password, or learn a new interface.
+            They receive an email. They hit reply. Their memory is added.
+            Or they hold a button in the app and speak for two minutes.
+            That is all we ask.
+          </p>
+          <p style={{ ...P, marginBottom: 0 }}>
+            The archive grows because we made contributing feel like a conversation, not a task.
+          </p>
+        </section>
+
         {/* 4-stage milestone roadmap */}
         <div style={{ borderTop: '1px solid var(--color-border)', background: 'var(--color-void)' }}>
           <div style={{ maxWidth: '640px', margin: '0 auto', padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,48px) 0' }}>

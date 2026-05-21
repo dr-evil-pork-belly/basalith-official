@@ -209,6 +209,31 @@ export default function PricingPage() {
         {/* Tiers + toggle + founding note + tax note */}
         <PricingTiers />
 
+        {/* Immutability Vault trust signal */}
+        <section style={{ padding: '0 clamp(24px,6vw,80px) clamp(48px,6vw,64px)', background: 'var(--color-surface-alt)' }}>
+          <div style={{
+            maxWidth:       '680px',
+            margin:         '0 auto',
+            border:         '1px solid rgba(196,162,74,0.22)',
+            borderLeft:     '3px solid rgba(196,162,74,0.5)',
+            padding:        'clamp(24px,3vw,36px) clamp(24px,3vw,40px)',
+            background:     'rgba(196,162,74,0.03)',
+          }}>
+            <p style={{ ...MONO, fontSize: '0.5rem', color: 'var(--color-gold)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span>🔒</span> The Immutability Vault
+            </p>
+            <p style={{ ...SERIF, fontSize: '1rem', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-secondary)', margin: '0 0 8px' }}>
+              Your cognitive fingerprint is permanently frozen after you pass.
+            </p>
+            <p style={{ ...SERIF, fontSize: '1rem', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-secondary)', margin: '0 0 8px' }}>
+              Heirs can add context. Nobody can change what you said.
+            </p>
+            <a href="/integrity" style={{ ...MONO, fontSize: '0.44rem', color: 'rgba(196,162,74,0.6)', textDecoration: 'none', display: 'inline-block', marginTop: '8px' }}>
+              How this works →
+            </a>
+          </div>
+        </section>
+
         {/* FAQ */}
         <PricingFAQ />
 

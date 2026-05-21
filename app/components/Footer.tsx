@@ -24,12 +24,13 @@ const COLS: { heading: string; links: { label: string; href?: string }[] }[] = [
     ],
   },
   {
-    heading: 'Legal',
+    heading: 'Trust',
     links: [
+      { label: 'The Integrity Promise', href: '/integrity'      },
+      { label: 'The Immutability Vault',href: '/integrity'      },
       { label: 'Privacy Policy',        href: '/privacy'        },
       { label: 'Terms of Service',      href: '/terms'          },
       { label: 'Security',              href: '/security'       },
-      { label: 'The Integrity Promise', href: '/integrity'      },
       { label: 'Data Ownership',        href: '/data-ownership' },
     ],
   },

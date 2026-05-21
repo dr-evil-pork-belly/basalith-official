@@ -352,7 +352,7 @@ export default function PreferencesClient({ archiveId }: { archiveId: string }) 
       <div className="rounded-sm border border-[rgba(255,255,255,0.06)] px-6 py-6" style={{ background: '#111112' }}>
         <p className="font-sans text-[0.6rem] font-bold tracking-[0.18em] uppercase text-[#5C6166] mb-2">Complete Archive Export</p>
         <p className="font-sans text-[0.75rem] mb-5" style={{ color: '#5C6166' }}>
-          Your export includes all deposits, training pairs, voice recordings, photographs, significant dates,
+          Your export includes all deposits, voice recordings, photographs, significant dates,
           and conversation history in open formats (JSON, signed URLs). Download links in the export expire after 24 hours.
         </p>
         <div className="flex items-center gap-4 flex-wrap">

@@ -49,9 +49,9 @@ const SECTIONS = [
     num:   '05',
     title: 'Intellectual Property',
     body: [
-      'Your archive content — including all deposits, voice recordings, photographs, training pairs, and the cognitive reference model derived from them — remains your intellectual property at all times. Heritage Nexus Inc. claims no intellectual property rights over your archive content.',
+      'Your archive content — including all deposits, voice recordings, photographs, and the cognitive reference model derived from them — remains your intellectual property at all times. Heritage Nexus Inc. claims no intellectual property rights over your archive content.',
       'You grant Heritage Nexus Inc. a limited license to process your archive content solely for the purpose of operating and improving your specific archive. This license does not extend to using your content to train general models, sharing with other users, or commercializing in any form.',
-      'Your training pairs, entity conversations, and voice data are your property. You may export them at any time in open formats. You may use them with any compatible platform.',
+      'Your deposits, entity conversations, and voice data are your property. You may export them at any time in open formats. You may use them with any compatible platform.',
     ],
   },
   {

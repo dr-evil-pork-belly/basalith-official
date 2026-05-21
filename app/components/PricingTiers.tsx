@@ -13,19 +13,20 @@ const SERIF: React.CSSProperties = {
 }
 
 interface Tier {
-  id:           'active' | 'resting' | 'legacy'
-  eyebrow:      string
-  name:         string
-  annualPrice:  string
-  annualSub:    string
-  monthlyPrice: string
-  annualOnly?:  boolean
-  description:  string
-  featured:     boolean
-  features:     string[]
-  cta:          string
-  ctaHref:      string
-  note:         string
+  id:              'active' | 'resting' | 'legacy'
+  eyebrow:         string
+  name:            string
+  annualPrice:     string
+  annualSub:       string
+  monthlyPrice:    string
+  annualOnly?:     boolean
+  description:     string
+  featured:        boolean
+  features:        string[]
+  contributorNote?: string
+  cta:             string
+  ctaHref:         string
+  note:            string
 }
 
 const TIERS: Tier[] = [
@@ -48,6 +49,7 @@ const TIERS: Tier[] = [
       'Quarterly entity letter',
       'All supported languages',
     ],
+    contributorNote: 'Your contributors never need to log in, remember a password, or learn a new interface. They receive an email. They hit reply. Their memory is added. Or they hold a button in the app and speak for two minutes.',
     cta:     'Begin Your Archive',
     ctaHref: '/apply',
     note:    'One-time founding fee of $2,500',
@@ -242,7 +244,7 @@ export default function PricingTiers() {
           margin:              '0 auto',
         }}
       >
-        {TIERS.map(({ id, eyebrow, name, annualPrice, annualSub, monthlyPrice, annualOnly, description, featured, features, cta, ctaHref, note }) => (
+        {TIERS.map(({ id, eyebrow, name, annualPrice, annualSub, monthlyPrice, annualOnly, description, featured, features, contributorNote, cta, ctaHref, note }) => (
           <div
             key={id}
             style={{
@@ -328,7 +330,7 @@ export default function PricingTiers() {
             <div style={{ height: '1px', background: featured ? 'rgba(250,248,244,0.06)' : 'var(--color-border)', marginBottom: '24px' }} />
 
             {/* Features */}
-            <ul style={{ listStyle: 'none', margin: '0 0 32px', padding: 0, display: 'flex', flexDirection: 'column', gap: '10px', flex: 1 }}>
+            <ul style={{ listStyle: 'none', margin: contributorNote ? '0 0 16px' : '0 0 32px', padding: 0, display: 'flex', flexDirection: 'column', gap: '10px', flex: contributorNote ? 0 : 1 }}>
               {features.map(f => (
                 <li key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
                   <Check />
@@ -338,6 +340,23 @@ export default function PricingTiers() {
                 </li>
               ))}
             </ul>
+
+            {contributorNote && (
+              <p style={{
+                ...SERIF,
+                fontSize:     '0.85rem',
+                fontStyle:    'italic',
+                fontWeight:   300,
+                lineHeight:   1.75,
+                color:        'rgba(250,248,244,0.3)',
+                borderTop:    '1px solid rgba(250,248,244,0.06)',
+                paddingTop:   '16px',
+                marginBottom: '32px',
+                flex:         1,
+              }}>
+                {contributorNote}
+              </p>
+            )}
 
             {/* CTA */}
             <a

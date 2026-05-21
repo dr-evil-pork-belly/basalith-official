@@ -85,24 +85,34 @@ export default function IntegrityPage() {
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '24px' }}>
               After You Pass
             </p>
-            <h2 style={H2}>No one can change what you built.</h2>
+            <h2 style={{ ...H2, letterSpacing: '0.12em', textTransform: 'uppercase' as const, fontFamily: 'var(--font-space-mono, "Space Mono", "Courier New", monospace)', fontSize: 'clamp(1.1rem,2vw,1.5rem)', fontWeight: 500 }}>
+              The Immutability Vault
+            </h2>
 
-            <p style={BODY}>When you die your archive is sealed.</p>
             <p style={BODY}>
-              Not locked behind a paywall. Not archived in a format no one can access. Sealed.
+              When you pass your Cognitive Fingerprint Layer is permanently frozen at the database level.
             </p>
             <p style={BODY}>
-              Your cognitive fingerprint — the training data that makes your entity sound like you —
-              is permanently frozen at the database level.
+              Not locked behind a paywall. Not archived in a format no one can access.
             </p>
-            <p style={BODY}>Your heirs can talk to your entity. Your grandchildren can add new memories to the archive.</p>
+            <p style={{ ...BODY, color: 'var(--color-text-primary)', fontStyle: 'italic' }}>
+              Frozen.
+            </p>
+            <p style={BODY}>Your heirs can talk to your entity. Your grandchildren can add new context — a marriage, a grandchild, a company milestone.</p>
             <p style={{ ...BODY, color: 'var(--color-text-primary)' }}>
-              What they cannot do is change what you built. They cannot edit your stated values.
-              They cannot delete your voice recordings. They cannot alter the deposits you made
-              while you were alive and thinking clearly.
+              What they cannot do is change what you built. Your stated values.
+              Your voice recordings. Your deposits made while you were alive and thinking clearly.
+            </p>
+            <div aria-hidden="true" style={{ width: '40px', height: '1px', background: 'var(--color-gold)', margin: '32px 0' }} />
+            <p style={{ ...BODY, fontWeight: 500, color: 'var(--color-text-primary)' }}>
+              Two layers. One permanent. One living.
+            </p>
+            <p style={BODY}>
+              The permanent layer is who you were.
+              The living layer is how the world around you continued after you left.
             </p>
             <p style={{ ...BODY, color: 'var(--color-gold)', fontStyle: 'italic' }}>
-              What you said is what you said. Forever.
+              Both matter. Neither overwrites the other.
             </p>
           </div>
         </section>

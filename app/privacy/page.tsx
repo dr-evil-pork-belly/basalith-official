@@ -204,7 +204,7 @@ export default function PrivacyPage() {
             <h3 style={{ ...H2, fontSize: '1.1rem', marginTop: '32px', color: 'var(--color-text-primary)' }}>Ownership After Death</h3>
             <p style={BODY}>Your archive is your property. It does not become ours when you die.</p>
             <p style={BODY}>Upon your death your archive transfers to your designated heirs or estate exactly as you would transfer any other private asset.</p>
-            <p style={BODY}>Heritage Nexus Inc. does not acquire any rights to your archive data upon your death. Your cognitive reference model — the training pairs, deposits, voice recordings, and photographs — is a private digital asset that belongs to your estate.</p>
+            <p style={BODY}>Heritage Nexus Inc. does not acquire any rights to your archive data upon your death. Your cognitive reference model — your deposits, voice recordings, and photographs — is a private digital asset that belongs to your estate.</p>
             <p style={{ ...BODY, fontStyle: 'italic' }}>We are the custodian. You are the owner. Your heirs are the beneficiaries. We are never the inheritor.</p>
 
             <h3 style={{ ...H2, fontSize: '1.1rem', marginTop: '32px', color: 'var(--color-text-primary)' }}>Company Dissolution</h3>
@@ -212,7 +212,7 @@ export default function PrivacyPage() {
             <ul style={{ paddingLeft: 0, margin: '0 0 12px' }}>
               {[
                 'You will receive 90 days advance notice where possible.',
-                'During that period you can download your complete archive in full — all training pairs, deposits, voice recordings, and photographs in standard open formats (JSON, MP3, JPEG).',
+                'During that period you can download your complete archive in full — all deposits, voice recordings, and photographs in standard open formats (JSON, MP3, JPEG).',
                 'Your archive data will never be sold to a third party as part of any asset sale, acquisition, or bankruptcy proceeding.',
                 'If we are acquired, the acquiring entity must honor these same commitments as a condition of the acquisition.',
               ].map(item => (
