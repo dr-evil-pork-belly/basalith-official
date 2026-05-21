@@ -29,10 +29,10 @@ const FOUNDING_DELIVERABLES = [
 ]
 
 const TRUST_BADGES = [
-  { icon: '🔒', label: 'AES-256 encrypted' },
-  { icon: '📦', label: 'Full data export anytime' },
-  { icon: '🚫', label: 'Never used to train other models' },
-  { icon: '👤', label: 'You own your data' },
+  { icon: '🔒', label: 'Immutability Vault after passing' },
+  { icon: '📦', label: 'Complete data export anytime' },
+  { icon: '🚫', label: 'Never used for other entities' },
+  { icon: '✉', label: '90-day notice if we close' },
 ]
 
 export default function PricingPage() {

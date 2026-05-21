@@ -26,10 +26,11 @@ const COLS: { heading: string; links: { label: string; href?: string }[] }[] = [
   {
     heading: 'Legal',
     links: [
-      { label: 'Privacy Policy',   href: '/privacy'        },
-      { label: 'Terms of Service', href: '/terms'          },
-      { label: 'Security',         href: '/security'       },
-      { label: 'Data Ownership',   href: '/data-ownership' },
+      { label: 'Privacy Policy',        href: '/privacy'        },
+      { label: 'Terms of Service',      href: '/terms'          },
+      { label: 'Security',              href: '/security'       },
+      { label: 'The Integrity Promise', href: '/integrity'      },
+      { label: 'Data Ownership',        href: '/data-ownership' },
     ],
   },
   {

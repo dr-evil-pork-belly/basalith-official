@@ -1,6 +1,7 @@
-import Nav    from '../components/Nav'
-import Footer from '../components/Footer'
-import type { Metadata } from 'next'
+import Nav                from '../components/Nav'
+import Footer             from '../components/Footer'
+import MilestoneProgress  from '../components/MilestoneProgress'
+import type { Metadata }  from 'next'
 
 export const metadata: Metadata = {
   title:       'The Founding Session · Basalith',
@@ -105,6 +106,46 @@ export default function FoundingSessionPage() {
             Begin
           </a>
         </section>
+
+        {/* 4-stage milestone roadmap */}
+        <div style={{ borderTop: '1px solid var(--color-border)', background: 'var(--color-void)' }}>
+          <div style={{ maxWidth: '640px', margin: '0 auto', padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,48px) 0' }}>
+            <p style={{
+              fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+              fontSize:     '1.05rem',
+              fontStyle:    'italic',
+              fontWeight:   300,
+              lineHeight:   1.85,
+              color:        'var(--color-text-secondary)',
+              marginBottom: '8px',
+            }}>
+              You are starting at Stage 1.
+            </p>
+            <p style={{
+              fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+              fontSize:     '1.05rem',
+              fontStyle:    'italic',
+              fontWeight:   300,
+              lineHeight:   1.85,
+              color:        'var(--color-text-secondary)',
+              marginBottom: '4px',
+            }}>
+              Here is what unlocks as you build.
+            </p>
+            <p style={{
+              fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+              fontSize:      '0.46rem',
+              letterSpacing: '0.15em',
+              color:         'var(--color-text-faint)',
+              marginBottom:  0,
+            }}>
+              Most archives reach Stage 2 within the first month.
+              The Cognitive Fingerprint typically emerges between months 4 and 12.
+            </p>
+          </div>
+          <MilestoneProgress />
+        </div>
+
       </main>
       <Footer />
     </>

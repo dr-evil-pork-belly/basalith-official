@@ -137,7 +137,7 @@ export default function TimelineClient() {
           { label: 'Photographs',    value: data.totalPhotos        },
           { label: 'Deposits',       value: data.totalDeposits      },
           { label: 'Voice',          value: data.totalVoice         },
-          { label: 'Training Pairs', value: data.totalTrainingPairs },
+          { label: 'Memories',        value: data.totalTrainingPairs },
         ].map(s => (
           <div key={s.label} style={{ background: 'rgba(196,162,74,0.04)', border: '1px solid rgba(196,162,74,0.1)', borderRadius: '4px', padding: '14px 18px', minWidth: '110px' }}>
             <p style={{ ...MONO, fontSize: '0.36rem', color: '#5C6166', margin: '0 0 6px' }}>{s.label}</p>
