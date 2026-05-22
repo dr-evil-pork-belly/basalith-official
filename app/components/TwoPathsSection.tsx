@@ -76,7 +76,7 @@ export default function TwoPathsSection() {
               style={{
                 ...MONO,
                 display:        'inline-block',
-                color:          'var(--color-surface)',
+                color:          '#0A0908',
                 textDecoration: 'none',
                 background:     'var(--color-gold)',
                 padding:        '14px 28px',
@@ -139,7 +139,7 @@ export default function TwoPathsSection() {
               onMouseEnter={e => {
                 const el = e.currentTarget as HTMLElement
                 el.style.background = 'var(--color-gold)'
-                el.style.color = 'var(--color-surface)'
+                el.style.color = '#0A0908'
               }}
               onMouseLeave={e => {
                 const el = e.currentTarget as HTMLElement

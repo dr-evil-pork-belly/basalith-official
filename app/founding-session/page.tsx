@@ -142,7 +142,7 @@ export default function FoundingSessionPage() {
               fontStyle:    'italic',
               fontWeight:   300,
               lineHeight:   1.85,
-              color:        'var(--color-text-secondary)',
+              color:        'rgba(250,248,244,0.5)',
               marginBottom: '8px',
             }}>
               You are starting at Stage 1.
@@ -153,7 +153,7 @@ export default function FoundingSessionPage() {
               fontStyle:    'italic',
               fontWeight:   300,
               lineHeight:   1.85,
-              color:        'var(--color-text-secondary)',
+              color:        'rgba(250,248,244,0.5)',
               marginBottom: '4px',
             }}>
               Here is what unlocks as you build.
@@ -162,7 +162,7 @@ export default function FoundingSessionPage() {
               fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
               fontSize:      '0.46rem',
               letterSpacing: '0.15em',
-              color:         'var(--color-text-faint)',
+              color:         'rgba(250,248,244,0.35)',
               marginBottom:  0,
             }}>
               Most archives reach Stage 2 within the first month.

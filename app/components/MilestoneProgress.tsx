@@ -62,7 +62,7 @@ export default function MilestoneProgress({ currentDeposits = 0 }: { currentDepo
           fontSize:      'clamp(1.75rem,3vw,2.5rem)',
           fontWeight:    300,
           lineHeight:    1.15,
-          color:         'var(--color-text-primary)',
+          color:         'rgba(250,248,244,0.9)',
           letterSpacing: '-0.02em',
           marginBottom:  '48px',
         }}>
@@ -93,7 +93,7 @@ export default function MilestoneProgress({ currentDeposits = 0 }: { currentDepo
                 </p>
                 <p style={{
                   ...MONO, fontSize: '0.5rem',
-                  color:        isComplete || isActive ? 'var(--color-text-primary)' : 'var(--color-text-muted)',
+                  color:        isComplete || isActive ? 'rgba(250,248,244,0.85)' : 'var(--color-text-muted)',
                   marginBottom: '16px', lineHeight: 1.4,
                 }}>
                   {stage.name}

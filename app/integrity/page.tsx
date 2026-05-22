@@ -85,29 +85,29 @@ export default function IntegrityPage() {
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '24px' }}>
               After You Pass
             </p>
-            <h2 style={{ ...H2, letterSpacing: '0.12em', textTransform: 'uppercase' as const, fontFamily: 'var(--font-space-mono, "Space Mono", "Courier New", monospace)', fontSize: 'clamp(1.1rem,2vw,1.5rem)', fontWeight: 500 }}>
+            <h2 style={{ ...H2, color: 'rgba(250,248,244,0.9)', letterSpacing: '0.12em', textTransform: 'uppercase' as const, fontFamily: 'var(--font-space-mono, "Space Mono", "Courier New", monospace)', fontSize: 'clamp(1.1rem,2vw,1.5rem)', fontWeight: 500 }}>
               The Immutability Vault
             </h2>
 
-            <p style={BODY}>
+            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>
               When you pass your Cognitive Fingerprint Layer is permanently frozen at the database level.
             </p>
-            <p style={BODY}>
+            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>
               Not locked behind a paywall. Not archived in a format no one can access.
             </p>
-            <p style={{ ...BODY, color: 'var(--color-text-primary)', fontStyle: 'italic' }}>
+            <p style={{ ...BODY, color: 'rgba(250,248,244,0.9)', fontStyle: 'italic' }}>
               Frozen.
             </p>
-            <p style={BODY}>Your heirs can talk to your entity. Your grandchildren can add new context — a marriage, a grandchild, a company milestone.</p>
-            <p style={{ ...BODY, color: 'var(--color-text-primary)' }}>
+            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>Your heirs can talk to your entity. Your grandchildren can add new context — a marriage, a grandchild, a company milestone.</p>
+            <p style={{ ...BODY, color: 'rgba(250,248,244,0.85)' }}>
               What they cannot do is change what you built. Your stated values.
               Your voice recordings. Your deposits made while you were alive and thinking clearly.
             </p>
             <div aria-hidden="true" style={{ width: '40px', height: '1px', background: 'var(--color-gold)', margin: '32px 0' }} />
-            <p style={{ ...BODY, fontWeight: 500, color: 'var(--color-text-primary)' }}>
+            <p style={{ ...BODY, fontWeight: 500, color: 'rgba(250,248,244,0.9)' }}>
               Two layers. One permanent. One living.
             </p>
-            <p style={BODY}>
+            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>
               The permanent layer is who you were.
               The living layer is how the world around you continued after you left.
             </p>
@@ -152,9 +152,9 @@ export default function IntegrityPage() {
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '24px' }}>
               If Basalith Closes
             </p>
-            <h2 style={H2}>You will not lose what you built.</h2>
-            <p style={{ ...BODY, fontStyle: 'italic' }}>Startups close. We know this.</p>
-            <p style={BODY}>
+            <h2 style={{ ...H2, color: 'rgba(250,248,244,0.9)' }}>You will not lose what you built.</h2>
+            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)', fontStyle: 'italic' }}>Startups close. We know this.</p>
+            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>
               If Heritage Nexus Inc. ever faces dissolution we commit to three things:
             </p>
             {[
@@ -164,10 +164,10 @@ export default function IntegrityPage() {
             ].map((item, i) => (
               <div key={i} style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
                 <span style={{ ...MONO, fontSize: '0.52rem', color: 'var(--color-gold)', paddingTop: '5px', flexShrink: 0 }}>0{i + 1}</span>
-                <p style={{ ...BODY, margin: 0 }}>{item}</p>
+                <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)', margin: 0 }}>{item}</p>
               </div>
             ))}
-            <p style={{ ...BODY, marginTop: '24px' }}>
+            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)', marginTop: '24px' }}>
               We cannot promise we will exist forever. We can promise you will not lose what
               you built without warning and without the option to take it with you.
             </p>
@@ -177,13 +177,13 @@ export default function IntegrityPage() {
         {/* Section 4 — Dual-Engine */}
         <section style={{ padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,80px)' }}>
           <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-            <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '24px' }}>
+            <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold-on-light)', marginBottom: '24px' }}>
               How Your Entity Stays Accurate
             </p>
             <h2 style={H2}>Two systems protect what you actually said.</h2>
             <div className="data-cards" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div style={{ border: '1px solid var(--color-border)', padding: 'clamp(24px,3vw,36px)', background: 'var(--color-surface)' }}>
-                <p style={{ ...MONO, fontSize: '0.48rem', color: 'var(--color-gold)', marginBottom: '16px' }}>The Memory Vault</p>
+                <p style={{ ...MONO, fontSize: '0.48rem', color: 'var(--color-gold-on-light)', marginBottom: '16px' }}>The Memory Vault</p>
                 <p style={{ ...BODY, margin: 0 }}>
                   Every deposit you make is stored permanently. When your entity answers a question
                   it retrieves your actual words — not a guess.
@@ -192,7 +192,7 @@ export default function IntegrityPage() {
                 </p>
               </div>
               <div style={{ border: '1px solid rgba(196,162,74,0.3)', padding: 'clamp(24px,3vw,36px)', background: 'rgba(196,162,74,0.03)' }}>
-                <p style={{ ...MONO, fontSize: '0.48rem', color: 'var(--color-gold)', marginBottom: '16px' }}>The Voice Layer</p>
+                <p style={{ ...MONO, fontSize: '0.48rem', color: 'var(--color-gold-on-light)', marginBottom: '16px' }}>The Voice Layer</p>
                 <p style={{ ...BODY, margin: 0 }}>
                   As your archive grows a second system learns how you say things — your phrasing,
                   your characteristic way of expressing uncertainty, the specific words you reach for.
@@ -206,24 +206,24 @@ export default function IntegrityPage() {
 
         {/* Closing CTA */}
         <section style={{ background: 'var(--color-void)', padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,80px)', textAlign: 'center' }}>
-          <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--color-text-secondary)', marginBottom: '8px', lineHeight: 1.85 }}>
+          <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.5)', marginBottom: '8px', lineHeight: 1.85 }}>
             These are not marketing claims.
           </p>
-          <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--color-text-secondary)', marginBottom: '40px', lineHeight: 1.85 }}>
+          <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.5)', marginBottom: '40px', lineHeight: 1.85 }}>
             They are the principles this company was built on.
             If you have a question we have not answered here — ask us directly.
           </p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
             <a href="mailto:hello@basalith.xyz"
-              style={{ ...MONO, fontSize: 'var(--text-caption)', display: 'inline-block', background: 'var(--color-gold)', color: 'var(--color-bg)', textDecoration: 'none', padding: '14px 28px' }}>
+              style={{ ...MONO, fontSize: 'var(--text-caption)', display: 'inline-block', background: 'var(--color-gold)', color: '#0A0908', textDecoration: 'none', padding: '14px 28px' }}>
               hello@basalith.xyz
             </a>
             <Link href="/privacy"
-              style={{ ...MONO, fontSize: 'var(--text-caption)', display: 'inline-block', border: '1px solid var(--color-border)', color: 'var(--color-text-secondary)', textDecoration: 'none', padding: '13px 27px' }}>
+              style={{ ...MONO, fontSize: 'var(--text-caption)', display: 'inline-block', border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(250,248,244,0.55)', textDecoration: 'none', padding: '13px 27px' }}>
               Privacy Policy
             </Link>
             <Link href="/security"
-              style={{ ...MONO, fontSize: 'var(--text-caption)', display: 'inline-block', border: '1px solid var(--color-border)', color: 'var(--color-text-secondary)', textDecoration: 'none', padding: '13px 27px' }}>
+              style={{ ...MONO, fontSize: 'var(--text-caption)', display: 'inline-block', border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(250,248,244,0.55)', textDecoration: 'none', padding: '13px 27px' }}>
               Security Practices
             </Link>
           </div>

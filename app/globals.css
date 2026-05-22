@@ -87,6 +87,9 @@
   --radius-lg:   8px;
   --radius-full: 9999px;
 
+  /* Contrast-safe gold for light backgrounds (passes 4.5:1 on #FAFAF8) */
+  --color-gold-on-light: #8A6E30;
+
   /* Nav */
   --nav-height: 100px;
 
@@ -138,6 +141,61 @@ body {
   -moz-osx-font-smoothing:  grayscale;
   overflow-x:               hidden;
 }
+
+/*
+CONTRAST RULES — READ BEFORE USING
+
+ON DARK BACKGROUNDS (#0A0908, #0D0C0A):
+  Primary text:   rgba(250,248,244,0.9)  ✓  ~16:1
+  Secondary text: rgba(250,248,244,0.5)  ✓  ~8:1
+  Faint text:     rgba(250,248,244,0.4)  ✓  ~6:1
+  Gold accent:    #B8963E               ✓  ~7.4:1
+  NEVER USE:      var(--color-text-primary)   #1A1814  ✗  1.8:1
+  NEVER USE:      var(--color-text-secondary) #4A4640  ✗  3.5:1
+
+ON LIGHT BACKGROUNDS (#FAFAF8, #FFFFFF, #F5F3EE):
+  Primary text:   #1A1814  ✓  14:1
+  Secondary text: #4A4640  ✓  7.5:1
+  Muted text:     #6A6660  ✓  4.6:1
+  NEVER USE:      #9A9690  ✗  2.8:1  (var(--color-text-faint))
+  NEVER USE:      #B8963E  ✗  2.7:1  (var(--color-gold) on light)
+  Gold adjusted:  #8A6E30  ✓  4.6:1  (var(--color-gold-on-light))
+
+ON GOLD BUTTON (#B8963E):
+  ONLY USE:       #0A0908  ✓  7.25:1
+  NEVER USE:      #FAFAF8  ✗  2.7:1
+  NEVER USE:      #FFFFFF  ✗  2.8:1
+*/
+
+/* ── Contrast-safe section utilities ── */
+.section-dark {
+  background: #0A0908;
+  color: rgba(250,248,244,0.9);
+}
+.section-dark p,
+.section-dark h1,
+.section-dark h2,
+.section-dark h3,
+.section-dark li {
+  color: inherit;
+}
+.section-light {
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+}
+.section-light p,
+.section-light h1,
+.section-light h2,
+.section-light h3,
+.section-light li {
+  color: inherit;
+}
+.section-dark .text-muted  { color: rgba(250,248,244,0.45); }
+.section-light .text-muted { color: var(--color-text-muted); }
+.section-dark .text-gold,
+.section-dark .eyebrow-light { color: var(--color-gold); }
+.section-light .text-gold,
+.section-light .eyebrow-light { color: var(--color-gold-on-light); }
 
 /* ── Grain texture ── */
 .grain {

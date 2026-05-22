@@ -176,22 +176,22 @@ export default function MethodPage() {
         </section>
 
         {/* Two-tier quality system */}
-        <section style={{ padding: 'clamp(80px,10vw,120px) clamp(24px,6vw,80px)', background: 'var(--color-void)', borderTop: '1px solid var(--color-border)' }}>
+        <section style={{ padding: 'clamp(80px,10vw,120px) clamp(24px,6vw,80px)', background: 'var(--color-void)', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
           <div style={{ maxWidth: 'calc(var(--max-width-text) + 160px)', margin: '0 auto' }}>
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '24px' }}>
               How We Evaluate What You Share
             </p>
-            <h2 style={{ ...H2, fontSize: 'clamp(1.6rem,3vw,2.4rem)', marginTop: 0, marginBottom: '28px' }}>
+            <h2 style={{ ...H2, color: 'rgba(250,248,244,0.9)', fontSize: 'clamp(1.6rem,3vw,2.4rem)', marginTop: 0, marginBottom: '28px' }}>
               Not everything you deposit is equally valuable.
             </h2>
-            <p style={{ ...BODY, maxWidth: '580px', marginBottom: '48px' }}>
+            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)', maxWidth: '580px', marginBottom: '48px' }}>
               A specific story about a specific morning in 1974 is worth more than a general
               statement about hard work. Every deposit is evaluated to reflect that distinction.
             </p>
 
             <div className="quality-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px', maxWidth: '680px', marginBottom: '32px' }}>
               <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', padding: 'clamp(28px,3vw,40px)' }}>
-                <p style={{ ...MONO, fontSize: '0.44rem', color: 'var(--color-gold)', marginBottom: '20px' }}>First Review</p>
+                <p style={{ ...MONO, fontSize: '0.44rem', color: 'var(--color-gold-on-light)', marginBottom: '20px' }}>First Review</p>
                 {[
                   'Volume scoring',
                   'Speed and coverage',
@@ -207,18 +207,18 @@ export default function MethodPage() {
                   'Ambiguous cases',
                   'High-stakes decisions',
                 ].map(item => (
-                  <p key={item} style={{ ...SERIF, fontSize: '0.9rem', fontWeight: 300, color: 'var(--color-text-secondary)', lineHeight: 1.7, marginBottom: '8px' }}>{item}</p>
+                  <p key={item} style={{ ...SERIF, fontSize: '0.9rem', fontWeight: 300, color: 'rgba(250,248,244,0.5)', lineHeight: 1.7, marginBottom: '8px' }}>{item}</p>
                 ))}
               </div>
             </div>
 
-            <div style={{ maxWidth: '680px', textAlign: 'center', padding: '16px 0', borderTop: '1px solid var(--color-border)' }}>
-              <p style={{ ...MONO, fontSize: '0.44rem', color: 'var(--color-text-faint)', letterSpacing: '0.2em' }}>
+            <div style={{ maxWidth: '680px', textAlign: 'center', padding: '16px 0', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+              <p style={{ ...MONO, fontSize: '0.44rem', color: 'rgba(250,248,244,0.35)', letterSpacing: '0.2em' }}>
                 Only after both systems agree does a deposit influence your entity
               </p>
             </div>
 
-            <p style={{ ...BODY, maxWidth: '580px', marginTop: '40px' }}>
+            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)', maxWidth: '580px', marginTop: '40px' }}>
               Your archive is not scored by the cheapest available model.
               It is scored by the right model for each decision.
             </p>

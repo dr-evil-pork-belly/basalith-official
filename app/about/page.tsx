@@ -118,7 +118,7 @@ export default function AboutPage() {
                     padding:    'clamp(28px,3vw,40px)',
                   }}
                 >
-                  <p style={{ ...MONO, fontSize: '0.5rem', color: 'var(--color-gold)', marginBottom: '20px' }}>
+                  <p style={{ ...MONO, fontSize: '0.5rem', color: 'var(--color-gold-on-light)', marginBottom: '20px' }}>
                     {name}
                   </p>
                   <p style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--color-text-secondary)', lineHeight: 1.8, margin: 0 }}>
@@ -238,13 +238,13 @@ export default function AboutPage() {
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '24px' }}>
               The Legacy Guides
             </p>
-            <h2 style={H2}>The people who make this real.</h2>
-            <p style={BODY}>
+            <h2 style={{ ...H2, color: 'rgba(250,248,244,0.9)' }}>The people who make this real.</h2>
+            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>
               Basalith is built by a network of Legacy Guides, trained professionals
               who conduct Founding Sessions and maintain archive relationships over time.
             </p>
-            <p style={BODY}>The technology handles the complexity. The Guide handles the humanity.</p>
-            <p style={{ ...BODY, color: 'var(--color-text-primary)', fontStyle: 'italic', marginBottom: '36px' }}>
+            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>The technology handles the complexity. The Guide handles the humanity.</p>
+            <p style={{ ...BODY, color: 'rgba(250,248,244,0.85)', fontStyle: 'italic', marginBottom: '36px' }}>
               Every archive is a relationship, not a subscription.
             </p>
             <a
@@ -303,17 +303,17 @@ export default function AboutPage() {
         {/* Section 6 — Closing */}
         <section style={{ background: 'var(--color-void)', padding: 'clamp(80px,12vw,140px) clamp(24px,6vw,80px)', textAlign: 'center' }}>
           <div style={{ maxWidth: '540px', margin: '0 auto' }}>
-            <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--color-text-secondary)', lineHeight: 1.85, marginBottom: '8px' }}>
+            <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.5)', lineHeight: 1.85, marginBottom: '8px' }}>
               We are early.
             </p>
-            <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--color-text-secondary)', lineHeight: 1.85, marginBottom: '8px' }}>
+            <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.5)', lineHeight: 1.85, marginBottom: '8px' }}>
               The archives being built today will be the most valuable ones
               in twenty years, because they will have had the most time.
             </p>
-            <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--color-text-secondary)', lineHeight: 1.85, marginBottom: '8px' }}>
+            <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.5)', lineHeight: 1.85, marginBottom: '8px' }}>
               Every year you begin is a year the entity has more to work with.
             </p>
-            <p style={{ ...SERIF, fontSize: '1.15rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--color-text-primary)', lineHeight: 1.85, marginBottom: '48px' }}>
+            <p style={{ ...SERIF, fontSize: '1.15rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.85)', lineHeight: 1.85, marginBottom: '48px' }}>
               Every year you wait is a year it has less.
             </p>
             <a
@@ -325,7 +325,7 @@ export default function AboutPage() {
                 textTransform:  'uppercase' as const,
                 display:        'inline-block',
                 background:     'var(--color-gold)',
-                color:          'var(--color-bg)',
+                color:          '#0A0908',
                 textDecoration: 'none',
                 padding:        '14px 32px',
                 borderRadius:   'var(--radius-sm)',

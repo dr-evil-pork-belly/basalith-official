@@ -118,7 +118,7 @@ export default function HeroSection() {
             style={{
               ...MONO,
               display:        'inline-block',
-              color:          'var(--color-surface)',
+              color:          '#0A0908',
               textDecoration: 'none',
               background:     'var(--color-gold)',
               padding:        '14px 32px',

@@ -80,7 +80,7 @@ export default function SuccessionPage() {
               ...MONO,
               fontSize:       'var(--text-caption)',
               display:        'inline-block',
-              color:          'var(--color-surface)',
+              color:          '#0A0908',
               textDecoration: 'none',
               background:     'var(--color-gold)',
               padding:        '16px 36px',
@@ -173,8 +173,8 @@ export default function SuccessionPage() {
             {/* Pricing card */}
             <div style={{ border: '1px solid rgba(184,150,62,0.4)', padding: 'clamp(32px,5vw,56px)', marginBottom: '40px', background: 'rgba(184,150,62,0.04)' }}>
               <p style={{ ...MONO, fontSize: '0.52rem', color: 'var(--color-gold)', marginBottom: '20px' }}>Succession</p>
-              <p style={{ ...SERIF, fontSize: 'clamp(2.5rem,5vw,3.5rem)', fontWeight: 300, color: 'var(--color-text-primary)', lineHeight: 1, marginBottom: '4px' }}>$12,000</p>
-              <p style={{ ...MONO, fontSize: '0.45rem', color: 'var(--color-text-muted)', marginBottom: '8px' }}>per year</p>
+              <p style={{ ...SERIF, fontSize: 'clamp(2.5rem,5vw,3.5rem)', fontWeight: 300, color: 'rgba(250,248,244,0.9)', lineHeight: 1, marginBottom: '4px' }}>$12,000</p>
+              <p style={{ ...MONO, fontSize: '0.45rem', color: 'rgba(250,248,244,0.4)', marginBottom: '8px' }}>per year</p>
               <p style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', color: 'var(--color-gold)', marginBottom: '36px' }}>
                 + $5,000 founding session (one-time)
               </p>
@@ -197,7 +197,7 @@ export default function SuccessionPage() {
                 style={{
                   ...MONO, fontSize: 'var(--text-caption)',
                   display: 'block', textAlign: 'center',
-                  color: 'var(--color-surface)', textDecoration: 'none',
+                  color: '#0A0908', textDecoration: 'none',
                   background: 'var(--color-gold)', padding: '16px 32px',
                   transition: 'background 250ms ease',
                 }}
@@ -208,28 +208,28 @@ export default function SuccessionPage() {
               </Link>
             </div>
 
-            <p style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', color: 'var(--color-text-muted)', marginBottom: '52px' }}>
+            <p style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', color: 'rgba(250,248,244,0.4)', marginBottom: '52px' }}>
               After transition: $3,600/year. Institutional access for the successor continues.
               Entity updated with new AI models. No active sessions required.
             </p>
 
             {/* Comparison table */}
             <Eyebrow>Legacy vs. Succession</Eyebrow>
-            <div style={{ border: '1px solid var(--color-border-medium)' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', borderBottom: '1px solid var(--color-border-medium)' }}>
+            <div style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
                 <div style={{ padding: '12px 16px' }} />
-                <p style={{ ...MONO, fontSize: '0.45rem', color: 'var(--color-text-muted)', padding: '12px 16px', margin: 0 }}>Legacy</p>
+                <p style={{ ...MONO, fontSize: '0.45rem', color: 'rgba(250,248,244,0.4)', padding: '12px 16px', margin: 0 }}>Legacy</p>
                 <p style={{ ...MONO, fontSize: '0.45rem', color: 'var(--color-gold)', padding: '12px 16px', margin: 0 }}>Succession</p>
               </div>
               {COMPARISON.map((row, i) => (
                 <div key={row.label} style={{
                   display:       'grid',
                   gridTemplateColumns: '2fr 1fr 1fr',
-                  borderBottom:  i < COMPARISON.length - 1 ? '1px solid var(--color-border-medium)' : 'none',
+                  borderBottom:  i < COMPARISON.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none',
                   background:    i % 2 === 0 ? 'transparent' : 'rgba(250,248,244,0.02)',
                 }}>
                   <p style={{ ...MONO, fontSize: '0.44rem', color: 'rgba(250,248,244,0.5)', padding: '12px 16px', margin: 0 }}>{row.label}</p>
-                  <p style={{ ...SERIF, fontSize: '0.9rem', color: 'var(--color-text-secondary)', padding: '12px 16px', margin: 0 }}>{row.legacy}</p>
+                  <p style={{ ...SERIF, fontSize: '0.9rem', color: 'rgba(250,248,244,0.5)', padding: '12px 16px', margin: 0 }}>{row.legacy}</p>
                   <p style={{ ...SERIF, fontSize: '0.9rem', color: 'rgba(250,248,244,0.9)', padding: '12px 16px', margin: 0, fontWeight: 500 }}>{row.succession}</p>
                 </div>
               ))}
@@ -249,7 +249,7 @@ export default function SuccessionPage() {
             href="/apply?type=succession"
             style={{
               ...MONO, fontSize: 'var(--text-caption)',
-              display: 'inline-block', color: 'var(--color-surface)', textDecoration: 'none',
+              display: 'inline-block', color: '#0A0908', textDecoration: 'none',
               background: 'var(--color-gold)', padding: '16px 40px',
               transition: 'background 250ms ease',
             }}
