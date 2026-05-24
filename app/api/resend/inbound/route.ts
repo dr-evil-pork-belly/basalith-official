@@ -58,9 +58,25 @@ export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => null)
     if (!body) return NextResponse.json({ error: 'Invalid body' }, { status: 400 })
 
-    const to      = Array.isArray(body.to)   ? body.to[0]   : (body.to   ?? '')
-    const from    = Array.isArray(body.from) ? body.from[0] : (body.from ?? '')
+    // Normalise to/from: Resend may send strings, arrays of strings, or arrays
+    // of objects ({ email, name }) depending on webhook version.
+    function extractAddress(raw: unknown): string {
+      const first = Array.isArray(raw) ? raw[0] : raw
+      if (typeof first === 'object' && first !== null) {
+        return (first as Record<string, string>).email ?? ''
+      }
+      return String(first ?? '')
+    }
+
+    const to      = extractAddress(body.to)
+    const from    = extractAddress(body.from)
     const rawText = body.text ?? body.plain_text ?? ''
+
+    // Log raw shape once so Vercel shows exactly what Resend is sending
+    console.log('[inbound] received — to:', to, 'from:', from,
+      'to_type:', Array.isArray(body.to) ? `array[${body.to.length}] of ${typeof body.to[0]}` : typeof body.to,
+      'text_len:', rawText.length)
+
     const replyText = extractReplyBody(rawText)
 
     if (!replyText || replyText.length < 3) {
@@ -206,8 +222,6 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Route 2: Legacy photo-reply pattern (existing email_sessions) ─────────
-    const toAddress = to.toLowerCase().split('@')[0]
-
     const { data: emailSession } = await supabaseAdmin
       .from('email_sessions')
       .select('id, archive_id, photograph_id, recipients')
