@@ -11,18 +11,21 @@ export const dynamic = 'force-dynamic'
 export async function POST(req: NextRequest) {
   try {
     const { token, questionId, answerText } = await req.json()
+    console.log('[contribute-answer] called, token:', token?.substring(0, 8), 'questionId:', questionId)
+
     if (!token || !questionId || !answerText?.trim()) {
       return NextResponse.json({ error: 'token, questionId, and answerText required' }, { status: 400 })
     }
 
     const contributor = await getContributorByToken(token)
+    console.log('[contribute-answer] contributor:', contributor?.id ?? 'NOT FOUND')
     if (!contributor) return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
 
     const archiveId = contributor.archive_id as string
     const archive   = contributor.archives as { name: string; family_name: string; owner_email: string | null; owner_name: string | null } | null
 
     // Fetch the question
-    const { data: question } = await supabaseAdmin
+    const { data: question, error: questionError } = await supabaseAdmin
       .from('contributor_questions')
       .select('*')
       .eq('id', questionId)
@@ -30,19 +33,22 @@ export async function POST(req: NextRequest) {
       .eq('status', 'pending')
       .maybeSingle()
 
+    console.log('[contribute-answer] question fetch:', question?.id ?? 'NOT FOUND', questionError?.message ?? 'ok')
+
     if (!question) return NextResponse.json({ error: 'Question not found' }, { status: 404 })
 
     const now = new Date().toISOString()
 
     // If it's a photograph question, save to labels table too
     if (question.question_type === 'photograph_label' && question.photograph_id) {
-      await supabaseAdmin.from('labels').insert({
+      const { error: labelErr } = await supabaseAdmin.from('labels').insert({
         archive_id:         archiveId,
         photograph_id:      question.photograph_id,
         what_was_happening: answerText.trim(),
         labelled_by:        contributor.name ?? contributor.email,
         created_at:         now,
       })
+      if (labelErr) console.warn('[contribute-answer] labels insert:', labelErr.message)
 
       // Mark photo as responded in contributor_photo_sends (non-fatal)
       void (async () => {
@@ -56,20 +62,28 @@ export async function POST(req: NextRequest) {
       })()
     }
 
-    // Save as owner_deposit so entity learns from it
-    await supabaseAdmin.from('owner_deposits').insert({
+    // Save as owner_deposit so entity learns from it (fire-and-forget — never blocks the answer save)
+    void supabaseAdmin.from('owner_deposits').insert({
       archive_id:  archiveId,
       prompt:      question.question_text,
       response:    answerText.trim(),
       source_type: 'contributor',
       created_at:  now,
+    }).then(({ error }) => {
+      if (error) console.warn('[contribute-answer] owner_deposits insert:', error.message)
     })
 
-    // Mark question answered
-    await supabaseAdmin
+    // Mark question answered — this is the critical write
+    console.log('[contribute-answer] saving:', { questionId, answerLength: answerText.trim().length, contributorId: contributor.id })
+    const { error: updateError } = await supabaseAdmin
       .from('contributor_questions')
       .update({ status: 'answered', answer_text: answerText.trim(), answered_at: now })
       .eq('id', questionId)
+
+    console.log('[contribute-answer] update result:', updateError ? `ERROR: ${updateError.message}` : 'ok')
+    if (updateError) {
+      return NextResponse.json({ error: 'Failed to save answer: ' + updateError.message }, { status: 500 })
+    }
 
     // Increment contributor's questions_answered count
     try {

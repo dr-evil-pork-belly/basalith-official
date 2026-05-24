@@ -342,6 +342,7 @@ function QuestionsSection({
   const [answers,      setAnswers]      = useState<Record<string, string>>({})
   const [saving,       setSaving]       = useState<Record<string, boolean>>({})
   const [saved,        setSaved]        = useState<Record<string, boolean>>({})
+  const [saveError,    setSaveError]    = useState<Record<string, string>>({})
   const [loading,      setLoading]      = useState(true)
 
   const load = useCallback(async () => {
@@ -359,6 +360,8 @@ function QuestionsSection({
     const text = answers[q.id]?.trim()
     if (!text) return
     setSaving(prev => ({ ...prev, [q.id]: true }))
+    setSaveError(prev => { const next = { ...prev }; delete next[q.id]; return next })
+    console.log('[portal] submitting:', { questionId: q.id, answerLength: text.length, token: token.substring(0, 8) })
     try {
       const res  = await fetch('/api/contribute/answer', {
         method:  'POST',
@@ -366,7 +369,8 @@ function QuestionsSection({
         body:    JSON.stringify({ token, questionId: q.id, answerText: text }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error)
+      console.log('[portal] response:', res.status, data)
+      if (!res.ok) throw new Error(data.error ?? `HTTP ${res.status}`)
 
       setSaved(prev => ({ ...prev, [q.id]: true }))
       // Replace answered question with next one
@@ -376,7 +380,11 @@ function QuestionsSection({
         return remaining
       })
       setAnswers(prev => { const next = { ...prev }; delete next[q.id]; return next })
-    } catch {}
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Save failed'
+      console.error('[portal] save error:', msg)
+      setSaveError(prev => ({ ...prev, [q.id]: msg }))
+    }
     setSaving(prev => ({ ...prev, [q.id]: false }))
   }
 
@@ -492,6 +500,11 @@ function QuestionsSection({
                 >
                   {saving[q.id] ? 'Saving...' : 'Save Answer'}
                 </button>
+                {saveError[q.id] && (
+                  <p style={{ fontFamily: 'monospace', fontSize: '0.42rem', color: '#C0392B', marginTop: '0.4rem', letterSpacing: '0.08em' }}>
+                    Could not save. Please try again.
+                  </p>
+                )}
               </>
             )}
           </div>
