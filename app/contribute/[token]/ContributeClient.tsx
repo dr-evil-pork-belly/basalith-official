@@ -345,12 +345,24 @@ function QuestionsSection({
   const [saveError,    setSaveError]    = useState<Record<string, string>>({})
   const [loading,      setLoading]      = useState(true)
 
+  const [loadError, setLoadError] = useState(false)
+
   const load = useCallback(async () => {
     try {
+      console.log('[portal] loading questions, token:', token.substring(0, 8))
       const res  = await fetch(`/api/contribute/questions?token=${token}`)
       const data = await res.json()
-      if (res.ok) setQuestions(data.questions ?? [])
-    } catch {}
+      console.log('[portal] questions response:', res.status, 'count:', data.questions?.length ?? 0, data.error ?? '')
+      if (res.ok) {
+        setQuestions(data.questions ?? [])
+      } else {
+        console.error('[portal] questions load failed:', data.error)
+        setLoadError(true)
+      }
+    } catch (err) {
+      console.error('[portal] questions fetch error:', err instanceof Error ? err.message : err)
+      setLoadError(true)
+    }
     setLoading(false)
   }, [token])
 
@@ -392,6 +404,16 @@ function QuestionsSection({
     return (
       <SectionCard title={PORTAL_UI[lang === 'zh' ? 'zh' : 'en'].questionsForYou} prominent>
         <div style={{ height: '80px', background: 'rgba(255,255,255,0.03)', borderRadius: '2px', animation: 'pulse 1.5s ease-in-out infinite' }} />
+      </SectionCard>
+    )
+  }
+
+  if (loadError) {
+    return (
+      <SectionCard title={PORTAL_UI[lang === 'zh' ? 'zh' : 'en'].questionsForYou} prominent>
+        <p style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.12em', color: '#C0392B' }}>
+          Could not load questions. Please refresh the page.
+        </p>
       </SectionCard>
     )
   }
