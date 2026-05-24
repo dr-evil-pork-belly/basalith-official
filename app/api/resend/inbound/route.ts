@@ -193,6 +193,11 @@ export async function POST(req: NextRequest) {
         }
       }
 
+      // Log owner replies explicitly
+      if (session.email_type === 'owner_daily' || session.email_type === 'owner_weekly') {
+        console.log('[inbound] owner reply received — type:', session.email_type, 'archive:', archiveId.substring(0, 8))
+      }
+
       // Always save to owner_deposits — no reply is ever lost even if the
       // type-specific save above failed or the session had null IDs
       const { data: deposit, error: depositError } = await supabaseAdmin
@@ -207,6 +212,7 @@ export async function POST(req: NextRequest) {
         .select('id, archive_id, prompt, response, source_type')
         .single()
       if (depositError) console.error('[inbound] deposit save failed:', depositError.message)
+      else console.log('[inbound] owner_deposits saved — id:', deposit?.id?.substring(0, 8))
 
       // Training pair
       if (deposit && archive) {
@@ -215,11 +221,11 @@ export async function POST(req: NextRequest) {
           archive.owner_name ?? '',
           archive.name ?? '',
           archive.preferred_language ?? 'en',
-          'contributor',
+          contributorId ? 'contributor' : 'owner',
         ).catch(() => {})
       }
 
-      // Memory chain for substantial replies
+      // Memory chain — only for contributor replies (owner has no contributor row)
       if (replyText.length > 50 && archiveId && contributorId && archive) {
         const promptText = session.email_type === 'spark'
           ? (session.spark_id ?? 'a spark question')

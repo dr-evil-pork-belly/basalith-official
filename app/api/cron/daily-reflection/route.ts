@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
 import { getDailyReflection, getDayOfYear } from '@/lib/dailyReflections'
+import { createEmailReplySession, buildReplyAddress } from '@/lib/emailReplySessions'
 
 export const dynamic = 'force-dynamic'
 
@@ -62,9 +63,23 @@ export async function GET(req: NextRequest) {
         ? `今天的问题 · ${archive.name}`
         : `Today's question · ${archive.name}`
 
+      let ownerReplyTo: string | undefined
+      try {
+        const replyToken = await createEmailReplySession({
+          archiveId:     archive.id,
+          contributorId: null,
+          emailType:     'owner_daily',
+          sparkId:       question.substring(0, 200),
+        })
+        ownerReplyTo = buildReplyAddress(replyToken)
+      } catch (e) {
+        console.warn('[daily-reflection] reply session failed:', e instanceof Error ? e.message : e)
+      }
+
       await resend.emails.send({
         from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
         to:      archive.owner_email,
+        replyTo: ownerReplyTo,
         subject,
         html:    buildDailyReflectionEmail(archive.name, firstName, question, formattedPhone, lang),
         headers: {

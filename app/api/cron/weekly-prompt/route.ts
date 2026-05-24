@@ -6,6 +6,7 @@ import { getWeeklyPrompt, getWeeklyPromptZh, getWeekNumber } from '@/lib/weeklyP
 import { t } from '@/lib/emailTranslations'
 import { generateQuestionsForContributor } from '@/lib/contributorToken'
 import { generateRelationshipQuestion, buildQuestionSubject, buildQuestionEmail } from '@/lib/questionEngine'
+import { createEmailReplySession, buildReplyAddress } from '@/lib/emailReplySessions'
 
 export const dynamic = 'force-dynamic'
 
@@ -82,9 +83,23 @@ export async function GET(req: NextRequest) {
         ? Math.round(allAccuracy.reduce((s, a) => s + a.accuracy_score, 0) / allAccuracy.length * 100)
         : 0
 
+      let ownerReplyTo: string | undefined
+      try {
+        const replyToken = await createEmailReplySession({
+          archiveId:     archive.id,
+          contributorId: null,
+          emailType:     'owner_weekly',
+          promptId:      prompt.substring(0, 200),
+        })
+        ownerReplyTo = buildReplyAddress(replyToken)
+      } catch (e) {
+        console.warn('[weekly-prompt] reply session failed:', e instanceof Error ? e.message : e)
+      }
+
       await resend.emails.send({
         from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
         to:      archive.owner_email,
+        replyTo: ownerReplyTo,
         subject: lang === 'zh' ? `本周问题 · ${archive.name}` : `This week's question — ${archive.name}`,
         html:    buildWeeklyPromptEmail({
           archiveName:      archive.name,
