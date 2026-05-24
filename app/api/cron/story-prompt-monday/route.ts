@@ -194,9 +194,16 @@ export async function GET(req: NextRequest) {
 
           for (const contributor of photoContributors) {
             try {
+              const photoReplyToken = await createEmailReplySession({
+                archiveId:    archive.id,
+                contributorId: contributor.id,
+                emailType:    'photograph',
+                photographId: selectedPhoto.id,
+              })
               await resend.emails.send({
                 from:    `The ${archive.family_name} Archive <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
                 to:      contributor.email,
+                replyTo: buildReplyAddress(photoReplyToken),
                 subject: `Monday mystery — what was happening here? · ${archive.name}`,
                 html:    buildMondayPhotoEmail(archive.family_name, photoUrl, selectedPhoto.ai_era_estimate, dateStr),
                 headers: {

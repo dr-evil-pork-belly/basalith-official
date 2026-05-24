@@ -20,6 +20,7 @@ export interface CreateSessionOptions {
   emailType:     'spark' | 'story_prompt' | 'photograph'
   sparkId?:      string
   promptId?:     string
+  photographId?: string
 }
 
 export async function createEmailReplySession(opts: CreateSessionOptions): Promise<string> {
@@ -30,8 +31,9 @@ export async function createEmailReplySession(opts: CreateSessionOptions): Promi
     archive_id:     opts.archiveId,
     contributor_id: opts.contributorId ?? null,
     email_type:     opts.emailType,
-    spark_id:       opts.sparkId   ?? null,
-    prompt_id:      opts.promptId  ?? null,
+    spark_id:       opts.sparkId      ?? null,
+    prompt_id:      opts.promptId     ?? null,
+    photograph_id:  opts.photographId ?? null,
   })
 
   return token

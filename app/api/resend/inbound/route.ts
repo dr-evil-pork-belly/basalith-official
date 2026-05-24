@@ -126,6 +126,25 @@ export async function POST(req: NextRequest) {
             console.log('[inbound] story prompt answered')
           }
         }
+      } else if (session.email_type === 'photograph') {
+        const photographId = session.photograph_id as string | null
+        if (!photographId) {
+          console.error('[inbound] photograph session missing photograph_id:', session.id)
+        } else {
+          const senderName = parseDisplayName(from) || (contributor?.name ?? parseEmailAddress(from))
+          const { error: labelErr } = await supabaseAdmin.from('labels').insert({
+            archive_id:         archiveId,
+            photograph_id:      photographId,
+            what_was_happening: replyText,
+            labelled_by:        senderName,
+            created_at:         new Date().toISOString(),
+          })
+          if (labelErr) {
+            console.error('[inbound] photograph label insert:', labelErr.message)
+          } else {
+            console.log('[inbound] photograph labeled via email reply, photo:', photographId)
+          }
+        }
       }
 
       // Always save to owner_deposits — no reply is ever lost even if the
