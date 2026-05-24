@@ -131,24 +131,61 @@ export async function generateQuestionsForContributor(
   }
 
   const relQuestions = relationshipQuestions[relationship] ?? relationshipQuestions.other
+
+  // Fetch all existing question texts (pending + answered) so we never repeat one
+  const { data: existingRows } = await supabaseAdmin
+    .from('contributor_questions')
+    .select('question_text')
+    .eq('contributor_id', contributorId)
+    .eq('archive_id', archiveId)
+    .in('status', ['pending', 'answered'])
+
+  const existingTexts = existingRows?.map(r => r.question_text.toLowerCase()) ?? []
+
+  function isDuplicate(candidate: string): boolean {
+    const keywords = candidate.toLowerCase().split(' ').filter(w => w.length > 5)
+    return existingTexts.some(existing => {
+      const matches = keywords.filter(k => existing.includes(k)).length
+      return matches > 3
+    })
+  }
+
   const questions: object[] = []
 
   // 1. Photograph question if we have unlabelled photos
   if (photos && photos.length > 0 && needed > 0) {
-    const photo = photos[0]
-    questions.push({
-      archive_id:     archiveId,
-      contributor_id: contributorId,
-      question_text:  `Do you recognize anyone in this photograph${photo.ai_era_estimate ? ` from ${photo.ai_era_estimate}` : ''}? What do you remember about this moment?`,
-      question_type:  'photograph_label',
-      photograph_id:  photo.id,
-      dimension:      null,
-    })
+    // Find a photo not already used in a pending/answered question
+    const usedPhotoIds = new Set(
+      await supabaseAdmin
+        .from('contributor_questions')
+        .select('photograph_id')
+        .eq('contributor_id', contributorId)
+        .not('photograph_id', 'is', null)
+        .then(({ data }) => (data ?? []).map(r => r.photograph_id as string))
+    )
+    const freshPhoto = photos.find(p => !usedPhotoIds.has(p.id))
+    if (freshPhoto) {
+      const photoQuestion = `Do you recognize anyone in this photograph${freshPhoto.ai_era_estimate ? ` from ${freshPhoto.ai_era_estimate}` : ''}? What do you remember about this moment?`
+      if (!isDuplicate(photoQuestion)) {
+        questions.push({
+          archive_id:     archiveId,
+          contributor_id: contributorId,
+          question_text:  photoQuestion,
+          question_type:  'photograph_label',
+          photograph_id:  freshPhoto.id,
+          dimension:      null,
+        })
+      }
+    }
   }
 
-  // 2. Relationship-specific questions
+  // 2. Relationship-specific questions — skip any already asked
   for (const q of relQuestions) {
     if (questions.length >= needed) break
+    if (isDuplicate(q)) {
+      console.log('[questions] skipping duplicate:', q.substring(0, 60))
+      continue
+    }
     const weakDimension = accuracy?.[questions.length]?.dimension ?? null
     questions.push({
       archive_id:     archiveId,
