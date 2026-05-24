@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
 
       // Save the reply
       if (session.email_type === 'spark') {
-        await supabaseAdmin.from('daily_spark_responses').insert({
+        const { error: sparkError } = await supabaseAdmin.from('daily_spark_responses').insert({
           archive_id:     archiveId,
           contributor_id: contributorId,
           spark_id:       session.spark_id ?? 'unknown',
@@ -105,27 +105,43 @@ export async function POST(req: NextRequest) {
           response_type:  'text',
           is_owner:       !contributorId,
         })
+        if (sparkError) console.error('[inbound] spark save failed:', sparkError.message)
       } else if (session.email_type === 'story_prompt') {
-        await supabaseAdmin
-          .from('contributor_story_prompts')
-          .update({ answered: true, answer_text: replyText, answered_at: new Date().toISOString() })
-          .eq('archive_id', archiveId)
-          .eq('contributor_id', contributorId ?? '')
-          .eq('prompt_id', session.prompt_id ?? '')
-          .eq('answered', false)
+        if (!contributorId || !session.prompt_id) {
+          console.error('[inbound] missing contributorId or prompt_id — cannot update story prompt', {
+            contributorId,
+            promptId: session.prompt_id,
+          })
+        } else {
+          const { error: promptError } = await supabaseAdmin
+            .from('contributor_story_prompts')
+            .update({ answered: true, answer_text: replyText, answered_at: new Date().toISOString() })
+            .eq('archive_id', archiveId)
+            .eq('contributor_id', contributorId)
+            .eq('prompt_id', session.prompt_id)
+            .eq('answered', false)
+          if (promptError) {
+            console.error('[inbound] story prompt update failed:', promptError.message)
+          } else {
+            console.log('[inbound] story prompt answered')
+          }
+        }
       }
 
-      // Save as owner_deposit (entity training)
-      const { data: deposit } = await supabaseAdmin
+      // Always save to owner_deposits — no reply is ever lost even if the
+      // type-specific save above failed or the session had null IDs
+      const { data: deposit, error: depositError } = await supabaseAdmin
         .from('owner_deposits')
         .insert({
-          archive_id:  archiveId,
-          prompt:      session.email_type === 'spark' ? 'Spark reply' : 'Story prompt reply',
-          response:    replyText,
-          source_type: session.email_type === 'spark' ? 'contributor' : 'contributor',
+          archive_id:     archiveId,
+          prompt:         session.prompt_id || session.spark_id || 'Email reply',
+          response:       replyText,
+          source_type:    'email_reply',
+          contributor_id: contributorId ?? null,
         })
         .select('id, archive_id, prompt, response, source_type')
         .single()
+      if (depositError) console.error('[inbound] deposit save failed:', depositError.message)
 
       // Training pair
       if (deposit && archive) {
