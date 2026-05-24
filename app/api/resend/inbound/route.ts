@@ -8,11 +8,37 @@ export const dynamic = 'force-dynamic'
 
 // ── Strip quoted reply text ───────────────────────────────────────────────────
 
-function extractReplyBody(text: string): string {
+function extractReplyBody(rawText: string, htmlBody?: string): string {
+  // Remove zero-width / invisible chars Gmail sometimes injects
+  let text = (rawText ?? '').replace(/[​-‍﻿]/g, '').trim()
+
+  // HTML fallback when plain text is absent or empty
+  if (!text && htmlBody) {
+    text = htmlBody
+      .replace(/<style[\s\S]*?<\/style>/gi, '')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+  }
+
+  if (!text) return ''
+
+  // Gmail multiline quote header spans 2-3 lines:
+  //   On Sat, May 23, 2026 at 11:37 PM
+  //   Archive Name <archive@basalith.xyz>
+  //   wrote:
+  // Match lazily across up to 300 chars so we don't overshoot into body.
+  const gmailPattern = /\r?\nOn [\s\S]{5,300}?wrote:\r?\n/
+  const gmailParts   = text.split(gmailPattern)
+  if (gmailParts[0].trim().length > 0) {
+    return gmailParts[0].trim()
+  }
+
+  // Fallback: line-by-line for other email clients
   const lines: string[] = []
   for (const line of text.split('\n')) {
-    if (line.startsWith('>')) break
-    if (/^On .+ wrote:/.test(line)) break
+    if (line.trimStart().startsWith('>')) break
+    if (/^On .+ wrote:/.test(line))       break
     if (line.includes('-----Original Message-----')) break
     if (line.includes('________________________________')) break
     lines.push(line)
@@ -75,11 +101,15 @@ export async function POST(req: NextRequest) {
     // Log raw shape once so Vercel shows exactly what Resend is sending
     console.log('[inbound] received — to:', to, 'from:', from,
       'to_type:', Array.isArray(body.to) ? `array[${body.to.length}] of ${typeof body.to[0]}` : typeof body.to,
-      'text_len:', rawText.length)
+      'text_len:', rawText.length, 'html_len:', (body.html ?? '').length)
 
-    const replyText = extractReplyBody(rawText)
+    console.log('[inbound] text_preview:', rawText.substring(0, 150))
 
-    if (!replyText || replyText.length < 3) {
+    const replyText = extractReplyBody(rawText, body.html)
+
+    console.log('[inbound] extracted:', replyText.substring(0, 150), 'len:', replyText.length)
+
+    if (!replyText || replyText.length < 2) {
       console.log('[inbound] empty reply — skipping')
       return NextResponse.json({ ok: true, skipped: 'empty reply' })
     }
