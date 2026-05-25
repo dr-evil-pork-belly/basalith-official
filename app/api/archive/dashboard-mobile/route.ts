@@ -14,10 +14,10 @@ export async function GET(req: NextRequest) {
 
   const today = new Date().toISOString().substring(0, 10) // "2026-05-19"
 
-  const [archiveRes, depositsRes, contribsRes, sparkAnswerRes, sentPhotosRes] = await Promise.allSettled([
+  const [archiveRes, depositsRes, contribsRes, sparkAnswerRes, sentPhotosRes, sessionRes] = await Promise.allSettled([
     supabaseAdmin
       .from('archives')
-      .select('id, name, owner_name, status, preferred_language')
+      .select('id, name, owner_name, status, preferred_language, current_streak, longest_streak')
       .eq('id', archiveId)
       .single(),
 
@@ -47,13 +47,23 @@ export async function GET(req: NextRequest) {
       .from('owner_photo_sends')
       .select('photograph_id')
       .eq('archive_id', archiveId),
+
+    // Whether today's daily session is already completed
+    supabaseAdmin
+      .from('daily_sessions')
+      .select('completed')
+      .eq('archive_id', archiveId)
+      .eq('session_date', today)
+      .maybeSingle(),
   ])
 
-  const archive         = archiveRes.status        === 'fulfilled' ? archiveRes.value.data        : null
-  const deposits        = depositsRes.status        === 'fulfilled' ? depositsRes.value.count       : 0
-  const contribs        = contribsRes.status        === 'fulfilled' ? contribsRes.value.count       : 0
-  const todaySparkEntry = sparkAnswerRes.status     === 'fulfilled' ? sparkAnswerRes.value.data     : null
-  const sentRows        = sentPhotosRes.status      === 'fulfilled' ? (sentPhotosRes.value.data ?? []) : []
+  const archive         = archiveRes.status    === 'fulfilled' ? archiveRes.value.data        : null
+  const deposits        = depositsRes.status   === 'fulfilled' ? depositsRes.value.count       : 0
+  const contribs        = contribsRes.status   === 'fulfilled' ? contribsRes.value.count       : 0
+  const todaySparkEntry = sparkAnswerRes.status=== 'fulfilled' ? sparkAnswerRes.value.data     : null
+  const sentRows        = sentPhotosRes.status === 'fulfilled' ? (sentPhotosRes.value.data ?? []) : []
+  const sessionRow      = sessionRes.status    === 'fulfilled' ? sessionRes.value.data         : null
+  const sessionCompleted = sessionRow?.completed === true
 
   if (!archive) {
     return NextResponse.json({ error: 'Archive not found' }, { status: 404 })
@@ -142,5 +152,8 @@ export async function GET(req: NextRequest) {
     currentSpark:       sparkAnsweredToday ? null : (spark?.text ?? null),
     currentSparkId:     sparkAnsweredToday ? null : (spark?.id  ?? null),
     sparkAnsweredToday,
+    streak:             (archive as { current_streak?: number }).current_streak ?? 0,
+    longestStreak:      (archive as { longest_streak?: number }).longest_streak ?? 0,
+    sessionReady:       !sessionCompleted,
   })
 }
