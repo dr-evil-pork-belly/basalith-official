@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
 export async function GET() {
-  const replyDomain = process.env.RESEND_REPLY_DOMAIN || 'zoibrenae.resend.app'
+  const replyDomain = process.env.RESEND_REPLY_DOMAIN || 'reply.basalith.ai'
 
   return NextResponse.json({
     replyDomain,

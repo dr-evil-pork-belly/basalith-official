@@ -84,6 +84,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => null)
     if (!body) return NextResponse.json({ error: 'Invalid body' }, { status: 400 })
 
+    // Resend wraps the email fields under body.data in their inbound webhook v2.
+    // Fall back to body directly for any older or test payloads.
+    const email = body.data ?? body
+
     // Normalise to/from: Resend may send strings, arrays of strings, or arrays
     // of objects ({ email, name }) depending on webhook version.
     function extractAddress(raw: unknown): string {
@@ -94,18 +98,35 @@ export async function POST(req: NextRequest) {
       return String(first ?? '')
     }
 
-    const to      = extractAddress(body.to)
-    const from    = extractAddress(body.from)
-    const rawText = body.text ?? body.plain_text ?? ''
+    const to   = extractAddress(email.to)
+    const from = extractAddress(email.from)
 
-    // Log raw shape once so Vercel shows exactly what Resend is sending
+    // Some inbound webhook payloads carry only an email_id with no body content.
+    // When that happens, fetch the full email from the Resend API.
+    let emailText: string = email.text ?? email.plain_text ?? ''
+    let emailHtml: string = email.html ?? ''
+    if (!emailText && !emailHtml && email.email_id) {
+      const resendRes   = await fetch(
+        `https://api.resend.com/emails/receiving/${email.email_id}`,
+        { headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}` } },
+      )
+      const resendEmail = await resendRes.json()
+      console.log('[inbound] receiving API response:', JSON.stringify(resendEmail).substring(0, 500))
+      emailText = resendEmail.text ?? resendEmail.plain_text ?? resendEmail.body ?? resendEmail.content ?? ''
+      emailHtml = resendEmail.html ?? ''
+    }
+
+    const rawText = emailText
+
+    // Log raw shape so Vercel shows exactly what Resend is sending
     console.log('[inbound] received — to:', to, 'from:', from,
-      'to_type:', Array.isArray(body.to) ? `array[${body.to.length}] of ${typeof body.to[0]}` : typeof body.to,
-      'text_len:', rawText.length, 'html_len:', (body.html ?? '').length)
+      'to_type:', Array.isArray(email.to) ? `array[${email.to.length}] of ${typeof email.to[0]}` : typeof email.to,
+      'text_len:', rawText.length, 'html_len:', emailHtml.length,
+      'via_data_wrapper:', body.data != null)
 
     console.log('[inbound] text_preview:', rawText.substring(0, 150))
 
-    const replyText = extractReplyBody(rawText, body.html)
+    const replyText = extractReplyBody(rawText, emailHtml)
 
     console.log('[inbound] extracted:', replyText.substring(0, 150), 'len:', replyText.length)
 

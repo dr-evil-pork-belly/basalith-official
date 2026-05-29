@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
+import { createEmailReplySession, buildReplyAddress } from '@/lib/emailReplySessions'
 
 export const dynamic = 'force-dynamic'
 
@@ -68,9 +69,24 @@ export async function GET(req: NextRequest) {
       const streak    = archive.current_streak ?? 0
       const siteUrl   = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
 
+      let replyTo: string | undefined
+      try {
+        const replyToken = await createEmailReplySession({
+          archiveId:     archive.id,
+          contributorId: null,
+          emailType:     'owner_weekly',
+          sparkId:       'Weekly replay',
+        })
+        replyTo = buildReplyAddress(replyToken)
+      } catch (e) {
+        console.warn('[weekly-replay] reply session failed:', e instanceof Error ? e.message : e)
+      }
+
+      console.log('[weekly-replay] sending to:', archive.owner_email, 'replyTo:', replyTo)
       await resend.emails.send({
         from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
         to:      archive.owner_email,
+        replyTo,
         subject: `Your week in the archive · ${archive.name}`,
         html:    buildWeeklyReplayEmail({
           archiveName:      archive.name,
@@ -92,7 +108,6 @@ export async function GET(req: NextRequest) {
       })
 
       sent++
-      console.log('[weekly-replay] sent to:', archive.owner_email)
     } catch (err: unknown) {
       console.error('[weekly-replay] failed for archive:', archive.id, err instanceof Error ? err.message : err)
     }

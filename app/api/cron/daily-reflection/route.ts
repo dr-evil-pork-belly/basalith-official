@@ -76,6 +76,7 @@ export async function GET(req: NextRequest) {
         console.warn('[daily-reflection] reply session failed:', e instanceof Error ? e.message : e)
       }
 
+      console.log('[daily-reflection] sending to:', archive.owner_email, 'replyTo:', ownerReplyTo)
       await resend.emails.send({
         from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
         to:      archive.owner_email,

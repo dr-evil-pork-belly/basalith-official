@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
 import { getEmailPhotoUrl } from '@/lib/photo-url'
+import { createEmailReplySession, buildReplyAddress } from '@/lib/emailReplySessions'
 
 export const dynamic = 'force-dynamic'
 
@@ -61,7 +62,7 @@ export async function GET(req: NextRequest) {
           .single(),
         supabaseAdmin
           .from('contributors')
-          .select('email, name')
+          .select('id, email, name')
           .eq('archive_id', session.archive_id)
           .eq('status', 'active'),
         supabaseAdmin
@@ -98,9 +99,23 @@ export async function GET(req: NextRequest) {
       // Send reveal to all contributors
       for (const contributor of contributors ?? []) {
         try {
+          let replyTo: string | undefined
+          try {
+            const replyToken = await createEmailReplySession({
+              archiveId:     session.archive_id,
+              contributorId: contributor.id,
+              emailType:     'photograph',
+              photographId:  session.photograph_id,
+            })
+            replyTo = buildReplyAddress(replyToken)
+          } catch (e) {
+            console.warn('[story-prompt-friday] reply session failed:', e instanceof Error ? e.message : e)
+          }
+          console.log('[story-prompt-friday] sending to:', contributor.email, 'replyTo:', replyTo)
           await resend.emails.send({
             from:    `The ${archive.family_name} Archive <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
             to:      contributor.email,
+            replyTo,
             subject: `Friday reveal — here is what the family knows · ${archive.name}`,
             html:    buildFridayEmail(archive.family_name, photoUrl, photo.ai_era_estimate, responses, dateStr),
             headers: {

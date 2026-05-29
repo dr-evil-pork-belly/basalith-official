@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { getTodaysSpark } from '@/lib/dailySparks'
+import Anthropic from '@anthropic-ai/sdk'
+
+const anthropic = new Anthropic()
 
 export const dynamic = 'force-dynamic'
 
@@ -14,7 +17,7 @@ export async function GET(req: NextRequest) {
 
   const today = new Date().toISOString().substring(0, 10) // "2026-05-19"
 
-  const [archiveRes, depositsRes, contribsRes, sparkAnswerRes, sentPhotosRes, sessionRes] = await Promise.allSettled([
+  const [archiveRes, depositsRes, photosCountRes, contribsRes, sparkAnswerRes, sentPhotosRes, sessionRes] = await Promise.allSettled([
     supabaseAdmin
       .from('archives')
       .select('id, name, owner_name, status, preferred_language, current_streak, longest_streak')
@@ -23,6 +26,11 @@ export async function GET(req: NextRequest) {
 
     supabaseAdmin
       .from('owner_deposits')
+      .select('id', { count: 'exact', head: true })
+      .eq('archive_id', archiveId),
+
+    supabaseAdmin
+      .from('photographs')
       .select('id', { count: 'exact', head: true })
       .eq('archive_id', archiveId),
 
@@ -57,12 +65,13 @@ export async function GET(req: NextRequest) {
       .maybeSingle(),
   ])
 
-  const archive         = archiveRes.status    === 'fulfilled' ? archiveRes.value.data        : null
-  const deposits        = depositsRes.status   === 'fulfilled' ? depositsRes.value.count       : 0
-  const contribs        = contribsRes.status   === 'fulfilled' ? contribsRes.value.count       : 0
-  const todaySparkEntry = sparkAnswerRes.status=== 'fulfilled' ? sparkAnswerRes.value.data     : null
-  const sentRows        = sentPhotosRes.status === 'fulfilled' ? (sentPhotosRes.value.data ?? []) : []
-  const sessionRow      = sessionRes.status    === 'fulfilled' ? sessionRes.value.data         : null
+  const archive         = archiveRes.status       === 'fulfilled' ? archiveRes.value.data           : null
+  const deposits        = depositsRes.status      === 'fulfilled' ? depositsRes.value.count          : 0
+  const photoCount      = photosCountRes.status   === 'fulfilled' ? (photosCountRes.value.count ?? 0) : 0
+  const contribs        = contribsRes.status      === 'fulfilled' ? contribsRes.value.count          : 0
+  const todaySparkEntry = sparkAnswerRes.status   === 'fulfilled' ? sparkAnswerRes.value.data        : null
+  const sentRows        = sentPhotosRes.status    === 'fulfilled' ? (sentPhotosRes.value.data ?? []) : []
+  const sessionRow      = sessionRes.status       === 'fulfilled' ? sessionRes.value.data            : null
   const sessionCompleted = sessionRow?.completed === true
 
   if (!archive) {
@@ -141,14 +150,36 @@ export async function GET(req: NextRequest) {
     ? { id: photo.id, url: signedUrl, eraEstimate: photo.ai_era_estimate ?? null }
     : null
 
+  // Generate a fresh AI question for this photo
+  const aiEra = photo?.ai_era_estimate ?? null
+  let question = 'What do you remember about this day?'
+  if (photo?.id) {
+    try {
+      const questionResponse = await anthropic.messages.create({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 60,
+        messages: [{
+          role: 'user',
+          content: `Write one short reflective question (under 15 words) to prompt someone to share a memory about a photo from ${aiEra ? aiEra : 'their past'}. Make it specific and personal, not generic. No em dashes. No quotation marks. Just the question.`,
+        }],
+      })
+      question = questionResponse.content[0].type === 'text'
+        ? questionResponse.content[0].text.trim()
+        : 'What do you remember about this day?'
+    } catch (e) {
+      console.warn('[dashboard-mobile] question generation failed:', e instanceof Error ? e.message : e)
+    }
+  }
+
   return NextResponse.json({
     archiveName:        archive.name       ?? '',
     ownerName:          archive.owner_name ?? '',
     preferredLanguage:  archive.preferred_language ?? 'en',
-    photoCount:         0,
+    photoCount,
     depositCount:       deposits ?? 0,
     contribCount:       contribs ?? 0,
     todayPhoto,
+    question,
     currentSpark:       sparkAnsweredToday ? null : (spark?.text ?? null),
     currentSparkId:     sparkAnsweredToday ? null : (spark?.id  ?? null),
     sparkAnsweredToday,

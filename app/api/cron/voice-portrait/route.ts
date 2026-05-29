@@ -254,6 +254,7 @@ Return only the message text. No preamble. No translation.${lang === 'yue' ? '\n
 
       for (const c of contributors ?? []) {
         const cName = (c.name ?? '').split(' ')[0] || 'there'
+        console.log('[voice-portrait] sending to:', c.email, 'replyTo: (none)')
         await resend.emails.send({
           from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
           to:      c.email,

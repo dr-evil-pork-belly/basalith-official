@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
+import { createEmailReplySession, buildReplyAddress } from '@/lib/emailReplySessions'
 
 export const dynamic = 'force-dynamic'
 
@@ -163,9 +164,24 @@ export async function GET(req: NextRequest) {
 
       const subject = `A letter from your entity · ${archive.name}`
 
+      let replyTo: string | undefined
+      try {
+        const replyToken = await createEmailReplySession({
+          archiveId:     archive.id,
+          contributorId: null,
+          emailType:     'owner_daily',
+          sparkId:       letter.substring(0, 200),
+        })
+        replyTo = buildReplyAddress(replyToken)
+      } catch (e) {
+        console.warn('[entity-letter] reply session failed:', e instanceof Error ? e.message : e)
+      }
+
+      console.log('[entity-letter] sending to:', archive.owner_email, 'replyTo:', replyTo)
       await resend.emails.send({
         from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
         to:      archive.owner_email,
+        replyTo,
         subject,
         html:    buildEntityLetterEmail(firstName, archive.name, letter, `${siteUrl}/archive/entity`),
         headers: {

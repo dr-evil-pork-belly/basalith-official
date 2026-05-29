@@ -561,8 +561,11 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
             <h2 className="font-serif" style={{ fontWeight: 700, fontSize: '1.3rem', color: '#F0EDE6', marginBottom: '0.25rem' }}>
               Your Entity
             </h2>
-            <p className="font-serif italic" style={{ fontSize: '0.85rem', color: '#9DA3A8' }}>
+            <p className="font-serif italic" style={{ fontSize: '0.85rem', color: '#9DA3A8', marginBottom: '0.5rem' }}>
               {subtitleText}
+            </p>
+            <p className="font-serif italic" style={{ fontSize: '0.78rem', color: '#5C6166', lineHeight: 1.85 }}>
+              Your archive runs on two permanent layers: one that holds every fact and memory you have deposited, and one that learns how you express, reason, and decide. Neither replaces the other.
             </p>
           </div>
 

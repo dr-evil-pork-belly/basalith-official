@@ -165,9 +165,12 @@ export default function PricingPage() {
                 your archive initialization,
                 and your first-year entity calibration.
               </p>
-              <p style={{ margin: 0 }}>
+              <p style={{ marginBottom: '20px' }}>
                 This is where your archive begins.
                 Everything that follows builds on it.
+              </p>
+              <p style={{ ...SERIF, fontSize: '0.88rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.28)', lineHeight: 1.85, margin: 0 }}>
+                Your archive runs on two permanent layers: one that holds every fact and memory you have deposited, and one that learns how you express, reason, and decide. Neither replaces the other.
               </p>
             </div>
 
@@ -265,8 +268,11 @@ export default function PricingPage() {
             <h2 style={{ ...SERIF, fontSize: 'clamp(2rem,4vw,3rem)', fontWeight: 300, lineHeight: 1.1, color: 'var(--color-text-primary)', marginBottom: '16px' }}>
               Succession Pricing
             </h2>
-            <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: 'var(--color-text-secondary)', marginBottom: '48px' }}>
+            <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: 'var(--color-text-secondary)', marginBottom: '16px' }}>
               For SME founders and key knowledge holders.
+            </p>
+            <p style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: 'var(--color-text-secondary)', marginBottom: '48px' }}>
+              The unwritten pattern recognition. The risk calibration built over decades. The judgment that cannot be put in a handbook. That is what Basalith captures before a founder steps back.
             </p>
 
             <div style={{ border: '1px solid rgba(184,150,62,0.35)', padding: 'clamp(32px,5vw,52px)', background: 'rgba(184,150,62,0.03)', marginBottom: '24px' }}>

@@ -7,7 +7,7 @@ export function generateReplyToken(): string {
 }
 
 export function getReplyDomain(): string {
-  return process.env.RESEND_REPLY_DOMAIN ?? 'zoibrenae.resend.app'
+  return process.env.RESEND_REPLY_DOMAIN ?? 'reply.basalith.ai'
 }
 
 export function buildReplyAddress(token: string): string {
@@ -26,7 +26,7 @@ export interface CreateSessionOptions {
 export async function createEmailReplySession(opts: CreateSessionOptions): Promise<string> {
   const token = generateReplyToken()
 
-  await supabaseAdmin.from('email_reply_sessions').insert({
+  const { error } = await supabaseAdmin.from('email_reply_sessions').insert({
     token,
     archive_id:     opts.archiveId,
     contributor_id: opts.contributorId ?? null,
@@ -35,6 +35,8 @@ export async function createEmailReplySession(opts: CreateSessionOptions): Promi
     prompt_id:      opts.promptId     ?? null,
     photograph_id:  opts.photographId ?? null,
   })
+
+  if (error) throw new Error(`email_reply_sessions insert failed: ${error.message}`)
 
   return token
 }

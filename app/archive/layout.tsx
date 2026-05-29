@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
+import ArchiveSwitcher from './components/ArchiveSwitcher'
 
 const P = '#0C0B09'   // portal bg
 const S = '#141210'   // sidebar
@@ -39,6 +40,7 @@ const CONTRIBUTE_NAV = [
 const MANAGE_NAV = [
   { href: '/archive/dates',        label: 'Important Dates'  },
   { href: '/archive/preferences',  label: 'Email Delivery'   },
+  { href: '/archive/succession',   label: 'Succession'       },
 ]
 
 function NavGroup({ label, items, pathname }: { label: string; items: typeof PRIMARY_NAV; pathname: string }) {
@@ -106,6 +108,7 @@ export default function ArchiveLayout({ children }: { children: React.ReactNode 
           <p style={{ ...MONO, fontSize: '0.42rem', color: 'rgba(112,108,101,0.7)', letterSpacing: '0.18em' }}>
             Archive Portal
           </p>
+          <ArchiveSwitcher />
         </div>
 
         {/* Navigation */}

@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
+import { createEmailReplySession, buildReplyAddress } from '@/lib/emailReplySessions'
 
 export const dynamic = 'force-dynamic'
 
@@ -138,9 +139,23 @@ export async function GET(req: NextRequest) {
         : lang === 'yue' ? `本月你嘅家人分享咗嘅内容 · ${archive.name}`
         : `What your family shared this month · ${archive.name}`
 
+      let replyTo: string | undefined
+      try {
+        const replyToken = await createEmailReplySession({
+          archiveId:     archive.id,
+          contributorId: null,
+          emailType:     'owner_weekly',
+          sparkId:       'contributor_mirror',
+        })
+        replyTo = buildReplyAddress(replyToken)
+      } catch (e) {
+        console.warn('[contributor-mirror] reply session failed:', e instanceof Error ? e.message : e)
+      }
+      console.log('[contributor-mirror] sending to:', archive.owner_email, 'replyTo:', replyTo)
       await resend.emails.send({
         from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
         to:      archive.owner_email,
+        replyTo,
         subject,
         html:    buildMirrorEmail(firstName, archive.name, answers, `${siteUrl}/archive/deposit`),
         headers: {

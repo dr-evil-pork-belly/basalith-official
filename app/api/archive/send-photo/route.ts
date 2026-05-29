@@ -241,7 +241,7 @@ export async function POST(req: NextRequest) {
       // ── 3E. Build unique reply address per contributor ──────────────────────
       const sessionCode  = Math.random().toString(36).substring(2, 8)
       const familySlug   = archive.family_name.toLowerCase().replace(/\s+/g, '-')
-      const replyDomain  = process.env.RESEND_REPLY_DOMAIN ?? 'zoibrenae.resend.app'
+      const replyDomain  = process.env.RESEND_REPLY_DOMAIN ?? 'reply.basalith.ai'
       const replyAddress = `${familySlug}-${sessionCode}@${replyDomain}`
 
       const yearStr = photo.ai_era_estimate ? ` · ${photo.ai_era_estimate}` : ''

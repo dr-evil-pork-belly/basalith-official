@@ -118,11 +118,13 @@ export async function GET(req: NextRequest) {
             emailType:     'story_prompt',
             promptId:      prompt.promptId,
           })
+          const storyReplyTo = buildReplyAddress(replyToken)
 
+          console.log('[story-prompt-monday] sending to:', contributor.email, 'replyTo:', storyReplyTo)
           await resend.emails.send({
             from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
             to:      contributor.email,
-            replyTo: buildReplyAddress(replyToken),
+            replyTo: storyReplyTo,
             subject: buildStoryPromptSubject(archive.name, lang),
             html:    buildStoryPromptEmail(
               contributor.name?.split(' ')[0] ?? contributor.name ?? 'Hello',
@@ -200,10 +202,13 @@ export async function GET(req: NextRequest) {
                 emailType:    'photograph',
                 photographId: selectedPhoto.id,
               })
+              const photoReplyTo = buildReplyAddress(photoReplyToken)
+
+              console.log('[story-prompt-monday] sending photo to:', contributor.email, 'replyTo:', photoReplyTo)
               await resend.emails.send({
                 from:    `The ${archive.family_name} Archive <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
                 to:      contributor.email,
-                replyTo: buildReplyAddress(photoReplyToken),
+                replyTo: photoReplyTo,
                 subject: `Monday mystery — what was happening here? · ${archive.name}`,
                 html:    buildMondayPhotoEmail(archive.family_name, photoUrl, selectedPhoto.ai_era_estimate, dateStr),
                 headers: {

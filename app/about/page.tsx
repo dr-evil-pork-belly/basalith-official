@@ -313,8 +313,11 @@ export default function AboutPage() {
             <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.5)', lineHeight: 1.85, marginBottom: '8px' }}>
               Every year you begin is a year the entity has more to work with.
             </p>
-            <p style={{ ...SERIF, fontSize: '1.15rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.85)', lineHeight: 1.85, marginBottom: '48px' }}>
+            <p style={{ ...SERIF, fontSize: '1.15rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.85)', lineHeight: 1.85, marginBottom: '32px' }}>
               Every year you wait is a year it has less.
+            </p>
+            <p style={{ ...SERIF, fontSize: '0.88rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.25)', lineHeight: 1.85, marginBottom: '40px', maxWidth: '420px', margin: '0 auto 40px' }}>
+              Your archive runs on two permanent layers: one that holds every fact and memory you have deposited, and one that learns how you express, reason, and decide. Neither replaces the other.
             </p>
             <a
               href="/apply"
