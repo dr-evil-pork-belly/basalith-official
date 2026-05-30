@@ -150,6 +150,27 @@ export default function SuccessorPortalClient({
           </Link>
         </div>
 
+        {/* Scenarios */}
+        <Link
+          href="/succession/portal/scenarios"
+          style={{
+            display:        'block',
+            background:     'transparent',
+            color:          '#F0EDE6',
+            padding:        '20px 28px',
+            textDecoration: 'none',
+            border:         '1px solid rgba(196,162,74,0.15)',
+            marginBottom:   '56px',
+          }}
+        >
+          <p style={{ ...MONO, fontSize: '0.62rem', letterSpacing: '3px', textTransform: 'uppercase', color: 'rgba(196,162,74,0.6)', margin: '0 0 6px' }}>
+            Scenario Responses
+          </p>
+          <p style={{ ...SERIF, fontSize: '0.85rem', fontStyle: 'italic', fontWeight: 300, color: '#706C65', margin: 0, lineHeight: 1.5 }}>
+            How the founder would handle twenty structured business situations.
+          </p>
+        </Link>
+
         {/* Recent context injections */}
         <div>
           <p style={{ ...MONO, fontSize: '0.6rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#5C6166', margin: '0 0 20px' }}>

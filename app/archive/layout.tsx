@@ -40,6 +40,7 @@ const CONTRIBUTE_NAV = [
 const MANAGE_NAV = [
   { href: '/archive/dates',        label: 'Important Dates'  },
   { href: '/archive/preferences',  label: 'Email Delivery'   },
+  { href: '/archive/scenarios',    label: 'Scenarios'        },
   { href: '/archive/succession',   label: 'Succession'       },
 ]
 

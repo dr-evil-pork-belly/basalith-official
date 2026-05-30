@@ -1,0 +1,30 @@
+export interface B2BScenario {
+  id:       string
+  category: string
+  title:    string
+  setup:    string
+  question: string
+}
+
+export const B2B_SCENARIOS: B2BScenario[] = [
+  { id: 'key-hire',            category: 'People',          title: 'The Key Hire',              setup: 'A candidate for a senior role is technically exceptional but you have a nagging concern about values fit. Every other indicator says hire.',    question: 'What do you do and how do you decide?' },
+  { id: 'acquisition',         category: 'Strategy',        title: 'The Acquisition Offer',     setup: 'A competitor reaches out informally about acquisition interest. The number is fair but not exciting. The timing is unexpected.',                question: 'How do you think about this?' },
+  { id: 'culture-fracture',    category: 'Culture',         title: 'The Culture Fracture',      setup: 'A senior leader who produces significant results is creating a toxic dynamic on their team. HR has documented multiple complaints.',            question: 'What is your process?' },
+  { id: 'market-shift',        category: 'Strategy',        title: 'The Market Shift',          setup: 'A technology shift is threatening your core business model. You have 18 months before it matters materially.',                                 question: 'What do you prioritize?' },
+  { id: 'board-conflict',      category: 'Governance',      title: 'The Board Conflict',        setup: 'A board member with significant influence is pushing a strategic direction you believe is wrong.',                                              question: 'How do you handle this?' },
+  { id: 'capital-raise',       category: 'Capital',         title: 'The Capital Decision',      setup: 'You have the opportunity to raise at a strong valuation but do not need the money today. Dilution is real.',                                   question: 'What factors drive your decision?' },
+  { id: 'partnership',         category: 'Strategy',        title: 'The Partnership Proposal',  setup: 'A larger company wants to partner in a way that gives you significant distribution but limits your strategic flexibility.',                    question: 'Walk me through how you evaluate it.' },
+  { id: 'key-departure',       category: 'People',          title: 'The Key Departure',         setup: 'Your most important non-founder employee has just given notice. You have 30 days.',                                                            question: 'What do you do in that time?' },
+  { id: 'product-pivot',       category: 'Strategy',        title: 'The Product Pivot',         setup: 'Data shows a significant portion of users are using the product in a way you did not design for. The numbers suggest a pivot.',                question: 'Do you follow the data?' },
+  { id: 'public-crisis',       category: 'Adversity',       title: 'The Public Crisis',         setup: 'Something has gone wrong publicly — a product failure, a PR incident, a customer complaint gone viral.',                                       question: 'What is your first move?' },
+  { id: 'slow-performer',      category: 'People',          title: 'The Slow Performer',        setup: 'A long-tenured employee who was foundational to early success is clearly no longer performing at the level the role requires.',                question: 'How do you handle this?' },
+  { id: 'opportunity-cost',    category: 'Decision-Making', title: 'The Opportunity Cost',      setup: 'You have two significant opportunities but only resources to pursue one.',                                                                       question: 'How do you choose?' },
+  { id: 'negotiation',         category: 'Decision-Making', title: 'The Negotiation',           setup: 'You are in a high-stakes negotiation and the other party has just made a move you did not expect.',                                            question: 'Walk me through how you recalibrate.' },
+  { id: 'customer-concentration', category: 'Risk',         title: 'The Customer Concentration', setup: 'One customer represents 35% of revenue. They are asking for pricing concessions you are uncomfortable with.',                                 question: 'What do you do?' },
+  { id: 'internal-promotion',  category: 'People',          title: 'The Internal Promotion',    setup: 'Two strong internal candidates for a leadership role. One is safer, one has higher upside but more risk.',                                     question: 'How do you decide?' },
+  { id: 'ethical-line',        category: 'Culture',         title: 'The Ethical Line',          setup: 'A business opportunity is legal and profitable but feels wrong in a way that is hard to articulate.',                                          question: 'How do you decide whether to pursue it?' },
+  { id: 'expansion',           category: 'Strategy',        title: 'The Expansion Decision',    setup: 'You have the opportunity to enter a new market. The fundamentals are attractive but it would stretch the team.',                               question: 'What makes you go or stay?' },
+  { id: 'co-founder-exit',     category: 'Governance',      title: 'The Founder Exit',          setup: 'A co-founder wants to exit. The terms are complicated. The relationship is under strain.',                                                     question: 'How do you approach this?' },
+  { id: 'recession',           category: 'Adversity',       title: 'The Recession Playbook',    setup: 'The economy has shifted materially and quickly. Revenue is down 20% with more decline expected.',                                             question: 'Walk me through your first 90 days.' },
+  { id: 'legacy',              category: 'Succession',      title: 'The Legacy Question',       setup: 'Looking back at everything you have built.',                                                                                                    question: 'What do you most want a successor to understand about why this organization exists?' },
+]
