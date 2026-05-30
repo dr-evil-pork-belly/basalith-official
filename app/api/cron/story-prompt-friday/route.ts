@@ -124,8 +124,8 @@ export async function GET(req: NextRequest) {
               'Precedence':       'bulk',
             },
           })
-        } catch (emailErr: any) {
-          console.error(`[story-prompt-friday] Email failed for ${contributor.email}:`, emailErr.message)
+        } catch (emailErr: unknown) {
+          console.error(`[story-prompt-friday] Email failed for ${contributor.email}:`, emailErr instanceof Error ? emailErr.message : emailErr)
         }
       }
 
@@ -137,8 +137,8 @@ export async function GET(req: NextRequest) {
 
       console.log(`[story-prompt-friday] Revealed session ${session.id} — ${responses.length} responses`)
       sent++
-    } catch (err: any) {
-      console.error(`[story-prompt-friday] Failed for session ${session.id}:`, err.message)
+    } catch (err: unknown) {
+      console.error(`[story-prompt-friday] Failed for session ${session.id}:`, err instanceof Error ? err.message : err)
     }
   }
 

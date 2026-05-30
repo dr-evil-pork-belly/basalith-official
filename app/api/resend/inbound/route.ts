@@ -161,8 +161,22 @@ export async function POST(req: NextRequest) {
       const archive       = session.archives as { id: string; name: string; owner_name: string | null; preferred_language: string | null } | null
       const contributor   = session.contributors as { id: string; name: string; email: string } | null
 
+      if (contributorId) {
+        console.log('[inbound] contributor reply — contributor:', contributorId, 'archive:', archiveId)
+      }
+
       // Save the reply
-      if (session.email_type === 'spark') {
+      if (session.email_type === 'contributor_question') {
+        if (session.prompt_id) {
+          const { error: cqError } = await supabaseAdmin
+            .from('contributor_questions')
+            .update({ status: 'answered' })
+            .eq('id', session.prompt_id)
+            .eq('status', 'pending')
+          if (cqError) console.error('[inbound] contributor_question update failed:', cqError.message)
+          else console.log('[inbound] contributor_question answered — id:', session.prompt_id)
+        }
+      } else if (session.email_type === 'spark') {
         const { error: sparkError } = await supabaseAdmin.from('daily_spark_responses').insert({
           archive_id:     archiveId,
           contributor_id: contributorId,

@@ -17,7 +17,7 @@ export function buildReplyAddress(token: string): string {
 export interface CreateSessionOptions {
   archiveId:     string
   contributorId: string | null
-  emailType:     'spark' | 'story_prompt' | 'photograph' | 'owner_daily' | 'owner_weekly' | 'b2b_question'
+  emailType:     'spark' | 'story_prompt' | 'photograph' | 'owner_daily' | 'owner_weekly' | 'b2b_question' | 'contributor_question'
   sparkId?:      string
   promptId?:     string
   photographId?: string

@@ -122,8 +122,8 @@ export async function GET(req: NextRequest) {
 
       sent++
       console.log(`[weekly-prompt] Sent to: ${archive.owner_email}`)
-    } catch (err: any) {
-      console.error(`[weekly-prompt] Failed for archive ${archive.id}:`, err.message)
+    } catch (err: unknown) {
+      console.error(`[weekly-prompt] Failed for archive ${archive.id}:`, err instanceof Error ? err.message : err)
     }
   }
 
@@ -179,7 +179,7 @@ export async function GET(req: NextRequest) {
       if (!question) continue
 
       // Save to contributor_questions
-      await supabaseAdmin
+      const { data: questionRow } = await supabaseAdmin
         .from('contributor_questions')
         .insert({
           archive_id:     contributor.archive_id,
@@ -188,13 +188,30 @@ export async function GET(req: NextRequest) {
           question_type:  'relationship_specific',
           status:         'pending',
         })
-        .then(() => {})
+        .select('id')
+        .single()
+
+      // Create reply session so contributor can answer by email
+      let contributorReplyTo: string | undefined
+      try {
+        const replyToken = await createEmailReplySession({
+          archiveId:     contributor.archive_id,
+          contributorId: contributor.id,
+          emailType:     'contributor_question',
+          promptId:      questionRow?.id,
+        })
+        contributorReplyTo = buildReplyAddress(replyToken)
+      } catch (e) {
+        console.warn('[weekly-prompt] reply session failed:', e instanceof Error ? e.message : e)
+      }
 
       // Send email
       const portalUrl = `${siteUrl}/contribute/${contributor.access_token}`
+      console.log('[contributor-email] sending to:', contributor.email, 'replyTo:', contributorReplyTo)
       await resend.emails.send({
         from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
         to:      contributor.email,
+        replyTo: contributorReplyTo,
         subject: buildQuestionSubject(archive.name, contributor.preferred_language || 'en'),
         html:    buildQuestionEmail(
           archive.name,

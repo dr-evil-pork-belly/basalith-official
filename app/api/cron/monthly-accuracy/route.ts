@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
-import { DIMENSIONS } from '@/lib/entityAccuracy'
+import { DIMENSIONS, calculateDimensionScore } from '@/lib/entityAccuracy'
 
 export const dynamic = 'force-dynamic'
 
@@ -174,13 +174,32 @@ export async function GET(req: NextRequest) {
 
       if (existing && !force) { skipped.push(archive.name); continue }
 
-      // Get current accuracy scores
-      const { data: accuracy } = await supabaseAdmin
-        .from('entity_accuracy')
-        .select('dimension, accuracy_score')
-        .eq('archive_id', archive.id)
+      // Compute fresh accuracy scores from raw archive data (do not read stale entity_accuracy)
+      const [depositsResult, conversationsResult, labelsResult] = await Promise.all([
+        supabaseAdmin.from('owner_deposits').select('response, prompt').eq('archive_id', archive.id),
+        supabaseAdmin.from('entity_conversations').select('role, content, accuracy_rating').eq('archive_id', archive.id),
+        supabaseAdmin.from('labels').select('what_was_happening, legacy_note').eq('archive_id', archive.id),
+      ])
 
-      if (!accuracy?.length) { skipped.push(`${archive.name} (no accuracy data)`); continue }
+      const depositsData      = depositsResult.data      ?? []
+      const conversationsData = conversationsResult.data ?? []
+      const labelsData        = labelsResult.data        ?? []
+
+      const freshScores = DIMENSIONS.map(dim => ({
+        id:    dim.id,
+        label: dim.label,
+        score: calculateDimensionScore(dim, depositsData, conversationsData, labelsData),
+      }))
+
+      // Write fresh scores back to entity_accuracy as a side effect (non-blocking)
+      void Promise.all(
+        freshScores.map(fs =>
+          supabaseAdmin.from('entity_accuracy').upsert(
+            { archive_id: archive.id, dimension: fs.id, accuracy_score: fs.score / 100, last_updated: new Date().toISOString() },
+            { onConflict: 'archive_id,dimension' }
+          )
+        )
+      ).catch(e => console.warn('[monthly-accuracy] entity_accuracy upsert:', e instanceof Error ? e.message : e))
 
       // Get last month's snapshot from previous notification
       const { data: lastNotif } = await supabaseAdmin
@@ -192,14 +211,13 @@ export async function GET(req: NextRequest) {
         .limit(1)
         .maybeSingle()
 
-      const lastScores: Record<string, number> = (lastNotif?.metadata as any)?.scores ?? {}
+      const lastScores = (lastNotif?.metadata as { scores?: Record<string, number> } | null)?.scores ?? {}
 
-      // Build accuracy change rows
-      const accuracyChanges = DIMENSIONS.map(dim => {
-        const current = accuracy.find(a => a.dimension === dim.id)
-        const after   = Math.round((current?.accuracy_score ?? 0) * 100)
-        const before  = Math.round((lastScores[dim.id] ?? after) * 100) // default to same if no history
-        return { dimension: dim.id, label: dim.label, before, after, change: after - before }
+      // Build accuracy change rows (before = last snapshot float×100, after = fresh integer 0-100)
+      const accuracyChanges = freshScores.map(fs => {
+        const after  = fs.score
+        const before = Math.round((lastScores[fs.id] ?? fs.score / 100) * 100)
+        return { dimension: fs.id, label: fs.label, before, after, change: after - before }
       }).sort((a, b) => b.change - a.change)
 
       // Get top training pair from last 30 days
@@ -216,8 +234,9 @@ export async function GET(req: NextRequest) {
         ? recentPairs[0].prompt.substring(0, 120) + (recentPairs[0].prompt.length > 120 ? '…' : '')
         : null
 
-      // Find weakest dimension
-      const weakestDim = [...accuracyChanges].sort((a, b) => a.after - b.after)[0]
+      // Find weakest dimension by fresh score
+      const weakestDim = [...freshScores].sort((a, b) => a.score - b.score)
+        .map(fs => ({ dimension: fs.id, label: fs.label, after: fs.score }))[0]
 
       const lang      = archive.preferred_language ?? 'en'
       const firstName = archive.owner_name?.split(' ')[0] ?? 'there'
@@ -259,9 +278,9 @@ export async function GET(req: NextRequest) {
         },
       })
 
-      // Save snapshot for next month's comparison
+      // Save fresh scores as snapshot for next month's comparison (stored as 0-1 floats)
       const scoreSnapshot: Record<string, number> = {}
-      for (const a of accuracy) scoreSnapshot[a.dimension] = a.accuracy_score
+      for (const fs of freshScores) scoreSnapshot[fs.id] = fs.score / 100
 
       await supabaseAdmin.from('owner_notifications').insert({
         archive_id: archive.id,
@@ -273,8 +292,8 @@ export async function GET(req: NextRequest) {
       })
 
       sent++
-    } catch (err: any) {
-      console.error(`[monthly-accuracy] ${archive.id}:`, err.message)
+    } catch (err: unknown) {
+      console.error(`[monthly-accuracy] ${archive.id}:`, err instanceof Error ? err.message : err)
       skipped.push(`${archive.name} (error)`)
     }
   }
