@@ -228,8 +228,10 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // Log owner replies explicitly
-      if (session.email_type === 'owner_daily' || session.email_type === 'owner_weekly' || session.email_type === 'conversational') {
+      // Log owner replies explicitly. 'mirror' replies (the weekly "keep going"
+      // thread) need no special casing: they fall through to the generic
+      // owner_deposits save + training pair below, exactly like owner_daily.
+      if (session.email_type === 'owner_daily' || session.email_type === 'owner_weekly' || session.email_type === 'conversational' || session.email_type === 'mirror') {
         console.log('[inbound] owner reply received — type:', session.email_type, 'archive:', archiveId.substring(0, 8))
       }
 

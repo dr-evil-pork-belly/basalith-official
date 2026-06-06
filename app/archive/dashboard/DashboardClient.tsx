@@ -1088,6 +1088,185 @@ function RandomThoughtCapture({ archiveId }: { archiveId: string }) {
   )
 }
 
+// ── Mirror Card ──────────────────────────────────────────────────────────────
+// The entity reflecting back what it is learning. The reflection is the hero.
+
+type MirrorData = {
+  id:              string
+  reflection:      string
+  thread_question: string
+  owner_reaction:  string | null
+  created_at:      string
+}
+
+function MirrorCard({ archiveId }: { archiveId: string }) {
+  const [mirror,       setMirror]       = useState<MirrorData | null>(null)
+  const [reaction,     setReaction]     = useState<string | null>(null)
+  const [respondOpen,  setRespondOpen]  = useState(false)
+  const [responseText, setResponseText] = useState('')
+  const [saving,       setSaving]       = useState(false)
+  const [saved,        setSaved]        = useState(false)
+
+  useEffect(() => {
+    fetch('/api/archive/mirror')
+      .then(r => (r.ok ? r.json() : { mirror: null }))
+      .then(d => {
+        const m: MirrorData | null = d.mirror ?? null
+        if (!m) return
+        // Only surface a reflection from the last 10 days.
+        if (Date.now() - new Date(m.created_at).getTime() > 10 * 86400000) return
+        setMirror(m)
+        setReaction(m.owner_reaction ?? null)
+      })
+      .catch(() => {})
+  }, [archiveId])
+
+  if (!mirror) return null
+
+  async function react(value: string) {
+    setReaction(value)
+    try {
+      await fetch('/api/archive/mirror/react', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ reflectionId: mirror!.id, reaction: value }),
+      })
+    } catch {}
+  }
+
+  async function saveResponse() {
+    if (responseText.trim().length < 5 || saving) return
+    setSaving(true)
+    try {
+      await fetch('/api/archive/owner-deposit', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ prompt: mirror!.thread_question, response: responseText, source_type: 'mirror' }),
+      })
+      setSaved(true)
+      setResponseText('')
+      setTimeout(() => { setSaved(false); setRespondOpen(false) }, 2500)
+    } catch {}
+    setSaving(false)
+  }
+
+  const reactionBtnStyle = (active: boolean): React.CSSProperties => ({
+    fontFamily:    '"Space Mono","Courier New",monospace',
+    fontSize:      '0.42rem',
+    letterSpacing: '0.16em',
+    textTransform: 'uppercase' as const,
+    color:         active ? '#C4A24A' : '#5C6166',
+    background:    active ? 'rgba(196,162,74,0.1)' : 'transparent',
+    border:        `1px solid ${active ? 'rgba(196,162,74,0.4)' : 'rgba(255,255,255,0.08)'}`,
+    borderRadius:  '2px',
+    padding:       '0.45rem 0.9rem',
+    cursor:        'pointer',
+    transition:    'all 0.15s',
+  })
+
+  return (
+    <div
+      className="rounded-sm mb-8"
+      style={{
+        background: 'rgba(196,162,74,0.04)',
+        border:     '1px solid rgba(196,162,74,0.12)',
+        borderTop:  '3px solid rgba(196,162,74,0.5)',
+        padding:    'clamp(1.5rem,4vw,2.25rem) clamp(1.25rem,4vw,2.5rem)',
+      }}
+    >
+      {/* Eyebrow */}
+      <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.44rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.8)', marginBottom: '1.5rem' }}>
+        What Your Entity Is Learning
+      </p>
+
+      {/* Reflection — the hero */}
+      <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontWeight: 300, fontSize: 'clamp(1.3rem,2.8vw,1.7rem)', color: '#F0EDE6', lineHeight: 1.9, whiteSpace: 'pre-wrap', margin: 0 }}>
+        {mirror.reflection}
+      </p>
+
+      {/* Divider */}
+      <div style={{ height: '1px', background: 'rgba(196,162,74,0.18)', margin: '1.85rem 0 1.5rem' }} />
+
+      {/* Thread question */}
+      <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontWeight: 300, fontSize: '1.1rem', color: '#B8B4AB', lineHeight: 1.65, marginBottom: '1.1rem' }}>
+        {mirror.thread_question}
+      </p>
+
+      {/* Respond */}
+      {saved ? (
+        <p style={{ fontFamily: 'Georgia,serif', fontStyle: 'italic', fontSize: '0.92rem', color: 'rgba(196,162,74,0.85)', margin: 0 }}>
+          Saved to your archive.
+        </p>
+      ) : respondOpen ? (
+        <div>
+          <textarea
+            value={responseText}
+            onChange={e => setResponseText(e.target.value)}
+            placeholder="Answer in your own words. No length required."
+            autoFocus
+            rows={4}
+            style={{
+              width:        '100%',
+              background:   'rgba(196,162,74,0.04)',
+              border:       '1px solid rgba(196,162,74,0.18)',
+              borderRadius: '2px',
+              padding:      '12px 16px',
+              fontFamily:   '"Cormorant Garamond",Georgia,serif',
+              fontSize:     '1rem',
+              color:        '#F0EDE6',
+              lineHeight:   1.7,
+              resize:       'vertical' as const,
+              outline:      'none',
+              boxSizing:    'border-box' as const,
+            }}
+          />
+          <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.75rem' }}>
+            <button
+              onClick={saveResponse}
+              disabled={saving || responseText.trim().length < 5}
+              style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.44rem', letterSpacing: '0.25em', textTransform: 'uppercase' as const, color: '#0A0908', background: '#C4A24A', border: 'none', borderRadius: '2px', padding: '0.6rem 1.25rem', cursor: saving ? 'not-allowed' : 'pointer', opacity: responseText.trim().length < 5 ? 0.5 : 1 }}
+            >
+              {saving ? 'Saving…' : 'Save'}
+            </button>
+            <button
+              onClick={() => { setRespondOpen(false); setResponseText('') }}
+              style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.44rem', letterSpacing: '0.2em', textTransform: 'uppercase' as const, color: '#706C65', background: 'transparent', border: '1px solid rgba(240,237,230,0.1)', borderRadius: '2px', padding: '0.6rem 1.25rem', cursor: 'pointer' }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      ) : (
+        <button
+          onClick={() => setRespondOpen(true)}
+          style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.46rem', letterSpacing: '0.25em', textTransform: 'uppercase' as const, color: '#0A0908', background: '#C4A24A', border: 'none', borderRadius: '2px', padding: '0.65rem 1.4rem', cursor: 'pointer' }}
+        >
+          Respond →
+        </button>
+      )}
+
+      {/* Reactions */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginTop: '1.75rem', paddingTop: '1.25rem', borderTop: '1px solid rgba(196,162,74,0.1)' }}>
+        <button onClick={() => react('this_is_me')} style={reactionBtnStyle(reaction === 'this_is_me')}>
+          This is me
+        </button>
+        <button onClick={() => react('not_quite_right')} style={reactionBtnStyle(reaction === 'not_quite_right')}>
+          Not quite right
+        </button>
+        <button
+          onClick={() => react('heart')}
+          aria-label="Love this"
+          style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '0.3rem', display: 'flex', alignItems: 'center', marginLeft: '0.1rem' }}
+        >
+          <svg width="17" height="17" viewBox="0 0 24 24" fill={reaction === 'heart' ? '#C4A24A' : 'none'} stroke={reaction === 'heart' ? '#C4A24A' : '#5C6166'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export default function DashboardClient({ archiveId }: { archiveId: string }) {
   const [loading,              setLoading]              = useState(true)
   const [archive,              setArchive]              = useState<ArchiveRow | null>(null)
@@ -1273,6 +1452,11 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
             Resume Now →
           </a>
         </div>
+      )}
+
+      {/* ── MIRROR (what the entity is learning) ── */}
+      {!loading && archive?.status !== 'paused' && (
+        <MirrorCard archiveId={archiveId} />
       )}
 
       {/* ── RANDOM THOUGHT CAPTURE ── */}
