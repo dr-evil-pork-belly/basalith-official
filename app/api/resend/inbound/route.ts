@@ -229,9 +229,16 @@ export async function POST(req: NextRequest) {
       }
 
       // Log owner replies explicitly
-      if (session.email_type === 'owner_daily' || session.email_type === 'owner_weekly') {
+      if (session.email_type === 'owner_daily' || session.email_type === 'owner_weekly' || session.email_type === 'conversational') {
         console.log('[inbound] owner reply received — type:', session.email_type, 'archive:', archiveId.substring(0, 8))
       }
+
+      // Pre-Echo conversational prompts are tagged distinctly so the onboarding
+      // path is trackable. They still flow through owner_deposits and the
+      // training pipeline below exactly like any other owner reply.
+      const depositSourceType = session.email_type === 'conversational'
+        ? 'conversational'
+        : 'email_reply'
 
       // Always save to owner_deposits — no reply is ever lost even if the
       // type-specific save above failed or the session had null IDs
@@ -241,7 +248,7 @@ export async function POST(req: NextRequest) {
           archive_id:     archiveId,
           prompt:         session.prompt_id || session.spark_id || 'Email reply',
           response:       replyText,
-          source_type:    'email_reply',
+          source_type:    depositSourceType,
           contributor_id: contributorId ?? null,
         })
         .select('id, archive_id, prompt, response, source_type')

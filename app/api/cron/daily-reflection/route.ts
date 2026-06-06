@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
 import { getDailyReflection, getDayOfYear } from '@/lib/dailyReflections'
+import { getConversationalPrompt } from '@/lib/conversationalPrompts'
 import { createEmailReplySession, buildReplyAddress } from '@/lib/emailReplySessions'
 
 export const dynamic = 'force-dynamic'
@@ -105,16 +106,38 @@ export async function GET(req: NextRequest) {
         continue
       }
 
-      // ── Standard tier: existing dimension-based reflection logic ──────────
-      const { data: accuracy } = await supabaseAdmin
-        .from('entity_accuracy')
-        .select('dimension, accuracy_score')
+      // ── Standard tier ─────────────────────────────────────────────────────
+      // Count the owner's deposits to decide which register to use.
+      const { data: deposits } = await supabaseAdmin
+        .from('owner_deposits')
+        .select('prompt')
         .eq('archive_id', archive.id)
-        .order('accuracy_score', { ascending: true })
-        .limit(3)
+        .limit(50)
 
-      const weakestDimension = accuracy?.[dayOfYear % 3]?.dimension ?? 'wisdom_and_lessons'
-      const question         = getDailyReflection(weakestDimension, lang, dayOfYear)
+      const depositCount = deposits?.length ?? 0
+
+      let question: string
+      let isConversational = false
+      if (depositCount < 10) {
+        // Pre-Echo Layer (fewer than 10 deposits): keep the barrier on the floor.
+        // A warm, ordinary conversational prompt instead of a dimension-targeted
+        // question, so building toward 10 deposits never feels like a test. Served
+        // in the owner's language (falls back to English when untranslated).
+        isConversational = true
+        const used = new Set((deposits ?? []).map(d => d.prompt).filter(Boolean) as string[])
+        question = getConversationalPrompt(dayOfYear, used, lang).prompt
+      } else {
+        // Echo Layer and beyond: dimension-targeted reflection on the weakest area.
+        const { data: accuracy } = await supabaseAdmin
+          .from('entity_accuracy')
+          .select('dimension, accuracy_score')
+          .eq('archive_id', archive.id)
+          .order('accuracy_score', { ascending: true })
+          .limit(3)
+
+        const weakestDimension = accuracy?.[dayOfYear % 3]?.dimension ?? 'wisdom_and_lessons'
+        question = getDailyReflection(weakestDimension, lang, dayOfYear)
+      }
 
       const subject = lang === 'zh'
         ? `今天的问题 · ${archive.name}`
@@ -125,7 +148,7 @@ export async function GET(req: NextRequest) {
         const replyToken = await createEmailReplySession({
           archiveId:     archive.id,
           contributorId: null,
-          emailType:     'owner_daily',
+          emailType:     isConversational ? 'conversational' : 'owner_daily',
           sparkId:       question.substring(0, 200),
         })
         ownerReplyTo = buildReplyAddress(replyToken)
