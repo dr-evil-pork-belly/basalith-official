@@ -21,6 +21,7 @@ const COLS: { heading: string; links: { label: string; href?: string }[] }[] = [
       { label: 'For Business',          href: '/succession'      },
       { label: 'Become a Legacy Guide', href: '/join-archivists' },
       { label: 'Apply',                 href: '/apply'           },
+      { label: 'Press',                 href: '/press'           },
     ],
   },
   {
@@ -174,6 +175,15 @@ export default function Footer() {
           }}
         >
           if you leave enough of yourself behind.
+        </p>
+      </div>
+
+      {/* Company registration */}
+      <div style={{ padding: '28px clamp(24px,6vw,80px) 0', textAlign: 'center' }}>
+        <p style={{ ...MONO, fontSize: '0.46rem', letterSpacing: '0.14em', textTransform: 'none', color: 'rgba(250,250,248,0.42)', lineHeight: 2 }}>
+          Heritage Nexus Inc.<br />
+          Registered in Delaware, United States.<br />
+          <a href="mailto:hello@basalith.xyz" style={{ color: 'rgba(250,250,248,0.55)', textDecoration: 'none' }}>hello@basalith.xyz</a>
         </p>
       </div>
 

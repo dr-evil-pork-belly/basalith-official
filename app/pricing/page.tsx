@@ -35,6 +35,14 @@ const TRUST_BADGES = [
   { icon: '✉', label: '90-day notice if we close' },
 ]
 
+const SECURITY_BADGES = [
+  { icon: '🔒', label: 'AES-256 encrypted at rest' },
+  { icon: '🔐', label: 'TLS 1.3 in transit' },
+  { icon: '📦', label: 'Full data export anytime' },
+  { icon: '⚖️', label: 'Delaware C-Corp' },
+  { icon: '🏛️', label: 'Academic research foundation' },
+]
+
 export default function PricingPage() {
   return (
     <>
@@ -211,6 +219,31 @@ export default function PricingPage() {
 
         {/* Tiers + toggle + founding note + tax note */}
         <PricingTiers />
+
+        {/* Security & legitimacy trust row */}
+        <div style={{
+          display:        'flex',
+          justifyContent: 'center',
+          flexWrap:       'wrap',
+          gap:            '12px 32px',
+          padding:        'clamp(40px,6vw,64px) clamp(24px,6vw,80px)',
+          background:     'var(--color-bg)',
+        }}>
+          {SECURITY_BADGES.map(b => (
+            <span key={b.label} style={{
+              fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+              fontSize:      '0.48rem',
+              letterSpacing: '0.15em',
+              textTransform: 'uppercase' as const,
+              color:         'var(--color-text-faint)',
+              display:       'flex',
+              alignItems:    'center',
+              gap:           '6px',
+            }}>
+              <span>{b.icon}</span>{b.label}
+            </span>
+          ))}
+        </div>
 
         {/* Immutability Vault trust signal */}
         <section style={{ padding: '0 clamp(24px,6vw,80px) clamp(48px,6vw,64px)', background: 'var(--color-surface-alt)' }}>
