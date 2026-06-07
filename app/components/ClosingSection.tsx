@@ -80,8 +80,7 @@ export default function ClosingSection() {
           }}
         >
           <p style={{ margin: '0' }}>{t('closing.tagline_1')}</p>
-          <p style={{ margin: '0' }}>{t('closing.tagline_2')}</p>
-          <p style={{ margin: '0' }}>{t('closing.tagline_3')}</p>
+          <p style={{ margin: '0' }}>{[t('closing.tagline_2'), t('closing.tagline_3')].filter(Boolean).join(' ')}</p>
         </div>
 
         <Link

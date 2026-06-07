@@ -13,7 +13,7 @@
     "eyebrow": "Heritage Nexus · Basalith",
     "headline_1": "The way you think is irreplaceable.",
     "headline_2": "Most people leave nothing of it behind.",
-    "subheadline": "Basalith builds a living cognitive entity from the way you think, decide, and see the world. For your family. For your business. For the generations that follow.",
+    "subheadline": "Basalith builds a cognitive entity from the way you think, decide, and see the world.",
     "cta_primary": "Build Your Entity",
     "cta_secondary": "For Business",
     "subheadline_a": "For your family. For your business.",
@@ -32,7 +32,7 @@
     "pillar_2_body": "Every photograph labeled.\nEvery voice recorded.\nEvery question answered.\n\nEach one teaches your entity\nsomething specific about\nhow you move through the world.\n\nThe archive is not the product.\nIt is the training ground.",
     "pillar_3_title": "It continues.",
     "pillar_3_body": "There are people spending billions\nto ensure what they built\noutlasts them.\n\nWe think every family\ndeserves the same thing.\n\nNot because death is the enemy.\nBut because the people we love\nshould not have to wonder.",
-    "body_5": "We built Basalith\nso your family never has to."
+    "body_5": "We built Basalith\nso your family never has to wonder."
   },
   "two_paths": {
     "eyebrow": "WHO BASALITH IS FOR",
@@ -215,18 +215,18 @@
   },
   "tagline": {
     "quote_1": "You never truly leave",
-    "quote_2": "if you leave enough",
-    "quote_3": "of yourself behind.",
+    "quote_2": "if you leave enough of yourself behind.",
+    "quote_3": "",
     "scroll": "Begin"
   },
   "closing": {
     "eyebrow": "For the forward-thinking",
-    "headline_1": "The most sophisticated AI in the world",
-    "headline_2": "can learn to think like you.",
-    "sub": "The question is whether you give it enough to learn from while you still can.",
+    "headline_1": "What you have learned",
+    "headline_2": "can outlast you.",
+    "sub": "The only question is whether you capture it while you still can.",
     "tagline_1": "You never truly leave",
-    "tagline_2": "if you leave enough",
-    "tagline_3": "of yourself behind.",
+    "tagline_2": "if you leave enough of yourself behind.",
+    "tagline_3": "",
     "cta": "Begin",
     "price": "The Estate begins at $2,500"
   }

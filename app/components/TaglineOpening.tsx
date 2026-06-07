@@ -45,9 +45,7 @@ export default function TaglineOpening() {
       >
         &ldquo;{t('tagline.quote_1')}
         <br />
-        {t('tagline.quote_2')}
-        <br />
-        {t('tagline.quote_3')}&rdquo;
+        {[t('tagline.quote_2'), t('tagline.quote_3')].filter(Boolean).join(' ')}&rdquo;
       </p>
 
       <div
