@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { useLanguage } from '@/app/context/LanguageContext'
 
 const MONO: React.CSSProperties = {
   fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
@@ -14,8 +13,6 @@ const SERIF: React.CSSProperties = {
 }
 
 export default function TwoPathsSection() {
-  const { t } = useLanguage()
-
   return (
     <section
       aria-label="Who Basalith is for"
@@ -28,7 +25,7 @@ export default function TwoPathsSection() {
 
         {/* Eyebrow */}
         <p style={{ ...MONO, color: 'var(--color-gold)', marginBottom: '48px' }}>
-          {t('two_paths.eyebrow')}
+          WHO BASALITH IS FOR
         </p>
 
         {/* Two cards */}
@@ -47,7 +44,7 @@ export default function TwoPathsSection() {
             flexDirection: 'column',
           }}>
             <p style={{ ...MONO, color: 'var(--color-gold)', marginBottom: '20px' }}>
-              {t('two_paths.legacy_eyebrow')}
+              LEGACY
             </p>
             <h2 style={{
               ...SERIF,
@@ -57,7 +54,7 @@ export default function TwoPathsSection() {
               color:        'var(--color-text-primary)',
               marginBottom: '20px',
             }}>
-              {t('two_paths.legacy_headline')}
+              Your parents know things they have never written down.
             </h2>
             <p style={{
               ...SERIF,
@@ -69,7 +66,7 @@ export default function TwoPathsSection() {
               marginBottom: '32px',
               flex:         1,
             }}>
-              {t('two_paths.legacy_body')}
+              Your children will spend years trying to understand how they thought. Basalith gives them the answer while there is still time to get it right.
             </p>
             <Link
               href="/apply"
@@ -86,7 +83,7 @@ export default function TwoPathsSection() {
               onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'var(--color-gold-light)'}
               onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'var(--color-gold)'}
             >
-              {t('two_paths.legacy_cta')} &rarr;
+              Begin Your Archive &rarr;
             </Link>
           </div>
 
@@ -99,7 +96,7 @@ export default function TwoPathsSection() {
             flexDirection: 'column',
           }}>
             <p style={{ ...MONO, color: 'var(--color-gold)', marginBottom: '20px' }}>
-              {t('two_paths.succession_eyebrow')}
+              SUCCESSION
             </p>
             <h2 style={{
               ...SERIF,
@@ -109,7 +106,7 @@ export default function TwoPathsSection() {
               color:        'var(--color-text-primary)',
               marginBottom: '20px',
             }}>
-              {t('two_paths.succession_headline')}
+              Your founder built this with a way of thinking that exists nowhere in your documentation.
             </h2>
             <p style={{
               ...SERIF,
@@ -121,7 +118,7 @@ export default function TwoPathsSection() {
               marginBottom: '32px',
               flex:         1,
             }}>
-              {t('two_paths.succession_body')}
+              When they step back that thinking goes with them. Unless you build a Basalith.
             </p>
             <Link
               href="/succession"
@@ -147,7 +144,7 @@ export default function TwoPathsSection() {
                 el.style.color = 'var(--color-gold)'
               }}
             >
-              {t('two_paths.succession_cta')} &rarr;
+              Learn About Succession &rarr;
             </Link>
           </div>
 

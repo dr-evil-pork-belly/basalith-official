@@ -28,7 +28,7 @@ const TENETS = [
     tagline: 'You decide who inherits. You decide for how long.',
     body: [
       'You determine the terms of your archive\'s continuity during your lifetime. Who may access it. Who may contribute to it. Under what conditions your entity may be queried. For how long after your death it remains active.',
-      'These terms are documented in your Basalith agreement and enforced by your designated Custodian — an individual or institutional trustee you name, with the same legal standing as a financial executor.',
+      'These terms are documented in your Basalith agreement and enforced by your designated Custodian, an individual or institutional trustee you name, with the same legal standing as a financial executor.',
       'No representative of Heritage Nexus Inc. can override the continuity terms you set. No acquisition, restructuring, or change in our business can alter the rights your agreement establishes. Those rights exist in a documented instrument that predates and survives any change in our corporate status.',
     ],
   },
@@ -39,7 +39,7 @@ const TENETS = [
     body: [
       'At any time, you or your designated Custodian may invoke the Right of Dissolution. This initiates the permanent, verified deletion of all archive content from our systems: every file, every annotation, every model weight derived from your data.',
       'Dissolution is irreversible. We have no backup of your archive that survives a dissolution request. This is a deliberate architectural choice. You are not dissolving a subscription. You are exercising the right to be forgotten in the most complete sense we can technically implement.',
-      'A dissolution request must be verified against your Basalith agreement. Once initiated, deletion is completed within 30 days and confirmed in writing. We maintain no shadow copy, no training residual, and no commercial derivative of dissolved archives.',
+      'A dissolution request must be verified against your Basalith agreement. After it is verified, Heritage Nexus holds the archive for 12 months, then permanently deletes it and confirms in writing. We maintain no shadow copy, no training residual, and no commercial derivative of deleted archives.',
     ],
   },
 ]

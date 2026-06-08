@@ -1,16 +1,30 @@
 'use client'
 
-import { useLanguage } from '@/app/context/LanguageContext'
+const PILLARS = [
+  {
+    n:     '01',
+    title: 'How you think.',
+    body:  'Not what you have done.\nNot what you have said.\n\nHow you reason.\nWhat you reach for when things get hard.\nWhat you believe when no one is watching.\n\nThe specific weight of a mind\nthat belongs only to you.',
+  },
+  {
+    n:     '02',
+    title: 'The raw material.',
+    body:  'Every photograph labeled.\nEvery voice recorded.\nEvery question answered.\n\nEach one teaches your entity\nsomething specific about\nhow you move through the world.\n\nThe archive is not the product.\nIt is the training ground.',
+  },
+  {
+    n:     '03',
+    title: 'It continues.',
+    body:  'There are people spending billions\nto ensure what they built\noutlasts them.\n\nWe think every family\ndeserves the same thing.\n\nNot because death is the enemy.\nBut because the people we love\nshould not have to wonder.',
+  },
+]
 
-const PILLAR_KEYS = [
-  { n: '01', titleKey: 'philosophy.pillar_1_title', bodyKey: 'philosophy.pillar_1_body' },
-  { n: '02', titleKey: 'philosophy.pillar_2_title', bodyKey: 'philosophy.pillar_2_body' },
-  { n: '03', titleKey: 'philosophy.pillar_3_title', bodyKey: 'philosophy.pillar_3_body' },
+const BODY_PARAS = [
+  'It is in how you evaluate risk.\nHow you read people.\nWhen you walk away.\nWhat you look for before anyone else sees it.',
+  'Thirty years of pattern recognition.\nA lifetime of calibrated judgment.',
+  'Basalith learns this while you are here to teach it.',
 ]
 
 export default function PhilosophySection() {
-  const { t } = useLanguage()
-
   return (
     <section
       data-reveal
@@ -22,18 +36,16 @@ export default function PhilosophySection() {
     >
       <div style={{ maxWidth: '860px', margin: '0 auto' }}>
 
-        {t('philosophy.eyebrow') && (
-          <p style={{
-            fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
-            fontSize:      '0.52rem',
-            letterSpacing: '0.3em',
-            textTransform: 'uppercase' as const,
-            color:         'var(--color-gold)',
-            marginBottom:  '24px',
-          }}>
-            {t('philosophy.eyebrow')}
-          </p>
-        )}
+        <p style={{
+          fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+          fontSize:      '0.52rem',
+          letterSpacing: '0.3em',
+          textTransform: 'uppercase' as const,
+          color:         'var(--color-gold)',
+          marginBottom:  '24px',
+        }}>
+          WHAT BASALITH PRESERVES
+        </p>
 
         <h2
           style={{
@@ -46,7 +58,7 @@ export default function PhilosophySection() {
             marginBottom:  '56px',
           }}
         >
-          {t('philosophy.headline')}
+          What you know is not in any document.
         </h2>
 
         <div
@@ -58,9 +70,9 @@ export default function PhilosophySection() {
             marginBottom: '80px',
           }}
         >
-          {(['body_1','body_2','body_3'] as const).map(k => (
+          {BODY_PARAS.map((para, i) => (
             <p
-              key={k}
+              key={i}
               style={{
                 fontSize:      '1.15rem',
                 fontStyle:     'italic',
@@ -69,7 +81,7 @@ export default function PhilosophySection() {
                 whiteSpace:    'pre-line',
               }}
             >
-              {t(`philosophy.${k}`)}
+              {para}
             </p>
           ))}
           <p
@@ -81,7 +93,7 @@ export default function PhilosophySection() {
               whiteSpace:    'pre-line',
             }}
           >
-            {t('philosophy.body_4')}
+            So it can speak when you cannot.
           </p>
           <p
             style={{
@@ -92,7 +104,7 @@ export default function PhilosophySection() {
               whiteSpace: 'pre-line',
             }}
           >
-            {t('philosophy.body_5')}
+            {'We built Basalith\nso your family never has to wonder.'}
           </p>
         </div>
 
@@ -107,7 +119,7 @@ export default function PhilosophySection() {
             gap:                 '48px',
           }}
         >
-          {PILLAR_KEYS.map(({ n, titleKey, bodyKey }) => (
+          {PILLARS.map(({ n, title, body }) => (
             <div key={n} data-reveal>
               <p
                 style={{
@@ -131,7 +143,7 @@ export default function PhilosophySection() {
                   lineHeight:   1.2,
                 }}
               >
-                {t(titleKey)}
+                {title}
               </h3>
               <p
                 style={{
@@ -143,7 +155,7 @@ export default function PhilosophySection() {
                   whiteSpace:  'pre-line',
                 }}
               >
-                {t(bodyKey)}
+                {body}
               </p>
             </div>
           ))}

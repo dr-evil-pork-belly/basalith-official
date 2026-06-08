@@ -1,10 +1,6 @@
 'use client'
 
-import { useLanguage } from '@/app/context/LanguageContext'
-
 export default function TaglineOpening() {
-  const { t } = useLanguage()
-
   return (
     <section
       aria-label="Tagline"
@@ -43,9 +39,9 @@ export default function TaglineOpening() {
           letterSpacing: '-0.01em',
         }}
       >
-        &ldquo;{t('tagline.quote_1')}
+        &ldquo;You never truly leave
         <br />
-        {[t('tagline.quote_2'), t('tagline.quote_3')].filter(Boolean).join(' ')}&rdquo;
+        if you leave enough of yourself behind.&rdquo;
       </p>
 
       <div
@@ -82,7 +78,7 @@ export default function TaglineOpening() {
             textTransform: 'uppercase' as const,
           }}
         >
-          {t('tagline.scroll')}
+          Begin
         </p>
         <svg
           width="16"

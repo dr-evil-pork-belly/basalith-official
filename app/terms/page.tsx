@@ -22,7 +22,7 @@ const SECTIONS = [
       'All Basalith archives require a one-time Founding fee, currently $2,500, due at the commencement of your archive. The Founding fee covers initial archive architecture, legal framework configuration, and your first Essence Mapping session. It is non-refundable once The Founding process has commenced.',
       'Following The Founding, archives are maintained on an annual subscription basis at the rate applicable to your chosen tier: The Archive ($1,200/year), The Estate ($3,600/year), or The Dynasty ($9,600/year). Prices are denominated in US dollars and are exclusive of any taxes, duties, or levies that may apply in your jurisdiction.',
       'Annual subscriptions are billed on the anniversary of your Founding date. Payment is processed by Stripe. Your Family Trust, estate entity, or personal account may be designated as the billing party at any time.',
-      'Invoices are issued 14 days before each renewal date. Failure to pay within 14 days of the due date will result in your archive entering a paused state. Content is preserved during this period. A 30-day cure period follows, after which Heritage Nexus Inc. reserves the right to initiate the archive dissolution process as described in your Basalith agreement.',
+      'Invoices are issued 14 days before each renewal date. If payment is not received, your archive moves to Resting status. Your content is preserved in full during Resting, and your entity remains intact. Active features are suspended until payment resumes. We do not delete an archive for non-payment. Permanent deletion occurs only through the deliberate process described in the Cancellation section below.',
     ],
   },
   {
@@ -31,8 +31,8 @@ const SECTIONS = [
     body: [
       'You may cancel your annual subscription at any time by providing written notice to legacy@basalith.xyz. Cancellation takes effect at the end of the current billing period. No partial refunds are issued for unused subscription time.',
       'Upon cancellation, you retain full rights to a complete export of your archive in open, portable formats. This export right is unconditional and does not require a reason. Export requests are fulfilled within 30 business days.',
-      'Cancellation of a subscription is distinct from dissolution of your archive. Dissolution, meaning the permanent deletion of all archive content from our systems, is a separate, deliberate act governed by your Basalith agreement and requires a verified written request from the designated Custodian.',
-      'If Basalith ceases operations for any reason, the Data Custodianship Reserve, an independent legal structure funded by subscription revenue, ensures that all archives are transferred to a successor custodian or returned to subscribers in full. The terms of this arrangement are specified in your Basalith agreement.',
+      'Cancellation of a subscription is distinct from dissolution of your archive. Dissolution, meaning the permanent deletion of all archive content from our systems, is a separate, deliberate act. It requires a verified written request from the designated Custodian, or from an executor with documented authority. After the request is verified, Heritage Nexus Inc. holds the archive for 12 months, then permanently deletes it and confirms in writing.',
+      'You retain full ownership of your archive at all times. Heritage Nexus Inc. is the custodian, not the owner. If Basalith ceases operations for any reason, you may export your archive in full, in open and portable formats, at any time. Because the archive is always yours to hold, no closure can strand your data. The terms of this arrangement are specified in your Basalith agreement.',
     ],
   },
   {
@@ -78,7 +78,7 @@ const SECTIONS = [
       `These Terms of Service are governed by and construed in accordance with the laws of the State of ${GOVERNING_STATE}, United States of America, without regard to its conflict of law provisions.`,
       `Any dispute arising out of or relating to these Terms, your Basalith agreement, or the Basalith service shall be subject to the exclusive jurisdiction of the courts of the State of ${GOVERNING_STATE} and the federal courts located therein, and you consent to personal jurisdiction in those courts.`,
       'If any provision of these Terms is found to be unenforceable, the remaining provisions will continue in full force and effect.',
-      'These Terms, together with your Basalith agreement and the Data Custodianship Reserve instrument, constitute the entire agreement between you and Heritage Nexus Inc. in respect of the Basalith service, and supersede all prior agreements, representations, and understandings.',
+      'These Terms, together with your Basalith agreement, constitute the entire agreement between you and Heritage Nexus Inc. in respect of the Basalith service, and supersede all prior agreements, representations, and understandings.',
     ],
   },
 ]

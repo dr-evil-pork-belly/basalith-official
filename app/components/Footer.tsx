@@ -1,7 +1,5 @@
 'use client'
 
-import { useLanguage } from '@/app/context/LanguageContext'
-
 const COLS: { heading: string; links: { label: string; href?: string }[] }[] = [
   {
     heading: 'Plans',
@@ -52,7 +50,6 @@ const MONO: React.CSSProperties = {
 }
 
 export default function Footer() {
-  const { t } = useLanguage()
   return (
     <footer style={{ background: 'var(--color-void)' }}>
 

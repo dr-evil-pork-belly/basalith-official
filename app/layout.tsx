@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { Cormorant_Garamond, Space_Mono } from 'next/font/google'
-import { LanguageProvider } from './context/LanguageContext'
 import './globals.css'
 import ScrollReveal      from './components/ScrollReveal'
 import AuthErrorRedirect from './components/AuthErrorRedirect'
@@ -61,12 +60,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${cormorant.variable} ${spaceMono.variable}`}>
       <body>
-        <LanguageProvider>
-          <div className="grain fixed inset-0 z-[9997] pointer-events-none" aria-hidden="true" />
-          <AuthErrorRedirect />
-          <ScrollReveal />
-          {children}
-        </LanguageProvider>
+        <div className="grain fixed inset-0 z-[9997] pointer-events-none" aria-hidden="true" />
+        <AuthErrorRedirect />
+        <ScrollReveal />
+        {children}
       </body>
     </html>
   )

@@ -157,8 +157,8 @@ export default function PrivacyPage() {
 
             {/* 6 */}
             <h2 style={H2}>6. Data Retention</h2>
-            <p style={BODY}>Your archive is retained for the duration of your plan plus a minimum of 24 months following any cancellation to allow for data export.</p>
-            <p style={BODY}>The Data Custodianship Reserve ensures archive continuity beyond the life of Basalith as a company. <a href="/custodianship" style={{ color: '#C4A24A', textDecoration: 'none' }}>Learn more about the Reserve →</a></p>
+            <p style={BODY}>You own your archive, and you can export it in full, in open formats, at any time. If a payment is missed, your archive moves to Resting status. Your content is preserved and is never deleted for non-payment. Permanent deletion occurs only when you, or an executor with documented authority, make a verified written request. After that request is verified, we hold the archive for 12 months, then permanently delete it and confirm in writing.</p>
+            <p style={BODY}>Because you keep ownership and can export at any time, your archive does not depend on the continued existence of Basalith as a company. Basalith is the custodian, not the owner. <a href="/data-ownership" style={{ color: '#C4A24A', textDecoration: 'none' }}>Read our data ownership commitments →</a></p>
 
             {/* 7 */}
             <h2 style={H2}>7. Your Rights</h2>

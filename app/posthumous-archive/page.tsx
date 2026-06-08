@@ -367,7 +367,7 @@ function Pricing() {
               'Up to 10 family contributors',
               'Nightly photograph emails continue',
               'Custodian designation maintained',
-              'Data Custodianship Reserve coverage',
+              'Full archive export in open formats anytime',
               'Legal estate documentation preserved',
             ].map(f => (
               <div key={f} style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>

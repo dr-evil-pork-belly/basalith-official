@@ -24,7 +24,7 @@ const ITEMS = [
   },
   {
     title: 'Not a startup with your memories.',
-    body:  'You own your archive completely. Export everything at any time. 90 days notice if we ever close.',
+    body:  'You own your archive completely. You can export all of it at any time. Because the archive is yours to hold, nothing is stranded if we ever close.',
   },
 ]
 

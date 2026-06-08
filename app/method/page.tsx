@@ -63,7 +63,7 @@ const STEPS = [
     body:  [
       'Inside data plus outside data equals something neither could produce alone.',
       'The archive becomes training data for your entity. The entity learns not just what you said but how you think. Not just your opinions but your reasoning patterns.',
-      'This is the distinction between memory and cognition. Memory stores facts. The entity understands how a specific mind works.',
+      'This is the distinction between memory and cognition. Memory stores facts. The entity captures how a specific mind works.',
     ],
   },
   {

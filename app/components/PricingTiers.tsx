@@ -42,7 +42,7 @@ const TIERS: Tier[] = [
     features: [
       'Weekly story prompts',
       'Nightly photograph emails',
-      'Entity chat — full access',
+      'Entity chat, full access',
       'Contributor network',
       'Memory game (monthly)',
       'Annual accuracy report',
@@ -61,7 +61,7 @@ const TIERS: Tier[] = [
     annualPrice: '$600',
     annualSub:   '$50/mo equivalent',
     monthlyPrice:'$60',
-    description: 'Your archive preserved and waiting.\nNo emails. No prompts.\nJust your data — safe and intact —\nuntil you are ready to return.',
+    description: 'Your archive preserved and waiting.\nNo emails. No prompts.\nJust your data, safe and intact,\nuntil you are ready to return.',
     featured:    false,
     features: [
       'All data preserved permanently',
@@ -90,7 +90,7 @@ const TIERS: Tier[] = [
       'New capability integration as technology advances',
       'Annual entity report to family',
       'Archive storage and security',
-      'Generational access — forever',
+      'Generational access, forever',
       'Archive and entity continue for your heirs',
     ],
     cta:     'Ask Your Legacy Guide',

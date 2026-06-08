@@ -104,7 +104,7 @@ export default function SecurityPage() {
             {/* 1 — Encryption */}
             <h2 style={H2}>1. Encryption</h2>
             <p style={BODY}>Your data is encrypted at rest and in transit.</p>
-            <p style={BODY}><strong>At rest:</strong> Supabase encrypts all data at rest using <span style={CODE}>AES-256</span> encryption. Your voice recordings, photographs, and deposits are stored in private storage buckets — not publicly accessible under any circumstances.</p>
+            <p style={BODY}><strong>At rest:</strong> Supabase encrypts all data at rest using <span style={CODE}>AES-256</span> encryption. Your voice recordings, photographs, and deposits are stored in private storage buckets, not publicly accessible under any circumstances.</p>
             <p style={BODY}><strong>In transit:</strong> All data transmitted between your devices and Basalith uses <span style={CODE}>TLS 1.3</span> encryption. No data travels unencrypted.</p>
             <p style={BODY}><strong>Voice clone data:</strong> Your ElevenLabs voice clone is stored under your archive&rsquo;s private identifier. The voice ID is never publicly accessible. Voice portraits are served through time-limited signed URLs that expire after 1 hour.</p>
 
@@ -113,8 +113,8 @@ export default function SecurityPage() {
             <p style={BODY}>Only designated people can access your archive.</p>
             <ul style={{ paddingLeft: 0, margin: '0 0 12px' }}>
               {[
-                'Archive owners: Authenticated via bcrypt-hashed passwords with 12 salt rounds — the same standard used by banks.',
-                'Contributors: Authenticated via 64-character cryptographically random tokens generated using crypto.getRandomValues — not guessable by brute force.',
+                'Archive owners: Authenticated via bcrypt-hashed passwords with 12 salt rounds, the same standard used by banks.',
+                'Contributors: Authenticated via 64-character cryptographically random tokens generated using crypto.getRandomValues, not guessable by brute force.',
                 'Database isolation: Row Level Security is enforced on every table at the database level, not just the application level. Even a misconfigured application cannot access data across archive boundaries.',
                 'No shared access: Your archive data is never visible to other archive owners, contributors of other archives, or Basalith employees in the normal course of operations.',
               ].map(item => (

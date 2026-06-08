@@ -41,7 +41,7 @@ const DATA_CARDS = [
   },
   {
     headline: 'You can take everything with you.',
-    body:     'At any time, for any reason, you can download your complete archive — every deposit, every voice recording, every photograph — in formats you can open on any device.',
+    body:     'At any time, for any reason, you can download your complete archive. Every deposit, every voice recording, and every photograph, in formats you can open on any device.',
   },
   {
     headline: 'We will never sell your archive.',
@@ -98,18 +98,18 @@ export default function IntegrityPage() {
             <p style={{ ...BODY, color: 'rgba(250,248,244,0.9)', fontStyle: 'italic' }}>
               Frozen.
             </p>
-            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>Your heirs can talk to your entity. Your grandchildren can add new context — a marriage, a grandchild, a company milestone.</p>
+            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>Your heirs can talk to your entity. Your grandchildren can add new context: a marriage, a grandchild, a company milestone.</p>
             <p style={{ ...BODY, color: 'rgba(250,248,244,0.85)' }}>
               What they cannot do is change what you built. Your stated values.
               Your voice recordings. Your deposits made while you were alive and thinking clearly.
             </p>
             <div aria-hidden="true" style={{ width: '40px', height: '1px', background: 'var(--color-gold)', margin: '32px 0' }} />
             <p style={{ ...BODY, fontWeight: 500, color: 'rgba(250,248,244,0.9)' }}>
-              Two layers. One permanent. One living.
+              Two layers. One permanent. One active.
             </p>
             <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>
               The permanent layer is who you were.
-              The living layer is how the world around you continued after you left.
+              The active layer is how the world around you continued after you left.
             </p>
             <p style={{ ...BODY, color: 'var(--color-gold)', fontStyle: 'italic' }}>
               Both matter. Neither overwrites the other.
@@ -158,9 +158,9 @@ export default function IntegrityPage() {
               If Heritage Nexus Inc. ever faces dissolution we commit to three things:
             </p>
             {[
-              '90 days notice where circumstances allow — so you have time to decide what to do.',
-              'Complete data export before we close — everything in open formats you can take to any platform or host yourself.',
-              'No sale of archive data — your memories are not a corporate asset we can liquidate. They are yours.',
+              'You own your archive. Heritage Nexus is the custodian, not the owner. Closing the company does not change who it belongs to.',
+              'Full export at any time. You can download the complete archive in open formats whenever you ask, so a closure never strands your data.',
+              'No sale of archive data. Your memories are not a corporate asset we can liquidate. They are yours.',
             ].map((item, i) => (
               <div key={i} style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
                 <span style={{ ...MONO, fontSize: '0.52rem', color: 'var(--color-gold)', paddingTop: '5px', flexShrink: 0 }}>0{i + 1}</span>
@@ -168,8 +168,8 @@ export default function IntegrityPage() {
               </div>
             ))}
             <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)', marginTop: '24px' }}>
-              We cannot promise we will exist forever. We can promise you will not lose what
-              you built without warning and without the option to take it with you.
+              We cannot promise we will exist forever. We can promise the archive is always
+              yours to hold, in full, in formats you can take anywhere.
             </p>
           </div>
         </section>
@@ -186,7 +186,7 @@ export default function IntegrityPage() {
                 <p style={{ ...MONO, fontSize: '0.48rem', color: 'var(--color-gold-on-light)', marginBottom: '16px' }}>The Memory Vault</p>
                 <p style={{ ...BODY, margin: 0 }}>
                   Every deposit you make is stored permanently. When your entity answers a question
-                  it retrieves your actual words — not a guess.
+                  it retrieves your actual words, not a guess.
                   <br /><br />
                   This is why your entity will never tell your grandchildren something you never said.
                 </p>
@@ -194,7 +194,7 @@ export default function IntegrityPage() {
               <div style={{ border: '1px solid rgba(196,162,74,0.3)', padding: 'clamp(24px,3vw,36px)', background: 'rgba(196,162,74,0.03)' }}>
                 <p style={{ ...MONO, fontSize: '0.48rem', color: 'var(--color-gold-on-light)', marginBottom: '16px' }}>The Voice Layer</p>
                 <p style={{ ...BODY, margin: 0 }}>
-                  As your archive grows a second system learns how you say things — your phrasing,
+                  As your archive grows a second system learns how you say things: your phrasing,
                   your characteristic way of expressing uncertainty, the specific words you reach for.
                   <br /><br />
                   This is why your entity starts to sound like you, not just inform like you.
@@ -211,7 +211,7 @@ export default function IntegrityPage() {
           </p>
           <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.5)', marginBottom: '40px', lineHeight: 1.85 }}>
             They are the principles this company was built on.
-            If you have a question we have not answered here — ask us directly.
+            If you have a question we have not answered here, ask us directly.
           </p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
             <a href="mailto:hello@basalith.xyz"

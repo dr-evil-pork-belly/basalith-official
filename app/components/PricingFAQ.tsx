@@ -22,12 +22,12 @@ const ITEMS: Item[] = [
   {
     q: 'What happens to my archive if Basalith ceases to exist?',
     a: <>
-      Every active archive is covered by the Data Custodianship Reserve, a dedicated fund maintained
-      separately from our operating finances. If Basalith were to cease operations, the Reserve funds a
-      minimum of 10 years of continued archive storage and access under an independent custodian institution.
-      Your archive does not depend on our continued existence.
-      {' '}<a href="/custodianship" style={{ color: '#C4A24A', textDecoration: 'none' }}>
-        Learn more about the Reserve →
+      You own your archive. Basalith is the custodian, not the owner. You can export the complete
+      archive, in open and portable formats, at any time you ask. Because the full archive is always
+      yours to hold, no closure can strand your data. Your archive does not depend on our continued
+      existence.
+      {' '}<a href="/data-ownership" style={{ color: '#C4A24A', textDecoration: 'none' }}>
+        Read our data ownership commitments →
       </a>
     </>,
   },
@@ -41,17 +41,17 @@ const ITEMS: Item[] = [
     q: 'Can my family access the archive after I am gone?',
     a: `Yes. This is one of the core purposes of the archive. Your designated Custodian has formal estate
       standing to govern the archive after your passing. Contributors retain their access. The archive
-      continues. Your AI entity, if initialized, remains available to your family indefinitely.
-      The Estate and Dynasty tiers include specific provisions for multi-generational access and inheritance.`,
+      continues. Your entity, if initialized, remains available to your family indefinitely.
+      The Legacy tier includes specific provisions for multi-generational access and inheritance.`,
   },
   {
-    q: 'What is the Digital Clone and how does it work?',
-    a: `The Digital Clone is an AI entity trained exclusively on your archive content: your labeled
+    q: 'What is the entity and how does it work?',
+    a: `Your entity is a cognitive reference model trained exclusively on your archive content: your labeled
       photographs, voice recordings, written deposits, and the stories your family has contributed over
       time. It speaks in the patterns of your voice, carries your known opinions and values, and references
-      your specific memories. It is not a simulation. It is not a chatbot. It is the most faithful
-      preservation of who you were, built from everything you chose to deposit. The richer the archive,
-      the richer the entity.`,
+      your specific memories. It is not a simulation. It is not a chatbot. It is the most faithful record
+      of how you think, decide, and see the world, built from everything you chose to deposit. The richer
+      the archive, the richer the entity.`,
   },
 ]
 

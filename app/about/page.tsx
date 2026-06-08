@@ -143,7 +143,7 @@ export default function AboutPage() {
               How does a person hand forward everything they have learned
               in a way that actually lands? Not a letter that gets read once.
               Not a document that sits in a folder.
-              Something living. Something that gets more accurate over time, not less.
+              Something that gets more accurate over time, not less.
             </p>
 
             <div aria-hidden="true" style={{ width: '40px', height: '1px', background: 'var(--color-gold)', margin: '44px 0' }} />

@@ -158,16 +158,6 @@ export default function FoundingSessionPage() {
             }}>
               Here is what unlocks as you build.
             </p>
-            <p style={{
-              fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
-              fontSize:      '0.46rem',
-              letterSpacing: '0.15em',
-              color:         'rgba(250,248,244,0.35)',
-              marginBottom:  0,
-            }}>
-              Most archives reach Stage 2 within the first month.
-              The Cognitive Fingerprint typically emerges between months 4 and 12.
-            </p>
           </div>
           <MilestoneProgress />
         </div>

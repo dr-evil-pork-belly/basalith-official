@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { useLanguage } from '@/app/context/LanguageContext'
 
 const MONO: React.CSSProperties = {
   fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
@@ -11,8 +10,6 @@ const MONO: React.CSSProperties = {
 }
 
 export default function ClosingSection() {
-  const { t } = useLanguage()
-
   return (
     <section
       aria-label="Begin your archive"
@@ -25,7 +22,7 @@ export default function ClosingSection() {
       <div style={{ maxWidth: '640px', margin: '0 auto' }}>
 
         <p style={{ ...MONO, color: 'var(--color-gold)', marginBottom: '48px' }}>
-          {t('closing.eyebrow')}
+          For the forward-thinking
         </p>
 
         <p
@@ -39,9 +36,9 @@ export default function ClosingSection() {
             marginBottom:  '28px',
           }}
         >
-          {t('closing.headline_1')}
+          What you have learned
           <br />
-          {t('closing.headline_2')}
+          can outlast you.
         </p>
 
         <p
@@ -55,7 +52,7 @@ export default function ClosingSection() {
             marginBottom: '56px',
           }}
         >
-          {t('closing.sub')}
+          The only question is whether you capture it while you still can.
         </p>
 
         <div
@@ -79,8 +76,8 @@ export default function ClosingSection() {
             marginBottom: '56px',
           }}
         >
-          <p style={{ margin: '0' }}>{t('closing.tagline_1')}</p>
-          <p style={{ margin: '0' }}>{[t('closing.tagline_2'), t('closing.tagline_3')].filter(Boolean).join(' ')}</p>
+          <p style={{ margin: '0' }}>You never truly leave</p>
+          <p style={{ margin: '0' }}>if you leave enough of yourself behind.</p>
         </div>
 
         <Link
@@ -96,7 +93,7 @@ export default function ClosingSection() {
             marginBottom:   '24px',
           }}
         >
-          {t('closing.cta')}
+          Begin
         </Link>
 
         <p
@@ -107,7 +104,7 @@ export default function ClosingSection() {
             marginTop: '20px',
           }}
         >
-          {t('closing.price')}
+          Every archive begins at $2,500
         </p>
 
       </div>

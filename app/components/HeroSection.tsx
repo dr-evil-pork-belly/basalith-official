@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { useLanguage } from '@/app/context/LanguageContext'
 
 const MONO: React.CSSProperties = {
   fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
@@ -11,8 +10,6 @@ const MONO: React.CSSProperties = {
 }
 
 export default function HeroSection() {
-  const { t } = useLanguage()
-
   return (
     <section
       aria-label="Basalith — Heritage archive"
@@ -62,8 +59,8 @@ export default function HeroSection() {
             margin:        '0 0 20px',
           }}
         >
-          <span className="headline-line headline-line-1">{t('hero.headline_1')}</span>
-          <span className="headline-line headline-line-2">{t('hero.headline_2')}</span>
+          <span className="headline-line headline-line-1">The way you think is irreplaceable.</span>
+          <span className="headline-line headline-line-2">Most people leave nothing of it behind.</span>
         </h1>
 
         {/* Smaller echo line */}
@@ -80,8 +77,8 @@ export default function HeroSection() {
             animation:     'lineReveal 700ms cubic-bezier(0.16,1,0.3,1) 300ms both',
           }}
         >
-          <span style={{ display: 'block' }}>{t('hero.subheadline_a')}</span>
-          <span style={{ display: 'block' }}>{t('hero.subheadline_b')}</span>
+          <span style={{ display: 'block' }}>For your family. For your business.</span>
+          <span style={{ display: 'block' }}>For the generations that follow.</span>
         </div>
 
         {/* Sub copy */}
@@ -99,7 +96,7 @@ export default function HeroSection() {
             animation:   'lineReveal 700ms cubic-bezier(0.16,1,0.3,1) 500ms both',
           }}
         >
-          {t('hero.subheadline')}
+          Basalith builds a cognitive entity from the way you think, decide, and see the world.
         </p>
 
         {/* CTAs */}
@@ -128,7 +125,7 @@ export default function HeroSection() {
             onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'var(--color-gold-light)'}
             onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'var(--color-gold)'}
           >
-            {t('hero.cta_primary')}
+            Build Your Entity
           </Link>
           <Link
             href="/succession"
@@ -154,7 +151,7 @@ export default function HeroSection() {
               el.style.color       = 'var(--color-text-secondary)'
             }}
           >
-            {t('hero.cta_secondary')}
+            For Business
           </Link>
         </div>
       </div>

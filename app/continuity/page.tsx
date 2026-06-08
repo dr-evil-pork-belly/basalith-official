@@ -86,7 +86,7 @@ export default function ContinuityPage() {
         <section style={{ maxWidth: '720px', margin: '0 auto', padding: 'clamp(40px,6vw,64px) clamp(24px,6vw,48px)' }}>
 
           {/* Section 1 */}
-          <h2 style={h2style}>Every generation of AI makes your entity more accurate.</h2>
+          <h2 style={h2style}>Your entity becomes more accurate over time.</h2>
 
           <p style={body}>
             When you initialize your archive today the AI that trains your entity is the best available.
@@ -95,7 +95,7 @@ export default function ContinuityPage() {
           <p style={body}>
             Every major advancement in AI is applied to your entity automatically.
             What begins as a reasonable representation of how you think becomes, over decades,
-            something extraordinarily accurate.
+            something far more accurate.
           </p>
           <p style={body}>
             Your grandchildren will interact with a more complete version of your entity than your children will.
@@ -145,17 +145,16 @@ export default function ContinuityPage() {
           <h2 style={h2style}>What happens to the archive if Basalith ceases to exist?</h2>
 
           <p style={body}>
-            Every active archive is protected by the Data Custodianship Reserve.
-            A dedicated fund maintained separately from our operating accounts ensures every archive
-            transfers to a designated custodian institution with a minimum of ten years of continued
-            access at no cost to the family.
+            You own your archive. Basalith is the custodian, not the owner.
+            You can export the complete archive, in open formats, at any time you ask.
           </p>
           <p style={body}>
-            Your archive does not depend on Basalith&rsquo;s continued existence.
+            Because the full archive is always yours to hold, it does not depend on
+            Basalith&rsquo;s continued existence. If we ever close, you keep everything.
           </p>
 
           <a
-            href="/custodianship"
+            href="/data-ownership"
             style={{
               fontFamily:     'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
               fontStyle:      'italic',
@@ -166,7 +165,7 @@ export default function ContinuityPage() {
               marginTop:      '0.5rem',
             }}
           >
-            Read the full Custodianship Reserve details →
+            Read our full data ownership commitments →
           </a>
 
           <div style={rule} />

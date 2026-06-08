@@ -281,7 +281,7 @@ export default function PricingPage() {
           </h2>
           <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: 'rgba(250,248,244,0.4)', maxWidth: '480px', margin: '0 auto 40px' }}>
             It is for the rare few who understand that what they know
-            and how they think is a legacy — and that leaving it uncaptured
+            and how they think is a legacy, and that leaving it uncaptured
             is a choice their family will feel for generations.
           </p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
