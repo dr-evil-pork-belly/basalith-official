@@ -40,10 +40,10 @@ export default function WhatBasalithIsNot() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(28px,4vw,44px)' }}>
           {ITEMS.map(item => (
             <div key={item.title} style={{ borderLeft: '3px solid rgba(196,162,74,0.5)', paddingLeft: 'clamp(20px,3vw,32px)' }}>
-              <p style={{ ...SERIF, fontSize: 'clamp(1.3rem,2.6vw,1.7rem)', fontWeight: 300, color: 'var(--color-text-primary)', letterSpacing: '-0.01em', margin: '0 0 10px' }}>
+              <p style={{ ...SERIF, fontSize: 'clamp(1.3rem,2.6vw,1.7rem)', fontWeight: 300, color: '#F0EDE6', letterSpacing: '-0.01em', margin: '0 0 10px' }}>
                 {item.title}
               </p>
-              <p style={{ ...SERIF, fontSize: '1.05rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: 'var(--color-text-secondary)', margin: 0 }}>
+              <p style={{ ...SERIF, fontSize: '1.05rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: '#B8B4AB', margin: 0 }}>
                 {item.body}
               </p>
             </div>
