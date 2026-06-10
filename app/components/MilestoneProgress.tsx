@@ -4,7 +4,7 @@ const STAGES = [
     name:      'The Echo Layer',
     threshold: 10,
     timeline:  'Day one to week two',
-    consumer:  'Your entity knows who you are.',
+    consumer:  'Your entity echoes you back.',
     unlocks:   'Accurate answers about your life — names, dates, key relationships, core family history.',
   },
   {
@@ -12,7 +12,7 @@ const STAGES = [
     name:      'The Wisdom Compass',
     threshold: 50,
     timeline:  'First month',
-    consumer:  'Your entity knows how you think.',
+    consumer:  'Your entity reflects how you reason.',
     unlocks:   'Guidance that reflects your specific approach to risk, family, and values — not generic advice.',
   },
   {
@@ -20,7 +20,7 @@ const STAGES = [
     name:      'The Full Portrait',
     threshold: 200,
     timeline:  'Months two to four',
-    consumer:  'Your entity knows why you are the way you are.',
+    consumer:  'Your entity captures what shapes your judgment.',
     unlocks:   'Inner contradictions recognized. The entity stops sounding like an advisor and starts sounding like a specific person.',
   },
   {

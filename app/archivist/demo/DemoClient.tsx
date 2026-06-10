@@ -22,9 +22,16 @@ const C = {
 const SERIF = 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)'
 const MONO  = 'var(--font-space-mono, "Space Mono", "Courier New", monospace)'
 
-const DEMO_QUESTION  = 'What matters most to you, and why?'
 const APPLY_URL      = 'https://basalith.ai/apply'
 const TOTAL_Q        = 5
+
+// Follow-up prompts a Guide can use in the room to draw out a thin answer
+// before moving on. Shown as tappable cues, not inserted into the response.
+const FOLLOW_UPS = [
+  'Say more about that.',
+  'What was that like for you?',
+  'Can you give me one specific time that happened?',
+]
 
 type EntityState = 'idle' | 'loading' | 'streaming' | 'done' | 'error'
 type PaperState  = 'idle' | 'sending' | 'sent' | 'error'
@@ -54,6 +61,9 @@ export default function DemoClient() {
 
   // ── Echo layer pacing (step 7) ──────────────────────────────────────────────
   const [echoReady, setEchoReady] = useState(false)
+
+  // ── Follow-up affordance (per-question, tracked for visual state only) ─────
+  const [usedFollowUps, setUsedFollowUps] = useState<Record<number, Set<number>>>({})
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -91,7 +101,7 @@ export default function DemoClient() {
       const res = await fetch('/api/demo/entity', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ name, deposits: answers, question: DEMO_QUESTION }),
+        body:    JSON.stringify({ name, deposits: answers }),
       })
       const data = await res.json().catch(() => null)
       const reply = data && typeof data.reply === 'string' ? data.reply.trim() : ''
@@ -145,6 +155,7 @@ export default function DemoClient() {
     setShowPaper(false)
     setPaperError('')
     setEchoReady(false)
+    setUsedFollowUps({})
   }
 
   // ── Effects ─────────────────────────────────────────────────────────────────
@@ -331,6 +342,48 @@ export default function DemoClient() {
             dimension={dimensionLabel(prompts[qIndex].dimension)}
           />
 
+          {/* Follow-up affordance: shown while the answer is still thin */}
+          {(() => {
+            const wordCount = (answers[qIndex] ?? '').trim().split(/\s+/).filter(Boolean).length
+            if (wordCount === 0 || wordCount >= 8) return null
+            const used = usedFollowUps[qIndex] ?? new Set<number>()
+            return (
+              <div style={{ width: '100%', maxWidth: '760px', marginTop: '1.5rem' }}>
+                <p style={{ fontFamily: MONO, fontSize: '0.54rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: C.dim, marginBottom: '0.65rem' }}>
+                  Draw them out
+                </p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
+                  {FOLLOW_UPS.map((f, i) => (
+                    <button
+                      key={f}
+                      type="button"
+                      onClick={() => setUsedFollowUps(prev => {
+                        const next = new Set(prev[qIndex] ?? [])
+                        if (next.has(i)) next.delete(i); else next.add(i)
+                        return { ...prev, [qIndex]: next }
+                      })}
+                      style={{
+                        fontFamily:    SERIF,
+                        fontStyle:     'italic',
+                        fontSize:      '0.85rem',
+                        color:         used.has(i) ? C.dim : C.muted,
+                        background:    'transparent',
+                        border:        `1px solid ${used.has(i) ? 'rgba(240,237,230,0.06)' : 'rgba(196,162,74,0.25)'}`,
+                        borderRadius:  '999px',
+                        padding:       '0.4rem 0.95rem',
+                        cursor:        'pointer',
+                        textDecoration: used.has(i) ? 'line-through' : 'none',
+                        transition:    'all 0.15s',
+                      }}
+                    >
+                      {f}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )
+          })()}
+
           <div style={{ marginTop: '2.75rem' }}>
             <PrimaryButton onClick={nextQuestion} disabled={!(answers[qIndex] ?? '').trim()}>
               {qIndex < TOTAL_Q - 1 ? 'Next Question' : 'Complete'}
@@ -354,7 +407,7 @@ export default function DemoClient() {
             The Echo Layer
           </h1>
           <p className="demo-fade-up" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(1.2rem,3vw,1.8rem)', color: C.text, marginBottom: '2rem' }}>
-            Your entity now knows who you are.
+            Your entity echoes you back.
           </p>
           <p className="demo-fade" style={{ fontFamily: SERIF, fontWeight: 300, fontSize: 'clamp(0.95rem,2vw,1.15rem)', color: C.muted, lineHeight: 1.8, maxWidth: '520px' }}>
             {firstName} has answered {TOTAL_Q} questions. This is the beginning of a
@@ -391,7 +444,7 @@ export default function DemoClient() {
           <Eyebrow>The Entity Responds</Eyebrow>
 
           <p className="demo-fade-up" style={{ fontFamily: SERIF, fontWeight: 300, fontSize: 'clamp(1.4rem,3vw,2rem)', color: C.muted, lineHeight: 1.4, maxWidth: '680px', marginBottom: '2.5rem' }}>
-            {DEMO_QUESTION}
+            A reflection on what {firstName} just said.
           </p>
 
           <div
@@ -463,11 +516,13 @@ export default function DemoClient() {
               This is your archive after fifteen minutes.
             </p>
             <p style={{ fontFamily: SERIF, fontWeight: 300, fontSize: 'clamp(1.2rem,2.6vw,1.6rem)', color: C.muted, lineHeight: 1.7, marginBottom: '1.5rem' }}>
-              After eighteen months of daily deposits, it knows how you think, what
-              you weigh, and how you decide.
+              With daily deposits, it stops guessing and grounds in your real
+              patterns. How you reason, what you weigh, how you decide, in the
+              words that sound like you.
             </p>
             <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(1.3rem,2.8vw,1.8rem)', color: C.goldBright, lineHeight: 1.6 }}>
-              After your death, it knows you.
+              When you are no longer here to ask, the way you thought is still
+              here to find.
             </p>
           </div>
 

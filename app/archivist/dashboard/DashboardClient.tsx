@@ -78,6 +78,34 @@ function ProjectionChart({ activeClients, monthlyMRR }: { activeClients: number;
   )
 }
 
+function DemoCard() {
+  return (
+    <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderTop: `2px solid ${C.gold}`, padding: '24px', marginBottom: '24px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '20px' }}>
+      <div style={{ maxWidth: '440px' }}>
+        <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.58rem', letterSpacing: '0.24em', textTransform: 'uppercase', color: C.gold, marginBottom: '8px' }}>Live Demonstration</p>
+        <p style={{ fontFamily: 'Georgia, serif', fontSize: '1.15rem', fontWeight: 300, color: C.text, marginBottom: '6px' }}>Run a live demo.</p>
+        <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: '0.85rem', color: C.muted, lineHeight: 1.6 }}>
+          Five questions, answered out loud in the room, become a brief reflection from the entity.
+        </p>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '12px' }}>
+        <Link
+          href="/archivist/demo"
+          style={{ fontFamily: 'Courier New, monospace', fontSize: '0.62rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#0A0908', background: C.gold, padding: '12px 24px', textDecoration: 'none', whiteSpace: 'nowrap', fontWeight: 700 }}
+        >
+          Run a Live Demo →
+        </Link>
+        <Link
+          href="/archivist/demo/succession"
+          style={{ fontFamily: 'Courier New, monospace', fontSize: '0.55rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: C.dim, textDecoration: 'none' }}
+        >
+          Succession demo (preview)
+        </Link>
+      </div>
+    </div>
+  )
+}
+
 function StatCard({ label, value, caption, color }: { label: string; value: string; caption?: string; color?: string }) {
   return (
     <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderTop: `2px solid ${color ?? C.gold}`, padding: '20px 24px' }}>
@@ -204,6 +232,9 @@ export default function DashboardClient({ archivistId }: { archivistId: string }
           <span style={{ fontFamily: 'Courier New, monospace', fontSize: '0.55rem', letterSpacing: '0.28em', textTransform: 'uppercase', color: C.gold, background: 'rgba(196,162,74,0.08)', border: '1px solid rgba(196,162,74,0.2)', padding: '4px 10px' }}>✓ Certified Legacy Guide</span>
         </div>
       )}
+
+      {/* Live demo entry points */}
+      <DemoCard />
 
       {/* Stat cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '12px', marginBottom: '28px' }}>

@@ -110,7 +110,7 @@ export default function ContinuityPillar() {
           From{' '}
           <span className="text-amber">Static Archive</span>
           <br />
-          to Living Intelligence.
+          to Living Archive.
         </h2>
         <p className="font-sans font-light text-body-base text-text-secondary leading-[1.82]">
           The your archive does not sit still. It evolves, trained on new contributions,

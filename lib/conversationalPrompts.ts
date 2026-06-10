@@ -400,20 +400,11 @@ export type DemoPrompt = {
 }
 
 export const DEMO_PROMPTS: DemoPrompt[] = [
-  { id: 'kitchen_morning',   dimension: 'early_life',                text: 'What did your kitchen smell like on a cold morning when you were a child? Who else was usually there?' },
-  { id: 'ordinary_saturday', dimension: 'early_life',                text: 'Walk me through an ordinary Saturday when you were twelve. What did the day actually look like?' },
-  { id: 'made_you_laugh',    dimension: 'approach_to_people',        text: 'Who made you laugh harder than anyone else in your life? What did they do that nobody else did?' },
-  { id: 'never_cared',       dimension: 'core_values',               text: 'What is something most people think matters that you have never cared much about?' },
-  { id: 'quietly_good',      dimension: 'professional_philosophy',   text: 'What is one thing you were quietly good at that most people never noticed?' },
-  { id: 'most_beautiful',    dimension: 'defining_experiences',      text: 'What is the most beautiful place you have ever stood in? Not the most famous, the most beautiful.' },
-  { id: 'wish_told',         dimension: 'wisdom_and_lessons',        text: 'What is something you understand now that you wish someone had told you at twenty five?' },
-  { id: 'everyday_sound',    dimension: 'early_life',                text: 'What is an everyday sound you connect to a specific time in your life? What was happening when you heard it?' },
-  { id: 'never_thanked',     dimension: 'relationship_to_family',    text: 'What is a small thing someone in your family did for you that you never properly thanked them for?' },
-  { id: 'money_belief',      dimension: 'approach_to_money',         text: 'What did your parents believe about money? Did you keep that belief or leave it behind?' },
-  { id: 'before_awake',      dimension: 'core_values',               text: 'What was the first thing you did most mornings before anyone else was awake?' },
-  { id: 'your_phrase',       dimension: 'approach_to_people',        text: 'What is a phrase you say that people who know you would recognize as yours?' },
-  { id: 'taught_yourself',   dimension: 'defining_experiences',      text: 'What is something you taught yourself to do that you are still a little proud of?' },
-  { id: 'lighter_than',      dimension: 'fears_and_vulnerabilities', text: 'What is something you worried about for years that turned out lighter than you feared?' },
+  { id: 'proud_decision',    dimension: 'decision_making',     text: "Think of a decision you're proud of, even a small one. What was going on in your head while you made it?" },
+  { id: 'taught_you_carry',  dimension: 'wisdom_and_lessons',   text: 'Who taught you something you still carry with you? What did they actually do or say?' },
+  { id: 'your_signature',    dimension: 'personal_signature',   text: 'What is a small, ordinary thing you do, a habit or a phrase, that anyone who knows you would recognize as yours?' },
+  { id: 'hard_conversation', dimension: 'communication_style',  text: 'When you have to tell someone something hard, how do you usually go about it?' },
+  { id: 'what_you_believe',  dimension: 'core_values',          text: 'What is something you believe that you would want the people who come after you to understand?' },
 ]
 
 // Human-readable labels for the cognitive dimensions each demo prompt maps to.
@@ -427,6 +418,9 @@ export const DIMENSION_LABELS: Record<string, string> = {
   fears_and_vulnerabilities:'What You Carry',
   approach_to_money:        'Money and Security',
   relationship_to_family:   'Family',
+  decision_making:          'How You Decide',
+  personal_signature:       "What's Distinctly You",
+  communication_style:      'How You Communicate',
 }
 
 export function dimensionLabel(dimension: string): string {

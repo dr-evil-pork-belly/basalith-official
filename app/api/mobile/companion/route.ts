@@ -7,10 +7,10 @@ const anthropic = new Anthropic()
 
 function milestoneStage(depositCount: number): string {
   if (depositCount < 10)  return `Building the archive (${depositCount} memories so far)`
-  if (depositCount < 50)  return 'The Echo Layer — your entity knows who you are'
-  if (depositCount < 200) return 'The Wisdom Compass — your entity knows how you think'
-  if (depositCount < 500) return 'The Full Portrait — your entity knows why you are the way you are'
-  return 'The Cognitive Fingerprint — your entity sounds like you'
+  if (depositCount < 50)  return 'The Echo Layer. Your entity echoes you back.'
+  if (depositCount < 200) return 'The Wisdom Compass. Your entity reflects how you reason.'
+  if (depositCount < 500) return 'The Full Portrait. Your entity captures what shapes your judgment.'
+  return 'The Cognitive Fingerprint. Your entity sounds like you.'
 }
 
 // The Guide can save real archive material it hears in conversation.
