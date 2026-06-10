@@ -132,17 +132,29 @@ export async function generateQuestionsForContributor(
 
   const relQuestions = relationshipQuestions[relationship] ?? relationshipQuestions.other
 
-  // Fetch all existing question texts (pending + answered) so we never repeat one
+  // Fetch all existing question texts (any status) so we never repeat one
   const { data: existingRows } = await supabaseAdmin
     .from('contributor_questions')
     .select('question_text')
     .eq('contributor_id', contributorId)
     .eq('archive_id', archiveId)
-    .in('status', ['pending', 'answered'])
 
-  const existingTexts = existingRows?.map(r => r.question_text.toLowerCase()) ?? []
+  function normalizeQuestionText(text: string): string {
+    return text
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, ' ')
+      .replace(/[.!?]+$/, '')
+  }
+
+  const existingNormalized = new Set((existingRows ?? []).map(r => normalizeQuestionText(r.question_text)))
+  const existingTexts       = (existingRows ?? []).map(r => normalizeQuestionText(r.question_text))
 
   function isDuplicate(candidate: string): boolean {
+    // Hard exclusion: exact match (after normalization) regardless of keyword count
+    if (existingNormalized.has(normalizeQuestionText(candidate))) return true
+
+    // Secondary fuzzy guard for paraphrase-level near-duplicates
     const keywords = candidate.toLowerCase().split(' ').filter(w => w.length > 5)
     return existingTexts.some(existing => {
       const matches = keywords.filter(k => existing.includes(k)).length

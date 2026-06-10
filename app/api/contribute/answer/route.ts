@@ -24,27 +24,61 @@ export async function POST(req: NextRequest) {
     const archiveId = contributor.archive_id as string
     const archive   = contributor.archives as { name: string; family_name: string; owner_email: string | null; owner_name: string | null } | null
 
-    // Fetch the question
-    const { data: question, error: questionError } = await supabaseAdmin
+    const now = new Date().toISOString()
+    const trimmedAnswer = answerText.trim()
+
+    // Atomically claim this question — only one request can win the
+    // pending -> answered transition. Losers (lost race / duplicate
+    // submit) get a benign no-op so the client appends nothing further.
+    const { data: claimedRows, error: claimError } = await supabaseAdmin
       .from('contributor_questions')
-      .select('*')
+      .update({ status: 'answered', answer_text: trimmedAnswer, answered_at: now })
       .eq('id', questionId)
       .eq('contributor_id', contributor.id)
       .eq('status', 'pending')
-      .maybeSingle()
+      .select('*')
 
-    console.log('[contribute-answer] question fetch:', question?.id ?? 'NOT FOUND', questionError?.message ?? 'ok')
+    if (claimError) {
+      console.error('[contribute-answer] claim error:', claimError.message)
+      return NextResponse.json({ error: 'Failed to save answer: ' + claimError.message }, { status: 500 })
+    }
 
-    if (!question) return NextResponse.json({ error: 'Question not found' }, { status: 404 })
+    const question = claimedRows?.[0]
+    if (!question) {
+      console.log('[contribute-answer] no rows claimed — lost race or duplicate submit:', questionId)
+      return NextResponse.json({ success: true, nextQuestion: null })
+    }
 
-    const now = new Date().toISOString()
+    console.log('[contribute-answer] claimed:', { questionId, answerLength: trimmedAnswer.length, contributorId: contributor.id })
+
+    // Save as owner_deposit so entity learns from it. This is our
+    // permanent record of the contribution — must never be silently
+    // dropped once the question has been claimed.
+    const { error: depositError } = await supabaseAdmin.from('owner_deposits').insert({
+      archive_id:        archiveId,
+      prompt:            question.question_text,
+      response:          trimmedAnswer,
+      source_type:       'contributor',
+      contributor_id:    contributor.id,
+      contributor_name:  contributor.name ?? null,
+      created_at:        now,
+    })
+
+    if (depositError) {
+      console.error('[contribute-answer] CRITICAL: owner_deposits insert failed, reverting claim:', depositError.message)
+      await supabaseAdmin
+        .from('contributor_questions')
+        .update({ status: 'pending', answer_text: null, answered_at: null })
+        .eq('id', questionId)
+      return NextResponse.json({ error: 'Failed to save answer: ' + depositError.message }, { status: 500 })
+    }
 
     // If it's a photograph question, save to labels table too
     if (question.question_type === 'photograph_label' && question.photograph_id) {
       const { error: labelErr } = await supabaseAdmin.from('labels').insert({
         archive_id:         archiveId,
         photograph_id:      question.photograph_id,
-        what_was_happening: answerText.trim(),
+        what_was_happening: trimmedAnswer,
         labelled_by:        contributor.name ?? contributor.email,
         created_at:         now,
       })
@@ -62,29 +96,6 @@ export async function POST(req: NextRequest) {
       })()
     }
 
-    // Save as owner_deposit so entity learns from it (fire-and-forget — never blocks the answer save)
-    void supabaseAdmin.from('owner_deposits').insert({
-      archive_id:  archiveId,
-      prompt:      question.question_text,
-      response:    answerText.trim(),
-      source_type: 'contributor',
-      created_at:  now,
-    }).then(({ error }) => {
-      if (error) console.warn('[contribute-answer] owner_deposits insert:', error.message)
-    })
-
-    // Mark question answered — this is the critical write
-    console.log('[contribute-answer] saving:', { questionId, answerLength: answerText.trim().length, contributorId: contributor.id })
-    const { error: updateError } = await supabaseAdmin
-      .from('contributor_questions')
-      .update({ status: 'answered', answer_text: answerText.trim(), answered_at: now })
-      .eq('id', questionId)
-
-    console.log('[contribute-answer] update result:', updateError ? `ERROR: ${updateError.message}` : 'ok')
-    if (updateError) {
-      return NextResponse.json({ error: 'Failed to save answer: ' + updateError.message }, { status: 500 })
-    }
-
     // Increment contributor's questions_answered count
     try {
       const { error: rpcErr } = await supabaseAdmin.rpc('increment_contributor_questions_answered', {
@@ -99,14 +110,14 @@ export async function POST(req: NextRequest) {
     }
 
     // Training pair from contributor answer (fire-and-forget)
-    if (archive?.owner_name && answerText.trim().length > 20) {
+    if (archive?.owner_name && trimmedAnswer.length > 20) {
       createTrainingPairFromContributor(
         {
           archive_id:       archiveId,
           contributor_name: contributor.name ?? contributor.email,
           relationship:     contributor.relationship ?? 'family member',
           question:         question.question_text,
-          answer:           answerText.trim(),
+          answer:           trimmedAnswer,
         },
         archive.owner_name,
         archive.name,
@@ -179,7 +190,7 @@ export async function POST(req: NextRequest) {
     </p>
     <div style="border-left:2px solid rgba(196,162,74,0.4);padding:0 0 0 20px">
       <p style="font-family:Georgia,serif;font-size:16px;font-weight:300;color:#F0EDE6;line-height:1.8;font-style:italic;margin:0">
-        ${answerText.trim()}
+        ${trimmedAnswer}
       </p>
     </div>
     <div style="border-top:1px solid rgba(240,237,230,0.06);padding-top:20px;margin-top:28px">
@@ -202,12 +213,12 @@ export async function POST(req: NextRequest) {
     }
 
     // Trigger memory chain if answer is substantial (fire-and-forget)
-    if (answerText.trim().length > 50 && archive?.owner_name) {
+    if (trimmedAnswer.length > 50 && archive?.owner_name) {
       triggerMemoryChain(
         archiveId,
         contributor.id as string,
         question.question_text,
-        answerText.trim(),
+        trimmedAnswer,
         archive.owner_name,
       ).catch(() => {})
     }

@@ -31,6 +31,9 @@ const PORTAL_UI = {
     footerNote:       'Everything you share here is preserved permanently.',
     contributions_n:  (n: number) => `${n} CONTRIBUTION${n !== 1 ? 'S' : ''}`,
     honesty:          'Be honest. The most valuable thing you can contribute is the truth. Difficult memories and complicated feelings are as important as positive ones.',
+    savedConfirm:     'Saved to your archive',
+    caughtUpTitle:    'You are caught up',
+    caughtUpBody:     'There are no new questions right now. Check back soon for more.',
   },
   zh: {
     welcome:          (name: string) => `欢迎您，${name}。`,
@@ -43,6 +46,9 @@ const PORTAL_UI = {
     footerNote:       '您在此分享的一切都将被永久保存。',
     contributions_n:  (n: number) => `${n} 条贡献`,
     honesty:          '请诚实作答。您能贡献的最有价值的东西是真相。困难的记忆和复杂的感受与积极的记忆同样重要。',
+    savedConfirm:     '已保存到您的档案',
+    caughtUpTitle:    '暂无新问题',
+    caughtUpBody:     '目前没有新问题。请稍后再来查看。',
   },
   es: {
     welcome:          (name: string) => `Bienvenido, ${name}.`,
@@ -325,6 +331,25 @@ function SectionCard({
   )
 }
 
+// ── Save confirmation pill ───────────────────────────────────────────────────────
+
+function SavedConfirmation({ lang }: { lang: string }) {
+  const t = PORTAL_UI[lang === 'zh' ? 'zh' : 'en']
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
+      <span style={{
+        fontFamily:    '"Space Mono","Courier New",monospace',
+        fontSize:      '0.5rem',
+        letterSpacing: '0.25em',
+        textTransform: 'uppercase',
+        color:         '#B8963E',
+      }}>
+        ✓ {t.savedConfirm}
+      </span>
+    </div>
+  )
+}
+
 // ── Questions section ──────────────────────────────────────────────────────────
 
 function QuestionsSection({
@@ -344,8 +369,19 @@ function QuestionsSection({
   const [saved,        setSaved]        = useState<Record<string, boolean>>({})
   const [saveError,    setSaveError]    = useState<Record<string, string>>({})
   const [loading,      setLoading]      = useState(true)
+  const [showSaved,    setShowSaved]    = useState(false)
 
   const [loadError, setLoadError] = useState(false)
+
+  // Synchronous lock for in-flight submissions. React state (saving) updates
+  // asynchronously, so a fast second click can race past that check before
+  // the re-render lands. This ref is checked and set immediately.
+  const inFlightRef   = useRef<Set<string>>(new Set())
+  const savedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    return () => { if (savedTimerRef.current) clearTimeout(savedTimerRef.current) }
+  }, [])
 
   const load = useCallback(async () => {
     try {
@@ -371,6 +407,11 @@ function QuestionsSection({
   async function saveAnswer(q: Question) {
     const text = answers[q.id]?.trim()
     if (!text) return
+
+    // Synchronous guard — blocks a second click before React re-renders.
+    if (inFlightRef.current.has(q.id)) return
+    inFlightRef.current.add(q.id)
+
     setSaving(prev => ({ ...prev, [q.id]: true }))
     setSaveError(prev => { const next = { ...prev }; delete next[q.id]; return next })
     console.log('[portal] submitting:', { questionId: q.id, answerLength: text.length, token: token.substring(0, 8) })
@@ -385,19 +426,30 @@ function QuestionsSection({
       if (!res.ok) throw new Error(data.error ?? `HTTP ${res.status}`)
 
       setSaved(prev => ({ ...prev, [q.id]: true }))
-      // Replace answered question with next one
+      // Replace answered question with next one — never let the same
+      // question id appear twice in the list.
       setQuestions(prev => {
         const remaining = prev.filter(x => x.id !== q.id)
-        if (data.nextQuestion) return [...remaining, data.nextQuestion]
+        const next = data.nextQuestion
+        if (next && next.id !== q.id && !remaining.some(x => x.id === next.id)) {
+          return [...remaining, next]
+        }
         return remaining
       })
       setAnswers(prev => { const next = { ...prev }; delete next[q.id]; return next })
+
+      // Brief save confirmation — only on a real, successful save.
+      if (savedTimerRef.current) clearTimeout(savedTimerRef.current)
+      setShowSaved(true)
+      savedTimerRef.current = setTimeout(() => setShowSaved(false), 3000)
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Save failed'
       console.error('[portal] save error:', msg)
       setSaveError(prev => ({ ...prev, [q.id]: msg }))
+    } finally {
+      setSaving(prev => ({ ...prev, [q.id]: false }))
+      inFlightRef.current.delete(q.id)
     }
-    setSaving(prev => ({ ...prev, [q.id]: false }))
   }
 
   if (loading) {
@@ -418,7 +470,20 @@ function QuestionsSection({
     )
   }
 
-  if (questions.length === 0) return null
+  if (questions.length === 0) {
+    const t = PORTAL_UI[lang === 'zh' ? 'zh' : 'en']
+    return (
+      <SectionCard title={t.questionsForYou} prominent>
+        {showSaved && <SavedConfirmation lang={lang} />}
+        <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.5rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#B8963E', marginBottom: '8px' }}>
+          {t.caughtUpTitle}
+        </p>
+        <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontWeight: 300, fontSize: '1rem', color: '#4A4640', lineHeight: 1.8, margin: 0 }}>
+          {t.caughtUpBody}
+        </p>
+      </SectionCard>
+    )
+  }
 
   const subjectName = ownerName ? ownerName.split(' ')[0] : 'the archive subject'
 
@@ -430,6 +495,8 @@ function QuestionsSection({
         : `The archive has ${questions.length} question${questions.length !== 1 ? 's' : ''} only you can answer.`}
       prominent
     >
+      {showSaved && <SavedConfirmation lang={lang} />}
+
       {/* Honesty framing */}
       <div
         style={{
