@@ -1,4 +1,4 @@
-import { cookies } from 'next/headers'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 
 export const dynamic = 'force-dynamic'
@@ -27,8 +27,8 @@ function coverageStatus(pct: number) {
 }
 
 export async function GET() {
-  const cookieStore = await cookies()
-  const archiveId   = cookieStore.get('archive-id')?.value
+  const session   = await getSessionUser()
+  const archiveId = session?.archiveId
 
   if (!archiveId) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })

@@ -1,17 +1,13 @@
-import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import SuccessorContextClient from './SuccessorContextClient'
 
 export default async function SuccessorContextPage() {
-  const cookieStore = await cookies()
-  const raw = cookieStore.get('successor_session')?.value
+  const session = await getSessionUser()
+  if (!session?.successorId || !session.archiveId) redirect('/succession/login')
 
-  let session: { successorId: string; archiveId: string; name: string; organization: string | null } | null = null
-  try { session = raw ? JSON.parse(raw) : null } catch {}
-  if (!session?.successorId) redirect('/succession/login')
-
-  const [archiveResult, contextsResult] = await Promise.all([
+  const [archiveResult, contextsResult, successorResult] = await Promise.all([
     supabaseAdmin
       .from('archives')
       .select('name')
@@ -22,11 +18,21 @@ export default async function SuccessorContextPage() {
       .select('id, content, context_type, created_at')
       .eq('successor_id', session.successorId)
       .order('created_at', { ascending: false }),
+    supabaseAdmin
+      .from('successors')
+      .select('name, organization')
+      .eq('id', session.successorId)
+      .single(),
   ])
 
   return (
     <SuccessorContextClient
-      session={session}
+      session={{
+        successorId: session.successorId,
+        archiveId:   session.archiveId,
+        name:        successorResult.data?.name ?? '',
+        organization: successorResult.data?.organization ?? null,
+      }}
       archiveName={archiveResult.data?.name ?? 'Archive'}
       existingContexts={contextsResult.data ?? []}
     />

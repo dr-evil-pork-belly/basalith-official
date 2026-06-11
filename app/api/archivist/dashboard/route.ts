@@ -1,18 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { getArchivistSession } from '@/lib/apiSecurity'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 
 export async function GET(req: NextRequest) {
-  // ── Verify the session cookie matches the requested archivistId (IDOR guard)
-  const session = await getArchivistSession()
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const session = await getSessionUser()
+  if (!session?.archivistId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const archivistId = req.nextUrl.searchParams.get('id')
-  if (!archivistId) return NextResponse.json({ error: 'archivistId required' }, { status: 400 })
-
-  if (archivistId !== session.archivistId) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
+  // Ignore any id from query params — always use the authenticated session
+  const archivistId = session.archivistId
 
   const [
     { data: archivist,   error: archivistErr },

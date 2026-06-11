@@ -37,7 +37,7 @@ function formatDate(iso: string): string {
 }
 
 async function handleLogout() {
-  await fetch('/api/succession/logout', { method: 'POST' })
+  await fetch('/api/auth/logout', { method: 'POST' })
   window.location.href = '/succession/login'
 }
 

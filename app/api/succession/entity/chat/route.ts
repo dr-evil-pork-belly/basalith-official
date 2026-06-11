@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { getSuccessorSession } from '@/lib/successorAuth'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 
 const anthropic = new Anthropic()
 
@@ -23,24 +23,20 @@ function labelContextType(raw: string): string {
 }
 
 export async function POST(req: NextRequest) {
-  const session = getSuccessorSession(req)
-  if (!session) {
+  const session = await getSessionUser()
+  if (!session?.successorId || !session.archiveId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  let messages: ChatMessage[], successorId: string, archiveId: string
+  const successorId = session.successorId
+  const archiveId    = session.archiveId
+
+  let messages: ChatMessage[]
   try {
     const body = await req.json()
-    messages    = body.messages    ?? []
-    successorId = body.successorId ?? ''
-    archiveId   = body.archiveId   ?? ''
+    messages = body.messages ?? []
   } catch {
     return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
-  }
-
-  // Guard: session must match request body
-  if (session.successorId !== successorId || session.archiveId !== archiveId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   const [archiveResult, trainingResult, contextsResult] = await Promise.all([

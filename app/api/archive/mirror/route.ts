@@ -1,14 +1,14 @@
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 
 export const dynamic = 'force-dynamic'
 
-// Latest mirror reflection for the signed-in archive (cookie session).
+// Latest mirror reflection for the signed-in archive.
 export async function GET() {
   try {
-    const cookieStore = await cookies()
-    const archiveId   = cookieStore.get('archive-id')?.value
+    const session   = await getSessionUser()
+    const archiveId = session?.archiveId
     if (!archiveId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }

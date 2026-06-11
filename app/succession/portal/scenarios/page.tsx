@@ -1,15 +1,11 @@
-import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import SuccessorScenariosClient from './SuccessorScenariosClient'
 
 export default async function SuccessorScenariosPage() {
-  const cookieStore = await cookies()
-  const raw = cookieStore.get('successor_session')?.value
-
-  let session: { successorId: string; archiveId: string; name: string; organization: string | null } | null = null
-  try { session = raw ? JSON.parse(raw) : null } catch {}
-  if (!session?.successorId) redirect('/succession/login')
+  const session = await getSessionUser()
+  if (!session?.successorId || !session.archiveId) redirect('/succession/login')
 
   const [archiveResult, responsesResult] = await Promise.all([
     supabaseAdmin

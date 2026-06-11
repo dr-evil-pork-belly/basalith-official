@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
+import { getOrCreateAuthUser } from '@/lib/auth/getOrCreateAuthUser'
 import bcrypt from 'bcryptjs'
 
-function generateMagicLinkToken(): string {
-  const bytes = new Uint8Array(32)
-  crypto.getRandomValues(bytes)
-  return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('')
-}
-
+// Mobile login (app/api/archive/mobile-login) still authenticates with
+// archive_credentials + a password, so a password is generated and stored
+// for that shim. It is no longer included in the welcome email — the web
+// portal is magic-link only, so the welcome email's primary access point is
+// the Supabase magic link below.
 function generateClientPassword(familyName: string): string {
   const clean = familyName.replace(/\s+/g, '').replace(/[^a-zA-Z]/g, '')
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
@@ -22,7 +22,6 @@ function generateClientPassword(familyName: string): string {
 function buildWelcomeEmail(
   familyName:    string,
   firstName:     string,
-  password:      string,
   tierName:      string,
   archivistName: string,
   magicLinkUrl:  string | null,
@@ -53,25 +52,20 @@ function buildWelcomeEmail(
       ${magicLinkUrl}
     </a>
     <p style="font-size:13px;font-style:italic;color:#706C65;margin:0;line-height:1.7">
-      Bookmark this link. It is your personal entry to the archive and never expires.
+      This link signs you in directly. If it expires, request a new one any time at ${siteUrl}/archive-login.
     </p>
   </div>
-  ` : ''}
-
+  ` : `
   <div style="background:rgba(196,162,74,0.04);border:1px solid rgba(196,162,74,0.15);padding:24px;margin:0 0 24px">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;margin:0 0 16px;text-transform:uppercase">
-      Password Login (Alternative)
-    </p>
     <p style="font-size:14px;color:#B8B4AB;margin:0 0 8px">
-      <strong style="color:#F0EDE6">URL:</strong> ${siteUrl}/archive-login
-    </p>
-    <p style="font-size:14px;color:#B8B4AB;margin:0 0 8px">
-      <strong style="color:#F0EDE6">Password:</strong> ${password}
+      Sign in any time at <strong style="color:#F0EDE6">${siteUrl}/archive-login</strong> with this email address. We will send you a sign-in link.
     </p>
     <p style="font-size:14px;color:#B8B4AB;margin:0">
       <strong style="color:#F0EDE6">Tier:</strong> ${tierName}
     </p>
   </div>
+  `}
+
   <p style="font-size:15px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 16px">
     Once you are inside you can begin uploading photographs. Our AI will analyze everything, removing screenshots and unrelated images automatically.
   </p>
@@ -105,14 +99,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Archivist not found or inactive' }, { status: 404 })
     }
 
-    // ── 2. Generate password ──────────────────────────────────────────────────
+    // ── 2. Generate password (mobile-login shim only — see note above) ────────
     const password     = generateClientPassword(familyName)
     const passwordHash = await bcrypt.hash(password, 12)
-    console.log('[onboard-client] Hash generated, length:', passwordHash.length)
 
     // ── 3. Create archive ─────────────────────────────────────────────────────
-    const magicLinkToken = generateMagicLinkToken()
-
     const { data: archive, error: archiveError } = await supabaseAdmin
       .from('archives')
       .insert({
@@ -123,8 +114,6 @@ export async function POST(req: NextRequest) {
         tier,
         generation:          'Generation I',
         status:              'active',
-        magic_link_token:    magicLinkToken,
-        magic_link_created_at: new Date().toISOString(),
       })
       .select()
       .single()
@@ -133,7 +122,7 @@ export async function POST(req: NextRequest) {
       throw new Error(archiveError?.message || 'Failed to create archive')
     }
 
-    // ── 4. Store hashed credentials ───────────────────────────────────────────
+    // ── 4. Store hashed credentials (mobile-login shim only) ──────────────────
     const { error: credError } = await supabaseAdmin
       .from('archive_credentials')
       .insert({
@@ -143,8 +132,17 @@ export async function POST(req: NextRequest) {
         is_active:     true,
       })
 
-    console.log('[onboard-client] Credential insert error:', credError?.message || 'none')
     if (credError) throw new Error('Failed to store credentials: ' + credError.message)
+
+    // ── 4b. Create or reuse the Supabase Auth user for the new owner ──────────
+    const ownerUserId = await getOrCreateAuthUser(clientEmail, 'owner')
+
+    const { error: ownerLinkError } = await supabaseAdmin
+      .from('archives')
+      .update({ owner_user_id: ownerUserId })
+      .eq('id', archive.id)
+
+    if (ownerLinkError) throw new Error('Failed to link owner account: ' + ownerLinkError.message)
 
     // ── 5. Record commission (best-effort) ────────────────────────────────────
     await supabaseAdmin
@@ -183,14 +181,27 @@ export async function POST(req: NextRequest) {
     const tierName = tierNames[tier] || 'The Estate'
     const firstName = (clientName || familyName).split(' ')[0]
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
-    const magicLinkUrl = `${siteUrl}/api/archive/magic-login?token=${magicLinkToken}`
+
+    let magicLinkUrl: string | null = null
+    try {
+      const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
+        type:  'magiclink',
+        email: clientEmail,
+        options: { redirectTo: `${siteUrl}/auth/callback` },
+      })
+      if (linkError) throw linkError
+      magicLinkUrl = linkData.properties?.action_link ?? null
+    } catch (linkErr: unknown) {
+      console.error('[onboard-client] Magic link generation failed:', linkErr instanceof Error ? linkErr.message : linkErr)
+      // Non-fatal — owner can still request a sign-in link at /archive-login
+    }
 
     try {
       await resend.emails.send({
         from:    `The ${familyName} Archive <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
         to:      clientEmail,
         subject: `Welcome to Basalith. The ${familyName} Archive is ready.`,
-        html:    buildWelcomeEmail(familyName, firstName, password, tierName, archivist.name, magicLinkUrl),
+        html:    buildWelcomeEmail(familyName, firstName, tierName, archivist.name, magicLinkUrl),
         headers: {
           'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
           'X-Entity-Ref-ID':  `basalith-${archive.id}-${Date.now()}`,
@@ -199,7 +210,7 @@ export async function POST(req: NextRequest) {
       })
     } catch (emailErr: unknown) {
       console.error('[onboard-client] Welcome email failed:', emailErr instanceof Error ? emailErr.message : emailErr)
-      // Non-fatal — archive is created, password returned below regardless
+      // Non-fatal — archive is created and reachable at /archive-login regardless
     }
 
     // ── 9. Notify admin ───────────────────────────────────────────────────────
@@ -230,9 +241,8 @@ export async function POST(req: NextRequest) {
       archiveId:    archive.id,
       archiveName:  `The ${familyName} Archive`,
       clientEmail,
-      password,
       magicLink:    magicLinkUrl,
-      message:      `The ${familyName} Archive has been initialized. Login credentials sent to ${clientEmail}.`,
+      message:      `The ${familyName} Archive has been initialized. A sign-in link was sent to ${clientEmail}.`,
     })
 
   } catch (error: any) {

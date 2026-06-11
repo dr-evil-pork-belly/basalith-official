@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 
 export const dynamic = 'force-dynamic'
@@ -13,8 +13,8 @@ function estimateDecade(eraStr: string | null): number | null {
 }
 
 export async function GET() {
-  const cookieStore = await cookies()
-  const archiveId   = cookieStore.get('archive-id')?.value
+  const session   = await getSessionUser()
+  const archiveId = session?.archiveId
   if (!archiveId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const [

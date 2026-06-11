@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { B2B_SCENARIOS } from '@/lib/b2bScenarios'
 import { createTrainingPairFromDeposit } from '@/lib/trainingPipeline'
 
 export async function POST(req: NextRequest) {
-  const archiveId = req.cookies.get('archive-id')?.value
+  const session   = await getSessionUser()
+  const archiveId = session?.archiveId
   if (!archiveId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   let body: { scenarioId?: string; response?: string }

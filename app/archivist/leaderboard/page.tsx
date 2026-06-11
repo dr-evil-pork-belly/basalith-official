@@ -1,10 +1,9 @@
-import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 import LeaderboardClient from './LeaderboardClient'
 
 export default async function ArchivistLeaderboardPage() {
-  const cookieStore = await cookies()
-  const archivistId = cookieStore.get('archivist-id')?.value
-  if (!archivistId) redirect('/archivist-login')
-  return <LeaderboardClient archivistId={archivistId} />
+  const session = await getSessionUser()
+  if (!session?.archivistId) redirect('/archivist-login')
+  return <LeaderboardClient archivistId={session.archivistId} />
 }

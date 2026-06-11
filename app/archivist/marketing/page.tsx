@@ -1,5 +1,5 @@
-import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 
 export const metadata = { title: 'Marketing Toolkit — Basalith Guide Portal' }
 
@@ -47,8 +47,8 @@ function DownloadRow({ label, file, ext, disabled }: { label: string; file: stri
 }
 
 export default async function MarketingPage() {
-  const cookieStore = await cookies()
-  if (!cookieStore.get('archivist-id')?.value) redirect('/archivist-login')
+  const session = await getSessionUser()
+  if (!session?.archivistId) redirect('/archivist-login')
 
   return (
     <div style={{ padding: 'clamp(24px,5vw,48px)', maxWidth: '800px' }}>

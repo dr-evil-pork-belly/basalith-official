@@ -1,9 +1,15 @@
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
 export async function POST(req: Request) {
   try {
+    const session = await getSessionUser()
+    if (!session?.userId) {
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
+    }
+
     const body = await req.json()
     const { archiveId, role } = body as { archiveId?: string; role?: string }
 
@@ -11,58 +17,40 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'archiveId and role are required' }, { status: 400 })
     }
 
-    const cookieStore = await cookies()
-    const currentArchiveId = cookieStore.get('archive-id')?.value
-
-    if (!currentArchiveId) {
-      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
-    }
-
-    // Resolve the current archive's email to verify the switch is legitimate
-    const { data: currentArchive } = await supabaseAdmin
-      .from('archives')
-      .select('email')
-      .eq('id', currentArchiveId)
-      .single()
-
-    const email = currentArchive?.email
-    if (!email) {
-      return NextResponse.json({ error: 'Session invalid' }, { status: 401 })
-    }
-
-    // Verify the target archive belongs to this email
+    // Verify the target archive belongs to this session
     if (role === 'owner') {
       const { data } = await supabaseAdmin
         .from('archives')
         .select('id')
         .eq('id', archiveId)
-        .eq('email', email)
+        .eq('owner_user_id', session.userId)
         .single()
       if (!data) {
         return NextResponse.json({ error: 'Archive not found' }, { status: 403 })
       }
     } else {
+      // Contributor access is matched by email, not by session scope.
       const { data } = await supabaseAdmin
         .from('contributors')
         .select('id')
         .eq('archive_id', archiveId)
-        .eq('email', email)
+        .eq('email', session.email)
         .single()
       if (!data) {
         return NextResponse.json({ error: 'Archive not found' }, { status: 403 })
       }
     }
 
-    const cookieOptions = {
+    // Record which archive is "active" for this session, used to disambiguate
+    // owners of more than one archive (see lib/auth/getSessionUser.ts).
+    const cookieStore = await cookies()
+    cookieStore.set('archive-id', archiveId, {
       httpOnly: true,
       secure:   true,
       sameSite: 'strict' as const,
       maxAge:   60 * 60 * 24 * 7,
       path:     '/',
-    }
-
-    cookieStore.set('archive-id',   archiveId, cookieOptions)
-    cookieStore.set('archive-auth', archiveId, cookieOptions)
+    })
 
     return NextResponse.json({ ok: true })
   } catch (error: unknown) {

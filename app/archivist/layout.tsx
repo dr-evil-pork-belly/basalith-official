@@ -158,7 +158,7 @@ export default function ArchivistLayout({ children }: { children: React.ReactNod
         {/* Sign Out */}
         <div style={{ padding: '16px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
           <a
-            href="/api/archivist-signout"
+            href="/api/auth/logout"
             style={{
               display:       'block',
               fontFamily:    'Courier New, monospace',

@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { getArchivistSession } from '@/lib/apiSecurity'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 
 // GET /api/archivist/prospects
 export async function GET(req: NextRequest) {
-  const session = await getArchivistSession()
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const session = await getSessionUser()
+  if (!session?.archivistId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   // Ignore any archivistId from query params — always use the authenticated session
   const archivistId = session.archivistId
-  if (!archivistId) return NextResponse.json({ error: 'No archivist ID' }, { status: 400 })
 
   const { data, error } = await supabaseAdmin
     .from('prospects')
@@ -23,8 +22,8 @@ export async function GET(req: NextRequest) {
 
 // POST /api/archivist/prospects
 export async function POST(req: NextRequest) {
-  const session = await getArchivistSession()
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const session = await getSessionUser()
+  if (!session?.archivistId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await req.json()
   // Always use session archivistId — ignore body.archivistId
@@ -57,8 +56,8 @@ export async function POST(req: NextRequest) {
 
 // PATCH /api/archivist/prospects
 export async function PATCH(req: NextRequest) {
-  const session = await getArchivistSession()
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const session = await getSessionUser()
+  if (!session?.archivistId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await req.json()
   const archivistId = session.archivistId
@@ -89,8 +88,8 @@ export async function PATCH(req: NextRequest) {
 
 // DELETE /api/archivist/prospects?id=xxx
 export async function DELETE(req: NextRequest) {
-  const session = await getArchivistSession()
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const session = await getSessionUser()
+  if (!session?.archivistId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const archivistId = session.archivistId
 

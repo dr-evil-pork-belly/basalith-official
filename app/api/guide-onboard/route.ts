@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { checkRateLimit, getClientIP, sanitizedError } from '@/lib/apiSecurity'
+import { getOrCreateAuthUser } from '@/lib/auth/getOrCreateAuthUser'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-// Public, invite-code gated. Creates a new archivists row and signs the new
-// Legacy Guide in immediately, the same way /api/archivist-login does, so
-// they land in their portal without any manual provisioning.
+// Public, invite-code gated. Creates a new archivists row, provisions a
+// Supabase Auth user for the Guide (magic-link only, no password), and
+// links archivists.auth_user_id so getSessionUser resolves their portal
+// scope. The client triggers the magic-link sign-in after this returns.
 export async function POST(req: NextRequest) {
   try {
     const ip = getClientIP(req)
@@ -67,23 +69,22 @@ export async function POST(req: NextRequest) {
       .update({ status: 'used', used_by: archivist.id, used_at: new Date().toISOString() })
       .eq('id', invite.id)
 
-    // ── Sign the Guide in ───────────────────────────────────────────────────
-    const cookieOptions = {
-      httpOnly: true,
-      secure:   true,
-      sameSite: 'strict' as const,
-      maxAge:   60 * 60 * 24 * 7, // 7 days
-      path:     '/',
-    }
+    // ── Provision the Guide's Supabase Auth user (magic-link only) ──────────
+    const guideUserId = await getOrCreateAuthUser(email, 'guide')
 
-    const response = NextResponse.json({
+    const { error: linkError } = await supabaseAdmin
+      .from('archivists')
+      .update({ auth_user_id: guideUserId })
+      .eq('id', archivist.id)
+
+    if (linkError) throw new Error('Failed to link Guide account: ' + linkError.message)
+
+    return NextResponse.json({
       success:       true,
       archivistName: archivist.name,
       rank:          archivist.rank,
+      email,
     })
-    response.cookies.set('archivist-auth', archivist.id, cookieOptions)
-    response.cookies.set('archivist-id',   archivist.id, cookieOptions)
-    return response
   } catch (err) {
     return NextResponse.json({ error: sanitizedError(err, 'guide-onboard') }, { status: 500 })
   }

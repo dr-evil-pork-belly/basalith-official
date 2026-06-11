@@ -1,26 +1,12 @@
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { cookies } from 'next/headers'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { NextResponse } from 'next/server'
 
 export async function GET() {
   try {
-    const cookieStore = await cookies()
-    const currentArchiveId = cookieStore.get('archive-id')?.value ?? null
-
-    if (!currentArchiveId) {
+    const session = await getSessionUser()
+    if (!session?.userId) {
       return NextResponse.json({ archives: [], currentArchiveId: null })
-    }
-
-    // Resolve the email from the current archive
-    const { data: archiveRow } = await supabaseAdmin
-      .from('archives')
-      .select('email')
-      .eq('id', currentArchiveId)
-      .single()
-
-    const email = archiveRow?.email
-    if (!email) {
-      return NextResponse.json({ archives: [], currentArchiveId })
     }
 
     type ArchiveRow = {
@@ -41,12 +27,14 @@ export async function GET() {
       supabaseAdmin
         .from('archives')
         .select('id, name, preferred_language, current_streak, tier')
-        .eq('email', email),
+        .eq('owner_user_id', session.userId),
 
-      supabaseAdmin
-        .from('contributors')
-        .select('id, archive_id, archives!inner(id, name, preferred_language, current_streak, tier)')
-        .eq('email', email),
+      session.email
+        ? supabaseAdmin
+            .from('contributors')
+            .select('id, archive_id, archives!inner(id, name, preferred_language, current_streak, tier)')
+            .eq('email', session.email)
+        : Promise.resolve({ data: [] as ContributorRow[] }),
     ])
 
     const owned    = (ownedResult.data ?? []) as ArchiveRow[]
@@ -88,7 +76,7 @@ export async function GET() {
         }),
     ]
 
-    return NextResponse.json({ archives, currentArchiveId })
+    return NextResponse.json({ archives, currentArchiveId: session.archiveId ?? null })
   } catch (error: unknown) {
     console.error('[archive/my-archives] error:', error instanceof Error ? error.message : error)
     return NextResponse.json({ archives: [], currentArchiveId: null })

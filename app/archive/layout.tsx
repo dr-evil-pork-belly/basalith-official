@@ -127,7 +127,7 @@ export default function ArchiveLayout({ children }: { children: React.ReactNode 
             <div>
               <p style={{ ...MONO, fontSize: '0.44rem', color: M, marginBottom: '8px' }}>Confirm sign out?</p>
               <div style={{ display: 'flex', gap: '16px' }}>
-                <a href="/api/archive-signout" style={{ ...MONO, fontSize: '0.44rem', color: G, textDecoration: 'none' }}>Yes</a>
+                <a href="/api/auth/logout" style={{ ...MONO, fontSize: '0.44rem', color: G, textDecoration: 'none' }}>Yes</a>
                 <button onClick={() => setConfirmSignOut(false)} style={{ ...MONO, fontSize: '0.44rem', color: M, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>Cancel</button>
               </div>
             </div>
@@ -198,7 +198,7 @@ export default function ArchiveLayout({ children }: { children: React.ReactNode 
             <div style={{ height: '1px', background: 'rgba(196,162,74,0.06)', margin: '16px 24px' }} />
             {confirmSignOut ? (
               <div style={{ padding: '0 24px', display: 'flex', gap: '24px', alignItems: 'center', minHeight: '56px' }}>
-                <a href="/api/archive-signout" style={{ ...MONO, fontSize: '0.54rem', color: G, textDecoration: 'none' }}>Yes, sign out</a>
+                <a href="/api/auth/logout" style={{ ...MONO, fontSize: '0.54rem', color: G, textDecoration: 'none' }}>Yes, sign out</a>
                 <button onClick={() => setConfirmSignOut(false)} style={{ ...MONO, fontSize: '0.54rem', color: M, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>Cancel</button>
               </div>
             ) : (

@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { getSuccessorSession } from '@/lib/successorAuth'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 
 export async function POST(req: NextRequest) {
-  const session = getSuccessorSession(req)
-  if (!session) {
+  const session = await getSessionUser()
+  if (!session?.successorId || !session.archiveId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

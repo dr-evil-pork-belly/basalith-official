@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { createTrainingPairFromDeposit } from '@/lib/trainingPipeline'
 
 export const dynamic = 'force-dynamic'
 
 async function getArchiveId(): Promise<string | null> {
-  const cookieStore = await cookies()
-  return cookieStore.get('archive-id')?.value ?? null
+  const session = await getSessionUser()
+  return session?.archiveId ?? null
 }
 
 // GET — owner views all exchanges

@@ -2,31 +2,36 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase-browser'
 
 const MONO: React.CSSProperties = { fontFamily: "'Courier New', monospace" }
 const SERIF: React.CSSProperties = { fontFamily: 'Georgia, serif' }
 
 export default function SuccessorLoginPage() {
   const [email, setEmail]     = useState('')
-  const [password, setPassword] = useState('')
   const [error, setError]     = useState('')
   const [loading, setLoading] = useState(false)
+  const [sent, setSent]       = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
     setError('')
 
-    const res = await fetch('/api/succession/login', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ email, password }),
+    const supabase = createClient()
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        shouldCreateUser: false,
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
     })
 
-    if (res.ok) {
-      window.location.href = '/succession/portal'
+    if (error) {
+      setError('We could not send a sign-in link. Please check the email address and try again.')
+      setLoading(false)
     } else {
-      setError('Invalid credentials')
+      setSent(true)
       setLoading(false)
     }
   }
@@ -114,102 +119,87 @@ export default function SuccessorLoginPage() {
             lineHeight: 1.6,
           }}
         >
-          Enter your credentials to access the archive.
+          {sent ? 'A sign-in link is on its way to you.' : 'Enter your email to access the archive.'}
         </p>
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
-
-          {/* Email */}
-          <div>
-            <label
-              style={{
-                ...MONO,
-                fontSize:      '0.6rem',
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-                color:         '#5C6166',
-                display:       'block',
-                marginBottom:  '10px',
-              }}
-            >
-              Email
-            </label>
-            <input
-              type="email"
-              required
-              autoFocus
-              autoComplete="email"
-              placeholder="you@organization.com"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              style={{ ...inputStyle, caretColor: '#C4A24A' }}
-            />
-          </div>
-
-          {/* Password */}
-          <div>
-            <label
-              style={{
-                ...MONO,
-                fontSize:      '0.6rem',
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-                color:         '#5C6166',
-                display:       'block',
-                marginBottom:  '10px',
-              }}
-            >
-              Password
-            </label>
-            <input
-              type="password"
-              required
-              autoComplete="current-password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              style={{ ...inputStyle, caretColor: '#C4A24A' }}
-            />
-          </div>
-
-          {/* Error */}
-          {error && (
-            <p
-              style={{
-                ...MONO,
-                fontSize:      '0.65rem',
-                letterSpacing: '0.06em',
-                color:         'rgba(196,162,74,0.7)',
-                textAlign:     'center',
-                margin:        0,
-              }}
-            >
-              {error}
+        {sent ? (
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ ...SERIF, fontSize: '0.95rem', fontWeight: 300, color: '#F0EDE6', margin: '0 0 8px' }}>
+              Check your email
             </p>
-          )}
+            <p style={{ ...MONO, fontSize: '0.65rem', letterSpacing: '0.06em', color: '#5C6166', lineHeight: 1.7 }}>
+              We sent a sign-in link to {email}. Open it on this device to access the archive.
+            </p>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
 
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              ...MONO,
-              fontSize:        '0.65rem',
-              letterSpacing:   '3px',
-              textTransform:   'uppercase',
-              background:      loading ? 'rgba(196,162,74,0.15)' : '#C4A24A',
-              color:           loading ? '#C4A24A' : '#0A0908',
-              border:          '1px solid rgba(196,162,74,0.4)',
-              padding:         '14px 24px',
-              width:           '100%',
-              cursor:          loading ? 'not-allowed' : 'pointer',
-              marginTop:       '4px',
-              transition:      'background 0.2s, color 0.2s',
-            }}
-          >
-            {loading ? 'Verifying…' : 'Access Archive'}
-          </button>
-        </form>
+            {/* Email */}
+            <div>
+              <label
+                style={{
+                  ...MONO,
+                  fontSize:      '0.6rem',
+                  letterSpacing: '0.14em',
+                  textTransform: 'uppercase',
+                  color:         '#5C6166',
+                  display:       'block',
+                  marginBottom:  '10px',
+                }}
+              >
+                Email
+              </label>
+              <input
+                type="email"
+                required
+                autoFocus
+                autoComplete="email"
+                placeholder="you@organization.com"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                style={{ ...inputStyle, caretColor: '#C4A24A' }}
+              />
+            </div>
+
+            {/* Error */}
+            {error && (
+              <p
+                style={{
+                  ...MONO,
+                  fontSize:      '0.65rem',
+                  letterSpacing: '0.06em',
+                  color:         'rgba(196,162,74,0.7)',
+                  textAlign:     'center',
+                  margin:        0,
+                }}
+              >
+                {error}
+              </p>
+            )}
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                ...MONO,
+                fontSize:        '0.65rem',
+                letterSpacing:   '3px',
+                textTransform:   'uppercase',
+                background:      loading ? 'rgba(196,162,74,0.15)' : '#C4A24A',
+                color:           loading ? '#C4A24A' : '#0A0908',
+                border:          '1px solid rgba(196,162,74,0.4)',
+                padding:         '14px 24px',
+                width:           '100%',
+                cursor:          loading ? 'not-allowed' : 'pointer',
+                marginTop:       '4px',
+                transition:      'background 0.2s, color 0.2s',
+              }}
+            >
+              {loading ? 'Sending…' : 'Send Sign-In Link'}
+            </button>
+          </form>
+        )}
 
         {/* Footer note */}
         <p

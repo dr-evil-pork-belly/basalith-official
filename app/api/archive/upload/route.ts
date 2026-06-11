@@ -1,19 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { inngest } from '@/lib/inngest'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 
 export const dynamic = 'force-dynamic'
 
-// Mobile photo upload — accepts multipart/form-data with a 'file' field.
-// Auth: x-archive-id header (mobile) or archive-id cookie (portal).
+// Photo upload — accepts multipart/form-data with a 'file' field.
+// Auth: Supabase owner session (portal) or x-archive-id header (mobile).
+// The header path is a DEPRECATED mobile shim, not a Supabase session.
+// Kept for the existing iOS build until the Phase 7 OTP build ships,
+// then removed in Phase 8.
 
 export async function POST(req: NextRequest) {
   try {
-    const cookieStore = await cookies()
-    const archiveId   =
-      req.headers.get('x-archive-id') ||
-      cookieStore.get('archive-id')?.value
+    const session   = await getSessionUser()
+    const archiveId =
+      session?.archiveId ||
+      req.headers.get('x-archive-id')
 
     console.log('[upload] archiveId header:', req.headers.get('x-archive-id') || 'NOT RECEIVED', '| resolved:', archiveId?.substring(0, 8) ?? 'NONE')
     if (!archiveId) {

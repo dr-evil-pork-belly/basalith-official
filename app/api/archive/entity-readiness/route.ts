@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
 import { calculateEntityReadiness } from '@/lib/entityReadiness'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 
 // ── Invitation email ──────────────────────────────────────────────────────────
 
@@ -98,8 +98,8 @@ export async function GET(req: NextRequest) {
 // ── POST — change access level ────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
-  const cookieStore = await cookies()
-  const archiveId   = cookieStore.get('archive-id')?.value
+  const session   = await getSessionUser()
+  const archiveId = session?.archiveId
   if (!archiveId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await req.json()

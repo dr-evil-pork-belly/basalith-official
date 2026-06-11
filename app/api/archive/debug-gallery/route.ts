@@ -1,17 +1,16 @@
-import { cookies } from 'next/headers'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
-  const cookieStore = await cookies()
-  const archiveId   = cookieStore.get('archive-id')?.value
-  const archiveAuth = cookieStore.get('archive-auth')?.value
+  const session   = await getSessionUser()
+  const archiveId = session?.archiveId
 
   if (!archiveId) {
     return Response.json({
-      error:   'No archive-id cookie found',
-      cookies: { archiveId: null, archiveAuth: null },
+      error:   'No active session',
+      session: null,
     })
   }
 
@@ -42,7 +41,6 @@ export async function GET() {
 
   return Response.json({
     archiveId,
-    archiveAuth:   archiveAuth ? '[present]' : '[missing]',
     archiveName:   archive?.name   ?? null,
     archiveStatus: archive?.status ?? null,
     totalPhotos:   statusCounts?.length ?? 0,

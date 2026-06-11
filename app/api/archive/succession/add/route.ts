@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import bcrypt from 'bcryptjs'
 
 export async function POST(req: NextRequest) {
-  const archiveId = req.cookies.get('archive-id')?.value
+  const session   = await getSessionUser()
+  const archiveId = session?.archiveId
   if (!archiveId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   let body: { name?: string; email?: string; organization?: string; title?: string; password?: string }

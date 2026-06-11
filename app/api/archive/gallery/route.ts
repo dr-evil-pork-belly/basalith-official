@@ -1,7 +1,7 @@
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { NextRequest, NextResponse } from 'next/server'
 import { getInAppPhotoUrl } from '@/lib/photo-url'
-import { getArchiveSession } from '@/lib/apiSecurity'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 
 const PAGE_SIZE = 24
 
@@ -15,7 +15,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'archiveId required' }, { status: 400 })
   }
 
-  // Auth: portal session cookie OR mobile x-archive-id header
+  // Auth: Supabase owner session OR mobile x-archive-id header
+  // The mobile header path is a DEPRECATED shim, not a Supabase session.
+  // Kept for the existing iOS build until the Phase 7 OTP build ships,
+  // then removed in Phase 8.
   const mobileId = req.headers.get('x-archive-id')
   if (mobileId) {
     // Mobile path: validate archiveId matches the header
@@ -23,9 +26,9 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
   } else {
-    // Portal path: require full session
-    const session = await getArchiveSession()
-    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    // Portal path: require an owner session
+    const session = await getSessionUser()
+    if (!session?.archiveId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     if (archiveId !== session.archiveId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }

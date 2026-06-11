@@ -1,12 +1,10 @@
-import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 import VideosClient from './VideosClient'
 
 export default async function VideosPage() {
-  const cookieStore = await cookies()
-  const archiveId   = cookieStore.get('archive-id')?.value
+  const session = await getSessionUser()
+  if (!session?.archiveId) redirect('/archive-login')
 
-  if (!archiveId) redirect('/archive-login')
-
-  return <VideosClient archiveId={archiveId} />
+  return <VideosClient archiveId={session.archiveId} />
 }

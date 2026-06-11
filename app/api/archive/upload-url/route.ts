@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { getArchiveSession } from '@/lib/apiSecurity'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 
 export const dynamic = 'force-dynamic'
 
@@ -8,19 +8,16 @@ const ALLOWED_EXTENSIONS = new Set(['jpg', 'jpeg', 'png', 'webp', 'heic', 'heif'
 
 export async function POST(req: NextRequest) {
   // ── Auth ────────────────────────────────────────────────────────────────────
-  const session = await getArchiveSession()
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const session = await getSessionUser()
+  if (!session?.archiveId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const archiveId = session.archiveId
 
   try {
-    const { archiveId, fileName } = await req.json()
+    const { fileName } = await req.json()
 
-    if (!archiveId || !fileName) {
+    if (!fileName) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
-    }
-
-    // Ensure the session owns this archive
-    if (archiveId !== session.archiveId) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     // ── Sanitize file name and validate extension ──────────────────────────

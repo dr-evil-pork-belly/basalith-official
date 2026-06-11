@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 
 const ALLOWED_REACTIONS = new Set(['this_is_me', 'not_quite_right', 'heart'])
 
-// Record the owner's reaction to a mirror reflection. Cookie session verified.
+// Record the owner's reaction to a mirror reflection. Session verified.
 export async function POST(req: NextRequest) {
   try {
-    const cookieStore = await cookies()
-    const archiveId   = cookieStore.get('archive-id')?.value
+    const session   = await getSessionUser()
+    const archiveId = session?.archiveId
     if (!archiveId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }

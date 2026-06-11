@@ -2,23 +2,18 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
 import { buildTerminationEmail } from '@/lib/pauseEmails'
-import { getArchiveSession } from '@/lib/apiSecurity'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
-  const session = await getArchiveSession()
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const session = await getSessionUser()
+  if (!session?.archiveId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  let body: { confirm?: boolean; archiveId?: string }
+  const archiveId = session.archiveId
+
+  let body: { confirm?: boolean }
   try { body = await req.json() } catch { return NextResponse.json({ error: 'Invalid request' }, { status: 400 }) }
-
-  const archiveId = body.archiveId || session.archiveId
-
-  // Must come from the owner's own session
-  if (archiveId !== session.archiveId) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
 
   if (!body.confirm) {
     return NextResponse.json({ error: 'Explicit confirmation required' }, { status: 400 })

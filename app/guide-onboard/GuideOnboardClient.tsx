@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase-browser'
 
 const C = {
   void:    '#0A0908',
@@ -17,7 +17,6 @@ const BODY  = 'Georgia, serif'
 const MONO  = "'Courier New', 'Space Mono', monospace"
 
 export default function GuideOnboardClient() {
-  const router = useRouter()
   const [code,  setCode]  = useState('')
   const [name,  setName]  = useState('')
   const [email, setEmail] = useState('')
@@ -44,7 +43,24 @@ export default function GuideOnboardClient() {
         setLoading(false)
         return
       }
+
+      const supabase = createClient()
+      const { error: otpError } = await supabase.auth.signInWithOtp({
+        email: email.trim(),
+        options: {
+          shouldCreateUser: false,
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
+
+      if (otpError) {
+        setError('Your portal was created, but we could not send a sign-in link. Visit the Guide sign-in page to request one.')
+        setLoading(false)
+        return
+      }
+
       setDone(true)
+      setLoading(false)
     } catch {
       setError('Something went wrong. Please try again.')
       setLoading(false)
@@ -122,50 +138,14 @@ export default function GuideOnboardClient() {
 
             <div style={{ background: C.surface, border: `1px solid rgba(196,162,74,0.15)`, borderRadius: '2px', padding: '1.25rem 1.5rem' }}>
               <p style={{ fontFamily: MONO, fontSize: '0.55rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: C.gold, marginBottom: '0.75rem' }}>
-                Your First Step
+                Check Your Email
               </p>
               <p style={{ fontFamily: BODY, fontSize: '0.92rem', color: C.bone, lineHeight: 1.7 }}>
-                The fastest way to show a family what this is: run the live demo. Five
-                questions, answered out loud, become a short reflection in their own
-                words. Let&rsquo;s see it work.
+                We sent a sign-in link to {email}. Open it on this device to enter your
+                portal. From there you can run the live demo and bring families into
+                Basalith.
               </p>
             </div>
-
-            <button
-              onClick={() => router.push('/archivist/demo')}
-              style={{
-                fontFamily:    MONO,
-                fontSize:      '0.7rem',
-                fontWeight:    700,
-                letterSpacing: '0.18em',
-                textTransform: 'uppercase',
-                background:    C.gold,
-                color:         C.void,
-                border:        'none',
-                borderRadius:  '2px',
-                padding:       '0.95rem 1.5rem',
-                cursor:        'pointer',
-              }}
-            >
-              Launch the Demo →
-            </button>
-
-            <button
-              onClick={() => router.push('/archivist/dashboard')}
-              style={{
-                fontFamily:    MONO,
-                fontSize:      '0.6rem',
-                letterSpacing: '0.16em',
-                textTransform: 'uppercase',
-                background:    'transparent',
-                color:         C.dim,
-                border:        'none',
-                cursor:        'pointer',
-                padding:       '0.4rem',
-              }}
-            >
-              Go to my dashboard instead
-            </button>
           </div>
         )}
       </div>

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
-import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 import DashboardClient from './DashboardClient'
 
 export const metadata: Metadata = {
@@ -8,8 +8,7 @@ export const metadata: Metadata = {
 }
 
 export default async function ArchiveDashboardPage() {
-  const cookieStore = await cookies()
-  const archiveId = cookieStore.get('archive-id')?.value
-  if (!archiveId) redirect('/archive-login')
-  return <DashboardClient archiveId={archiveId} />
+  const session = await getSessionUser()
+  if (!session?.archiveId) redirect('/archive-login')
+  return <DashboardClient archiveId={session.archiveId} />
 }

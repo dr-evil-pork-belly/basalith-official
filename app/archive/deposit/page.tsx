@@ -1,10 +1,9 @@
-import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 import DepositClient from './DepositClient'
 
 export default async function DepositPage() {
-  const cookieStore = await cookies()
-  const archiveId   = cookieStore.get('archive-id')?.value
-  if (!archiveId) redirect('/archive-login')
-  return <DepositClient archiveId={archiveId} />
+  const session = await getSessionUser()
+  if (!session?.archiveId) redirect('/archive-login')
+  return <DepositClient archiveId={session.archiveId} />
 }

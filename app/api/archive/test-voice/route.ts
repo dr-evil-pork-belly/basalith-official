@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { ElevenLabsClient } from 'elevenlabs'
 
 export const dynamic    = 'force-dynamic'
@@ -17,16 +18,16 @@ export async function POST(req: NextRequest) {
     testText      = body.testText  ?? null
   } catch {}
 
-  const godAuth        = cookieStore.get('god-mode-auth')?.value
-  const expected       = process.env.GOD_MODE_PASSWORD || process.env.CRON_SECRET || ''
-  const isGodMode      = !!expected && godAuth === expected
-  const ownerArchiveId = cookieStore.get('archive-id')?.value ?? null
+  const godAuth   = cookieStore.get('god-mode-auth')?.value
+  const expected  = process.env.GOD_MODE_PASSWORD || process.env.CRON_SECRET || ''
+  const isGodMode = !!expected && godAuth === expected
+  const session   = await getSessionUser()
 
   let archiveId: string | null = null
   if (isGodMode && bodyArchiveId) {
     archiveId = bodyArchiveId
-  } else if (ownerArchiveId) {
-    archiveId = ownerArchiveId
+  } else if (session?.archiveId) {
+    archiveId = session.archiveId
   }
 
   if (!archiveId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

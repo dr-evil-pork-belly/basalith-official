@@ -1,13 +1,12 @@
 import type { Metadata } from 'next'
-import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 import DashboardClient from './DashboardClient'
 
 export const metadata: Metadata = { title: 'Legacy Guide Dashboard' }
 
 export default async function ArchivistDashboardPage() {
-  const cookieStore = await cookies()
-  const archivistId = cookieStore.get('archivist-id')?.value
-  if (!archivistId) redirect('/archivist-login')
-  return <DashboardClient archivistId={archivistId} />
+  const session = await getSessionUser()
+  if (!session?.archivistId) redirect('/archivist-login')
+  return <DashboardClient archivistId={session.archivistId} />
 }

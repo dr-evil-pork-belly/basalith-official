@@ -150,7 +150,7 @@ export default function SettingsClient({ archivistId }: { archivistId: string })
       {/* Danger zone */}
       <Section title="Sign Out">
         <a
-          href="/api/archivist-signout"
+          href="/api/auth/logout"
           style={{ display: 'inline-block', fontFamily: 'Courier New, monospace', fontSize: '0.62rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: C.dim, border: `1px solid ${C.border}`, padding: '10px 20px', textDecoration: 'none' }}
         >
           Sign Out of Guide Portal

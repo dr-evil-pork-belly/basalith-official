@@ -4,6 +4,10 @@ import bcrypt from 'bcryptjs'
 
 // Mobile login — email + password, looks up archive by owner_email then checks
 // archive_credentials for that specific archive. No credential scanning.
+//
+// DEPRECATED — this is a mobile shim, not a Supabase session. Kept for the
+// existing iOS build until the Phase 7 OTP build ships, then removed in
+// Phase 8.
 
 export async function POST(req: NextRequest) {
   const { email, password } = await req.json()

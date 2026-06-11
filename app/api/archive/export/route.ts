@@ -1,17 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 import JSZip from 'jszip'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60 // seconds — export can take time for large archives
 
 export async function GET(req: NextRequest) {
-  // Auth: cookie (portal) OR x-archive-id header (mobile)
-  const cookieStore   = await cookies()
-  const cookieId      = cookieStore.get('archive-id')?.value
+  // Auth: Supabase owner session (portal) OR x-archive-id header (mobile)
+  // The header path is a DEPRECATED mobile shim, not a Supabase session.
+  // Kept for the existing iOS build until the Phase 7 OTP build ships,
+  // then removed in Phase 8.
+  const session       = await getSessionUser()
   const headerId      = req.headers.get('x-archive-id')
-  const archiveId     = cookieId || headerId
+  const archiveId     = session?.archiveId || headerId
 
   if (!archiveId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

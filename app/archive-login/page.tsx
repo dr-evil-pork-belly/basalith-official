@@ -2,25 +2,33 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase-browser'
 
 export default function ArchiveLoginPage() {
-  const [password, setPassword]   = useState('')
-  const [error, setError]         = useState('')
-  const [loading, setLoading]     = useState(false)
+  const [email, setEmail]     = useState('')
+  const [error, setError]     = useState('')
+  const [loading, setLoading] = useState(false)
+  const [sent, setSent]       = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
     setError('')
-    const res = await fetch('/api/archive-login', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ password }),
+
+    const supabase = createClient()
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        shouldCreateUser: false,
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
     })
-    if (res.ok) {
-      window.location.href = '/archive/dashboard'
+
+    if (error) {
+      setError('We could not send a sign-in link. Please check the email address and try again.')
+      setLoading(false)
     } else {
-      setError('Access denied.')
+      setSent(true)
       setLoading(false)
     }
   }
@@ -52,43 +60,55 @@ export default function ArchiveLoginPage() {
         {/* Eyebrow */}
         <p className="eyebrow text-center mb-12" style={{ letterSpacing: '0.2em' }}>Archive Portal</p>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-          <div>
-            <label className="font-sans text-[0.62rem] font-bold tracking-[0.14em] uppercase block mb-3" style={{ color: '#5C6166' }}>
-              Access Key
-            </label>
-            <input
-              type="password"
-              required
-              autoFocus
-              placeholder="Enter your archive key"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              className="w-full bg-transparent font-serif text-[1.1rem] font-light placeholder:text-[#3A3F44] focus:outline-none pb-3 transition-colors duration-200"
-              style={{
-                color:        '#F0F0EE',
-                borderBottom: '1px solid rgba(255,255,255,0.12)',
-              }}
-            />
-          </div>
-
-          {error && (
-            <p className="font-sans text-[0.72rem] tracking-[0.06em] text-center" style={{ color: 'rgba(196,162,74,0.7)' }}>
-              {error}
+        {sent ? (
+          <div className="flex flex-col items-center gap-4 text-center">
+            <p className="font-serif text-[1.1rem] font-light" style={{ color: '#F0F0EE' }}>
+              Check your email
             </p>
-          )}
+            <p className="font-sans text-[0.78rem] leading-relaxed" style={{ color: '#5C6166' }}>
+              We sent a sign-in link to {email}. Open it on this device to access your archive.
+            </p>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+            <div>
+              <label className="font-sans text-[0.62rem] font-bold tracking-[0.14em] uppercase block mb-3" style={{ color: '#5C6166' }}>
+                Email
+              </label>
+              <input
+                type="email"
+                required
+                autoFocus
+                autoComplete="email"
+                placeholder="you@email.com"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                className="w-full bg-transparent font-serif text-[1.1rem] font-light placeholder:text-[#3A3F44] focus:outline-none pb-3 transition-colors duration-200"
+                style={{
+                  color:        '#F0F0EE',
+                  borderBottom: '1px solid rgba(255,255,255,0.12)',
+                }}
+              />
+            </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="btn-monolith-amber w-full text-center mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? 'Verifying…' : 'Access Archive'}
-          </button>
-        </form>
+            {error && (
+              <p className="font-sans text-[0.72rem] tracking-[0.06em] text-center" style={{ color: 'rgba(196,162,74,0.7)' }}>
+                {error}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-monolith-amber w-full text-center mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? 'Sending…' : 'Send Sign-In Link'}
+            </button>
+          </form>
+        )}
 
         <p className="font-sans text-[0.62rem] tracking-[0.1em] uppercase text-center mt-10" style={{ color: '#3A3F44' }}>
-          Authorized Legacy Guides only
+          Authorized archive owners only
         </p>
       </div>
     </main>

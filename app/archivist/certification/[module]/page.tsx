@@ -1,5 +1,5 @@
-import { cookies } from 'next/headers'
 import { redirect, notFound } from 'next/navigation'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { getCertModule } from '@/lib/certificationContent'
 import ModuleClient from './ModuleClient'
 
@@ -15,9 +15,9 @@ export async function generateMetadata({ params }: { params: Promise<{ module: s
 
 export default async function ModulePage({ params }: { params: Promise<{ module: string }> }) {
   const { module: moduleParam } = await params
-  const cookieStore = await cookies()
-  const archivistId = cookieStore.get('archivist-id')?.value
-  if (!archivistId) redirect('/archivist-login')
+  const session = await getSessionUser()
+  if (!session?.archivistId) redirect('/archivist-login')
+  const archivistId = session.archivistId
 
   const moduleNumber = parseInt(moduleParam, 10)
   const mod          = getCertModule(moduleNumber)

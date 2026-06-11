@@ -3,6 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { NextResponse } from 'next/server'
 import { resend } from '@/lib/resend'
 import { createTrainingPairFromDeposit } from '@/lib/trainingPipeline'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 
 const anthropic = new Anthropic()
 
@@ -333,10 +334,11 @@ export async function POST(req: Request) {
     }
 
     // ── Step 1: Resolve caller identity ───────────────────────────────────────
-    // Priority: owner cookie → x-archive-id header → body.archiveId (mobile fallback) → contributor bearer token
-    const { cookies } = await import('next/headers')
-    const cookieStore      = await cookies()
-    const sessionArchiveId = cookieStore.get('archive-id')?.value
+    // Priority: owner session → x-archive-id header → body.archiveId (mobile fallback) → contributor bearer token
+    // The x-archive-id / body.archiveId mobile paths are a DEPRECATED shim,
+    // not Supabase sessions. Kept for the existing iOS build until the
+    // Phase 7 OTP build ships, then removed in Phase 8.
+    const session = await getSessionUser()
 
     const nextReq          = req as import('next/server').NextRequest
     const headerArchiveId  = nextReq.headers.get('x-archive-id')
@@ -344,14 +346,14 @@ export async function POST(req: Request) {
     const contributorToken = authHeader?.replace('Bearer ', '') || body.contributorToken
     const bodyArchiveId    = typeof requestedArchiveId === 'string' && requestedArchiveId ? requestedArchiveId : null
 
-    console.log('[entity-chat] auth sources — cookie:', !!sessionArchiveId,
+    console.log('[entity-chat] auth sources — session:', !!session?.archiveId,
       '| header:', !!headerArchiveId, '| body:', !!bodyArchiveId)
 
     let authorizedArchiveId: string | null = null
     let callerType: 'owner' | 'contributor' | null = null
 
-    if (sessionArchiveId) {
-      authorizedArchiveId = sessionArchiveId
+    if (session?.archiveId) {
+      authorizedArchiveId = session.archiveId
       callerType          = 'owner'
     } else if (headerArchiveId || bodyArchiveId) {
       // Mobile owner: validate the archiveId from header or body against DB

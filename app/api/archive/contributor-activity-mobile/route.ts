@@ -3,6 +3,9 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 
 export const dynamic = 'force-dynamic'
 
+// DEPRECATED mobile shim — auth via x-archive-id header / archiveId query
+// param, not Supabase sessions. Kept for the existing iOS build until the
+// Phase 7 OTP build ships, then removed in Phase 8.
 export async function GET(req: NextRequest) {
   const archiveId =
     req.headers.get('x-archive-id') ||

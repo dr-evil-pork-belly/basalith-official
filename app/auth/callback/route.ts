@@ -2,11 +2,11 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
-  const next = searchParams.get('next') ?? '/dashboard'
 
   if (code) {
     const cookieStore = await cookies()
@@ -29,9 +29,18 @@ export async function GET(request: NextRequest) {
 
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`)
+      const session = await getSessionUser()
+
+      // owner+guide resolves to role 'owner' already (set during the
+      // Phase 3 backfill with owner > guide > successor precedence), so
+      // that combination lands on /archive/dashboard by default here.
+      if (session?.role === 'owner')     return NextResponse.redirect(`${origin}/archive/dashboard`)
+      if (session?.role === 'guide')     return NextResponse.redirect(`${origin}/archivist/dashboard`)
+      if (session?.role === 'successor') return NextResponse.redirect(`${origin}/succession/portal`)
+
+      return NextResponse.redirect(`${origin}/archive-login?error=no_role`)
     }
   }
 
-  return NextResponse.redirect(`${origin}/login?error=auth_failed`)
+  return NextResponse.redirect(`${origin}/archive-login?error=auth_failed`)
 }
