@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { NextRequest, NextResponse } from 'next/server'
+import { classifyDeposit } from '@/lib/classifyDeposit'
 
 export const maxDuration = 120
 
@@ -166,6 +167,7 @@ Return ONLY valid JSON with no markdown fences:
       if (deposit) {
         depositId = deposit.id
         await supabaseAdmin.from('archive_videos').update({ deposit_id: depositId }).eq('id', video.id)
+        void classifyDeposit({ depositId: deposit.id, archiveId, text: transcript })
       }
     }
 

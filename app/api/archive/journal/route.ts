@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { createTrainingPairFromDeposit } from '@/lib/trainingPipeline'
+import { classifyDeposit } from '@/lib/classifyDeposit'
 
 export const dynamic = 'force-dynamic'
 
@@ -92,6 +93,8 @@ export async function POST(req: NextRequest) {
       }).select('id, archive_id, prompt, response, source_type').single()
 
       if (deposit) {
+        void classifyDeposit({ depositId: deposit.id, archiveId, text: content.trim() })
+
         const { data: arch } = await supabaseAdmin
           .from('archives')
           .select('owner_name, name, preferred_language')

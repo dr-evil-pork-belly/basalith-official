@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import { parseStringPromise } from 'xml2js'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { createTrainingPairFromDeposit } from '@/lib/trainingPipeline'
+import { classifyDeposit } from '@/lib/classifyDeposit'
 import { verifyWeChatSignature, buildTextReply, xmlResponse } from '@/lib/wechat'
 
 export const dynamic = 'force-dynamic'
@@ -158,6 +159,8 @@ async function saveWeChatDeposit(
       .single()
 
     if (!deposit?.id) return
+
+    void classifyDeposit({ depositId: deposit.id, archiveId, text: response })
 
     void (async () => {
       try {

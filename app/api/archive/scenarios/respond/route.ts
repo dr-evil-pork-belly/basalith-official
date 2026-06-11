@@ -3,6 +3,7 @@ import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { B2B_SCENARIOS } from '@/lib/b2bScenarios'
 import { createTrainingPairFromDeposit } from '@/lib/trainingPipeline'
+import { classifyDeposit } from '@/lib/classifyDeposit'
 
 export async function POST(req: NextRequest) {
   const session   = await getSessionUser()
@@ -45,6 +46,8 @@ export async function POST(req: NextRequest) {
 
   if (depositErr) {
     console.warn('[scenarios/respond] owner_deposits insert failed:', depositErr.message)
+  } else if (deposit) {
+    void classifyDeposit({ depositId: deposit.id, archiveId, text: trimmed })
   }
 
   // Training pair — fire and forget

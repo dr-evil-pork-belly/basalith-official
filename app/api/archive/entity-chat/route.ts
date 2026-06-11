@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server'
 import { resend } from '@/lib/resend'
 import { createTrainingPairFromDeposit } from '@/lib/trainingPipeline'
 import { getSessionUser } from '@/lib/auth/getSessionUser'
+import { classifyDeposit } from '@/lib/classifyDeposit'
 
 const anthropic = new Anthropic()
 
@@ -454,6 +455,8 @@ export async function POST(req: Request) {
             console.warn('[entity-chat] deposit save failed:', depErr.message)
             return
           }
+
+          if (dep?.id) void classifyDeposit({ depositId: dep.id, archiveId, text: message })
 
           const { data: arch } = await supabaseAdmin
             .from('archives')

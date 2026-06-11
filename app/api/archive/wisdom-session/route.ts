@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { WISDOM_SESSIONS } from '@/lib/wisdomSessions'
 import { DIMENSIONS, calculateDimensionScore } from '@/lib/entityAccuracy'
 import { createTrainingPairFromDeposit } from '@/lib/trainingPipeline'
+import { classifyDeposit } from '@/lib/classifyDeposit'
 
 // ── GET — recommended + in-progress session ────────────────────────────────
 export async function GET(req: Request) {
@@ -141,8 +142,9 @@ export async function PATCH(req: Request) {
         response:       answer.trim(),
         source_type:    'wisdom',
         essence_status: 'pending',
-      }).then(({ error }) => {
+      }).select('id').single().then(({ data: dep, error }) => {
         if (error) console.warn('wisdom deposit skipped:', error.message)
+        else if (dep) void classifyDeposit({ depositId: dep.id, archiveId: session.archive_id, text: answer.trim() })
       })
 
       // Training pair from wisdom answer (fire-and-forget)

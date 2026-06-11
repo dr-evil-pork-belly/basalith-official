@@ -1,6 +1,7 @@
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { NextRequest, NextResponse } from 'next/server'
 import { createTrainingPairsFromVoice } from '@/lib/trainingPipeline'
+import { classifyDeposit } from '@/lib/classifyDeposit'
 
 export const maxDuration = 60
 
@@ -129,6 +130,7 @@ export async function POST(req: NextRequest) {
           .from('voice_recordings')
           .update({ deposit_id: depositId })
           .eq('id', recording.id)
+        void classifyDeposit({ depositId: deposit.id, archiveId, text: transcript })
       }
     }
 

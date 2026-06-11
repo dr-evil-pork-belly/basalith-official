@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
 import { createTrainingPairFromDeposit } from '@/lib/trainingPipeline'
+import { classifyDeposit } from '@/lib/classifyDeposit'
 import { triggerMemoryChain } from '@/lib/memoryChain'
 
 export const dynamic = 'force-dynamic'
@@ -257,6 +258,11 @@ export async function POST(req: NextRequest) {
         .single()
       if (depositError) console.error('[inbound] deposit save failed:', depositError.message)
       else console.log('[inbound] owner_deposits saved — id:', deposit?.id?.substring(0, 8))
+
+      // Domain classification — owner deposits only, fire-and-forget
+      if (deposit && !contributorId) {
+        void classifyDeposit({ depositId: deposit.id, archiveId, text: replyText })
+      }
 
       // Training pair
       if (deposit && archive) {

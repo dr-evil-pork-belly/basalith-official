@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { dailySparks } from '@/lib/dailySparks'
+import { classifyDeposit } from '@/lib/classifyDeposit'
 
 export const dynamic = 'force-dynamic'
 
@@ -67,12 +68,18 @@ export async function POST(req: NextRequest) {
 
   const question = getWeeklyQuestion()
 
-  await supabaseAdmin.from('owner_deposits').insert({
-    archive_id:  archiveId,
-    prompt:      question.text,
-    response:    response.trim(),
-    source_type: 'memory_game',
-  })
+  const { data: deposit } = await supabaseAdmin
+    .from('owner_deposits')
+    .insert({
+      archive_id:  archiveId,
+      prompt:      question.text,
+      response:    response.trim(),
+      source_type: 'memory_game',
+    })
+    .select('id')
+    .single()
+
+  if (deposit) void classifyDeposit({ depositId: deposit.id, archiveId, text: response.trim() })
 
   return NextResponse.json({ success: true })
 }

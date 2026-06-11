@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { createTrainingPairFromDeposit } from '@/lib/trainingPipeline'
+import { classifyDeposit } from '@/lib/classifyDeposit'
 import { getSessionUser } from '@/lib/auth/getSessionUser'
 
 export const dynamic = 'force-dynamic'
@@ -44,6 +45,8 @@ export async function POST(req: NextRequest) {
   if (error || !deposit) {
     return NextResponse.json({ error: error?.message ?? 'Insert failed' }, { status: 500 })
   }
+
+  void classifyDeposit({ depositId: deposit.id, archiveId, text: thought })
 
   if (archive) {
     createTrainingPairFromDeposit(

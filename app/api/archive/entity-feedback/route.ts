@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { classifyDeposit } from '@/lib/classifyDeposit'
 import { NextResponse } from 'next/server'
 
 export async function POST(req: Request) {
@@ -17,13 +18,14 @@ export async function POST(req: Request) {
 
     // If a correction was provided, save it as an owner deposit so it enriches the entity
     if (correction?.trim()) {
-      await supabaseAdmin.from('owner_deposits').insert({
+      const { data: dep } = await supabaseAdmin.from('owner_deposits').insert({
         archive_id:     archiveId,
         prompt:         'Accuracy correction',
         response:       correction.trim(),
         source_type:    'entity_chat',
         essence_status: 'pending',
-      })
+      }).select('id').single()
+      if (dep) void classifyDeposit({ depositId: dep.id, archiveId, text: correction.trim() })
     }
 
     // Update entity_accuracy — increment deposit count, nudge score toward accuracy

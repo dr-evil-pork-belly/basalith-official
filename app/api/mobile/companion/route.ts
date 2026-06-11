@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { createTrainingPairFromDeposit } from '@/lib/trainingPipeline'
+import { classifyDeposit } from '@/lib/classifyDeposit'
 import { NextResponse } from 'next/server'
 
 const anthropic = new Anthropic()
@@ -138,6 +139,9 @@ You can save meaningful things the user shares to their archive using the save_d
         toolResultIsError = true
       } else {
         savedDepositId = deposit.id as string
+
+        // Domain classification — fire-and-forget
+        void classifyDeposit({ depositId: savedDepositId, archiveId, text: content })
 
         // Training pair — awaited so it runs before the function returns, but
         // non-fatal: a failure here must not undo the save or block confirmation.

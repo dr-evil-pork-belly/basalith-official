@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { createTrainingPairFromDeposit } from '@/lib/trainingPipeline'
+import { classifyDeposit } from '@/lib/classifyDeposit'
 import { getSessionUser } from '@/lib/auth/getSessionUser'
 
 export async function POST(req: NextRequest) {
@@ -84,6 +85,9 @@ export async function POST(req: NextRequest) {
         }
       })()
     }
+
+    // Domain classification — fire-and-forget
+    void classifyDeposit({ depositId: deposit.id, archiveId, text: response.trim() })
 
     return NextResponse.json({ success: true, depositId: deposit.id })
 

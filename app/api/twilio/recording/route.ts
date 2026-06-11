@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { createTrainingPairsFromVoice } from '@/lib/trainingPipeline'
+import { classifyDeposit } from '@/lib/classifyDeposit'
 
 export const dynamic    = 'force-dynamic'
 export const maxDuration = 60
@@ -219,6 +220,8 @@ export async function POST(req: NextRequest) {
         console.log('[twilio/recording] deposit saved:', deposit?.id)
         if (depositError) {
           console.error('[twilio/recording] DEPOSIT FAILED:', depositError.message, depositError.details, depositError.hint)
+        } else if (deposit?.id) {
+          void classifyDeposit({ depositId: deposit.id, archiveId, text: depositText })
         }
       } else {
         console.log('[twilio/recording] saving contributor deposit — archiveId:', archiveId)

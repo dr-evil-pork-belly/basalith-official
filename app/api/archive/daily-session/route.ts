@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { getTodaysSpark } from '@/lib/dailySparks'
 import { createTrainingPairFromDeposit } from '@/lib/trainingPipeline'
+import { classifyDeposit } from '@/lib/classifyDeposit'
 
 export const dynamic = 'force-dynamic'
 
@@ -226,12 +227,13 @@ export async function POST(req: NextRequest) {
     let depositsAdded = 0
 
     if (stepType === 'question') {
-      await supabaseAdmin.from('owner_deposits').insert({
+      const { data: dep } = await supabaseAdmin.from('owner_deposits').insert({
         archive_id:  archiveId,
         prompt:      sparkText ?? 'Daily question',
         response:    text,
         source_type: 'spark',
-      })
+      }).select('id').single()
+      if (dep) void classifyDeposit({ depositId: dep.id, archiveId, text })
       await supabaseAdmin.from('daily_spark_responses').insert({
         archive_id:    archiveId,
         contributor_id: null,
@@ -253,31 +255,34 @@ export async function POST(req: NextRequest) {
         is_primary_label:    true,
         essence_feed_status: 'pending',
       }).then(({ error }) => { if (error) console.warn('[daily-session] label:', error.message) })
-      await supabaseAdmin.from('owner_deposits').insert({
+      const { data: photoDep } = await supabaseAdmin.from('owner_deposits').insert({
         archive_id:    archiveId,
         photograph_id: photoId,
         prompt:        'What do you remember about this moment?',
         response:      text,
         source_type:   'photograph_label',
-      })
+      }).select('id').single()
+      if (photoDep) void classifyDeposit({ depositId: photoDep.id, archiveId, text })
       depositsAdded = 1
 
     } else if (stepType === 'free_capture') {
-      await supabaseAdmin.from('owner_deposits').insert({
+      const { data: freeDep } = await supabaseAdmin.from('owner_deposits').insert({
         archive_id:  archiveId,
         prompt:      'What is on your mind today?',
         response:    text,
         source_type: 'free_capture',
-      })
+      }).select('id').single()
+      if (freeDep) void classifyDeposit({ depositId: freeDep.id, archiveId, text })
       depositsAdded = 1
 
     } else if (stepType === 'contributor_ping') {
-      await supabaseAdmin.from('owner_deposits').insert({
+      const { data: pingDep } = await supabaseAdmin.from('owner_deposits').insert({
         archive_id:  archiveId,
         prompt:      'Reaction to family contribution',
         response:    text,
         source_type: 'contributor_ping',
-      })
+      }).select('id').single()
+      if (pingDep) void classifyDeposit({ depositId: pingDep.id, archiveId, text })
       depositsAdded = 1
 
     } else if (stepType === 'journal') {
@@ -293,6 +298,7 @@ export async function POST(req: NextRequest) {
         source_type: 'journal',
       }).select('id, archive_id, prompt, response, source_type').single()
       if (dep) {
+        void classifyDeposit({ depositId: dep.id, archiveId, text })
         const { data: arch } = await supabaseAdmin
           .from('archives').select('owner_name, name, preferred_language').eq('id', archiveId).single()
         if (arch) {

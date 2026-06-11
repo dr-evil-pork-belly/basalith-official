@@ -54,6 +54,8 @@ export async function POST(req: NextRequest) {
     // Save as owner_deposit so entity learns from it. This is our
     // permanent record of the contribution — must never be silently
     // dropped once the question has been claimed.
+    // Deliberately not classified via classifyDeposit: contributor-sourced
+    // deposits must not feed the owner's coverage map.
     const { error: depositError } = await supabaseAdmin.from('owner_deposits').insert({
       archive_id:        archiveId,
       prompt:            question.question_text,

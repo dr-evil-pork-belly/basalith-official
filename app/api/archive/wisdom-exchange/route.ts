@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { createTrainingPairFromDeposit } from '@/lib/trainingPipeline'
+import { classifyDeposit } from '@/lib/classifyDeposit'
 
 export const dynamic = 'force-dynamic'
 
@@ -59,7 +60,10 @@ export async function POST(req: NextRequest) {
         const { data: dep } = await supabaseAdmin.from('owner_deposits').insert({
           archive_id: archiveId, prompt: exchange.question, response: exchange.entity_response, source_type: 'entity_chat',
         }).select('id, archive_id, prompt, response, source_type').single()
-        if (dep) createTrainingPairFromDeposit(dep, arch.owner_name ?? '', arch.name, arch.preferred_language ?? 'en', 'entity_chat').catch(() => {})
+        if (dep) {
+          void classifyDeposit({ depositId: dep.id, archiveId, text: dep.response })
+          createTrainingPairFromDeposit(dep, arch.owner_name ?? '', arch.name, arch.preferred_language ?? 'en', 'entity_chat').catch(() => {})
+        }
       }
     }
     return NextResponse.json({ success: true })
@@ -79,7 +83,10 @@ export async function POST(req: NextRequest) {
       const { data: dep } = await supabaseAdmin.from('owner_deposits').insert({
         archive_id: archiveId, prompt: exchange.question, response: correction.trim(), source_type: 'entity_chat',
       }).select('id, archive_id, prompt, response, source_type').single()
-      if (dep) createTrainingPairFromDeposit(dep, arch.owner_name ?? '', arch.name, arch.preferred_language ?? 'en', 'entity_chat').catch(() => {})
+      if (dep) {
+        void classifyDeposit({ depositId: dep.id, archiveId, text: dep.response })
+        createTrainingPairFromDeposit(dep, arch.owner_name ?? '', arch.name, arch.preferred_language ?? 'en', 'entity_chat').catch(() => {})
+      }
     }
     return NextResponse.json({ success: true })
   }
