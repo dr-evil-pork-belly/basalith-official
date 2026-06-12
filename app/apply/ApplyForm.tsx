@@ -53,6 +53,7 @@ export default function ApplyForm({ initialType = 'legacy' }: { initialType?: st
     subject:           '',
     reason:            '',
     referralSource:    '',
+    company_website:   '',
   })
   const [submitting, setSubmitting] = useState(false)
   const [submitted,  setSubmitted]  = useState(false)
@@ -220,6 +221,17 @@ export default function ApplyForm({ initialType = 'legacy' }: { initialType?: st
                     <option>Other</option>
                   </select>
                 </div>
+
+                <input
+                  type="text"
+                  name="company_website"
+                  value={form.company_website}
+                  onChange={set('company_website')}
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  style={{ position: 'absolute', left: '-9999px', opacity: 0, height: 0, width: 0, pointerEvents: 'none' }}
+                />
 
                 {error && <p style={{ ...SERIF, fontSize: '0.9rem', fontStyle: 'italic', color: 'var(--color-text-muted)' }}>{error}</p>}
 

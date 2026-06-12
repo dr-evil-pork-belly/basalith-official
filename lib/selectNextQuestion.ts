@@ -80,7 +80,7 @@ export interface Deps {
   getB2BQuestions:        (domainIds: number[]) => Promise<B2BQuestion[]>
   getAnchorDeposit:       (archiveId: string, domainId: number) => Promise<AnchorDeposit | null>
   getReflectionAnchorDeposit: (archiveId: string, reflection: MirrorReflectionRow) => Promise<AnchorDeposit | null>
-  generateFramingSentence: (anchor: AnchorDeposit) => Promise<string | null>
+  generateFramingSentence: (anchor: AnchorDeposit, questionText: string, domainEmotionalWeight: number) => Promise<string | null>
   generateP0Question:     (reflection: MirrorReflectionRow, anchor: AnchorDeposit | null) => Promise<{ questionText: string; framingUsed: string | null }>
   insertQuestionHistory:  (row: {
     archiveId:     string
@@ -301,6 +301,48 @@ export function validateFraming(text: string | null | undefined): boolean {
   return true
 }
 
+// Grounded framing for the P2/P3 daily question (defaultGenerateFramingSentence).
+// Stricter than validateFraming above, which also covers the P0 repair bridge
+// (defaultGenerateP0Question), whose system prompt intentionally permits
+// "I notice" / tentative phrasing that this contract forbids.
+export type FramingRejectionReason =
+  | 'empty'
+  | 'em_dash'
+  | 'too_long'
+  | 'generic_praise'
+  | 'exclamation'
+  | 'question_mark'
+  | 'too_many_words'
+  | 'i_notice'
+  | 'multiple_sentences'
+
+export function validateGroundedFramingReason(text: string | null | undefined): FramingRejectionReason | null {
+  if (!text) return 'empty'
+  const trimmed = text.trim()
+  if (!trimmed) return 'empty'
+  if (trimmed.includes('—')) return 'em_dash'
+  if (trimmed.length > 400) return 'too_long'
+  if (GENERIC_PRAISE.test(trimmed)) return 'generic_praise'
+  if (trimmed.includes('!')) return 'exclamation'
+  if (trimmed.includes('?')) return 'question_mark'
+
+  const wordCount = trimmed.split(/\s+/).filter(Boolean).length
+  if (wordCount > 45) return 'too_many_words'
+
+  if (/\bi notice\b/i.test(trimmed)) return 'i_notice'
+
+  // Allow exactly one trailing terminator (period plus optional closing
+  // quote/paren). Anything else with a '.' left over is a second sentence.
+  const withoutTrailing = trimmed.replace(/[.!?]+["'’”)]*$/, '')
+  if (withoutTrailing.includes('.')) return 'multiple_sentences'
+
+  return null
+}
+
+export function validateGroundedFraming(text: string | null | undefined): boolean {
+  return validateGroundedFramingReason(text) === null
+}
+
 // ── Main selection ──────────────────────────────────────────────────────────
 
 export async function selectNextQuestion(
@@ -369,8 +411,8 @@ export async function selectNextQuestion(
   if (b !== 'p1') {
     const anchor = await deps.getAnchorDeposit(archiveId, domain.domainId)
     if (anchor) {
-      const sentence = await deps.generateFramingSentence(anchor)
-      if (validateFraming(sentence)) framingUsed = sentence!.trim()
+      const sentence = await deps.generateFramingSentence(anchor, questionText, domain.emotionalWeight)
+      if (validateGroundedFraming(sentence)) framingUsed = sentence!.trim()
     }
   }
 
@@ -392,22 +434,33 @@ export async function selectNextQuestion(
 
 const anthropic = new Anthropic()
 
-const FRAMING_SYSTEM_PROMPT = `You are the cognitive reference model of a person, writing one short bridge sentence that will appear immediately before a question you are about to ask them.
+const FRAMING_SYSTEM_PROMPT = `You are the cognitive reference model of a person. In a moment they will be asked a new question. Your job is to write ONE short bridge sentence that connects something real they shared before to the topic of the question ahead.
 
-Rules:
-- Anchor the sentence in the specific thing they actually said below. Closely paraphrase it. Never invent details.
-- Be tentative and humble. Say something like "I have been thinking about" or "I notice" or "It seems" rather than declaring a conclusion.
-- Never use generic praise (thoughtful, wise, special, insightful, remarkable, amazing, wonderful, inspiring, brilliant).
-- No em dashes. American English. No exclamation points.
-- One sentence only. No preamble, no quotation marks, no labels. If you cannot ground the sentence in what they said, respond with exactly: NONE`
+CONTRACT: the bridge is one declarative sentence, maximum 30 words. It is not a question, not a reflection, and not an observation about how the person feels.
 
-async function defaultGenerateFramingSentence(anchor: AnchorDeposit): Promise<string | null> {
+RULES:
+1. Never ask a question. The question ahead is the only question. Do not echo it, hint at it, or add a question of your own.
+2. Do not open with or use "I notice". Vary your openings. Prefer plain references such as "You once mentioned..." or "A while back you described...".
+3. Do not attribute feelings or mental states ("you're sitting with", "carrying", "the tension you feel"). State what they SAID, not what they feel.
+4. What they shared must connect naturally to the topic of the question ahead. If the only thing available is from a much heavier emotional register than the question ahead, or otherwise does not connect, respond with exactly: NONE
+5. Closely paraphrase the thing they shared. Never invent specifics. No em dashes. American English. No exclamation points, no question marks.
+
+One sentence only. No preamble, no quotation marks, no labels. If you cannot meet all of the above, respond with exactly: NONE`
+
+async function defaultGenerateFramingSentence(
+  anchor: AnchorDeposit,
+  questionText: string,
+  domainEmotionalWeight: number,
+): Promise<string | null> {
   try {
     const response = await anthropic.messages.create({
       model:      'claude-sonnet-4-6',
-      max_tokens: 120,
+      max_tokens: 100,
       system:     FRAMING_SYSTEM_PROMPT,
-      messages:   [{ role: 'user', content: `They shared: ${anchor.response}` }],
+      messages:   [{
+        role: 'user',
+        content: `They shared: ${anchor.response}\n\nThe question ahead (domain emotional weight ${domainEmotionalWeight} of 3, where 1 is light/everyday and 3 is heavy/significant): ${questionText}`,
+      }],
     })
 
     const text = response.content[0]?.type === 'text' ? response.content[0].text.trim() : ''

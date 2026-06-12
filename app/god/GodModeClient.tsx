@@ -421,6 +421,132 @@ import React from 'react'
 
 type PhotoStatRow = { contributorId: string; name: string; sent: number; responded: number; remaining: number; exhausted: boolean }
 
+// ── Elicitation metrics panel ─────────────────────────────────────────────────
+
+interface ElicitationMetrics {
+  depositsPerArchivePerWeek: { archiveId: string; archiveName: string; week: string; deposits: number }[]
+  answerRateByDomainTierFraming: { domain: string; tier: string; framingUsed: boolean; served: number; answeredWithin72h: number; answerRatePct: number }[]
+  coveragePerArchive: { archiveId: string; archiveName: string; slug: string; density: number; avgDepth: number; lastTouched: string | null }[]
+  questionLeaderboard: { questionId: number | null; b2bQuestionId: string | null; questionText: string; served: number; answered: number; answerRatePct: number }[]
+}
+
+function metricsTh(label: string) {
+  return (
+    <th key={label} style={{ ...mono, fontSize: '0.32rem', letterSpacing: '0.1em', color: '#5C6166', textAlign: 'left', padding: '2px 8px 4px 0', whiteSpace: 'nowrap' }}>
+      {label}
+    </th>
+  )
+}
+
+function metricsTd(value: React.ReactNode, key: string | number) {
+  return (
+    <td key={key} style={{ ...mono, fontSize: '0.34rem', letterSpacing: '0.05em', color: '#9DA3A8', padding: '2px 8px 2px 0', whiteSpace: 'nowrap' }}>
+      {value}
+    </td>
+  )
+}
+
+function MetricsTable({ title, headers, rows }: { title: string; headers: string[]; rows: React.ReactNode[][] }) {
+  return (
+    <div style={{ marginBottom: '0.9rem' }}>
+      <p style={{ ...mono, fontSize: '0.34rem', letterSpacing: '0.18em', color: '#C4A24A', margin: '0 0 0.4rem' }}>
+        {title}
+      </p>
+      {rows.length === 0 ? (
+        <p style={{ ...mono, fontSize: '0.34rem', color: '#3A3F44', margin: 0 }}>no data</p>
+      ) : (
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ borderCollapse: 'collapse' }}>
+            <thead><tr>{headers.map(metricsTh)}</tr></thead>
+            <tbody>
+              {rows.map((row, i) => <tr key={i}>{row.map((cell, j) => metricsTd(cell, j))}</tr>)}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function ElicitationMetricsPanel() {
+  const [data,    setData]    = useState<ElicitationMetrics | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error,   setError]   = useState<string | null>(null)
+
+  async function load() {
+    setLoading(true)
+    setError(null)
+    try {
+      const res = await fetch('/api/god/elicitation-metrics')
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      setData(await res.json())
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to load')
+    }
+    setLoading(false)
+  }
+
+  return (
+    <div style={{
+      marginTop:    '1rem',
+      background:   'rgba(196,162,74,0.02)',
+      border:       '1px solid rgba(196,162,74,0.1)',
+      borderRadius: '2px',
+      padding:      '1rem',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+        <p style={{ ...mono, fontSize: '0.38rem', letterSpacing: '0.25em', color: '#C4A24A', margin: 0 }}>
+          ELICITATION METRICS
+        </p>
+        <button
+          onClick={load}
+          disabled={loading}
+          style={{
+            background:    'rgba(255,255,255,0.04)',
+            border:        '1px solid rgba(255,255,255,0.07)',
+            borderRadius:  '2px',
+            padding:       '3px 10px',
+            ...mono,
+            fontSize:      '0.34rem',
+            letterSpacing: '0.12em',
+            color:         '#9DA3A8',
+            cursor:        loading ? 'not-allowed' : 'pointer',
+          }}
+        >
+          {loading ? '...' : data ? 'REFRESH' : 'LOAD'}
+        </button>
+      </div>
+
+      {error && <p style={{ ...mono, fontSize: '0.34rem', color: '#C44A4A', margin: '0 0 0.5rem' }}>{error}</p>}
+
+      {data && (
+        <>
+          <MetricsTable
+            title="OWNER DEPOSITS / ARCHIVE / WEEK (TRAILING 4 WEEKS)"
+            headers={['ARCHIVE', 'WEEK', 'DEPOSITS']}
+            rows={data.depositsPerArchivePerWeek.map(r => [r.archiveName, r.week, r.deposits])}
+          />
+          <MetricsTable
+            title="ANSWER RATE WITHIN 72H · DOMAIN / TIER / FRAMING"
+            headers={['DOMAIN', 'TIER', 'FRAMING USED', 'SERVED', 'ANSWERED', 'RATE %']}
+            rows={data.answerRateByDomainTierFraming.map(r => [r.domain, r.tier, r.framingUsed ? 'yes' : 'no', r.served, r.answeredWithin72h, r.answerRatePct])}
+          />
+          <MetricsTable
+            title="COVERAGE PER ARCHIVE / DOMAIN"
+            headers={['ARCHIVE', 'DOMAIN', 'DENSITY', 'AVG DEPTH', 'LAST TOUCHED']}
+            rows={data.coveragePerArchive.map(r => [r.archiveName, r.slug, r.density.toFixed(2), r.avgDepth.toFixed(2), r.lastTouched ? new Date(r.lastTouched).toLocaleDateString() : '-'])}
+          />
+          <MetricsTable
+            title="QUESTION LEADERBOARD (>= 5 SERVES)"
+            headers={['QUESTION', 'SERVED', 'ANSWERED', 'RATE %']}
+            rows={data.questionLeaderboard.map(r => [r.questionText.length > 80 ? r.questionText.slice(0, 80) + '...' : r.questionText, r.served, r.answered, r.answerRatePct])}
+          />
+        </>
+      )}
+    </div>
+  )
+}
+
 function ArchiveCard({ archive, onRefresh }: { archive: ArchiveData; onRefresh: () => void }) {
   const router = useRouter()
   const [impersonating,  setImpersonating]  = useState(false)
@@ -1078,6 +1204,8 @@ export default function GodModeClient() {
                 </a>
               </div>
             </div>
+
+            <ElicitationMetricsPanel />
             </div>
           </>
         )}

@@ -1,9 +1,8 @@
 import { NextRequest } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
-import { getDailyReflection, getDayOfYear } from '@/lib/dailyReflections'
-import { getConversationalPrompt } from '@/lib/conversationalPrompts'
-import { createEmailReplySession, buildReplyAddress } from '@/lib/emailReplySessions'
+import { selectNextQuestion } from '@/lib/selectNextQuestion'
+import { createEmailReplySession, buildReplyAddress, type CreateSessionOptions } from '@/lib/emailReplySessions'
 
 export const dynamic = 'force-dynamic'
 
@@ -37,7 +36,6 @@ export async function GET(req: NextRequest) {
     .not('owner_email', 'is', null)
 
   let sent = 0
-  const dayOfYear = getDayOfYear()
 
   for (const archive of archives ?? []) {
     try {
@@ -46,123 +44,67 @@ export async function GET(req: NextRequest) {
       const twilioNumber   = process.env.NEXT_PUBLIC_TWILIO_PHONE_NUMBER ?? '1-888-688-9168'
       const formattedPhone = twilioNumber.replace(/\+1(\d{3})(\d{3})(\d{4})/, '1-$1-$2-$3') || '1-888-688-9168'
 
-      // ── Succession tier: serve B2B questions in sequence ──────────────────
-      if (archive.tier === 'succession') {
-        const [{ data: allQuestions }, { data: answeredDeposits }] = await Promise.all([
-          supabaseAdmin
-            .from('b2b_questions')
-            .select('id, category, question, order_index')
-            .order('order_index', { ascending: true }),
-          supabaseAdmin
-            .from('owner_deposits')
-            .select('prompt')
-            .eq('archive_id', archive.id)
-            .eq('source_type', 'b2b_question'),
-        ])
+      const result = await selectNextQuestion({ archiveId: archive.id, channel: 'daily_email' })
+      const isSuccession = archive.tier === 'succession'
 
-        const questions = allQuestions ?? []
-        if (questions.length === 0) {
-          console.warn(`[daily-reflection] No b2b_questions found — skipping succession archive ${archive.id}`)
-          continue
-        }
-
-        const answeredSet = new Set((answeredDeposits ?? []).map(d => d.prompt))
-        const unanswered  = questions.filter(q => !answeredSet.has(q.question))
-
-        const b2bQuestion = unanswered.length > 0
-          ? unanswered[0]
-          : questions[(answeredDeposits?.length ?? 0) % questions.length]
-
-        const subject = `Today's succession question · ${archive.name}`
-
-        let replyTo: string | undefined
-        try {
-          const token = await createEmailReplySession({
-            archiveId:     archive.id,
-            contributorId: null,
-            emailType:     'b2b_question',
-            sparkId:       b2bQuestion.question.substring(0, 200),
-          })
-          replyTo = buildReplyAddress(token)
-        } catch (e) {
-          console.warn('[daily-reflection] b2b reply session failed:', e instanceof Error ? e.message : e)
-        }
-
-        console.log('[daily-reflection] succession — sending to:', archive.owner_email, 'category:', b2bQuestion.category, 'replyTo:', replyTo)
-        await resend.emails.send({
-          from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
-          to:      archive.owner_email,
-          replyTo,
-          subject,
-          html:    buildB2BQuestionEmail(archive.name, firstName, b2bQuestion.category, b2bQuestion.question, formattedPhone),
-          headers: {
-            'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
-            'X-Entity-Ref-ID':  `basalith-${archive.id}-${Date.now()}`,
-            'Precedence':       'bulk',
-          },
-        })
-
-        sent++
-        continue
-      }
-
-      // ── Standard tier ─────────────────────────────────────────────────────
-      // Count the owner's deposits to decide which register to use.
-      const { data: deposits } = await supabaseAdmin
-        .from('owner_deposits')
-        .select('prompt')
-        .eq('archive_id', archive.id)
-        .limit(50)
-
-      const depositCount = deposits?.length ?? 0
-
-      let question: string
-      let isConversational = false
-      if (depositCount < 10) {
-        // Pre-Echo Layer (fewer than 10 deposits): keep the barrier on the floor.
-        // A warm, ordinary conversational prompt instead of a dimension-targeted
-        // question, so building toward 10 deposits never feels like a test. Served
-        // in the owner's language (falls back to English when untranslated).
-        isConversational = true
-        const used = new Set((deposits ?? []).map(d => d.prompt).filter(Boolean) as string[])
-        question = getConversationalPrompt(dayOfYear, used, lang).prompt
+      let emailType: CreateSessionOptions['emailType']
+      if (isSuccession) {
+        emailType = 'b2b_question'
+      } else if (result.source === 'p1') {
+        emailType = 'conversational'
       } else {
-        // Echo Layer and beyond: dimension-targeted reflection on the weakest area.
-        const { data: accuracy } = await supabaseAdmin
-          .from('entity_accuracy')
-          .select('dimension, accuracy_score')
-          .eq('archive_id', archive.id)
-          .order('accuracy_score', { ascending: true })
-          .limit(3)
-
-        const weakestDimension = accuracy?.[dayOfYear % 3]?.dimension ?? 'wisdom_and_lessons'
-        question = getDailyReflection(weakestDimension, lang, dayOfYear)
+        emailType = 'owner_daily'
       }
 
-      const subject = lang === 'zh'
-        ? `今天的问题 · ${archive.name}`
-        : `Today's question · ${archive.name}`
-
-      let ownerReplyTo: string | undefined
+      let replyTo: string | undefined
       try {
-        const replyToken = await createEmailReplySession({
+        const token = await createEmailReplySession({
           archiveId:     archive.id,
           contributorId: null,
-          emailType:     isConversational ? 'conversational' : 'owner_daily',
-          sparkId:       question.substring(0, 200),
+          emailType,
+          sparkId:       result.questionText.substring(0, 200),
         })
-        ownerReplyTo = buildReplyAddress(replyToken)
+        replyTo = buildReplyAddress(token)
       } catch (e) {
         console.warn('[daily-reflection] reply session failed:', e instanceof Error ? e.message : e)
       }
 
-      console.log('[daily-reflection] sending to:', archive.owner_email, 'replyTo:', ownerReplyTo)
+      let subject: string
+      let html: string
+
+      if (isSuccession) {
+        let category = 'REFLECTION'
+        if (result.b2bQuestionId) {
+          const { data: b2bQ } = await supabaseAdmin
+            .from('b2b_questions')
+            .select('category')
+            .eq('id', result.b2bQuestionId)
+            .maybeSingle()
+          category = b2bQ?.category ?? category
+        }
+
+        subject = `Today's succession question · ${archive.name}`
+        html    = buildB2BQuestionEmail(archive.name, firstName, category, result.questionText, formattedPhone, result.framingUsed)
+      } else {
+        subject = lang === 'zh'
+          ? `今天的问题 · ${archive.name}`
+          : `Today's question · ${archive.name}`
+        html = buildDailyReflectionEmail(archive.name, firstName, result.questionText, formattedPhone, lang, result.framingUsed)
+      }
+
+      console.log(
+        '[daily-reflection] sending to:', archive.owner_email,
+        'replyTo:', replyTo,
+        'source:', result.source,
+        'questionId:', result.questionId,
+        'b2bQuestionId:', result.b2bQuestionId,
+      )
       await resend.emails.send({
         from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
         to:      archive.owner_email,
-        replyTo: ownerReplyTo,
+        replyTo,
         subject,
-        html:    buildDailyReflectionEmail(archive.name, firstName, question, formattedPhone, lang),
+        html,
         headers: {
           'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
           'X-Entity-Ref-ID':  `basalith-${archive.id}-${Date.now()}`,
@@ -185,7 +127,7 @@ export async function GET(req: NextRequest) {
     .not('magic_link_token', 'is', null)
     .select('id')
 
-  return Response.json({ sent, total: archives?.length ?? 0, dayOfYear, magicLinksCleared: clearedRows?.length ?? 0 })
+  return Response.json({ sent, total: archives?.length ?? 0, magicLinksCleared: clearedRows?.length ?? 0 })
 }
 
 function buildDailyReflectionEmail(
@@ -194,7 +136,11 @@ function buildDailyReflectionEmail(
   question:     string,
   phoneNumber:  string,
   lang:         string,
+  framing:      string | null = null,
 ): string {
+  const framingHtml = framing
+    ? `<p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#9A968C;line-height:1.7;margin:0 0 16px">${framing}</p>`
+    : ''
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
   const dateStr = new Date().toLocaleDateString(
     lang === 'zh' ? 'zh-CN' : 'en-US',
@@ -223,6 +169,8 @@ function buildDailyReflectionEmail(
     <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#B8B4AB;margin:0 0 24px">
       今天的问题是：
     </p>
+
+    ${framingHtml}
 
     <div style="border-left:3px solid rgba(196,162,74,0.5);padding:20px 24px;margin:0 0 32px;background:rgba(196,162,74,0.04)">
       <p style="font-family:Georgia,serif;font-size:20px;font-weight:300;color:#F0EDE6;line-height:1.7;margin:0;font-style:italic">
@@ -296,6 +244,8 @@ function buildDailyReflectionEmail(
       ${firstName},
     </p>
 
+    ${framingHtml}
+
     <div style="border-left:3px solid rgba(196,162,74,0.5);padding:20px 24px;margin:0 0 32px;background:rgba(196,162,74,0.04)">
       <p style="font-family:Georgia,serif;font-size:20px;font-weight:300;color:#F0EDE6;line-height:1.7;margin:0;font-style:italic">
         "${question}"
@@ -346,10 +296,14 @@ function buildB2BQuestionEmail(
   category:     string,
   question:     string,
   phoneNumber:  string,
+  framing:      string | null = null,
 ): string {
   const siteUrl  = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
   const dateStr  = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
   const eyebrow  = category.toUpperCase()
+  const framingHtml = framing
+    ? `<p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#9A968C;line-height:1.7;margin:0 0 16px">${framing}</p>`
+    : ''
 
   return `<!DOCTYPE html>
 <html>
@@ -369,6 +323,8 @@ function buildB2BQuestionEmail(
     <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#B8B4AB;margin:0 0 24px">
       ${firstName},
     </p>
+
+    ${framingHtml}
 
     <div style="border-left:3px solid rgba(196,162,74,0.5);padding:20px 24px;margin:0 0 32px;background:rgba(196,162,74,0.04)">
       <p style="font-family:Georgia,serif;font-size:20px;font-weight:300;color:#F0EDE6;line-height:1.7;margin:0;font-style:italic">

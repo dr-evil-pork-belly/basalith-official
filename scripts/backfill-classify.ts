@@ -1,3 +1,5 @@
+import './load-env'
+
 /**
  * One-time backfill that runs classifyDeposit() against every owner_deposits
  * row that does not yet have a deposit_domain_scores entry.
@@ -23,12 +25,8 @@
  *   ANTHROPIC_API_KEY
  */
 
-import * as dotenv from 'dotenv'
-import * as path from 'path'
-import * as fs from 'fs'
-
-const envPath = path.resolve(process.cwd(), '.env.local')
-if (fs.existsSync(envPath)) dotenv.config({ path: envPath })
+import { supabaseAdmin } from '../lib/supabase-admin'
+import { classifyDeposit } from '../lib/classifyDeposit'
 
 const COMMIT = process.argv.includes('--commit')
 
@@ -39,21 +37,6 @@ if (archiveFlagIndex !== -1 && !ARCHIVE_ID) {
   console.error('\nERROR: --archive requires an archive id argument.\n')
   process.exit(1)
 }
-
-if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-  console.error('\nERROR: NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set.')
-  console.error('Set them in .env.local or in your shell environment.\n')
-  process.exit(1)
-}
-
-if (!process.env.ANTHROPIC_API_KEY) {
-  console.error('\nERROR: ANTHROPIC_API_KEY must be set.\n')
-  process.exit(1)
-}
-
-// Imported after env vars are loaded, since these modules read env at module scope.
-import { supabaseAdmin } from '../lib/supabase-admin'
-import { classifyDeposit } from '../lib/classifyDeposit'
 
 interface DepositRow {
   id:             string

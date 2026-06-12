@@ -2,12 +2,60 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
 
+// ── Spam hardening ──────────────────────────────────────────────────────────
+
+// Conservative gibberish heuristic. Only fires on long, single-token,
+// pure-ASCII-alphanumeric strings -- never on names/messages containing
+// spaces, punctuation, or non-ASCII (Chinese, Vietnamese, accented, etc).
+function looksLikeBotToken(s: string): boolean {
+  const t = s.trim()
+  if (!/^[A-Za-z0-9]+$/.test(t)) return false // non-ASCII or has spaces/punctuation: pass
+  if (t.length < 16) return false             // short single tokens: pass
+  const vowels = (t.match(/[aeiouAEIOU]/g) || []).length
+  const caseFlips = (t.match(/[a-z][A-Z]/g) || []).length
+  return vowels / t.length < 0.25 || caseFlips >= 4
+}
+
+// In-memory IP rate limiter: 5 submissions per IP per hour. Soft limit --
+// resets per serverless instance. The honeypot is the primary defense.
+const submissionLog = new Map<string, number[]>()
+
+function rateLimited(ip: string): boolean {
+  const now = Date.now()
+  const windowMs = 60 * 60 * 1000
+  const hits = (submissionLog.get(ip) || []).filter((t) => now - t < windowMs)
+  hits.push(now)
+  submissionLog.set(ip, hits)
+  if (submissionLog.size > 5000) submissionLog.clear() // memory guard
+  return hits.length > 5
+}
+
 export async function POST(req: NextRequest) {
   try {
-    const { name, email, subject, reason, referralSource } = await req.json()
+    const { name, email, subject, reason, referralSource, company_website } = await req.json()
 
     if (!name || !email || !subject || !reason || !referralSource) {
       return NextResponse.json({ error: 'All fields required' }, { status: 400 })
+    }
+
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+
+    // 2a. Honeypot — bots fill every field, including the decoy.
+    if (typeof company_website === 'string' && company_website.length > 0) {
+      console.warn('[spam-drop] honeypot', { ip })
+      return NextResponse.json({ success: true })
+    }
+
+    // 2b. Gibberish heuristics — conservative, ASCII-only.
+    if (looksLikeBotToken(name) || looksLikeBotToken(reason)) {
+      console.warn('[spam-drop] heuristic', { ip })
+      return NextResponse.json({ success: true })
+    }
+
+    // 2c. Rate limit by IP — soft, in-memory.
+    if (rateLimited(ip)) {
+      console.warn('[spam-drop] rate-limit', { ip })
+      return NextResponse.json({ success: true })
     }
 
     // Save to Supabase

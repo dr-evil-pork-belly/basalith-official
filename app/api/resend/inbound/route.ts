@@ -259,6 +259,30 @@ export async function POST(req: NextRequest) {
       if (depositError) console.error('[inbound] deposit save failed:', depositError.message)
       else console.log('[inbound] owner_deposits saved — id:', deposit?.id?.substring(0, 8))
 
+      // Elicitation engine: mark the most recent unanswered served question for
+      // this archive as answered by this deposit. Owner replies only.
+      if (deposit && !contributorId) {
+        const historyCutoff = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString()
+        const { data: historyRow } = await supabaseAdmin
+          .from('question_history')
+          .select('id')
+          .eq('archive_id', archiveId)
+          .is('answered_deposit_id', null)
+          .gte('served_at', historyCutoff)
+          .order('served_at', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+
+        if (historyRow) {
+          const { error: historyError } = await supabaseAdmin
+            .from('question_history')
+            .update({ answered_deposit_id: deposit.id, answered_at: new Date().toISOString() })
+            .eq('id', historyRow.id)
+          if (historyError) console.error('[inbound] question_history update failed:', historyError.message)
+          else console.log('[inbound] question_history answered — id:', historyRow.id)
+        }
+      }
+
       // Domain classification — owner deposits only, fire-and-forget
       if (deposit && !contributorId) {
         void classifyDeposit({ depositId: deposit.id, archiveId, text: replyText })
