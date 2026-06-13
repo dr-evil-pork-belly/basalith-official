@@ -53,7 +53,7 @@ export default function ArchiveLoginPage() {
           <Link href="/" className="font-sans text-[0.75rem] font-bold tracking-[0.24em] uppercase no-underline" style={{ color: '#F0F0EE' }}>
             Basalith
             <span style={{ color: 'rgba(196,162,74,0.5)', margin: '0 0.3em' }} aria-hidden="true">·</span>
-            <span style={{ fontStyle: 'italic', fontWeight: 300, color: 'var(--text-muted)', fontSize: '0.85em', textTransform: 'lowercase', letterSpacing: '0.08em' }}>xyz</span>
+            <span style={{ fontStyle: 'italic', fontWeight: 300, color: 'var(--text-muted)', fontSize: '0.85em', textTransform: 'lowercase', letterSpacing: '0.08em' }}>ai</span>
           </Link>
         </div>
 

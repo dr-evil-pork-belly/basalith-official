@@ -87,7 +87,7 @@ export default function SuccessorLoginPage() {
           >
             Basalith
             <span style={{ color: 'rgba(196,162,74,0.45)', margin: '0 0.3em' }}>·</span>
-            <span style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontWeight: 300, color: '#5C6166', fontSize: '0.85em' }}>xyz</span>
+            <span style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontWeight: 300, color: '#5C6166', fontSize: '0.85em' }}>ai</span>
           </Link>
         </div>
 

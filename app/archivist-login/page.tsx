@@ -44,7 +44,7 @@ export default function ArchivistLoginPage() {
           <p className="font-sans text-[0.8rem] font-bold tracking-[0.24em] uppercase text-text-primary inline-flex items-baseline gap-0">
             Basalith
             <span style={{ color: 'rgba(196,162,74,0.5)', margin: '0 0.3em' }} aria-hidden="true">&middot;</span>
-            <span style={{ fontStyle: 'italic', fontWeight: 300, color: 'var(--text-muted)', fontSize: '0.85em', textTransform: 'lowercase', letterSpacing: '0.08em' }}>xyz</span>
+            <span style={{ fontStyle: 'italic', fontWeight: 300, color: 'var(--text-muted)', fontSize: '0.85em', textTransform: 'lowercase', letterSpacing: '0.08em' }}>ai</span>
           </p>
           <p
             className="font-sans font-bold tracking-[0.22em] uppercase mt-3"

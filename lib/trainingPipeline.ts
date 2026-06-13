@@ -269,13 +269,25 @@ export async function scoreAndUpdatePair(trainingPairId: string): Promise<void> 
 
 export async function exportTrainingData(archiveId: string): Promise<string> {
   const { data: pairs } = await supabaseAdmin
-    .from('training_pairs').select('prompt, completion, system_prompt')
+    .from('training_pairs').select('source_id, prompt, completion, system_prompt')
     .eq('archive_id', archiveId).eq('included_in_training', true)
     .gte('quality_score', QUALITY_THRESHOLD).order('quality_score', { ascending: false })
 
   if (!pairs?.length) return ''
 
-  return pairs.map(p => JSON.stringify({
+  // Eval holdout deposits must never leak into the fine-tune set. Flag them
+  // out here rather than at insert time, so re-running an export always
+  // reflects the current holdout assignment.
+  const { data: holdoutDeposits } = await supabaseAdmin
+    .from('owner_deposits')
+    .select('id')
+    .eq('archive_id', archiveId)
+    .eq('eval_holdout', true)
+
+  const holdoutIds = new Set((holdoutDeposits ?? []).map(d => d.id))
+  const eligible   = pairs.filter(p => !p.source_id || !holdoutIds.has(p.source_id))
+
+  return eligible.map(p => JSON.stringify({
     messages: [
       { role: 'system',    content: p.system_prompt || 'You are a specific person. Answer as them.' },
       { role: 'user',      content: p.prompt },
