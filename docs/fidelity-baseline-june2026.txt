@@ -1,0 +1,95 @@
+Date: 2026-06-13
+Archive: a38e4503-c7d2-4af3-af8c-cacd66974e0b (Dr Ha)
+eval_run id: 267bc741-eb7f-486f-bc3f-fbaa4714419b
+
+── FIDELITY EVAL (COMMIT) — archive a38e4503-c7d2-4af3-af8c-cacd66974e0b ──
+
+Classified owner deposits: 49
+Holdout deposits:          7
+Test A qualifying (holdouts with stored prompt): 7/7
+
+Planned trials:
+  Test A: 7 deposit(s) x 3 repetitions = 21 voice judge trials
+  Test B: 7 deposit(s) x 1-2 questions = 7-14 content trials
+  Test C: stub only (reasoning) -- no model calls
+  Test D: read-only query over mirror_reflections -- no model calls
+
+Estimated model API calls:
+  Entity generations (Test A):    7
+  Voice judge calls (Test A):      21
+  Question-generation calls (B):   7
+  Entity generations (Test B):     7-14
+  Content judge calls (Test B):    7-14
+  Total:                            49-63 calls
+
+═══ FIDELITY EVAL REPORT ═══
+
+Archive: a38e4503-c7d2-4af3-af8c-cacd66974e0b
+Holdout deposits: 7 (15% stratified sample, see scripts/assign-holdout.ts)
+
+Test A (voice/distinguishability): judge correctly identified the real person in 6/7 cases.
+  Interpretation: 50% = indistinguishable (best for the entity); 100% = entity is obviously not the person.
+  Small-sample caveat: n=7 is below 10; treat as directional only.
+
+Test B (content/groundedness): mean score 0.88 over 8 scored trial(s).
+  Distribution — 2 (consistent): 1, 1 (doesn't know / declines): 5, 0 (contradicts / invents): 2.
+  2 trial(s) scored 0 — the entity contradicted or invented facts. This is the failure that matters.
+
+Test C (reasoning): stub only. This archive is not succession-tier, so Test C reports "no succession archives active" and was not executed.
+
+Test D (live signal, 2026-06): 2 reaction(s) — this_is_me=1, not_quite_right=0, heart=1
+
+── Run info ──
+eval_run id: 267bc741-eb7f-486f-bc3f-fbaa4714419b
+Config:
+  judge model:           claude-sonnet-4-6 (fidelity-eval-v1)
+  generator model:       claude-opus-4-6
+  generator path:        entityContext.buildEntitySystemPrompt+excludeDepositIds+honestyClause-v1
+  prompt template hashes:
+    voiceJudge: 56f31b73380e
+    contentQuestionGen: 80e1984b7e14
+    contentJudge: 5b901c330c05
+
+WARNING: config differs from previous run af1de3c0-a8c4-40b7-9729-a0e7100f2c91 -- results are NOT directly comparable:
+  - generatorPathVersion: entityContext.buildEntitySystemPrompt+excludeDepositIds -> entityContext.buildEntitySystemPrompt+excludeDepositIds+honestyClause-v1
+
+──────────────────────────────────────────────────────────────────
+
+PURPOSE AND LIMITS
+
+This is the regression anchor for the Dr Ha archive (a38e4503-c7d2-4af3-af8c-cacd66974e0b).
+No model, prompt, or retrieval change ships unless it beats this baseline: Test B
+zero-count at or below 2, Test A held at or near 6/7.
+
+Limits: n=7 holdouts, single archive, English only. All counts are directional,
+not statistically significant. Test B is not comparable to the v1 run
+(033f548c-fbc4-4521-9aa4-a65e9ef9b6ca) or the v2 run
+(d38526ff-b1ea-49a9-90c1-0c45587e1c98) due to instrument fixes (judge rubric
+rewrite and question-generation phrasing rewrite); this run is the successor
+to those, not a peer.
+
+Test B's operative metric is the 0-count (confabulation detector). Score-2
+confirmations are structurally rare at this corpus size and their absence is
+expected, not a deficiency.
+
+KNOWN RESIDUAL FAILURE
+
+The honesty clause (added to the entity system prompt between eval_run
+af1de3c0-a8c4-40b7-9729-a0e7100f2c91 and this run) reduced observed
+confabulation from 3/7 to 2/7 at n=7.
+
+The 2 residual zeros are prior-driven overwrites: when asked about a fact it
+lacks, the entity does not experience a gap. It generates a confident,
+on-brand answer instead. Example: asked what usually wakes it up, the entity
+claimed that ambition and responsibility keep it from sleeping in, while the
+deposit records that the person likes sleeping in and is woken by Cindy's
+alarm, the kids, or Blake playing with Alexa.
+
+A prompt-layer instruction structurally cannot catch these, because the model
+does not recognize them as fabrication at generation time. Closing them is a
+future architectural track, not a prompt fix:
+  (a) tighter generation-time retrieval grounding (answer from retrieved
+      deposits or decline), or
+  (b) a generation-time self-check pass that strips unwarranted specifics.
+
+Flagged for a later session.
