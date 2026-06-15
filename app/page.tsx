@@ -10,6 +10,7 @@ import TaglineOpening    from './components/TaglineOpening'
 import HeroSection       from './components/HeroSection'
 import PhilosophySection from './components/PhilosophySection'
 import TwoPathsSection   from './components/TwoPathsSection'
+import ContrastDemo      from './components/ContrastDemo'
 import ClosingSection    from './components/ClosingSection'
 import WhatBasalithIsNot from './components/WhatBasalithIsNot'
 import Footer            from './components/Footer'
@@ -62,6 +63,7 @@ export default function HomePage() {
         <PhilosophySection />
         <WhatBasalithIsNot />
         <TwoPathsSection />
+        <ContrastDemo />
         <ClosingSection />
       </main>
       <Footer />

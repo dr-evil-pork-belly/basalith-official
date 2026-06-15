@@ -6,7 +6,7 @@ const anthropic = new Anthropic()
 
 function buildChainSubject(ownerFirstName: string, lang: string): string {
   const map: Record<string, string> = {
-    en:  `Something came up about ${ownerFirstName} — add your perspective`,
+    en:  `Something came up about ${ownerFirstName}: add your perspective`,
     zh:  `关于${ownerFirstName}的问题`,
     yue: `${ownerFirstName}有啲嘢想問你`,
     ja:  `${ownerFirstName}さんについて — あなたの視点を`,

@@ -73,7 +73,7 @@ Important scoring notes:
 - Under 20 words → specificity max 3
 - Generic statements → authenticity max 4
 - Pure facts → trainability max 3
-- Scores of exactly 5 should be rare — actually evaluate and differentiate
+- Scores of exactly 5 should be rare. Actually evaluate and differentiate
 
 Return ONLY this JSON, no other text:
 {"specificity":<1-10>,"authenticity":<1-10>,"trainability":<1-10>,"reasoning":"<one sentence>"}`,
@@ -320,8 +320,8 @@ export async function getTrainingStats(archiveId: string): Promise<{
 
   const estimatedAccuracy =
     included < 50   ? 'Too early to estimate' :
-    included < 100  ? 'Early stage — entity will show personality but limited depth' :
-    included < 250  ? 'Developing — entity recognizable to close family' :
+    included < 100  ? 'Early stage: entity will show personality but limited depth' :
+    included < 250  ? 'Developing: entity recognizable to close family' :
     included < 500  ? 'Approaching fine-tuning threshold' :
     included < 1000 ? 'Ready for first fine-tuning run' :
     'Ready for high-quality fine-tuning'

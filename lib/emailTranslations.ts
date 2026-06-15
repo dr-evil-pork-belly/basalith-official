@@ -21,7 +21,7 @@ export const translations = {
     viewArchive:            'VIEW YOUR ARCHIVE →',
     todayMemories:          "Today's memories",
     photoQuestion:          'What do you remember about this photograph?',
-    photoReplyBody:         'Reply to this email with anything you know — who is in it, when and where it was taken, what was happening, what you want the family to remember about this moment.',
+    photoReplyBody:         'Reply to this email with anything you know: who is in it, when and where it was taken, what was happening, what you want the family to remember about this moment.',
     photoReplyPermanent:    'Every reply becomes part of',
     photoReplyPermanentEnd: 'permanently.',
     photoMoreThanReply:     'Want to do more than reply?',

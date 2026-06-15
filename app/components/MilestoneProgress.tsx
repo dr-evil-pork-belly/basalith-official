@@ -5,7 +5,7 @@ const STAGES = [
     threshold: 10,
     timeline:  'Day one to week two',
     consumer:  'Your entity echoes you back.',
-    unlocks:   'Accurate answers about your life — names, dates, key relationships, core family history.',
+    unlocks:   'Accurate answers about your life: names, dates, key relationships, core family history.',
   },
   {
     num:       '02',
@@ -13,7 +13,7 @@ const STAGES = [
     threshold: 50,
     timeline:  'First month',
     consumer:  'Your entity reflects how you reason.',
-    unlocks:   'Guidance that reflects your specific approach to risk, family, and values — not generic advice.',
+    unlocks:   'Guidance that reflects your specific approach to risk, family, and values, not generic advice.',
   },
   {
     num:       '03',

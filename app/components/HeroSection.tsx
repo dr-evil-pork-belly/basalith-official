@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import { scrollToAudience } from '@/lib/scrollToAudience'
 
 const MONO: React.CSSProperties = {
   fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
@@ -12,7 +12,7 @@ const MONO: React.CSSProperties = {
 export default function HeroSection() {
   return (
     <section
-      aria-label="Basalith — Heritage archive"
+      aria-label="Basalith: Heritage archive"
       style={{
         minHeight:           '100svh',
         display:             'grid',
@@ -34,7 +34,7 @@ export default function HeroSection() {
         <p
           style={{
             ...MONO,
-            color:        'var(--color-gold)',
+            color:        'var(--color-gold-on-light)',
             display:      'flex',
             alignItems:   'center',
             gap:          '12px',
@@ -63,24 +63,6 @@ export default function HeroSection() {
           <span className="headline-line headline-line-2">Most people leave nothing of it behind.</span>
         </h1>
 
-        {/* Smaller echo line */}
-        <div
-          style={{
-            fontFamily:    'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-            fontSize:      'clamp(1rem, 2vw, 1.25rem)',
-            fontStyle:     'italic',
-            fontWeight:    300,
-            lineHeight:    1.6,
-            color:         'var(--color-text-muted)',
-            marginBottom:  '36px',
-            opacity:       0,
-            animation:     'lineReveal 700ms cubic-bezier(0.16,1,0.3,1) 300ms both',
-          }}
-        >
-          <span style={{ display: 'block' }}>For your family. For your business.</span>
-          <span style={{ display: 'block' }}>For the generations that follow.</span>
-        </div>
-
         {/* Sub copy */}
         <p
           style={{
@@ -99,61 +81,30 @@ export default function HeroSection() {
           Basalith builds a cognitive entity from the way you think, decide, and see the world.
         </p>
 
-        {/* CTAs */}
-        <div
-          className="hero-ctas"
+        {/* Quiet handoff to the audience selector below. The fork lives there. */}
+        <button
+          type="button"
+          onClick={scrollToAudience}
           style={{
-            display:   'flex',
-            gap:       '16px',
-            flexWrap:  'wrap',
-            opacity:   0,
-            animation: 'lineReveal 600ms cubic-bezier(0.16,1,0.3,1) 700ms both',
+            ...MONO,
+            display:    'inline-flex',
+            alignItems: 'center',
+            gap:        '10px',
+            alignSelf:  'flex-start',
+            background: 'transparent',
+            border:     'none',
+            cursor:     'pointer',
+            color:      'var(--color-gold-on-light)',
+            padding:    '4px 0',
+            opacity:    0,
+            animation:  'lineReveal 600ms cubic-bezier(0.16,1,0.3,1) 700ms both',
           }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--color-text-primary)' }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--color-gold-on-light)' }}
         >
-          <Link
-            href="/apply"
-            style={{
-              ...MONO,
-              display:        'inline-block',
-              color:          '#0A0908',
-              textDecoration: 'none',
-              background:     'var(--color-gold)',
-              padding:        '14px 32px',
-              borderRadius:   'var(--radius-sm)',
-              transition:     'background 250ms ease',
-            }}
-            onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'var(--color-gold-light)'}
-            onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'var(--color-gold)'}
-          >
-            Build Your Entity
-          </Link>
-          <Link
-            href="/succession"
-            style={{
-              ...MONO,
-              display:        'inline-block',
-              color:          'var(--color-text-secondary)',
-              textDecoration: 'none',
-              background:     'transparent',
-              padding:        '13px 31px',
-              border:         '1px solid var(--color-border-medium)',
-              borderRadius:   'var(--radius-sm)',
-              transition:     'border-color 250ms ease, color 250ms ease',
-            }}
-            onMouseEnter={e => {
-              const el = e.currentTarget as HTMLElement
-              el.style.borderColor = 'var(--color-gold)'
-              el.style.color       = 'var(--color-gold)'
-            }}
-            onMouseLeave={e => {
-              const el = e.currentTarget as HTMLElement
-              el.style.borderColor = 'var(--color-border-medium)'
-              el.style.color       = 'var(--color-text-secondary)'
-            }}
-          >
-            For Business
-          </Link>
-        </div>
+          See where you fit
+          <span aria-hidden="true" style={{ fontSize: '0.9rem', lineHeight: 1 }}>&darr;</span>
+        </button>
       </div>
 
       {/* ── Right: Dark archive art ── */}
@@ -225,7 +176,7 @@ export default function HeroSection() {
       {/* Mobile: text above, image below */}
       <style>{`
         @media (max-width: 767px) {
-          section[aria-label="Basalith — Heritage archive"] {
+          section[aria-label="Basalith: Heritage archive"] {
             grid-template-columns: 1fr !important;
             grid-template-rows: auto clamp(240px, 40vh, 320px) !important;
             min-height: unset !important;

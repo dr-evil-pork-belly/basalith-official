@@ -1,6 +1,9 @@
 'use client'
 
 import Link from 'next/link'
+import { Suspense } from 'react'
+import { useAudience, type Audience } from '@/lib/useAudience'
+import SwitchPath from './SwitchPath'
 
 const MONO: React.CSSProperties = {
   fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
@@ -9,7 +12,17 @@ const MONO: React.CSSProperties = {
   textTransform: 'uppercase' as const,
 }
 
-export default function ClosingSection() {
+// `default` is the existing neutral copy, shown when no path is chosen. Founders
+// are pointed at the succession path; families and the neutral default at /apply.
+const VARIANT: Record<'default' | Audience, { eyebrow: string; href: string }> = {
+  default: { eyebrow: 'For the forward-thinking',    href: '/apply' },
+  family:  { eyebrow: 'For individuals and families', href: '/apply' },
+  founder: { eyebrow: 'For founders and successors',  href: '/succession' },
+}
+
+function ClosingView({ audience }: { audience: Audience | null }) {
+  const variant = VARIANT[audience ?? 'default']
+
   return (
     <section
       aria-label="Begin your archive"
@@ -21,8 +34,10 @@ export default function ClosingSection() {
     >
       <div style={{ maxWidth: '640px', margin: '0 auto' }}>
 
+        {audience && <SwitchPath audience={audience} align="center" />}
+
         <p style={{ ...MONO, color: 'var(--color-gold)', marginBottom: '48px' }}>
-          For the forward-thinking
+          {variant.eyebrow}
         </p>
 
         <p
@@ -81,7 +96,7 @@ export default function ClosingSection() {
         </div>
 
         <Link
-          href="/apply"
+          href={variant.href}
           style={{
             ...MONO,
             display:        'inline-block',
@@ -109,5 +124,19 @@ export default function ClosingSection() {
 
       </div>
     </section>
+  )
+}
+
+function ClosingInner() {
+  return <ClosingView audience={useAudience()} />
+}
+
+export default function ClosingSection() {
+  // useAudience reads the URL param, so it must sit under a Suspense boundary.
+  // The fallback renders the neutral copy, which is also the no-choice default.
+  return (
+    <Suspense fallback={<ClosingView audience={null} />}>
+      <ClosingInner />
+    </Suspense>
   )
 }

@@ -1,5 +1,8 @@
 'use client'
 
+import { Suspense } from 'react'
+import { useAudience, type Audience } from '@/lib/useAudience'
+
 const PILLARS = [
   {
     n:     '01',
@@ -24,7 +27,27 @@ const BODY_PARAS = [
   'Basalith learns this while you are here to teach it.',
 ]
 
-export default function PhilosophySection() {
+// Audience-specific framing. `default` is the existing neutral copy, shown when
+// no path is chosen. `family` matches the default; `founder` reframes the same
+// idea for a business and its successors.
+const VARIANT: Record<'default' | Audience, { closingLine: string; pillar3Body: string }> = {
+  default: {
+    closingLine: 'We built Basalith\nso your family never has to wonder.',
+    pillar3Body: PILLARS[2].body,
+  },
+  family: {
+    closingLine: 'We built Basalith\nso your family never has to wonder.',
+    pillar3Body: PILLARS[2].body,
+  },
+  founder: {
+    closingLine: 'We built Basalith\nso your successors never have to guess.',
+    pillar3Body: 'There are people spending billions\nto ensure what they built\noutlasts them.\n\nWe think every founder\ndeserves the same thing.\n\nNot because stepping back is the enemy.\nBut because the people who carry it forward\nshould not have to guess.',
+  },
+}
+
+function PhilosophyView({ audience }: { audience: Audience | null }) {
+  const variant = VARIANT[audience ?? 'default']
+
   return (
     <section
       data-reveal
@@ -104,7 +127,7 @@ export default function PhilosophySection() {
               whiteSpace: 'pre-line',
             }}
           >
-            {'We built Basalith\nso your family never has to wonder.'}
+            {variant.closingLine}
           </p>
         </div>
 
@@ -155,7 +178,7 @@ export default function PhilosophySection() {
                   whiteSpace:  'pre-line',
                 }}
               >
-                {body}
+                {n === '03' ? variant.pillar3Body : body}
               </p>
             </div>
           ))}
@@ -178,5 +201,19 @@ export default function PhilosophySection() {
         }
       `}</style>
     </section>
+  )
+}
+
+function PhilosophyInner() {
+  return <PhilosophyView audience={useAudience()} />
+}
+
+export default function PhilosophySection() {
+  // useAudience reads the URL param, so it must sit under a Suspense boundary.
+  // The fallback renders the neutral copy, which is also the no-choice default.
+  return (
+    <Suspense fallback={<PhilosophyView audience={null} />}>
+      <PhilosophyInner />
+    </Suspense>
   )
 }
