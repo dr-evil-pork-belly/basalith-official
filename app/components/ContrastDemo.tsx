@@ -1,8 +1,7 @@
 'use client'
 
 import { Suspense, useState } from 'react'
-import { useSearchParams } from 'next/navigation'
-import { scrollToAudience } from '@/lib/scrollToAudience'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 
 type Audience = 'founder' | 'family'
 
@@ -21,13 +20,18 @@ const AUDIENCE_NAME: Record<Audience, string> = {
   family:  'Individuals & Families',
 }
 
+// Neutral default, shown when neither path is toggled.
+const NEUTRAL_QUESTION =
+  "What's a decision you make almost without thinking, that others rarely get right?"
+
 const QUESTION: Record<Audience, string> = {
   founder: "What's a call you trust your gut on, that your team usually gets wrong?",
   family:  "What's something you understand now that you wish you'd known at thirty?",
 }
 
 // Fixed, illustrative "after two hundred deposits" answers. Not generated and
-// not a real person; the visible caption says exactly that.
+// not a real person; the visible caption says exactly that. The neutral default
+// reuses the founder walk-away pair.
 const ILLUSTRATION: Record<Audience, [string, string]> = {
   founder: [
     'When to walk away. Most people wait for proof that a thing has failed. I watch for the moment it stops teaching me anything.',
@@ -46,7 +50,42 @@ const CLOSING_LINE = 'That distance is the product.'
 const CLOSING_SUB =
   'Not a record of what they said. A model of how they reasoned, shaped to answer what no one thought to ask.'
 
-function ContrastDemoSection({ audience }: { audience: Audience }) {
+// Fire-and-forget instrumentation. Counts the pick with no analytics vendor.
+// Every path is guarded and failures are swallowed, so the toggle can never
+// wait on or break from any of this.
+function trackAudience(audience: Audience) {
+  // Generic dataLayer event, so a future analytics tool picks up the same signal.
+  try {
+    const w = window as unknown as { dataLayer?: unknown[] }
+    if (Array.isArray(w.dataLayer)) {
+      w.dataLayer.push({ event: 'audience_select', audience })
+    }
+  } catch { /* ignore */ }
+
+  // Server beacon. sendBeacon survives navigation; a keepalive fetch is the
+  // fallback when it is unavailable.
+  try {
+    const payload = JSON.stringify({ audience })
+    if (typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
+      navigator.sendBeacon('/api/track/audience', new Blob([payload], { type: 'application/json' }))
+    } else {
+      fetch('/api/track/audience', {
+        method:    'POST',
+        headers:   { 'Content-Type': 'application/json' },
+        body:      payload,
+        keepalive: true,
+      }).catch(() => { /* ignore */ })
+    }
+  } catch { /* ignore */ }
+}
+
+function ContrastDemoSection({
+  audience,
+  onSelect,
+}: {
+  audience: Audience | null
+  onSelect: (audience: Audience) => void
+}) {
   const [input, setInput]       = useState('')
   const [answered, setAnswered] = useState<string | null>(null)
 
@@ -56,6 +95,9 @@ function ContrastDemoSection({ audience }: { audience: Audience }) {
     if (!canSubmit) return
     setAnswered(input.trim())
   }
+
+  const question     = audience ? QUESTION[audience] : NEUTRAL_QUESTION
+  const illustration = audience ? ILLUSTRATION[audience] : ILLUSTRATION.founder
 
   return (
     <section
@@ -85,31 +127,36 @@ function ContrastDemoSection({ audience }: { audience: Audience }) {
           Answer one question.
         </h2>
 
-        {/* Lane marker + switch path */}
-        <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '16px', marginBottom: '40px' }}>
-          <span style={{ ...MONO, color: 'var(--color-gold-on-light)' }}>
-            {AUDIENCE_NAME[audience]}
-          </span>
-          <span aria-hidden="true" style={{ color: 'var(--color-border-medium)' }}>&middot;</span>
-          <button
-            type="button"
-            onClick={scrollToAudience}
-            style={{
-              ...MONO,
-              background: 'transparent',
-              border:     'none',
-              cursor:     'pointer',
-              color:      'var(--color-text-secondary)',
-              padding:    '4px 0',
-            }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--color-gold-on-light)' }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--color-text-secondary)' }}
-          >
-            Switch path
-          </button>
+        {/* Audience toggle. Switches the question and illustration in place; it
+            never navigates. Neither option is selected by default. */}
+        <div role="group" aria-label="Choose a path" style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginBottom: '40px' }}>
+          {(['founder', 'family'] as const).map(opt => {
+            const selected = audience === opt
+            return (
+              <button
+                key={opt}
+                type="button"
+                aria-pressed={selected}
+                onClick={() => onSelect(opt)}
+                className="contrast-toggle"
+                style={{
+                  ...MONO,
+                  cursor:       'pointer',
+                  padding:      '10px 18px',
+                  borderRadius: 'var(--radius-full)',
+                  border:       `1px solid ${selected ? 'var(--color-gold-on-light)' : 'var(--color-border-medium)'}`,
+                  background:   selected ? 'var(--color-gold-subtle)' : 'transparent',
+                  color:        selected ? 'var(--color-gold-on-light)' : 'var(--color-text-secondary)',
+                  transition:   'background 200ms ease, border-color 200ms ease, color 200ms ease',
+                }}
+              >
+                {AUDIENCE_NAME[opt]}
+              </button>
+            )
+          })}
         </div>
 
-        {/* The question, specific to the audience */}
+        {/* The question, neutral by default and audience-specific when toggled */}
         <p
           style={{
             ...SERIF,
@@ -121,7 +168,7 @@ function ContrastDemoSection({ audience }: { audience: Audience }) {
             margin:     '0 0 24px',
           }}
         >
-          {QUESTION[audience]}
+          {question}
         </p>
 
         {/* Answer field */}
@@ -215,7 +262,7 @@ function ContrastDemoSection({ audience }: { audience: Audience }) {
                 <p style={{ ...MONO, color: 'var(--color-gold-on-light)', marginBottom: '20px' }}>
                   After two hundred deposits
                 </p>
-                {ILLUSTRATION[audience].map((para, i) => (
+                {illustration.map((para, i) => (
                   <p
                     key={i}
                     style={{ ...SERIF, fontSize: '1.25rem', fontWeight: 300, lineHeight: 1.7, color: 'var(--color-text-primary)', margin: i === 0 ? '0 0 16px' : '0 0 24px' }}
@@ -266,21 +313,32 @@ function ContrastDemoSection({ audience }: { audience: Audience }) {
 }
 
 function ContrastDemoInner() {
+  const router       = useRouter()
+  const pathname     = usePathname()
   const searchParams = useSearchParams()
+
   const raw = searchParams.get('audience')
   const audience: Audience | null = raw === 'founder' || raw === 'family' ? raw : null
 
-  // Hidden until an audience is chosen. Keyed by audience so switching paths
-  // remounts and fully resets the demo (cleared input and hidden panels).
-  if (!audience) return null
-  return <ContrastDemoSection key={audience} audience={audience} />
+  function onSelect(next: Audience) {
+    if (next === audience) return
+    // Update the URL in place (no scroll) so the lower sections still thread,
+    // then fire-and-forget the count. The toggle never navigates.
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('audience', next)
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+    trackAudience(next)
+  }
+
+  // Keyed by the choice so toggling remounts the section and resets the answer.
+  return <ContrastDemoSection key={audience ?? 'neutral'} audience={audience} onSelect={onSelect} />
 }
 
 export default function ContrastDemo() {
-  // useSearchParams requires a Suspense boundary in the App Router. Mirrors the
-  // pattern in TwoPathsSection / app/begin/tier/page.tsx.
+  // useSearchParams requires a Suspense boundary in the App Router. The fallback
+  // renders the always-visible neutral demo, so SSR shows it with no flash.
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<ContrastDemoSection audience={null} onSelect={() => {}} />}>
       <ContrastDemoInner />
     </Suspense>
   )

@@ -62,8 +62,8 @@ export default function HomePage() {
         <HeroSection />
         <PhilosophySection />
         <WhatBasalithIsNot />
-        <TwoPathsSection />
         <ContrastDemo />
+        <TwoPathsSection />
         <ClosingSection />
       </main>
       <Footer />

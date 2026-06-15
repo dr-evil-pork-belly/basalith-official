@@ -1,8 +1,4 @@
-'use client'
-
-import { Suspense } from 'react'
 import Link from 'next/link'
-import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 
 type Audience = 'founder' | 'family'
 
@@ -16,9 +12,9 @@ const SERIF: React.CSSProperties = {
   fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
 }
 
-// Two choices mapped to the existing concepts: LEGACY -> /apply (family) and
-// SUCCESSION -> /succession (founder). Headlines are the cards' own voice and
-// deliberately do not repeat the hero copy.
+// Two paths mapped to the existing concepts: LEGACY -> /apply (family) and
+// SUCCESSION -> /succession (founder). The cards are pure navigation now; the
+// audience demo above owns the founder/family choice.
 const CARDS: {
   audience: Audience
   eyebrow:  string
@@ -45,45 +41,7 @@ const CARDS: {
   },
 ]
 
-// Fire-and-forget instrumentation. Counts the pick with no analytics vendor.
-// Every path is guarded and failures are swallowed, so the selection itself can
-// never wait on or break from any of this.
-function trackAudience(audience: Audience) {
-  // Generic dataLayer event, so a future analytics tool picks up the same signal.
-  try {
-    const w = window as unknown as { dataLayer?: unknown[] }
-    if (Array.isArray(w.dataLayer)) {
-      w.dataLayer.push({ event: 'audience_select', audience })
-    }
-  } catch { /* ignore */ }
-
-  // Server beacon. sendBeacon survives navigation; a keepalive fetch is the
-  // fallback when it is unavailable.
-  try {
-    const payload = JSON.stringify({ audience })
-    if (typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
-      navigator.sendBeacon('/api/track/audience', new Blob([payload], { type: 'application/json' }))
-    } else {
-      fetch('/api/track/audience', {
-        method:    'POST',
-        headers:   { 'Content-Type': 'application/json' },
-        body:      payload,
-        keepalive: true,
-      }).catch(() => { /* ignore */ })
-    }
-  } catch { /* ignore */ }
-}
-
-// Presentational section. Pure: it takes the current selection and a pick
-// handler, so it renders identically whether it is the Suspense fallback or the
-// hydrated, interactive version.
-function AudienceSection({
-  selected,
-  onPick,
-}: {
-  selected: Audience | null
-  onPick:   (audience: Audience) => void
-}) {
+export default function TwoPathsSection() {
   return (
     <section
       id="audience"
@@ -112,166 +70,94 @@ function AudienceSection({
           Which are you here for?
         </h2>
 
-        {/* Two cards — the card itself is the stateful choice */}
+        {/* Two cards, each a single link to its path */}
         <div
           className="two-paths-grid"
-          role="group"
-          aria-label="Which are you here for?"
           style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}
         >
-          {CARDS.map(card => {
-            const isSelected = selected === card.audience
-            return (
+          {CARDS.map(card => (
+            <Link
+              key={card.audience}
+              href={card.href}
+              className="path-card"
+              style={{
+                display:        'flex',
+                flexDirection:  'column',
+                textDecoration: 'none',
+                border:         '1px solid var(--color-border-medium)',
+                background:     'var(--color-surface)',
+                transition:     'border-color 250ms ease, box-shadow 250ms ease',
+              }}
+            >
               <div
-                key={card.audience}
                 style={{
+                  flex:          1,
                   display:       'flex',
                   flexDirection: 'column',
-                  border:        `1px solid ${isSelected ? 'var(--color-gold-on-light)' : 'var(--color-border-medium)'}`,
-                  background:    isSelected ? 'var(--color-gold-subtle)' : 'var(--color-surface)',
-                  boxShadow:     isSelected ? 'var(--shadow-gold)' : 'none',
-                  transition:    'border-color 250ms ease, background 250ms ease, box-shadow 250ms ease',
+                  alignItems:    'flex-start',
+                  padding:       'clamp(32px,4vw,52px) clamp(32px,4vw,52px) 24px',
                 }}
               >
-                {/* The choice. A real button, with aria-pressed reflecting state. */}
-                <button
-                  type="button"
-                  aria-pressed={isSelected}
-                  onClick={() => onPick(card.audience)}
-                  className="audience-card-btn"
+                <span style={{ ...MONO, color: 'var(--color-gold-on-light)', marginBottom: '20px' }}>
+                  {card.eyebrow}
+                </span>
+                <span
                   style={{
-                    flex:          1,
-                    display:       'flex',
-                    flexDirection: 'column',
-                    alignItems:    'flex-start',
-                    textAlign:     'left',
-                    width:         '100%',
-                    background:    'transparent',
-                    border:        'none',
-                    cursor:        'pointer',
-                    font:          'inherit',
-                    padding:       'clamp(32px,4vw,52px) clamp(32px,4vw,52px) 24px',
+                    ...SERIF,
+                    display:      'block',
+                    fontSize:     'clamp(1.5rem,2.5vw,2.1rem)',
+                    fontWeight:   300,
+                    lineHeight:   1.15,
+                    color:        'var(--color-text-primary)',
+                    marginBottom: '16px',
                   }}
                 >
-                  <span style={{ ...MONO, color: 'var(--color-gold-on-light)', marginBottom: '20px' }}>
-                    {card.eyebrow}
-                  </span>
-                  <span
-                    style={{
-                      ...SERIF,
-                      display:      'block',
-                      fontSize:     'clamp(1.5rem,2.5vw,2.1rem)',
-                      fontWeight:   300,
-                      lineHeight:   1.15,
-                      color:        'var(--color-text-primary)',
-                      marginBottom: '16px',
-                    }}
-                  >
-                    {card.headline}
-                  </span>
-                  <span
-                    style={{
-                      ...SERIF,
-                      display:    'block',
-                      fontSize:   '1.05rem',
-                      fontStyle:  'italic',
-                      fontWeight: 300,
-                      lineHeight: 1.7,
-                      color:      'var(--color-text-secondary)',
-                    }}
-                  >
-                    {card.support}
-                  </span>
-
-                  <span
-                    aria-hidden={!isSelected}
-                    style={{
-                      ...MONO,
-                      fontSize:   '0.5rem',
-                      color:      'var(--color-gold-on-light)',
-                      marginTop:  '20px',
-                      opacity:    isSelected ? 1 : 0,
-                      transition: 'opacity 250ms ease',
-                    }}
-                  >
-                    Selected
-                  </span>
-                </button>
-
-                {/* CTA stays on its card. Keeps /apply and /succession. */}
-                <div style={{ padding: '0 clamp(32px,4vw,52px) clamp(32px,4vw,52px)' }}>
-                  <Link
-                    href={card.href}
-                    style={{
-                      ...MONO,
-                      display:        'inline-block',
-                      textDecoration: 'none',
-                      color:          '#0A0908',
-                      background:     'var(--color-gold)',
-                      border:         'none',
-                      padding:        '14px 28px',
-                      transition:     'background 250ms ease, color 250ms ease',
-                    }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--color-gold-light)' }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'var(--color-gold)' }}
-                  >
-                    {card.cta} &rarr;
-                  </Link>
-                </div>
+                  {card.headline}
+                </span>
+                <span
+                  style={{
+                    ...SERIF,
+                    display:    'block',
+                    fontSize:   '1.05rem',
+                    fontStyle:  'italic',
+                    fontWeight: 300,
+                    lineHeight: 1.7,
+                    color:      'var(--color-text-secondary)',
+                  }}
+                >
+                  {card.support}
+                </span>
               </div>
-            )
-          })}
+
+              {/* Gold CTA, visual affordance for the card link */}
+              <div style={{ padding: '0 clamp(32px,4vw,52px) clamp(32px,4vw,52px)' }}>
+                <span
+                  className="path-cta"
+                  style={{
+                    ...MONO,
+                    display:    'inline-block',
+                    color:      '#0A0908',
+                    background: 'var(--color-gold)',
+                    padding:    '14px 28px',
+                    transition: 'background 250ms ease',
+                  }}
+                >
+                  {card.cta} &rarr;
+                </span>
+              </div>
+            </Link>
+          ))}
         </div>
       </div>
 
       <style>{`
-        .audience-card-btn:focus-visible {
-          outline: 2px solid var(--color-gold-on-light);
-          outline-offset: -2px;
-        }
+        .path-card:hover { border-color: var(--color-gold-on-light); box-shadow: var(--shadow-gold); }
+        .path-card:hover .path-cta { background: var(--color-gold-light); }
+        .path-card:focus-visible { outline: 2px solid var(--color-gold-on-light); outline-offset: 2px; }
         @media (max-width: 767px) {
-          .two-paths-grid {
-            grid-template-columns: 1fr !important;
-          }
+          .two-paths-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
     </section>
-  )
-}
-
-// Reads/writes the audience choice through the URL search param. The param is
-// the source of truth: nothing is selected by default, and the choice survives
-// reload and is shareable.
-function AudienceSelector() {
-  const router       = useRouter()
-  const pathname     = usePathname()
-  const searchParams = useSearchParams()
-
-  const raw = searchParams.get('audience')
-  const selected: Audience | null = raw === 'founder' || raw === 'family' ? raw : null
-
-  function onPick(audience: Audience) {
-    // The selection is instant and self-contained: update the URL in place,
-    // with no scroll jump. This is the source of truth and survives reload.
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('audience', audience)
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false })
-
-    // Then fire-and-forget instrumentation, fully guarded so it can never
-    // affect the selection above.
-    trackAudience(audience)
-  }
-
-  return <AudienceSection selected={selected} onPick={onPick} />
-}
-
-export default function TwoPathsSection() {
-  // useSearchParams requires a Suspense boundary in the App Router. Mirrors the
-  // pattern in app/begin/tier/page.tsx. The fallback renders the section with
-  // nothing selected, which is also the default state, so there is no flash.
-  return (
-    <Suspense fallback={<AudienceSection selected={null} onPick={() => {}} />}>
-      <AudienceSelector />
-    </Suspense>
   )
 }
