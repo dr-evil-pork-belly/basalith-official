@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { calculateArchiveScore } from '@/lib/archiveScore'
+import { shouldShowPrompt } from '@/lib/resurfacingPrompt'
 import OnboardingGuide from '@/app/components/OnboardingGuide'
 import TrainingDataCard from './TrainingDataCard'
 
@@ -1267,6 +1268,117 @@ function MirrorCard({ archiveId }: { archiveId: string }) {
   )
 }
 
+// ── "You told me this" — resurfaced owner deposit ─────────────────────────────
+// Pure retrieval. The frame line is the only added copy; the deposit's own
+// `response` is shown verbatim as the hero. Renders only when the endpoint
+// returns a deposit. The prompt is shown as quiet context (never merged into
+// the response) only for source_types whose prompt is a genuine question — see
+// shouldShowPrompt / RESURFACING_PROMPT_WHITELIST in lib/resurfacingPrompt.ts.
+type ResurfacingData = {
+  deposit_id:  string
+  source_type: string
+  prompt:      string | null
+  response:    string
+  frame_text:  string
+  reaction:    string | null
+}
+
+function ResurfacingCard({ archiveId }: { archiveId: string }) {
+  const [data,     setData]     = useState<ResurfacingData | null>(null)
+  const [reaction, setReaction] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetch('/api/resurfacing/today')
+      .then(r => (r.ok ? r.json() : { resurfacing: null }))
+      .then(d => {
+        const r: ResurfacingData | null = d.resurfacing ?? null
+        if (!r) return
+        setData(r)
+        setReaction(r.reaction ?? null)
+      })
+      .catch(() => {})
+  }, [archiveId])
+
+  if (!data) return null
+
+  async function react(value: string) {
+    setReaction(value)
+    try {
+      await fetch('/api/resurfacing/react', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ reaction: value }),
+      })
+    } catch {}
+  }
+
+  const showPrompt = shouldShowPrompt(data.source_type, data.prompt)
+
+  const reactionBtnStyle = (active: boolean): React.CSSProperties => ({
+    fontFamily:    '"Space Mono","Courier New",monospace',
+    fontSize:      '0.42rem',
+    letterSpacing: '0.16em',
+    textTransform: 'uppercase' as const,
+    color:         active ? '#C4A24A' : '#5C6166',
+    background:    active ? 'rgba(196,162,74,0.1)' : 'transparent',
+    border:        `1px solid ${active ? 'rgba(196,162,74,0.4)' : 'rgba(255,255,255,0.08)'}`,
+    borderRadius:  '2px',
+    padding:       '0.45rem 0.9rem',
+    cursor:        'pointer',
+    transition:    'all 0.15s',
+  })
+
+  return (
+    <div
+      className="rounded-sm mb-8"
+      style={{
+        background: 'rgba(196,162,74,0.04)',
+        border:     '1px solid rgba(196,162,74,0.12)',
+        borderTop:  '3px solid rgba(196,162,74,0.5)',
+        padding:    'clamp(1.5rem,4vw,2.25rem) clamp(1.25rem,4vw,2.5rem)',
+      }}
+    >
+      {/* Eyebrow */}
+      <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.44rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.8)', marginBottom: '1.25rem' }}>
+        You Told Me This
+      </p>
+
+      {/* Frame line — the only added words */}
+      <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontWeight: 300, fontSize: '1.05rem', color: 'rgba(196,162,74,0.9)', lineHeight: 1.6, margin: '0 0 1.35rem' }}>
+        {data.frame_text}
+      </p>
+
+      {/* Prompt as quiet context (the question), never merged into the response */}
+      {showPrompt && (
+        <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontWeight: 300, fontSize: '0.98rem', color: '#B8B4AB', lineHeight: 1.6, margin: '0 0 0.85rem' }}>
+          {data.prompt}
+        </p>
+      )}
+
+      {/* The deposit, verbatim — the hero */}
+      <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontWeight: 300, fontSize: 'clamp(1.3rem,2.8vw,1.65rem)', color: '#F0EDE6', lineHeight: 1.9, whiteSpace: 'pre-wrap', margin: 0 }}>
+        {data.response}
+      </p>
+
+      {/* Reactions */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginTop: '1.75rem', paddingTop: '1.25rem', borderTop: '1px solid rgba(196,162,74,0.1)' }}>
+        <button onClick={() => react('remember')} style={reactionBtnStyle(reaction === 'remember')}>
+          I remember this
+        </button>
+        <button
+          onClick={() => react('heart')}
+          aria-label="Love this"
+          style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '0.3rem', display: 'flex', alignItems: 'center', marginLeft: '0.1rem' }}
+        >
+          <svg width="17" height="17" viewBox="0 0 24 24" fill={reaction === 'heart' ? '#C4A24A' : 'none'} stroke={reaction === 'heart' ? '#C4A24A' : '#5C6166'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export default function DashboardClient({ archiveId }: { archiveId: string }) {
   const [loading,              setLoading]              = useState(true)
   const [archive,              setArchive]              = useState<ArchiveRow | null>(null)
@@ -1457,6 +1569,11 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
       {/* ── MIRROR (what the entity is learning) ── */}
       {!loading && archive?.status !== 'paused' && (
         <MirrorCard archiveId={archiveId} />
+      )}
+
+      {/* ── YOU TOLD ME THIS (resurfaced owner deposit) ── */}
+      {!loading && archive?.status !== 'paused' && (
+        <ResurfacingCard archiveId={archiveId} />
       )}
 
       {/* ── RANDOM THOUGHT CAPTURE ── */}

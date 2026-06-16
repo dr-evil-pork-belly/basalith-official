@@ -12,7 +12,7 @@ const SERIF: React.CSSProperties = {
   fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
 }
 
-// Two paths mapped to the existing concepts: LEGACY -> /apply (family) and
+// Two paths mapped to the existing concepts: LEGACY -> /families and
 // SUCCESSION -> /succession (founder). The cards are pure navigation now; the
 // audience demo above owns the founder/family choice.
 const CARDS: {
@@ -28,8 +28,8 @@ const CARDS: {
     eyebrow:  'INDIVIDUALS & FAMILIES',
     headline: 'Give them how you think, not just what you leave.',
     support:  'The years your family would spend guessing, answered while you are here.',
-    href:     '/apply',
-    cta:      'Begin Your Archive',
+    href:     '/families',
+    cta:      'Learn About Legacy',
   },
   {
     audience: 'founder',

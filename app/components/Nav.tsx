@@ -7,12 +7,14 @@ import { usePathname } from 'next/navigation'
 const DESKTOP_LINKS = [
   { href: '/method',      label: 'The Method'  },
   { href: '/pricing',     label: 'Pricing'     },
+  { href: '/families',    label: 'For Families'},
   { href: '/succession',  label: 'For Business'},
   { href: '/about',       label: 'About'       },
 ]
 
 const MOBILE_LINKS = [
   { href: '/pricing',         label: 'Pricing'               },
+  { href: '/families',        label: 'For Families'          },
   { href: '/succession',      label: 'For Business'          },
   { href: '/about',           label: 'About'                 },
   { href: '/method',          label: 'The Method'            },
