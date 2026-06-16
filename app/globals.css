@@ -74,6 +74,21 @@
   --section-padding:        120px;
   --section-padding-mobile: 64px;
 
+  /* Design system — stage 1 (homepage pass) */
+  --content-max:      1040px;
+  --measure:          680px;
+  --page-x:           clamp(24px, 6vw, 80px);
+  --section-y:        clamp(96px, 12vw, 160px);
+
+  --text-section:     clamp(2.1rem, 3.8vw, 3.4rem);
+  --text-lead:        clamp(1.15rem, 1.6vw, 1.4rem);
+  --eyebrow-size:     0.55rem;
+  --eyebrow-tracking: 0.25em;
+
+  --text-on-dark:   #F0EDE6;
+  --text-on-dark-2: rgba(240,237,230,0.7);
+  --text-on-dark-3: rgba(240,237,230,0.45);
+
   /* Motion */
   --ease-expo:     cubic-bezier(0.16, 1, 0.3, 1);
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
@@ -210,6 +225,29 @@ ON GOLD BUTTON (#B8963E):
   .section-padding {
     padding: var(--section-padding-mobile) 24px;
   }
+}
+
+/* Prose measure — constrains reading width, left-anchored within the content column */
+.measure { max-width: var(--measure); }
+
+/* Editorial two-column spine: sticky lede + prose/grid */
+.editorial{
+  display:grid;
+  grid-template-columns:minmax(300px,400px) 1fr;
+  gap:clamp(48px,6vw,104px);
+  align-items:start;
+}
+.editorial-lede{ position:sticky; top:clamp(96px,12vh,150px); align-self:start; }
+.editorial-prose{ max-width:600px; }
+.editorial-prose p{ font-size:1.18rem; line-height:1.72; }
+.pillar p{ font-size:1.02rem; line-height:1.7; }
+.negations{ display:grid; grid-template-columns:1fr; gap:clamp(40px,5vw,56px); }
+.neg h3{ font-size:1.7rem; }
+.neg p{ font-size:1.1rem; line-height:1.72; font-style:normal; }
+@media (max-width:860px){
+  .editorial{ grid-template-columns:1fr; gap:40px; }
+  .editorial-lede{ position:static; }
+  .editorial-prose{ max-width:none; }
 }
 
 /* Eyebrow text — Space Mono, gold, tracking */

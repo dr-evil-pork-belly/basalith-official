@@ -2,16 +2,7 @@
 
 import { Suspense } from 'react'
 import { useAudience, type Audience } from '@/lib/useAudience'
-
-const MONO: React.CSSProperties = {
-  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
-  textTransform: 'uppercase' as const,
-  letterSpacing: '0.28em',
-}
-
-const SERIF: React.CSSProperties = {
-  fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-}
+import Section, { mono, serif } from './Section'
 
 type Item = { title: string; body: string }
 
@@ -80,28 +71,35 @@ function WhatBasalithIsNotView({ audience }: { audience: Audience | null }) {
   const items = ITEMS[audience ?? 'default']
 
   return (
-    <section style={{ background: 'var(--color-void)', padding: 'clamp(72px,10vw,128px) clamp(24px,6vw,80px)' }}>
-      <div style={{ maxWidth: '780px', margin: '0 auto' }}>
+    <Section tone="dark" align="left" ariaLabel="What Basalith is not">
 
-        <p style={{ ...MONO, fontSize: '0.6rem', color: 'var(--color-gold)', display: 'flex', alignItems: 'center', gap: '12px', marginBottom: 'clamp(36px,5vw,56px)' }}>
-          <span style={{ width: '24px', height: '1px', background: 'var(--color-gold)', display: 'block', flexShrink: 0 }} aria-hidden="true" />
-          What Basalith Is Not
-        </p>
+      {/* Editorial spine: sticky lede on the left, stacked refusals on the right */}
+      <div className="editorial">
+        <div className="editorial-lede">
+          <p style={{ ...mono, fontSize: 'var(--eyebrow-size)', letterSpacing: 'var(--eyebrow-tracking)', color: 'var(--color-gold)', marginBottom: 'var(--space-4)' }}>
+            WHAT BASALITH IS NOT
+          </p>
+          {/* Same treatment as the Philosophy heading */}
+          <h2 style={{ ...serif, fontSize: 'var(--text-section)', fontWeight: 300, lineHeight: 1.15, letterSpacing: '-0.02em', color: 'var(--text-on-dark)', margin: 0 }}>
+            Trust is the whole product.
+          </h2>
+        </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(28px,4vw,44px)' }}>
+        {/* Single stacked column; .neg h3 / .neg p sizing comes from globals.css */}
+        <div className="negations">
           {items.map(item => (
-            <div key={item.title} style={{ borderLeft: '3px solid rgba(196,162,74,0.5)', paddingLeft: 'clamp(20px,3vw,32px)' }}>
-              <p style={{ ...SERIF, fontSize: 'clamp(1.3rem,2.6vw,1.7rem)', fontWeight: 300, color: '#F0EDE6', letterSpacing: '-0.01em', margin: '0 0 10px' }}>
+            <div key={item.title} className="neg" style={{ borderLeft: '3px solid rgba(196,162,74,0.5)', paddingLeft: 'clamp(20px,3vw,32px)' }}>
+              <h3 style={{ ...serif, fontWeight: 300, color: 'var(--text-on-dark)', letterSpacing: '-0.01em', lineHeight: 1.2, margin: '0 0 10px' }}>
                 {item.title}
-              </p>
-              <p style={{ ...SERIF, fontSize: '1.05rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: '#B8B4AB', margin: 0 }}>
+              </h3>
+              <p style={{ ...serif, fontWeight: 300, color: 'var(--text-on-dark-2)', margin: 0 }}>
                 {item.body}
               </p>
             </div>
           ))}
         </div>
       </div>
-    </section>
+    </Section>
   )
 }
 

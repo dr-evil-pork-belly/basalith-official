@@ -2,6 +2,7 @@
 
 import { Suspense } from 'react'
 import { useAudience, type Audience } from '@/lib/useAudience'
+import Section, { mono, serif } from './Section'
 
 const PILLARS = [
   {
@@ -19,12 +20,6 @@ const PILLARS = [
     title: 'It continues.',
     body:  'There are people spending billions\nto ensure what they built\noutlasts them.\n\nWe think every family\ndeserves the same thing.\n\nNot because death is the enemy.\nBut because the people we love\nshould not have to wonder.',
   },
-]
-
-const BODY_PARAS = [
-  'It is in how you evaluate risk.\nHow you read people.\nWhen you walk away.\nWhat you look for before anyone else sees it.',
-  'Thirty years of pattern recognition.\nA lifetime of calibrated judgment.',
-  'Basalith learns this while you are here to teach it.',
 ]
 
 // Audience-specific framing. `default` is the existing neutral copy, shown when
@@ -49,158 +44,64 @@ function PhilosophyView({ audience }: { audience: Audience | null }) {
   const variant = VARIANT[audience ?? 'default']
 
   return (
-    <section
-      data-reveal
-      aria-label="Our philosophy"
-      style={{
-        background: 'var(--color-void)',
-        padding:    'clamp(80px,12vw,160px) clamp(24px,6vw,80px)',
-      }}
-    >
-      <div style={{ maxWidth: '860px', margin: '0 auto' }}>
+    <Section tone="dark" align="left" reveal ariaLabel="Our philosophy">
 
-        <p style={{
-          fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
-          fontSize:      '0.52rem',
-          letterSpacing: '0.3em',
-          textTransform: 'uppercase' as const,
-          color:         'var(--color-gold)',
-          marginBottom:  '24px',
-        }}>
-          WHAT BASALITH PRESERVES
-        </p>
-
-        <h2
-          style={{
-            fontFamily:    'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-            fontSize:      'clamp(2rem, 4vw, 3.25rem)',
-            fontWeight:    300,
-            lineHeight:    1.15,
-            letterSpacing: '-0.02em',
-            color:         'rgba(250,250,248,0.9)',
-            marginBottom:  '56px',
-          }}
-        >
-          What you know is not in any document.
-        </h2>
-
-        <div
-          style={{
-            fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-            fontWeight:   300,
-            lineHeight:   1.9,
-            maxWidth:     '600px',
-            marginBottom: '80px',
-          }}
-        >
-          {BODY_PARAS.map((para, i) => (
-            <p
-              key={i}
-              style={{
-                fontSize:      '1.15rem',
-                fontStyle:     'italic',
-                color:         'rgba(250,248,244,0.55)',
-                marginBottom:  '28px',
-                whiteSpace:    'pre-line',
-              }}
-            >
-              {para}
-            </p>
-          ))}
-          <p
-            style={{
-              fontSize:      'clamp(1.2rem, 2.5vw, 1.5rem)',
-              fontStyle:     'italic',
-              color:         'rgba(250,248,244,0.8)',
-              marginBottom:  '28px',
-              whiteSpace:    'pre-line',
-            }}
-          >
-            So it can speak when you cannot.
+      {/* Editorial spine: sticky lede on the left, prose on the right */}
+      <div className="editorial" style={{ marginBottom: 'var(--space-6)' }}>
+        <div className="editorial-lede">
+          <p style={{ ...mono, fontSize: 'var(--eyebrow-size)', letterSpacing: 'var(--eyebrow-tracking)', color: 'var(--color-gold)', marginBottom: 'var(--space-4)' }}>
+            WHAT BASALITH PRESERVES
           </p>
-          <p
-            style={{
-              fontSize:   'clamp(1.2rem, 2.5vw, 1.5rem)',
-              fontStyle:  'italic',
-              color:      'rgba(196,162,74,0.9)',
-              margin:     0,
-              whiteSpace: 'pre-line',
-            }}
-          >
+          <h2 style={{ ...serif, fontSize: 'var(--text-section)', fontWeight: 300, lineHeight: 1.15, letterSpacing: '-0.02em', color: 'var(--text-on-dark)', margin: 0 }}>
+            What you know is not in any document.
+          </h2>
+        </div>
+
+        {/* Prose sizes/line-height come from .editorial-prose p in globals.css */}
+        <div className="editorial-prose">
+          <p style={{ ...serif, fontWeight: 300, color: 'var(--text-on-dark-2)', margin: '0 0 var(--space-4)' }}>
+            It is in how you evaluate risk. How you read people. When you walk away. What you look for before anyone else sees it.
+          </p>
+          <p style={{ ...serif, fontWeight: 300, color: 'var(--text-on-dark-2)', margin: '0 0 var(--space-4)' }}>
+            Thirty years of pattern recognition. A lifetime of calibrated judgment.
+          </p>
+          <p style={{ ...serif, fontWeight: 300, color: 'var(--text-on-dark)', margin: '0 0 var(--space-4)' }}>
+            Basalith learns this while you are here to teach it. So it can speak when you cannot.
+          </p>
+          {/* Emphasis: the only italic in the section; size overrides .editorial-prose p */}
+          <p style={{ ...serif, fontSize: '1.32rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--color-gold)', whiteSpace: 'pre-line', margin: 0 }}>
             {variant.closingLine}
           </p>
         </div>
+      </div>
 
-        {/* Gold divider */}
-        <div aria-hidden="true" style={{ width: '40px', height: '1px', background: 'var(--color-gold)', margin: '0 0 80px' }} />
+      {/* Rule divider above the pillars */}
+      <div aria-hidden="true" style={{ width: '40px', height: '1px', background: 'var(--color-gold)', margin: '0 0 var(--space-5)' }} />
 
-        {/* Three pillars */}
-        <div
-          style={{
-            display:             'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap:                 '48px',
-          }}
-        >
-          {PILLARS.map(({ n, title, body }) => (
-            <div key={n} data-reveal>
-              <p
-                style={{
-                  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
-                  fontSize:      '0.52rem',
-                  letterSpacing: '0.3em',
-                  textTransform: 'uppercase' as const,
-                  color:         'var(--color-gold)',
-                  marginBottom:  '16px',
-                }}
-              >
-                {n}
-              </p>
-              <h3
-                style={{
-                  fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-                  fontSize:     '1.4rem',
-                  fontWeight:   500,
-                  color:        'rgba(250,248,244,0.9)',
-                  marginBottom: '20px',
-                  lineHeight:   1.2,
-                }}
-              >
-                {title}
-              </h3>
-              <p
-                style={{
-                  fontFamily:  'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-                  fontSize:    '1.05rem',
-                  fontWeight:  300,
-                  lineHeight:  1.85,
-                  color:       'rgba(250,248,244,0.45)',
-                  whiteSpace:  'pre-line',
-                }}
-              >
-                {n === '03' ? variant.pillar3Body : body}
-              </p>
-            </div>
-          ))}
-        </div>
-
+      {/* Three pillars — full-width siblings below the editorial grid */}
+      <div className="philosophy-pillars" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-5)' }}>
+        {PILLARS.map(({ n, title, body }) => (
+          <div key={n} className="pillar" data-reveal>
+            <p style={{ ...mono, fontSize: 'var(--eyebrow-size)', color: 'var(--color-gold)', marginBottom: 'var(--space-3)' }}>
+              {n}
+            </p>
+            <h3 style={{ ...serif, fontSize: '1.4rem', fontWeight: 500, color: 'var(--text-on-dark)', marginBottom: '20px', lineHeight: 1.2 }}>
+              {title}
+            </h3>
+            {/* Pillar body size/line-height come from .pillar p in globals.css */}
+            <p style={{ ...serif, fontWeight: 300, color: 'var(--text-on-dark-3)', whiteSpace: 'pre-line', margin: 0 }}>
+              {n === '03' ? variant.pillar3Body : body}
+            </p>
+          </div>
+        ))}
       </div>
 
       <style>{`
         @media (max-width: 768px) {
-          section[aria-label="Our philosophy"] {
-            padding: 64px 24px !important;
-          }
-          section[aria-label="Our philosophy"] > div > div[style*="grid-template-columns"] {
-            grid-template-columns: 1fr !important;
-            gap: 40px !important;
-          }
-          section[aria-label="Our philosophy"] h2 {
-            font-size: clamp(1.75rem, 7vw, 2.5rem) !important;
-          }
+          .philosophy-pillars { grid-template-columns: 1fr !important; gap: var(--space-5) !important; }
         }
       `}</style>
-    </section>
+    </Section>
   )
 }
 
