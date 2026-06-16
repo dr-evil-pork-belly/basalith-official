@@ -1,7 +1,7 @@
 'use client'
 
 import { Suspense, useState } from 'react'
-import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import { useAudience } from '@/lib/useAudience'
 
 type Audience = 'founder' | 'family'
 
@@ -313,30 +313,26 @@ function ContrastDemoSection({
 }
 
 function ContrastDemoInner() {
-  const router       = useRouter()
-  const pathname     = usePathname()
-  const searchParams = useSearchParams()
-
-  const raw = searchParams.get('audience')
-  const audience: Audience | null = raw === 'founder' || raw === 'family' ? raw : null
+  // Seed once from the URL so deep links pre-select, then keep the choice in
+  // local state. The toggle drives only this demo; it never writes ?audience,
+  // so the other sections (above and below) are unaffected by toggling here.
+  const urlAudience = useAudience()
+  const [demoAudience, setDemoAudience] = useState<Audience | null>(urlAudience ?? null)
 
   function onSelect(next: Audience) {
-    if (next === audience) return
-    // Update the URL in place (no scroll) so the lower sections still thread,
-    // then fire-and-forget the count. The toggle never navigates.
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('audience', next)
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false })
-    trackAudience(next)
+    if (next === demoAudience) return
+    setDemoAudience(next)
+    trackAudience(next)   // analytics ping only; does not touch the URL
   }
 
   // Keyed by the choice so toggling remounts the section and resets the answer.
-  return <ContrastDemoSection key={audience ?? 'neutral'} audience={audience} onSelect={onSelect} />
+  return <ContrastDemoSection key={demoAudience ?? 'neutral'} audience={demoAudience} onSelect={onSelect} />
 }
 
 export default function ContrastDemo() {
-  // useSearchParams requires a Suspense boundary in the App Router. The fallback
-  // renders the always-visible neutral demo, so SSR shows it with no flash.
+  // useAudience reads useSearchParams under the hood (for the one-time seed), so
+  // it needs a Suspense boundary. The fallback renders the always-visible
+  // neutral demo, so SSR shows it with no flash.
   return (
     <Suspense fallback={<ContrastDemoSection audience={null} onSelect={() => {}} />}>
       <ContrastDemoInner />

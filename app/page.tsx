@@ -9,6 +9,7 @@ import Nav               from './components/Nav'
 import TaglineOpening    from './components/TaglineOpening'
 import HeroSection       from './components/HeroSection'
 import PhilosophySection from './components/PhilosophySection'
+import SuccessionSection from './components/SuccessionSection'
 import TwoPathsSection   from './components/TwoPathsSection'
 import ContrastDemo      from './components/ContrastDemo'
 import ClosingSection    from './components/ClosingSection'
@@ -61,6 +62,7 @@ export default function HomePage() {
         <TaglineOpening />
         <HeroSection />
         <PhilosophySection />
+        <SuccessionSection />
         <WhatBasalithIsNot />
         <ContrastDemo />
         <TwoPathsSection />

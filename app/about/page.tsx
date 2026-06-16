@@ -154,7 +154,7 @@ export default function AboutPage() {
               meaning and what does not.
             </p>
             <p style={BODY}>
-              What I found, consistently, is that people do not want to be remembered.
+              What I keep coming back to is that people do not want to be remembered.
               They want to be known.
             </p>
             <p style={{ ...BODY, color: 'var(--color-text-primary)', fontStyle: 'italic' }}>
@@ -188,15 +188,14 @@ export default function AboutPage() {
             <p style={BODY}>But this was never only a family product.</p>
             <p style={BODY}>
               Every founder I know has the same problem my parents have.
-              They carry thirty years of judgment that lives nowhere but in their head.
+              They carry decades of judgment that lives nowhere but in their head.
               When they leave, that judgment leaves.
               Their successor gets the systems.
               They do not get the thinking behind the systems.
             </p>
             <p style={{ ...BODY, color: 'var(--color-text-primary)' }}>Basalith changes that.</p>
             <p style={BODY}>
-              The technology being used by the wealthiest people in the world
-              to preserve institutional knowledge should not belong only to them.
+              Preserving how a person thinks should not be a privilege of the wealthy.
             </p>
             <p style={BODY}>
               My mother deserves this.
