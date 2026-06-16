@@ -148,10 +148,16 @@ export default function AboutPage() {
 
             <div aria-hidden="true" style={{ width: '40px', height: '1px', background: 'var(--color-gold)', margin: '44px 0' }} />
 
-            <p style={BODY}>I am a researcher by training.</p>
+            <p style={BODY}>I am an entrepreneur by upbringing and a researcher by training.</p>
             <p style={BODY}>
-              I spent years studying what makes people happy, what gives a life
-              meaning and what does not.
+              I set out to study business, settled on accounting, and then, given the
+              freedom to write on whatever I wanted, wrote my dissertation on
+              entrepreneur well-being instead.
+            </p>
+            <p style={BODY}>
+              The years since have circled the same question from new angles. What
+              actually makes people happy, and how the things we build either deepen
+              our relationships or thin them out.
             </p>
             <p style={BODY}>
               What I keep coming back to is that people do not want to be remembered.
