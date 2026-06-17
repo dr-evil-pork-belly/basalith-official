@@ -1,7 +1,12 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { supabaseAdmin } from './supabase-admin'
 
-const anthropic = new Anthropic()
+export const anthropic = new Anthropic()
+
+// The Haiku model string used for cheap, structured classification calls.
+// Exported so other structured-extraction paths (e.g. grounding attribution)
+// reuse the exact same model rather than hardcoding their own.
+export const HAIKU_MODEL = 'claude-haiku-4-5-20251001'
 
 const DEPTH_RUBRIC = `1 = states a fact or memory
 2 = explains a choice or pattern
@@ -67,7 +72,7 @@ export async function classifyDeposit(params: {
     }
 
     const response = await anthropic.messages.create({
-      model:      'claude-haiku-4-5-20251001',
+      model:      HAIKU_MODEL,
       max_tokens: 300,
       system:     buildSystemPrompt(domains),
       messages:   [

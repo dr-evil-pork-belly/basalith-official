@@ -6,6 +6,8 @@ import { createTrainingPairFromDeposit } from '@/lib/trainingPipeline'
 import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { classifyDeposit } from '@/lib/classifyDeposit'
 import { buildEntitySystemPrompt } from '@/lib/entityContext'
+import { computeAndStoreReceipt } from '@/lib/groundingAttribution'
+import { waitUntil } from '@vercel/functions'
 
 const anthropic = new Anthropic()
 
@@ -110,7 +112,7 @@ export async function POST(req: Request) {
 
     console.log('[entity-chat] archiveId:', archiveId, '| caller:', callerType, '| msgLen:', message?.length, '| msgPreview:', message?.substring(0, 60))
 
-    const { systemPrompt, usedDepositIds } = await buildEntitySystemPrompt(archiveId, message)
+    const { systemPrompt, usedDepositIds, retrievedById, language } = await buildEntitySystemPrompt(archiveId, message)
 
     const messages = [
       ...(conversationHistory || []),
@@ -128,6 +130,35 @@ export async function POST(req: Request) {
       aiResponse.content[0].type === 'text' ? aiResponse.content[0].text : ''
 
     const currentSessionId = sessionId || crypto.randomUUID()
+
+    // ── Provenance receipt (phase 1, owner path) ──────────────────────────────
+    // retrievedById was captured at generation time, above — BEFORE the
+    // auto-deposit insert further down mutates this archive's deposits.
+    // Write a pending receipt synchronously, then run attribution AFTER the
+    // response is sent (waitUntil) so it can never affect or delay the reply.
+    const messageId = crypto.randomUUID()
+    await supabaseAdmin
+      .from('entity_response_receipts')
+      .upsert(
+        {
+          message_id:            messageId,
+          archive_id:            archiveId,
+          session_id:            currentSessionId,
+          retrieved_deposit_ids: Object.keys(retrievedById),
+          status:                'pending',
+        },
+        { onConflict: 'message_id', ignoreDuplicates: true },
+      )
+
+    waitUntil(
+      computeAndStoreReceipt({
+        messageId,
+        archiveId,
+        answer: entityResponse,
+        retrievedById,
+        language,
+      }),
+    )
 
     // Save conversation (non-fatal)
     supabaseAdmin.from('entity_conversations').insert([
@@ -238,7 +269,7 @@ export async function POST(req: Request) {
       })
     }
 
-    return NextResponse.json({ response: entityResponse, sessionId: currentSessionId, wasDeposit })
+    return NextResponse.json({ response: entityResponse, sessionId: currentSessionId, wasDeposit, messageId })
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Unknown error'
     console.error('Entity chat error:', msg)

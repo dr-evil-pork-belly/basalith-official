@@ -40,7 +40,7 @@ export async function buildEntitySystemPrompt(
   archiveId: string,
   currentMessage?: string,
   excludeDepositIds: string[] = [],
-): Promise<{ systemPrompt: string; usedDepositIds: string[] }> {
+): Promise<{ systemPrompt: string; usedDepositIds: string[]; retrievedById: Record<string, string>; language: string }> {
   const topics = currentMessage ? extractTopics(currentMessage) : []
 
   // ── Parallel fetches (static data) ────────────────────────────────────────
@@ -95,6 +95,11 @@ export async function buildEntitySystemPrompt(
     depositsData = (allDeposits || []).slice(0, 50)
   }
   const usedDepositIds = depositsData.map((d: any) => d.id as string)
+  // Additive (provenance receipts, phase 1): id -> injected response text for the
+  // exact deposits selected above. Built from depositsData; no new query.
+  const retrievedById: Record<string, string> = Object.fromEntries(
+    depositsData.map((d: any) => [d.id as string, (d.response ?? '') as string]),
+  )
 
   // ── Label selection ────────────────────────────────────────────────────────
   let labelsFromContributors: any[] = []
@@ -184,6 +189,7 @@ export async function buildEntitySystemPrompt(
   const isRichArchive = totalDepositCount > 10 || totalLabelCount > 20
   const ownerName  = archiveData?.owner_name  || 'the archive owner'
   const familyName = archiveData?.family_name || 'this family'
+  const language   = archiveData?.preferred_language || 'en'
 
   const contextNote = topics.length > 0
     ? `CONTEXT SELECTION NOTE:
@@ -265,7 +271,7 @@ Make the user feel heard, not redirected.
 
 LANGUAGE:
 Respond in whatever language the user writes to you in. If they write in Spanish respond in Spanish. If they write in French respond in French. If they write in Mandarin respond in Mandarin. Your archive data may be in English but your responses adapt completely to the language of the person you are speaking with. You are equally fluent in all languages.`
-    return { systemPrompt, usedDepositIds }
+    return { systemPrompt, usedDepositIds, retrievedById, language }
   }
 
   const systemPrompt = `You are the personal AI entity of ${ownerName}, built from The ${familyName} Archive on Basalith.
@@ -326,7 +332,7 @@ Keep responses to 4-6 sentences. Be specific. Be honest. Be human.
 
 LANGUAGE:
 Respond in whatever language the user writes to you in. If they write in Spanish respond in Spanish. If they write in French respond in French. If they write in Mandarin respond in Mandarin. Your archive data may be in English but your responses adapt completely to the language of the person you are speaking with. You are equally fluent in all languages.`
-  return { systemPrompt, usedDepositIds }
+  return { systemPrompt, usedDepositIds, retrievedById, language }
 }
 
 /**
