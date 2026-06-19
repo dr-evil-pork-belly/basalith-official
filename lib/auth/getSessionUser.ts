@@ -61,5 +61,13 @@ export async function getSessionUser(): Promise<SessionUser | null> {
   result.archivistId = archivistRes.data?.id ?? null
   result.successorId = successorRes.data?.id ?? null
 
+  // A successor owns no archive, so the owner path above leaves archiveId null
+  // for them. Fall back to the archive their successor row is scoped to, so the
+  // successor portal (which requires both successorId and archiveId) is
+  // reachable. This never overrides an owner's resolved archive.
+  if (result.successorId && !result.archiveId) {
+    result.archiveId = successorRes.data?.archive_id ?? null
+  }
+
   return result
 }
