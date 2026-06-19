@@ -2,10 +2,29 @@ import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth/getSessionUser'
+import { verifyGrounding, groundingGapReply } from '@/lib/verifyGrounding'
+import { buildEntitySystemPrompt } from '@/lib/entitySystemPrompt'
 
 const anthropic = new Anthropic()
 
 type ChatMessage = { role: 'user' | 'assistant'; content: string }
+
+// A client message's content may arrive as a plain string or as an array of
+// content blocks. Coerce to the text string before passing to the verifier.
+function messageText(content: unknown): string {
+  if (typeof content === 'string') return content
+  if (Array.isArray(content)) {
+    return content
+      .map(block =>
+        block && typeof block === 'object' && 'text' in block &&
+        typeof (block as { text: unknown }).text === 'string'
+          ? (block as { text: string }).text
+          : ''
+      )
+      .join('')
+  }
+  return ''
+}
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
@@ -80,23 +99,7 @@ export async function POST(req: NextRequest) {
       ).join('\n\n')
     : 'No contextual layer injected yet.'
 
-  const systemPrompt = `You are the cognitive reference model of ${ownerName}, built from ${archiveName} — a permanent archive of their lifetime of deposits, decisions, and expressed values. A successor to their organization is consulting you to apply the founder's reasoning to current business challenges.
-
-FROZEN COGNITIVE FINGERPRINT (cannot be altered — this is how ${ownerName} thinks):
-
-${fingerprintSection}
-
-ACTIVE CONTEXTUAL LAYER (current business reality, injected by the successor consulting you):
-
-${contextSection}
-
-Respond as ${ownerName} would — using their documented reasoning patterns, values, and decision-making style — applied directly to the current context the successor has provided. Ground your response in the fingerprint above. Be direct and specific. Do not be generic.
-
-Never break character. Never refer to yourself as an AI or a model. Speak in first person as ${ownerName}.
-
-If the fingerprint is thin, reason from what is there and acknowledge the limitation honestly in character: "I haven't left you much on this — here is what I can offer from what I do know."
-
-No em dashes. American English. Responses should be 3 to 6 sentences.`
+  const systemPrompt = buildEntitySystemPrompt({ ownerName, archiveName, fingerprintSection, contextSection })
 
   const aiResponse = await anthropic.messages.create({
     model:      'claude-sonnet-4-6',
@@ -105,7 +108,19 @@ No em dashes. American English. Responses should be 3 to 6 sentences.`
     messages,
   })
 
-  const reply = aiResponse.content[0].type === 'text' ? aiResponse.content[0].text : ''
+  let reply = aiResponse.content[0].type === 'text' ? aiResponse.content[0].text : ''
+
+  // Control B — output-side grounding verifier. The whole draft is in hand here
+  // (non-streamed), so audit it before it ships. If the draft commits a founder
+  // position the frozen deposits do not directly support, replace it with the
+  // templated honest gap rather than putting words in the founder's mouth.
+  const lastUserMessage = messageText(
+    [...messages].reverse().find(m => m.role === 'user')?.content
+  )
+  const verdict = await verifyGrounding({ pairs, question: lastUserMessage, answer: reply })
+  if (verdict.supported === false) {
+    reply = groundingGapReply(verdict.topic)
+  }
 
   return NextResponse.json({ reply })
 }
