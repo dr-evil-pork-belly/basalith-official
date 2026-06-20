@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useRouter } from 'next/navigation'
 
 type ArchiveItem = {
   id:                string
@@ -23,7 +22,6 @@ const MONO: React.CSSProperties = {
 }
 
 export default function ArchiveSwitcher() {
-  const router                          = useRouter()
   const dropdownRef                     = useRef<HTMLDivElement>(null)
   const [archives,   setArchives]       = useState<ArchiveItem[]>([])
   const [currentId,  setCurrentId]      = useState<string | null>(null)
@@ -61,13 +59,20 @@ export default function ArchiveSwitcher() {
     setSwitching(true)
     setOpen(false)
     try {
-      await fetch('/api/archive/switch', {
+      const res = await fetch('/api/archive/switch', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ archiveId, role }),
       })
-      router.refresh()
-    } finally {
+      if (res.ok) {
+        // Full reload so the server re-reads the freshly-set httpOnly
+        // archive-id cookie. router.refresh() soft-refreshes without
+        // applying the new cookie, leaving the dashboard body on the old archive.
+        window.location.reload()
+        return
+      }
+      setSwitching(false)
+    } catch {
       setSwitching(false)
     }
   }
