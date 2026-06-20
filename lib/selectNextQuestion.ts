@@ -7,7 +7,7 @@ export type Tier    = 'onramp' | 'standard' | 'deep'
 export type Band    = 'p1' | 'p2' | 'p3'
 export type Source  = 'p0' | 'p1' | 'p2' | 'p3'
 export type Scope   = 'b2c' | 'b2b'
-export type Channel = 'daily_email' | 'mirror_thread' | 'app_companion' | 'app_spark'
+export type Channel = 'daily_email' | 'mirror_thread' | 'app_companion' | 'app_spark' | 'founder_web'
 
 export interface DomainCoverage {
   domainId:        number

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { calculateArchiveScore } from '@/lib/archiveScore'
 import OnboardingGuide from '@/app/components/OnboardingGuide'
 import TrainingDataCard from './TrainingDataCard'
+import SuccessionDashboard from './SuccessionDashboard'
 
 // ── Accuracy types ──────────────────────────────────────────────────────────
 type DimensionResult = {
@@ -885,6 +886,7 @@ type ArchiveRow = {
   last_label_date:  string | null
   status:           string
   paused_at:        string | null
+  tier:             string | null
 }
 
 type DecadeRow = {
@@ -1360,6 +1362,11 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
 
   const maxCount = Math.max(...Object.values(byDecade), 1)
 
+  // Succession archives get a distinct judgment-capture dashboard. This branch
+  // only adds a path; the consumer return below is untouched.
+  if (!loading && archive?.tier === 'succession') {
+    return <SuccessionDashboard archiveId={archiveId} ownerName={archive.owner_name} />
+  }
 
   return (
     <div className="max-w-4xl mx-auto">
