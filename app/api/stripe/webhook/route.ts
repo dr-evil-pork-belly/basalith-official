@@ -66,6 +66,7 @@ function buildAdminActivationEmail(
   billing:     string,
   guideName:   string,
   archiveId:   string,
+  commissionWarning?: string,
 ): string {
   return `<!DOCTYPE html>
 <html>
@@ -90,6 +91,9 @@ function buildAdminActivationEmail(
       <td style="font-size:14px;color:#B8B4AB;padding:8px 0">${v}</td>
     </tr>`).join('')}
   </table>
+  ${commissionWarning
+    ? `<p style="color:#c0392b;font-family:'Courier New',monospace;font-size:12px;letter-spacing:1px;margin:20px 0 0">COMMISSION WRITE FAILED: ${commissionWarning}</p>`
+    : ''}
 </body>
 </html>`
 }
@@ -321,17 +325,25 @@ export async function POST(req: NextRequest) {
       : { data: null }
 
     // ── Record $1,000 founding commission ────────────────────────────────────
+    // Live `commissions` columns: type / amount_cents / status / description.
+    // prospect_id is omitted (nullable): the prospect is matched by contact above
+    // and its id is not captured here, so there is nothing to pass.
+    let commissionError: string | null = null
     if (archivist) {
-      await supabaseAdmin
+      const { error: commErr } = await supabaseAdmin
         .from('commissions')
         .insert({
-          archivist_id:    archivist.id,
-          commission_type: 'founding_fee',
-          amount:          1000,
-          status:          'pending',
-          notes:           `${archive.family_name} Archive, ${archive.tier} tier founding`,
+          archivist_id: archivist.id,
+          type:         'founding',
+          amount_cents: 100000, // $1,000 in cents
+          status:       'pending',
+          description:  `${archive.family_name} Archive, ${archive.tier} tier founding`,
         })
-        .then(() => {})
+
+      if (commErr) {
+        commissionError = commErr.message
+        console.error('[webhook] Founding commission write failed:', commErr.message)
+      }
 
       // ── Increment archivist closings ────────────────────────────────────────
       await supabaseAdmin
@@ -392,6 +404,7 @@ export async function POST(req: NextRequest) {
         html:    buildAdminActivationEmail(
           clientName, archive.owner_email, familyName, tierLabel,
           archive.billing ?? 'annual', archivist?.name ?? 'Unknown guide', archiveId,
+          commissionError ?? undefined,
         ),
       })
     } catch (e) {

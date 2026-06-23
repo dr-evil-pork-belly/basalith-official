@@ -144,17 +144,23 @@ export async function POST(req: NextRequest) {
 
     if (ownerLinkError) throw new Error('Failed to link owner account: ' + ownerLinkError.message)
 
-    // ── 5. Record commission (best-effort) ────────────────────────────────────
-    await supabaseAdmin
+    // ── 5. Record founding commission ($1,000) ────────────────────────────────
+    // Live `commissions` columns: type / amount_cents / status / description.
+    // prospect_id is omitted (nullable): the prospect row is created below and its
+    // id is not captured here, so there is nothing to pass.
+    const { error: commissionError } = await supabaseAdmin
       .from('commissions')
       .insert({
-        archivist_id:    archivistId,
-        commission_type: 'founding_fee',
-        amount:          1000,
-        status:          'pending',
-        notes:           `${familyName} Archive, ${tier} tier founding`,
+        archivist_id: archivistId,
+        type:         'founding',
+        amount_cents: 100000, // $1,000 in cents
+        status:       'pending',
+        description:  `${familyName} Archive, ${tier} tier founding`,
       })
-      .then(() => {})
+
+    if (commissionError) {
+      console.error('[onboard-client] Founding commission write failed:', commissionError.message)
+    }
 
     // ── 6. Update archivist stats via increment_closings rpc ─────────────────
     await supabaseAdmin
@@ -230,7 +236,9 @@ export async function POST(req: NextRequest) {
           <p>Tier: ${tierName}</p>
           <p>Archivist: ${archivist.name}</p>
           <p>Archive ID: ${archive.id}</p>
-          <p>Commission recorded: $1,000 pending</p>`,
+          ${commissionError
+            ? `<p style="color:#c0392b"><strong>COMMISSION WRITE FAILED:</strong> ${commissionError.message}</p>`
+            : `<p>Commission recorded: $1,000 pending</p>`}`,
       })
     } catch (adminEmailErr: unknown) {
       console.error('[onboard-client] Admin notification failed:', adminEmailErr instanceof Error ? adminEmailErr.message : adminEmailErr)

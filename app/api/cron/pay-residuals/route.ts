@@ -3,14 +3,18 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 
 export const maxDuration = 300
 
-const RESIDUAL_MONTHLY_CENTS: Record<string, number> = {
-  active:  2000,   // $20 (8% of $3,600/yr = $288/yr = $24/mo; use $20 to be conservative)
-  resting: 400,    // $4  (8% of $600/yr = $48/yr = $4/mo)
-  legacy:  800,    // $8  (8% of $1,200/yr = $96/yr = $8/mo)
-  // Old tier aliases
-  archive: 2000,
-  estate:  2000,
-  dynasty: 2000,
+const RESIDUAL_RATE = 0.12
+
+// Annual fee per tier in cents. Source of truth: submit-client TIER_PRICES.
+// Monthly residual is derived from these, not stored as a flat amount.
+const TIER_ANNUAL_CENTS: Record<string, number> = {
+  active:  360000,  // $3,600/yr
+  resting:  60000,  // $600/yr
+  legacy:  120000,  // $1,200/yr
+  // Old tier aliases → Active
+  archive: 360000,
+  estate:  360000,
+  dynasty: 360000,
 }
 
 function validateCronAuth(req: NextRequest): boolean {
@@ -51,8 +55,9 @@ export async function POST(req: NextRequest) {
 
       // 3. Calculate monthly residual
       const totalCents = activeProspects.reduce((sum, p) => {
-        const tier = (p.tier ?? '').toLowerCase()
-        return sum + (RESIDUAL_MONTHLY_CENTS[tier] ?? RESIDUAL_MONTHLY_CENTS.estate)
+        const tier        = (p.tier ?? '').toLowerCase()
+        const annualCents = TIER_ANNUAL_CENTS[tier] ?? TIER_ANNUAL_CENTS.active
+        return sum + Math.round(annualCents * RESIDUAL_RATE / 12)
       }, 0)
 
       if (totalCents === 0) continue
