@@ -179,6 +179,45 @@ export default function PricingPage() {
           </div>
         </section>
 
+        {/* Acquisition — per-deal engagement. Distinct block, not a tier card, not in the Active/Resting/Legacy group. */}
+        <section style={{ background: 'var(--color-bg)', padding: 'clamp(72px,10vw,120px) clamp(24px,6vw,80px)', borderTop: '1px solid rgba(196,162,74,0.18)' }}>
+          <div style={{ maxWidth: '700px', margin: '0 auto' }}>
+            <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+              <span style={{ width: '24px', height: '1px', background: 'var(--color-gold)', display: 'block', flexShrink: 0 }} aria-hidden="true" />
+              Acquisition
+            </p>
+            <h2 style={{ ...SERIF, fontSize: 'clamp(2rem,4vw,3rem)', fontWeight: 300, lineHeight: 1.15, color: 'var(--color-text-primary)', letterSpacing: '-0.02em', marginBottom: '28px' }}>
+              When you buy the company, you buy how it was run.
+            </h2>
+            <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: 'var(--color-text-secondary)', marginBottom: '20px' }}>
+              In an acquisition, the operator&rsquo;s judgment is part of what you valued, and most of it lives in one person&rsquo;s head. Basalith captures it during the active period before close, so what you priced in diligence is still in the room after the operator is gone.
+            </p>
+            <p style={{ ...SERIF, fontSize: '1.05rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: 'var(--color-text-secondary)', marginBottom: '40px' }}>
+              Acquisition work is a per-deal engagement, scoped to the transaction, not an annual subscription.
+            </p>
+
+            <div style={{ borderTop: '1px solid rgba(196,162,74,0.18)', paddingTop: '36px', marginBottom: '40px' }}>
+              <p style={{ ...SERIF, fontSize: 'clamp(1.5rem,3vw,2rem)', fontWeight: 300, color: 'var(--color-text-primary)', lineHeight: 1.3, marginBottom: '16px' }}>
+                Engagements start at $25,000, scaled to the size and complexity of the transaction.
+              </p>
+              <p style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>
+                Priced against the value at risk in the transaction, as part of diligence, not as software.
+              </p>
+              <p style={{ ...SERIF, fontSize: '0.9rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-faint)', margin: 0 }}>
+                For larger transactions, engagement scope and fee are set in conversation.
+              </p>
+            </div>
+
+            <Link
+              href="/apply?type=acquisition"
+              className="pricing-cta"
+              style={{ ...MONO, fontSize: 'var(--text-caption)', display: 'inline-block', textDecoration: 'none', background: 'var(--color-gold)', color: '#0A0908', padding: '16px 32px', transition: 'background 250ms ease' }}
+            >
+              Talk to us about a transaction.
+            </Link>
+          </div>
+        </section>
+
         {/* The Founding — audience-neutral, business framing first */}
         <section
           style={{
