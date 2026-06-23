@@ -1,8 +1,14 @@
-'use client'
+import type { Metadata } from 'next'
+import Link        from 'next/link'
+import Nav         from '../components/Nav'
+import Footer      from '../components/Footer'
+import ContrastDemo from '../components/ContrastDemo'
+import { CATEGORY_LINE } from '@/lib/copy'
 
-import Link   from 'next/link'
-import Nav    from '../components/Nav'
-import Footer from '../components/Footer'
+export const metadata: Metadata = {
+  title:       'For Business · Basalith',
+  description: 'When a business changes hands, the judgment that built it usually does not transfer. Basalith captures how the operator reasons during the active years, so it transfers through an acquisition or a succession.',
+}
 
 const MONO: React.CSSProperties = {
   fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
@@ -31,6 +37,63 @@ const WALKS_OUT = [
   'The judgment that shaped every outcome',
 ]
 
+const TRANSITIONS = [
+  {
+    label: 'Acquisition',
+    body:  'You bought the company because of how it was run. The operator’s judgment is the asset you paid for, and the earnout assumes it transfers. Most of it lives in one person’s head and leaves on their last day. Basalith captures it during the active years, so what you valued in diligence is still in the room after the operator is gone.',
+  },
+  {
+    label: 'Succession',
+    body:  'The founder is stepping back, or a partner is retiring. The successor inherits the systems and the client list. Not the reasoning that built them. Basalith hands forward the thinking behind the structure, so the next person can ask how the founder would have decided instead of guessing.',
+  },
+]
+
+const HANDOFF = [
+  {
+    n:     '01',
+    title: 'The Founding.',
+    body:  'An extended guided session captures the decision frameworks the operator uses most.',
+  },
+  {
+    n:     '02',
+    title: 'Scenario capture.',
+    body:  'The operator works through 20 real business scenarios and 29 decision questions across 8 domains. Their responses train the model.',
+  },
+  {
+    n:     '03',
+    title: 'Verification.',
+    body:  'Responses are evaluated before they influence the model, so the system reflects how the operator actually decided.',
+  },
+  {
+    n:     '04',
+    title: 'Handoff.',
+    body:  'The successor or acquirer gets portal access and consults the model on the calls that matter, long after the operator has stepped back.',
+  },
+]
+
+const TRUST = [
+  {
+    title: 'Not reconstructed after the fact.',
+    body:  'Basalith is built while the operator is active and fully participating. Not assembled from old messages once they are gone.',
+  },
+  {
+    title: 'Not a wrapper on a general AI.',
+    body:  'Every model is trained only on one operator’s deposits. No general model speaks for the archive.',
+  },
+  {
+    title: 'Never shared. Never sold.',
+    body:  'Your archive is never shared, sold, or used to train another company’s model.',
+  },
+  {
+    title: 'You own the archive.',
+    body:  'You own the archive and can export all of it at any time. Nothing is stranded if we ever close.',
+  },
+  {
+    title: 'Frozen at transition.',
+    body:  'The fingerprint is frozen at transition. The new owner can add context. Nobody can rewrite what the operator said.',
+  },
+]
+
 const FEATURES = [
   'Extended 3-hour founding session',
   'Business decision framework capture',
@@ -53,8 +116,11 @@ export default function SuccessionPage() {
           padding:   `clamp(140px,16vw,200px) ${PAD} clamp(80px,10vw,120px)`,
           maxWidth:  '960px',
         }}>
-          <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '32px' }}>
-            Basalith for Business
+          <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '16px' }}>
+            Basalith for Business &middot; Acquisition and Succession
+          </p>
+          <p style={{ ...MONO, fontSize: '0.46rem', color: 'rgba(196,162,74,0.7)', lineHeight: 1.8, marginBottom: '36px', maxWidth: '640px' }}>
+            {CATEGORY_LINE}
           </p>
           <h1 style={{
             ...SERIF,
@@ -64,9 +130,9 @@ export default function SuccessionPage() {
             letterSpacing: '-0.02em',
             color:         'var(--color-text-primary)',
             marginBottom:  '36px',
-            maxWidth:      '780px',
+            maxWidth:      '820px',
           }}>
-            When the founder leaves, the judgment leaves with them.
+            When a business changes hands, the judgment that built it usually doesn&rsquo;t.
           </h1>
           <p style={{
             ...GEORGIA,
@@ -75,10 +141,10 @@ export default function SuccessionPage() {
             fontWeight: 300,
             lineHeight: 1.85,
             color:      'var(--color-text-secondary)',
-            maxWidth:   '600px',
+            maxWidth:   '660px',
             margin:     0,
           }}>
-            Not the strategy deck. Not the org chart. The pattern recognition built over decades that never made it into any document.
+            Basalith builds a cognitive reference model of the operator while they are still running the company. How they price risk, how they read people, the calls they make without thinking. It captures the reasoning behind the decisions, so it transfers with the business, through an acquisition or a succession.
           </p>
         </section>
 
@@ -141,8 +207,43 @@ export default function SuccessionPage() {
           </div>
         </section>
 
-        {/* ── Section 3: The Solution ── */}
+        {/* ── Section 3: Two transitions ── */}
         <section style={{ padding: `clamp(80px,10vw,120px) ${PAD}` }}>
+          <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+            <h2 style={{
+              ...SERIF,
+              fontSize:      'clamp(1.8rem,3.4vw,2.6rem)',
+              fontWeight:    300,
+              lineHeight:    1.15,
+              letterSpacing: '-0.02em',
+              color:         'var(--color-text-primary)',
+              marginBottom:  '48px',
+              maxWidth:      '720px',
+            }}>
+              A business changes hands two ways. Both lose the same thing.
+            </h2>
+            <div className="succession-transitions" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+              {TRANSITIONS.map(({ label, body }) => (
+                <div key={label} style={{
+                  border:     '1px solid rgba(196,162,74,0.2)',
+                  borderTop:  '2px solid rgba(196,162,74,0.6)',
+                  background: 'rgba(196,162,74,0.03)',
+                  padding:    'clamp(28px,4vw,44px)',
+                }}>
+                  <p style={{ ...MONO, fontSize: '0.46rem', color: 'var(--color-gold)', marginBottom: '20px' }}>
+                    {label}
+                  </p>
+                  <p style={{ ...GEORGIA, fontSize: '1.05rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: 'var(--color-text-secondary)', margin: 0 }}>
+                    {body}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── Section 4: The Solution ── */}
+        <section style={{ background: 'var(--color-void)', padding: `clamp(80px,10vw,120px) ${PAD}` }}>
           <div style={{ maxWidth: '700px', margin: '0 auto' }}>
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '40px' }}>
               How Basalith Solves It
@@ -167,8 +268,8 @@ export default function SuccessionPage() {
           </div>
         </section>
 
-        {/* ── Section 4: The Two Layers ── */}
-        <section style={{ background: 'var(--color-void)', padding: `clamp(80px,10vw,120px) ${PAD}` }}>
+        {/* ── Section 5: The Two Layers ── */}
+        <section style={{ background: 'var(--color-void)', padding: `0 ${PAD} clamp(80px,10vw,120px)` }}>
           <div style={{ maxWidth: '900px', margin: '0 auto' }}>
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '48px' }}>
               Succession Governance
@@ -196,7 +297,7 @@ export default function SuccessionPage() {
                   The Cognitive Fingerprint Layer
                 </h3>
                 <p style={{ ...GEORGIA, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-secondary)', marginBottom: '16px' }}>
-                  The founder's lifetime logic. Locked at transition. Cannot be altered.
+                  The founder&rsquo;s lifetime logic. Locked at transition. Cannot be altered.
                 </p>
                 <p style={{ ...GEORGIA, fontSize: '0.9rem', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-muted)', margin: 0 }}>
                   Every decision, position, and judgment captured during the active years. Immutable after the founder steps back.
@@ -224,7 +325,7 @@ export default function SuccessionPage() {
                   The Contextual Intelligence Layer
                 </h3>
                 <p style={{ ...GEORGIA, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-secondary)', marginBottom: '16px' }}>
-                  Successors inject current business context. The system combines the founder's reasoning with present facts.
+                  Successors inject current business context. The system combines the founder&rsquo;s reasoning with present facts.
                 </p>
                 <p style={{ ...GEORGIA, fontSize: '0.9rem', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-muted)', margin: 0 }}>
                   The archive does not freeze in time. It meets the present.
@@ -235,7 +336,52 @@ export default function SuccessionPage() {
           </div>
         </section>
 
-        {/* ── Section 5: Pricing + CTA ── */}
+        {/* ── Section 6: How the handoff works ── */}
+        <section style={{ padding: `clamp(80px,10vw,120px) ${PAD}` }}>
+          <div style={{ maxWidth: '760px', margin: '0 auto' }}>
+            <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '48px' }}>
+              How the handoff actually works
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
+              {HANDOFF.map(({ n, title, body }) => (
+                <div key={n} style={{ display: 'grid', gridTemplateColumns: '3rem 1fr', gap: '24px' }}>
+                  <p style={{ ...MONO, fontSize: '0.52rem', color: 'var(--color-gold)', paddingTop: '4px' }}>{n}</p>
+                  <div>
+                    <h3 style={{ ...SERIF, fontSize: '1.4rem', fontWeight: 500, color: 'var(--color-text-primary)', marginBottom: '10px', lineHeight: 1.2 }}>
+                      {title}
+                    </h3>
+                    <p style={{ ...GEORGIA, fontSize: '1.05rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-secondary)', margin: 0 }}>
+                      {body}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── Section 7: Trust framing ── */}
+        <section style={{ background: 'var(--color-void)', padding: `clamp(80px,10vw,120px) ${PAD}` }}>
+          <div style={{ maxWidth: '760px', margin: '0 auto' }}>
+            <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '24px' }}>
+              Trust is the whole product
+            </p>
+            <div className="succession-trust" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px 24px', marginTop: '24px' }}>
+              {TRUST.map(({ title, body }) => (
+                <div key={title} style={{ borderLeft: '3px solid rgba(196,162,74,0.5)', paddingLeft: 'clamp(20px,3vw,28px)' }}>
+                  <h3 style={{ ...SERIF, fontSize: '1.25rem', fontWeight: 300, color: 'var(--text-on-dark, rgba(250,248,244,0.9))', lineHeight: 1.25, margin: '0 0 10px' }}>
+                    {title}
+                  </h3>
+                  <p style={{ ...GEORGIA, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: 'rgba(250,248,244,0.55)', margin: 0 }}>
+                    {body}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── Section 8: Pricing + CTA ── */}
         <section style={{ padding: `clamp(80px,10vw,120px) ${PAD}` }}>
           <div style={{ maxWidth: '640px', margin: '0 auto' }}>
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '32px' }}>
@@ -270,11 +416,12 @@ export default function SuccessionPage() {
               </div>
 
               <p style={{ ...GEORGIA, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-secondary)', marginBottom: '28px' }}>
-                Onboarding begins with a founding session. Apply below.
+                Onboarding begins with a founding session. Start the conversation below.
               </p>
 
               <Link
                 href="/contact"
+                className="succession-cta"
                 style={{
                   ...MONO,
                   fontSize:       'var(--text-caption)',
@@ -286,10 +433,8 @@ export default function SuccessionPage() {
                   padding:        '16px 32px',
                   transition:     'background 250ms ease',
                 }}
-                onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'var(--color-gold-light)'}
-                onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'var(--color-gold)'}
               >
-                Start the Conversation
+                Start the conversation
               </Link>
             </div>
 
@@ -299,13 +444,52 @@ export default function SuccessionPage() {
           </div>
         </section>
 
+        {/* ── Section 9: Proof ── */}
+        <ContrastDemo />
+
+        {/* ── Section 10: Close ── */}
+        <section style={{ background: 'var(--color-void)', padding: `clamp(80px,12vw,160px) ${PAD}`, textAlign: 'center' }}>
+          <div style={{ maxWidth: '640px', margin: '0 auto' }}>
+            <p style={{
+              ...SERIF,
+              fontSize:      'clamp(1.6rem,3.2vw,2.4rem)',
+              fontWeight:    300,
+              lineHeight:    1.3,
+              letterSpacing: '-0.02em',
+              color:         'rgba(250,248,244,0.9)',
+              marginBottom:  '40px',
+            }}>
+              The judgment that built the company is the one thing diligence cannot copy. Capture it while the person making the calls is still making them.
+            </p>
+            <Link
+              href="/contact"
+              className="succession-cta"
+              style={{
+                ...MONO,
+                fontSize:       'var(--text-caption)',
+                display:        'inline-block',
+                color:          '#0A0908',
+                textDecoration: 'none',
+                background:     'var(--color-gold)',
+                padding:        '16px 48px',
+                transition:     'background 250ms ease',
+              }}
+            >
+              Start the conversation
+            </Link>
+          </div>
+        </section>
+
       </main>
       <Footer />
 
       <style>{`
+        .succession-cta:hover { background: var(--color-gold-light) !important; }
         @media (max-width: 680px) {
-          .succession-contrast { grid-template-columns: 1fr !important; }
-          .succession-layers   { grid-template-columns: 1fr !important; }
+          .succession-contrast    { grid-template-columns: 1fr !important; }
+          .succession-layers      { grid-template-columns: 1fr !important; }
+          .succession-transitions { grid-template-columns: 1fr !important; }
+          .succession-trust       { grid-template-columns: 1fr !important; }
         }
       `}</style>
     </>

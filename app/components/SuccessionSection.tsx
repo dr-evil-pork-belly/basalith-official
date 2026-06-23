@@ -73,9 +73,30 @@ export default function SuccessionSection() {
         ))}
       </div>
 
+      {/* Two-transition teaser. One line each. */}
+      <div className="succession-teaser" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-5)', marginTop: 'var(--space-6)' }}>
+        <div style={{ borderTop: '1px solid rgba(196,162,74,0.3)', paddingTop: '20px' }}>
+          <p style={{ ...mono, fontSize: 'var(--eyebrow-size)', color: 'var(--color-gold)', marginBottom: '12px' }}>
+            Acquisition
+          </p>
+          <p style={{ ...serif, fontSize: '1.15rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.7, color: 'var(--text-on-dark-2)', margin: 0 }}>
+            You paid for how it was run. Make sure that transfers.
+          </p>
+        </div>
+        <div style={{ borderTop: '1px solid rgba(196,162,74,0.3)', paddingTop: '20px' }}>
+          <p style={{ ...mono, fontSize: 'var(--eyebrow-size)', color: 'var(--color-gold)', marginBottom: '12px' }}>
+            Succession
+          </p>
+          <p style={{ ...serif, fontSize: '1.15rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.7, color: 'var(--text-on-dark-2)', margin: 0 }}>
+            The successor gets the systems. Hand forward the thinking.
+          </p>
+        </div>
+      </div>
+
       <style>{`
         @media (max-width: 768px) {
           .succession-pillars { grid-template-columns: 1fr !important; gap: var(--space-5) !important; }
+          .succession-teaser  { grid-template-columns: 1fr !important; gap: var(--space-5) !important; }
         }
       `}</style>
     </Section>

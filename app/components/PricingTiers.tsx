@@ -35,7 +35,7 @@ const TIERS: Tier[] = [
     eyebrow:     'While You Are Building',
     name:        'Active',
     annualPrice: '$3,600',
-    annualSub:   '$300/mo equivalent',
+    annualSub:   '',
     monthlyPrice:'$360',
     description: 'The full archive experience.\nYour entity learns every week.\nYour family stays connected.\nYour story keeps growing.',
     featured:    true,
@@ -59,7 +59,7 @@ const TIERS: Tier[] = [
     eyebrow:     'When Life Gets in the Way',
     name:        'Resting',
     annualPrice: '$600',
-    annualSub:   '$50/mo equivalent',
+    annualSub:   '',
     monthlyPrice:'$60',
     description: 'Your archive preserved and waiting.\nNo emails. No prompts.\nJust your data, safe and intact,\nuntil you are ready to return.',
     featured:    false,
@@ -209,7 +209,7 @@ export default function PricingTiers() {
               borderRadius:  '2px',
             }}
           >
-            Save 20%
+            Save $720 a year
           </div>
           <button
             onClick={() => setBilling('monthly')}
@@ -313,7 +313,7 @@ export default function PricingTiers() {
                   {annualPrice}
                 </div>
                 <p style={{ ...MONO, fontSize: '0.5rem', letterSpacing: '0.2em', color: featured ? 'rgba(250,248,244,0.3)' : 'var(--color-text-faint)', marginBottom: '24px' }}>
-                  Per year · {annualSub}
+                  Per year{annualSub ? ` · ${annualSub}` : ''}
                 </p>
               </>
             ) : (

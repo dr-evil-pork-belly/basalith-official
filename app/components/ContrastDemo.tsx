@@ -316,8 +316,9 @@ function ContrastDemoInner() {
   // Seed once from the URL so deep links pre-select, then keep the choice in
   // local state. The toggle drives only this demo; it never writes ?audience,
   // so the other sections (above and below) are unaffected by toggling here.
+  // Default is Founders, the primary audience.
   const urlAudience = useAudience()
-  const [demoAudience, setDemoAudience] = useState<Audience | null>(urlAudience ?? null)
+  const [demoAudience, setDemoAudience] = useState<Audience | null>(urlAudience ?? 'founder')
 
   function onSelect(next: Audience) {
     if (next === demoAudience) return
@@ -331,10 +332,10 @@ function ContrastDemoInner() {
 
 export default function ContrastDemo() {
   // useAudience reads useSearchParams under the hood (for the one-time seed), so
-  // it needs a Suspense boundary. The fallback renders the always-visible
-  // neutral demo, so SSR shows it with no flash.
+  // it needs a Suspense boundary. The fallback renders the Founders default, so
+  // SSR matches the seeded client default with no flash.
   return (
-    <Suspense fallback={<ContrastDemoSection audience={null} onSelect={() => {}} />}>
+    <Suspense fallback={<ContrastDemoSection audience="founder" onSelect={() => {}} />}>
       <ContrastDemoInner />
     </Suspense>
   )

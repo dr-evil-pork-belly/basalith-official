@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     default:  'Basalith',
     template: '%s · Basalith',
   },
-  description: 'The archive of a life, governed with the same seriousness as an estate. We build for legacy.',
+  description: 'Knowledge transfer when a business changes hands. Basalith captures how an operator reasons, so it transfers through an acquisition or a succession.',
   metadataBase: new URL('https://basalith.ai'),
   manifest:    '/site.webmanifest',
   icons: {
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title:       'Basalith',
-    description: 'The archive of a life, governed with the same seriousness as an estate.',
+    description: 'Knowledge transfer when a business changes hands. Basalith captures how an operator reasons, so it transfers through an acquisition or a succession.',
     url:         'https://basalith.ai',
     siteName:    'Basalith',
     images:      [{ url: '/icon-512x512.png' }],
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
   twitter: {
     card:        'summary',
     title:       'Basalith',
-    description: 'The archive of a life, governed with the same seriousness as an estate.',
+    description: 'Knowledge transfer when a business changes hands. Basalith captures how an operator reasons, so it transfers through an acquisition or a succession.',
     images:      ['/icon-512x512.png'],
   },
 }

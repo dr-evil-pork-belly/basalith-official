@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title:       'About · Basalith',
-  description: 'We are building the infrastructure for how human knowledge outlasts the people who hold it. Heritage Nexus Inc.',
+  description: 'Heritage Nexus Inc. built Basalith to capture how an operator reasons before a business changes hands, so the judgment transfers through an acquisition or a succession. Individual and family archives also available.',
 }
 
 const SERIF: React.CSSProperties = {
@@ -70,15 +70,21 @@ export default function AboutPage() {
               marginBottom:  '48px',
             }}
           >
-            We are building the infrastructure
+            Most of what a person knows
             <br />
-            for how human knowledge
+            leaves when they do.
             <br />
             <em style={{ fontStyle: 'italic', color: 'var(--color-gold)' }}>
-              outlasts the people who hold it.
+              We built the company that keeps it.
             </em>
           </h1>
 
+          <p style={BODY}>
+            When a business changes hands, by acquisition or succession, the assets
+            transfer and the judgment that built them does not. Basalith captures how
+            the operator reasons while they are still running the company, so it
+            transfers too.
+          </p>
           <p style={BODY}>Most of what a person knows never gets written down.</p>
           <p style={BODY}>
             Not because they do not want to share it. Because nobody built
@@ -87,11 +93,11 @@ export default function AboutPage() {
           </p>
           <p style={BODY}>Basalith is that infrastructure.</p>
           <p style={BODY}>
-            For families who want to preserve how someone thinks, not just what they owned.
-          </p>
-          <p style={BODY}>
             For businesses whose founders carry thirty years of judgment
             in their heads and nowhere else.
+          </p>
+          <p style={BODY}>
+            For families who want to preserve how someone thinks, not just what they owned.
           </p>
           <p style={{ ...BODY, marginBottom: 0 }}>
             For the generations that follow, who deserve access to the real
@@ -183,8 +189,6 @@ export default function AboutPage() {
               Now. While they can correct me when I get it wrong.
             </p>
 
-            <div aria-hidden="true" style={{ width: '40px', height: '1px', background: 'var(--color-gold)', margin: '44px 0' }} />
-
             <p style={BODY}>But this was never only a family product.</p>
             <p style={BODY}>
               Every founder I know has the same problem my parents have.
@@ -198,8 +202,8 @@ export default function AboutPage() {
               Preserving how a person thinks should not be a privilege of the wealthy.
             </p>
             <p style={BODY}>
-              My mother deserves this.
               Your founders deserve this.
+              My mother deserves this.
               Every family and every organization that has ever wondered
               what someone would have said deserves this.
             </p>
@@ -273,8 +277,8 @@ export default function AboutPage() {
             </p>
             <p style={BODY}>
               The architecture behind Basalith draws on peer-reviewed research in
-              cognitive fingerprinting, personalized language model fine-tuning, oral
-              history preservation, and organizational succession planning.
+              organizational succession planning, cognitive fingerprinting, personalized
+              language model fine-tuning, and oral history preservation.
             </p>
             <p style={{ ...BODY, marginBottom: '36px' }}>
               The technical foundation is documented at basalith.xyz for anyone who wants
@@ -295,6 +299,25 @@ export default function AboutPage() {
               }}
             >
               Read the Technical Foundation <span aria-hidden="true">→</span>
+            </a>
+          </div>
+        </section>
+
+        {/* Section 5b — The second door */}
+        <section style={{ background: 'var(--color-void)', padding: 'clamp(56px,7vw,88px) clamp(24px,6vw,80px)' }}>
+          <div style={{ maxWidth: '640px', margin: '0 auto' }}>
+            <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)', marginBottom: '20px' }}>
+              The second door
+            </p>
+            <p style={{ ...BODY, color: 'rgba(250,248,244,0.55)', marginBottom: '24px' }}>
+              Basalith began as a family product, and that path is still open. The same
+              method, for preserving how a person thinks rather than how a business is run.
+            </p>
+            <a
+              href="/apply"
+              style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+            >
+              For individuals and families <span aria-hidden="true">→</span>
             </a>
           </div>
         </section>

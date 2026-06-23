@@ -111,17 +111,6 @@ function ClosingView({ audience }: { audience: Audience | null }) {
           Begin
         </Link>
 
-        <p
-          style={{
-            ...MONO,
-            fontSize:  '0.44rem',
-            color:     'rgba(250,250,248,0.2)',
-            marginTop: '20px',
-          }}
-        >
-          Every archive begins at $2,500
-        </p>
-
       </div>
     </section>
   )

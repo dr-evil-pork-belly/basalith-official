@@ -6,8 +6,8 @@ type Item = { title: string; body: string }
 // One fixed set for everyone (no audience variants).
 const ITEMS: Item[] = [
   {
-    title: 'Not a grief chatbot.',
-    body:  'Basalith is built while the person is alive and fully participating. Not reconstructed from old messages after they are gone.',
+    title: 'Not reconstructed after the fact.',
+    body:  'Basalith is built while the operator is active and fully participating. Not assembled from old messages once they are gone.',
   },
   {
     title: 'Not a wrapper on a general AI.',

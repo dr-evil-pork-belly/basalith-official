@@ -1,19 +1,16 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Basalith · The way you think is irreplaceable.',
-  description: 'Basalith builds a cognitive entity from the way you think, decide, and see the world. For families preserving a legacy. For businesses preserving a founder.',
+  title: 'Basalith · Knowledge transfer when a business changes hands',
+  description: 'What built the company is not in the data room. Basalith captures how an operator reasons, so it transfers through an acquisition or a succession. Individual and family archives also available.',
 }
 
 import Nav               from './components/Nav'
-import TaglineOpening    from './components/TaglineOpening'
 import HeroSection       from './components/HeroSection'
-import PhilosophySection from './components/PhilosophySection'
 import SuccessionSection from './components/SuccessionSection'
-import TwoPathsSection   from './components/TwoPathsSection'
+import SecondDoorSection from './components/SecondDoorSection'
 import ContrastDemo      from './components/ContrastDemo'
 import ClosingSection    from './components/ClosingSection'
-import WhatBasalithIsNot from './components/WhatBasalithIsNot'
 import Footer            from './components/Footer'
 
 const ORG_SCHEMA = {
@@ -59,13 +56,10 @@ export default function HomePage() {
       />
       <Nav />
       <main>
-        <TaglineOpening />
         <HeroSection />
-        <PhilosophySection />
         <SuccessionSection />
-        <WhatBasalithIsNot />
         <ContrastDemo />
-        <TwoPathsSection />
+        <SecondDoorSection />
         <ClosingSection />
       </main>
       <Footer />

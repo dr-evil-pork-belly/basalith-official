@@ -1,6 +1,7 @@
 'use client'
 
-import { scrollToAudience } from '@/lib/scrollToAudience'
+import Link from 'next/link'
+import { CATEGORY_LINE } from '@/lib/copy'
 
 const MONO: React.CSSProperties = {
   fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
@@ -44,7 +45,7 @@ export default function HeroSection() {
           }}
         >
           <span style={{ display: 'block', width: '24px', height: '1px', background: 'var(--color-gold)', flexShrink: 0 }} aria-hidden="true" />
-          Heritage Nexus · Basalith
+          {CATEGORY_LINE}
         </p>
 
         {/* Display headline — two lines */}
@@ -59,8 +60,8 @@ export default function HeroSection() {
             margin:        '0 0 20px',
           }}
         >
-          <span className="headline-line headline-line-1">The way you think is irreplaceable.</span>
-          <span className="headline-line headline-line-2">Most people leave nothing of it behind.</span>
+          <span className="headline-line headline-line-1">What built the company</span>
+          <span className="headline-line headline-line-2">is not in the data room.</span>
         </h1>
 
         {/* Sub copy */}
@@ -72,39 +73,38 @@ export default function HeroSection() {
             fontWeight:  300,
             lineHeight:  1.9,
             color:       'var(--color-text-secondary)',
-            maxWidth:    '440px',
+            maxWidth:    '500px',
             margin:      '0 0 44px',
             opacity:     0,
             animation:   'lineReveal 700ms cubic-bezier(0.16,1,0.3,1) 500ms both',
           }}
         >
-          Basalith builds a cognitive entity from the way you think, decide, and see the world.
+          Basalith builds a cognitive reference model of the operator while they are still running the company. How they price risk, how they read people, the calls they make without thinking. It transfers with the business, through an acquisition or a succession.
         </p>
 
-        {/* Quiet handoff to the audience selector below. The fork lives there. */}
-        <button
-          type="button"
-          onClick={scrollToAudience}
+        {/* Primary CTA → the business flagship. */}
+        <Link
+          href="/succession"
           style={{
             ...MONO,
-            display:    'inline-flex',
-            alignItems: 'center',
-            gap:        '10px',
-            alignSelf:  'flex-start',
-            background: 'transparent',
-            border:     'none',
-            cursor:     'pointer',
-            color:      'var(--color-gold-on-light)',
-            padding:    '4px 0',
-            opacity:    0,
-            animation:  'lineReveal 600ms cubic-bezier(0.16,1,0.3,1) 700ms both',
+            display:        'inline-flex',
+            alignItems:     'center',
+            gap:            '10px',
+            alignSelf:      'flex-start',
+            textDecoration: 'none',
+            color:          '#0A0908',
+            background:     'var(--color-gold)',
+            padding:        '14px 28px',
+            opacity:        0,
+            animation:      'lineReveal 600ms cubic-bezier(0.16,1,0.3,1) 700ms both',
+            transition:     'background 250ms ease',
           }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--color-text-primary)' }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--color-gold-on-light)' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--color-gold-light)' }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'var(--color-gold)' }}
         >
-          See where you fit
-          <span aria-hidden="true" style={{ fontSize: '0.9rem', lineHeight: 1 }}>&darr;</span>
-        </button>
+          For Business
+          <span aria-hidden="true" style={{ fontSize: '0.9rem', lineHeight: 1 }}>&rarr;</span>
+        </Link>
       </div>
 
       {/* ── Right: Dark archive art ── */}

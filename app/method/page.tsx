@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title:       'The Method · Basalith',
-  description: 'We are not building memory. We are building cognition. Two sources of data that together capture how a specific person actually thinks.',
+  description: 'We are not building memory. We are building cognition. Two sources of data that together capture not just what an operator decided, but how they reasoned.',
 }
 
 const SERIF: React.CSSProperties = {
@@ -42,19 +42,18 @@ const RULE: React.CSSProperties = {
 const STEPS = [
   {
     n:     '01',
-    title: 'What you deposit',
+    title: 'What the operator deposits',
     body:  [
-      'The entity learns directly from you. Your voice recordings, your wisdom sessions, your entity conversations, your written deposits.',
-      'This is first-person training data. How you reason through problems. What you believe. What you learned from failure. The specific logic of how your mind works.',
-      'Every session adds depth. Every deposit teaches the entity something the people who love you could never tell it.',
+      'The model learns directly from the operator. Recorded sessions, decision frameworks, scenario responses, written deposits.',
+      'First-person reasoning: how they work a problem, what they weigh, what they took from the calls that went wrong. The specific logic of how this particular mind decides.',
     ],
   },
   {
     n:     '02',
-    title: 'What the people who know you observe',
+    title: 'What the people who worked alongside them observe',
     body:  [
-      'The people who know you see things you do not see about yourself. A daughter notices how her father handled pressure. A colleague remembers the specific way a decision was reasoned through.',
-      'Family members label photographs. Contributors answer witness questions designed for their exact relationship to you. This outside view captures cognitive patterns you would never think to deposit.',
+      'The people who watched the operator decide see what the operator would never think to record. A co-founder remembers how a deal was reasoned through. A long-tenured exec remembers the hire everyone else doubted.',
+      'The outside view captures patterns the operator takes for granted. In a family, this is a daughter noticing how her father handled pressure. Same mechanism.',
     ],
   },
   {
@@ -62,25 +61,16 @@ const STEPS = [
     title: 'The combination builds a cognitive model',
     body:  [
       'Inside data plus outside data equals something neither could produce alone.',
-      'The archive becomes training data for your entity. The entity learns not just what you said but how you think. Not just your opinions but your reasoning patterns.',
+      'The archive becomes training data for the entity. The entity learns not just what they said but how they think. Not just their opinions but their reasoning patterns.',
       'This is the distinction between memory and cognition. Memory stores facts. The entity captures how a specific mind works.',
     ],
   },
   {
     n:     '04',
-    title: 'The archive builds itself',
+    title: 'How the archive accumulates',
     body:  [
-      'Every evening one photograph goes to every family member by email. No login. No app. They reply with what they remember. Their words go into the archive.',
-      'The archive builds itself around the family. The entity deepens without anyone organizing a session or scheduling a call.',
-      'The longer it runs the more accurate it becomes. Start early. Give it years.',
-    ],
-  },
-  {
-    n:     '05',
-    title: 'The Intelligence Layer',
-    body:  [
-      'Before a single photograph reaches the labeling interface our AI pipeline has already processed every upload. Screenshots removed. Duplicates collapsed. Photographs ranked by cognitive value.',
-      'The system surfaces the photographs most likely to unlock real memory. The family never sees the noise. They only see what builds the entity.',
+      'Capture is ongoing, not a single interview. The operator works through 20 real business scenarios and a sequence of 29 decision questions across the 8 domains that built the company.',
+      'Each response adds depth. The longer the active period runs before a transition, the more the model has to work with. Begin before the handoff is on the calendar, not after.',
     ],
   },
 ]
@@ -133,8 +123,8 @@ export default function MethodPage() {
               maxWidth:  '520px',
             }}
           >
-            Two sources of data. Together they capture not just what a person did,
-            but how they actually thought.
+            Two sources of data. Together they capture not just what an operator
+            decided, but how they reasoned.
           </p>
         </section>
 
@@ -225,35 +215,51 @@ export default function MethodPage() {
           </div>
         </section>
 
-        {/* B2B section */}
+        {/* 06 — Bridge to the flagship architecture */}
+        <section style={{ padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,80px)' }}>
+          <div style={{ maxWidth: 'calc(var(--max-width-text) + 160px)', margin: '0 auto' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '3rem 1fr', gap: '32px' }}>
+              <p style={{ ...MONO, fontSize: '0.52rem', color: 'var(--color-gold)', paddingTop: '4px' }}>06</p>
+              <div>
+                <h2 style={{ ...H2, marginTop: 0 }}>Two layers, one handoff</h2>
+                <p style={BODY}>
+                  The fingerprint is frozen at transition, fixed from the operator&rsquo;s own deposits. It does not drift.
+                </p>
+                <p style={{ ...BODY, marginBottom: '28px' }}>
+                  A living layer lets the successor add today&rsquo;s context, while the judgment stays the operator&rsquo;s.
+                </p>
+                <a
+                  href="/succession"
+                  style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                >
+                  See the full architecture <span aria-hidden="true">→</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Second door — families */}
         <section style={{ padding: 'clamp(80px,12vw,140px) clamp(24px,6vw,80px)', background: 'var(--color-void)' }}>
           <div style={{ maxWidth: '700px' }}>
-            <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '24px' }}>
-              Beyond Legacy
+            <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)', marginBottom: '24px' }}>
+              The second door
             </p>
             <h2 style={{ ...H2, color: 'rgba(250,250,248,0.9)', marginTop: 0 }}>
-              A succession tool for the knowledge that cannot be documented.
+              Where this began: families.
             </h2>
             <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)', marginBottom: '24px' }}>
-              Basalith began as a legacy product for families who wanted to preserve how someone thought before they were gone.
-              We discovered the same problem exists in every business where one person carries the institutional knowledge that built the company.
+              Basalith started as a way for families to preserve how someone thinks while they are still here to get it right.
+              The method is identical. The operator becomes a parent. The colleagues become the family. The scenario library becomes everyday memory.
             </p>
-            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)', marginBottom: '24px' }}>
-              The founder who knows which customers to walk away from.
-              The executive whose pattern recognition has saved the company three times.
-              The partner whose judgment about people has never been wrong.
-            </p>
-            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)', marginBottom: '24px' }}>
-              When they leave that knowledge leaves.
-            </p>
-            <p style={{ fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)', fontSize: '1.15rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: 'rgba(184,150,62,0.9)', marginBottom: '36px' }}>
-              Basalith keeps it.
+            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)', marginBottom: '36px' }}>
+              For family archives, an upload pipeline filters and ranks photographs before labeling, so the family only sees what is worth their time.
             </p>
             <a
-              href="/succession"
+              href="/apply"
               style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px', border: '1px solid rgba(184,150,62,0.4)', padding: '12px 24px' }}
             >
-              Basalith for Business <span aria-hidden="true">→</span>
+              Begin a family archive <span aria-hidden="true">→</span>
             </a>
           </div>
         </section>
