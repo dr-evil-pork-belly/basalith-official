@@ -32,9 +32,17 @@ function rateLimited(ip: string): boolean {
 
 export async function POST(req: NextRequest) {
   try {
-    const { name, email, subject, reason, referralSource, company_website } = await req.json()
+    const {
+      name, email, subject, reason, referralSource, company_website,
+      applyType: rawApplyType, companyName, industry, employees, successionTimeline,
+    } = await req.json()
 
-    if (!name || !email || !subject || !reason || !referralSource) {
+    const applyType = ['legacy', 'succession', 'acquisition'].includes(rawApplyType)
+      ? rawApplyType
+      : 'legacy'
+    const isBusiness = applyType === 'succession' || applyType === 'acquisition'
+
+    if (!name || !email || !reason || !referralSource || (!isBusiness && !subject)) {
       return NextResponse.json({ error: 'All fields required' }, { status: 400 })
     }
 
@@ -64,10 +72,15 @@ export async function POST(req: NextRequest) {
       .insert({
         name,
         email,
-        subject,
+        subject:           isBusiness ? null : subject,
         reason,
-        referral_source: referralSource,
-        status:          'pending',
+        referral_source:   referralSource,
+        apply_type:        applyType,
+        company_name:      isBusiness ? companyName : null,
+        industry:          isBusiness ? industry : null,
+        employees:         isBusiness ? employees : null,
+        business_timeline: isBusiness ? successionTimeline : null,
+        status:            'pending',
       })
 
     if (dbError) {
@@ -75,12 +88,42 @@ export async function POST(req: NextRequest) {
       // Non-fatal — still send the notification
     }
 
-    // Notify legacy@basalith.xyz
+    // Notify the team. Business leads also copy David's personal inbox.
+    const adminEmail = process.env.ADMIN_EMAIL ?? 'legacy@basalith.xyz'
+    const to = isBusiness ? ['mrdavidha@gmail.com', adminEmail] : [adminEmail]
+
+    const leadTypeLabel =
+      applyType === 'succession'   ? 'Business Succession'
+      : applyType === 'acquisition' ? 'Business Acquisition'
+      : 'Personal Legacy'
+
+    const emailSubject =
+      applyType === 'succession'   ? `New Succession Lead: ${name}`
+      : applyType === 'acquisition' ? `New Acquisition Lead: ${name}`
+      : `New Archive Application: ${name}`
+
+    const tdLabel = 'font-family: monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: #888; padding: 12px 16px 12px 0; vertical-align: top; white-space: nowrap;'
+    const tdValue = 'font-size: 15px; padding: 12px 0; border-bottom: 1px solid #f0f0f0;'
+    const row = (label: string, value: string) =>
+      `<tr><td style="${tdLabel}">${label}</td><td style="${tdValue}">${value}</td></tr>`
+
+    const detailRows = [
+      row('Lead Type', leadTypeLabel),
+      !isBusiness && subject     ? row('Archive Subject', subject) : '',
+      isBusiness && companyName  ? row('Company', companyName) : '',
+      isBusiness && industry     ? row('Industry', industry) : '',
+      isBusiness && employees    ? row('Employees', employees) : '',
+      isBusiness && successionTimeline
+        ? row(applyType === 'acquisition' ? 'Deal Stage' : 'Timeline', successionTimeline)
+        : '',
+      referralSource             ? row('Referral Source', referralSource) : '',
+    ].filter(Boolean).join('')
+
     await resend.emails.send({
       from:    'Basalith <davidha@basalith.xyz>',
-      to:      process.env.ADMIN_EMAIL ?? 'legacy@basalith.xyz',
+      to,
       replyTo: email,
-      subject: `New Archive Application: ${name}`,
+      subject: emailSubject,
       headers: {
         'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
         'X-Entity-Ref-ID':  `basalith-apply-${Date.now()}`,
@@ -98,14 +141,7 @@ export async function POST(req: NextRequest) {
           </p>
 
           <table style="width: 100%; border-collapse: collapse;">
-            <tr>
-              <td style="font-family: monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: #888; padding: 12px 16px 12px 0; vertical-align: top; white-space: nowrap;">Archive Subject</td>
-              <td style="font-size: 15px; padding: 12px 0; border-bottom: 1px solid #f0f0f0;">${subject}</td>
-            </tr>
-            <tr>
-              <td style="font-family: monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: #888; padding: 12px 16px 12px 0; vertical-align: top; white-space: nowrap;">Referral Source</td>
-              <td style="font-size: 15px; padding: 12px 0; border-bottom: 1px solid #f0f0f0;">${referralSource}</td>
-            </tr>
+            ${detailRows}
             <tr>
               <td style="font-family: monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: #888; padding: 12px 16px 12px 0; vertical-align: top; white-space: nowrap;">Their Message</td>
               <td style="font-size: 15px; line-height: 1.7; padding: 12px 0;">${reason.replace(/\n/g, '<br />')}</td>

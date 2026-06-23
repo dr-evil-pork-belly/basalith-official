@@ -37,11 +37,13 @@ const MONO: React.CSSProperties = {
   letterSpacing: '0.28em',
 }
 
-type ApplyType = 'legacy' | 'succession'
+type ApplyType = 'legacy' | 'succession' | 'acquisition'
 
 export default function ApplyForm({ initialType = 'legacy' }: { initialType?: string }) {
   const [applyType, setApplyType] = useState<ApplyType>(
-    initialType === 'succession' ? 'succession' : 'legacy'
+    initialType === 'succession'  ? 'succession'
+      : initialType === 'acquisition' ? 'acquisition'
+      : 'legacy'
   )
   const [form, setForm] = useState({
     name:              '',
@@ -83,7 +85,7 @@ export default function ApplyForm({ initialType = 'legacy' }: { initialType?: st
     }
   }
 
-  const isBusiness = applyType === 'succession'
+  const isBusiness = applyType === 'succession' || applyType === 'acquisition'
 
   return (
     <>
@@ -120,17 +122,17 @@ export default function ApplyForm({ initialType = 'legacy' }: { initialType?: st
               <div style={{ marginBottom: '40px' }}>
                 <p style={{ ...LABEL, marginBottom: '12px' }}>I am applying for</p>
                 <div style={{ display: 'flex', gap: '10px' }}>
-                  {(['legacy', 'succession'] as ApplyType[]).map(type => (
+                  {(['legacy', 'succession', 'acquisition'] as ApplyType[]).map(type => (
                     <button key={type} type="button" className="type-btn"
                       onClick={() => setApplyType(type)}
                       style={{
-                        ...MONO, fontSize: '0.52rem', flex: 1, height: '48px',
+                        ...MONO, fontSize: '0.52rem', flex: 1, minHeight: '48px', padding: '8px 6px', lineHeight: 1.3,
                         border:     `1px solid ${applyType === type ? 'var(--color-gold)' : 'var(--color-border)'}`,
                         background: applyType === type ? 'var(--color-gold)' : 'transparent',
                         color:      applyType === type ? 'var(--color-surface)' : 'var(--color-text-muted)',
                         cursor: 'pointer', borderRadius: 'var(--radius-sm)',
                       }}>
-                      {type === 'legacy' ? 'Personal Legacy' : 'Business Succession'}
+                      {type === 'legacy' ? 'Personal Legacy' : type === 'succession' ? 'Business Succession' : 'Business Acquisition'}
                     </button>
                   ))}
                 </div>
@@ -145,7 +147,7 @@ export default function ApplyForm({ initialType = 'legacy' }: { initialType?: st
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
 
                 <div>
-                  <label style={LABEL} htmlFor="apply-name">{isBusiness ? 'Founder Name' : 'Your Name'}</label>
+                  <label style={LABEL} htmlFor="apply-name">{applyType === 'succession' ? 'Founder Name' : 'Your Name'}</label>
                   <input id="apply-name" type="text" required placeholder="First and last name"
                     value={form.name} onChange={set('name')} className="apply-input" style={INPUT} />
                 </div>
@@ -159,7 +161,7 @@ export default function ApplyForm({ initialType = 'legacy' }: { initialType?: st
                 {isBusiness && (
                   <>
                     <div>
-                      <label style={LABEL} htmlFor="apply-company">Company Name</label>
+                      <label style={LABEL} htmlFor="apply-company">{applyType === 'acquisition' ? 'Company Being Acquired' : 'Company Name'}</label>
                       <input id="apply-company" type="text" required placeholder="Your company"
                         value={form.companyName} onChange={set('companyName')} className="apply-input" style={INPUT} />
                     </div>
@@ -177,15 +179,28 @@ export default function ApplyForm({ initialType = 'legacy' }: { initialType?: st
                         <option>51 to 200</option><option>201 to 1000</option><option>1000+</option>
                       </select>
                     </div>
-                    <div>
-                      <label style={LABEL} htmlFor="apply-timeline">Succession Timeline</label>
-                      <select id="apply-timeline" required value={form.successionTimeline} onChange={set('successionTimeline')}
-                        className="apply-input" style={{ ...INPUT, cursor: 'pointer', appearance: 'none' as const }}>
-                        <option value="" disabled>Select one</option>
-                        <option>Within 1 year</option><option>1 to 3 years</option>
-                        <option>3 to 5 years</option><option>Planning ahead</option>
-                      </select>
-                    </div>
+                    {applyType === 'acquisition' ? (
+                      <div>
+                        <label style={LABEL} htmlFor="apply-timeline">Deal stage</label>
+                        <select id="apply-timeline" required value={form.successionTimeline} onChange={set('successionTimeline')}
+                          className="apply-input" style={{ ...INPUT, cursor: 'pointer', appearance: 'none' as const }}>
+                          <option value="" disabled>Select one</option>
+                          <option>Exploring, no LOI yet</option><option>Under LOI</option>
+                          <option>In diligence</option><option>Signed, before close</option>
+                          <option>Recently closed</option>
+                        </select>
+                      </div>
+                    ) : (
+                      <div>
+                        <label style={LABEL} htmlFor="apply-timeline">Succession Timeline</label>
+                        <select id="apply-timeline" required value={form.successionTimeline} onChange={set('successionTimeline')}
+                          className="apply-input" style={{ ...INPUT, cursor: 'pointer', appearance: 'none' as const }}>
+                          <option value="" disabled>Select one</option>
+                          <option>Within 1 year</option><option>1 to 3 years</option>
+                          <option>3 to 5 years</option><option>Planning ahead</option>
+                        </select>
+                      </div>
+                    )}
                   </>
                 )}
 
@@ -202,7 +217,7 @@ export default function ApplyForm({ initialType = 'legacy' }: { initialType?: st
                 )}
 
                 <div>
-                  <label style={LABEL} htmlFor="apply-reason">{isBusiness ? 'Tell us about your succession situation' : 'What brings you to Basalith'}</label>
+                  <label style={LABEL} htmlFor="apply-reason">{applyType === 'succession' ? 'Tell us about your succession situation' : applyType === 'acquisition' ? 'Tell us about the transaction' : 'What brings you to Basalith'}</label>
                   <textarea id="apply-reason" rows={5} required
                     placeholder={isBusiness ? 'Describe the founder, the business, and what you are hoping to preserve.' : 'Tell us what you are hoping to preserve and why now.'}
                     value={form.reason} onChange={set('reason')}
