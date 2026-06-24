@@ -1,14 +1,22 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth/getSessionUser'
-import { selectNextQuestion } from '@/lib/selectNextQuestion'
+import {
+  loadOpenIncident,
+  createIncident,
+  persist,
+  pickIncidentSeed,
+  type IncidentSession,
+} from '@/lib/incidentSession'
+import { renderProbe } from '@/lib/renderProbe'
 
 export const dynamic = 'force-dynamic'
 
-// Returns the founder's current B2B (succession) question. archiveId is resolved
-// from the session, never from the client. The flow deliberately avoids serving
-// a new question on every reload: if a question has already been served and is
-// still unanswered, we return that same one.
+// Serves the founder's current incident-interview probe (succession / founder_web
+// only). archiveId is resolved from the session, never the client. This route is
+// reload-safe: it NEVER advances. If an incident is open it returns that
+// incident's pending probe verbatim; only POST /answer advances. If no incident
+// is open it opens one from a narrative incident seed and returns the SEED probe.
 export async function GET() {
   const session = await getSessionUser()
   if (!session?.archiveId) {
@@ -26,38 +34,45 @@ export async function GET() {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
-  // 1. Reuse an already-served, still-unanswered B2B question if one exists, so
-  //    reloads don't burn through the bank.
-  const { data: open } = await supabaseAdmin
-    .from('question_history')
-    .select('b2b_question_id, question_text, domain_id')
-    .eq('archive_id', archiveId)
-    .not('b2b_question_id', 'is', null)
-    .is('answered_deposit_id', null)
-    .order('served_at', { ascending: false })
-    .limit(1)
-    .maybeSingle()
-
-  if (open) {
-    return NextResponse.json({
-      b2bQuestionId: open.b2b_question_id,
-      questionText:  open.question_text,
-      domainId:      open.domain_id,
+  const serve = (s: IncidentSession) =>
+    NextResponse.json({
+      // Existing client contract: questionText is shown, b2bQuestionId is
+      // round-tripped. We keep both and add incident fields the client can ignore.
+      b2bQuestionId: s.id,
+      questionText:  s.state.pendingQuestion ?? null,
+      domainId:      null,
+      incidentId:    s.id,
+      probeType:     s.state.pendingProbeType ?? null,
+      phase:         s.phase,
     })
-  }
 
-  // 2. Otherwise serve a new one. selectNextQuestion records the serve in
-  //    question_history (channel 'founder_web').
-  try {
-    const result = await selectNextQuestion({ archiveId, channel: 'founder_web' })
-    return NextResponse.json({
-      b2bQuestionId: result.b2bQuestionId,
-      questionText:  result.questionText,
-      domainId:      result.domainId,
-    })
-  } catch (err) {
-    // No eligible question right now (e.g. everything answered within cooldown).
-    console.warn('[b2b-question/next] no question available:', err instanceof Error ? err.message : err)
+  // 1. Reuse an open incident's pending probe. Reloading never advances.
+  const open = await loadOpenIncident(archiveId)
+  if (open) return serve(open)
+
+  // 2. No open incident: pick a narrative incident seed and open one.
+  const seed = await pickIncidentSeed(archiveId)
+  if (!seed) {
     return NextResponse.json({ b2bQuestionId: null, questionText: null, domainId: null, allAnswered: true })
   }
+
+  let incident: IncidentSession
+  try {
+    incident = await createIncident(archiveId, { questionId: seed.questionId, category: seed.category })
+  } catch (err) {
+    // The partial unique index allows one open incident per archive. If a
+    // concurrent request just opened one, reuse the winner instead of erroring.
+    const raced = await loadOpenIncident(archiveId)
+    if (raced) return serve(raced)
+    console.error('[b2b-question/next] could not open incident:', err instanceof Error ? err.message : err)
+    return NextResponse.json({ error: 'Could not start incident' }, { status: 500 })
+  }
+
+  const seedProbe = renderProbe({ probeType: 'SEED', anchor: '', seedText: seed.seedText })
+  incident.state.pendingQuestion    = seedProbe
+  incident.state.pendingProbeType   = 'SEED'
+  incident.state.pendingBranchIndex = -1
+  await persist(incident)
+
+  return serve(incident)
 }

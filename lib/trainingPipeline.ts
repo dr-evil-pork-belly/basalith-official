@@ -115,6 +115,7 @@ export async function createTrainingPairFromDeposit(
   archiveName: string,
   language   = 'en',
   sourceType = deposit.source_type ?? 'deposit',
+  probeType?: string,
 ): Promise<void> {
   console.log('[training] createTrainingPairFromDeposit called —',
     'depositId:', deposit.id,
@@ -147,6 +148,12 @@ export async function createTrainingPairFromDeposit(
   const scores = await scoreTrainingPair(deposit.prompt, deposit.response)
   console.log('[training] quality score:', scores.quality_score)
 
+  // Carry the incident probe type into metadata only when a caller passes it.
+  // Absent probeType -> metadata is exactly { owner_name, archive_name } as
+  // before, so every existing caller's row is byte-for-byte unchanged.
+  const metadata: Record<string, string> = { owner_name: ownerName, archive_name: archiveName }
+  if (probeType) metadata.probe_type = probeType
+
   const { data: inserted, error: insertError } = await supabaseAdmin
     .from('training_pairs')
     .insert({
@@ -160,7 +167,7 @@ export async function createTrainingPairFromDeposit(
       word_count:           deposit.response.split(/\s+/).filter(Boolean).length,
       included_in_training: scores.quality_score >= QUALITY_THRESHOLD,
       ...scores,
-      metadata:             { owner_name: ownerName, archive_name: archiveName },
+      metadata,
     })
     .select('id')
     .single()

@@ -612,6 +612,7 @@ async function defaultGetB2BQuestions(domainIds: number[]): Promise<B2BQuestion[
     .from('b2b_questions')
     .select('id, domain_id, question, order_index')
     .in('domain_id', domainIds)
+    .eq('is_incident_seed', false)
     .order('order_index', { ascending: true })
   if (error) throw new Error(`b2b_questions fetch failed: ${error.message}`)
 

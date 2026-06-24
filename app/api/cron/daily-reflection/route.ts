@@ -3,6 +3,8 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
 import { selectNextQuestion } from '@/lib/selectNextQuestion'
 import { createEmailReplySession, buildReplyAddress, type CreateSessionOptions } from '@/lib/emailReplySessions'
+import { loadOpenIncident, pickIncidentSeed } from '@/lib/incidentSession'
+import { renderProbe } from '@/lib/renderProbe'
 
 export const dynamic = 'force-dynamic'
 
@@ -41,64 +43,71 @@ export async function GET(req: NextRequest) {
     try {
       const lang        = archive.preferred_language ?? 'en'
       const firstName   = archive.owner_name?.split(' ')[0] ?? 'there'
-      const twilioNumber   = process.env.NEXT_PUBLIC_TWILIO_PHONE_NUMBER ?? '1-888-688-9168'
-      const formattedPhone = twilioNumber.replace(/\+1(\d{3})(\d{3})(\d{4})/, '1-$1-$2-$3') || '1-888-688-9168'
-
-      const result = await selectNextQuestion({ archiveId: archive.id, channel: 'daily_email' })
       const isSuccession = archive.tier === 'succession'
 
-      let emailType: CreateSessionOptions['emailType']
-      if (isSuccession) {
-        emailType = 'b2b_question'
-      } else if (result.source === 'p1') {
-        emailType = 'conversational'
-      } else {
-        emailType = 'owner_daily'
-      }
-
-      let replyTo: string | undefined
-      try {
-        const token = await createEmailReplySession({
-          archiveId:     archive.id,
-          contributorId: null,
-          emailType,
-          sparkId:       result.questionText.substring(0, 200),
-        })
-        replyTo = buildReplyAddress(token)
-      } catch (e) {
-        console.warn('[daily-reflection] reply session failed:', e instanceof Error ? e.message : e)
-      }
-
       let subject: string
-      let html: string
+      let html:    string
+      let replyTo: string | undefined
 
       if (isSuccession) {
-        let category = 'REFLECTION'
-        if (result.b2bQuestionId) {
-          const { data: b2bQ } = await supabaseAdmin
-            .from('b2b_questions')
-            .select('category')
-            .eq('id', result.b2bQuestionId)
-            .maybeSingle()
-          category = b2bQ?.category ?? category
+        // Seed-and-invite. The probe chain cannot run over email (each probe
+        // needs the prior answer), so the daily email stops carrying the
+        // interview. It shows the day's incident opener and links into the
+        // founder portal, where the multi-turn interview actually runs. This
+        // creates NO state: the portal's GET /next owns incident creation. We
+        // mirror that route's read (continue an open incident, else a fresh
+        // narrative seed) so the email and the portal agree on what is up. No
+        // reply-to: answering by email cannot drive the chain.
+        const open = await loadOpenIncident(archive.id)
+        let opener:   string
+        let category: string
+        let continued = false
+
+        if (open && open.state.pendingQuestion) {
+          opener    = open.state.pendingQuestion
+          category  = open.category
+          continued = true
+        } else {
+          const seed = await pickIncidentSeed(archive.id)
+          if (!seed) {
+            console.warn('[daily-reflection] no incident seed for', archive.id, '— skipping')
+            continue
+          }
+          opener   = renderProbe({ probeType: 'SEED', anchor: '', seedText: seed.seedText })
+          category = seed.category
         }
 
-        subject = `Today's succession question · ${archive.name}`
-        html    = buildB2BQuestionEmail(archive.name, firstName, category, result.questionText, formattedPhone, result.framingUsed)
+        const siteUrl   = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
+        const portalUrl = `${siteUrl}/archive/dashboard`
+        subject = `Your reflection is ready · ${archive.name}`
+        html    = buildSuccessionInviteEmail(archive.name, firstName, category, opener, portalUrl, continued)
       } else {
+        const twilioNumber   = process.env.NEXT_PUBLIC_TWILIO_PHONE_NUMBER ?? '1-888-688-9168'
+        const formattedPhone = twilioNumber.replace(/\+1(\d{3})(\d{3})(\d{4})/, '1-$1-$2-$3') || '1-888-688-9168'
+
+        const result = await selectNextQuestion({ archiveId: archive.id, channel: 'daily_email' })
+        const emailType: CreateSessionOptions['emailType'] =
+          result.source === 'p1' ? 'conversational' : 'owner_daily'
+
+        try {
+          const token = await createEmailReplySession({
+            archiveId:     archive.id,
+            contributorId: null,
+            emailType,
+            sparkId:       result.questionText.substring(0, 200),
+          })
+          replyTo = buildReplyAddress(token)
+        } catch (e) {
+          console.warn('[daily-reflection] reply session failed:', e instanceof Error ? e.message : e)
+        }
+
         subject = lang === 'zh'
           ? `今天的问题 · ${archive.name}`
           : `Today's question · ${archive.name}`
         html = buildDailyReflectionEmail(archive.name, firstName, result.questionText, formattedPhone, lang, result.framingUsed)
       }
 
-      console.log(
-        '[daily-reflection] sending to:', archive.owner_email,
-        'replyTo:', replyTo,
-        'source:', result.source,
-        'questionId:', result.questionId,
-        'b2bQuestionId:', result.b2bQuestionId,
-      )
+      console.log('[daily-reflection] sending to:', archive.owner_email, '| succession:', isSuccession, '| replyTo:', replyTo ?? 'none')
       await resend.emails.send({
         from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
         to:      archive.owner_email,
@@ -290,20 +299,28 @@ function buildDailyReflectionEmail(
 </html>`
 }
 
-function buildB2BQuestionEmail(
-  archiveName:  string,
-  firstName:    string,
-  category:     string,
-  question:     string,
-  phoneNumber:  string,
-  framing:      string | null = null,
+// Succession daily email: a seed-and-invite, not a question-and-reply. The probe
+// chain runs in the founder portal, so this email leads with the human reason to
+// come reflect, shows the day's incident opener, and links into the portal. No
+// reply-to and no phone affordance: answering by email cannot drive the chain.
+// Copy obeys the standing rules (no em dashes, American English, short
+// declarative sentences, no banned words, nothing implying the entity is alive).
+function buildSuccessionInviteEmail(
+  archiveName: string,
+  firstName:   string,
+  category:    string,
+  opener:      string,
+  portalUrl:   string,
+  continued:   boolean = false,
 ): string {
-  const siteUrl  = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
-  const dateStr  = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
-  const eyebrow  = category.toUpperCase()
-  const framingHtml = framing
-    ? `<p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#9A968C;line-height:1.7;margin:0 0 16px">${framing}</p>`
-    : ''
+  const dateStr = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
+  const eyebrow = continued ? `${category.toUpperCase()} · IN PROGRESS` : category.toUpperCase()
+
+  const lead = continued
+    ? 'You started a reflection and stepped away. It is still here whenever you are ready to finish it.'
+    : 'Some of the calls you made still shape the people who came after you. Today there is one worth returning to.'
+
+  const ctaLabel = continued ? 'Continue in your portal' : 'Begin in your portal'
 
   return `<!DOCTYPE html>
 <html>
@@ -320,41 +337,34 @@ function buildB2BQuestionEmail(
 
   <div style="padding:32px">
 
-    <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#B8B4AB;margin:0 0 24px">
+    <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#B8B4AB;margin:0 0 20px">
       ${firstName},
     </p>
 
-    ${framingHtml}
-
-    <div style="border-left:3px solid rgba(196,162,74,0.5);padding:20px 24px;margin:0 0 32px;background:rgba(196,162,74,0.04)">
-      <p style="font-family:Georgia,serif;font-size:20px;font-weight:300;color:#F0EDE6;line-height:1.7;margin:0;font-style:italic">
-        "${question}"
-      </p>
-    </div>
-
-    <p style="font-family:Georgia,serif;font-size:16px;font-weight:300;color:#B8B4AB;margin:0 0 16px">
-      Reply to this email with your answer. Your response is captured and woven into your entity.
+    <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#B8B4AB;line-height:1.7;margin:0 0 24px">
+      ${lead}
     </p>
 
-    <div style="background:rgba(196,162,74,0.06);border:1px solid rgba(196,162,74,0.2);padding:16px 24px;margin:0 0 24px">
-      <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#C4A24A;margin:0 0 6px">
-        OR CALL TO RECORD YOUR ANSWER
-      </p>
-      <p style="font-family:Georgia,serif;font-size:24px;font-weight:700;color:#F0EDE6;margin:0 0 4px;letter-spacing:2px">
-        ${phoneNumber}
-      </p>
-      <p style="font-family:Georgia,serif;font-size:13px;font-style:italic;color:#706C65;margin:0">
-        No login needed.
+    <div style="border-left:3px solid rgba(196,162,74,0.5);padding:20px 24px;margin:0 0 28px;background:rgba(196,162,74,0.04)">
+      <p style="font-family:Georgia,serif;font-size:20px;font-weight:300;color:#F0EDE6;line-height:1.7;margin:0;font-style:italic">
+        "${opener}"
       </p>
     </div>
 
-    <div style="border-top:1px solid rgba(240,237,230,0.06);padding-top:20px;text-align:center;margin-top:24px">
-      <p style="font-family:Georgia,serif;font-size:13px;font-style:italic;color:#5C6166;margin:0 0 8px">
+    <p style="font-family:Georgia,serif;font-size:16px;font-weight:300;color:#B8B4AB;line-height:1.7;margin:0 0 28px">
+      This one is a conversation, not a single reply. Set aside a few quiet minutes and work through it one question at a time.
+    </p>
+
+    <div style="text-align:center;margin:0 0 28px">
+      <a href="${portalUrl}" style="display:inline-block;font-family:'Courier New',monospace;font-size:12px;letter-spacing:3px;color:#0A0908;background:#C4A24A;text-decoration:none;padding:14px 32px">
+        ${ctaLabel.toUpperCase()}
+      </a>
+    </div>
+
+    <div style="border-top:1px solid rgba(240,237,230,0.06);padding-top:20px;text-align:center">
+      <p style="font-family:Georgia,serif;font-size:13px;font-style:italic;color:#5C6166;margin:0">
         Your judgment deserves to outlast you.
       </p>
-      <a href="${siteUrl}/archive/entity" style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#C4A24A;text-decoration:none">
-        VIEW YOUR ENTITY
-      </a>
     </div>
 
   </div>
