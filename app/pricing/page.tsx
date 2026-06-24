@@ -62,6 +62,7 @@ export default function PricingPage() {
 
         {/* Hero */}
         <section
+          className="b2b-paper"
           style={{
             padding:    'clamp(140px,18vw,200px) clamp(24px,6vw,80px) clamp(64px,8vw,88px)',
             textAlign:  'center',
@@ -180,7 +181,7 @@ export default function PricingPage() {
         </section>
 
         {/* Acquisition — per-deal engagement. Distinct block, not a tier card, not in the Active/Resting/Legacy group. */}
-        <section style={{ background: 'var(--color-bg)', padding: 'clamp(72px,10vw,120px) clamp(24px,6vw,80px)', borderTop: '1px solid rgba(196,162,74,0.18)' }}>
+        <section className="b2b-paper" style={{ background: 'var(--color-bg)', padding: 'clamp(72px,10vw,120px) clamp(24px,6vw,80px)', borderTop: '1px solid rgba(196,162,74,0.18)' }}>
           <div style={{ maxWidth: '700px', margin: '0 auto' }}>
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
               <span style={{ width: '24px', height: '1px', background: 'var(--color-gold)', display: 'block', flexShrink: 0 }} aria-hidden="true" />
@@ -210,8 +211,8 @@ export default function PricingPage() {
 
             <Link
               href="/apply?type=acquisition"
-              className="pricing-cta"
-              style={{ ...MONO, fontSize: 'var(--text-caption)', display: 'inline-block', textDecoration: 'none', background: 'var(--color-gold)', color: '#0A0908', padding: '16px 32px', transition: 'background 250ms ease' }}
+              className="pricing-cta-paper"
+              style={{ ...MONO, fontSize: 'var(--text-caption)', display: 'inline-block', textDecoration: 'none', background: 'var(--b2b-btn)', color: '#0A0908', padding: '16px 32px', transition: 'background 250ms ease' }}
             >
               Talk to us about a transaction.
             </Link>
@@ -390,7 +391,8 @@ export default function PricingPage() {
 
       <style>{`
         .pricing-ghost-link:hover { color: var(--color-gold) !important; }
-        .pricing-cta:hover { background: var(--color-gold-light) !important; }
+        .pricing-cta:hover       { background: var(--color-gold-light) !important; }
+        .pricing-cta-paper:hover { background: var(--b2b-btn-hover) !important; }
         @media (max-width: 900px) {
           .founding-grid {
             grid-template-columns: 1fr !important;

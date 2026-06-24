@@ -93,14 +93,14 @@ export default function HeroSection() {
             alignSelf:      'flex-start',
             textDecoration: 'none',
             color:          '#0A0908',
-            background:     'var(--color-gold)',
+            background:     'var(--b2b-btn)',
             padding:        '14px 28px',
             opacity:        0,
             animation:      'lineReveal 600ms cubic-bezier(0.16,1,0.3,1) 700ms both',
             transition:     'background 250ms ease',
           }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--color-gold-light)' }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'var(--color-gold)' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--b2b-btn-hover)' }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'var(--b2b-btn)' }}
         >
           For Business
           <span aria-hidden="true" style={{ fontSize: '0.9rem', lineHeight: 1 }}>&rarr;</span>

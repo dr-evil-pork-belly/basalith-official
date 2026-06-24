@@ -113,6 +113,15 @@
   --shadow-md:   0 4px 16px rgba(26,24,20,0.08);
   --shadow-lg:   0 16px 48px rgba(26,24,20,0.12);
   --shadow-gold: 0 4px 24px rgba(184,150,62,0.15);
+
+  /* Institutional "paper" register — B2B marketing spine (scoped via .b2b-paper) */
+  --b2b-paper:     #F4F1EA;
+  --b2b-paper-alt: #EAE6DC;
+  --b2b-ink-faint: #857F75;
+  --b2b-rule:      rgba(26,24,20,0.12);
+  --b2b-gold-line: rgba(138,110,48,0.30);
+  --b2b-btn:       #C4A24A;   /* paper CTA bg: ~8:1 behind the #0A0908 label */
+  --b2b-btn-hover: #B08F3E;   /* paper CTA hover: darker, real delta */
 }
 
 html {
@@ -211,6 +220,27 @@ ON GOLD BUTTON (#B8963E):
 .section-dark .eyebrow-light { color: var(--color-gold); }
 .section-light .text-gold,
 .section-light .eyebrow-light { color: var(--color-gold-on-light); }
+
+/* ── Institutional "paper" register ──────────────────────────────────────────
+   Scoped re-point: wrap a B2B light section in `.b2b-paper` and every
+   `var(--color-*)` underneath retints to the paper palette, with no component
+   edits. Void interludes must stay OUTSIDE this wrapper so their gold stays
+   #C4A24A on dark.
+   Gold accents (eyebrows, section numbers, the emphasis line, hairlines) re-point
+   to the contrast-safe #8A6E30 (~4.6:1 on paper). Gold-backed BUTTONS do NOT use
+   --color-gold; they point at the dedicated --b2b-btn / --b2b-btn-hover tokens, so
+   the label keeps ~8:1 without dragging the accents bright. */
+.b2b-paper {
+  --color-bg:            var(--b2b-paper);
+  --color-surface:       var(--b2b-paper);
+  --color-surface-alt:   var(--b2b-paper-alt);
+  --color-text-faint:    var(--b2b-ink-faint);
+  --color-gold:          var(--color-gold-on-light);
+  --color-border:        var(--b2b-rule);
+  --color-border-medium: var(--b2b-rule);
+  --font-cormorant:      var(--font-newsreader);
+  background:            var(--b2b-paper);
+}
 
 /* ── Grain texture ── */
 .grain {

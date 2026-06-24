@@ -82,6 +82,7 @@ export default function MethodPage() {
       <main style={{ background: 'var(--color-bg)' }}>
 
         {/* Hero */}
+        <div className="b2b-paper">
         <section style={{ padding: 'clamp(140px,16vw,180px) clamp(24px,6vw,80px) clamp(60px,8vw,80px)', maxWidth: 'calc(var(--max-width-text) + 160px)', margin: '0 auto' }}>
           <p
             style={{
@@ -127,8 +128,10 @@ export default function MethodPage() {
             decided, but how they reasoned.
           </p>
         </section>
+        </div>
 
         {/* Steps */}
+        <div className="b2b-paper">
         <section style={{ padding: '0 clamp(24px,6vw,80px) clamp(80px,10vw,120px)', maxWidth: 'calc(var(--max-width-text) + 160px)', margin: '0 auto' }}>
           {STEPS.map(({ n, title, body }, i) => (
             <div key={n} style={{ display: 'grid', gridTemplateColumns: '3rem 1fr', gap: '32px', marginBottom: '56px' }}>
@@ -164,6 +167,7 @@ export default function MethodPage() {
             </a>
           </div>
         </section>
+        </div>
 
         {/* Two-tier quality system */}
         <section style={{ padding: 'clamp(80px,10vw,120px) clamp(24px,6vw,80px)', background: 'var(--color-void)', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
@@ -216,7 +220,7 @@ export default function MethodPage() {
         </section>
 
         {/* 06 — Bridge to the flagship architecture */}
-        <section style={{ padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,80px)' }}>
+        <section className="b2b-paper" style={{ padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,80px)' }}>
           <div style={{ maxWidth: 'calc(var(--max-width-text) + 160px)', margin: '0 auto' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '3rem 1fr', gap: '32px' }}>
               <p style={{ ...MONO, fontSize: '0.52rem', color: 'var(--color-gold)', paddingTop: '4px' }}>06</p>

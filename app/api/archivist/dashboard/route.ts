@@ -40,15 +40,18 @@ export async function GET(req: NextRequest) {
   // Active clients count
   const activeCount = pipelineCounts['Active Client'] ?? 0
 
-  // Residual MRR
-  const RESIDUAL_MONTHLY: Record<string, number> = {
-    active: 2000, resting: 400, legacy: 800,
-    archive: 2000, estate: 2000, dynasty: 2000, // old tier aliases
-  } // cents
+  // Residual MRR that mirrors the pay-residuals cron derivation (12% of annual / 12),
+  // so the dashboard tile agrees with the earnings page and with what is paid.
+  const RESIDUAL_RATE = 0.12
+  const TIER_ANNUAL_CENTS: Record<string, number> = {
+    active: 360000, resting: 60000, legacy: 120000,
+    archive: 360000, estate: 360000, dynasty: 360000, // old tier aliases → Active
+  }
   const activeProspects    = (prospects ?? []).filter(p => p.status === 'Active Client')
   const residualMRRCents   = activeProspects.reduce((sum, p) => {
-    const tier = (p.tier ?? '').toLowerCase()
-    return sum + (RESIDUAL_MONTHLY[tier] ?? 2000)
+    const tier        = (p.tier ?? '').toLowerCase()
+    const annualCents = TIER_ANNUAL_CENTS[tier] ?? TIER_ANNUAL_CENTS.active
+    return sum + Math.round(annualCents * RESIDUAL_RATE / 12)
   }, 0)
 
   // Quality score from archivist table

@@ -96,7 +96,7 @@ function DemoCard() {
           Run a Live Demo →
         </Link>
         <Link
-          href="/archivist/demo/succession"
+          href="/succession/demo"
           style={{ fontFamily: 'Courier New, monospace', fontSize: '0.55rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: C.dim, textDecoration: 'none' }}
         >
           Succession demo (preview)

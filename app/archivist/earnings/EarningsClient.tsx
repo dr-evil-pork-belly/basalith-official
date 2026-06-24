@@ -15,15 +15,25 @@ type Commission = {
 
 type Prospect = { id: string; name: string; status: string; tier: string }
 
-const RESIDUAL_MONTHLY: Record<string, number> = {
-  active: 20, resting: 4, legacy: 8,
-  archive: 20, estate: 20, dynasty: 20, // old tier aliases
+// Residual derivation that mirrors the pay-residuals cron exactly, so the figures a
+// guide sees here match what they are actually paid. One rate, no hand-tuned table.
+const RESIDUAL_RATE = 0.12
+
+// Annual fee per tier in cents. Source of truth: submit-client TIER_PRICES.
+const TIER_ANNUAL_CENTS: Record<string, number> = {
+  active:  360000,  // $3,600/yr
+  resting:  60000,  // $600/yr
+  legacy:  120000,  // $1,200/yr
+  // Old tier aliases → Active
+  archive: 360000,
+  estate:  360000,
+  dynasty: 360000,
 }
 
-const TIER_TIER: Record<string, { annual: number; monthly: number }> = {
-  Archive: { annual: 1800, monthly: 180 },
-  Estate:  { annual: 3600, monthly: 360 },
-  Dynasty: { annual: 9600, monthly: 960 },
+// Monthly residual in cents for a tier: Math.round(annual * 0.12 / 12).
+function monthlyResidualCents(tier: string): number {
+  const annual = TIER_ANNUAL_CENTS[(tier ?? '').toLowerCase()] ?? TIER_ANNUAL_CENTS.active
+  return Math.round(annual * RESIDUAL_RATE / 12)
 }
 
 export default function EarningsClient({ archivistId }: { archivistId: string }) {
@@ -56,12 +66,9 @@ export default function EarningsClient({ archivistId }: { archivistId: string })
   const allTime       = founding.reduce((s, c) => s + (c.amount_cents ?? 0), 0)
 
   // ── Recurring income ─────────────────────────────────────────────────────────
-  const activeClients = prospects.filter(p => p.status === 'Active Client')
-  const monthlyMRR    = activeClients.reduce((sum, p) => {
-    const t = (p.tier ?? '').toLowerCase()
-    return sum + (RESIDUAL_MONTHLY[t] ?? 24)
-  }, 0)
-  const annualResidual = monthlyMRR * 12
+  const activeClients       = prospects.filter(p => p.status === 'Active Client')
+  const monthlyMRRCents     = activeClients.reduce((sum, p) => sum + monthlyResidualCents(p.tier), 0)
+  const annualResidualCents = monthlyMRRCents * 12
 
   // ── Tier info ────────────────────────────────────────────────────────────────
   const totalClosings  = Number(archivist?.total_closings ?? 0)
@@ -97,10 +104,10 @@ export default function EarningsClient({ archivistId }: { archivistId: string })
         <div>
           <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.58rem', letterSpacing: '0.24em', textTransform: 'uppercase', color: C.dim, marginBottom: '6px' }}>Annual Recurring Income</p>
           <p style={{ fontFamily: 'Georgia, serif', fontSize: '2.2rem', fontWeight: 300, color: C.gold, lineHeight: 1 }}>
-            ${annualResidual.toLocaleString()}
+            {fmt(annualResidualCents)}
           </p>
           <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.58rem', color: C.ghost, marginTop: '6px' }}>
-            {activeClients.length} active {activeClients.length === 1 ? 'archive' : 'archives'} · ${monthlyMRR}/month
+            {activeClients.length} active {activeClients.length === 1 ? 'archive' : 'archives'} · {fmt(monthlyMRRCents)}/month
           </p>
         </div>
         <div style={{ borderLeft: `1px solid rgba(196,162,74,0.2)`, paddingLeft: '32px' }}>
@@ -124,7 +131,7 @@ export default function EarningsClient({ archivistId }: { archivistId: string })
             {certified ? 'Certified Guide' : 'Uncertified'}
           </p>
           <p style={{ fontFamily: 'Georgia, serif', fontSize: '0.95rem', color: C.muted }}>Founding: <span style={{ color: C.gold }}>$1,000</span> per archive</p>
-          <p style={{ fontFamily: 'Georgia, serif', fontSize: '0.95rem', color: C.muted }}>Residual: <span style={{ color: C.gold }}>8%</span> annually</p>
+          <p style={{ fontFamily: 'Georgia, serif', fontSize: '0.95rem', color: C.muted }}>Residual: <span style={{ color: C.gold }}>12%</span> annually</p>
         </div>
         {certified && (
           <div style={{ borderLeft: `1px solid ${C.border}`, paddingLeft: '32px', flex: 1 }}>
@@ -198,13 +205,12 @@ export default function EarningsClient({ archivistId }: { archivistId: string })
               <p style={{ padding: '24px', fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: '0.9rem', color: C.ghost }}>No active archives yet.</p>
             )}
             {activeClients.map((p, i) => {
-              const tierKey = p.tier as keyof typeof RESIDUAL_MONTHLY
-              const monthly = RESIDUAL_MONTHLY[(p.tier ?? '').toLowerCase()] ?? 24
+              const monthlyCents = monthlyResidualCents(p.tier)
               return (
                 <div key={p.id} style={{ display: 'grid', gridTemplateColumns: '1fr 80px 100px', borderBottom: i < activeClients.length - 1 ? `1px solid ${C.border}` : 'none' }}>
                   <div style={{ padding: '12px 16px' }}><p style={{ fontFamily: 'Georgia, serif', fontSize: '0.9rem', color: C.muted }}>{p.name}</p></div>
-                  <div style={{ padding: '12px 16px' }}><p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.6rem', color: C.dim }}>{p.tier || '—'}</p></div>
-                  <div style={{ padding: '12px 16px', textAlign: 'right' }}><p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.65rem', color: C.gold }}>${monthly}/mo</p></div>
+                  <div style={{ padding: '12px 16px' }}><p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.6rem', color: C.dim }}>{p.tier || '-'}</p></div>
+                  <div style={{ padding: '12px 16px', textAlign: 'right' }}><p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.65rem', color: C.gold }}>{fmt(monthlyCents)}/mo</p></div>
                 </div>
               )
             })}
@@ -212,11 +218,11 @@ export default function EarningsClient({ archivistId }: { archivistId: string })
               <div style={{ borderTop: `1px solid ${C.border}`, padding: '14px 16px', display: 'flex', justifyContent: 'flex-end', gap: '24px' }}>
                 <div style={{ textAlign: 'right' }}>
                   <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.55rem', color: C.ghost, marginBottom: '3px' }}>Total Monthly</p>
-                  <p style={{ fontFamily: 'Georgia, serif', fontSize: '1.1rem', color: C.gold }}>${monthlyMRR}/mo</p>
+                  <p style={{ fontFamily: 'Georgia, serif', fontSize: '1.1rem', color: C.gold }}>{fmt(monthlyMRRCents)}/mo</p>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <p style={{ fontFamily: 'Courier New, monospace', fontSize: '0.55rem', color: C.ghost, marginBottom: '3px' }}>Annual</p>
-                  <p style={{ fontFamily: 'Georgia, serif', fontSize: '1.1rem', color: C.gold }}>${annualResidual.toLocaleString()}/yr</p>
+                  <p style={{ fontFamily: 'Georgia, serif', fontSize: '1.1rem', color: C.gold }}>{fmt(annualResidualCents)}/yr</p>
                 </div>
               </div>
             )}
@@ -229,8 +235,8 @@ export default function EarningsClient({ archivistId }: { archivistId: string })
               LEGACY RESIDUALS
             </p>
             <p style={{ fontFamily: 'Georgia, serif', fontSize: '0.85rem', color: C.muted, lineHeight: 1.7, margin: 0 }}>
-              Legacy archives generate $96/year in residuals ($8/month).
-              A family that maintains Legacy status for 20 years generates $1,920 in residuals from one client.
+              Legacy archives generate $144/year in residuals ($12/month).
+              A family that maintains Legacy status for 20 years generates $2,880 in residuals from one client.
               The Legacy conversation is worth having correctly.
             </p>
           </div>

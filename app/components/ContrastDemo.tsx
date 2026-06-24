@@ -204,15 +204,15 @@ function ContrastDemoSection({
               ...MONO,
               display:    'inline-block',
               color:      '#0A0908',
-              background: 'var(--color-gold)',
+              background: 'var(--b2b-btn)',
               border:     'none',
               padding:    '14px 28px',
               cursor:     canSubmit ? 'pointer' : 'default',
               opacity:    canSubmit ? 1 : 0.4,
               transition: 'background 250ms ease',
             }}
-            onMouseEnter={e => { if (canSubmit) (e.currentTarget as HTMLElement).style.background = 'var(--color-gold-light)' }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'var(--color-gold)' }}
+            onMouseEnter={e => { if (canSubmit) (e.currentTarget as HTMLElement).style.background = 'var(--b2b-btn-hover)' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'var(--b2b-btn)' }}
           >
             Show me the difference.
           </button>

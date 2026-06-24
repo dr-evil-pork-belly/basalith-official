@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Cormorant_Garamond, Space_Mono } from 'next/font/google'
+import { Cormorant_Garamond, Space_Mono, Newsreader } from 'next/font/google'
 import './globals.css'
 import ScrollReveal      from './components/ScrollReveal'
 import AuthErrorRedirect from './components/AuthErrorRedirect'
@@ -16,6 +16,16 @@ const spaceMono = Space_Mono({
   subsets:  ['latin'],
   weight:   ['400', '700'],
   variable: '--font-space-mono',
+  display:  'swap',
+})
+
+// Institutional display serif. Loaded site-wide but only takes effect inside
+// `.b2b-paper`, where the paper register re-points --font-cormorant to it.
+const newsreader = Newsreader({
+  subsets:  ['latin'],
+  weight:   ['300', '400', '500', '600', '700'],
+  style:    ['normal', 'italic'],
+  variable: '--font-newsreader',
   display:  'swap',
 })
 
@@ -58,7 +68,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${cormorant.variable} ${spaceMono.variable}`}>
+    <html lang="en" className={`${cormorant.variable} ${spaceMono.variable} ${newsreader.variable}`}>
       <body>
         <div className="grain fixed inset-0 z-[9997] pointer-events-none" aria-hidden="true" />
         <AuthErrorRedirect />

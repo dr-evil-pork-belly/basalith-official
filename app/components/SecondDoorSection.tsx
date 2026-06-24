@@ -19,13 +19,13 @@ export default function SecondDoorSection() {
       id="audience"
       aria-label="The second door"
       style={{
-        background: 'var(--color-bg)',
+        background: 'var(--color-void)',
         padding:    'clamp(64px,9vw,110px) clamp(24px,6vw,80px)',
-        borderTop:  '1px solid var(--color-border)',
+        borderTop:  '1px solid rgba(250,250,248,0.06)',
       }}
     >
       <div style={{ maxWidth: '620px', margin: '0 auto' }}>
-        <p style={{ ...MONO, color: 'var(--color-text-muted)', marginBottom: '20px' }}>
+        <p style={{ ...MONO, color: 'var(--text-on-dark-3)', marginBottom: '20px' }}>
           The second door
         </p>
         <h2
@@ -34,13 +34,13 @@ export default function SecondDoorSection() {
             fontSize:   'clamp(1.6rem,2.8vw,2.2rem)',
             fontWeight: 300,
             lineHeight: 1.2,
-            color:      'var(--color-text-primary)',
+            color:      'var(--text-on-dark)',
             margin:     '0 0 20px',
           }}
         >
           Basalith began with families.
         </h2>
-        <p style={{ ...SERIF, fontSize: '1.05rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-secondary)', margin: '0 0 28px' }}>
+        <p style={{ ...SERIF, fontSize: '1.05rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: 'var(--text-on-dark-2)', margin: '0 0 28px' }}>
           Before it was a way to hand forward how a business is run, it was a way to preserve how a person thinks while they are still here to get it right. That path is still open. The method is the same.
         </p>
         <Link
@@ -50,9 +50,9 @@ export default function SecondDoorSection() {
             display:        'inline-flex',
             alignItems:     'center',
             gap:            '8px',
-            color:          'var(--color-gold-on-light)',
+            color:          'var(--color-gold)',
             textDecoration: 'none',
-            border:         '1px solid var(--color-border-medium)',
+            border:         '1px solid rgba(196,162,74,0.4)',
             padding:        '12px 24px',
           }}
         >

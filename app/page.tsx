@@ -56,9 +56,9 @@ export default function HomePage() {
       />
       <Nav />
       <main>
-        <HeroSection />
-        <SuccessionSection />
-        <ContrastDemo />
+        <div className="b2b-paper"><HeroSection /></div>
+        <div className="b2b-paper"><SuccessionSection /></div>
+        <div className="b2b-paper"><ContrastDemo /></div>
         <SecondDoorSection />
         <ClosingSection />
       </main>

@@ -112,6 +112,7 @@ export default function SuccessionPage() {
       <main style={{ background: 'var(--color-bg)' }}>
 
         {/* ── Section 1: The Problem ── */}
+        <div className="b2b-paper">
         <section style={{
           padding:   `clamp(140px,16vw,200px) ${PAD} clamp(80px,10vw,120px)`,
           maxWidth:  '960px',
@@ -147,6 +148,7 @@ export default function SuccessionPage() {
             Basalith builds a cognitive reference model of the operator while they are still running the company. How they price risk, how they read people, the calls they make without thinking. It captures the reasoning behind the decisions, so it transfers with the business, through an acquisition or a succession.
           </p>
         </section>
+        </div>
 
         {/* ── Section 2: What is actually lost ── */}
         <section style={{ background: 'var(--color-void)', padding: `clamp(80px,10vw,120px) ${PAD}` }}>
@@ -208,7 +210,7 @@ export default function SuccessionPage() {
         </section>
 
         {/* ── Section 3: Two transitions ── */}
-        <section style={{ padding: `clamp(80px,10vw,120px) ${PAD}` }}>
+        <section className="b2b-paper" style={{ padding: `clamp(80px,10vw,120px) ${PAD}` }}>
           <div style={{ maxWidth: '900px', margin: '0 auto' }}>
             <h2 style={{
               ...SERIF,
@@ -337,7 +339,7 @@ export default function SuccessionPage() {
         </section>
 
         {/* ── Section 6: How the handoff works ── */}
-        <section style={{ padding: `clamp(80px,10vw,120px) ${PAD}` }}>
+        <section className="b2b-paper" style={{ padding: `clamp(80px,10vw,120px) ${PAD}` }}>
           <div style={{ maxWidth: '760px', margin: '0 auto' }}>
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '48px' }}>
               How the handoff actually works
@@ -382,7 +384,7 @@ export default function SuccessionPage() {
         </section>
 
         {/* ── Section 8: Pricing + CTA ── */}
-        <section style={{ padding: `clamp(80px,10vw,120px) ${PAD}` }}>
+        <section className="b2b-paper" style={{ padding: `clamp(80px,10vw,120px) ${PAD}` }}>
           <div style={{ maxWidth: '640px', margin: '0 auto' }}>
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '32px' }}>
               The Succession Tier
@@ -398,7 +400,7 @@ export default function SuccessionPage() {
               <p style={{ ...SERIF, fontSize: 'clamp(3rem,6vw,4rem)', fontWeight: 300, color: 'var(--color-text-primary)', lineHeight: 1, letterSpacing: '-0.02em', marginBottom: '4px' }}>
                 $12,000
               </p>
-              <p style={{ ...MONO, fontSize: '0.46rem', color: 'rgba(250,248,244,0.4)', marginBottom: '8px' }}>
+              <p style={{ ...MONO, fontSize: '0.46rem', color: 'var(--color-text-faint)', marginBottom: '8px' }}>
                 per year
               </p>
               <p style={{ ...GEORGIA, fontSize: '0.95rem', fontStyle: 'italic', color: 'var(--color-gold)', marginBottom: '32px' }}>
@@ -409,7 +411,7 @@ export default function SuccessionPage() {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px 24px', marginBottom: '36px' }}>
                 {FEATURES.map(f => (
-                  <p key={f} style={{ ...MONO, fontSize: '0.43rem', color: 'rgba(250,248,244,0.5)', margin: 0 }}>
+                  <p key={f} style={{ ...MONO, fontSize: '0.43rem', color: 'var(--color-text-muted)', margin: 0 }}>
                     &#10003; {f}
                   </p>
                 ))}
@@ -421,7 +423,7 @@ export default function SuccessionPage() {
 
               <Link
                 href="/contact"
-                className="succession-cta"
+                className="succession-cta-paper"
                 style={{
                   ...MONO,
                   fontSize:       'var(--text-caption)',
@@ -429,7 +431,7 @@ export default function SuccessionPage() {
                   textAlign:      'center',
                   color:          '#0A0908',
                   textDecoration: 'none',
-                  background:     'var(--color-gold)',
+                  background:     'var(--b2b-btn)',
                   padding:        '16px 32px',
                   transition:     'background 250ms ease',
                 }}
@@ -438,14 +440,14 @@ export default function SuccessionPage() {
               </Link>
             </div>
 
-            <p style={{ ...GEORGIA, fontSize: '0.9rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: 'rgba(250,248,244,0.3)' }}>
+            <p style={{ ...GEORGIA, fontSize: '0.9rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-faint)' }}>
               Post-transition access: $3,600/year. Institutional query access for the successor continues. No active sessions required.
             </p>
           </div>
         </section>
 
         {/* ── Section 9: Proof ── */}
-        <ContrastDemo />
+        <div className="b2b-paper"><ContrastDemo /></div>
 
         {/* ── Section 10: Close ── */}
         <section style={{ background: 'var(--color-void)', padding: `clamp(80px,12vw,160px) ${PAD}`, textAlign: 'center' }}>
@@ -484,7 +486,8 @@ export default function SuccessionPage() {
       <Footer />
 
       <style>{`
-        .succession-cta:hover { background: var(--color-gold-light) !important; }
+        .succession-cta:hover       { background: var(--color-gold-light) !important; }
+        .succession-cta-paper:hover { background: var(--b2b-btn-hover) !important; }
         @media (max-width: 680px) {
           .succession-contrast    { grid-template-columns: 1fr !important; }
           .succession-layers      { grid-template-columns: 1fr !important; }

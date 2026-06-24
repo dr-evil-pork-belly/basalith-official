@@ -55,6 +55,7 @@ export default function AboutPage() {
       <main style={{ background: 'var(--color-bg)' }}>
 
         {/* Section 1 — What We Are Building */}
+        <div className="b2b-paper">
         <section style={{ padding: 'clamp(140px,16vw,200px) clamp(24px,6vw,80px) clamp(64px,8vw,96px)', maxWidth: '760px' }}>
           <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '28px' }}>
             Heritage Nexus Inc.
@@ -104,6 +105,7 @@ export default function AboutPage() {
             version of the people who shaped them.
           </p>
         </section>
+        </div>
 
         {/* Section 2 — The Ecosystem */}
         <section style={{ background: 'var(--color-void)', padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,80px)' }}>
@@ -137,7 +139,7 @@ export default function AboutPage() {
         </section>
 
         {/* Section 3 — Founder Story */}
-        <section style={{ padding: 'clamp(80px,10vw,120px) clamp(24px,6vw,80px)' }}>
+        <section className="b2b-paper" style={{ padding: 'clamp(80px,10vw,120px) clamp(24px,6vw,80px)' }}>
           <div style={{ maxWidth: '640px', margin: '0 auto' }}>
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '48px' }}>
               From the Founder
@@ -270,7 +272,7 @@ export default function AboutPage() {
         </section>
 
         {/* Section 5 — The Research */}
-        <section style={{ padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,80px)' }}>
+        <section className="b2b-paper" style={{ padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,80px)' }}>
           <div style={{ maxWidth: '640px', margin: '0 auto' }}>
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '24px' }}>
               Built on Evidence

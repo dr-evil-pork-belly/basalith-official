@@ -112,7 +112,7 @@ export default function SuccessionDemoClient() {
       {/* ── Top bar ── */}
       <div style={{ borderBottom: `1px solid ${C.line}`, padding: '16px clamp(20px,4vw,48px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px', minWidth: 0 }}>
-          <Link href="/archivist/dashboard" style={{ ...MONO, fontSize: '0.56rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: C.dim, textDecoration: 'none', whiteSpace: 'nowrap' }}>
+          <Link href="/succession" style={{ ...MONO, fontSize: '0.56rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: C.dim, textDecoration: 'none', whiteSpace: 'nowrap' }}>
             ← Exit
           </Link>
           <span style={{ ...MONO, fontSize: '0.56rem', color: C.ghost }}>|</span>
