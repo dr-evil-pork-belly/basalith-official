@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 
 const DESKTOP_LINKS = [
   { href: '/method',      label: 'The Method'  },
@@ -23,18 +22,11 @@ const MOBILE_LINKS = [
 ]
 
 export default function Nav() {
-  const pathname  = usePathname()
-  const isHome    = pathname === '/'
-
-  const [scrolled,  setScrolled]  = useState(false)
-  const [pastHero,  setPastHero]  = useState(false)
-  const [open,      setOpen]      = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+  const [open,     setOpen]     = useState(false)
 
   useEffect(() => {
-    const fn = () => {
-      setScrolled(window.scrollY > 40)
-      setPastHero(window.scrollY > window.innerHeight * 0.8)
-    }
+    const fn = () => setScrolled(window.scrollY > 40)
     fn() // run once on mount so SSR matches client
     window.addEventListener('scroll', fn, { passive: true })
     return () => window.removeEventListener('scroll', fn)
@@ -52,23 +44,16 @@ export default function Nav() {
     textTransform: 'uppercase' as const,
   }
 
-  // On homepage: use light text over the dark opening section, switch to dark after pastHero.
-  // On all other pages: always dark text regardless of scroll position.
-  const useLightText  = isHome && !pastHero
+  // The bar carries its own opaque paper surface on every route, so link colour no
+  // longer depends on the hero tone behind it. All nav text uses the dark token path,
+  // which reads on the paper surface (and #0A0908 on the gold pill, for Begin).
+  const wordmarkColor = 'var(--color-text-primary)'
+  const linkColor     = 'var(--color-text-muted)'
+  const linkHover     = 'var(--color-text-primary)'
 
-  const wordmarkColor = useLightText ? 'rgba(250,250,248,0.9)'  : 'var(--color-text-primary)'
-  const linkColor     = useLightText ? 'rgba(250,250,248,0.65)' : 'var(--color-text-muted)'
-  const linkHover     = useLightText ? 'rgba(250,250,248,0.95)' : 'var(--color-text-primary)'
-
-  // On homepage: transparent dark bg → light frosted after pastHero.
-  // On other pages: always light frosted (opaque enough to be readable).
-  const navBg = isHome
-    ? (pastHero
-        ? (scrolled ? 'rgba(250,250,248,0.96)' : 'transparent')
-        : (scrolled ? 'rgba(10,9,8,0.65)'      : 'transparent'))
-    : (scrolled ? 'rgba(250,250,248,0.97)' : 'rgba(250,250,248,0.94)')
-
-  const navShadow = (!isHome || (scrolled && pastHero)) ? '0 1px 0 rgba(26,24,20,0.06)' : 'none'
+  // Always paper-surfaced. scrolled still drives padding compaction + a lift shadow.
+  const navBg     = 'var(--b2b-paper)'
+  const navShadow = scrolled ? '0 1px 0 rgba(26,24,20,0.06)' : 'none'
 
   return (
     <>
@@ -86,6 +71,7 @@ export default function Nav() {
           paddingLeft:    'clamp(24px,6vw,80px)',
           paddingRight:   'clamp(24px,6vw,80px)',
           background:     navBg,
+          borderBottom:   '1px solid var(--b2b-rule)',
           backdropFilter: scrolled ? 'blur(12px)' : 'none',
           boxShadow:      navShadow,
           transition:     'all 400ms cubic-bezier(0.16,1,0.3,1)',
@@ -155,7 +141,7 @@ export default function Nav() {
             className="hidden md:block"
             style={{
               ...MONO,
-              color:          'var(--color-surface)',
+              color:          '#0A0908',
               textDecoration: 'none',
               background:     'var(--color-gold)',
               padding:        '11px 24px',

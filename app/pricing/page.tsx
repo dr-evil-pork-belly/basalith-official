@@ -20,6 +20,83 @@ const SERIF: React.CSSProperties = {
   fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
 }
 
+// Inline stroke marks — match the page's existing hand-drawn <svg> convention
+// (square viewBox, fill="none", stroke-based). stroke=currentColor so each mark
+// inherits the colour token of the cluster it sits in.
+type IconName = 'lock' | 'lock-key' | 'prohibited' | 'box' | 'scales' | 'columns'
+
+const MARK_PATHS: Record<IconName, React.ReactNode> = {
+  lock: (
+    <>
+      <rect x="5" y="11" width="14" height="9" rx="1.5" />
+      <path d="M8 11 V8 a4 4 0 0 1 8 0 V11" />
+      <line x1="12" y1="14.5" x2="12" y2="16.5" />
+    </>
+  ),
+  'lock-key': (
+    <>
+      <rect x="5" y="11" width="14" height="9" rx="1.5" />
+      <path d="M8 11 V8 a4 4 0 0 1 8 0 V11" />
+      <circle cx="12" cy="14.8" r="1.3" />
+      <line x1="12" y1="16.1" x2="12" y2="18" />
+    </>
+  ),
+  prohibited: (
+    <>
+      <circle cx="12" cy="12" r="8.5" />
+      <line x1="6.2" y1="6.2" x2="17.8" y2="17.8" />
+    </>
+  ),
+  box: (
+    <>
+      <rect x="4" y="7" width="16" height="13" rx="1" />
+      <line x1="4" y1="11" x2="20" y2="11" />
+      <line x1="12" y1="11" x2="12" y2="20" />
+    </>
+  ),
+  scales: (
+    <>
+      <line x1="12" y1="6" x2="12" y2="19" />
+      <line x1="9" y1="19" x2="15" y2="19" />
+      <line x1="6" y1="7" x2="18" y2="7" />
+      <line x1="6" y1="7" x2="6" y2="9.5" />
+      <line x1="18" y1="7" x2="18" y2="9.5" />
+      <path d="M3.5 9.5 a2.5 1.6 0 0 0 5 0" />
+      <path d="M15.5 9.5 a2.5 1.6 0 0 0 5 0" />
+    </>
+  ),
+  columns: (
+    <>
+      <path d="M4 8 L12 4 L20 8" />
+      <line x1="3.5" y1="8" x2="20.5" y2="8" />
+      <line x1="7" y1="8" x2="7" y2="17" />
+      <line x1="12" y1="8" x2="12" y2="17" />
+      <line x1="17" y1="8" x2="17" y2="17" />
+      <line x1="4" y1="17" x2="20" y2="17" />
+      <line x1="3" y1="20" x2="21" y2="20" />
+    </>
+  ),
+}
+
+function Mark({ name, size = 13 }: { name: IconName; size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      style={{ flexShrink: 0 }}
+    >
+      {MARK_PATHS[name]}
+    </svg>
+  )
+}
+
 const FOUNDING_DELIVERABLES = [
   { n: '01', title: 'Archive Architecture Build',     desc: 'Your permanent archive structure, configured for transfer and long-term standing.' },
   { n: '02', title: 'Document Compatibility Review',   desc: 'Assessment against your existing legal and succession documents. Attorney-ready output.' },
@@ -29,18 +106,18 @@ const FOUNDING_DELIVERABLES = [
   { n: '06', title: 'Custodian Designation',           desc: "Your archive's custodian assigned and formally documented." },
 ]
 
-const TRUST_BADGES = [
-  { icon: '🔒', label: 'Immutability Vault after passing' },
-  { icon: '🚫', label: 'Never used for other entities' },
-  { icon: '📦', label: 'Full export in open formats at any time. Nothing is stranded if we ever close.' },
+const TRUST_BADGES: { icon: IconName; label: string }[] = [
+  { icon: 'lock',       label: 'Immutability Vault after passing' },
+  { icon: 'prohibited', label: 'Never used for other entities' },
+  { icon: 'box',        label: 'Full export in open formats at any time. Nothing is stranded if we ever close.' },
 ]
 
-const SECURITY_BADGES = [
-  { icon: '🔒', label: 'AES-256 encrypted at rest' },
-  { icon: '🔐', label: 'TLS 1.3 in transit' },
-  { icon: '📦', label: 'Full data export anytime' },
-  { icon: '⚖️', label: 'Delaware C-Corp' },
-  { icon: '🏛️', label: 'Academic research foundation' },
+const SECURITY_BADGES: { icon: IconName; label: string }[] = [
+  { icon: 'lock',     label: 'AES-256 encrypted at rest' },
+  { icon: 'lock-key', label: 'TLS 1.3 in transit' },
+  { icon: 'box',      label: 'Full data export anytime' },
+  { icon: 'scales',   label: 'Delaware C-Corp' },
+  { icon: 'columns',  label: 'Academic research foundation' },
 ]
 
 const SUCCESSION_FEATURES = [
@@ -114,8 +191,8 @@ export default function PricingPage() {
           </p>
         </section>
 
-        {/* Trust badges */}
-        <div style={{
+        {/* Trust badges — paper register so it continues the hero, not a stranded band */}
+        <div className="b2b-paper" style={{
           display:        'flex',
           justifyContent: 'center',
           flexWrap:       'wrap',
@@ -128,12 +205,12 @@ export default function PricingPage() {
               fontSize:      '0.48rem',
               letterSpacing: '0.15em',
               textTransform: 'uppercase' as const,
-              color:         'var(--color-text-faint)',
+              color:         'var(--color-text-muted)',
               display:       'flex',
               alignItems:    'center',
               gap:           '6px',
             }}>
-              <span>{b.icon}</span>{b.label}
+              <Mark name={b.icon} />{b.label}
             </span>
           ))}
         </div>
@@ -338,7 +415,7 @@ export default function PricingPage() {
               alignItems:    'center',
               gap:           '6px',
             }}>
-              <span>{b.icon}</span>{b.label}
+              <Mark name={b.icon} />{b.label}
             </span>
           ))}
         </div>
@@ -354,7 +431,7 @@ export default function PricingPage() {
             background:     'rgba(196,162,74,0.03)',
           }}>
             <p style={{ ...MONO, fontSize: '0.5rem', color: 'var(--color-gold)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span>🔒</span> The Immutability Vault
+              <Mark name="lock" size={14} /> The Immutability Vault
             </p>
             <p style={{ ...SERIF, fontSize: '1rem', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-secondary)', margin: '0 0 8px' }}>
               Your cognitive fingerprint is permanently frozen after you pass.

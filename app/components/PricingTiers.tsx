@@ -166,9 +166,9 @@ export default function PricingTiers() {
           Begin active. Rest when life demands it. Leave something permanent.
         </p>
 
-        {/* Founding fee */}
-        <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '24px' }}>
-          All plans begin with a one-time Founding Session investment of $2,500
+        {/* Founding fee — legible subhead, not a faint mono eyebrow */}
+        <p style={{ ...SERIF, fontSize: '1.05rem', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-primary)', marginBottom: '24px' }}>
+          Every plan begins with a one-time $2,500 founding session.
         </p>
 
         {/* Toggle — Annual / Monthly (Active + Resting only) */}
