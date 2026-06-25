@@ -2,29 +2,31 @@
  *
  * Generates the homepage hero "cognitive fingerprint" as evenly-spaced
  * STREAMLINES of a loop+delta orientation field (Sherlock-Monro zero-pole
- * model), traced with the Jobard-Lefebvre algorithm and CLIPPED TO A BRAIN
- * silhouette. Ridges flow and recurve and converge to a triangular delta on
- * one side; they do NOT share a single center.
+ * model), traced with the Jobard-Lefebvre algorithm and FILLING AN OVAL MASK
+ * (the full thumbprint). A brain silhouette is drawn as an overlay outline ON
+ * TOP of the finished print: the ridges run THROUGH and PAST the brain line,
+ * they are NOT clipped to it. Ridges flow and recurve and converge to a
+ * triangular delta on one side; they do NOT share a single center.
  *
  *   theta(x,y) = SWIRL*atan2(y-CORE_y, x-CORE_x) - SWIRL*atan2(y-DELTA_y, x-DELTA_x)
  *
  * Run:  node scripts/fingerprint-field.js
- * Emits (to scripts/fingerprint-out.txt) the ridge <path>s plus the brain
- * outline as one smooth <path>, scaled into the panel's 500x700 space, and
- * prints a concentric-arc sanity check.
+ * Emits (to scripts/fingerprint-out.txt) the oval-filled ridge <path>s plus
+ * the brain outline as one smooth overlay <path>, scaled into the panel's
+ * 500x700 space, and prints a concentric-arc sanity check.
  */
 'use strict'
 const fs = require('fs')
 const path = require('path')
 
 // ── single density knob: d_sep tuned for ~30-34 ridges ──────────────────────
-const D_SEP = 8.5
+const D_SEP = 9.4
 
 // integration / tracing
 const STEP      = 1.0
 const D_TEST    = 0.5 * D_SEP   // min ridge gap while tracing AND seed rejection
 const MAX_STEPS = 6000
-const MIN_LEN   = 9.0           // discard ridge fragments shorter than this (box units)
+const MIN_LEN   = 14.0          // discard ridge fragments shorter than this (box units)
 const RDP_EPS   = 0.30          // light smoothing only — no integer rounding
 
 // ── loop core + delta field (in the 215x180 design box) ─────────────────────
@@ -66,16 +68,6 @@ const POLY = []
     cur = end
   }
 }
-function inBrain(x, y) {
-  let inside = false
-  for (let i = 0, j = POLY.length - 1; i < POLY.length; j = i++) {
-    const xi = POLY[i][0], yi = POLY[i][1], xj = POLY[j][0], yj = POLY[j][1]
-    if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) inside = !inside
-  }
-  return inside
-}
-const inMask = inBrain
-
 // ── output mapping: box → panel 500x700, brain bbox center → (245,300) ───────
 let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
 for (const [x, y] of POLY) { if (x < minX) minX = x; if (y < minY) minY = y; if (x > maxX) maxX = x; if (y > maxY) maxY = y }
@@ -83,6 +75,14 @@ const BCX = (minX + maxX) / 2, BCY = (minY + maxY) / 2
 const S = 1.45
 const PCX = 245.0, PCY = 300.0
 const toPanel = (x, y) => [PCX + (x - BCX) * S, PCY + (y - BCY) * S]
+
+// ── OVAL mask: the full thumbprint fills an oval centred on the brain, so the
+//    ridges run through AND past the brain outline. The brain is drawn on top
+//    as an overlay line only — it does NOT clip the ridges. ─────────────────
+const MASK_C = [BCX, BCY]         // oval centred on the brain silhouette
+const RX = 78.0, RY = 98.0        // oval radii in the 215x180 design box
+const inMask = (x, y) =>
+  ((x - MASK_C[0]) / RX) ** 2 + ((y - MASK_C[1]) / RY) ** 2 <= 1.0
 
 // orientation field (line field over half-angles)
 function field(x, y) {
@@ -213,7 +213,7 @@ for (const ln of committed)
     resid += perp * perp
   }
 const rms = Math.sqrt(resid / samples)
-// (b) containment: every ridge point must lie inside the brain mask.
+// (b) containment: every ridge point must lie inside the oval mask.
 let outside = 0
 for (const ln of committed) for (const [x, y] of ln) if (!inMask(x, y)) outside++
 
@@ -227,14 +227,14 @@ const fmt = (p) => { const [x, y] = toPanel(p[0], p[1]); return `${x.toFixed(1)}
 let outlineD = `M ${fmt(START)}`
 for (const [c1, c2, end] of SEGS) outlineD += ` C ${fmt(c1)} ${fmt(c2)} ${fmt(end)}`
 outlineD += ' Z'
-const outlinePath = `            {/* Brain silhouette */}\n            <path d="${outlineD}" strokeWidth={1.4} strokeOpacity={0.72} />`
+const outlinePath = `            {/* Brain silhouette — overlay outline on top of the full print */}\n            <path d="${outlineD}" strokeWidth={1.2} strokeOpacity={0.7} />`
 
 fs.writeFileSync(path.join(__dirname, 'fingerprint-out.txt'), ridgePaths + '\n' + outlinePath + '\n')
 
 process.stdout.write(
 `RIDGES: ${committed.length}
 SAMPLES: ${samples}
-CONTAINMENT: ${outside} ridge points outside the brain mask (must be 0).
+CONTAINMENT: ${outside} ridge points outside the oval mask (must be 0).
 CONCENTRIC-ARC CHECK (least-squares shared-center): center=(${Cx.toFixed(1)}, ${Cy.toFixed(1)}) box units, RMS residual=${rms.toFixed(1)} box units
-  -> ${rms > 10 && outside === 0 ? 'PASS: large residual (not concentric) AND all ridges inside the brain.' : 'FAIL.'}
+  -> ${rms > 10 && outside === 0 ? 'PASS: large residual (not concentric) AND all ridges inside the oval.' : 'FAIL.'}
 `)
