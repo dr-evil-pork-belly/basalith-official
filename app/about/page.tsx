@@ -145,76 +145,78 @@ export default function AboutPage() {
               From the Founder
             </p>
 
-            <p style={BODY}>I built Basalith because I kept asking the same question.</p>
-            <p style={BODY}>Not after someone died. While they were still here.</p>
             <p style={BODY}>
-              How does a person hand forward everything they have learned
-              in a way that actually lands? Not a letter that gets read once.
-              Not a document that sits in a folder.
-              Something that gets more accurate over time, not less.
-            </p>
-
-            <div aria-hidden="true" style={{ width: '40px', height: '1px', background: 'var(--color-gold)', margin: '44px 0' }} />
-
-            <p style={BODY}>I am a researcher by training.</p>
-            <p style={BODY}>
-              I spent years studying what makes people happy, what gives a life
-              meaning and what does not.
+              I built Basalith because I have already built something that worked,
+              sold it, and watched it disappear.
             </p>
             <p style={BODY}>
-              What I keep coming back to is that people do not want to be remembered.
-              They want to be known.
-            </p>
-            <p style={{ ...BODY, color: 'var(--color-text-primary)', fontStyle: 'italic' }}>
-              There is a difference.
+              Years ago my wife and I built a retail and ecommerce business from scratch.
+              We renovated the store ourselves. We grew it through a lot of time and sweat.
+              I was the visionary and the face of it. She ran management and operations.
+              It worked because of the combination. Neither half would have built it alone.
             </p>
             <p style={BODY}>
-              Being remembered is passive. It happens to you after you are gone.
-              Being known is active.
-              It happens through a relationship that continues because you built
-              something worth continuing.
+              We could have run that business well for a long time.
+              Instead I left to build another company, and we had our first child, and we sold.
+              Within five years of the sale, it was gone.
             </p>
+            <p style={BODY}>
+              Here is the part that stays with me. On paper, everything transferred.
+              The store, the inventory, the systems, the customer list.
+              What did not transfer was the thing that actually made it work:
+              how the two of us thought, the thousand small decisions we made
+              without explaining them to anyone, the judgment that was so automatic
+              we barely noticed we were using it. Nobody knew how to capture that.
+              So it walked out the door with us, and the business could not survive without it.
+            </p>
+            <p style={BODY}>That is the problem Basalith exists to solve.</p>
 
             <div aria-hidden="true" style={{ width: '40px', height: '1px', background: 'var(--color-gold)', margin: '44px 0' }} />
 
             <p style={BODY}>
-              My parents built their lives in languages I do not fully speak,
-              in a country that was not theirs,
-              through decades I did not witness.
-              What they know about surviving, about building, about the specific
-              weight of leaving one place for another, I am still learning
-              how to ask the right questions.
+              Every business owner has a version of it.
+              Decades of judgment that lives nowhere but in their own head.
+              When they step back, it leaves with them.
+              The successor inherits the systems.
+              They do not inherit the thinking behind the systems.
             </p>
             <p style={BODY}>
-              Basalith is the answer to that.
-              Not for after they are gone.
-              Now. While they can correct me when I get it wrong.
-            </p>
-
-            <p style={BODY}>But this was never only a family product.</p>
-            <p style={BODY}>
-              Every founder I know has the same problem my parents have.
-              They carry decades of judgment that lives nowhere but in their head.
-              When they leave, that judgment leaves.
-              Their successor gets the systems.
-              They do not get the thinking behind the systems.
-            </p>
-            <p style={{ ...BODY, color: 'var(--color-text-primary)' }}>Basalith changes that.</p>
-            <p style={BODY}>
-              Preserving how a person thinks should not be a privilege of the wealthy.
+              It is not only a business problem. My parents built their lives in
+              languages I do not fully speak, in a country that was not theirs,
+              through decades I did not witness. What they know lives only in them.
+              And I am still learning how to ask the right questions while they are
+              here to answer.
             </p>
             <p style={BODY}>
-              Your founders deserve this.
-              My mother deserves this.
-              Every family and every organization that has ever wondered
-              what someone would have said deserves this.
+              That is the thing I keep coming back to.
+              I do not want to wait until someone is gone to capture how they think.
+              I want to do it now, while they can correct me when I get it wrong.
             </p>
 
             <div aria-hidden="true" style={{ width: '40px', height: '1px', background: 'var(--color-gold)', margin: '44px 0' }} />
 
-            <p style={BODY}>This is not about living forever.</p>
+            <p style={BODY}>
+              I am a researcher by training. I spent years studying what gives a life
+              meaning and what does not. What I keep returning to is that people do not
+              want to be remembered. They want to be known. Being remembered is passive.
+              It happens to you after you are gone. Being known is active.
+              It continues because you built something worth continuing.
+            </p>
+            <p style={BODY}>
+              An owner's judgment and a parent's wisdom are the same problem wearing
+              different clothes. Both are decades of hard-won reasoning that usually
+              transfer as fragments, if they transfer at all. Basalith captures how a
+              person thinks while they are still here to keep it honest.
+            </p>
+            <p style={BODY}>
+              You deserve this. So does every family that has ever wondered
+              what someone would have said.
+            </p>
+
+            <div aria-hidden="true" style={{ width: '40px', height: '1px', background: 'var(--color-gold)', margin: '44px 0' }} />
+
             <p style={{ ...BODY, color: 'var(--color-gold)', fontStyle: 'italic', marginBottom: '12px' }}>
-              It is about never fully leaving.
+              This is not about living forever. It is about never fully leaving.
             </p>
             <p style={{ ...BODY, fontStyle: 'italic', color: 'var(--color-text-secondary)', marginBottom: '48px' }}>
               There is a difference.

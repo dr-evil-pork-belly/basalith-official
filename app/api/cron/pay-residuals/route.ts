@@ -5,8 +5,9 @@ export const maxDuration = 300
 
 const RESIDUAL_RATE = 0.12
 
-// Annual fee per tier in cents. Source of truth: submit-client TIER_PRICES.
-// Monthly residual is derived from these, not stored as a flat amount.
+// Annual fee per tier in cents. Source of truth: the Stripe prices created by
+// scripts/stripe-setup.ts (see lib/stripe/prices.ts). Monthly residual is
+// derived from these, not stored as a flat amount.
 const TIER_ANNUAL_CENTS: Record<string, number> = {
   active:  360000,  // $3,600/yr
   resting:  60000,  // $600/yr

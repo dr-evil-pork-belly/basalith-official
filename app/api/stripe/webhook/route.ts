@@ -1,462 +1,237 @@
 /**
- * Stripe webhook handler — activates archives on payment completion.
+ * Stripe webhook — billing slice.
  *
- * Wiring Stripe:
- *   1. Set STRIPE_SECRET_KEY and STRIPE_WEBHOOK_SECRET in env
- *   2. Register this endpoint in Stripe dashboard: POST /api/stripe/webhook
- *   3. Listen for: checkout.session.completed
- *   4. Pass metadata: { archiveId: string } when creating checkout sessions
+ * Flow: read the RAW body, verify the signature with constructEvent, dedup on
+ * event.id via the stripe_events ledger, then map Stripe events to lifecycle
+ * Inngest events and ack 200 fast. The real provisioning work happens in the
+ * Inngest function provisionOnFoundingFee, not here.
  *
- * Manual activation (for testing or admin override):
- *   POST /api/stripe/webhook
- *   Body: { archiveId: string, _manual: true }
- *   Header: x-manual-secret: <MANUAL_ACTIVATION_SECRET>
+ * checkout.session.completed is handled inline: it writes the billing linkage
+ * from the session metadata (new model) or activates a legacy archive when a
+ * pre-slice payment link carries metadata.archiveId.
+ *
+ * The manual activation override (x-manual-secret) is preserved from the
+ * pre-slice webhook for admin/testing use.
  */
-
 import { NextRequest, NextResponse } from 'next/server'
+import type Stripe from 'stripe'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { resend } from '@/lib/resend'
-import {
-  buildPaymentFailedEmail,
-  buildPaymentFailedSubject,
-  buildArchivePausedEmail,
-  buildWelcomeBackEmail,
-} from '@/lib/pauseEmails'
+import { getStripe } from '@/lib/stripe/client'
+import { inngest } from '@/lib/inngest'
+import { activateArchiveById } from '@/lib/billing/legacyActivation'
 
-function buildGuideActivationEmail(
-  guideName:   string,
-  clientName:  string,
-  familyName:  string,
-  tierLabel:   string,
-  archiveId:   string,
-): string {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
-  return `<!DOCTYPE html>
-<html>
-<body style="background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:600px;margin:0 auto;padding:32px">
-  <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;text-transform:uppercase;margin:0 0 16px">
-    Client Activated
-  </p>
-  <h1 style="font-size:22px;font-weight:300;color:#F0EDE6;margin:0 0 20px;line-height:1.2">
-    ${clientName} has completed their founding investment.
-  </h1>
-  <p style="font-size:15px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 20px">
-    The ${familyName} Archive (${tierLabel}) is now active. Your commission of $1,000 has been recorded.
-  </p>
-  <p style="font-size:15px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 32px">
-    Schedule the Founding Session. This is where the archive begins.
-  </p>
-  <a href="${siteUrl}/archivist/pipeline"
-    style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#0A0908;background:#C4A24A;text-decoration:none;padding:12px 28px;display:inline-block">
-    View in Pipeline
-  </a>
-  <hr style="border:none;border-top:1px solid rgba(240,237,230,0.06);margin:32px 0">
-  <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830">
-    BASALITH · Archive ID: ${archiveId}
-  </p>
-</body>
-</html>`
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+
+// ── helpers ──────────────────────────────────────────────────────────────────
+
+function idOf(v: string | { id?: string } | null | undefined): string | null {
+  if (!v) return null
+  return typeof v === 'string' ? v : (v.id ?? null)
 }
 
-function buildAdminActivationEmail(
-  clientName:  string,
-  clientEmail: string,
-  familyName:  string,
-  tierLabel:   string,
-  billing:     string,
-  guideName:   string,
-  archiveId:   string,
-  commissionWarning?: string,
-): string {
-  return `<!DOCTYPE html>
-<html>
-<body style="background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:600px;margin:0 auto;padding:32px">
-  <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;text-transform:uppercase;margin:0 0 16px">
-    New Active Client
-  </p>
-  <h1 style="font-size:22px;font-weight:300;color:#F0EDE6;margin:0 0 20px">
-    The ${familyName} Archive is now active.
-  </h1>
-  <table style="width:100%;border-collapse:collapse">
-    ${[
-      ['Client',    clientName],
-      ['Email',     clientEmail],
-      ['Tier',      tierLabel],
-      ['Billing',   billing === 'annual' ? 'Annual' : 'Monthly'],
-      ['Guide',     guideName],
-      ['Archive',   archiveId],
-    ].map(([k, v]) => `
-    <tr>
-      <td style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;text-transform:uppercase;padding:8px 16px 8px 0;white-space:nowrap">${k}</td>
-      <td style="font-size:14px;color:#B8B4AB;padding:8px 0">${v}</td>
-    </tr>`).join('')}
-  </table>
-  ${commissionWarning
-    ? `<p style="color:#c0392b;font-family:'Courier New',monospace;font-size:12px;letter-spacing:1px;margin:20px 0 0">COMMISSION WRITE FAILED: ${commissionWarning}</p>`
-    : ''}
-</body>
-</html>`
+/**
+ * The subscription id has lived in different places across API versions
+ * (invoice.subscription vs invoice.parent.subscription_details.subscription vs
+ * the line item). Resolve defensively so the handler is version-robust.
+ */
+function subscriptionIdFromInvoice(invoice: any): string | null {
+  return (
+    idOf(invoice?.parent?.subscription_details?.subscription) ??
+    idOf(invoice?.subscription) ??
+    idOf(invoice?.lines?.data?.[0]?.parent?.subscription_item_details?.subscription) ??
+    idOf(invoice?.lines?.data?.[0]?.subscription) ??
+    null
+  )
 }
 
-function buildClientWelcomeEmail(
-  familyName:   string,
-  firstName:    string,
-  guideName:    string,
-  password:     string,
-  magicLinkUrl: string,
-  tierLabel:    string,
-): string {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
-  return `<!DOCTYPE html>
-<html>
-<body style="background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:600px;margin:0 auto;padding:32px">
-  <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;text-transform:uppercase;margin:0 0 16px">
-    THE ${familyName.toUpperCase()} ARCHIVE
-  </p>
-  <h1 style="font-size:26px;font-weight:300;color:#F0EDE6;margin:0 0 16px">
-    Welcome to Basalith, ${firstName}.
-  </h1>
-  <p style="font-size:15px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 24px">
-    Your archive is active. ${guideName} will be in touch to schedule your Founding Session.
-  </p>
+// ── checkout.session.completed (inline linkage) ──────────────────────────────
 
-  <div style="background:rgba(196,162,74,0.08);border:1px solid rgba(196,162,74,0.3);border-top:3px solid rgba(196,162,74,0.8);padding:24px;margin:0 0 24px">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;margin:0 0 12px;text-transform:uppercase">
-      Your Personal Archive Link
-    </p>
-    <p style="font-size:14px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 12px">
-      Click below to access your archive — no password required.
-    </p>
-    <a href="${magicLinkUrl}"
-      style="display:inline-block;font-family:'Courier New',monospace;font-size:11px;color:#C4A24A;word-break:break-all;margin:0 0 10px">
-      ${magicLinkUrl}
-    </a>
-    <p style="font-size:12px;font-style:italic;color:#706C65;margin:0;line-height:1.7">
-      Bookmark this link. It is your personal entry to the archive.
-    </p>
-  </div>
+async function handleCheckoutCompleted(session: Stripe.Checkout.Session): Promise<void> {
+  const md = (session.metadata ?? {}) as Record<string, string>
+  const subscriptionId = idOf(session.subscription as any)
+  const customerId     = idOf(session.customer as any)
 
-  <div style="background:rgba(196,162,74,0.04);border:1px solid rgba(196,162,74,0.12);padding:20px;margin:0 0 24px">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;margin:0 0 12px;text-transform:uppercase">
-      Password Login (alternative)
-    </p>
-    <p style="font-size:13px;color:#B8B4AB;margin:0 0 6px"><strong style="color:#F0EDE6">URL:</strong> ${siteUrl}/archive-login</p>
-    <p style="font-size:13px;color:#B8B4AB;margin:0 0 6px"><strong style="color:#F0EDE6">Password:</strong> ${password}</p>
-    <p style="font-size:13px;color:#B8B4AB;margin:0"><strong style="color:#F0EDE6">Tier:</strong> ${tierLabel}</p>
-  </div>
+  // NEW model: application-driven billing linkage.
+  if (md.application_id) {
+    if (!subscriptionId) {
+      console.warn('[checkout.session.completed] application_id present but no subscription on session', session.id)
+      return
+    }
+    const { data: existing } = await supabaseAdmin
+      .from('billing').select('id').eq('stripe_subscription_id', subscriptionId).maybeSingle()
 
-  <p style="font-size:14px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 24px">
-    Once inside, you can begin uploading photographs. Our AI will analyze everything automatically.
-  </p>
-  <hr style="border:none;border-top:1px solid rgba(240,237,230,0.06);margin:24px 0">
-  <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830;line-height:1.8;margin:0">
-    BASALITH · XYZ<br>The ${familyName} Archive · Generation I<br>Heritage Nexus Inc.
-  </p>
-</body>
-</html>`
+    if (existing) {
+      await supabaseAdmin
+        .from('billing')
+        .update({
+          application_id:     md.application_id,
+          segment:            md.segment ?? null,
+          tier:               md.tier ?? null,
+          stripe_customer_id: customerId,
+          updated_at:         new Date().toISOString(),
+        })
+        .eq('stripe_subscription_id', subscriptionId)
+    } else {
+      const { error } = await supabaseAdmin
+        .from('billing')
+        .insert({
+          application_id:         md.application_id,
+          segment:                md.segment ?? null,
+          tier:                   md.tier ?? null,
+          stripe_customer_id:     customerId,
+          stripe_subscription_id: subscriptionId,
+        })
+      if (error) console.error('[checkout.session.completed] billing insert failed:', error.message)
+    }
+    return
+  }
+
+  // LEGACY model: pre-slice payment links carrying metadata.archiveId.
+  if (md.archiveId) {
+    if (subscriptionId || customerId) {
+      await supabaseAdmin
+        .from('archives')
+        .update({ stripe_subscription_id: subscriptionId, stripe_customer_id: customerId })
+        .eq('id', md.archiveId)
+    }
+    await activateArchiveById(md.archiveId)
+  }
 }
+
+// ── event router ─────────────────────────────────────────────────────────────
+
+async function routeEvent(event: Stripe.Event): Promise<void> {
+  switch (event.type) {
+    case 'checkout.session.completed': {
+      await handleCheckoutCompleted(event.data.object as Stripe.Checkout.Session)
+      return
+    }
+
+    case 'invoice.paid': {
+      const invoice = event.data.object as any
+      const subscriptionId = subscriptionIdFromInvoice(invoice)
+      if (!subscriptionId) return
+      if (invoice.billing_reason === 'subscription_create') {
+        await inngest.send({
+          name: 'founding_fee.paid',
+          data: { subscriptionId, customerId: idOf(invoice.customer), invoiceId: invoice.id },
+        })
+      } else if (invoice.billing_reason === 'subscription_cycle') {
+        await inngest.send({
+          name: 'subscription.renewed',
+          data: { subscriptionId, invoiceId: invoice.id },
+        })
+      }
+      return
+    }
+
+    case 'invoice.payment_failed': {
+      const invoice = event.data.object as any
+      const subscriptionId = subscriptionIdFromInvoice(invoice)
+      if (!subscriptionId) return
+      await inngest.send({
+        name: 'payment.failed',
+        data: { subscriptionId, invoiceId: invoice.id, hostedInvoiceUrl: invoice.hosted_invoice_url ?? '' },
+      })
+      return
+    }
+
+    case 'invoice.payment_succeeded': {
+      const invoice = event.data.object as any
+      const subscriptionId = subscriptionIdFromInvoice(invoice)
+      if (!subscriptionId) return
+      // Only a recovery if a prior attempt failed (first attempt counts as 1).
+      if ((invoice.attempt_count ?? 0) > 1) {
+        await inngest.send({
+          name: 'payment.recovered',
+          data: { subscriptionId, invoiceId: invoice.id },
+        })
+      }
+      return
+    }
+
+    case 'customer.subscription.deleted': {
+      const sub = event.data.object as Stripe.Subscription
+      await inngest.send({ name: 'subscription.canceled', data: { subscriptionId: sub.id } })
+      return
+    }
+
+    default:
+      // Unhandled event type — recorded in the ledger, no action.
+      return
+  }
+}
+
+// ── handler ──────────────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
-  try {
-    const body = await req.text()
-    let archiveId: string | null = null
+  const raw = await req.text() // RAW body. Do not JSON.parse before verifying.
 
-    // ── Manual activation (admin override / testing) ──────────────────────────
-    const manualSecret = req.headers.get('x-manual-secret')
-    if (manualSecret && manualSecret === (process.env.MANUAL_ACTIVATION_SECRET ?? '')) {
-      const payload = JSON.parse(body)
-      if (payload._manual && payload.archiveId) {
-        archiveId = payload.archiveId
-      }
-    }
-
-    // ── Stripe event dispatch ──────────────────────────────────────────────────
-    if (!archiveId) {
-      let event: { type: string; data: { object: Record<string, unknown> } }
-      try {
-        event = JSON.parse(body)
-      } catch {
-        return NextResponse.json({ error: 'Invalid payload' }, { status: 400 })
-      }
-
-      // ── invoice.payment_failed — send friendly payment email, don't pause ──
-      if (event.type === 'invoice.payment_failed') {
-        const invoice = event.data.object as Record<string, any>
-        const { data: archive } = await supabaseAdmin
-          .from('archives')
-          .select('id, name, owner_email, owner_name, preferred_language, status')
-          .eq('stripe_subscription_id', invoice.subscription as string)
-          .maybeSingle()
-
-        if (archive && archive.status === 'active') {
-          const firstName = archive.owner_name?.split(' ')[0] ?? 'there'
-          const lang      = archive.preferred_language ?? 'en'
-          try {
-            await resend.emails.send({
-              from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
-              to:      archive.owner_email,
-              subject: buildPaymentFailedSubject(archive.name, lang),
-              html:    buildPaymentFailedEmail(firstName, archive.name, invoice.hosted_invoice_url as string ?? '', lang),
-              headers: {
-                'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
-                'X-Entity-Ref-ID':  `basalith-payment-failed-${archive.id}-${Date.now()}`,
-                'Precedence':       'bulk',
-              },
-            })
-          } catch (e) {
-            console.error('[webhook] payment_failed email error:', e)
-          }
-        }
-        return NextResponse.json({ ok: true, handled: 'invoice.payment_failed' })
-      }
-
-      // ── customer.subscription.deleted — pause archive ──────────────────────
-      if (event.type === 'customer.subscription.deleted') {
-        const sub = event.data.object as Record<string, any>
-        const { data: archive } = await supabaseAdmin
-          .from('archives')
-          .select('id, name, owner_email, owner_name, preferred_language, status')
-          .eq('stripe_subscription_id', sub.id as string)
-          .maybeSingle()
-
-        if (archive && archive.status === 'active') {
-          await supabaseAdmin
-            .from('archives')
-            .update({
-              status:       'paused',
-              paused_at:    new Date().toISOString(),
-              pause_reason: 'payment_failed',
-            })
-            .eq('id', archive.id)
-
-          const firstName = archive.owner_name?.split(' ')[0] ?? 'there'
-          const lang      = archive.preferred_language ?? 'en'
-          try {
-            await resend.emails.send({
-              from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
-              to:      archive.owner_email,
-              subject: `Your archive is preserved · ${archive.name}`,
-              html:    buildArchivePausedEmail(firstName, archive.name, lang),
-              headers: {
-                'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
-                'X-Entity-Ref-ID':  `basalith-paused-${archive.id}-${Date.now()}`,
-                'Precedence':       'bulk',
-              },
-            })
-          } catch (e) {
-            console.error('[webhook] paused email error:', e)
-          }
-        }
-        return NextResponse.json({ ok: true, handled: 'customer.subscription.deleted' })
-      }
-
-      // ── checkout.session.completed — activate or re-activate archive ────────
-      if (event.type === 'checkout.session.completed') {
-        archiveId = (event.data.object as Record<string, any>)?.metadata?.archiveId ?? null
-        // Store subscription ID for future webhook lookups
-        const session = event.data.object as Record<string, any>
-        if (archiveId && session.subscription) {
-          await supabaseAdmin
-            .from('archives')
-            .update({
-              stripe_subscription_id: session.subscription as string,
-              stripe_customer_id:     (session.customer as string) ?? null,
-            })
-            .eq('id', archiveId)
-            .then(() => {})
-        }
-      }
-    }
-
-    if (!archiveId) {
-      return NextResponse.json({ error: 'archiveId not found in payload' }, { status: 400 })
-    }
-
-    // ── Fetch archive ──────────────────────────────────────────────────────────
-    const { data: archive, error: archiveError } = await supabaseAdmin
-      .from('archives')
-      .select('id, name, family_name, owner_email, owner_name, tier, billing, submitted_by, magic_link_token, status, preferred_language, resume_count')
-      .eq('id', archiveId)
-      .single()
-
-    if (archiveError || !archive) {
-      return NextResponse.json({ error: 'Archive not found' }, { status: 404 })
-    }
-
-    if (archive.status === 'active') {
-      // Idempotency — already activated, return success
-      return NextResponse.json({ ok: true, alreadyActive: true })
-    }
-
-    const isResume = archive.status === 'paused'
-
-    // ── Activate (or re-activate) archive ─────────────────────────────────────
-    await supabaseAdmin
-      .from('archives')
-      .update({
-        status:     'active',
-        paused_at:  null,
-        ...(isResume ? { resume_count: (archive as any).resume_count + 1 } : {}),
-      })
-      .eq('id', archiveId)
-
-    // ── Activate credentials ───────────────────────────────────────────────────
-    await supabaseAdmin
-      .from('archive_credentials')
-      .update({ is_active: true })
-      .eq('archive_id', archiveId)
-      .then(() => {})
-
-    // ── Update prospect status ─────────────────────────────────────────────────
-    await supabaseAdmin
-      .from('prospects')
-      .update({ status: 'Active Client', next_action: 'Schedule Founding Session', closed_at: new Date().toISOString() })
-      .eq('contact', archive.owner_email)
-      .eq('archivist_id', archive.submitted_by)
-      .then(() => {})
-
-    // ── Fetch archivist details ────────────────────────────────────────────────
-    const { data: archivist } = archive.submitted_by
-      ? await supabaseAdmin
-          .from('archivists')
-          .select('id, name, email')
-          .eq('id', archive.submitted_by)
-          .single()
-      : { data: null }
-
-    // ── Record $1,000 founding commission ────────────────────────────────────
-    // Live `commissions` columns: type / amount_cents / status / description.
-    // prospect_id is omitted (nullable): the prospect is matched by contact above
-    // and its id is not captured here, so there is nothing to pass.
-    let commissionError: string | null = null
-    if (archivist) {
-      const { error: commErr } = await supabaseAdmin
-        .from('commissions')
-        .insert({
-          archivist_id: archivist.id,
-          type:         'founding',
-          amount_cents: 100000, // $1,000 in cents
-          status:       'pending',
-          description:  `${archive.family_name} Archive, ${archive.tier} tier founding`,
-        })
-
-      if (commErr) {
-        commissionError = commErr.message
-        console.error('[webhook] Founding commission write failed:', commErr.message)
-      }
-
-      // ── Increment archivist closings ────────────────────────────────────────
-      await supabaseAdmin
-        .rpc('increment_closings', { archivist_id: archivist.id })
-        .maybeSingle()
-        .then(() => {})
-    }
-
-    // ── Fetch stored password from credentials ────────────────────────────────
-    const { data: cred } = await supabaseAdmin
-      .from('archive_credentials')
-      .select('password_hash')
-      .eq('archive_id', archiveId)
-      .eq('is_active', true)
-      .single()
-
-    const siteUrl      = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
-    const magicLinkUrl = `${siteUrl}/api/archive/magic-login?token=${archive.magic_link_token}`
-    const tierNames: Record<string, string> = { archive: 'The Archive', estate: 'The Estate', dynasty: 'The Dynasty' }
-    const tierLabel    = tierNames[archive.tier] ?? 'The Estate'
-    const familyName   = archive.family_name ?? ''
-    const clientName   = archive.owner_name ?? familyName
-    const firstName    = clientName.split(' ')[0]
-
-    // We stored the plaintext password in bcrypt — we can't recover it, so
-    // we regenerate one and update the hash. This is the activation password.
-    const { default: bcrypt } = await import('bcryptjs')
-    const newPassword    = `${familyName.replace(/\s+/g, '').replace(/[^a-zA-Z]/g, '')}${new Date().getFullYear()}${Math.random().toString(36).slice(2, 6).toUpperCase()}!`
-    const newHash        = await bcrypt.hash(newPassword, 12)
-    await supabaseAdmin
-      .from('archive_credentials')
-      .update({ password_hash: newHash })
-      .eq('archive_id', archiveId)
-      .then(() => {})
-
-    // ── Email guide: "Client activated" ───────────────────────────────────────
-    if (archivist) {
-      try {
-        await resend.emails.send({
-          from:    `Basalith <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
-          to:      archivist.email,
-          subject: `Client activated — The ${familyName} Archive`,
-          headers: { 'X-Entity-Ref-ID': `basalith-guide-act-${archiveId}` },
-          html:    buildGuideActivationEmail(archivist.name, clientName, familyName, tierLabel, archiveId),
-        })
-      } catch (e) {
-        console.error('[webhook] Guide activation email failed:', e)
-      }
-    }
-
-    // ── Email admin: "New active client" ──────────────────────────────────────
+  // ── Manual activation override (admin / testing) — preserved ───────────────
+  const manualSecret = req.headers.get('x-manual-secret')
+  if (manualSecret && process.env.MANUAL_ACTIVATION_SECRET && manualSecret === process.env.MANUAL_ACTIVATION_SECRET) {
     try {
-      await resend.emails.send({
-        from:    `Basalith <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
-        to:      process.env.ADMIN_EMAIL ?? 'legacy@basalith.xyz',
-        subject: `New active client — The ${familyName} Archive (${tierLabel})`,
-        headers: { 'X-Entity-Ref-ID': `basalith-admin-act-${archiveId}` },
-        html:    buildAdminActivationEmail(
-          clientName, archive.owner_email, familyName, tierLabel,
-          archive.billing ?? 'annual', archivist?.name ?? 'Unknown guide', archiveId,
-          commissionError ?? undefined,
-        ),
-      })
-    } catch (e) {
-      console.error('[webhook] Admin activation email failed:', e)
-    }
-
-    // ── Email client: welcome back (resume) or new welcome ───────────────────
-    if (isResume) {
-      try {
-        const lang = archive.preferred_language ?? 'en'
-        await resend.emails.send({
-          from:    `The ${familyName} Archive <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
-          to:      archive.owner_email,
-          subject: `Your archive is reactivated · The ${familyName} Archive`,
-          headers: {
-            'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
-            'X-Entity-Ref-ID':  `basalith-client-resume-${archiveId}`,
-            'Precedence':       'bulk',
-          },
-          html: buildWelcomeBackEmail(firstName, archive.name ?? `The ${familyName} Archive`, lang),
-        })
-      } catch (e) {
-        console.error('[webhook] Client welcome-back email failed:', e)
+      const payload = JSON.parse(raw)
+      if (payload._manual && payload.archiveId) {
+        const result = await activateArchiveById(payload.archiveId)
+        return NextResponse.json(result.json, { status: result.status })
       }
-    } else {
-      try {
-        await resend.emails.send({
-          from:    `The ${familyName} Archive <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
-          to:      archive.owner_email,
-          subject: `Welcome to Basalith. The ${familyName} Archive is ready.`,
-          headers: {
-            'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
-            'X-Entity-Ref-ID':  `basalith-client-act-${archiveId}`,
-            'Precedence':       'bulk',
-          },
-          html: buildClientWelcomeEmail(
-            familyName, firstName, archivist?.name ?? 'your Legacy Guide',
-            newPassword, magicLinkUrl, tierLabel,
-          ),
-        })
-      } catch (e) {
-        console.error('[webhook] Client welcome email failed:', e)
-      }
+    } catch {
+      return NextResponse.json({ error: 'Invalid manual payload' }, { status: 400 })
     }
-
-    return NextResponse.json({ ok: true, archiveId, activated: true, resumed: isResume })
-
-  } catch (error: unknown) {
-    console.error('[stripe/webhook]', error)
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 },
-    )
+    return NextResponse.json({ error: 'archiveId required for manual activation' }, { status: 400 })
   }
+
+  // ── Signature verification ─────────────────────────────────────────────────
+  const sig    = req.headers.get('stripe-signature')
+  const secret = process.env.STRIPE_WEBHOOK_SECRET
+  if (!sig || !secret) {
+    return NextResponse.json({ error: 'Missing signature or webhook secret' }, { status: 400 })
+  }
+
+  let event: Stripe.Event
+  try {
+    event = getStripe().webhooks.constructEvent(raw, sig, secret)
+  } catch (err) {
+    console.error('[stripe/webhook] signature verification failed:', err instanceof Error ? err.message : err)
+    return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
+  }
+
+  // ── Dedup ledger ───────────────────────────────────────────────────────────
+  const { data: existing } = await supabaseAdmin
+    .from('stripe_events').select('event_id, processed_at').eq('event_id', event.id).maybeSingle()
+
+  if (existing?.processed_at) {
+    return NextResponse.json({ received: true, deduped: true })
+  }
+
+  if (!existing) {
+    const { error: insErr } = await supabaseAdmin
+      .from('stripe_events')
+      .insert({ event_id: event.id, type: event.type, payload: event as unknown as Record<string, unknown> })
+    if (insErr) {
+      // Concurrent delivery already inserted it. If that one finished, no-op.
+      const { data: race } = await supabaseAdmin
+        .from('stripe_events').select('processed_at').eq('event_id', event.id).maybeSingle()
+      if (race?.processed_at) return NextResponse.json({ received: true, deduped: true })
+    }
+  }
+
+  // ── Route ──────────────────────────────────────────────────────────────────
+  try {
+    await routeEvent(event)
+  } catch (err) {
+    // Leave processed_at null so Stripe's retry re-runs this handler.
+    console.error('[stripe/webhook] handler error:', err instanceof Error ? err.message : err)
+    return NextResponse.json({ error: 'Handler error' }, { status: 500 })
+  }
+
+  // ── Mark processed, ack fast ───────────────────────────────────────────────
+  await supabaseAdmin
+    .from('stripe_events')
+    .update({ processed_at: new Date().toISOString() })
+    .eq('event_id', event.id)
+
+  return NextResponse.json({ received: true })
 }
