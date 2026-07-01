@@ -31,14 +31,25 @@ export type ProbeType =
   | 'ANALOGUE'
   | 'ERROR'
   | 'GOAL'
+  // Incident-level coverage dimensions (not part of the per-branch SPINE). CUE is
+  // already SPINE[0] and is deliberately not among these.
+  | 'STAKE'
+  | 'READ'
+  | 'CALIBRATION'
 
 export type Phase =
   | 'SEED'
   | 'TIMELINE'
   | 'DECISION_LOOP'
+  | 'DIMENSIONS'
   | 'GENERALIZE'
   | 'TRADEOFF_BATTERY'
   | 'COMPLETE'
+
+// Incident-level coverage dimensions. Each rides state.dimensions; every tag rides
+// training_pairs.metadata. Forward-only: a dimension leaves 'unelicited' once.
+export type DimensionName = 'read' | 'stake' | 'calibration'
+export type DimensionStatus = 'unelicited' | 'substantive' | 'not_a_factor'
 
 export interface Branch {
   index: number
@@ -70,6 +81,10 @@ export interface IncidentState {
   probeHistory: ProbeRecord[]
   tensions: string[] // collected for the tradeoff battery
   pendingDetour: PendingDetour | null // set while a detour probe is out, cleared on its answer
+  // Incident-level coverage. Flat, so it rides the serialized state jsonb with no
+  // collision with the pending* fields below and no schema change.
+  dimensions: Record<DimensionName, DimensionStatus>
+  probeBudgetUsed: number // dimension probes spent this incident (cap: BUDGET)
   // Set by the serve/answer routes (Step 3 wiring), never read by the reducer:
   // the probe currently shown to the founder, stored for reload-safety so a
   // repeated GET /next re-serves the same probe without advancing.
@@ -95,6 +110,10 @@ export interface ClassifierOut {
   detour: 'ANALOGUE' | 'GOAL' | 'NONE'
   branchComplete: boolean
   tension: string | null
+  // Coverage tag for the answer just given: which dimension (if any) this turn
+  // served, and whether substantively or as an explicit not-a-factor. null when
+  // unsure, so the dimension stays 'unelicited' and its probe still asks.
+  dimensionSignal: { dimension: DimensionName; status: 'substantive' | 'not_a_factor' } | null
 }
 
 export interface SaturationOut {
@@ -114,6 +133,13 @@ const SPINE: ProbeType[] = ['CUE', 'OPTION', 'BASIS', 'BOUNDARY', 'ERROR']
 const IDX_BASIS = 2
 const IDX_ERROR = 4
 
+// Dimension battery, run once after the last branch and before GENERALIZE.
+// Ask order: stake first (usually answerable, frames read), read second (needs
+// named people), calibration last (needs the decision on the table). At most
+// BUDGET probes total, so the interview never turns into an interrogation.
+const BUDGET = 3
+const DIMENSION_ORDER: DimensionName[] = ['stake', 'read', 'calibration']
+
 export function initialIncidentState(): IncidentState {
   return {
     branches: [],
@@ -123,11 +149,63 @@ export function initialIncidentState(): IncidentState {
     probeHistory: [],
     tensions: [],
     pendingDetour: null,
+    dimensions: { read: 'unelicited', stake: 'unelicited', calibration: 'unelicited' },
+    probeBudgetUsed: 0,
   }
 }
 
 function clone<T>(v: T): T {
   return JSON.parse(JSON.stringify(v)) as T
+}
+
+// ── Dimension helpers ─────────────────────────────────────────────────────────
+
+// Common non-name capitalized tokens (sentence starts, pronouns) to keep out of
+// the READ people anchor. Not exhaustive; the anchor only needs to be plausible.
+const NON_NAME = new Set([
+  'The', 'A', 'An', 'I', 'We', 'You', 'He', 'She', 'They', 'It', 'My', 'Our',
+  'His', 'Her', 'Their', 'When', 'After', 'Before', 'Once', 'Then', 'So', 'But',
+  'And', 'Or', 'If', 'Whether', 'What', 'Why', 'How', 'Decided', 'Chose',
+  'To', 'Of', 'On', 'In', 'At', 'For', 'With', 'That', 'This',
+])
+
+/** People named across the branch summaries, as a short anchor for the READ probe.
+ *  Empty string when the timeline named no one, in which case READ is skipped
+ *  entirely (a READ probe that names no one is a bug). Pure and deterministic. */
+export function deriveReadAnchor(branches: { summary: string; chosen: string }[]): string {
+  const names: string[] = []
+  const seen = new Set<string>()
+  for (const b of branches ?? []) {
+    for (const raw of `${b?.summary ?? ''} ${b?.chosen ?? ''}`.split(/\s+/)) {
+      const t = raw.replace(/[^A-Za-z'’-]/g, '')
+      if (/^[A-Z][a-z’'-]+$/.test(t) && !NON_NAME.has(t) && !seen.has(t)) {
+        seen.add(t)
+        names.push(t)
+      }
+    }
+  }
+  if (names.length === 0) return ''
+  if (names.length === 1) return names[0]
+  if (names.length === 2) return `${names[0]} and ${names[1]}`
+  return `${names[0]}, ${names[1]}, and ${names[2]}`
+}
+
+/** READ is askable only when the timeline named people. stake/calibration are
+ *  always askable while 'unelicited'. */
+function askableDimensions(st: IncidentState): DimensionName[] {
+  const readOk = deriveReadAnchor(st.branches).length > 0
+  return DIMENSION_ORDER.filter(
+    d => st.dimensions[d] === 'unelicited' && (d !== 'read' || readOk),
+  )
+}
+
+function dimensionProbeType(d: DimensionName): ProbeType {
+  return d === 'stake' ? 'STAKE' : d === 'read' ? 'READ' : 'CALIBRATION'
+}
+
+/** Forward-only write: a dimension leaves 'unelicited' exactly once, never regresses. */
+function setDimension(st: IncidentState, d: DimensionName, status: DimensionStatus): void {
+  if (st.dimensions[d] === 'unelicited') st.dimensions[d] = status
 }
 
 /** Three tradeoff probes when three tensions exist; otherwise as many as exist,
@@ -149,6 +227,15 @@ function emitCurrent(s: IncidentSession): ProbeDecision {
         branchIndexForProbe: st.currentBranchIndex,
         incidentComplete: false,
       }
+    case 'DIMENSIONS': {
+      const target = askableDimensions(st)[0]
+      // Only reached while an askable dimension remains; the reducer routes to
+      // GENERALIZE the instant none do. Fall closed to GENERALIZE's BOUNDARY.
+      if (!target) {
+        return { probeType: 'BOUNDARY', phaseAfter: 'GENERALIZE', branchIndexForProbe: -1, incidentComplete: false }
+      }
+      return { probeType: dimensionProbeType(target), phaseAfter: 'DIMENSIONS', branchIndexForProbe: -1, incidentComplete: false }
+    }
     case 'GENERALIZE':
       return {
         probeType: st.spineCursor === 0 ? 'BOUNDARY' : 'ERROR',
@@ -202,11 +289,20 @@ function moveToNextBranchOrPhase(s: IncidentSession): void {
     st.spineCursor = 0 // next branch starts at CUE
     st.reprobeUsedOnCurrent = false
   } else {
-    // All branches exhausted -> rule-level GENERALIZE (BOUNDARY then ERROR).
-    s.phase = 'GENERALIZE'
-    st.spineCursor = 0
-    st.reprobeUsedOnCurrent = false
+    // All branches exhausted -> DIMENSIONS battery (if any open + budget) then
+    // rule-level GENERALIZE (BOUNDARY then ERROR).
+    enterPostLoop(s)
   }
+}
+
+/** After the last branch's spine: run the DIMENSIONS battery when a dimension is
+ *  still askable and budget remains, otherwise skip straight to GENERALIZE. */
+function enterPostLoop(s: IncidentSession): void {
+  const st = s.state
+  st.spineCursor = 0
+  st.reprobeUsedOnCurrent = false
+  s.phase =
+    st.probeBudgetUsed < BUDGET && askableDimensions(st).length > 0 ? 'DIMENSIONS' : 'GENERALIZE'
 }
 
 // ── Reducer ───────────────────────────────────────────────────────────────────
@@ -224,6 +320,13 @@ export function advance(
 ): { session: IncidentSession; decision: ProbeDecision } {
   const s = clone(session)
   const st = s.state
+
+  // Fold a narration-borne dimension signal (forward-only, no budget spend) on any
+  // non-dimension turn: free narration can close a dimension with no probe of its
+  // own. The DIMENSIONS case below owns its close + budget for directly-asked ones.
+  if (s.phase !== 'DIMENSIONS' && classifierOut.dimensionSignal) {
+    setDimension(st, classifierOut.dimensionSignal.dimension, classifierOut.dimensionSignal.status)
+  }
 
   const collectTension = () => {
     if (classifierOut.tension) st.tensions.push(classifierOut.tension)
@@ -344,6 +447,33 @@ export function advance(
         session: s,
         decision: { probeType: 'TRADEOFF', phaseAfter: 'TRADEOFF_BATTERY', branchIndexForProbe: -1, incidentComplete: false },
       }
+    }
+
+    case 'DIMENSIONS': {
+      const target = askableDimensions(st)[0]
+      record(-1, target ? dimensionProbeType(target) : 'BOUNDARY')
+      collectTension()
+
+      if (target) {
+        // A directly-asked dimension is closed by its answer: substantive unless
+        // the classifier explicitly reads it as not-a-factor. Forward-only.
+        const sig = classifierOut.dimensionSignal
+        const status = sig && sig.dimension === target ? sig.status : 'substantive'
+        setDimension(st, target, status)
+        // A different dimension volunteered in the same answer folds in too.
+        if (sig && sig.dimension !== target) setDimension(st, sig.dimension, sig.status)
+        st.probeBudgetUsed += 1
+      }
+
+      // Exit when budget is spent or nothing askable remains. Any dimension still
+      // 'unelicited' at exit (budget cap, or READ with no named people) stays
+      // 'unelicited' — the graceful partial, recorded in state, never synthesized.
+      if (st.probeBudgetUsed >= BUDGET || askableDimensions(st).length === 0) {
+        s.phase = 'GENERALIZE'
+        st.spineCursor = 0
+        st.reprobeUsedOnCurrent = false
+      }
+      return { session: s, decision: emitCurrent(s) }
     }
 
     default: {
