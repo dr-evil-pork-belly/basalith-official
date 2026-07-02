@@ -8,7 +8,9 @@ import {
   loadOpenIncident,
   persist,
   completeIncident,
+  deriveReadAnchor,
   type ClassifierOut,
+  type DimensionName,
   type ProbeType,
   type SaturationOut,
 } from '@/lib/incidentSession'
@@ -122,6 +124,17 @@ export async function POST(req: NextRequest) {
 
   const { session: next, decision } = advance(incident, answer, classifierOut, saturationOut)
 
+  // A dimension the turn closed (unelicited -> substantive/not_a_factor), diffed
+  // across advance. Rides training_pairs.metadata alongside probe_type. A
+  // not_a_factor close is still a real, tagged training pair (negative space).
+  const DIMS: DimensionName[] = ['stake', 'read', 'calibration']
+  const closedDim = DIMS.find(
+    d => incident.state.dimensions[d] === 'unelicited' && next.state.dimensions[d] !== 'unelicited',
+  )
+  const dimensionTag = closedDim
+    ? { dimension: closedDim, status: next.state.dimensions[closedDim] }
+    : undefined
+
   // Write the deposit + training pair only when the answer was accepted.
   let depositId: string | null = null
   if (!isReprobe) {
@@ -149,8 +162,9 @@ export async function POST(req: NextRequest) {
     }
 
     void classifyDeposit({ depositId: deposit.id, archiveId, text: answer })
-    // Step 6: probe type rides into training_pairs.metadata.probe_type.
-    createTrainingPairFromDeposit(deposit, ownerName, archiveName, lang, 'owner', probeType).catch(() => {})
+    // Step 6: probe type rides into training_pairs.metadata.probe_type; the closed
+    // coverage dimension (if any) rides alongside it as metadata.dimension.
+    createTrainingPairFromDeposit(deposit, ownerName, archiveName, lang, 'owner', probeType, dimensionTag).catch(() => {})
 
     // Patch the depositId onto the just-answered ProbeRecord (the last appended).
     const recs = next.state.probeHistory
@@ -166,9 +180,13 @@ export async function POST(req: NextRequest) {
   } else {
     const tensionForTradeoff =
       decision.probeType === 'TRADEOFF' ? next.state.tensions[next.state.spineCursor] : undefined
+    // READ anchors on the people the timeline named (the reducer only emits READ
+    // when that anchor is non-empty). Every other probe anchors on the classifier.
+    const anchor =
+      decision.probeType === 'READ' ? deriveReadAnchor(next.state.branches) : classifierOut.anchor
     const nextText = renderProbe({
       probeType: decision.probeType,
-      anchor: classifierOut.anchor,
+      anchor,
       tensionForTradeoff,
     })
     next.state.pendingQuestion = nextText

@@ -16,6 +16,7 @@ const cls = (over: Partial<ClassifierOut> = {}): ClassifierOut => ({
   detour: 'NONE',
   branchComplete: false,
   tension: null,
+  dimensionSignal: null,
   ...over,
 })
 const sat = (saturated = false): SaturationOut => ({ saturated })
@@ -76,7 +77,11 @@ describe('advance — incident reducer', () => {
     // ── Branch 1 spine: CUE, OPTION, BASIS, then saturation skips BOUNDARY/ERROR ─
     step('cue answer b1') // -> OPTION
     step('option answer b1') // -> BASIS
-    step('cost drove it', cls({ tension: 'cost vs quality' }), sat(true)) // BASIS saturated -> GENERALIZE BOUNDARY
+    step('cost drove it', cls({ tension: 'cost vs quality' }), sat(true)) // BASIS saturated -> DIMENSIONS STAKE
+
+    // ── Dimensions battery (branches name no one -> READ skipped) ─────────────
+    step('protecting the client relationship') // STAKE -> CALIBRATION
+    step('i was maybe sixty percent sure') // CALIBRATION -> GENERALIZE BOUNDARY
 
     // ── Generalize (rule-level) ───────────────────────────────────────────────
     step('general boundary answer') // -> ERROR (generalize)
@@ -99,7 +104,9 @@ describe('advance — incident reducer', () => {
       'CUE', // branch 1
       'OPTION',
       'BASIS',
-      'BOUNDARY', // <- saturation skipped branch 1's BOUNDARY/ERROR; this is rule-level GENERALIZE
+      'STAKE', // <- saturation skipped branch 1's BOUNDARY/ERROR; DIMENSIONS battery opens
+      'CALIBRATION', // <- READ skipped (branches name no one)
+      'BOUNDARY', // rule-level GENERALIZE
       'ERROR', // rule-level GENERALIZE
       'TRADEOFF',
       'TRADEOFF',
@@ -132,6 +139,8 @@ describe('advance — incident reducer', () => {
       'CUE',
       'OPTION',
       'BASIS',
+      'STAKE', // dimensions battery
+      'CALIBRATION', // dimensions battery (read skipped)
       'BOUNDARY', // generalize
       'ERROR', // generalize
       'TRADEOFF',
@@ -151,6 +160,11 @@ describe('advance — incident reducer', () => {
     // Saturation skip: branch 1 produced only CUE/OPTION/BASIS, never its own BOUNDARY/ERROR.
     const branch1Types = s.state.probeHistory.filter(p => p.branchIndex === 1).map(p => p.probeType)
     expect(branch1Types).toEqual(['CUE', 'OPTION', 'BASIS'])
+
+    // Dimensions: STAKE and CALIBRATION closed by their probes; READ stayed
+    // unelicited because the branch summaries named no one. Budget held at 2.
+    expect(s.state.dimensions).toEqual({ stake: 'substantive', read: 'unelicited', calibration: 'substantive' })
+    expect(s.state.probeBudgetUsed).toBe(2)
   })
 
   it('falls closed to a single branch when the timeline yields none', () => {
@@ -162,5 +176,28 @@ describe('advance — incident reducer', () => {
     expect(s.state.branches).toHaveLength(1)
     expect(r.decision.probeType).toBe('CUE')
     expect(r.decision.branchIndexForProbe).toBe(0)
+  })
+
+  it('backfills coverage state on a pre-dimensions incident blob (forward-compat)', () => {
+    // A state serialized before the dimensions field existed (the shape the
+    // June 25 stale incident had: no `dimensions`, no `probeBudgetUsed`).
+    const legacyState = {
+      branches: [],
+      currentBranchIndex: 0,
+      spineCursor: 0,
+      reprobeUsedOnCurrent: false,
+      probeHistory: [],
+      tensions: [],
+      pendingDetour: null,
+    } as unknown as IncidentSession['state']
+    const s: IncidentSession = {
+      id: 'legacy', archiveId: 'a', seedQuestionId: 'q', category: 'Decision-Making',
+      phase: 'SEED', status: 'open', state: legacyState,
+    }
+
+    let r!: ReturnType<typeof advance>
+    expect(() => { r = advance(s, 'seed answer', cls(), sat()) }).not.toThrow()
+    expect(r.session.state.dimensions).toEqual({ read: 'unelicited', stake: 'unelicited', calibration: 'unelicited' })
+    expect(r.session.state.probeBudgetUsed).toBe(0)
   })
 })
