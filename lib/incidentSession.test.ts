@@ -177,4 +177,27 @@ describe('advance — incident reducer', () => {
     expect(r.decision.probeType).toBe('CUE')
     expect(r.decision.branchIndexForProbe).toBe(0)
   })
+
+  it('backfills coverage state on a pre-dimensions incident blob (forward-compat)', () => {
+    // A state serialized before the dimensions field existed (the shape the
+    // June 25 stale incident had: no `dimensions`, no `probeBudgetUsed`).
+    const legacyState = {
+      branches: [],
+      currentBranchIndex: 0,
+      spineCursor: 0,
+      reprobeUsedOnCurrent: false,
+      probeHistory: [],
+      tensions: [],
+      pendingDetour: null,
+    } as unknown as IncidentSession['state']
+    const s: IncidentSession = {
+      id: 'legacy', archiveId: 'a', seedQuestionId: 'q', category: 'Decision-Making',
+      phase: 'SEED', status: 'open', state: legacyState,
+    }
+
+    let r!: ReturnType<typeof advance>
+    expect(() => { r = advance(s, 'seed answer', cls(), sat()) }).not.toThrow()
+    expect(r.session.state.dimensions).toEqual({ read: 'unelicited', stake: 'unelicited', calibration: 'unelicited' })
+    expect(r.session.state.probeBudgetUsed).toBe(0)
+  })
 })
