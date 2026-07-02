@@ -208,6 +208,15 @@ function setDimension(st: IncidentState, d: DimensionName, status: DimensionStat
   if (st.dimensions[d] === 'unelicited') st.dimensions[d] = status
 }
 
+/** Backfill the coverage fields on a state serialized before they existed, so an
+ *  incident already open at deploy time advances through the enriched reducer
+ *  instead of throwing on a missing `dimensions`. Mutates and returns `st`. */
+function ensureCoverageState(st: IncidentState): IncidentState {
+  if (!st.dimensions) st.dimensions = { read: 'unelicited', stake: 'unelicited', calibration: 'unelicited' }
+  if (typeof st.probeBudgetUsed !== 'number') st.probeBudgetUsed = 0
+  return st
+}
+
 /** Three tradeoff probes when three tensions exist; otherwise as many as exist,
  *  minimum one. */
 function tradeoffTotal(st: IncidentState): number {
@@ -319,7 +328,7 @@ export function advance(
   saturationOut: SaturationOut,
 ): { session: IncidentSession; decision: ProbeDecision } {
   const s = clone(session)
-  const st = s.state
+  const st = ensureCoverageState(s.state)
 
   // Fold a narration-borne dimension signal (forward-only, no budget spend) on any
   // non-dimension turn: free narration can close a dimension with no probe of its
@@ -509,7 +518,7 @@ function rowToSession(row: IncidentRow): IncidentSession {
     category: row.category,
     phase: row.phase,
     status: row.status,
-    state: row.state,
+    state: ensureCoverageState(row.state),
   }
 }
 
