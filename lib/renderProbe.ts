@@ -148,6 +148,25 @@ export function renderProbe(input: {
       out = 'Set the decision aside. What were you actually trying to protect?'
       break
 
+    // ── Incident-level coverage dimensions ──────────────────────────────────────
+
+    case 'STAKE':
+      out = 'In that moment, what were you most trying to protect?'
+      break
+
+    case 'READ':
+      // anchor is the people the timeline named (see the answer route). The reducer
+      // never emits READ without an anchor, so a nameless READ would be a bug; guard
+      // anyway and fall back to a people-generic phrasing rather than a blank name.
+      out = anchor
+        ? `What was your read on ${anchor} while this was happening?`
+        : 'What was your read on the people involved while this was happening?'
+      break
+
+    case 'CALIBRATION':
+      out = 'How sure were you when you decided?'
+      break
+
     default: {
       // The union is fully covered above; this keeps the switch exhaustive.
       const _exhaustive: never = input.probeType

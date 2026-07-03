@@ -116,6 +116,7 @@ export async function createTrainingPairFromDeposit(
   language   = 'en',
   sourceType = deposit.source_type ?? 'deposit',
   probeType?: string,
+  dimensionTag?: { dimension: string; status: string },
 ): Promise<void> {
   console.log('[training] createTrainingPairFromDeposit called —',
     'depositId:', deposit.id,
@@ -153,6 +154,12 @@ export async function createTrainingPairFromDeposit(
   // before, so every existing caller's row is byte-for-byte unchanged.
   const metadata: Record<string, string> = { owner_name: ownerName, archive_name: archiveName }
   if (probeType) metadata.probe_type = probeType
+  // Coverage tag rides the existing metadata jsonb alongside probe_type. A
+  // not_a_factor close is still written (negative-space signal), tagged as such.
+  if (dimensionTag) {
+    metadata.dimension = dimensionTag.dimension
+    metadata.dimension_status = dimensionTag.status
+  }
 
   const { data: inserted, error: insertError } = await supabaseAdmin
     .from('training_pairs')
