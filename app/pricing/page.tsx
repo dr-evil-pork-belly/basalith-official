@@ -265,24 +265,18 @@ export default function PricingPage() {
               Acquisition
             </p>
             <h2 style={{ ...SERIF, fontSize: 'clamp(2rem,4vw,3rem)', fontWeight: 300, lineHeight: 1.15, color: 'var(--color-text-primary)', letterSpacing: '-0.02em', marginBottom: '28px' }}>
-              When you buy the company, you buy how it was run.
+              Acquisition engagements
             </h2>
-            <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: 'var(--color-text-secondary)', marginBottom: '20px' }}>
-              In an acquisition, the operator&rsquo;s judgment is part of what you valued, and most of it lives in one person&rsquo;s head. Basalith captures it during the active period before close, so what you priced in diligence is still in the room after the operator is gone.
-            </p>
-            <p style={{ ...SERIF, fontSize: '1.05rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: 'var(--color-text-secondary)', marginBottom: '40px' }}>
-              Acquisition work is a per-deal engagement, scoped to the transaction, not an annual subscription.
+            <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: 'var(--color-text-secondary)', marginBottom: '40px' }}>
+              For buyers. When the deal closes, the seller&rsquo;s judgment usually leaves with them. Basalith captures how the operator reasons before the handoff, so the earnout assumptions survive the transition.
             </p>
 
             <div style={{ borderTop: '1px solid rgba(196,162,74,0.18)', paddingTop: '36px', marginBottom: '40px' }}>
               <p style={{ ...SERIF, fontSize: 'clamp(1.5rem,3vw,2rem)', fontWeight: 300, color: 'var(--color-text-primary)', lineHeight: 1.3, marginBottom: '16px' }}>
-                Engagements start at $25,000, scaled to the size and complexity of the transaction.
+                Engagements start at $50,000, scaled to the size and complexity of the transaction.
               </p>
-              <p style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>
-                Priced against the value at risk in the transaction, as part of diligence, not as software.
-              </p>
-              <p style={{ ...SERIF, fontSize: '0.9rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-faint)', margin: 0 }}>
-                For larger transactions, engagement scope and fee are set in conversation.
+              <p style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-secondary)', margin: 0 }}>
+                Priced against the value at risk in the deal, as part of diligence, not as software.
               </p>
             </div>
 
