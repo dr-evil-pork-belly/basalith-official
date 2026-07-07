@@ -265,7 +265,7 @@ export default function PricingPage() {
               Acquisition
             </p>
             <h2 style={{ ...SERIF, fontSize: 'clamp(2rem,4vw,3rem)', fontWeight: 300, lineHeight: 1.15, color: 'var(--color-text-primary)', letterSpacing: '-0.02em', marginBottom: '28px' }}>
-              Acquisition engagements
+              When you buy the company, you buy how it was run.
             </h2>
             <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: 'var(--color-text-secondary)', marginBottom: '40px' }}>
               For buyers. When the deal closes, the seller&rsquo;s judgment usually leaves with them. Basalith captures how the operator reasons before the handoff, so the earnout assumptions survive the transition.
