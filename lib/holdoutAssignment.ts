@@ -136,7 +136,9 @@ export async function computeArchiveHoldoutPlan(archiveId: string): Promise<Arch
   const deposits = await fetchAllRows<DepositRow>(
     'owner_deposits',
     'id, archive_id, contributor_id, source_type, eval_holdout',
-    query => query.eq('archive_id', archiveId),
+    // Exclude seeded synthetic test content from the holdout pool by construction,
+    // so a test_artifact row can never be picked regardless of any eval_holdout value.
+    query => query.eq('archive_id', archiveId).not('test_artifact', 'is', true),
   )
 
   const depositIds = deposits.map(d => d.id)

@@ -60,6 +60,11 @@ export async function buildEntitySystemPrompt(
     .from('owner_deposits')
     .select('id, response, prompt, created_at')
     .eq('archive_id', archiveId)
+    // Seeded synthetic test content is marked test_artifact = true and must never
+    // reach the live entity. This is distinct from eval_holdout: eval_holdout marks
+    // *real* deposits withheld for the fidelity eval, which the family's entity is
+    // still meant to draw on. IS NOT TRUE keeps rows where the flag is false or null.
+    .not('test_artifact', 'is', true)
     .order('created_at', { ascending: false })
     .limit(500)
 

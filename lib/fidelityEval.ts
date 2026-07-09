@@ -659,6 +659,9 @@ async function defaultGetHoldoutDeposits(archiveId: string): Promise<HoldoutDepo
     .select('id, archive_id, prompt, response')
     .eq('archive_id', archiveId)
     .eq('eval_holdout', true)
+    // Seeded synthetic test content must never become eval material, regardless of
+    // its eval_holdout value. IS NOT TRUE keeps false-or-null (real) deposits only.
+    .not('test_artifact', 'is', true)
 
   return (data ?? []).map(d => ({
     id:        d.id,
