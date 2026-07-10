@@ -44,7 +44,7 @@ export default function SecondDoorSection() {
           Before it was a way to hand forward how a business is run, it was a way to preserve how a person thinks while they are still here to get it right. That path is still open. The method is the same.
         </p>
         <Link
-          href="/apply"
+          href="/families"
           style={{
             ...MONO,
             display:        'inline-flex',
