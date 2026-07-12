@@ -2,19 +2,32 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { NextRequest, NextResponse } from 'next/server'
 import { createTrainingPairsFromVoice } from '@/lib/trainingPipeline'
 import { classifyDeposit } from '@/lib/classifyDeposit'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 
 export const maxDuration = 60
 
 export async function POST(req: NextRequest) {
   try {
+    const session = await getSessionUser()
+    if (!session?.archiveId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const archiveId = session.archiveId
+
+    const { data: ownerRow } = await supabaseAdmin
+      .from('archives')
+      .select('owner_user_id')
+      .eq('id', archiveId)
+      .maybeSingle()
+    if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
     const formData        = await req.formData()
     const audioFile       = formData.get('audio') as File
-    const archiveId       = formData.get('archiveId') as string
     const prompt          = formData.get('prompt') as string || ''
     const durationSeconds = parseInt(formData.get('duration') as string || '0')
 
-    if (!audioFile || !archiveId) {
-      return NextResponse.json({ error: 'Missing audio or archiveId' }, { status: 400 })
+    if (!audioFile) {
+      return NextResponse.json({ error: 'Missing audio' }, { status: 400 })
     }
 
     // Upload audio to Supabase Storage

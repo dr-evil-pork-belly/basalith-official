@@ -1,17 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 
 export const dynamic = 'force-dynamic'
 
-// DEPRECATED mobile shim — auth via x-archive-id header / archiveId query
-// param, not Supabase sessions. Kept for the existing iOS build until the
-// Phase 7 OTP build ships, then removed in Phase 8.
 export async function GET(req: NextRequest) {
-  const archiveId =
-    req.headers.get('x-archive-id') ||
-    new URL(req.url).searchParams.get('archiveId')
+  const session = await getSessionUser()
+  if (!session?.archiveId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const archiveId = session.archiveId
 
-  if (!archiveId) return NextResponse.json({ error: 'archiveId required' }, { status: 400 })
+  const { data: ownerRow } = await supabaseAdmin
+    .from('archives')
+    .select('owner_user_id')
+    .eq('id', archiveId)
+    .maybeSingle()
+  if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
 
   // Labels from contributors (not owner) — no date restriction
   const { data: labels } = await supabaseAdmin

@@ -1,0 +1,333 @@
+/**
+ * Security regression gate — fix/close-unauth-archive-access.
+ *
+ * Exercises the REAL route handlers for the six routes hardened in this hotfix.
+ * Only the identity boundary (getSessionUser), the DB (supabase-admin), and the
+ * heavy downstream (Anthropic, training pipeline, email, etc.) are mocked, so
+ * what is under test is the guard itself. For each route we assert:
+ *
+ *   1. no session                          -> 401
+ *   2. session but NOT the archive owner   -> 403   (simulates a successor: a
+ *                                                     session whose archiveId is
+ *                                                     filled by getSessionUser's
+ *                                                     successor fallback)
+ *   3. x-archive-id header with no session -> 401   (the deleted shim / the hole)
+ *   4. the archive owner                   -> 200
+ *
+ * The ownership row returned by the mocked archives table always has
+ * owner_user_id = OWNER_UID, so the owner session (userId === OWNER_UID) passes
+ * and every other session is rejected.
+ */
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { NextRequest } from 'next/server'
+
+vi.mock('@/lib/auth/getSessionUser', () => ({ getSessionUser: vi.fn() }))
+
+// DB boundary: a flexible chainable stub. The archives ownership lookup resolves
+// to ARCHIVE_ROW (owner_user_id = OWNER_UID); inserts return a generated id;
+// every list-style query resolves empty so the owner happy-path can complete.
+const H = vi.hoisted(() => {
+  const OWNER_UID   = 'owner-uid'
+  const ARCHIVE_ID  = 'arch-1111'
+  const ARCHIVE_ROW = {
+    id: ARCHIVE_ID, owner_user_id: OWNER_UID, status: 'active',
+    name: 'Test Archive', owner_name: 'Test Owner', preferred_language: 'en',
+    total_photos: 3, contributor_entity_access: 'none', entity_preview_contributor_ids: [],
+  }
+
+  function makeBuilder(table: string) {
+    let op: 'select' | 'insert' | 'update' | 'delete' = 'select'
+    const b: Record<string, unknown> = {}
+    const pass = () => b
+    b.select = pass
+    b.insert = () => { op = 'insert'; return b }
+    b.update = () => { op = 'update'; return b }
+    b.delete = () => { op = 'delete'; return b }
+    for (const m of ['eq', 'neq', 'in', 'is', 'not', 'order', 'limit', 'range', 'gte', 'lte', 'contains', 'ilike', 'or', 'match']) b[m] = pass
+    const terminal = () => {
+      if (op === 'insert') return { data: { id: 'generated-id' }, error: null }
+      if (table === 'archives') return { data: ARCHIVE_ROW, error: null }
+      return { data: null, error: null }
+    }
+    b.single = async () => terminal()
+    b.maybeSingle = async () => terminal()
+    // Awaitable list-style queries: `await supabaseAdmin.from(x).select(...).eq(...)`
+    b.then = (res: (v: unknown) => unknown, rej?: (e: unknown) => unknown) =>
+      Promise.resolve({ data: [], error: null, count: 0 }).then(res, rej)
+    return b
+  }
+
+  const supabaseAdmin = {
+    from: (table: string) => makeBuilder(table),
+    storage: {
+      from: () => ({
+        createSignedUrl:       async () => ({ data: { signedUrl: 'https://signed.test/x' },  error: null }),
+        createSignedUploadUrl: async () => ({ data: { signedUrl: 'https://signed.test/up', token: 'tok' }, error: null }),
+        upload:                async () => ({ error: null }),
+      }),
+    },
+    rpc: async () => ({ data: null, error: null }),
+  }
+
+  return { OWNER_UID, ARCHIVE_ID, ARCHIVE_ROW, supabaseAdmin }
+})
+
+vi.mock('@/lib/supabase-admin', () => ({ supabaseAdmin: H.supabaseAdmin }))
+
+// Heavy downstream deps — mocked so the owner happy-path returns without real I/O.
+vi.mock('@anthropic-ai/sdk', () => ({
+  default: class {
+    messages = { create: async () => ({ content: [{ type: 'text', text: 'entity reply' }] }) }
+  },
+}))
+vi.mock('@/lib/trainingPipeline', () => ({
+  createTrainingPairFromDeposit: vi.fn(async () => {}),
+  createTrainingPairsFromVoice:  vi.fn(async () => {}),
+}))
+vi.mock('@/lib/classifyDeposit', () => ({ classifyDeposit: vi.fn(async () => {}) }))
+vi.mock('@/lib/inngest', () => ({ inngest: { send: () => Promise.resolve() } }))
+vi.mock('@/lib/resend', () => ({ resend: { emails: { send: async () => ({}) } } }))
+vi.mock('@/lib/entityContext', () => ({ buildEntitySystemPrompt: async () => ({ systemPrompt: 'sys', usedDepositIds: [] }) }))
+vi.mock('@/lib/entityReadiness', () => ({ calculateEntityReadiness: async () => ({ score: 42 }) }))
+
+// transcribe-voice calls the OpenAI Whisper endpoint via global fetch. Stub it so
+// the owner happy-path completes offline with an empty transcript.
+vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({ text: '', language: '' }), { status: 200 })))
+
+import { getSessionUser } from '@/lib/auth/getSessionUser'
+import { GET  as exportGET }        from '@/app/api/archive/export/route'
+import { POST as ownerDepositPOST } from '@/app/api/archive/owner-deposit/route'
+import { POST as randomThoughtPOST } from '@/app/api/archive/random-thought/route'
+import { POST as uploadPOST }       from '@/app/api/archive/upload/route'
+import { POST as entityChatPOST }   from '@/app/api/archive/entity-chat/route'
+import { GET  as readinessGET, POST as readinessPOST } from '@/app/api/archive/entity-readiness/route'
+// part 2 — the 14 remaining mobile-surface routes
+import { GET  as galleryGET }         from '@/app/api/archive/gallery/route'
+import { POST as transcribePOST }     from '@/app/api/archive/transcribe-voice/route'
+import { GET  as accuracyGET }        from '@/app/api/archive/accuracy-mobile/route'
+import { GET  as contribActivityGET } from '@/app/api/archive/contributor-activity-mobile/route'
+import { GET  as dashboardGET }       from '@/app/api/archive/dashboard-mobile/route'
+import { GET  as memGameGET, POST as memGamePOST }   from '@/app/api/archive/memory-game-mobile/route'
+import { GET  as recordingsGET }      from '@/app/api/archive/recordings-mobile/route'
+import { GET  as sigDatesGET, POST as sigDatesPOST } from '@/app/api/archive/significant-dates-mobile/route'
+import { GET  as wisdomGET, POST as wisdomPOST }     from '@/app/api/archive/wisdom-exchange-mobile/route'
+import { POST as companionPOST }      from '@/app/api/mobile/companion/route'
+import { GET  as mirrorGET }          from '@/app/api/mobile/mirror/route'
+import { POST as mirrorReactPOST }    from '@/app/api/mobile/mirror/react/route'
+import { POST as myArchivesPOST }     from '@/app/api/mobile/my-archives/route'
+import { POST as sparkRandomPOST }    from '@/app/api/mobile/spark/random/route'
+
+const { OWNER_UID, ARCHIVE_ID } = H
+const mockedSession = vi.mocked(getSessionUser)
+
+const OWNER_SESSION     = { userId: OWNER_UID,        email: 'owner@x.co', role: 'owner',     archiveId: ARCHIVE_ID }
+const SUCCESSOR_SESSION = { userId: 'successor-uid',  email: 'succ@x.co',  role: 'successor', archiveId: ARCHIVE_ID, successorId: 's1' }
+
+function get(url: string, headers: Record<string, string> = {}): NextRequest {
+  return new NextRequest(url, { method: 'GET', headers })
+}
+function jsonPost(url: string, body: unknown, headers: Record<string, string> = {}): NextRequest {
+  return new NextRequest(url, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json', ...headers },
+    body:    JSON.stringify(body),
+  })
+}
+function uploadReq(headers: Record<string, string> = {}): NextRequest {
+  const fd = new FormData()
+  fd.append('file', new File([new Uint8Array([0xff, 0xd8, 0xff, 0xe0])], 'test.jpg', { type: 'image/jpeg' }))
+  return new NextRequest('http://localhost/api/archive/upload', { method: 'POST', body: fd, headers })
+}
+function transcribeReq(headers: Record<string, string> = {}): NextRequest {
+  const fd = new FormData()
+  fd.append('audio', new File([new Uint8Array([0x1a, 0x45, 0xdf, 0xa3])], 'rec.webm', { type: 'audio/webm' }))
+  fd.append('prompt', 'A memory')
+  fd.append('duration', '12')
+  return new NextRequest('http://localhost/api/archive/transcribe-voice', { method: 'POST', body: fd, headers })
+}
+
+/**
+ * Drive one route through all four auth scenarios. `invoke(headers)` builds and
+ * calls the handler; POST bodies always carry archiveId so the dead body path is
+ * exercised too. ownerExpect defaults to 200.
+ */
+async function runGuard(
+  label: string,
+  invoke: (headers?: Record<string, string>) => Promise<Response>,
+  ownerExpect = 200,
+) {
+  mockedSession.mockResolvedValue(null)
+  let res = await invoke()
+  console.log(`${label.padEnd(22)} | no session             -> ${res.status}`)
+  expect(res.status).toBe(401)
+
+  mockedSession.mockResolvedValue(SUCCESSOR_SESSION as never)
+  res = await invoke()
+  console.log(`${label.padEnd(22)} | successor (not owner)  -> ${res.status}`)
+  expect(res.status).toBe(403)
+
+  mockedSession.mockResolvedValue(null)
+  res = await invoke({ 'x-archive-id': ARCHIVE_ID })
+  console.log(`${label.padEnd(22)} | x-archive-id, no sess  -> ${res.status}`)
+  expect(res.status).toBe(401)
+
+  mockedSession.mockResolvedValue(OWNER_SESSION as never)
+  res = await invoke()
+  console.log(`${label.padEnd(22)} | owner session          -> ${res.status}`)
+  expect(res.status).toBe(ownerExpect)
+}
+
+beforeEach(() => { mockedSession.mockReset() })
+
+describe('archive routes — unauthenticated-access hole closed + ownership enforced', () => {
+  it('GET /api/archive/export', async () => {
+    await runGuard('export', h => exportGET(get('http://localhost/api/archive/export', h)))
+  })
+
+  it('POST /api/archive/owner-deposit', async () => {
+    await runGuard('owner-deposit', h =>
+      ownerDepositPOST(jsonPost('http://localhost/api/archive/owner-deposit',
+        { response: 'A real deposit answer, long enough to store.', archiveId: ARCHIVE_ID }, h)))
+  })
+
+  it('POST /api/archive/random-thought', async () => {
+    await runGuard('random-thought', h =>
+      randomThoughtPOST(jsonPost('http://localhost/api/archive/random-thought',
+        { thought: 'A passing thought worth keeping here.', archiveId: ARCHIVE_ID }, h)))
+  })
+
+  it('POST /api/archive/upload', async () => {
+    await runGuard('upload', h => uploadPOST(uploadReq(h)))
+  })
+
+  it('POST /api/archive/entity-chat', async () => {
+    await runGuard('entity-chat', h =>
+      entityChatPOST(jsonPost('http://localhost/api/archive/entity-chat',
+        { message: 'This is a statement about my life long enough to be a deposit.', archiveId: ARCHIVE_ID }, h)))
+  })
+
+  it('POST /api/archive/entity-readiness', async () => {
+    await runGuard('entity-readiness POST', h =>
+      readinessPOST(jsonPost('http://localhost/api/archive/entity-readiness',
+        { action: 'disable', archiveId: ARCHIVE_ID }, h)))
+  })
+
+  it('GET /api/archive/entity-readiness (query param no longer trusted)', async () => {
+    // GET now takes no request object and reads archiveId from the session only,
+    // so the old `?archiveId=` PII-leak path is unreachable. The x-archive-id
+    // header case is represented by "no session" here since GET ignores inputs.
+    mockedSession.mockResolvedValue(null)
+    let res = await readinessGET()
+    console.log(`entity-readiness GET   | no session             -> ${res.status}`)
+    expect(res.status).toBe(401)
+
+    mockedSession.mockResolvedValue(SUCCESSOR_SESSION as never)
+    res = await readinessGET()
+    console.log(`entity-readiness GET   | successor (not owner)  -> ${res.status}`)
+    expect(res.status).toBe(403)
+
+    mockedSession.mockResolvedValue(OWNER_SESSION as never)
+    res = await readinessGET()
+    console.log(`entity-readiness GET   | owner session          -> ${res.status}`)
+    expect(res.status).toBe(200)
+  })
+})
+
+describe('mobile API surface — unauthenticated access closed + ownership enforced (part 2)', () => {
+  const U = 'http://localhost'
+
+  it('GET /api/archive/gallery', async () => {
+    await runGuard('gallery', h => galleryGET(get(`${U}/api/archive/gallery?archiveId=${ARCHIVE_ID}&page=1`, h)))
+  })
+
+  it('POST /api/archive/transcribe-voice', async () => {
+    await runGuard('transcribe-voice', h => transcribePOST(transcribeReq(h)))
+  })
+
+  it('GET /api/archive/accuracy-mobile', async () => {
+    await runGuard('accuracy-mobile', h => accuracyGET(get(`${U}/api/archive/accuracy-mobile?archiveId=${ARCHIVE_ID}`, h)))
+  })
+
+  it('GET /api/archive/contributor-activity-mobile', async () => {
+    await runGuard('contrib-activity', h => contribActivityGET(get(`${U}/api/archive/contributor-activity-mobile?archiveId=${ARCHIVE_ID}`, h)))
+  })
+
+  it('GET /api/archive/dashboard-mobile', async () => {
+    await runGuard('dashboard-mobile', h => dashboardGET(get(`${U}/api/archive/dashboard-mobile?archiveId=${ARCHIVE_ID}`, h)))
+  })
+
+  it('GET /api/archive/memory-game-mobile', async () => {
+    await runGuard('memory-game GET', h => memGameGET(get(`${U}/api/archive/memory-game-mobile?archiveId=${ARCHIVE_ID}`, h)))
+  })
+
+  it('POST /api/archive/memory-game-mobile', async () => {
+    await runGuard('memory-game POST', h => memGamePOST(jsonPost(`${U}/api/archive/memory-game-mobile`,
+      { response: 'My weekly memory answer.', archiveId: ARCHIVE_ID }, h)))
+  })
+
+  it('GET /api/archive/recordings-mobile', async () => {
+    await runGuard('recordings-mobile', h => recordingsGET(get(`${U}/api/archive/recordings-mobile?archiveId=${ARCHIVE_ID}`, h)))
+  })
+
+  it('GET /api/archive/significant-dates-mobile', async () => {
+    await runGuard('sig-dates GET', h => sigDatesGET(get(`${U}/api/archive/significant-dates-mobile?archiveId=${ARCHIVE_ID}`, h)))
+  })
+
+  it('POST /api/archive/significant-dates-mobile', async () => {
+    await runGuard('sig-dates POST', h => sigDatesPOST(jsonPost(`${U}/api/archive/significant-dates-mobile`,
+      { label: 'Anniversary', year: 1990, archiveId: ARCHIVE_ID }, h)))
+  })
+
+  it('GET /api/archive/wisdom-exchange-mobile', async () => {
+    await runGuard('wisdom GET', h => wisdomGET(get(`${U}/api/archive/wisdom-exchange-mobile?archiveId=${ARCHIVE_ID}`, h)))
+  })
+
+  it('POST /api/archive/wisdom-exchange-mobile', async () => {
+    await runGuard('wisdom POST', h => wisdomPOST(jsonPost(`${U}/api/archive/wisdom-exchange-mobile`,
+      { exchangeId: 'ex1', action: 'ignore', archiveId: ARCHIVE_ID }, h)))
+  })
+
+  it('POST /api/mobile/companion', async () => {
+    await runGuard('companion', h => companionPOST(jsonPost(`${U}/api/mobile/companion`,
+      { messages: [{ role: 'user', content: 'Hi there' }], archiveId: ARCHIVE_ID }, h)))
+  })
+
+  it('GET /api/mobile/mirror', async () => {
+    await runGuard('mirror GET', h => mirrorGET(get(`${U}/api/mobile/mirror?archiveId=${ARCHIVE_ID}`, h)))
+  })
+
+  it('POST /api/mobile/mirror/react', async () => {
+    await runGuard('mirror react', h => mirrorReactPOST(jsonPost(`${U}/api/mobile/mirror/react`,
+      { reflectionId: 'r1', reaction: 'heart', archiveId: ARCHIVE_ID }, h)))
+  })
+
+  it('POST /api/mobile/spark/random', async () => {
+    // Handler takes no request object; archiveId is derived from the session only.
+    await runGuard('spark/random', () => sparkRandomPOST())
+  })
+
+  // Special: my-archives takes no archiveId and no email. It returns only the
+  // authenticated caller's own archives. No session -> 401. There is no
+  // "not the owner -> 403" case because it is a caller-scoped listing, not an
+  // access to a specific archive.
+  it('POST /api/mobile/my-archives (email param deleted, caller-scoped)', async () => {
+    mockedSession.mockResolvedValue(null)
+    let res: Response = await myArchivesPOST()
+    console.log(`my-archives            | no session             -> ${res.status}`)
+    expect(res.status).toBe(401)
+
+    // Even with a caller-supplied email in the body and no session -> 401.
+    // The handler ignores any request body entirely.
+    mockedSession.mockResolvedValue(null)
+    res = await (myArchivesPOST as unknown as (r: NextRequest) => Promise<Response>)(
+      jsonPost(`${U}/api/mobile/my-archives`, { email: 'victim@example.com' }),
+    )
+    console.log(`my-archives            | supplied email, no sess -> ${res.status}`)
+    expect(res.status).toBe(401)
+
+    mockedSession.mockResolvedValue(OWNER_SESSION as never)
+    res = await myArchivesPOST()
+    console.log(`my-archives            | authenticated caller   -> ${res.status}`)
+    expect(res.status).toBe(200)
+  })
+})

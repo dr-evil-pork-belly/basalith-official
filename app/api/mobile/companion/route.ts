@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { createTrainingPairFromDeposit } from '@/lib/trainingPipeline'
 import { classifyDeposit } from '@/lib/classifyDeposit'
 import { NextResponse } from 'next/server'
@@ -34,15 +35,27 @@ const SAVE_DEPOSIT_TOOL: Anthropic.Tool = {
 
 export async function POST(req: Request) {
   try {
+    const session = await getSessionUser()
+    if (!session?.archiveId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const archiveId = session.archiveId
+
+    const { data: ownerRow } = await supabaseAdmin
+      .from('archives')
+      .select('owner_user_id')
+      .eq('id', archiveId)
+      .maybeSingle()
+    if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
     const body = await req.json()
-    const { archiveId, messages, context } = body as {
-      archiveId: string
+    const { messages, context } = body as {
       messages:  Array<{ role: 'user' | 'assistant'; content: string }>
       context:   { ownerName?: string; archiveName?: string; language?: string }
     }
 
-    if (!archiveId || !Array.isArray(messages) || messages.length === 0) {
-      return NextResponse.json({ error: 'archiveId and messages are required' }, { status: 400 })
+    if (!Array.isArray(messages) || messages.length === 0) {
+      return NextResponse.json({ error: 'messages are required' }, { status: 400 })
     }
 
     const [archiveResult, depositCountResult] = await Promise.all([

@@ -10,18 +10,21 @@ export async function POST(req: NextRequest) {
   let body: { thought?: string; source?: string; archiveId?: string }
   try { body = await req.json() } catch { return NextResponse.json({ error: 'Invalid request' }, { status: 400 }) }
 
-  // Auth: Supabase owner session OR x-archive-id header OR body.archiveId (mobile)
-  // The header/body paths are a DEPRECATED mobile shim, not Supabase
-  // sessions. Kept for the existing iOS build until the Phase 7 OTP
-  // build ships, then removed in Phase 8.
-  const session       = await getSessionUser()
-  const headerId      = req.headers.get('x-archive-id')
-  const bodyId        = typeof body.archiveId === 'string' ? body.archiveId : null
-  const archiveId     = session?.archiveId || headerId || bodyId
+  // Auth: Supabase owner session only. Ownership is verified against the
+  // archives table — a session carrying an archiveId is not proof of ownership
+  // (getSessionUser fills archiveId for successors too).
+  const session = await getSessionUser()
+  if (!session?.archiveId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const archiveId = session.archiveId
 
-  console.log('[random-thought] session:', !!session?.archiveId, '| header:', !!headerId, '| body:', !!bodyId, '| resolved:', archiveId?.substring(0, 8) ?? 'NONE')
-
-  if (!archiveId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const { data: ownerRow } = await supabaseAdmin
+    .from('archives')
+    .select('owner_user_id')
+    .eq('id', archiveId)
+    .maybeSingle()
+  if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
 
   const thought = body.thought?.trim()
   if (!thought || thought.length < 3) {

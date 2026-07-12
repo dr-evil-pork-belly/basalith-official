@@ -7,16 +7,22 @@ export const dynamic = 'force-dynamic'
 export const maxDuration = 60 // seconds — export can take time for large archives
 
 export async function GET(req: NextRequest) {
-  // Auth: Supabase owner session (portal) OR x-archive-id header (mobile)
-  // The header path is a DEPRECATED mobile shim, not a Supabase session.
-  // Kept for the existing iOS build until the Phase 7 OTP build ships,
-  // then removed in Phase 8.
-  const session       = await getSessionUser()
-  const headerId      = req.headers.get('x-archive-id')
-  const archiveId     = session?.archiveId || headerId
-
-  if (!archiveId) {
+  // Auth: Supabase owner session only. archiveId comes from the session and is
+  // verified against the archives table below — a session carrying an archiveId
+  // is not proof of ownership (getSessionUser fills archiveId for successors too).
+  const session = await getSessionUser()
+  if (!session?.archiveId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  const archiveId = session.archiveId
+
+  const { data: ownerRow } = await supabaseAdmin
+    .from('archives')
+    .select('owner_user_id')
+    .eq('id', archiveId)
+    .maybeSingle()
+  if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
   // Fetch all data in parallel
