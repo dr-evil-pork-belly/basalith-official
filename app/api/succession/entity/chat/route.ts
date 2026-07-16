@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
 
   const contextSection = contexts.length > 0
     ? contexts.map(c =>
-        `[${labelContextType(c.context_type)} — ${formatDate(c.created_at)}]:\n${c.content}`
+        `[${labelContextType(c.context_type)}, ${formatDate(c.created_at)}]:\n${c.content}`
       ).join('\n\n')
     : 'No contextual layer injected yet.'
 
