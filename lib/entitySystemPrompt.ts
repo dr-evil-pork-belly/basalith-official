@@ -11,6 +11,23 @@
  * exactly as production sends it.
  */
 
+/** A frozen-layer training pair, shaped as the succession entity reads it. */
+export type FingerprintPair = { prompt: string; completion: string }
+
+/**
+ * Renders training pairs into the FROZEN COGNITIVE FINGERPRINT section.
+ *
+ * Extracted verbatim from app/api/succession/entity/chat/route.ts so the route
+ * and any other caller build a byte-identical frozen layer. The empty-case
+ * string is part of the contract: the prompt's thin-fingerprint fallback keys
+ * off it, so do not reword it.
+ */
+export function formatFingerprintSection(pairs: FingerprintPair[]): string {
+  return pairs.length > 0
+    ? pairs.map(p => `Q: ${p.prompt}\nA: ${p.completion}`).join('\n\n')
+    : 'No training data available yet.'
+}
+
 export function buildEntitySystemPrompt(params: {
   ownerName: string
   archiveName: string
