@@ -14,10 +14,31 @@ import Anthropic from '@anthropic-ai/sdk'
 
 export type GroundingPair = { prompt: string; completion: string }
 
+/**
+ * What the draft answer rests on.
+ *
+ * 'deposit'      the draft commits a founder position and a deposit directly
+ *                takes that position on that question.
+ * 'no_position'  the draft commits no founder position: it declines, hedges,
+ *                or says the archive does not cover this.
+ * 'unsupported'  the draft commits a founder position no deposit supports.
+ *
+ * Note that 'no_position' is NOT evidence of grounding. It only means the
+ * draft did not overreach. Any surface that tells a viewer an answer is
+ * grounded must key off 'deposit', not off `supported`.
+ */
+export type GroundingBasis = 'deposit' | 'no_position' | 'unsupported'
+
 export type GroundingVerdict = {
   position: string
+  /** Derived: basis !== 'unsupported'. The refusal contract is unchanged. */
   supported: boolean
+  basis: GroundingBasis
   topic: string
+}
+
+function isBasis(v: unknown): v is GroundingBasis {
+  return v === 'deposit' || v === 'no_position' || v === 'unsupported'
 }
 
 // Lazy client: the probe loads ANTHROPIC_API_KEY via dotenv at runtime, after
@@ -37,9 +58,16 @@ const AUDITOR_SYSTEM =
   'QUESTION, and a DRAFT ANSWER. A position is SUPPORTED only if a deposit ' +
   'directly takes that position on that question. A general principle that ' +
   'could be used to ARGUE for the position does NOT count as support, because ' +
-  'the opposite position could be argued from the same principle. If the draft ' +
-  'takes no normative founder position, or already declines, it is supported. ' +
-  'Return only JSON: {"position":"<stance or none>","supported":<bool>,"topic":"<short topic>"}.'
+  'the opposite position could be argued from the same principle. ' +
+  'Classify the draft into exactly one BASIS: ' +
+  '"deposit" when the draft commits a normative founder position and a deposit ' +
+  'directly takes that position on that question; ' +
+  '"no_position" when the draft commits no normative founder position, or ' +
+  'already declines, or says the archive does not settle this, or only reasons ' +
+  'from general principles without landing on a stance; ' +
+  '"unsupported" when the draft commits a normative founder position that no ' +
+  'deposit directly takes. ' +
+  'Return only JSON: {"position":"<stance or none>","basis":"deposit"|"no_position"|"unsupported","topic":"<short topic>"}.'
 
 function stripFences(s: string): string {
   return s.replace(/```(?:json)?/gi, '').trim()
@@ -99,9 +127,15 @@ export async function verifyGrounding({
     if (!match) throw new Error(`auditor returned no JSON object: ${raw.slice(0, 200)}`)
 
     const parsed = JSON.parse(match[0])
+
+    // An unreadable basis is treated as unsupported, same as a parse failure:
+    // never let a malformed verdict ship an unverified founder position.
+    const basis: GroundingBasis = isBasis(parsed.basis) ? parsed.basis : 'unsupported'
+
     return {
       position:  typeof parsed.position === 'string' ? parsed.position : 'none',
-      supported: parsed.supported === true,
+      supported: basis !== 'unsupported',
+      basis,
       topic:
         typeof parsed.topic === 'string' && parsed.topic.trim()
           ? parsed.topic.trim()
@@ -112,6 +146,6 @@ export async function verifyGrounding({
     // caller falls back to the honest gap rather than shipping an unverified
     // founder position.
     console.error('[verifyGrounding]', err instanceof Error ? err.message : err)
-    return { position: 'unknown', supported: false, topic: 'this' }
+    return { position: 'unknown', supported: false, basis: 'unsupported', topic: 'this' }
   }
 }
