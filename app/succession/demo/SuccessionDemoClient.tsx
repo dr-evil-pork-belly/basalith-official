@@ -154,7 +154,7 @@ export default function SuccessionDemoClient() {
             Basalith &middot; Succession
           </span>
         </div>
-        <span style={{ ...MONO, fontSize: '0.56rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: C.ghost, whiteSpace: 'nowrap' }}>
+        <span style={{ ...MONO, fontSize: '0.56rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: C.dim, whiteSpace: 'nowrap' }}>
           Interactive Demonstration
         </span>
       </div>
@@ -425,7 +425,7 @@ export default function SuccessionDemoClient() {
                   Ask
                 </button>
               </form>
-              <p style={{ ...MONO, fontSize: '0.5rem', letterSpacing: '0.12em', color: C.ghost, marginTop: '10px', marginBottom: 0 }}>
+              <p style={{ ...MONO, fontSize: '0.58rem', letterSpacing: '0.12em', color: C.dim, marginTop: '10px', marginBottom: 0 }}>
                 {turns.filter(t => !t.failed).length} of {MAX_USER_MESSAGES} questions used
               </p>
             </>
