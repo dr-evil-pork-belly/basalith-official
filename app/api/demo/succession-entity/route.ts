@@ -110,10 +110,14 @@ export async function POST(req: NextRequest) {
       answer:   reply,
     })
 
-    const grounded = verdict.supported === true
-    if (!grounded) reply = groundingGapReply(verdict.topic)
+    // Only 'deposit' is evidence of grounding. 'no_position' means the entity
+    // never committed to anything, so it keeps its own in-character words and
+    // the page still renders the refusal state. Badging that as grounded would
+    // claim an archive basis the verifier never found.
+    const grounded = verdict.basis === 'deposit'
+    if (verdict.basis === 'unsupported') reply = groundingGapReply(verdict.topic)
 
-    return NextResponse.json({ reply, grounded })
+    return NextResponse.json({ reply, grounded, basis: verdict.basis })
   } catch (err) {
     return NextResponse.json(
       { error: sanitizedError(err, 'demo-succession-entity') },
