@@ -49,10 +49,19 @@ function buildInvitationEmail(
 
 // ── GET — readiness + current access state ────────────────────────────────────
 
-export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url)
-  const archiveId = searchParams.get('archiveId')
-  if (!archiveId) return NextResponse.json({ error: 'archiveId required' }, { status: 400 })
+export async function GET() {
+  const session = await getSessionUser()
+  if (!session?.archiveId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const archiveId = session.archiveId
+
+  const { data: ownerRow } = await supabaseAdmin
+    .from('archives')
+    .select('owner_user_id')
+    .eq('id', archiveId)
+    .maybeSingle()
+  if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
 
   try {
     const [readiness, archiveRow, contributors] = await Promise.all([
@@ -98,9 +107,18 @@ export async function GET(req: NextRequest) {
 // ── POST — change access level ────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
-  const session   = await getSessionUser()
-  const archiveId = session?.archiveId
-  if (!archiveId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const session = await getSessionUser()
+  if (!session?.archiveId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const archiveId = session.archiveId
+
+  const { data: ownerRow } = await supabaseAdmin
+    .from('archives')
+    .select('owner_user_id')
+    .eq('id', archiveId)
+    .maybeSingle()
+  if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
 
   const body = await req.json()
   const { action, contributorIds } = body as {

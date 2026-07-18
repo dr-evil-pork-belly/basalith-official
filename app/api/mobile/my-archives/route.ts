@@ -1,28 +1,16 @@
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { NextResponse } from 'next/server'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 
-export async function POST(req: Request) {
+// Returns the archives belonging to the AUTHENTICATED caller only — owned
+// archives resolved from session.userId, contributed archives from session.email.
+// It never accepts a caller-supplied email or archiveId.
+export async function POST() {
   try {
-    const body = await req.json()
-    const { email } = body as { email?: string }
-
-    if (!email) {
-      return NextResponse.json({ error: 'email is required' }, { status: 400 })
+    const session = await getSessionUser()
+    if (!session?.userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-
-    const [ownedResult, contributorResult] = await Promise.all([
-      // Query A — archives this email owns
-      supabaseAdmin
-        .from('archives')
-        .select('id, name, preferred_language, current_streak, tier')
-        .eq('email', email),
-
-      // Query B — archives this email contributes to (via contributors table)
-      supabaseAdmin
-        .from('contributors')
-        .select('id, name, archive_id, archives!inner(id, name, preferred_language, current_streak, tier)')
-        .eq('email', email),
-    ])
 
     type ArchiveRow = {
       id:                 string
@@ -38,6 +26,22 @@ export async function POST(req: Request) {
       archive_id:  string
       archives:    ArchiveRow[]
     }
+
+    const [ownedResult, contributorResult] = await Promise.all([
+      // Query A — archives this caller owns
+      supabaseAdmin
+        .from('archives')
+        .select('id, name, preferred_language, current_streak, tier')
+        .eq('owner_user_id', session.userId),
+
+      // Query B — archives this caller contributes to (matched by their own email)
+      session.email
+        ? supabaseAdmin
+            .from('contributors')
+            .select('id, name, archive_id, archives!inner(id, name, preferred_language, current_streak, tier)')
+            .eq('email', session.email)
+        : Promise.resolve({ data: [] as ContributorRow[] }),
+    ])
 
     const owned       = (ownedResult.data ?? []) as ArchiveRow[]
     const contribs    = (contributorResult.data ?? []) as unknown as ContributorRow[]

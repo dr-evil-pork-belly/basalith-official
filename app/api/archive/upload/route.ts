@@ -6,21 +6,25 @@ import { getSessionUser } from '@/lib/auth/getSessionUser'
 export const dynamic = 'force-dynamic'
 
 // Photo upload — accepts multipart/form-data with a 'file' field.
-// Auth: Supabase owner session (portal) or x-archive-id header (mobile).
-// The header path is a DEPRECATED mobile shim, not a Supabase session.
-// Kept for the existing iOS build until the Phase 7 OTP build ships,
-// then removed in Phase 8.
+// Auth: Supabase owner session only. Ownership is verified against the archives
+// table — a session carrying an archiveId is not proof of ownership
+// (getSessionUser fills archiveId for successors too).
 
 export async function POST(req: NextRequest) {
   try {
-    const session   = await getSessionUser()
-    const archiveId =
-      session?.archiveId ||
-      req.headers.get('x-archive-id')
-
-    console.log('[upload] archiveId header:', req.headers.get('x-archive-id') || 'NOT RECEIVED', '| resolved:', archiveId?.substring(0, 8) ?? 'NONE')
-    if (!archiveId) {
+    const session = await getSessionUser()
+    if (!session?.archiveId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    const archiveId = session.archiveId
+
+    const { data: ownerRow } = await supabaseAdmin
+      .from('archives')
+      .select('owner_user_id')
+      .eq('id', archiveId)
+      .maybeSingle()
+    if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     // Verify archive exists and is active

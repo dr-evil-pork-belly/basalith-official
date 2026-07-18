@@ -1,12 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { createTrainingPairFromDeposit } from '@/lib/trainingPipeline'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(req: NextRequest) {
-  const archiveId = new URL(req.url).searchParams.get('archiveId')
-  if (!archiveId) return NextResponse.json({ error: 'archiveId required' }, { status: 400 })
+  const session = await getSessionUser()
+  if (!session?.archiveId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const archiveId = session.archiveId
+
+  const { data: ownerRow } = await supabaseAdmin
+    .from('archives')
+    .select('owner_user_id')
+    .eq('id', archiveId)
+    .maybeSingle()
+  if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
 
   const { data, error } = await supabaseAdmin
     .from('wisdom_exchanges')
@@ -32,11 +43,24 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const body = await req.json()
-  const { archiveId, exchangeId, action, correction } = body
+  const session = await getSessionUser()
+  if (!session?.archiveId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const archiveId = session.archiveId
 
-  if (!archiveId || !exchangeId || !action) {
-    return NextResponse.json({ error: 'archiveId, exchangeId, and action required' }, { status: 400 })
+  const { data: ownerRow } = await supabaseAdmin
+    .from('archives')
+    .select('owner_user_id')
+    .eq('id', archiveId)
+    .maybeSingle()
+  if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
+  const body = await req.json()
+  const { exchangeId, action, correction } = body
+
+  if (!exchangeId || !action) {
+    return NextResponse.json({ error: 'exchangeId and action required' }, { status: 400 })
   }
 
   if (action === 'ignore') {

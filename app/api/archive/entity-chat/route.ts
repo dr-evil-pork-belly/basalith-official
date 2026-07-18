@@ -27,46 +27,36 @@ export async function POST(req: Request) {
   try {
     const body = await req.json()
     const { message, sessionId, conversationHistory } = body
-    const requestedArchiveId: string | undefined = body.archiveId
 
     if (!message) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
     // ── Step 1: Resolve caller identity ───────────────────────────────────────
-    // Priority: owner session → x-archive-id header → body.archiveId (mobile fallback) → contributor bearer token
-    // The x-archive-id / body.archiveId mobile paths are a DEPRECATED shim,
-    // not Supabase sessions. Kept for the existing iOS build until the
-    // Phase 7 OTP build ships, then removed in Phase 8.
+    // Owner Supabase session (ownership verified against the archives table) or
+    // contributor bearer token (validated against contributors.access_token).
     const session = await getSessionUser()
 
     const nextReq          = req as import('next/server').NextRequest
-    const headerArchiveId  = nextReq.headers.get('x-archive-id')
     const authHeader       = nextReq.headers.get('authorization')
     const contributorToken = authHeader?.replace('Bearer ', '') || body.contributorToken
-    const bodyArchiveId    = typeof requestedArchiveId === 'string' && requestedArchiveId ? requestedArchiveId : null
-
-    console.log('[entity-chat] auth sources — session:', !!session?.archiveId,
-      '| header:', !!headerArchiveId, '| body:', !!bodyArchiveId)
 
     let authorizedArchiveId: string | null = null
     let callerType: 'owner' | 'contributor' | null = null
 
     if (session?.archiveId) {
+      // A session carrying an archiveId is not proof of ownership (getSessionUser
+      // fills archiveId for successors too), so verify against the archives table.
+      const { data: ownerRow } = await supabaseAdmin
+        .from('archives')
+        .select('owner_user_id')
+        .eq('id', session.archiveId)
+        .maybeSingle()
+      if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      }
       authorizedArchiveId = session.archiveId
       callerType          = 'owner'
-    } else if (headerArchiveId || bodyArchiveId) {
-      // Mobile owner: validate the archiveId from header or body against DB
-      const candidateId = headerArchiveId ?? bodyArchiveId!
-      const { data: mobileArchive } = await supabaseAdmin
-        .from('archives')
-        .select('id, status')
-        .eq('id', candidateId)
-        .maybeSingle()
-      if (mobileArchive && (!mobileArchive.status || mobileArchive.status === 'active')) {
-        authorizedArchiveId = candidateId
-        callerType          = 'owner'
-      }
     } else if (contributorToken) {
       const { data: contributor } = await supabaseAdmin
         .from('contributors')
@@ -81,14 +71,9 @@ export async function POST(req: Request) {
       }
     }
 
-    console.log('[entity-chat] authorized:', authorizedArchiveId?.substring(0, 8) ?? 'NONE', '| caller:', callerType)
-
     if (!authorizedArchiveId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-
-    // ── Step 2: No IDOR risk — archiveId comes from the validated candidate ────
-    // requestedArchiveId === authorizedArchiveId by construction above
 
     const archiveId = authorizedArchiveId
 

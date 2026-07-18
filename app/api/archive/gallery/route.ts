@@ -7,31 +7,23 @@ const PAGE_SIZE = 24
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
-  const archiveId = searchParams.get('archiveId')
   const decade    = searchParams.get('decade')   || null
   const page      = Math.max(1, parseInt(searchParams.get('page') || '1', 10))
 
-  if (!archiveId || archiveId === 'will-be-set-after-db-setup') {
-    return NextResponse.json({ error: 'archiveId required' }, { status: 400 })
-  }
+  // Auth: Supabase owner session only. Ownership is verified against the archives
+  // table — a session carrying an archiveId is not proof of ownership
+  // (getSessionUser fills archiveId for successors too).
+  const session = await getSessionUser()
+  if (!session?.archiveId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const archiveId = session.archiveId
 
-  // Auth: Supabase owner session OR mobile x-archive-id header
-  // The mobile header path is a DEPRECATED shim, not a Supabase session.
-  // Kept for the existing iOS build until the Phase 7 OTP build ships,
-  // then removed in Phase 8.
-  const mobileId = req.headers.get('x-archive-id')
-  if (mobileId) {
-    // Mobile path: validate archiveId matches the header
-    if (mobileId !== archiveId) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    }
-  } else {
-    // Portal path: require an owner session
-    const session = await getSessionUser()
-    if (!session?.archiveId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    if (archiveId !== session.archiveId) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    }
+  const { data: ownerRow } = await supabaseAdmin
+    .from('archives')
+    .select('owner_user_id')
+    .eq('id', archiveId)
+    .maybeSingle()
+  if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
   // Build query

@@ -1,18 +1,27 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { NextResponse } from 'next/server'
 
 const anthropic = new Anthropic()
 
 const FALLBACK = 'Tell me about a decision you made that surprised even you.'
 
-export async function POST(req: Request) {
+export async function POST() {
   try {
-    const body = await req.json()
-    const { archiveId } = body as { archiveId?: string }
+    const session = await getSessionUser()
+    if (!session?.archiveId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    const archiveId = session.archiveId
 
-    if (!archiveId) {
-      return NextResponse.json({ error: 'archiveId is required' }, { status: 400 })
+    const { data: ownerRow } = await supabaseAdmin
+      .from('archives')
+      .select('owner_user_id')
+      .eq('id', archiveId)
+      .maybeSingle()
+    if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     const [archiveResult, depositsResult] = await Promise.all([
