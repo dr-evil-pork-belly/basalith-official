@@ -3,7 +3,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { verifyGrounding, groundingGapReply } from '@/lib/verifyGrounding'
-import { buildEntitySystemPrompt } from '@/lib/entitySystemPrompt'
+import { buildEntitySystemPrompt, formatFingerprintSection } from '@/lib/entitySystemPrompt'
 
 const anthropic = new Anthropic()
 
@@ -89,13 +89,11 @@ export async function POST(req: NextRequest) {
   const ownerName   = archive.owner_name ?? archive.name
   const archiveName = archive.name
 
-  const fingerprintSection = pairs.length > 0
-    ? pairs.map(p => `Q: ${p.prompt}\nA: ${p.completion}`).join('\n\n')
-    : 'No training data available yet.'
+  const fingerprintSection = formatFingerprintSection(pairs)
 
   const contextSection = contexts.length > 0
     ? contexts.map(c =>
-        `[${labelContextType(c.context_type)} — ${formatDate(c.created_at)}]:\n${c.content}`
+        `[${labelContextType(c.context_type)}, ${formatDate(c.created_at)}]:\n${c.content}`
       ).join('\n\n')
     : 'No contextual layer injected yet.'
 
