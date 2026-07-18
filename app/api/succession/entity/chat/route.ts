@@ -3,6 +3,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { verifyGrounding, groundingGapReply } from '@/lib/verifyGrounding'
+import { logGroundingGap } from '@/lib/groundingGapLog'
 import { buildEntitySystemPrompt, formatFingerprintSection } from '@/lib/entitySystemPrompt'
 
 const anthropic = new Anthropic()
@@ -116,6 +117,17 @@ export async function POST(req: NextRequest) {
     [...messages].reverse().find(m => m.role === 'user')?.content
   )
   const verdict = await verifyGrounding({ pairs, question: lastUserMessage, answer: reply })
+
+  // Grounding gap log (Slice A). Every non-'deposit' verdict is a question the
+  // frozen archive could not ground: both 'unsupported' (draft overreached and
+  // is replaced below) and 'no_position' (the entity declined in its own words,
+  // reply left as-is). Fire-and-forget — not awaited, all failures swallowed
+  // inside logGroundingGap — so it never affects the reply, its status, or its
+  // latency beyond dispatch.
+  if (verdict.basis !== 'deposit') {
+    void logGroundingGap({ archiveId, question: lastUserMessage, basis: verdict.basis })
+  }
+
   if (verdict.supported === false) {
     reply = groundingGapReply(verdict.topic)
   }
