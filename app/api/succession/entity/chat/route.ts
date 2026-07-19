@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse, after } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth/getSessionUser'
@@ -121,11 +121,20 @@ export async function POST(req: NextRequest) {
   // Grounding gap log (Slice A). Every non-'deposit' verdict is a question the
   // frozen archive could not ground: both 'unsupported' (draft overreached and
   // is replaced below) and 'no_position' (the entity declined in its own words,
-  // reply left as-is). Fire-and-forget — not awaited, all failures swallowed
-  // inside logGroundingGap — so it never affects the reply, its status, or its
-  // latency beyond dispatch.
+  // reply left as-is).
+  //
+  // after() is load-bearing here, NOT style. It defers the write until after
+  // the response is sent while keeping the serverless instance alive until the
+  // promise settles. A bare `void` dispatch dies on lambda freeze the moment
+  // the response resolves: the RPC never executes and the gap is silently lost
+  // (this is exactly what left the prod table empty across writing-eligible
+  // turns). The write still never affects the reply, its status, or its latency,
+  // and every failure stays swallowed inside logGroundingGap.
   if (verdict.basis !== 'deposit') {
-    void logGroundingGap({ archiveId, question: lastUserMessage, basis: verdict.basis })
+    // Capture the narrowed basis: TypeScript drops the `!== 'deposit'` narrowing
+    // inside the deferred after() closure, so bind it to a const here first.
+    const basis = verdict.basis
+    after(() => logGroundingGap({ archiveId, question: lastUserMessage, basis }))
   }
 
   if (verdict.supported === false) {
