@@ -18,6 +18,14 @@
  * this gate is the WRITE PATH. All probe rows are sentinel-prefixed and cleaned
  * up before and after, so it is safe to run repeatedly against the live table.
  *
+ * LIMITATION: this runs as a long-lived Node process, so it CANNOT catch the
+ * serverless-freeze class of failure. A route that dispatches logGroundingGap
+ * with a bare `void` (instead of after()) still passes here yet drops every
+ * write in production, because the freeze that kills an un-awaited promise
+ * after the response is sent never happens in a plain process. The live-route
+ * acceptance turns are the only gate that covers that class. See the after()
+ * call site in app/api/succession/entity/chat/route.ts.
+ *
  * Requires log_grounding_gap() (20260718_grounding_gap_log_fn.sql) to be applied.
  *
  * Run: npx tsx scripts/gap-log-probe.ts
