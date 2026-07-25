@@ -1,601 +1,382 @@
-# CLAUDE.md — Basalith Full-Stack
+# CLAUDE.md — basalith-official
 
-> This file tells Claude Code how to operate the Basalith codebase.
-> It is read automatically when you run `claude` in this directory.
-> Every task, convention, and system decision is documented here.
+Operating context for Claude Code in this repo. Read at the start of every run.
 
----
+Keep this file short. Every line costs context on every session. Business strategy,
+pricing, and positioning live in the project docs, not here. This file covers how to
+work in this repo, what actually exists, and what is known broken.
 
-## Project Overview
+Provenance markers:
+- VERIFIED (July 2026 recon) means confirmed by live query or by reading the file.
+- FROM DOCS means it comes from a context doc and has not been re-confirmed live.
+- NOT CONFIRMED means nobody has checked. Treat as unknown, not as true.
 
-**Basalith** is a luxury legacy preservation SaaS. Families pay an annual subscription
-to have their digital archive ingested, labeled via AI-assisted Essence Games, and
-preserved with an authenticated AI Presence.
-
-**Stack:** Next.js 14 (App Router) · Firebase (Auth + Firestore + Storage) · Stripe
-(Subscriptions + Connect) · Vercel (Deployment) · TypeScript throughout.
-
----
-
-## Repository Layout
-
-```
-basalith/
-├── app/
-│   ├── (marketing)/              # Public marketing pages (no auth)
-│   │   ├── page.tsx              # Home
-│   │   ├── pricing/page.tsx      # Pricing page (see below)
-│   │   └── partner/page.tsx      # Partner programme landing
-│   ├── (auth)/                   # Auth flows
-│   │   ├── login/page.tsx
-│   │   └── register/page.tsx
-│   ├── (dashboard)/              # Protected archivist portal
-│   │   ├── dashboard/page.tsx    # Vault overview
-│   │   ├── ingest/page.tsx       # File upload UI
-│   │   └── milestones/page.tsx   # Firewall controls
-│   ├── (partner)/                # Protected partner portal
-│   │   ├── partner/page.tsx      # Partner dashboard
-│   │   └── partner/apply/page.tsx
-│   ├── api/
-│   │   ├── stripe/webhook/route.ts   # ⚠ Critical — Stripe lifecycle
-│   │   ├── vault/route.ts            # Vault CRUD
-│   │   ├── vault/ingest/route.ts     # File ingestion
-│   │   └── partners/route.ts         # Partner programme
-│   ├── globals.css
-│   └── layout.tsx
-├── components/
-│   ├── pricing/                  # Pricing page components
-│   ├── vault/                    # Dashboard components
-│   └── shared/                   # VaultButton, AnimatedSection, etc.
-├── lib/
-│   ├── firebase/
-│   │   ├── client.ts             # Browser SDK (use in React components)
-│   │   └── admin.ts              # Server SDK (use in API routes only)
-│   └── stripe/
-│       └── index.ts              # Stripe client + tier config
-├── types/
-│   └── index.ts                  # All shared TypeScript types
-├── scripts/
-│   └── stripe-setup.ts           # One-time Stripe product creation
-├── firestore.rules               # Firestore security rules
-├── firestore.indexes.json        # Composite index definitions
-├── storage.rules                 # Firebase Storage security rules
-├── firebase.json                 # Firebase CLI config
-└── .env.local.example            # Environment variable template
-```
+Last rebuilt July 2026. The previous version described a Firebase and Firestore
+system that does not exist in this repo.
 
 ---
 
-## Environment Setup (do this first)
+## 0. WHAT THIS IS
 
-### Step 1 — Clone and install
+Basalith captures how a person reasons, decides, and expresses themselves, so that
+judgment transfers rather than disappearing. The company is Heritage Nexus Inc.
 
-```bash
-git clone https://github.com/basalith/basalith.git
-cd basalith
-npm install
-```
+- basalith.ai is the product front door. This repo serves it.
+- basalith.xyz is the technical white paper. Separate repo, git-wired to Vercel.
+- basalith.life is the lifestyle brand (the 135 mentality).
 
-### Step 2 — Firebase project
+Primary market is B2B: knowledge transfer when a business changes hands, by
+acquisition or succession. Secondary is B2C: individuals and families, sold through
+Legacy Guides. The engine is the same. The lifecycle shape is not.
 
-1. Go to [console.firebase.google.com](https://console.firebase.google.com)
-2. Create a new project named `basalith-prod`
-3. Enable **Authentication** → Sign-in methods → Email/Password + Google
-4. Enable **Firestore Database** → Start in production mode → Region: `us-central1`
-5. Enable **Storage** → Start in production mode → Region: `us-central1`
-6. Register a **Web app** → copy the config values
-7. **Service account** → Generate new private key → download JSON
+**The customer is a living, capable person making a proactive decision.** The trigger
+is agency, not crisis and not bereavement. Never import loss or grief framing into
+anything. This is not a memorial product.
 
-### Step 3 — Environment variables
-
-```bash
-cp .env.local.example .env.local
-# Fill in all values — see comments in the file for where to find each one
-```
-
-### Step 4 — Deploy Firebase rules and indexes
-
-```bash
-npm install -g firebase-tools
-firebase login
-firebase use --add  # select your basalith-prod project
-
-# Deploy security rules
-firebase deploy --only firestore:rules
-firebase deploy --only storage
-firebase deploy --only firestore:indexes
-```
-
-### Step 5 — Create Stripe products
-
-```bash
-# Ensure STRIPE_SECRET_KEY is set in .env.local first
-npx tsx scripts/stripe-setup.ts
-# Copy the output Price IDs back into .env.local
-```
-
-### Step 6 — Register Stripe webhook (local dev)
-
-```bash
-# In one terminal:
-npm run dev
-
-# In another terminal:
-stripe listen --forward-to localhost:3000/api/stripe/webhook
-# Copy the webhook signing secret → STRIPE_WEBHOOK_SECRET in .env.local
-```
-
-### Step 7 — Run
-
-```bash
-npm run dev
-# → http://localhost:3000
-```
+Production is live and there is no safe sandbox. Real archives hold real family and
+founder material.
 
 ---
 
-## Firebase Data Architecture
+## 1. NON-NEGOTIABLE RULES
 
-### Collections
+**Credentials.** Stop and ask before extracting or using any credential, every time.
+This includes pulling a token from the git credential store, reading a cached
+credential, and enabling or using a Vercel automation bypass secret. If a sanctioned
+tool is missing (for example `gh` is not on PATH), surface the gap and wait. Do not
+route around it.
 
-```
-users/{uid}
-  role: 'archivist' | 'curator' | 'guardian' | 'partner' | 'admin'
-  email, displayName, vaultId?, partnerId?
+Sanctioned without asking: reading `.env.local` through the repo's own
+`scripts/load-env.ts` path for read-only work, which is how every existing repo script
+already runs. Anything beyond read-only, or any credential from outside the repo's own
+env file, is a stop-and-ask. Never log an env var. Never echo a secret into output.
 
-vaults/{vaultId}                      # e.g. BSL-001-WHT
-  archivistUid, tier, status
-  essencePercent (0–100)
-  storageUsedBytes, storageLimitBytes
-  stripeSubscriptionId, stripeCustomerId
-  metadata: { partnerReferralCode?, partnerId? }
+**SQL.** Migrations are never run from the sandbox or the CLI, and never applied programmatically. David pastes every migration into the Supabase editor himself. This is a policy, not a limitation. The repo has pg installed as a devDependency, so raw Postgres access may be technically possible. That does not authorize schema changes. Read-only queries for recon are fine and are the correct way to read CHECK constraints, which PostgREST cannot expose. Any instruction to use the Supabase CLI for schema changes is wrong and predates this rule.
 
-  /curators/{curatorId}               # sub-collection
-    email, displayName, clearance
-    isKeyHolder, inviteToken, inviteAccepted
+**Deploys.** Claude Code deploys to preview only, with `vercel`. Never `vercel --prod`.
+David alone promotes. `git push` does NOT deploy this repo. Rollback is
+`vercel rollback`. Never commit straight to the default branch from a build step.
+Always branch off main.
 
-  /milestones/{milestoneId}           # sub-collection
-    title, triggerType, triggerValue
-    status: 'armed'|'pending'|'triggered'|'cancelled'
+**Recon before implementation.** Read the live codebase and paste literal output before
+any edit. Context docs go stale, including this one. Live code and live schema win on
+every conflict. When a finding contradicts a doc or the prompt, say so explicitly
+rather than proceeding on the stale premise.
 
-  /files/{fileId}                     # sub-collection
-    storagePath, category, sizeBytes
-    essenceTagged: boolean
+**Acceptance is pasted output.** Verbal "done" is never the gate. Paste real rows, real
+command output, real transcripts. Do not report a fix as complete unless the pasted
+evidence shows it applied. Never invent a schema, a column, or a result.
 
-  /essence_sessions/{sessionId}       # sub-collection
-    trait, choiceLabel, essenceGain
+**Serverless.** Any post-response async work uses `after()` from `next/server`. Void
+fire-and-forget dies on Vercel lambda freeze. Sandbox probes run in long lived
+processes and cannot catch this class of bug. Only a live production table read can.
 
-ingestion_requests/{id}
-  vaultId, status, sourceDescription
-
-subscriptions/{stripeSubscriptionId}
-  vaultId, tier, status
-  currentPeriodStart, currentPeriodEnd
-
-partners/{partnerId}
-  uid, referralCode, status, tier
-  commissionRate, pendingCommissionCents, totalCommissionCents
-  stripeConnectAccountId?
-
-commissions/{id}
-  partnerId, vaultId, invoiceId
-  amountCents, commissionCents, rate
-  status: 'pending'|'approved'|'paid'|'reversed'
-
-webhook_events/{stripeEventId}        # idempotency store
-  processed: boolean
-
-_meta/vault_counter
-  count: number                       # atomic counter for BSL-NNN-XXX IDs
-```
-
-### Storage paths
-
-```
-vaults/{vaultId}/files/{fileId}/{originalFilename}
-```
+**Surface problems, do not route around them.** If something blocks the task, name it.
+A workaround that hides the real problem is worse than a stop. When in doubt, ask one
+clarifying question rather than making an assumption that could affect real archive
+data.
 
 ---
 
-## API Routes Reference
+## 2. ENVIRONMENT
 
-### POST /api/vault
-Create a new vault and get a Stripe checkout URL.
-```json
-{
-  "tier": "estate",
-  "displayName": "Harold R. Whitmore",
-  "referralCode": "BSL-JHW-24ABC"   // optional
-}
-```
-Returns: `{ vaultId, checkoutUrl }`
+Windows and PowerShell. Use `Get-ChildItem` and `Select-String`. No `grep`, no `find`.
 
-### GET /api/vault
-Get the authenticated user's vault document.
+Repos:
+- `basalith-official` (this repo). Web app and basalith.ai. CLI-only deploys.
+- `basalith-app` at `C:\Users\mrdav\basalith-app`. iOS, Expo and React Native.
+  Reference by full path. Do not edit unless the task says to.
+- `basalith-xyz`. White paper. Git-wired, push to main deploys.
 
-### PATCH /api/vault
-Update vault metadata (displayName, establishedCity).
+Stack: Next.js App Router with TypeScript, Tailwind, Supabase (Postgres and Storage),
+Anthropic API, Resend for email, Inngest for background jobs, Vercel for hosting and
+crons, ElevenLabs for voice, Expo and EAS for iOS.
 
-### POST /api/vault/ingest
-Two actions:
+Versions, VERIFIED from package.json July 2026: next 16.1.6 and eslint-config-next 16.1.6, both pinned exact. react and react-dom 19.2.3, pinned. tailwindcss 3.4.x, not v4. React Compiler is on via babel-plugin-react-compiler. Tests run with vitest (npm test runs vitest run). Next 16 renamed middleware.ts to proxy.ts, which is why proxy.ts sits at the repo root.
 
-**action: "request"** — Submit white-glove ingestion request
-```json
-{
-  "action": "request",
-  "sourceDescription": "Google Photos, Dropbox, 3 external HDDs",
-  "estimatedFileCount": 15000,
-  "preferredDate": "2026-04-01"
-}
-```
-
-**action: "register"** — Register a directly-uploaded file
-```json
-{
-  "action": "register",
-  "originalName": "family-1974.jpg",
-  "mimeType": "image/jpeg",
-  "sizeBytes": 4200000,
-  "category": "photograph",
-  "storagePath": "vaults/BSL-001-WHT/files/abc123/family-1974.jpg",
-  "year": 1974,
-  "location": "Lake Tahoe, CA"
-}
-```
-
-### GET /api/vault/ingest?type=files|requests
-List vault files or ingestion requests.
-
-### POST /api/partners
-Three actions: `apply`, `payout`, `connect`
-
-### GET /api/partners
-Get partner profile, commissions, referred vaults.
-
-### POST /api/stripe/webhook
-Stripe sends events here. Do not call manually.
+**Route protection.** This repo HAS edge middleware, at `proxy.ts` in the repo root. It
+gates `/archive/*`, `/archivist/*`, and `/succession/portal/*` above route resolution.
+When reconning auth, search for BOTH `middleware.*` and `proxy.*`. Framework renames
+defeat filename memory. Any note saying protection is per-page only is stale.
 
 ---
 
-## Authentication Pattern
+## 3. ENGINEERING STANDARDS
 
-All protected API routes use this pattern:
+- RLS enabled on every table. A table without an RLS policy is a critical bug. Internal
+  tables are service-role only. Verify RLS by SQL, not by a dashboard toggle.
+- `supabaseAdmin` (service role) in API routes. Never the anon client for writes.
+- No direct Supabase calls from client components. Data goes through API routes or
+  server actions.
+- Inngest jobs must be idempotent. Assume every one runs twice. Guard each write.
+- All API routes validate input. No raw body use without a shape check.
+- No `unstable_cache` anywhere.
+- Storage is private by default. Photos are served through the `/api/photos/[id]` proxy
+  with signed URLs.
+- Avoid `any`. Where it is unavoidable, comment why.
 
-```typescript
-// In API route:
-import { getAuthedUser, requireRole } from '@/lib/firebase/admin'
-
-export async function GET(req: NextRequest) {
-  const user = await getAuthedUser(req)      // throws 401 if invalid
-  // or:
-  const user = await requireRole(req, 'archivist', 'admin')  // throws 403
-  ...
-}
-```
-
-Client sends the Firebase ID token in every request:
-
-```typescript
-// In React component:
-import { auth } from '@/lib/firebase/client'
-
-const token = await auth.currentUser?.getIdToken()
-const res = await fetch('/api/vault', {
-  headers: { Authorization: `Bearer ${token}` }
-})
-```
+Three of these are currently aspirational and live code does not meet them. See
+section 6 so nobody mistakes the gap for a fresh regression.
 
 ---
 
-## Stripe Webhook Flow
+## 4. ARCHITECTURE, THE PARTS THAT MATTER
 
-```
-User clicks "Begin with The Estate"
-  → POST /api/vault (creates vault doc, status: pending_payment)
-  → Redirects to Stripe Checkout
+**Control B, the grounding verifier.** `lib/verifyGrounding.ts`. A separate auditor call
+that refuses any founder position not directly supported by a deposit. It is the
+central integrity mechanism, live in production on the succession entity chat route.
+`lib/entitySystemPrompt.ts` holds the shared prompt.
 
-User completes payment
-  → Stripe fires checkout.session.completed
-  → /api/stripe/webhook handles:
-     1. Updates vault status → 'active'
-     2. Creates subscriptions/{id} document
-     3. Updates user role → 'archivist'
-     4. Credits partner referral if referralCode present
+`GroundingVerdict` carries `basis`: `'deposit'` (position backed by a pair),
+`'no_position'` (no normative position taken, includes the in character thin archive
+hedge), `'unsupported'` (overreach, triggers the gap reply). `supported` is derived as
+`basis !== 'unsupported'`.
 
-Stripe fires invoice.paid annually
-  → Renews subscription dates in Firestore
-  → Credits recurring commission to partner
+`supported: true` is a NEGATIVE check. It means the reply did not overreach. It is not
+a positive coverage attestation. Never render customer-facing copy that turns
+`supported` into "grounded in" or "verified." Only `basis === 'deposit'` backs coverage
+language, and the approved phrasing is "checked against the archive."
 
-Stripe fires invoice.payment_failed
-  → Sets vault status → 'paused'
-  → Sets subscription status → 'past_due'
-```
+**Grounding gap log.** Table `grounding_gaps` plus the atomic RPC `log_grounding_gap`
+(service role only). Logs both `unsupported` and `no_position`. The demo route is
+excluded. The write only lands via `after()`, see the serverless rule.
 
----
+**Elicitation engine.** `lib/selectNextQuestion.ts`. Pure functions plus injected deps,
+so it is testable. Bands by owner deposit count: `p1` under 10, `p2` under 200, `p3`
+above. P0 is a repair path that fires when a Mirror reflection was marked "not quite
+right" in the last 7 days. Cooldowns: weight-3 domains need 5 days, unanswered
+questions re-enter after 30, answered questions cool down for 180.
 
-## Partner Commission Flow
+**CDM incident system.** `lib/incidentSession.ts` (pure reducer),
+`lib/incidentClassifier.ts`, `lib/incidentSaturation.ts`, `lib/renderProbe.ts`. Probe
+types in a deterministic spine with model-driven detours. Incident-anchored, because
+abstract topic questions capture self-narrative rather than decision policy.
 
-```
-Partner applies → POST /api/partners { action: "apply" }
-  → Creates partners/{id} document (status: 'applicant')
-  → Admin reviews and sets status → 'active' (via admin console or directly in Firestore)
+**Training pipeline.** `lib/trainingPipeline.ts`. Haiku scores by volume, Sonnet
+escalates ambiguous cases. Idempotency key is the `(source_id, source_type)` tuple on
+`training_pairs`. Pairs are skipped when the response is under 20 characters.
 
-Partner shares referral code (e.g. BSL-JHW-24ABC)
-  → Client lands on /onboard?ref=BSL-JHW-24ABC
-  → referralCode stored in vault.metadata.partnerReferralCode
+**Models.** The succession entity route runs `claude-sonnet-4-6` for BOTH the entity
+voice call and the grounding verifier. Any doc claiming Opus voice or Haiku grounding
+on that route is stale. VERIFIED July 2026.
 
-On each invoice.paid webhook:
-  → creditPartnerCommission() creates commissions/{id}
-  → partner.pendingCommissionCents incremented
+**Email reply pipeline.** Outbound from basalith.xyz. Inbound at reply.basalith.ai.
+Reply-to format is `reply+{token}@reply.basalith.ai`, built by
+`lib/emailReplySessions.ts`. The inbound handler is `app/api/resend/inbound/route.ts`.
 
-Partner requests payout → POST /api/partners { action: "payout" }
-  → Validates minimum $50 balance
-  → Executes stripe.transfers.create() to Connect account
-  → Marks all pending commissions as 'paid'
-  → Resets pendingCommissionCents to 0
+CRITICAL: the Resend inbound webhook payload does NOT include the email body. Fetch it
+from `https://api.resend.com/emails/receiving/{email_id}`. The regular
+`/emails/{email_id}` endpoint returns empty for inbound.
 
-Commission rates by tier:
-  associate:  10%
-  senior:     15%
-  director:   15% + co-branded materials + quarterly reporting
-```
+`owner_deposits` is the permanent fallback for every email path. Nothing is lost if a
+type-specific save fails.
 
 ---
 
-## Design System
+## 5. LIVE SCHEMA NOTES (VERIFIED July 2026)
 
-The Monolithic design system is defined in:
-- `tailwind.config.ts` — all color tokens, font families, keyframes
-- `app/globals.css` — base styles, grain overlay, glassmorphism, vault button CSS
+Only the parts with traps. Query the rest.
 
-**Key tokens:**
-```
-obsidian  #0A0A0B   page background
-monolith  #141416   card surfaces
-gold      #C4A882   primary accent
-gold-bright #D9C4A3 high-emphasis gold
-white-ghost #E8E8EE body text
+`owner_deposits`. Columns include `prompt`, `response`, `source_type`,
+`contributor_id`, `photograph_id`, `eval_holdout`, `test_artifact`. There is NO
+`question_id` and no link to the question that prompted a deposit. `prompt` is free
+text whose meaning varies by `source_type`. For email replies it may hold the question
+text, or a spark id like `child_home`, or the literal string `Email reply`. Do not
+treat `prompt` as a question identifier.
 
-font-legacy   Cormorant Garamond  headlines, narrative
-font-compute  DM Mono             labels, data, system
-```
+`question_history`. Has `answered_deposit_id` (FK to `owner_deposits`) and
+`answered_at`. Both are effectively unpopulated and unreliable, see section 6.
 
-**Never use:** Inter, Roboto, Arial, purple gradients, generic card layouts.
+`elicitation_questions`. 104 rows. Columns are `id`, `scope`, `domain_id`, `tier`,
+`text`, `active`, `created_at`. `tier` is `onramp` / `standard` / `deep` and encodes
+depth of ask. There is NO column separating reflective from factual questions.
 
-**Motion principle:** All reveals use `cubic-bezier(0.16, 1, 0.3, 1)` (vault easing).
-Scanline gold sweeps signal security/authentication events.
+`b2b_questions`. 37 rows, `is_incident_seed` marks narrative openers. Shares no typing
+convention with the B2C bank.
 
----
+`training_pairs`. `source_id` is NOT a declared FK. It holds `owner_deposits.id` or
+`voice_recordings.id` depending on `source_type`, and is null for contributor-derived
+pairs. `metadata` is jsonb and already carries optional probe and dimension tags.
 
-## Deployment (Vercel)
+`email_reply_sessions`. Live table has NO `expires_at`, despite the migration creating
+one. See section 6.
 
-### First deploy
+Other tables in play: `archives`, `successors`, `cognitive_domains`,
+`deposit_domain_scores`, `mirror_reflections`, `grounding_gaps`, `eval_runs`,
+`eval_results`, `incident_sessions`, `stripe_events`, `billing`, `archive_lifecycle`.
 
-```bash
-npm install -g vercel
-vercel login
-vercel link   # link to your Vercel project
-```
-
-### Environment variables on Vercel
-
-In Vercel dashboard → Project → Settings → Environment Variables,
-add every variable from `.env.local.example`.
-
-For `FIREBASE_ADMIN_PRIVATE_KEY`: paste the full private key including
-`-----BEGIN...-----END-----` with literal `\n` characters (Vercel handles
-the escaping automatically).
-
-### Deploy
-
-```bash
-vercel --prod
-```
-
-### Post-deploy
-
-1. Update Stripe webhook URL to `https://basalith.xyz/api/stripe/webhook`
-2. Update Firebase authorized domains: Firebase Console → Authentication → Settings → Authorized domains → add `basalith.xyz`
-3. Update Storage CORS (if direct browser uploads needed):
-
-```bash
-# basalith-cors.json
-[
-  {
-    "origin": ["https://basalith.xyz"],
-    "method": ["GET", "PUT", "POST"],
-    "maxAgeSeconds": 3600
-  }
-]
-
-gsutil cors set basalith-cors.json gs://your-project.appspot.com
-```
+Note: PostgREST exposes columns, types, defaults, nullability, and FKs, but NOT CHECK
+constraints. Any CHECK is NOT CONFIRMED unless read another way. This matters when
+adding a value to a constrained column, because
+`selectNextQuestion.insertQuestionHistory` only `console.warn`s on insert failure, so a
+rejected value fails silently.
 
 ---
 
-## Common Tasks for Claude Code
+## 6. KNOWN BROKEN, DO NOT TRUST
 
-### Add a new API route
-1. Create `app/api/{name}/route.ts`
-2. Import `getAuthedUser` or `requireRole` from `@/lib/firebase/admin`
-3. Validate request body with Zod
-4. Write to Firestore via `adminDb`
-5. Return typed `ApiResponse<T>`
+**The question-to-deposit link.** `question_history.answered_deposit_id` is populated on
+2 rows out of 224, both on one archive, and both are wrong. The inbound handler does
+not know which question a reply answers. It marks the most recent unanswered row served
+within 14 days. A reply to a 3-day-old email is attributed to yesterday's question.
+Replies outside 14 days attach to nothing. Contributor replies never link. The comment
+in `selectNextQuestion.ts` saying the reply handler populates these describes an intent
+the code does not implement. Consequence: the engine's own `isQuestionEligible` branch
+(180-day answered cooldown vs 30-day unanswered re-entry) is reading fiction on nearly
+every row.
 
-### Add a new Firestore collection
-1. Add the type to `types/index.ts`
-2. Add security rules to `firestore.rules`
-3. Add composite indexes to `firestore.indexes.json` if needed
-4. Add collection path constant to `lib/firebase/client.ts` Collections object
-5. Deploy: `firebase deploy --only firestore`
+**The elicitation engine has produced no answers.** All 224 `question_history` rows are
+`channel = 'daily_email'`. The declared channels `mirror_thread`, `app_companion`,
+`app_spark`, and `founder_web` have zero rows. On the Dr Ha archive, 27 questions
+served since June 13, zero answered. Deposits that carry real question text arrive
+through spark, journal, memory_game, free_capture, and web capture instead. The
+question channel and the deposit channel are different channels.
 
-### Debug webhook events
-```bash
-# View all received events
-stripe events list --limit 10
+**No dashboard or iOS component reads the elicitation tables.** The daily question is
+email-only. The Mirror is a card on web and iOS. They are not siblings on a surface.
+Serving anything from the question bank as a card means building a serving surface that
+does not exist.
 
-# Resend a specific event
-stripe events resend evt_xxxxxxxxxxxxx
-```
+**Reply tokens never expire.** The migration creates `expires_at`. The live table has no
+such column, and the inbound handler never checks expiry. The `session.replied` guard
+makes each token effectively single-use, which caps exposure, but an unreplied token is
+a permanent bearer credential for writing into an archive.
 
-### Promote a partner from applicant to active
-```bash
-# Via Firebase Admin Console or:
-firebase firestore:update partners/{partnerId} '{"status": "active", "approvedAt": "2026-03-16T00:00:00Z"}'
-```
+**Two deposit-count definitions.** `lib/selectNextQuestion.ts` counts owner deposits only
+(`contributor_id IS NULL`) and feeds the band. `lib/entityReadiness.ts` counts all
+deposits with no contributor filter and feeds the readiness score. On Dr Ha these give
+74 and 77. Know which one a task means.
 
-### Check vault counter (for debugging duplicate IDs)
-```bash
-firebase firestore:get _meta/vault_counter
-```
+**Three milestone taxonomies.** `lib/entityReadiness.ts` MILESTONES uses Foundations /
+Taking Shape / Recognizable / Ready to Meet Your Family with photograph, voice, and
+session criteria. The context docs describe Echo 10 / Wisdom 50 / Portrait 200 /
+Fingerprint 500 on deposits alone. `selectNextQuestion` bands at 10 and 200. These are
+three different systems. Do not assume they agree.
 
----
+**Standards live code does not meet.** Each is a real gap, not a fresh regression. Do not
+"fix" one as a side effect of an unrelated task, and do not treat the standard as false.
+Flag and ask.
+- Outbound emails send HTML only. There is no plain-text fallback.
+- `any` appears throughout `lib/selectNextQuestion.ts` on Supabase row mapping.
+- Input validation is hand-rolled per route. There is no schema validation layer. Confirmed by absence: no zod or equivalent is installed.
 
-## Security Checklist
+**Other open conflicts.** FROM DOCS, each needs its own session. Inclusion threshold is
+50 in `trainingPipeline.ts` and 60 in the god scoring route. Dimension taxonomy is 10 vs
+9 vs 12 across subsystems. The Calder Archive was provisioned four times as empty
+duplicate rows, which is a provisioning idempotency bug. Dr Ha has deposits flagged
+`test_artifact = true` that may be real founder content from a CDM incident run.
 
-- [ ] All API routes call `getAuthedUser()` before any data access
-- [ ] Firebase Admin SDK never imported in client components
-- [ ] `STRIPE_SECRET_KEY` and `FIREBASE_ADMIN_PRIVATE_KEY` never in `NEXT_PUBLIC_` vars
-- [ ] Stripe webhook signature verified before processing
-- [ ] Webhook idempotency: every event checked in `webhook_events` collection first
-- [ ] Storage rules block all direct reads (use signed URLs)
-- [ ] Firestore rules deny all client writes (`allow write: if false`)
-- [ ] Vault dissolution physically deletes all Storage files, not just Firestore docs
-
----
-
-## Known Limitations & TODO
-
-- **Email notifications:** Stubs exist in comments. Wire up SendGrid for:
-  - Vault activation confirmation
-  - Payment failure warning
-  - Curator invite emails
-  - Partner application status
-
-- **Ingestion team notifications:** `notifyIngestionTeam()` is stubbed.
-  Implement with Slack webhook (`SLACK_INGESTION_WEBHOOK_URL`).
-
-- **AI Continuity:** The Basalith Presence AI feature is out of scope for
-  this backend. When ready, it requires a separate service with access
-  to `vaults/{vaultId}/essence_sessions` and `vaults/{vaultId}/files`.
-
-- **Milestone automation:** The `armed` milestones need a Cloud Function
-  or Vercel Cron job that runs nightly to check age gates and temporal triggers.
-  Use `firebase deploy --only functions` for the Cloud Function approach.
-
-- **Admin console:** No admin UI exists yet. Use Firebase Console directly
-  for partner approvals, vault status overrides, and commission management.
-
-# Basalith — Claude Code Context
-
-## What This Is
-
-Basalith is a premium legacy preservation and AI entity platform. It lets families capture, organize, and transmit their histories, wisdom, and identities across generations — not just wealth, but the *person*. The core product lives at basalith.xyz.
-
-Two related properties extend the brand:
-- **basalith.life** — lifestyle/community brand built around the "135 mentality": living boldly and fearlessly as a cultural identity, not a scientific claim
-- **basalith.ai** — AI entity layer, the intelligence infrastructure beneath the platform
-
-The company is **Heritage Nexus Inc.**
+**Migration files diverge from live schema.** `20260611_elicitation_engine.sql` marks
+`question_history.source` as PENDING. It is live. Assume nothing from a migration file's
+own status comments.
 
 ---
 
-## Tech Stack
+## 7. DATA SENSITIVITY
 
-| Layer | Technology |
-|---|---|
-| Frontend | Next.js 14 (App Router) |
-| Database | Supabase (Postgres + Auth + Storage) |
-| AI | Anthropic API (Claude) |
-| Email | Resend |
-| Background Jobs | Inngest |
-| Deployment | Vercel |
-| Styling | Tailwind CSS |
+This system stores family memories, personal histories, relationships, photographs,
+voice, and the reasoning of living founders. It is among the most sensitive data that
+exists. A breach is not a bug. It is a broken promise that cannot be repaired.
 
----
+Default posture: maximum protection, minimum exposure. Every decision about auth, RLS,
+storage access, and API surface is made from that posture first and convenience second.
 
-## Business Model
-
-**Tiered pricing** — families pay for access to legacy preservation tools and AI entity features.
-
-**Archivist sales model** — independent sales force who onboard families directly. Archivists are not employees. They are brand representatives with their own relationships. Any code touching onboarding flows must account for the Archivist as an intermediary actor, not just the family.
-
-**Current status:** Two real test families actively onboarding. Production is live. There is no sandbox that is "safe to break."
+History worth remembering: an unauthenticated read and write path on family archives
+(the mobile shim, OWASP A01) reached production and was closed in July 2026. Auth
+regressions here are not theoretical.
 
 ---
 
-## The People Using This
+## 8. COPY RULES (rendered copy AND code comments that become public)
 
-- **Families** — often non-technical. Older members may be primary contributors. Interfaces must be clear, dignified, and emotionally appropriate. This is not a SaaS dashboard. It is closer to a memorial, a living archive, a trusted keeper.
-- **Archivists** — semi-technical. Need clean onboarding flows, clear status visibility, and tools that make them look good to their clients.
-- **Admins (David)** — technical, building everything.
-
----
-
-## Data Sensitivity
-
-Basalith stores family memories, personal histories, relationships, photos, and eventually voice/video. This is among the most sensitive data that exists. Every decision around auth, RLS, storage access, and API exposure must be made with this in mind. A breach here is not a bug — it is a violation of trust that cannot be undone.
-
-**Default posture: maximum protection, minimum exposure.**
-
----
-
-## Brand Voice & Copy Rules
-
-- Intelligent, not reckless
-- Fearless, not rebellious
-- Generational, not trendy
-- Philosophical, not promotional
-- Premium — Basalith is not a consumer app. It is closer to a private bank or estate attorney in tone.
-- **No em dashes anywhere in rendered copy.** Not in UI, not in emails, not in documentation shown to users.
+- No em dashes anywhere. Use periods or commas.
 - No exclamation points in product copy.
-- No phrases like "unlock," "supercharge," "game-changer," "seamless."
+- American English. Short declarative sentences.
+- Banned words: curated, seamless, innovative, stewardship. Also avoid unlock,
+  supercharge, game-changer.
+- No "Golden Dataset." Say "your archive."
+- "Legacy Guide," never "Archivist," in anything user-facing. The route may still be
+  `/archivist-login`, but the copy says Legacy Guide.
+- Locked tagline, always exactly two lines, never one, never three:
+  > You never truly leave
+  > if you leave enough of yourself behind.
+  It renders only where it already renders. Never invent it into new placements.
+- Never claim the entity is living, conscious, that it thinks like the person, or that
+  it knows how they think. The honest framing is that it captures characteristic
+  patterns of expression and reasoning.
+- No AI language in consumer copy on basalith.ai. Use "entity," "cognitive reference
+  model." "Not a wrapper on a general AI" is explicitly allowed. basalith.xyz is
+  technical and AI-explicit by design.
+- No derived pricing totals presented as commitments. Literal dollar figures only. No
+  "/mo equivalent" computed from an annual price.
+
+Voice: intelligent not reckless, fearless not rebellious, generational not trendy,
+philosophical not promotional. The register is closer to a private bank or an estate
+attorney than to a consumer app.
+
+**The standing integrity rule.** Nothing states a number, a guarantee, or a mechanism
+that cannot be pointed to as real. This binds product copy, eval numbers, and
+architectural descriptions equally. If a claim needs a denominator that does not exist,
+the claim does not ship. Correct publicly rather than editing quietly.
 
 ---
 
-## Design Standards
+## 9. DESIGN
 
-- Dark, considered aesthetic. Typography-led. Negative space is intentional.
-- No decorative imagery unless it serves a specific purpose.
-- Components must feel like they belong in a premium financial or heritage institution — not a startup.
-- Motion should be restrained and purposeful. No gratuitous animation.
-- Accessibility is non-negotiable given the age range of users.
-
----
-
-## Engineering Standards
-
-- **No direct Supabase client calls from client components** — all data fetching through server actions or API routes.
-- **RLS on every table** — no exceptions. If a table lacks an RLS policy, it is a critical bug.
-- **Environment variables** — never log them, never expose them to the client unless explicitly prefixed `NEXT_PUBLIC_` and intended for client use.
-- **Inngest jobs** must be idempotent. Assume they can run twice.
-- **Resend emails** must have both HTML and plain-text fallbacks.
-- **No `any` types** in TypeScript unless absolutely necessary with a comment explaining why.
-- All API routes must validate input. No raw `req.body` usage without a schema check.
-- Migrations go through Supabase CLI — no manual schema changes in the dashboard.
+- `--void` #0A0908 background, `--gold` #C4A24A accent, `--gold-on-light` #8A6E30,
+  `--bone` #F0EDE6 primary text on dark, `--muted` #B8B4AB secondary, `--dim` #706C65
+  tertiary, `--faint` #3A3830, `--surface` #111009.
+- NEVER use `--faint` for text a user needs to read.
+- On light backgrounds use #1A1814 and #4A4640. Never `--muted` or `--gold` on light.
+- Gold buttons take #0A0908 text.
+- Display font Cormorant Garamond, body Georgia, mono and labels Courier New or Space
+  Mono.
+- Dark and typography-led. Negative space is intentional. Motion is restrained. No
+  decorative imagery without a reason.
+- Accessibility is not optional. Depositors are often older and often on tablets.
 
 ---
 
-## Current Priorities (as of build sprint)
+## 10. WHAT DONE MEANS
 
-1. Stable, trustworthy experience for the two onboarding families
-2. Archivist dashboard completeness
-3. AI entity layer foundations
-4. Payment and tier enforcement
+A change is done when all of these hold.
+
+- The pasted output shows it working, not a claim that it works.
+- The relevant regression gate is green.
+- It works for a non-technical seventy year old on an iPad, and a Legacy Guide could
+  explain it to a prospect in thirty seconds.
+- It exposes no data it should not.
+- It breaks nothing that was working.
+- Any copy in it passes section 8.
+
+Regression gates, run the relevant one and paste the output:
+- `scripts/two-layer-probe.ts` for security and grounding. Required for anything
+  touching `verifyGrounding.ts` or the two-layer prompt.
+- `scripts/demo-refusal-probe.ts`, 10/10 refusal on refuse chips and 10/10 deposit on
+  covered controls.
+- `scripts/gap-log-probe.ts` for the grounding gap log.
+- `scripts/probe-selector-probe.ts` for CDM spine determinism.
 
 ---
 
-## What "Done" Means Here
+## 11. KEY IDS
 
-A feature is done when:
-- It works for a non-technical 70-year-old using it on an iPad
-- An Archivist can explain it to a family in 30 seconds
-- It does not expose data it shouldn't
-- It does not break anything that was working before
-- It looks like it belongs in the product
+- Supabase project ref: `zmoauexzjfjloqxrkuma`
+- Dr Ha archive (most active, primary test surface):
+  `a38e4503-c7d2-4af3-af8c-cacd66974e0b`
+- Founder Test Archive (succession tier): `6c0722d3-719a-423f-9024-621ba0072d6f`
+- Stevens Ha: `7612e230-1ab3-4faf-bca6-07e234503e37`
+- Hoa Le Tran: `1783f9cf-19b5-486e-8c84-800f85f665c0`
+- Cindy Ha: `5040ffac-70cf-4429-afa0-1047051fe0e5`
+
+Credentials and portal URLs are not stored in this file.
 
 ---
 
-## Tone for This Session
+## 12. ROLE
 
-You are a senior engineer and product partner who has read everything above. You do not need to be reminded of the stack or the context mid-session. You hold the business logic, the brand standards, and the technical constraints simultaneously. When in doubt, you ask one clarifying question rather than making an assumption that could affect a real family's data.
+You are a senior engineer and product partner who has read the above and does not need
+reminding of it mid-session. Hold the business logic, the integrity rules, and the
+technical constraints at the same time. Make real recommendations with named
+trade-offs rather than listing options. Flag when a finding invalidates an earlier
+assumption instead of proceeding on it. When in doubt, ask one clarifying question.
