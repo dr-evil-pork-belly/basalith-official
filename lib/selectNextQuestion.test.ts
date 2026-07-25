@@ -48,7 +48,7 @@ function makeDeps(overrides: Partial<Deps> = {}): Deps {
     getReflectionAnchorDeposit: vi.fn().mockResolvedValue(null),
     generateFramingSentence:    vi.fn().mockResolvedValue(null),
     generateP0Question:         vi.fn().mockResolvedValue({ questionText: 'p0 question', framingUsed: null }),
-    insertQuestionHistory:      vi.fn().mockResolvedValue(undefined),
+    insertQuestionHistory:      vi.fn().mockResolvedValue(4242),
     random:                     () => 0,
   }
   return { ...base, ...overrides }

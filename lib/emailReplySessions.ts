@@ -21,6 +21,12 @@ export interface CreateSessionOptions {
   sparkId?:      string
   promptId?:     string
   photographId?: string
+  /**
+   * question_history row this email is serving, when there is one. The inbound
+   * handler uses it to attach the reply to the exact question served. Absent on
+   * every non-elicitation email type (spark, story_prompt, photograph, etc.).
+   */
+  questionHistoryId?: number | null
 }
 
 export async function createEmailReplySession(opts: CreateSessionOptions): Promise<string> {
@@ -34,6 +40,7 @@ export async function createEmailReplySession(opts: CreateSessionOptions): Promi
     spark_id:       opts.sparkId      ?? null,
     prompt_id:      opts.promptId     ?? null,
     photograph_id:  opts.photographId ?? null,
+    question_history_id: opts.questionHistoryId ?? null,
   })
 
   if (error) throw new Error(`email_reply_sessions insert failed: ${error.message}`)

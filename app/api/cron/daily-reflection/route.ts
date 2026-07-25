@@ -31,11 +31,26 @@ export async function GET(req: NextRequest) {
     return Response.json({ skipped: true, reason: 'Not 8am UTC' })
   }
 
-  const { data: archives } = await supabaseAdmin
+  // Test-only targeting. Reachable only past the secret check above, so it adds
+  // no new surface. When present, the run is restricted to this one archive,
+  // which is what makes it safe to exercise this cron on a preview deployment
+  // without emailing every active owner.
+  const onlyArchiveId = searchParams.get('archiveId')
+
+  let archiveQuery = supabaseAdmin
     .from('archives')
     .select('id, name, family_name, owner_name, owner_email, preferred_language, tier')
     .eq('status', 'active')
     .not('owner_email', 'is', null)
+
+  if (onlyArchiveId) archiveQuery = archiveQuery.eq('id', onlyArchiveId)
+
+  const { data: archives } = await archiveQuery
+
+  if (onlyArchiveId) {
+    console.log('[daily-reflection] targeted run — archiveId:', onlyArchiveId,
+      '| matched:', archives?.length ?? 0)
+  }
 
   let sent = 0
 
@@ -95,6 +110,10 @@ export async function GET(req: NextRequest) {
             contributorId: null,
             emailType,
             sparkId:       result.questionText.substring(0, 200),
+            // Binds the reply to the exact question_history row served here.
+            // sparkId still carries the question text because the inbound
+            // handler writes it to owner_deposits.prompt.
+            questionHistoryId: result.questionHistoryId,
           })
           replyTo = buildReplyAddress(token)
         } catch (e) {

@@ -111,7 +111,9 @@ async function main() {
         draws.push(v)
         return v
       },
-      insertQuestionHistory: RECORD ? defaultDeps.insertQuestionHistory : async () => {},
+      // Dry runs must not write a serve row. Returning null matches the "insert
+      // failed" contract, which is the honest answer here: no row exists.
+      insertQuestionHistory: RECORD ? defaultDeps.insertQuestionHistory : async () => null,
       generateFramingSentence: async (anchor, questionText, domainEmotionalWeight) => {
         const raw = await defaultDeps.generateFramingSentence(anchor, questionText, domainEmotionalWeight)
         framingAttempts.push({ raw, reason: validateGroundedFramingReason(raw) })

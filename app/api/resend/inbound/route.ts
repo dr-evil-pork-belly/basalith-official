@@ -259,27 +259,49 @@ export async function POST(req: NextRequest) {
       if (depositError) console.error('[inbound] deposit save failed:', depositError.message)
       else console.log('[inbound] owner_deposits saved — id:', deposit?.id?.substring(0, 8))
 
-      // Elicitation engine: mark the most recent unanswered served question for
-      // this archive as answered by this deposit. Owner replies only.
+      // Elicitation engine: attach this deposit to the question it answers.
+      // Owner replies only. A contributor reply is not an answer to the owner's
+      // question and must never link.
+      //
+      // Preferred path: the session carries the question_history row the email
+      // served, so we update that exact row. Fallback: sessions created before
+      // question_history_id existed carry no id, so they keep the old heuristic
+      // (most recent unanswered serve within 14 days), which is a guess and is
+      // wrong whenever a reply arrives out of order. Those sessions are already
+      // in flight and must still resolve, so the fallback is annotated, not
+      // deleted. It warns so the two cases are distinguishable in the logs.
       if (deposit && !contributorId) {
-        const historyCutoff = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString()
-        const { data: historyRow } = await supabaseAdmin
-          .from('question_history')
-          .select('id')
-          .eq('archive_id', archiveId)
-          .is('answered_deposit_id', null)
-          .gte('served_at', historyCutoff)
-          .order('served_at', { ascending: false })
-          .limit(1)
-          .maybeSingle()
+        const servedHistoryId = session.question_history_id as number | null
 
-        if (historyRow) {
+        let targetHistoryId: number | null = servedHistoryId
+
+        if (targetHistoryId === null) {
+          console.warn(
+            '[inbound] no question_history_id on session — falling back to the 14-day heuristic. token:',
+            token,
+          )
+          const historyCutoff = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString()
+          const { data: historyRow } = await supabaseAdmin
+            .from('question_history')
+            .select('id')
+            .eq('archive_id', archiveId)
+            .is('answered_deposit_id', null)
+            .gte('served_at', historyCutoff)
+            .order('served_at', { ascending: false })
+            .limit(1)
+            .maybeSingle()
+
+          targetHistoryId = historyRow?.id ?? null
+        }
+
+        if (targetHistoryId !== null) {
           const { error: historyError } = await supabaseAdmin
             .from('question_history')
             .update({ answered_deposit_id: deposit.id, answered_at: new Date().toISOString() })
-            .eq('id', historyRow.id)
+            .eq('id', targetHistoryId)
           if (historyError) console.error('[inbound] question_history update failed:', historyError.message)
-          else console.log('[inbound] question_history answered — id:', historyRow.id)
+          else console.log('[inbound] question_history answered — id:', targetHistoryId,
+            'via:', servedHistoryId !== null ? 'session_id' : 'heuristic')
         }
       }
 

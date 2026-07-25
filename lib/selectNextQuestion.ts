@@ -60,6 +60,13 @@ export interface SelectNextQuestionResult {
   b2bQuestionId:  string | null
   framingUsed:    string | null
   source:         Source
+  /**
+   * id of the question_history row written for this serve, or null if the
+   * insert failed. Carried onto the outbound email's reply session so the
+   * inbound handler can attach the answer to the exact question served,
+   * instead of guessing at the most recent unanswered row.
+   */
+  questionHistoryId: number | null
 }
 
 export interface SelectNextQuestionParams {
@@ -82,6 +89,7 @@ export interface Deps {
   getReflectionAnchorDeposit: (archiveId: string, reflection: MirrorReflectionRow) => Promise<AnchorDeposit | null>
   generateFramingSentence: (anchor: AnchorDeposit, questionText: string, domainEmotionalWeight: number) => Promise<string | null>
   generateP0Question:     (reflection: MirrorReflectionRow, anchor: AnchorDeposit | null) => Promise<{ questionText: string; framingUsed: string | null }>
+  /** Resolves to the new row's id, or null if the insert failed. Never throws. */
   insertQuestionHistory:  (row: {
     archiveId:     string
     domainId:      number | null
@@ -91,7 +99,7 @@ export interface Deps {
     source:        Source
     channel:       Channel
     framingUsed:   string | null
-  }) => Promise<void>
+  }) => Promise<number | null>
   random: () => number
 }
 
@@ -358,7 +366,7 @@ export async function selectNextQuestion(
     const anchor = await deps.getReflectionAnchorDeposit(archiveId, reflection)
     const { questionText, framingUsed } = await deps.generateP0Question(reflection, anchor)
 
-    await deps.insertQuestionHistory({
+    const questionHistoryId = await deps.insertQuestionHistory({
       archiveId,
       domainId:      null,
       questionId:    null,
@@ -369,7 +377,7 @@ export async function selectNextQuestion(
       framingUsed,
     })
 
-    return { questionText, domainId: null, questionId: null, b2bQuestionId: null, framingUsed, source: 'p0' }
+    return { questionText, domainId: null, questionId: null, b2bQuestionId: null, framingUsed, source: 'p0', questionHistoryId }
   }
 
   // ── Determine scope, band, coverage, history ───────────────────────────
@@ -416,7 +424,7 @@ export async function selectNextQuestion(
     }
   }
 
-  await deps.insertQuestionHistory({
+  const questionHistoryId = await deps.insertQuestionHistory({
     archiveId,
     domainId:      domain.domainId,
     questionId,
@@ -427,7 +435,7 @@ export async function selectNextQuestion(
     framingUsed,
   })
 
-  return { questionText, domainId: domain.domainId, questionId, b2bQuestionId, framingUsed, source: b }
+  return { questionText, domainId: domain.domainId, questionId, b2bQuestionId, framingUsed, source: b, questionHistoryId }
 }
 
 // ── Default (real) dependency implementations ───────────────────────────────
@@ -674,10 +682,12 @@ async function defaultInsertQuestionHistory(row: {
   source:        Source
   channel:       Channel
   framingUsed:   string | null
-}): Promise<void> {
-  // answered_deposit_id / answered_at are deliberately left unset here -- the
-  // reply handler populates those once the family responds to this question.
-  const { error } = await supabaseAdmin.from('question_history').insert({
+}): Promise<number | null> {
+  // answered_deposit_id / answered_at are deliberately left unset here. The
+  // reply handler sets them once the family responds, and it now identifies the
+  // row by the id returned below rather than by guessing at the most recent
+  // unanswered serve.
+  const { data, error } = await supabaseAdmin.from('question_history').insert({
     archive_id:      row.archiveId,
     domain_id:       row.domainId,
     question_id:     row.questionId,
@@ -687,7 +697,17 @@ async function defaultInsertQuestionHistory(row: {
     channel:         row.channel,
     framing_used:    row.framingUsed !== null,
   })
-  if (error) console.warn('[selectNextQuestion] question_history insert failed:', error.message)
+    .select('id')
+    .single()
+
+  // A failed history insert must never break the send. Warn and carry null, so
+  // the caller still emails the question and simply falls back to the heuristic
+  // when the reply arrives.
+  if (error) {
+    console.warn('[selectNextQuestion] question_history insert failed:', error.message)
+    return null
+  }
+  return data?.id ?? null
 }
 
 export const defaultDeps: Deps = {
