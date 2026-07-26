@@ -5,13 +5,31 @@ import {
   generateContributorToken,
   generateQuestionsForContributor,
 } from '@/lib/contributorToken'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url)
-  const archiveId = searchParams.get('archiveId')
-  if (!archiveId) return NextResponse.json({ error: 'archiveId required' }, { status: 400 })
+export async function GET() {
+  // Auth: Supabase owner session only. Ownership is verified against the
+  // archives table — a session carrying an archiveId is not proof of ownership
+  // (getSessionUser fills archiveId for successors too). archiveId comes from
+  // the session, not the query string: the rows below include access_token,
+  // which is the credential behind /contribute/{token}, so leaking this list
+  // hands over contributor portal access rather than just data.
+  const session = await getSessionUser()
+  if (!session?.archiveId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  const archiveId = session.archiveId
+
+  const { data: ownerRow } = await supabaseAdmin
+    .from('archives')
+    .select('owner_user_id')
+    .eq('id', archiveId)
+    .maybeSingle()
+  if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
 
   const { data, error } = await supabaseAdmin
     .from('contributors')

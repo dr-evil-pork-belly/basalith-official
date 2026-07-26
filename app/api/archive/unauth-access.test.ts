@@ -47,6 +47,18 @@ const H = vi.hoisted(() => {
     const terminal = () => {
       if (op === 'insert') return { data: { id: 'generated-id' }, error: null }
       if (table === 'archives') return { data: ARCHIVE_ROW, error: null }
+      // Rows for the by-id routes hardened in fix/mirror-ownership. Each route
+      // filters on archive_id as well as id, so the owner happy-path resolves
+      // and the guard is what decides the other three scenarios.
+      if (table === 'photographs') {
+        return { data: { id: 'photo-1', archive_id: ARCHIVE_ID, storage_path: `${ARCHIVE_ID}/photo-1.jpg` }, error: null }
+      }
+      if (table === 'archive_documents') {
+        return { data: { id: 'doc-1', archive_id: ARCHIVE_ID, transcript: 'A transcript.', title: 'A Letter', summary: null, linguistic_patterns: null }, error: null }
+      }
+      if (table === 'archive_videos') {
+        return { data: { id: 'vid-1', archive_id: ARCHIVE_ID, storage_path: `${ARCHIVE_ID}/vid-1.mp4` }, error: null }
+      }
       return { data: null, error: null }
     }
     b.single = async () => terminal()
@@ -116,6 +128,14 @@ import { GET  as mirrorGET }          from '@/app/api/mobile/mirror/route'
 import { POST as mirrorReactPOST }    from '@/app/api/mobile/mirror/react/route'
 import { POST as myArchivesPOST }     from '@/app/api/mobile/my-archives/route'
 import { POST as sparkRandomPOST }    from '@/app/api/mobile/spark/random/route'
+// part 3 — fix/mirror-ownership: the web mirror pair plus the sharpest
+// unauthenticated reads from the July 2026 /api/archive auth sweep.
+import { GET  as archiveMirrorGET }      from '@/app/api/archive/mirror/route'
+import { POST as archiveMirrorReactPOST } from '@/app/api/archive/mirror/react/route'
+import { GET  as photoUrlGET }           from '@/app/api/archive/photo-url/route'
+import { GET  as contributorsGET }       from '@/app/api/archive/contributors/route'
+import { GET  as documentByIdGET }       from '@/app/api/archive/documents/[id]/route'
+import { GET  as videoPlayGET }          from '@/app/api/archive/archive-videos/[id]/play/route'
 
 const { OWNER_UID, ARCHIVE_ID } = H
 const mockedSession = vi.mocked(getSessionUser)
@@ -329,5 +349,70 @@ describe('mobile API surface — unauthenticated access closed + ownership enfor
     res = await myArchivesPOST()
     console.log(`my-archives            | authenticated caller   -> ${res.status}`)
     expect(res.status).toBe(200)
+  })
+})
+
+/**
+ * part 3 — fix/mirror-ownership.
+ *
+ * The web mirror pair authorized on session.archiveId alone, so a signed-in
+ * successor could read the owner's latest reflection and write a reaction onto
+ * it. The other four routes had no auth at all: they took an archive id or a
+ * row id straight from the caller and answered on the service-role client.
+ *
+ * /api/mobile/mirror and /api/mobile/mirror/react already had the ownership
+ * check (covered in part 2). Only the /api/archive/* pair was missed.
+ */
+describe('web mirror pair + sharpest unauthenticated reads — ownership enforced (part 3)', () => {
+  const U = 'http://localhost'
+
+  it('GET /api/archive/mirror', async () => {
+    // Handler takes no request object; archiveId is derived from the session only.
+    await runGuard('archive mirror GET', () => archiveMirrorGET())
+  })
+
+  it('POST /api/archive/mirror/react', async () => {
+    await runGuard('archive mirror react', h => archiveMirrorReactPOST(jsonPost(`${U}/api/archive/mirror/react`,
+      { reflectionId: 'r1', reaction: 'heart', archiveId: ARCHIVE_ID }, h)))
+  })
+
+  it('POST /api/archive/mirror/react — successor cannot fire the P0 repair path', async () => {
+    // 'not_quite_right' is the signal that fires P0 in lib/selectNextQuestion.ts.
+    // A non-owner reaching it would steer the owner's next 7 days of questions.
+    mockedSession.mockResolvedValue(SUCCESSOR_SESSION as never)
+    const res = await archiveMirrorReactPOST(jsonPost(`${U}/api/archive/mirror/react`,
+      { reflectionId: 'r1', reaction: 'not_quite_right' }))
+    console.log(`mirror react P0        | successor (not owner)  -> ${res.status}`)
+    expect(res.status).toBe(403)
+  })
+
+  it('GET /api/archive/photo-url', async () => {
+    await runGuard('photo-url', h => photoUrlGET(get(`${U}/api/archive/photo-url?photographId=photo-1`, h)))
+  })
+
+  it('GET /api/archive/photo-url — caller-supplied path is no longer honoured', async () => {
+    // The old interface signed any storage path with no auth and no archive
+    // scoping. The parameter is gone: an owner passing only `path` now gets 400,
+    // and the path never reaches storage.
+    mockedSession.mockResolvedValue(OWNER_SESSION as never)
+    const res = await photoUrlGET(get(`${U}/api/archive/photo-url?path=${ARCHIVE_ID}/photo-1.jpg`))
+    console.log(`photo-url legacy path  | owner, path= only      -> ${res.status}`)
+    expect(res.status).toBe(400)
+    expect(await res.json()).toEqual({ error: 'photographId required' })
+  })
+
+  it('GET /api/archive/contributors (access_token no longer readable without ownership)', async () => {
+    // Handler takes no request object; the ?archiveId= param is no longer trusted.
+    await runGuard('contributors GET', () => contributorsGET())
+  })
+
+  it('GET /api/archive/documents/[id]', async () => {
+    await runGuard('document by id', h =>
+      documentByIdGET(get(`${U}/api/archive/documents/doc-1`, h), { params: Promise.resolve({ id: 'doc-1' }) }))
+  })
+
+  it('GET /api/archive/archive-videos/[id]/play', async () => {
+    await runGuard('video play by id', h =>
+      videoPlayGET(get(`${U}/api/archive/archive-videos/vid-1/play`, h), { params: Promise.resolve({ id: 'vid-1' }) }))
   })
 })
