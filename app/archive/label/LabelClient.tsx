@@ -42,29 +42,6 @@ function getDepthScore(item: Partial<ArchiveItem>): number {
   return Math.min(s, 100)
 }
 
-function DepthMeter({ score }: { score: number }) {
-  const pct   = Math.min(score, 100)
-  const label = pct < 30 ? 'Surface' : pct < 60 ? 'Developing' : pct < 85 ? 'Rich' : 'Complete'
-  const color = pct < 30
-    ? 'rgba(92,97,102,0.6)'
-    : pct < 60 ? 'rgba(196,162,74,0.4)'
-    : pct < 85 ? 'rgba(196,162,74,0.7)'
-    : 'rgba(196,162,74,1)'
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-1.5">
-        <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.12em', color: '#5C6166', textTransform: 'uppercase' }}>
-          Archive Depth
-        </p>
-        <p style={{ fontFamily: 'monospace', fontSize: '0.58rem', color }}>{label} · {pct}%</p>
-      </div>
-      <div className="h-px w-full" style={{ background: 'rgba(255,255,255,0.06)' }}>
-        <div className="h-px transition-all duration-500" style={{ width: `${pct}%`, background: color }} />
-      </div>
-    </div>
-  )
-}
-
 function Sigil({ size = 40, pulse = false }: { size?: number; pulse?: boolean }) {
   return (
     <svg width={size} height={size} viewBox="0 0 40 40" fill="none" aria-hidden="true"
@@ -696,9 +673,6 @@ export default function LabelClient({ archiveId }: { archiveId: string }) {
             <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#5C6166', marginBottom: '0.25rem' }}>Total Labeled</p>
             <p className="font-serif font-semibold" style={{ color: '#F0F0EE', fontSize: '1.3rem', lineHeight: 1 }}>{totalLabeled}</p>
           </div>
-          <div className="flex-1 pl-4">
-            <DepthMeter score={depth} />
-          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-10">
@@ -731,7 +705,7 @@ export default function LabelClient({ archiveId }: { archiveId: string }) {
             <label style={monoLabel}>What Was Happening</label>
             <div className="relative">
               <textarea rows={8} value={form.story} onChange={setField('story')}
-                placeholder={"Describe what was happening in this moment. What brought everyone together? What was the occasion? What do you remember about this day? What was the mood? What happened right before and right after this photograph was taken?\n\nWrite as much as you remember. Nothing is too small."}
+                placeholder={"What was happening in this moment?\nWrite as much as you remember. Nothing is too small."}
                 className="w-full resize-none focus:outline-none placeholder:italic"
                 style={{ background: 'transparent', color: '#F0F0EE', borderBottom: '1px solid rgba(196,162,74,0.3)', fontFamily: 'var(--font-cormorant), Georgia, serif', fontStyle: 'normal', fontWeight: 300, fontSize: '1.15rem', lineHeight: 1.9, padding: '1rem 0' }} />
               <p className="absolute bottom-2 right-0" style={{ fontFamily: 'monospace', fontSize: '0.4rem', color: '#3A3F44' }}>{form.story.length} characters</p>
@@ -741,10 +715,9 @@ export default function LabelClient({ archiveId }: { archiveId: string }) {
           <div>
             <label style={monoLabel}>What Should They Know</label>
             <textarea rows={5} value={form.essence} onChange={setField('essence')}
-              placeholder={"What should the people who come after you understand about this moment and the people in it? What did it mean? What does it still mean?\n\nThis becomes part of the Essence record."}
+              placeholder={"What should the people who come after you understand about this moment?\nWhat it meant then. What it still means."}
               className="w-full resize-none focus:outline-none placeholder:italic"
               style={{ background: 'transparent', color: '#F0F0EE', borderBottom: '1px solid rgba(255,255,255,0.10)', fontFamily: 'var(--font-cormorant), Georgia, serif', fontWeight: 300, fontSize: '1.05rem', lineHeight: 1.9, padding: '0.75rem 0' }} />
-            <p className="font-serif" style={{ fontSize: '0.78rem', fontStyle: 'italic', color: 'rgba(196,162,74,0.55)', marginTop: '0.5rem' }}>This field trains the Ancestor AI.</p>
           </div>
 
           <div>
@@ -772,15 +745,6 @@ export default function LabelClient({ archiveId }: { archiveId: string }) {
             <label style={compactLabel}>Where</label>
             <input type="text" placeholder="City, State or Country" value={form.location} onChange={setField('location')}
               className="focus:outline-none placeholder:text-[#3A3F44]" style={{ ...baseInput, paddingBottom: '0.5rem' }} />
-          </div>
-
-          <div className="rounded-sm border px-5 py-4" style={{ background: '#111112', borderColor: 'rgba(255,255,255,0.06)' }}>
-            <DepthMeter score={depth} />
-            {depth >= 85 && (
-              <p style={{ fontFamily: 'monospace', fontSize: '0.6rem', letterSpacing: '0.06em', color: 'rgba(196,162,74,0.7)', marginTop: '0.75rem' }}>
-                Complete record. Every detail contributes to the permanence of this memory.
-              </p>
-            )}
           </div>
 
           <div>
