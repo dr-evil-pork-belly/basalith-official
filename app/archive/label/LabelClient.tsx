@@ -576,8 +576,10 @@ export default function LabelClient({ archiveId }: { archiveId: string }) {
           <MilestoneOverlay count={milestoneCount} onDone={() => setShowOverlay(false)} />
         )}
         <div className="max-w-lg mx-auto pt-12">
-          <div className="rounded-sm border px-10 py-14 text-center" style={{ background: '#111112', borderColor: 'rgba(196,162,74,0.2)' }}>
-            <div className="flex items-center justify-center gap-6 mb-10">
+          <div className="rounded-sm border px-10 py-10 text-center" style={{ background: '#111112', borderColor: 'rgba(196,162,74,0.2)' }}>
+            <p className="font-serif font-semibold" style={{ fontSize: '1.55rem', color: '#F0F0EE', lineHeight: 1.25 }}>Saved to your archive.</p>
+            <p className="font-serif" style={{ fontSize: '0.95rem', color: '#B8B4AB', lineHeight: 1.5, marginTop: '0.4rem', marginBottom: '2.25rem' }}>Your entity has this now.</p>
+            <div className="flex items-center justify-center gap-6 mb-8">
               <div className="text-center">
                 <p className="font-serif font-semibold" style={{ fontSize: '1.6rem', color: '#F0F0EE', lineHeight: 1 }}>{streak}</p>
                 <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#5C6166', marginTop: '0.25rem' }}>Streak</p>
