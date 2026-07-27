@@ -31,17 +31,6 @@ const MILESTONE_TEXTS: Record<number, { main: string; sub: string }> = {
   100: { main: 'One hundred.\nThis is a legacy.',                  sub: 'ONE HUNDRED MEMORIES · PRESERVED FOREVER'  },
 }
 
-function getDepthScore(item: Partial<ArchiveItem>): number {
-  let s = 0
-  if (item.story   && item.story.length   > 50) s += 30
-  if (item.essence && item.essence.length > 20) s += 25
-  if (item.people)    s += 15
-  if (item.year)      s += 10
-  if (item.location)  s += 10
-  if (item.imageData) s += 10
-  return Math.min(s, 100)
-}
-
 function Sigil({ size = 40, pulse = false }: { size?: number; pulse?: boolean }) {
   return (
     <svg width={size} height={size} viewBox="0 0 40 40" fill="none" aria-hidden="true"
@@ -500,8 +489,6 @@ export default function LabelClient({ archiveId }: { archiveId: string }) {
     if (fileRef.current) fileRef.current.value = ''
   }
 
-  const depth = getDepthScore(form)
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setSaving(true)
@@ -590,11 +577,6 @@ export default function LabelClient({ archiveId }: { archiveId: string }) {
         )}
         <div className="max-w-lg mx-auto pt-12">
           <div className="rounded-sm border px-10 py-14 text-center" style={{ background: '#111112', borderColor: 'rgba(196,162,74,0.2)' }}>
-            <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.14em', color: '#5C6166', textTransform: 'uppercase', marginBottom: '1rem' }}>Archive Depth</p>
-            <p className="font-serif font-semibold mb-1" style={{ fontSize: '3.5rem', color: '#F0F0EE', lineHeight: 1 }}>{depth}</p>
-            <p style={{ fontFamily: 'monospace', fontSize: '0.58rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.7)', marginBottom: '2rem' }}>
-              {depth >= 85 ? 'Complete Record' : depth >= 60 ? 'Rich Record' : 'Partial Record'}
-            </p>
             <div className="flex items-center justify-center gap-6 mb-10">
               <div className="text-center">
                 <p className="font-serif font-semibold" style={{ fontSize: '1.6rem', color: '#F0F0EE', lineHeight: 1 }}>{streak}</p>
