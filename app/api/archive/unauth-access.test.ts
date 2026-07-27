@@ -136,6 +136,7 @@ import { GET  as photoUrlGET }           from '@/app/api/archive/photo-url/route
 import { GET  as contributorsGET }       from '@/app/api/archive/contributors/route'
 import { GET  as documentByIdGET }       from '@/app/api/archive/documents/[id]/route'
 import { GET  as videoPlayGET }          from '@/app/api/archive/archive-videos/[id]/play/route'
+import { GET  as videoByIdGET }          from '@/app/api/archive/archive-videos/[id]/route'
 
 const { OWNER_UID, ARCHIVE_ID } = H
 const mockedSession = vi.mocked(getSessionUser)
@@ -414,5 +415,13 @@ describe('web mirror pair + sharpest unauthenticated reads — ownership enforce
   it('GET /api/archive/archive-videos/[id]/play', async () => {
     await runGuard('video play by id', h =>
       videoPlayGET(get(`${U}/api/archive/archive-videos/vid-1/play`, h), { params: Promise.resolve({ id: 'vid-1' }) }))
+  })
+
+  // The transcript sibling of the route above. Guarding /play while leaving this
+  // one open would look handled and would not get a second look, and the
+  // transcript is the more sensitive of the two.
+  it('GET /api/archive/archive-videos/[id]', async () => {
+    await runGuard('video transcript by id', h =>
+      videoByIdGET(get(`${U}/api/archive/archive-videos/vid-1`, h), { params: Promise.resolve({ id: 'vid-1' }) }))
   })
 })

@@ -4,6 +4,41 @@ Produced during `fix/mirror-ownership`. This is the input document for the
 category-(d) session. It is a snapshot of live code read on 2026-07-26, not a
 design doc. Re-verify before acting on any single line.
 
+## Status as of commit `fix/mirror-ownership`
+
+**Fixed here (7 route files).** `mirror` GET, `mirror/react` POST, `photo-url`,
+`contributors` GET, `documents/[id]`, `archive-videos/[id]/play`,
+`archive-videos/[id]`. Each verifies `archives.owner_user_id === session.userId`
+and, where addressed by row id, filters the row query on `archive_id` too.
+Regression coverage is part 3 of `app/api/archive/unauth-access.test.ts`.
+
+**Still open, highest priority.** `contributors` POST, PATCH, and DELETE. Only
+GET was fixed. DELETE takes `?id=&archiveId=` with no auth at all, which makes it
+a destructive unauthenticated write and the worst single thing left in this
+table. Start here.
+
+**Still open.** The remaining category-(d) routes in the table below, plus the
+category-(a) routes that check `session.archiveId` without verifying ownership.
+
+**Recorded, not fixed.** `proxy.ts` uses `pathname.startsWith('/archive')`, which
+also matches `/archive-login`, so an unauthenticated hit on the login page
+appears to redirect to itself. Untouched here because this was a security commit
+and that is a security file.
+
+## The lesson this document exists to carry
+
+The July 2026 mobile-shim hotfix (OWASP A01, CLAUDE.md section 7) hardened
+`/api/mobile/*` and the mobile-facing `/api/archive/*-mobile` routes, and left
+the rest of `/api/archive/*` open. The most likely reason is that the dashboard
+pages sit behind `proxy.ts`, so the routes those pages call were assumed to
+inherit that gating.
+
+They do not. **Pages are gated. The API routes they call are not.** Page-level
+protection says nothing about who can call an endpoint directly, and every one
+of these routes runs on the service-role client, so RLS is not a second line of
+defence either. Any future auth work on this codebase should assume an API route
+is unprotected until its own handler is read.
+
 ## Why this exists
 
 The web mirror route authorized on `session?.archiveId` alone. Because
@@ -55,14 +90,14 @@ Totals at time of sweep: **(a) 13 · (b) 17 · (c) 9 · (d) 38** across 77
 |---|---|---|
 | accuracy-mobile | b | |
 | archive-videos | **d** | GET `?archiveId` → video list |
-| archive-videos/[id] | **d** | GET by id → transcript, summary |
-| archive-videos/[id]/play | **d** | GET by id → signed URL, no scoping |
+| archive-videos/[id] | **d** | GET by id → transcript, summary. Fixed in `fix/mirror-ownership` |
+| archive-videos/[id]/play | **d** | GET by id → signed URL, no scoping. Fixed in `fix/mirror-ownership` |
 | b2b-question/answer | b | + `tier === 'succession'` gate |
 | b2b-question/next | b | + `tier === 'succession'` gate |
 | bulk-upload | **d** | POST formData `archiveId` → write |
 | check-credentials | **d** | GET `?archiveId` |
 | contribution-alert | **d** | POST `archiveId` |
-| contributors | **d** | GET/POST/PATCH/DELETE `?archiveId`; GET selects `access_token` |
+| contributors | **d** | GET/POST/PATCH/DELETE `?archiveId`; GET selects `access_token`. GET fixed in `fix/mirror-ownership`, **POST/PATCH/DELETE still open** |
 | daily-session | **d** | GET `?archiveId`; POST derives archive from caller-supplied session row |
 | dashboard | **d** | GET `?archiveId` → full dashboard |
 | dashboard-mobile | b | |
@@ -70,7 +105,7 @@ Totals at time of sweep: **(a) 13 · (b) 17 · (c) 9 · (d) 38** across 77
 | debug-gallery | **a** | |
 | deposit-prompt | **d** | POST `archiveId` |
 | documents | **d** | GET `?archiveId` |
-| documents/[id] | **d** | GET by id → `transcript` |
+| documents/[id] | **d** | GET by id → `transcript`. Fixed in `fix/mirror-ownership` |
 | entity-accuracy | **d** | GET `?archiveId` |
 | entity-chat | b / c | owner session verified; contributor `Bearer` token path also |
 | entity-feedback | **d** | POST `archiveId` |
@@ -140,25 +175,20 @@ Totals at time of sweep: **(a) 13 · (b) 17 · (c) 9 · (d) 38** across 77
 | my-archives | c | caller-scoped |
 | spark/random | b | |
 
-## Closed in `fix/mirror-ownership` (six route files)
+## Closed in `fix/mirror-ownership` (seven route files)
 
 `mirror`, `mirror/react`, `photo-url`, `contributors` (GET), `documents/[id]`,
-`archive-videos/[id]/play`. Regression coverage is part 3 of
-`app/api/archive/unauth-access.test.ts`.
+`archive-videos/[id]/play`, `archive-videos/[id]`. Regression coverage is part 3
+of `app/api/archive/unauth-access.test.ts`.
 
 ## Still open, for the category-(d) session
 
 Roughly 33 category-(d) routes plus 11 category-(a) routes. Notes for whoever
 picks this up:
 
-1. **`archive-videos/[id]` was deliberately left open.** Its sibling
-   `archive-videos/[id]/play` was fixed. Same table, same gap, returns the
-   transcript instead of the media URL. It was outside the agreed six-file
-   scope. It is the single most obvious inconsistency in the codebase right now
-   and should probably be first.
-2. **`contributors` POST, PATCH, DELETE are still unauthenticated.** Only GET was
-   fixed. DELETE takes `?id=&archiveId=`. Fixing GET alone was scope, not
-   judgment.
+1. **`contributors` POST, PATCH, DELETE are still unauthenticated.** Only GET was
+   fixed. DELETE takes `?id=&archiveId=`, a destructive unauthenticated write.
+   This is the first thing to fix.
 3. **Not every (d) route wants an owner-session check.** At least four distinct
    legitimate caller types exist: the owner's browser session, cron with
    `CRON_SECRET`, the contributor portal with `contributors.access_token`, and
