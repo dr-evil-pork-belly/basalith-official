@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { ElevenLabsClient } from 'elevenlabs'
 
 export const dynamic    = 'force-dynamic'
@@ -16,20 +15,20 @@ export async function POST(req: NextRequest) {
     bodyArchiveId = body.archiveId ?? null
   } catch {}
 
-  // Auth: god-mode cookie OR owner Supabase session
+  // Auth: god-mode cookie only. An owner-session fallback used to sit here and
+  // authorized on session.archiveId alone, which is not proof of ownership
+  // (getSessionUser fills archiveId for successors too), so any signed-in
+  // successor could rebuild the owner's voice clone. It had no caller:
+  // app/god/GodModeClient.tsx is the only call site and it always sends an
+  // archiveId, so it always took the god branch. Removed rather than guarded.
   const godAuth   = cookieStore.get('god-mode-auth')?.value
   const expected  = process.env.GOD_MODE_PASSWORD || process.env.CRON_SECRET || ''
   const isGodMode = !!expected && godAuth === expected
-  const session   = await getSessionUser()
 
-  let archiveId: string | null = null
-  if (isGodMode && bodyArchiveId) {
-    archiveId = bodyArchiveId
-  } else if (session?.archiveId) {
-    archiveId = session.archiveId
+  if (!isGodMode || !bodyArchiveId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-
-  if (!archiveId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const archiveId = bodyArchiveId
 
   const apiKey = process.env.ELEVENLABS_API_KEY
   if (!apiKey) return NextResponse.json({ error: 'ELEVENLABS_API_KEY not configured' }, { status: 503 })

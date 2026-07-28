@@ -52,7 +52,7 @@ const H = vi.hoisted(() => {
     b.update = () => { op = 'update'; return b }
     b.delete = () => { op = 'delete'; return b }
     b.eq = (col: string, val: unknown) => { filters[col] = val; return b }
-    for (const m of ['neq', 'in', 'is', 'not', 'order', 'limit', 'range', 'gte', 'lte', 'contains', 'ilike', 'or', 'match']) b[m] = pass
+    for (const m of ['neq', 'in', 'is', 'not', 'order', 'limit', 'range', 'gt', 'gte', 'lt', 'lte', 'contains', 'ilike', 'or', 'match']) b[m] = pass
     const terminal = () => {
       if (op === 'insert') return { data: { id: 'generated-id' }, error: null }
       if (table === 'archives') return { data: ARCHIVE_ROW, error: null }
@@ -120,6 +120,12 @@ vi.mock('@/lib/trainingPipeline', () => ({
 vi.mock('@/lib/classifyDeposit', () => ({ classifyDeposit: vi.fn(async () => {}) }))
 vi.mock('@/lib/inngest', () => ({ inngest: { send: () => Promise.resolve() } }))
 vi.mock('@/lib/resend', () => ({ resend: { emails: { send: async () => ({}) } } }))
+// poll-replies constructs its own client at module scope rather than importing
+// the shared @/lib/resend singleton, and the real constructor throws without an
+// API key. Mock the package itself so importing that route is possible offline.
+vi.mock('resend', () => ({
+  Resend: class { emails = { send: async () => ({}) } },
+}))
 vi.mock('@/lib/entityContext', () => ({ buildEntitySystemPrompt: async () => ({ systemPrompt: 'sys', usedDepositIds: [] }) }))
 vi.mock('@/lib/entityReadiness', () => ({ calculateEntityReadiness: async () => ({ score: 42 }) }))
 
@@ -163,6 +169,8 @@ import {
 import { GET  as documentByIdGET }       from '@/app/api/archive/documents/[id]/route'
 import { GET  as videoPlayGET }          from '@/app/api/archive/archive-videos/[id]/play/route'
 import { GET  as videoByIdGET }          from '@/app/api/archive/archive-videos/[id]/route'
+// part 5 — fix/delete-dead-routes-poll-replies-auth
+import { POST as pollRepliesPOST }       from '@/app/api/archive/poll-replies/route'
 
 const { OWNER_UID, ARCHIVE_ID, CONTRIB_ID, FOREIGN_CONTRIB_ID } = H
 const mockedSession = vi.mocked(getSessionUser)
@@ -515,5 +523,120 @@ describe('contributors write methods — ownership enforced (part 4)', () => {
       del(`${U}/api/archive/contributors?id=${CONTRIB_ID}&archiveId=arch-someone-else`))
     console.log(`contributors DELETE    | supplied archiveId     -> ${res.status}`)
     expect(res.status).toBe(401)
+  })
+})
+
+/**
+ * part 5: fix/delete-dead-routes-poll-replies-auth.
+ *
+ * DELETED ROUTES, no test by design.
+ *
+ * Eight route files were removed in this commit rather than guarded. Each was
+ * confirmed to have no caller in basalith-official, none in basalith-app, none
+ * in basalith-xyz, no vercel.json cron entry, and no external-webhook shape.
+ * There is deliberately no test for any of them. The absence of the file is the
+ * fix, and a guard on a route nobody calls is dead code that still has to be
+ * reasoned about at the next sweep. This block exists so a future reader knows
+ * the missing coverage is a decision, not an oversight.
+ *
+ *   app/api/archive/init             anonymous archive creation. The live path
+ *                                    is lib/billing/createArchive.ts, called by
+ *                                    provisionOnFoundingFee.
+ *   app/api/archive/invite           upserted an active `contributors` row for a
+ *                                    caller-supplied email, which subscribed
+ *                                    that address to the nightly photograph send
+ *                                    indefinitely.
+ *   app/api/archive/bulk-upload      superseded by upload-url plus
+ *                                    register-photo, which is what
+ *                                    LabelClient.uploadFileDirect calls.
+ *   app/api/archive/deposit-prompt   owner email trigger that was never wired to
+ *                                    a cron.
+ *   app/api/archive/send-summary     replayed contributor reply text to the
+ *                                    recipient list of any email_sessions row.
+ *   app/api/archive/check-credentials  diagnostic. Confirmed whether an archive
+ *                                    had a live mobile password.
+ *   app/api/archive/test-inbound     diagnostic. Reported which env vars were
+ *                                    set.
+ *   app/api/archive/debug-gallery    diagnostic. Photograph counts.
+ *
+ * HELD BACK, not deleted: `terminate`. It also has no caller, but it implements
+ * a real lifecycle promise (archive_lifecycle, scheduled_deletion_at) and reads
+ * as an unbuilt UI rather than a retired feature. It takes the owner-guard in a
+ * later batch.
+ *
+ * SESSION BRANCH REMOVED, routes kept live: setup-voice-clone and test-voice.
+ * Both fell through from the god-mode cookie to session.archiveId with no
+ * ownership check, so any signed-in successor could rebuild the owner's voice
+ * clone or synthesize it saying arbitrary text. Neither fallback had a caller.
+ * Both routes stay live on the god path and are not covered by runGuard, which
+ * asserts an owner session succeeds. An owner session on these must now fail.
+ *
+ * POLL-REPLIES is the one route in this batch that is guarded rather than
+ * deleted, and it is covered below.
+ */
+describe('poll-replies — manual bypass removed, cron and owner paths separated (part 5)', () => {
+  const U = 'http://localhost'
+  const CRON_SECRET = 'test-cron-secret'
+
+  it('POST /api/archive/poll-replies', async () => {
+    await runGuard('poll-replies', h => pollRepliesPOST(jsonPost(`${U}/api/archive/poll-replies`, {}, h)))
+  })
+
+  it('POST /api/archive/poll-replies — {"manual": true} with no session is rejected', async () => {
+    // This is the bug. The old handler accepted this body as an alternative to
+    // CRON_SECRET, so an anonymous two-word POST triggered a Resend inbox poll,
+    // a model call per email, writes into email_replies and labels across every
+    // archive with an open session, and outbound confirmation email.
+    mockedSession.mockResolvedValue(null)
+    const res = await pollRepliesPOST(jsonPost(`${U}/api/archive/poll-replies`, { manual: true }))
+    console.log(`poll-replies           | {manual:true}, no sess -> ${res.status}`)
+    expect(res.status).toBe(401)
+  })
+
+  it('POST /api/archive/poll-replies — {"manual": true} cannot upgrade a successor', async () => {
+    // The body is not a credential and never was. A successor session plus the
+    // old magic word still fails ownership.
+    mockedSession.mockResolvedValue(SUCCESSOR_SESSION as never)
+    const res = await pollRepliesPOST(jsonPost(`${U}/api/archive/poll-replies`, { manual: true }))
+    console.log(`poll-replies           | {manual:true}, succ     -> ${res.status}`)
+    expect(res.status).toBe(403)
+  })
+
+  it('POST /api/archive/poll-replies — cron path, secret by header and by query', async () => {
+    vi.stubEnv('CRON_SECRET', CRON_SECRET)
+    try {
+      mockedSession.mockResolvedValue(null)
+
+      let res = await pollRepliesPOST(jsonPost(`${U}/api/archive/poll-replies`, {},
+        { authorization: `Bearer ${CRON_SECRET}` }))
+      console.log(`poll-replies           | cron header secret     -> ${res.status}`)
+      expect(res.status).toBe(200)
+
+      res = await pollRepliesPOST(jsonPost(`${U}/api/archive/poll-replies?secret=${CRON_SECRET}`, {}))
+      console.log(`poll-replies           | cron query secret      -> ${res.status}`)
+      expect(res.status).toBe(200)
+
+      res = await pollRepliesPOST(jsonPost(`${U}/api/archive/poll-replies`, {},
+        { authorization: 'Bearer wrong-secret' }))
+      console.log(`poll-replies           | wrong secret, no sess  -> ${res.status}`)
+      expect(res.status).toBe(401)
+    } finally {
+      vi.unstubAllEnvs()
+    }
+  })
+
+  it('POST /api/archive/poll-replies — an unset CRON_SECRET does not authorize an empty header', async () => {
+    // `!!expectedSecret &&` matters. Without it an unset env var would make
+    // `'' === ''` true and every anonymous caller would take the cron path.
+    vi.stubEnv('CRON_SECRET', '')
+    try {
+      mockedSession.mockResolvedValue(null)
+      const res = await pollRepliesPOST(jsonPost(`${U}/api/archive/poll-replies`, {},
+        { authorization: 'Bearer ' }))
+      console.log(`poll-replies           | empty secret + header  -> ${res.status}`)
+      expect(res.status).toBe(401)
+    } finally {
+      vi.unstubAllEnvs()
+    }
   })
 })

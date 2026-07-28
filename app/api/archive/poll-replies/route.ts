@@ -2,6 +2,7 @@ import { Resend } from 'resend'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import Anthropic from '@anthropic-ai/sdk'
 import { NextResponse } from 'next/server'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 
 const resend    = new Resend(process.env.RESEND_API_KEY)
 const anthropic = new Anthropic()
@@ -67,26 +68,67 @@ function extractReplyText(text: string): string {
 
 export async function POST(req: Request) {
   try {
-    const authHeader = req.headers.get('authorization')
-    const isFromCron = authHeader === `Bearer ${process.env.CRON_SECRET}`
+    // Auth. Two legitimate callers, two paths.
+    //
+    // Cron path: CRON_SECRET by authorization header or ?secret= query
+    // parameter, matching app/api/cron/daily-reflection/route.ts. Runs
+    // archive-wide, which is what the nightly job needs.
+    //
+    // Owner path: a Supabase owner session, with ownership verified against the
+    // archives table. A session carrying an archiveId is not proof of ownership
+    // (getSessionUser fills archiveId for successors too). The run is then
+    // scoped to that one archive, so an owner can never trigger a sweep across
+    // archives they do not own.
+    //
+    // A `{"manual": true}` request body used to be accepted here as an
+    // alternative to the secret. That made the gate decorative: any anonymous
+    // POST could trigger a Resend inbox poll, a model call per email, writes
+    // into email_replies and labels across every archive with an open session,
+    // and an outbound confirmation email to every sender.
+    const { searchParams } = new URL(req.url)
+    const expectedSecret = process.env.CRON_SECRET || ''
+    const headerSecret   = (req.headers.get('authorization') || '').replace('Bearer ', '')
+    const secretParam    = searchParams.get('secret') || ''
 
-    let isManual = false
-    try {
-      const body = await req.json()
-      isManual   = body.manual === true
-    } catch { /* no body — fine */ }
+    const isFromCron = !!expectedSecret && (
+      headerSecret === expectedSecret ||
+      secretParam  === expectedSecret
+    )
 
-    if (!isFromCron && !isManual) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    let scopedArchiveId: string | null = null
+
+    if (!isFromCron) {
+      const session = await getSessionUser()
+      if (!session?.archiveId) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+
+      const { data: ownerRow } = await supabaseAdmin
+        .from('archives')
+        .select('owner_user_id')
+        .eq('id', session.archiveId)
+        .maybeSingle()
+      if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      }
+
+      scopedArchiveId = session.archiveId
     }
 
-    // Get active email sessions — build a reply-address lookup map
-    const { data: sessions } = await supabaseAdmin
+    // Get active email sessions, build a reply-address lookup map. The owner
+    // path is filtered to the caller's own archive; the cron path is not.
+    let sessionQuery = supabaseAdmin
       .from('email_sessions')
       .select('*, archives(name, family_name)')
       .gt('reply_window_closes', new Date().toISOString())
       .order('created_at', { ascending: false })
       .limit(20)
+
+    if (scopedArchiveId) {
+      sessionQuery = sessionQuery.eq('archive_id', scopedArchiveId) as typeof sessionQuery
+    }
+
+    const { data: sessions } = await sessionQuery
 
     if (!sessions?.length) {
       return NextResponse.json({ processed: 0, message: 'No active email sessions found' })

@@ -122,11 +122,11 @@ export default function PreferencesClient({ archiveId }: { archiveId: string }) 
     setChecking(true)
     setReplyMsg(null)
     try {
-      const res = await fetch('/api/archive/poll-replies', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ manual: true }),
-      })
+      // No body. The route authenticates the owner from the Supabase session
+      // cookie, which the browser sends on this same-origin request, and scopes
+      // the run to this owner's archive. The old `{ manual: true }` body was
+      // the bypass, not a credential.
+      const res = await fetch('/api/archive/poll-replies', { method: 'POST' })
       const data = await res.json()
       if (data.error) {
         setReplyMsg(`Error: ${data.error}`)
