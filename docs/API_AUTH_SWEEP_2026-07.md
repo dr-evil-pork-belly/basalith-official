@@ -4,18 +4,22 @@ Produced during `fix/mirror-ownership`. This is the input document for the
 category-(d) session. It is a snapshot of live code read on 2026-07-26, not a
 design doc. Re-verify before acting on any single line.
 
-## Status as of commit `fix/mirror-ownership`
+## Status as of commit `fix/contributors-write-auth`
 
-**Fixed here (7 route files).** `mirror` GET, `mirror/react` POST, `photo-url`,
-`contributors` GET, `documents/[id]`, `archive-videos/[id]/play`,
-`archive-videos/[id]`. Each verifies `archives.owner_user_id === session.userId`
-and, where addressed by row id, filters the row query on `archive_id` too.
-Regression coverage is part 3 of `app/api/archive/unauth-access.test.ts`.
+**Fixed in `fix/mirror-ownership` (7 route files).** `mirror` GET, `mirror/react`
+POST, `photo-url`, `contributors` GET, `documents/[id]`,
+`archive-videos/[id]/play`, `archive-videos/[id]`. Each verifies
+`archives.owner_user_id === session.userId` and, where addressed by row id,
+filters the row query on `archive_id` too. Regression coverage is part 3 of
+`app/api/archive/unauth-access.test.ts`.
 
-**Still open, highest priority.** `contributors` POST, PATCH, and DELETE. Only
-GET was fixed. DELETE takes `?id=&archiveId=` with no auth at all, which makes it
-a destructive unauthenticated write and the worst single thing left in this
-table. Start here.
+**Fixed in `fix/contributors-write-auth`.** `contributors` POST, PATCH, and
+DELETE. The `contributors` route file is now closed on all four methods. Each
+write derives `archiveId` from the session; the caller-supplied parameter was
+removed rather than validated. DELETE additionally scopes the target row to the
+session archive before writing, so an archive id plus an arbitrary contributor id
+is no longer authority. Regression coverage is part 4 of
+`app/api/archive/unauth-access.test.ts`.
 
 **Still open.** The remaining category-(d) routes in the table below, plus the
 category-(a) routes that check `session.archiveId` without verifying ownership.
@@ -97,7 +101,7 @@ Totals at time of sweep: **(a) 13 · (b) 17 · (c) 9 · (d) 38** across 77
 | bulk-upload | **d** | POST formData `archiveId` → write |
 | check-credentials | **d** | GET `?archiveId` |
 | contribution-alert | **d** | POST `archiveId` |
-| contributors | **d** | GET/POST/PATCH/DELETE `?archiveId`; GET selects `access_token`. GET fixed in `fix/mirror-ownership`, **POST/PATCH/DELETE still open** |
+| contributors | b | All four methods closed. GET in `fix/mirror-ownership`, POST/PATCH/DELETE in `fix/contributors-write-auth` |
 | daily-session | **d** | GET `?archiveId`; POST derives archive from caller-supplied session row |
 | dashboard | **d** | GET `?archiveId` → full dashboard |
 | dashboard-mobile | b | |
@@ -181,28 +185,70 @@ Totals at time of sweep: **(a) 13 · (b) 17 · (c) 9 · (d) 38** across 77
 `archive-videos/[id]/play`, `archive-videos/[id]`. Regression coverage is part 3
 of `app/api/archive/unauth-access.test.ts`.
 
+## Closed in `fix/contributors-write-auth` (`contributors` POST, PATCH, DELETE)
+
+All three had a single caller: `app/archive/contributors/ContributorsClient.tsx`,
+the owner's Contributors page, which sits behind `proxy.ts`. `basalith-app` has
+no reference to the string `contributors` anywhere in its TypeScript sources, so
+there is no iOS caller. No cron and no contributor-portal caller either.
+`app/api/archive/invite/route.ts` writes to the `contributors` table directly
+rather than through this route. Nothing was left open for a live caller.
+
+**DELETE is a soft delete, not a hard delete.** The statement was, and still is:
+
+```ts
+supabaseAdmin.from('contributors').update({ status: 'inactive' }).eq('id', contributorId)
+```
+
+The old handler applied `.eq('archive_id', archiveId)` only when `?archiveId=`
+was present, so omitting the parameter dropped the archive filter and a
+contributor id alone was sufficient.
+
+Because no row is removed, **no foreign key cascade ever fired**. Related rows
+are untouched, not orphaned: `contributor_questions`, `email_reply_sessions`,
+`contributor_photo_sends`, `contributor_story_prompts`, `daily_spark_responses`,
+`wisdom_exchanges`, and every `owner_deposits` row carrying that
+`contributor_id` all survive intact. (Per the migration files those first four
+declare `ON DELETE CASCADE` and `owner_deposits.contributor_id` declares no
+delete action at all, so a hard delete would have been both destructive and
+partly blocked. Not re-confirmed against live schema, and moot while the handler
+only updates a status column.)
+
+What a successful attack destroyed was access, not data. `status = 'inactive'`
+removes the person from every active-filtered path at once: their
+`/contribute/{token}` portal stops resolving (`lib/contributorToken.ts`,
+`app/contribute/[token]/page.tsx`), the nightly photograph and the weekly,
+Monday-story and voice-portrait sends skip them, `lib/memoryChain.ts` stops
+passing memories to them, the Twilio phone deposit line no longer recognizes
+their number, the contributor `Bearer` path into `entity-chat` closes, and they
+disappear from the owner's own contributor list and dashboard counts. The
+existing deposits stay in the archive. It is recoverable, but there is no
+reactivate control in the UI: the only path back is re-adding the same email,
+which the POST upsert resolves on `(archive_id, email)` and sets back to active.
+
+Regression coverage is part 4 of `app/api/archive/unauth-access.test.ts`,
+including an owner session passing a contributor id from a different archive.
+
 ## Still open, for the category-(d) session
 
 Roughly 33 category-(d) routes plus 11 category-(a) routes. Notes for whoever
 picks this up:
 
-1. **`contributors` POST, PATCH, DELETE are still unauthenticated.** Only GET was
-   fixed. DELETE takes `?id=&archiveId=`, a destructive unauthenticated write.
-   This is the first thing to fix.
-3. **Not every (d) route wants an owner-session check.** At least four distinct
+1. **Not every (d) route wants an owner-session check.** At least four distinct
    legitimate caller types exist: the owner's browser session, cron with
    `CRON_SECRET`, the contributor portal with `contributors.access_token`, and
    the iOS app. `receive-reply` is a Resend webhook and needs signature
    verification, not a session. `poll-replies` is already cron-gated. Some
    routes may be dead code. Each needs its caller identified before it gets a
    guard, the same way the six above did.
-4. **A shared helper is still premature** for that reason. It has to be designed
+2. **A shared helper is still premature** for that reason. It has to be designed
    around those caller types, not extracted from a handful of owner-session
-   routes.
-5. **Do not verify exploitability against production.** The code is unambiguous.
+   routes. Ten route files now carry the same copied guard, which is uncomfortable
+   but still cheaper than a helper shaped by only one of the four caller types.
+3. **Do not verify exploitability against production.** The code is unambiguous.
    Confirming would mean pulling real family material through an
    unauthenticated route.
-6. **Separate, real, logged:** `proxy.ts` uses
+4. **Separate, real, logged:** `proxy.ts` uses
    `pathname.startsWith('/archive')`, which also matches `/archive-login`, so an
    unauthenticated hit on the login page appears to redirect to itself. Not
    touched here because it is a security file and this was a security commit.

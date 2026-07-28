@@ -29,24 +29,45 @@ vi.mock('@/lib/auth/getSessionUser', () => ({ getSessionUser: vi.fn() }))
 const H = vi.hoisted(() => {
   const OWNER_UID   = 'owner-uid'
   const ARCHIVE_ID  = 'arch-1111'
+  // A contributor of ARCHIVE_ID, and one belonging to some other archive. The
+  // second is what the contributors DELETE cross-archive case passes.
+  const CONTRIB_ID         = 'contrib-1111'
+  const FOREIGN_CONTRIB_ID = 'contrib-9999'
   const ARCHIVE_ROW = {
     id: ARCHIVE_ID, owner_user_id: OWNER_UID, status: 'active',
-    name: 'Test Archive', owner_name: 'Test Owner', preferred_language: 'en',
+    name: 'Test Archive', family_name: 'Test', owner_name: 'Test Owner', preferred_language: 'en',
     total_photos: 3, contributor_entity_access: 'none', entity_preview_contributor_ids: [],
   }
 
   function makeBuilder(table: string) {
     let op: 'select' | 'insert' | 'update' | 'delete' = 'select'
+    // Recorded so the contributors table can honour `.eq('id', ...)`: the
+    // DELETE guard is only meaningful if a foreign id actually misses.
+    const filters: Record<string, unknown> = {}
     const b: Record<string, unknown> = {}
     const pass = () => b
     b.select = pass
     b.insert = () => { op = 'insert'; return b }
+    b.upsert = () => { op = 'insert'; return b }
     b.update = () => { op = 'update'; return b }
     b.delete = () => { op = 'delete'; return b }
-    for (const m of ['eq', 'neq', 'in', 'is', 'not', 'order', 'limit', 'range', 'gte', 'lte', 'contains', 'ilike', 'or', 'match']) b[m] = pass
+    b.eq = (col: string, val: unknown) => { filters[col] = val; return b }
+    for (const m of ['neq', 'in', 'is', 'not', 'order', 'limit', 'range', 'gte', 'lte', 'contains', 'ilike', 'or', 'match']) b[m] = pass
     const terminal = () => {
       if (op === 'insert') return { data: { id: 'generated-id' }, error: null }
       if (table === 'archives') return { data: ARCHIVE_ROW, error: null }
+      // Scoped like the real table: a row resolves only when the id asked for
+      // is the one that lives in ARCHIVE_ID.
+      if (table === 'contributors') {
+        if (filters.id && filters.id !== CONTRIB_ID) return { data: null, error: null }
+        return {
+          data: {
+            id: CONTRIB_ID, archive_id: ARCHIVE_ID, name: 'A Contributor',
+            email: 'contrib@x.co', access_token: 'tok-1', preferred_language: 'en',
+          },
+          error: null,
+        }
+      }
       // Rows for the by-id routes hardened in fix/mirror-ownership. Each route
       // filters on archive_id as well as id, so the owner happy-path resolves
       // and the guard is what decides the other three scenarios.
@@ -81,7 +102,7 @@ const H = vi.hoisted(() => {
     rpc: async () => ({ data: null, error: null }),
   }
 
-  return { OWNER_UID, ARCHIVE_ID, ARCHIVE_ROW, supabaseAdmin }
+  return { OWNER_UID, ARCHIVE_ID, ARCHIVE_ROW, CONTRIB_ID, FOREIGN_CONTRIB_ID, supabaseAdmin }
 })
 
 vi.mock('@/lib/supabase-admin', () => ({ supabaseAdmin: H.supabaseAdmin }))
@@ -133,12 +154,17 @@ import { POST as sparkRandomPOST }    from '@/app/api/mobile/spark/random/route'
 import { GET  as archiveMirrorGET }      from '@/app/api/archive/mirror/route'
 import { POST as archiveMirrorReactPOST } from '@/app/api/archive/mirror/react/route'
 import { GET  as photoUrlGET }           from '@/app/api/archive/photo-url/route'
-import { GET  as contributorsGET }       from '@/app/api/archive/contributors/route'
+import {
+  GET    as contributorsGET,
+  POST   as contributorsPOST,
+  PATCH  as contributorsPATCH,
+  DELETE as contributorsDELETE,
+} from '@/app/api/archive/contributors/route'
 import { GET  as documentByIdGET }       from '@/app/api/archive/documents/[id]/route'
 import { GET  as videoPlayGET }          from '@/app/api/archive/archive-videos/[id]/play/route'
 import { GET  as videoByIdGET }          from '@/app/api/archive/archive-videos/[id]/route'
 
-const { OWNER_UID, ARCHIVE_ID } = H
+const { OWNER_UID, ARCHIVE_ID, CONTRIB_ID, FOREIGN_CONTRIB_ID } = H
 const mockedSession = vi.mocked(getSessionUser)
 
 const OWNER_SESSION     = { userId: OWNER_UID,        email: 'owner@x.co', role: 'owner',     archiveId: ARCHIVE_ID }
@@ -153,6 +179,16 @@ function jsonPost(url: string, body: unknown, headers: Record<string, string> = 
     headers: { 'Content-Type': 'application/json', ...headers },
     body:    JSON.stringify(body),
   })
+}
+function jsonPatch(url: string, body: unknown, headers: Record<string, string> = {}): NextRequest {
+  return new NextRequest(url, {
+    method:  'PATCH',
+    headers: { 'Content-Type': 'application/json', ...headers },
+    body:    JSON.stringify(body),
+  })
+}
+function del(url: string, headers: Record<string, string> = {}): NextRequest {
+  return new NextRequest(url, { method: 'DELETE', headers })
 }
 function uploadReq(headers: Record<string, string> = {}): NextRequest {
   const fd = new FormData()
@@ -423,5 +459,61 @@ describe('web mirror pair + sharpest unauthenticated reads — ownership enforce
   it('GET /api/archive/archive-videos/[id]', async () => {
     await runGuard('video transcript by id', h =>
       videoByIdGET(get(`${U}/api/archive/archive-videos/vid-1`, h), { params: Promise.resolve({ id: 'vid-1' }) }))
+  })
+})
+
+/**
+ * part 4 — fix/contributors-write-auth.
+ *
+ * The GET on this route was closed in fix/mirror-ownership; POST, PATCH and
+ * DELETE were out of scope and stayed unauthenticated. All three took the
+ * archive id from the caller. DELETE was the sharpest: `?id=&archiveId=` with
+ * archiveId optional, so a contributor id alone flipped the row to
+ * `status = 'inactive'` on the service-role client, which cuts that person out
+ * of every active-filtered path (their /contribute/{token} portal, the nightly
+ * photograph, the weekly prompt, the phone deposit line).
+ *
+ * All three now derive archiveId from the session. The caller-supplied
+ * parameter is gone rather than validated.
+ */
+describe('contributors write methods — ownership enforced (part 4)', () => {
+  const U = 'http://localhost'
+
+  it('POST /api/archive/contributors', async () => {
+    await runGuard('contributors POST', h =>
+      contributorsPOST(jsonPost(`${U}/api/archive/contributors`,
+        { archiveId: ARCHIVE_ID, name: 'New Person', email: 'new@x.co', relationship: 'daughter' }, h)))
+  })
+
+  it('PATCH /api/archive/contributors (resend-invite remails a portal token)', async () => {
+    await runGuard('contributors PATCH', h =>
+      contributorsPATCH(jsonPatch(`${U}/api/archive/contributors`,
+        { action: 'resend-invite', archiveId: ARCHIVE_ID, contributorId: CONTRIB_ID }, h)))
+  })
+
+  it('DELETE /api/archive/contributors', async () => {
+    await runGuard('contributors DELETE', h =>
+      contributorsDELETE(del(`${U}/api/archive/contributors?id=${CONTRIB_ID}&archiveId=${ARCHIVE_ID}`, h)))
+  })
+
+  it('DELETE /api/archive/contributors — owner cannot deactivate another archive\'s contributor', async () => {
+    // Owning an archive is not authority over an arbitrary contributor id. The
+    // target row is scoped to the session archive, so a foreign id misses.
+    mockedSession.mockResolvedValue(OWNER_SESSION as never)
+    const res = await contributorsDELETE(del(`${U}/api/archive/contributors?id=${FOREIGN_CONTRIB_ID}`))
+    console.log(`contributors DELETE    | owner, foreign contrib -> ${res.status}`)
+    expect(res.status).toBe(404)
+    expect(await res.json()).toEqual({ error: 'Contributor not found' })
+  })
+
+  it('DELETE /api/archive/contributors — caller-supplied archiveId is no longer honoured', async () => {
+    // The old handler dropped the archive filter entirely when ?archiveId= was
+    // omitted. archiveId now comes from the session, so a caller pointing at
+    // another archive changes nothing about which rows are in scope.
+    mockedSession.mockResolvedValue(null)
+    const res = await contributorsDELETE(
+      del(`${U}/api/archive/contributors?id=${CONTRIB_ID}&archiveId=arch-someone-else`))
+    console.log(`contributors DELETE    | supplied archiveId     -> ${res.status}`)
+    expect(res.status).toBe(401)
   })
 })

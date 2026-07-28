@@ -44,9 +44,31 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const { archiveId, name, email, role, relationship, phone, preferred_language } = await req.json()
-    if (!archiveId || !email) {
-      return NextResponse.json({ error: 'archiveId and email required' }, { status: 400 })
+    const { name, email, role, relationship, phone, preferred_language } = await req.json()
+
+    // Auth: Supabase owner session only. Ownership is verified against the
+    // archives table — a session carrying an archiveId is not proof of ownership
+    // (getSessionUser fills archiveId for successors too). archiveId comes from
+    // the session, not the body: this creates a contributor row and mails out a
+    // /contribute/{token} portal link, so a caller-supplied archive id would let
+    // anyone attach a contributor of their choosing to a stranger's archive.
+    const session = await getSessionUser()
+    if (!session?.archiveId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    const archiveId = session.archiveId
+
+    const { data: ownerRow } = await supabaseAdmin
+      .from('archives')
+      .select('owner_user_id')
+      .eq('id', archiveId)
+      .maybeSingle()
+    if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    if (!email) {
+      return NextResponse.json({ error: 'email required' }, { status: 400 })
     }
 
     const { data, error } = await supabaseAdmin
@@ -141,9 +163,31 @@ export async function POST(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
-    const { action, archiveId, contributorId } = await req.json()
-    if (action !== 'resend-invite' || !archiveId || !contributorId) {
-      return NextResponse.json({ error: 'action, archiveId, and contributorId required' }, { status: 400 })
+    const { action, contributorId } = await req.json()
+
+    // Auth: Supabase owner session only. Ownership is verified against the
+    // archives table — a session carrying an archiveId is not proof of ownership
+    // (getSessionUser fills archiveId for successors too). archiveId comes from
+    // the session, not the body: this re-mails the /contribute/{token} portal
+    // link, so a caller-supplied archive id would let anyone trigger delivery of
+    // a stranger's contributor credential.
+    const session = await getSessionUser()
+    if (!session?.archiveId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    const archiveId = session.archiveId
+
+    const { data: ownerRow } = await supabaseAdmin
+      .from('archives')
+      .select('owner_user_id')
+      .eq('id', archiveId)
+      .maybeSingle()
+    if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    if (action !== 'resend-invite' || !contributorId) {
+      return NextResponse.json({ error: 'action and contributorId required' }, { status: 400 })
     }
 
     const { data: contributor } = await supabaseAdmin
@@ -201,20 +245,51 @@ export async function DELETE(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
     const contributorId = searchParams.get('id')
-    const archiveId     = searchParams.get('archiveId')
+
+    // Auth: Supabase owner session only. Ownership is verified against the
+    // archives table — a session carrying an archiveId is not proof of ownership
+    // (getSessionUser fills archiveId for successors too). archiveId comes from
+    // the session, not the query string. The old `?archiveId=` parameter was
+    // optional: omitting it dropped the archive filter entirely, so a contributor
+    // id alone deactivated the row.
+    const session = await getSessionUser()
+    if (!session?.archiveId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    const archiveId = session.archiveId
+
+    const { data: ownerRow } = await supabaseAdmin
+      .from('archives')
+      .select('owner_user_id')
+      .eq('id', archiveId)
+      .maybeSingle()
+    if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
 
     if (!contributorId) {
       return NextResponse.json({ error: 'id required' }, { status: 400 })
     }
 
-    const query = supabaseAdmin
+    // Owning the archive is not authority over an arbitrary contributor id. The
+    // target row has to sit in this archive, or one owner could deactivate
+    // another archive's contributor by id.
+    const { data: target } = await supabaseAdmin
+      .from('contributors')
+      .select('id')
+      .eq('id', contributorId)
+      .eq('archive_id', archiveId)
+      .maybeSingle()
+
+    if (!target) {
+      return NextResponse.json({ error: 'Contributor not found' }, { status: 404 })
+    }
+
+    const { error } = await supabaseAdmin
       .from('contributors')
       .update({ status: 'inactive' })
       .eq('id', contributorId)
-
-    if (archiveId) query.eq('archive_id', archiveId)
-
-    const { error } = await query
+      .eq('archive_id', archiveId)
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
     return NextResponse.json({ success: true })
