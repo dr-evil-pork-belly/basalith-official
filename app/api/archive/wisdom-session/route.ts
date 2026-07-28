@@ -4,12 +4,27 @@ import { WISDOM_SESSIONS } from '@/lib/wisdomSessions'
 import { DIMENSIONS, calculateDimensionScore } from '@/lib/entityAccuracy'
 import { createTrainingPairFromDeposit } from '@/lib/trainingPipeline'
 import { classifyDeposit } from '@/lib/classifyDeposit'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 
 // ── GET — recommended + in-progress session ────────────────────────────────
-export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url)
-  const archiveId = searchParams.get('archiveId')
-  if (!archiveId) return NextResponse.json({ error: 'archiveId required' }, { status: 400 })
+export async function GET() {
+  // Auth: Supabase owner session only. Ownership is verified against the
+  // archives table — a session carrying an archiveId is not proof of ownership
+  // (getSessionUser fills archiveId for successors too).
+  const session = await getSessionUser()
+  if (!session?.archiveId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  const archiveId = session.archiveId
+
+  const { data: ownerRow } = await supabaseAdmin
+    .from('archives')
+    .select('owner_user_id')
+    .eq('id', archiveId)
+    .maybeSingle()
+  if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
 
   const [accuracyRows, sessionsRows] = await Promise.all([
     supabaseAdmin.from('entity_accuracy').select('dimension, accuracy_score').eq('archive_id', archiveId),
@@ -48,13 +63,13 @@ export async function GET(req: Request) {
     }
   }
 
-  const session = WISDOM_SESSIONS[recommendedDimension]
-  const recommended = session ? {
+  const sessionDef = WISDOM_SESSIONS[recommendedDimension]
+  const recommended = sessionDef ? {
     dimension:         recommendedDimension,
     score:             scoreMap[recommendedDimension] ?? 0,
-    title:             session.title,
-    intro:             session.intro,
-    estimatedMinutes:  session.estimatedMinutes,
+    title:             sessionDef.title,
+    intro:             sessionDef.intro,
+    estimatedMinutes:  sessionDef.estimatedMinutes,
   } : null
 
   // Completed sessions with metadata
@@ -74,11 +89,29 @@ export async function GET(req: Request) {
 // ── POST — start a new session ──────────────────────────────────────────────
 export async function POST(req: Request) {
   try {
-    const { archiveId, dimension } = await req.json()
-    if (!archiveId || !dimension) return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
+    // Auth: Supabase owner session only. Ownership is verified against the
+    // archives table — a session carrying an archiveId is not proof of ownership
+    // (getSessionUser fills archiveId for successors too).
+    const session = await getSessionUser()
+    if (!session?.archiveId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    const archiveId = session.archiveId
 
-    const session = WISDOM_SESSIONS[dimension]
-    if (!session) return NextResponse.json({ error: 'Unknown dimension' }, { status: 400 })
+    const { data: ownerRow } = await supabaseAdmin
+      .from('archives')
+      .select('owner_user_id')
+      .eq('id', archiveId)
+      .maybeSingle()
+    if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    const { dimension } = await req.json()
+    if (!dimension) return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
+
+    const sessionDef = WISDOM_SESSIONS[dimension]
+    if (!sessionDef) return NextResponse.json({ error: 'Unknown dimension' }, { status: 400 })
 
     const { data, error } = await supabaseAdmin
       .from('wisdom_sessions')
@@ -91,12 +124,12 @@ export async function POST(req: Request) {
     return NextResponse.json({
       sessionId:       data.id,
       dimension,
-      title:           session.title,
-      intro:           session.intro,
-      estimatedMinutes: session.estimatedMinutes,
+      title:           sessionDef.title,
+      intro:           sessionDef.intro,
+      estimatedMinutes: sessionDef.estimatedMinutes,
       currentQuestion: 0,
-      question:        session.questions[0],
-      totalQuestions:  session.questions.length,
+      question:        sessionDef.questions[0],
+      totalQuestions:  sessionDef.questions.length,
     })
   } catch (err: any) {
     console.error('wisdom-session POST:', err)
@@ -107,22 +140,42 @@ export async function POST(req: Request) {
 // ── PATCH — save answer and advance ────────────────────────────────────────
 export async function PATCH(req: Request) {
   try {
-    const { sessionId, questionIndex, answer, archiveId, skip } = await req.json()
+    // Auth: Supabase owner session only. Ownership is verified against the
+    // archives table — a session carrying an archiveId is not proof of ownership
+    // (getSessionUser fills archiveId for successors too).
+    const session = await getSessionUser()
+    if (!session?.archiveId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    const archiveId = session.archiveId
+
+    const { data: ownerRow } = await supabaseAdmin
+      .from('archives')
+      .select('owner_user_id')
+      .eq('id', archiveId)
+      .maybeSingle()
+    if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    const { sessionId, questionIndex, answer, skip } = await req.json()
     if (!sessionId || questionIndex == null) return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
 
-    // Fetch current session
-    const { data: session, error: fetchErr } = await supabaseAdmin
+    // Fetch current session, scoped to the caller's own archive. A session id
+    // alone is not authority to write an answer into the training corpus.
+    const { data: wisdomRow, error: fetchErr } = await supabaseAdmin
       .from('wisdom_sessions')
       .select('*')
       .eq('id', sessionId)
+      .eq('archive_id', archiveId)
       .single()
-    if (fetchErr || !session) return NextResponse.json({ error: 'Session not found' }, { status: 404 })
+    if (fetchErr || !wisdomRow) return NextResponse.json({ error: 'Session not found' }, { status: 404 })
 
-    const wisdomDef = WISDOM_SESSIONS[session.dimension]
+    const wisdomDef = WISDOM_SESSIONS[wisdomRow.dimension]
     if (!wisdomDef) return NextResponse.json({ error: 'Unknown dimension' }, { status: 400 })
 
     const totalQuestions = wisdomDef.questions.length
-    const existingAnswers: any[] = Array.isArray(session.answers) ? session.answers : []
+    const existingAnswers: any[] = Array.isArray(wisdomRow.answers) ? wisdomRow.answers : []
     const question = wisdomDef.questions[questionIndex]
 
     // Build updated answers array
@@ -137,14 +190,14 @@ export async function PATCH(req: Request) {
 
       // Save to owner_deposits (non-fatal)
       supabaseAdmin.from('owner_deposits').insert({
-        archive_id:     session.archive_id,
+        archive_id:     archiveId,
         prompt:         question.question,
         response:       answer.trim(),
         source_type:    'wisdom',
         essence_status: 'pending',
       }).select('id').single().then(({ data: dep, error }) => {
         if (error) console.warn('wisdom deposit skipped:', error.message)
-        else if (dep) void classifyDeposit({ depositId: dep.id, archiveId: session.archive_id, text: answer.trim() })
+        else if (dep) void classifyDeposit({ depositId: dep.id, archiveId, text: answer.trim() })
       })
 
       // Training pair from wisdom answer (fire-and-forget)
@@ -152,10 +205,10 @@ export async function PATCH(req: Request) {
         void (async () => {
           try {
             const { data: arch } = await supabaseAdmin
-              .from('archives').select('owner_name, name, preferred_language').eq('id', session.archive_id).single()
+              .from('archives').select('owner_name, name, preferred_language').eq('id', archiveId).single()
             if (!arch) return
             await createTrainingPairFromDeposit(
-              { archive_id: session.archive_id, prompt: question.question, response: answer.trim() },
+              { archive_id: archiveId, prompt: question.question, response: answer.trim() },
               arch.owner_name || 'Unknown',
               arch.name,
               arch.preferred_language || 'en',
@@ -179,17 +232,21 @@ export async function PATCH(req: Request) {
       updatePayload.completed_at = new Date().toISOString()
     }
 
-    await supabaseAdmin.from('wisdom_sessions').update(updatePayload).eq('id', sessionId)
+    await supabaseAdmin
+      .from('wisdom_sessions')
+      .update(updatePayload)
+      .eq('id', sessionId)
+      .eq('archive_id', archiveId)
 
     // Calculate new score for the dimension (non-blocking after update)
     let newScore = 0
-    if (isComplete && archiveId) {
+    if (isComplete) {
       const [deposits, conversations, labels] = await Promise.all([
         supabaseAdmin.from('owner_deposits').select('response, prompt').eq('archive_id', archiveId),
         supabaseAdmin.from('entity_conversations').select('role, content, accuracy_rating').eq('archive_id', archiveId),
         supabaseAdmin.from('labels').select('what_was_happening, legacy_note').eq('archive_id', archiveId),
       ])
-      const dim = DIMENSIONS.find(d => d.id === session.dimension)
+      const dim = DIMENSIONS.find(d => d.id === wisdomRow.dimension)
       if (dim) {
         newScore = calculateDimensionScore(dim, deposits.data || [], conversations.data || [], labels.data || [])
       }

@@ -1,20 +1,51 @@
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { classifyDeposit } from '@/lib/classifyDeposit'
 import { NextResponse } from 'next/server'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 
 export async function POST(req: Request) {
   try {
-    const { archiveId, conversationId, rating, correction } = await req.json()
+    // Auth: Supabase owner session only. Ownership is verified against the
+    // archives table — a session carrying an archiveId is not proof of ownership
+    // (getSessionUser fills archiveId for successors too).
+    const session = await getSessionUser()
+    if (!session?.archiveId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    const archiveId = session.archiveId
 
-    if (!archiveId || !conversationId || !rating) {
-      return NextResponse.json({ error: 'archiveId, conversationId, and rating required' }, { status: 400 })
+    const { data: ownerRow } = await supabaseAdmin
+      .from('archives')
+      .select('owner_user_id')
+      .eq('id', archiveId)
+      .maybeSingle()
+    if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    // Update the entity_conversations row with rating and correction
+    const { conversationId, rating, correction } = await req.json()
+
+    if (!conversationId || !rating) {
+      return NextResponse.json({ error: 'conversationId and rating required' }, { status: 400 })
+    }
+
+    // Update the entity_conversations row, scoped to the caller's own archive.
+    // A conversation id alone is not authority to write a correction into the
+    // training corpus.
+    const { data: convo } = await supabaseAdmin
+      .from('entity_conversations')
+      .select('id')
+      .eq('id', conversationId)
+      .eq('archive_id', archiveId)
+      .maybeSingle()
+
+    if (!convo) return NextResponse.json({ error: 'Conversation not found' }, { status: 404 })
+
     await supabaseAdmin
       .from('entity_conversations')
       .update({ accuracy_rating: rating, correction: correction ?? null })
       .eq('id', conversationId)
+      .eq('archive_id', archiveId)
 
     // If a correction was provided, save it as an owner deposit so it enriches the entity
     if (correction?.trim()) {

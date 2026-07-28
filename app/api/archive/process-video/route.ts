@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { NextRequest, NextResponse } from 'next/server'
 import { classifyDeposit } from '@/lib/classifyDeposit'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 
 export const maxDuration = 120
 
@@ -9,9 +10,28 @@ const anthropic = new Anthropic()
 
 export async function POST(req: NextRequest) {
   try {
+    // Auth: Supabase owner session only. Ownership is verified against the
+    // archives table — a session carrying an archiveId is not proof of ownership
+    // (getSessionUser fills archiveId for successors too). Checked before the
+    // body is read, so an unauthenticated caller never reaches the 500MB upload
+    // or the transcription and model calls.
+    const session = await getSessionUser()
+    if (!session?.archiveId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    const archiveId = session.archiveId
+
+    const { data: ownerRow } = await supabaseAdmin
+      .from('archives')
+      .select('owner_user_id')
+      .eq('id', archiveId)
+      .maybeSingle()
+    if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
     const formData      = await req.formData()
     const file          = formData.get('file')          as File
-    const archiveId     = formData.get('archiveId')     as string
     const videoType     = formData.get('videoType')     as string
     const createdBy     = formData.get('createdBy')     as string
     const decade        = formData.get('decade')        as string
@@ -19,8 +39,8 @@ export async function POST(req: NextRequest) {
     const uploaderEmail = formData.get('uploaderEmail') as string
     const title         = (formData.get('title')        as string) || ''
 
-    if (!file || !archiveId) {
-      return NextResponse.json({ error: 'Missing file or archiveId' }, { status: 400 })
+    if (!file) {
+      return NextResponse.json({ error: 'Missing file' }, { status: 400 })
     }
 
     if (file.size > 500 * 1024 * 1024) {

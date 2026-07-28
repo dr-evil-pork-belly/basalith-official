@@ -33,10 +33,29 @@ const H = vi.hoisted(() => {
   // second is what the contributors DELETE cross-archive case passes.
   const CONTRIB_ID         = 'contrib-1111'
   const FOREIGN_CONTRIB_ID = 'contrib-9999'
+  // part 6 — one owned row and one foreign row per by-id route, so the
+  // cross-archive case (owner session + another archive's row id) can miss.
+  const RECORDING_ID          = 'rec-1111'
+  const FOREIGN_RECORDING_ID  = 'rec-9999'
+  const WISDOM_ID             = 'wis-1111'
+  const FOREIGN_WISDOM_ID     = 'wis-9999'
+  const CONVO_ID              = 'convo-1111'
+  const FOREIGN_CONVO_ID      = 'convo-9999'
+  const DATE_ID               = 'date-1111'
+  const FOREIGN_DATE_ID       = 'date-9999'
+  const DAILY_ID              = 'daily-1111'
+  const FOREIGN_DAILY_ID      = 'daily-9999'
+  const SUCCESSOR_ROW_ID      = 'succ-1111'
+  const FOREIGN_SUCCESSOR_ID  = 'succ-9999'
   const ARCHIVE_ROW = {
     id: ARCHIVE_ID, owner_user_id: OWNER_UID, status: 'active',
     name: 'Test Archive', family_name: 'Test', owner_name: 'Test Owner', preferred_language: 'en',
     total_photos: 3, contributor_entity_access: 'none', entity_preview_contributor_ids: [],
+    // part 6 — fields the newly guarded owner happy-paths read.
+    owner_email: 'owner@x.co', labelled_photos: 2,
+    current_streak: 1, longest_streak: 4, last_label_date: null, last_session_date: null,
+    wechat_link_code: 'ABC123', wechat_open_id: null,
+    termination_requested_at: null, owner_birth_year: 1950, owner_birth_decade: 1950,
   }
 
   function makeBuilder(table: string) {
@@ -80,7 +99,24 @@ const H = vi.hoisted(() => {
       if (table === 'archive_videos') {
         return { data: { id: 'vid-1', archive_id: ARCHIVE_ID, storage_path: `${ARCHIVE_ID}/vid-1.mp4` }, error: null }
       }
-      return { data: null, error: null }
+      // part 6 — the by-id tables. Each resolves only when BOTH the row id and
+      // the archive_id filter match, which is exactly what the routes now send.
+      // Owning an archive plus an arbitrary row id has to miss.
+      const scoped = (t: string, ownId: string, row: Record<string, unknown>) => {
+        if (table !== t) return null
+        if (filters.id         && filters.id         !== ownId)     return { data: null, error: null }
+        if (filters.archive_id && filters.archive_id !== ARCHIVE_ID) return { data: null, error: null }
+        return { data: { id: ownId, archive_id: ARCHIVE_ID, ...row }, error: null }
+      }
+      return (
+        scoped('voice_recordings',      RECORDING_ID,     { storage_path: `${ARCHIVE_ID}/rec-1.webm`, transcript: 'A transcript.' }) ??
+        scoped('wisdom_sessions',       WISDOM_ID,        { dimension: 'professional_philosophy', answers: [], status: 'in_progress', current_question: 0 }) ??
+        scoped('entity_conversations',  CONVO_ID,         { role: 'entity', content: 'A reply.', accuracy_rating: null }) ??
+        scoped('significant_dates',     DATE_ID,          { person_name: 'A Person', active: true }) ??
+        scoped('daily_sessions',        DAILY_ID,         { steps_completed: 0, deposits_added: 0, completed: false, session_date: '2026-07-28' }) ??
+        scoped('successors',            SUCCESSOR_ROW_ID, { name: 'A Successor', email: 'succ@x.co' }) ??
+        { data: null, error: null }
+      )
     }
     b.single = async () => terminal()
     b.maybeSingle = async () => terminal()
@@ -102,7 +138,12 @@ const H = vi.hoisted(() => {
     rpc: async () => ({ data: null, error: null }),
   }
 
-  return { OWNER_UID, ARCHIVE_ID, ARCHIVE_ROW, CONTRIB_ID, FOREIGN_CONTRIB_ID, supabaseAdmin }
+  return {
+    OWNER_UID, ARCHIVE_ID, ARCHIVE_ROW, CONTRIB_ID, FOREIGN_CONTRIB_ID, supabaseAdmin,
+    RECORDING_ID, FOREIGN_RECORDING_ID, WISDOM_ID, FOREIGN_WISDOM_ID,
+    CONVO_ID, FOREIGN_CONVO_ID, DATE_ID, FOREIGN_DATE_ID,
+    DAILY_ID, FOREIGN_DAILY_ID, SUCCESSOR_ROW_ID, FOREIGN_SUCCESSOR_ID,
+  }
 })
 
 vi.mock('@/lib/supabase-admin', () => ({ supabaseAdmin: H.supabaseAdmin }))
@@ -128,6 +169,11 @@ vi.mock('resend', () => ({
 }))
 vi.mock('@/lib/entityContext', () => ({ buildEntitySystemPrompt: async () => ({ systemPrompt: 'sys', usedDepositIds: [] }) }))
 vi.mock('@/lib/entityReadiness', () => ({ calculateEntityReadiness: async () => ({ score: 42 }) }))
+// succession/add provisions a Supabase Auth user. Mocked so the owner
+// happy-path never reaches the real auth admin API.
+vi.mock('@/lib/auth/getOrCreateAuthUser', () => ({ getOrCreateAuthUser: vi.fn(async () => 'auth-user-1') }))
+// terminate is the one route in part 6 that sends email. @/lib/resend is
+// already mocked above, so no message leaves the process in any scenario.
 
 // transcribe-voice calls the OpenAI Whisper endpoint via global fetch. Stub it so
 // the owner happy-path completes offline with an empty transcript.
@@ -171,8 +217,42 @@ import { GET  as videoPlayGET }          from '@/app/api/archive/archive-videos/
 import { GET  as videoByIdGET }          from '@/app/api/archive/archive-videos/[id]/route'
 // part 5 — fix/delete-dead-routes-poll-replies-auth
 import { POST as pollRepliesPOST }       from '@/app/api/archive/poll-replies/route'
+// part 6a — fix/owner-guard-batch-2, commit A (high severity)
+import { GET  as archiveDashboardGET }   from '@/app/api/archive/dashboard/route'
+import { GET  as documentsGET }          from '@/app/api/archive/documents/route'
+import { GET  as archiveVideosGET }      from '@/app/api/archive/archive-videos/route'
+import { GET  as voiceRecordingsGET }    from '@/app/api/archive/voice-recordings/route'
+import { GET  as voicePlayGET }          from '@/app/api/archive/voice-recordings/[id]/play/route'
+import { GET  as photoLabelsGET }        from '@/app/api/archive/photo-labels/route'
+import { GET  as witnessSessionsGET }    from '@/app/api/archive/witness-sessions/route'
+import {
+  GET   as wisdomSessionGET,
+  POST  as wisdomSessionPOST,
+  PATCH as wisdomSessionPATCH,
+} from '@/app/api/archive/wisdom-session/route'
+import {
+  GET    as datesGET,
+  POST   as datesPOST,
+  DELETE as datesDELETE,
+} from '@/app/api/archive/dates/route'
+import { POST as savePOST }              from '@/app/api/archive/save/route'
+import { POST as entityFeedbackPOST }    from '@/app/api/archive/entity-feedback/route'
+import { POST as processDocumentPOST }   from '@/app/api/archive/process-document/route'
+import { POST as processVideoPOST }      from '@/app/api/archive/process-video/route'
+import { POST as pushTokenPOST }         from '@/app/api/archive/push-token/route'
+import { GET  as wechatLinkGET }         from '@/app/api/archive/wechat-link/route'
+import { POST as successionAddPOST }     from '@/app/api/archive/succession/add/route'
+import { POST as successionRemovePOST }  from '@/app/api/archive/succession/remove/route'
+import { POST as terminatePOST }         from '@/app/api/archive/terminate/route'
+import { GET  as journalGET, POST as journalPOST }           from '@/app/api/archive/journal/route'
+import { GET  as dailySessionGET, POST as dailySessionPOST } from '@/app/api/archive/daily-session/route'
 
-const { OWNER_UID, ARCHIVE_ID, CONTRIB_ID, FOREIGN_CONTRIB_ID } = H
+const {
+  OWNER_UID, ARCHIVE_ID, CONTRIB_ID, FOREIGN_CONTRIB_ID,
+  RECORDING_ID, FOREIGN_RECORDING_ID, WISDOM_ID, FOREIGN_WISDOM_ID,
+  CONVO_ID, FOREIGN_CONVO_ID, DATE_ID, FOREIGN_DATE_ID,
+  DAILY_ID, FOREIGN_DAILY_ID, SUCCESSOR_ROW_ID, FOREIGN_SUCCESSOR_ID,
+} = H
 const mockedSession = vi.mocked(getSessionUser)
 
 const OWNER_SESSION     = { userId: OWNER_UID,        email: 'owner@x.co', role: 'owner',     archiveId: ARCHIVE_ID }
@@ -209,6 +289,24 @@ function transcribeReq(headers: Record<string, string> = {}): NextRequest {
   fd.append('prompt', 'A memory')
   fd.append('duration', '12')
   return new NextRequest('http://localhost/api/archive/transcribe-voice', { method: 'POST', body: fd, headers })
+}
+// part 6 — process-document and process-video read multipart bodies. Both keep
+// the payload small enough that the owner path skips the model call and the
+// deposit insert, so what the test exercises is the guard, not the pipeline.
+// archiveId is still sent in the form so the dead parameter path is covered.
+function documentReq(headers: Record<string, string> = {}): NextRequest {
+  const fd = new FormData()
+  fd.append('file', new File(['A short letter.'], 'letter.txt', { type: 'text/plain' }))
+  fd.append('archiveId', ARCHIVE_ID)
+  fd.append('documentType', 'personal_letter')
+  return new NextRequest('http://localhost/api/archive/process-document', { method: 'POST', body: fd, headers })
+}
+function videoReq(headers: Record<string, string> = {}): NextRequest {
+  const fd = new FormData()
+  fd.append('file', new File([new Uint8Array([0x00, 0x00, 0x00, 0x18])], 'clip.mp4', { type: 'video/mp4' }))
+  fd.append('archiveId', ARCHIVE_ID)
+  fd.append('videoType', 'home_video')
+  return new NextRequest('http://localhost/api/archive/process-video', { method: 'POST', body: fd, headers })
 }
 
 /**
@@ -638,5 +736,243 @@ describe('poll-replies — manual bypass removed, cron and owner paths separated
     } finally {
       vi.unstubAllEnvs()
     }
+  })
+})
+
+/**
+ * part 6a — fix/owner-guard-batch-2, COMMIT A (high severity).
+ *
+ * Every route here had the same defect in one of two shapes:
+ *
+ *   - no auth at all, with the archive taken from a query string, a JSON body
+ *     or a multipart field: dashboard, documents, archive-videos,
+ *     voice-recordings, voice-recordings/[id]/play, photo-labels,
+ *     witness-sessions, wisdom-session, dates, save, entity-feedback,
+ *     process-document, process-video, push-token, wechat-link, journal,
+ *     daily-session
+ *   - a session check that authorized on session.archiveId alone, which
+ *     getSessionUser also fills for successors: succession/add,
+ *     succession/remove, terminate
+ *
+ * All of them now take the owner-deposit pattern: 401 without a session
+ * archiveId, then 403 unless archives.owner_user_id === session.userId. The
+ * caller-supplied archive parameter is deleted rather than validated.
+ *
+ * The by-id routes get a second assertion. Owning an archive is not authority
+ * over an arbitrary row id, so each row query is filtered on archive_id too and
+ * an owner passing another archive's id must miss.
+ *
+ * terminate sends email on the owner path. @/lib/resend is mocked at the top of
+ * this file, so nothing leaves the process in any scenario.
+ */
+describe('owner-guard batch 2, commit A — high severity (part 6a)', () => {
+  const U = 'http://localhost'
+
+  it('GET /api/archive/dashboard', async () => {
+    // Handler takes no request object; the ?archiveId= param is gone.
+    await runGuard('dashboard', () => archiveDashboardGET())
+  })
+
+  it('GET /api/archive/documents', async () => {
+    await runGuard('documents', () => documentsGET())
+  })
+
+  it('GET /api/archive/archive-videos', async () => {
+    await runGuard('archive-videos', () => archiveVideosGET())
+  })
+
+  it('GET /api/archive/voice-recordings', async () => {
+    await runGuard('voice-recordings', () => voiceRecordingsGET())
+  })
+
+  it('GET /api/archive/voice-recordings/[id]/play', async () => {
+    await runGuard('voice play by id', h =>
+      voicePlayGET(get(`${U}/api/archive/voice-recordings/${RECORDING_ID}/play`, h),
+        { params: Promise.resolve({ id: RECORDING_ID }) }))
+  })
+
+  it('GET voice-recordings/[id]/play — owner cannot play another archive recording', async () => {
+    // The row query is filtered on archive_id, so a foreign recording id misses
+    // and no signed audio URL is minted.
+    mockedSession.mockResolvedValue(OWNER_SESSION as never)
+    const res = await voicePlayGET(get(`${U}/api/archive/voice-recordings/${FOREIGN_RECORDING_ID}/play`),
+      { params: Promise.resolve({ id: FOREIGN_RECORDING_ID }) })
+    console.log(`voice play by id       | owner, foreign rec id  -> ${res.status}`)
+    expect(res.status).toBe(404)
+  })
+
+  it('GET /api/archive/photo-labels', async () => {
+    await runGuard('photo-labels', h =>
+      photoLabelsGET(get(`${U}/api/archive/photo-labels?archiveId=${ARCHIVE_ID}&photographId=photo-1`, h)))
+  })
+
+  it('GET /api/archive/witness-sessions', async () => {
+    await runGuard('witness-sessions', () => witnessSessionsGET())
+  })
+
+  it('GET /api/archive/wisdom-session', async () => {
+    await runGuard('wisdom-session GET', () => wisdomSessionGET())
+  })
+
+  it('POST /api/archive/wisdom-session', async () => {
+    await runGuard('wisdom-session POST', h =>
+      wisdomSessionPOST(jsonPost(`${U}/api/archive/wisdom-session`,
+        { archiveId: ARCHIVE_ID, dimension: 'core_values' }, h)))
+  })
+
+  it('PATCH /api/archive/wisdom-session', async () => {
+    await runGuard('wisdom-session PATCH', h =>
+      wisdomSessionPATCH(jsonPatch(`${U}/api/archive/wisdom-session`,
+        { sessionId: WISDOM_ID, questionIndex: 0, answer: 'A real answer, long enough to store.' }, h)))
+  })
+
+  it('PATCH wisdom-session — owner cannot answer into another archive session', async () => {
+    // This is the write that lands in owner_deposits and the training corpus.
+    // A session id alone must not be authority for it.
+    mockedSession.mockResolvedValue(OWNER_SESSION as never)
+    const res = await wisdomSessionPATCH(jsonPatch(`${U}/api/archive/wisdom-session`,
+      { sessionId: FOREIGN_WISDOM_ID, questionIndex: 0, answer: 'Text aimed at another archive.' }))
+    console.log(`wisdom-session PATCH   | owner, foreign sess id -> ${res.status}`)
+    expect(res.status).toBe(404)
+  })
+
+  it('GET /api/archive/dates', async () => {
+    await runGuard('dates GET', () => datesGET())
+  })
+
+  it('POST /api/archive/dates', async () => {
+    await runGuard('dates POST', h =>
+      datesPOST(jsonPost(`${U}/api/archive/dates`,
+        { archiveId: ARCHIVE_ID, personName: 'A Person', dateType: 'birthday', month: 4, day: 2 }, h)))
+  })
+
+  it('DELETE /api/archive/dates', async () => {
+    await runGuard('dates DELETE', h =>
+      datesDELETE(new NextRequest(`${U}/api/archive/dates`, {
+        method: 'DELETE', headers: { 'Content-Type': 'application/json', ...h },
+        body: JSON.stringify({ id: DATE_ID }),
+      })))
+  })
+
+  it('DELETE /api/archive/dates — owner cannot retire another archive date', async () => {
+    mockedSession.mockResolvedValue(OWNER_SESSION as never)
+    const res = await datesDELETE(new NextRequest(`${U}/api/archive/dates`, {
+      method: 'DELETE', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: FOREIGN_DATE_ID }),
+    }))
+    console.log(`dates DELETE           | owner, foreign date id -> ${res.status}`)
+    expect(res.status).toBe(404)
+  })
+
+  it('POST /api/archive/save', async () => {
+    await runGuard('save', h =>
+      savePOST(jsonPost(`${U}/api/archive/save`,
+        { archiveId: ARCHIVE_ID, whatWasHappening: 'A day at the lake.', labelledBy: 'owner' }, h)))
+  })
+
+  it('POST /api/archive/entity-feedback', async () => {
+    await runGuard('entity-feedback', h =>
+      entityFeedbackPOST(jsonPost(`${U}/api/archive/entity-feedback`,
+        { archiveId: ARCHIVE_ID, conversationId: CONVO_ID, rating: 'accurate' }, h)))
+  })
+
+  it('POST entity-feedback — owner cannot rate another archive conversation', async () => {
+    // Entity poisoning: the correction lands in owner_deposits. A conversation
+    // id from another archive must not reach the update or the deposit.
+    mockedSession.mockResolvedValue(OWNER_SESSION as never)
+    const res = await entityFeedbackPOST(jsonPost(`${U}/api/archive/entity-feedback`,
+      { conversationId: FOREIGN_CONVO_ID, rating: 'inaccurate', correction: 'Poisoned text.' }))
+    console.log(`entity-feedback        | owner, foreign convo   -> ${res.status}`)
+    expect(res.status).toBe(404)
+  })
+
+  it('POST /api/archive/process-document', async () => {
+    await runGuard('process-document', h => processDocumentPOST(documentReq(h)))
+  })
+
+  it('POST /api/archive/process-video', async () => {
+    await runGuard('process-video', h => processVideoPOST(videoReq(h)))
+  })
+
+  it('POST /api/archive/push-token', async () => {
+    await runGuard('push-token', h =>
+      pushTokenPOST(jsonPost(`${U}/api/archive/push-token`,
+        { archiveId: ARCHIVE_ID, token: 'ExponentPushToken[xxx]' }, h)))
+  })
+
+  it('GET /api/archive/wechat-link', async () => {
+    // Mints and persists wechat_link_code, which the WeChat webhook accepts as
+    // a bearer credential. Handler takes no request object.
+    await runGuard('wechat-link', () => wechatLinkGET())
+  })
+
+  it('POST /api/archive/succession/add', async () => {
+    await runGuard('succession/add', h =>
+      successionAddPOST(jsonPost(`${U}/api/archive/succession/add`,
+        { name: 'A Successor', email: 'new-succ@x.co', password: 'a-long-enough-password' }, h)))
+  })
+
+  it('POST /api/archive/succession/remove', async () => {
+    await runGuard('succession/remove', h =>
+      successionRemovePOST(jsonPost(`${U}/api/archive/succession/remove`,
+        { successorId: SUCCESSOR_ROW_ID }, h)))
+  })
+
+  it('POST succession/remove — owner cannot remove another archive successor', async () => {
+    mockedSession.mockResolvedValue(OWNER_SESSION as never)
+    const res = await successionRemovePOST(jsonPost(`${U}/api/archive/succession/remove`,
+      { successorId: FOREIGN_SUCCESSOR_ID }))
+    console.log(`succession/remove      | owner, foreign succ id -> ${res.status}`)
+    expect(res.status).toBe(404)
+  })
+
+  it('POST /api/archive/terminate (a successor could schedule the deletion)', async () => {
+    await runGuard('terminate', h =>
+      terminatePOST(jsonPost(`${U}/api/archive/terminate`, { confirm: true }, h)))
+  })
+
+  it('GET /api/archive/journal', async () => {
+    await runGuard('journal GET', () => journalGET())
+  })
+
+  it('POST /api/archive/journal', async () => {
+    await runGuard('journal POST', h =>
+      journalPOST(jsonPost(`${U}/api/archive/journal`,
+        { archiveId: ARCHIVE_ID, content: 'What I was thinking about today.' }, h)))
+  })
+
+  it('GET /api/archive/daily-session', async () => {
+    // Inserts a daily_sessions row and returns a signed photograph URL, so the
+    // GET is a write and a media read. Handler takes no request object.
+    await runGuard('daily-session GET', () => dailySessionGET())
+  })
+
+  it('POST /api/archive/daily-session', async () => {
+    await runGuard('daily-session POST', h =>
+      dailySessionPOST(jsonPost(`${U}/api/archive/daily-session`,
+        { action: 'step', sessionId: DAILY_ID, stepType: 'free_capture', response: 'A passing thought.' }, h)))
+  })
+
+  it('POST daily-session — the archive is no longer derived from the caller row', async () => {
+    // The original handler read `const archiveId = session.archive_id` off the
+    // row it had just fetched by caller-supplied id, so the row id was the
+    // authority and an owner could write into any archive by passing its
+    // session id. archiveId now comes from the session and the lookup is
+    // scoped to it, so a foreign session id simply misses.
+    mockedSession.mockResolvedValue(OWNER_SESSION as never)
+    const res = await dailySessionPOST(jsonPost(`${U}/api/archive/daily-session`,
+      { action: 'step', sessionId: FOREIGN_DAILY_ID, stepType: 'free_capture', response: 'Aimed elsewhere.' }))
+    console.log(`daily-session POST     | owner, foreign sess id -> ${res.status}`)
+    expect(res.status).toBe(404)
+  })
+
+  it('POST daily-session — complete cannot be aimed at another archive', async () => {
+    // The complete branch writes current_streak, longest_streak and
+    // last_session_date onto archives, so it needs the same scoping as step.
+    mockedSession.mockResolvedValue(OWNER_SESSION as never)
+    const res = await dailySessionPOST(jsonPost(`${U}/api/archive/daily-session`,
+      { action: 'complete', sessionId: FOREIGN_DAILY_ID }))
+    console.log(`daily-session complete | owner, foreign sess id -> ${res.status}`)
+    expect(res.status).toBe(404)
   })
 })

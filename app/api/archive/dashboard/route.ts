@@ -1,5 +1,6 @@
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { B2B_DOMAINS, B2B_TOTAL_QUESTIONS } from '@/lib/b2bDomains'
 
 // Per-domain B2B readiness for succession archives. answered counts DISTINCT
@@ -48,12 +49,23 @@ async function computeB2BReadiness(archiveId: string) {
   return { domains, overall: { answered, total } }
 }
 
-export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url)
-  const archiveId = searchParams.get('archiveId')
+export async function GET() {
+  // Auth: Supabase owner session only. Ownership is verified against the
+  // archives table — a session carrying an archiveId is not proof of ownership
+  // (getSessionUser fills archiveId for successors too).
+  const session = await getSessionUser()
+  if (!session?.archiveId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  const archiveId = session.archiveId
 
-  if (!archiveId || archiveId === 'will-be-set-after-db-setup') {
-    return NextResponse.json({ error: 'archiveId required' }, { status: 400 })
+  const { data: ownerRow } = await supabaseAdmin
+    .from('archives')
+    .select('owner_user_id')
+    .eq('id', archiveId)
+    .maybeSingle()
+  if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
   const [archive, decades, recentLabels, contributors, photographs, ownerDeposits, entityConvos, significantDates] = await Promise.all([

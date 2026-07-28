@@ -2,14 +2,32 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { inngest } from '@/lib/inngest'
 import { NextRequest, NextResponse } from 'next/server'
 import { createTrainingPairFromDeposit } from '@/lib/trainingPipeline'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 
 const MILESTONE_NUMBERS = [1, 5, 10, 25, 50, 100, 250, 500]
 
 export async function POST(req: NextRequest) {
   try {
+    // Auth: Supabase owner session only. Ownership is verified against the
+    // archives table — a session carrying an archiveId is not proof of ownership
+    // (getSessionUser fills archiveId for successors too).
+    const session = await getSessionUser()
+    if (!session?.archiveId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    const archiveId = session.archiveId
+
+    const { data: ownerRow } = await supabaseAdmin
+      .from('archives')
+      .select('owner_user_id')
+      .eq('id', archiveId)
+      .maybeSingle()
+    if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
     const body = await req.json()
     const {
-      archiveId,
       photoBase64,
       photoName,
       whatWasHappening,
@@ -21,11 +39,6 @@ export async function POST(req: NextRequest) {
       invitedContributor,
       labelledBy,
     } = body
-
-    // Validate archiveId — skip real DB ops when not configured
-    if (!archiveId || archiveId === 'will-be-set-after-db-setup') {
-      return NextResponse.json({ success: true, mock: true })
-    }
 
     // ── 1. Upload photograph to Storage (if photo provided) ──────────────────
     let storagePath: string | null = null

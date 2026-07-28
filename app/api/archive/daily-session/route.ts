@@ -3,6 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { getTodaysSpark } from '@/lib/dailySparks'
 import { createTrainingPairFromDeposit } from '@/lib/trainingPipeline'
 import { classifyDeposit } from '@/lib/classifyDeposit'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,9 +19,26 @@ const JOURNAL_PROMPTS: Record<number, string> = {
 
 // ── GET — today's session data ─────────────────────────────────────────────────
 
-export async function GET(req: NextRequest) {
-  const archiveId = new URL(req.url).searchParams.get('archiveId')
-  if (!archiveId) return NextResponse.json({ error: 'archiveId required' }, { status: 400 })
+export async function GET() {
+  // Auth: Supabase owner session only. Ownership is verified against the
+  // archives table — a session carrying an archiveId is not proof of ownership
+  // (getSessionUser fills archiveId for successors too). This GET inserts a
+  // daily_sessions row and returns a signed URL to a family photograph, so it
+  // is a write and a media read, not a metadata read.
+  const authSession = await getSessionUser()
+  if (!authSession?.archiveId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  const archiveId = authSession.archiveId
+
+  const { data: ownerRow } = await supabaseAdmin
+    .from('archives')
+    .select('owner_user_id')
+    .eq('id', archiveId)
+    .maybeSingle()
+  if (!ownerRow || ownerRow.owner_user_id !== authSession.userId) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
 
   const today = new Date().toISOString().substring(0, 10)
 
@@ -38,18 +56,18 @@ export async function GET(req: NextRequest) {
     .insert({ archive_id: archiveId, session_date: today })
     .then(() => {})
 
-  const { data: session } = await supabaseAdmin
+  const { data: dailyRow } = await supabaseAdmin
     .from('daily_sessions')
     .select('*')
     .eq('archive_id', archiveId)
     .eq('session_date', today)
     .single()
 
-  if (session?.completed) {
+  if (dailyRow?.completed) {
     return NextResponse.json({
       sessionDate:      today,
       alreadyCompleted: true,
-      sessionId:        session.id,
+      sessionId:        dailyRow.id,
       streak:           archive.current_streak ?? 0,
       longestStreak:    archive.longest_streak ?? 0,
       steps:            [],
@@ -155,7 +173,7 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({
     sessionDate:      today,
     alreadyCompleted: false,
-    sessionId:        session?.id ?? null,
+    sessionId:        dailyRow?.id ?? null,
     streak:           archive.current_streak ?? 0,
     longestStreak:    archive.longest_streak ?? 0,
     steps,
@@ -166,20 +184,42 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    // Auth: Supabase owner session only. Ownership is verified against the
+    // archives table — a session carrying an archiveId is not proof of ownership
+    // (getSessionUser fills archiveId for successors too).
+    const authSession = await getSessionUser()
+    if (!authSession?.archiveId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    const archiveId = authSession.archiveId
+
+    const { data: ownerRow } = await supabaseAdmin
+      .from('archives')
+      .select('owner_user_id')
+      .eq('id', archiveId)
+      .maybeSingle()
+    if (!ownerRow || ownerRow.owner_user_id !== authSession.userId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
     const body = await req.json()
     const { action, sessionId } = body
 
     if (!sessionId) return NextResponse.json({ error: 'sessionId required' }, { status: 400 })
 
-    const { data: session } = await supabaseAdmin
+    // The archive is NEVER derived from the caller-supplied row. archiveId comes
+    // from the session above, and the row lookup is scoped to it, so a session id
+    // belonging to another archive simply misses. Before this, `archiveId` was
+    // read off the fetched row, which made the row id the authority and left an
+    // owner able to write into any archive by passing its session id.
+    const { data: dailyRow } = await supabaseAdmin
       .from('daily_sessions')
       .select('id, archive_id, steps_completed, deposits_added')
       .eq('id', sessionId)
+      .eq('archive_id', archiveId)
       .single()
 
-    if (!session) return NextResponse.json({ error: 'Session not found' }, { status: 404 })
-
-    const archiveId = session.archive_id
+    if (!dailyRow) return NextResponse.json({ error: 'Session not found' }, { status: 404 })
 
     // ── Complete session ───────────────────────────────────────────────────────
     if (action === 'complete') {
@@ -205,7 +245,8 @@ export async function POST(req: NextRequest) {
         supabaseAdmin
           .from('daily_sessions')
           .update({ completed: true, completed_at: new Date().toISOString() })
-          .eq('id', sessionId),
+          .eq('id', sessionId)
+          .eq('archive_id', archiveId),
         supabaseAdmin
           .from('archives')
           .update({ current_streak: newStreak, longest_streak: newLongest, last_session_date: today })
@@ -313,10 +354,11 @@ export async function POST(req: NextRequest) {
     await supabaseAdmin
       .from('daily_sessions')
       .update({
-        steps_completed: session.steps_completed + 1,
-        deposits_added:  session.deposits_added + depositsAdded,
+        steps_completed: dailyRow.steps_completed + 1,
+        deposits_added:  dailyRow.deposits_added + depositsAdded,
       })
       .eq('id', sessionId)
+      .eq('archive_id', archiveId)
 
     console.log('[daily-session] step saved — type:', stepType, 'archive:', archiveId.substring(0, 8))
     return NextResponse.json({ ok: true })
