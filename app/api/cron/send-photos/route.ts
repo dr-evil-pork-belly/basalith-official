@@ -33,9 +33,14 @@ export async function GET(req: NextRequest) {
 
   for (const archive of activeArchives ?? []) {
     try {
+      // The fan-out children now require CRON_SECRET. Header, never a query
+      // parameter: URL parameters appear in server logs, headers do not.
       const res = await fetch(`${siteUrl}/api/archive/send-photo`, {
         method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type':  'application/json',
+          'Authorization': `Bearer ${process.env.CRON_SECRET}`,
+        },
         body:    JSON.stringify({ archiveId: archive.id }),
       })
       const result = await res.json()
@@ -95,7 +100,10 @@ export async function GET(req: NextRequest) {
       if ((count ?? 0) > 0) {
         await fetch(`${siteUrl}/api/archive/morning-digest`, {
           method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type':  'application/json',
+            'Authorization': `Bearer ${process.env.CRON_SECRET}`,
+          },
           body:    JSON.stringify({ archiveId: archive.id }),
         })
       }
@@ -120,7 +128,10 @@ export async function GET(req: NextRequest) {
     try {
       await fetch(`${siteUrl}/api/archive/life-event`, {
         method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type':  'application/json',
+          'Authorization': `Bearer ${process.env.CRON_SECRET}`,
+        },
         body:    JSON.stringify({ archiveId: dateRow.archive_id, dateId: dateRow.id }),
       })
     } catch {

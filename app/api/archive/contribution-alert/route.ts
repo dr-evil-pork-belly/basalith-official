@@ -4,6 +4,36 @@ import { NextResponse } from 'next/server'
 
 export async function POST(req: Request) {
   try {
+    // Auth: CRON_SECRET only. One caller, the server-to-server forward at
+    // app/api/archive/poll-replies/route.ts, which now sends the header.
+    //
+    // poll-replies itself has an owner path, so an owner clicking "check
+    // replies" can cause this route to run. That does not make this a two-path
+    // route: the forward is made by the server, which holds CRON_SECRET, and
+    // the archiveId it passes is one poll-replies has already scoped. There is
+    // no browser caller reaching this route directly.
+    //
+    // Header and query are an independent OR, so a stale query parameter never
+    // shadows a good header during a rotation, and !!expectedSecret means an
+    // unset CRON_SECRET authorizes nobody.
+    //
+    // Before this change the route had no auth at all: an anonymous POST
+    // carrying an archive UUID and a label id mailed that owner, quoting the
+    // label text back to them, and wrote an owner_notifications row.
+    const { searchParams } = new URL(req.url)
+    const expectedSecret = process.env.CRON_SECRET || ''
+    const headerSecret   = (req.headers.get('authorization') || '').replace('Bearer ', '')
+    const secretParam    = searchParams.get('secret') || ''
+
+    const isFromCron = !!expectedSecret && (
+      headerSecret === expectedSecret ||
+      secretParam  === expectedSecret
+    )
+
+    if (!isFromCron) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const { archiveId, labelId } = await req.json()
 
     if (!archiveId || !labelId) {

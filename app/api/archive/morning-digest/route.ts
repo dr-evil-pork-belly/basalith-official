@@ -8,6 +8,33 @@ import { t } from '@/lib/emailTranslations'
 
 export async function POST(req: Request) {
   try {
+    // Auth: CRON_SECRET only. One caller, app/api/cron/send-photos/route.ts,
+    // which now sends the header. There is no browser caller, so this route
+    // takes a single cron check rather than the two-path shape send-photo and
+    // life-event need.
+    //
+    // Header and query are an independent OR, so a stale query parameter never
+    // shadows a good header during a rotation, and !!expectedSecret means an
+    // unset CRON_SECRET authorizes nobody rather than making '' === '' true for
+    // every anonymous caller.
+    //
+    // Before this change the route had no auth at all: an anonymous POST
+    // carrying any archive UUID mailed that owner a digest of recent label text
+    // and a photograph.
+    const { searchParams } = new URL(req.url)
+    const expectedSecret = process.env.CRON_SECRET || ''
+    const headerSecret   = (req.headers.get('authorization') || '').replace('Bearer ', '')
+    const secretParam    = searchParams.get('secret') || ''
+
+    const isFromCron = !!expectedSecret && (
+      headerSecret === expectedSecret ||
+      secretParam  === expectedSecret
+    )
+
+    if (!isFromCron) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const { archiveId } = await req.json()
 
     const { data: archive } = await supabaseAdmin

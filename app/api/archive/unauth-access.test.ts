@@ -114,7 +114,10 @@ const H = vi.hoisted(() => {
         scoped('voice_recordings',      RECORDING_ID,     { storage_path: `${ARCHIVE_ID}/rec-1.webm`, transcript: 'A transcript.' }) ??
         scoped('wisdom_sessions',       WISDOM_ID,        { dimension: 'professional_philosophy', answers: [], status: 'in_progress', current_question: 0 }) ??
         scoped('entity_conversations',  CONVO_ID,         { role: 'entity', content: 'A reply.', accuracy_rating: null }) ??
-        scoped('significant_dates',     DATE_ID,          { person_name: 'A Person', active: true }) ??
+        // part 7 — date_type, month, day and notes are added for life-event,
+        // which renders date_type into the email body and would throw on
+        // undefined. The dates route (part 6a) does not read them.
+        scoped('significant_dates',     DATE_ID,          { person_name: 'A Person', active: true, date_type: 'birthday', month: 7, day: 28, year: null, notes: null }) ??
         scoped('daily_sessions',        DAILY_ID,         { steps_completed: 0, deposits_added: 0, completed: false, session_date: '2026-07-28' }) ??
         scoped('successors',            SUCCESSOR_ROW_ID, { name: 'A Successor', email: 'succ@x.co' }) ??
         scoped('wisdom_exchanges',      EXCHANGE_ID,      { question: 'A question?', entity_response: 'A reply.', contributor_id: null }) ??
@@ -267,6 +270,12 @@ import { GET  as mobileSparkGET }        from '@/app/api/archive/mobile-spark/ro
 import { GET  as memoryMapGET }          from '@/app/api/archive/memory-map/route'
 import { GET  as trainingDataGET }       from '@/app/api/archive/training-data/route'
 import { POST as updateProfilePOST }     from '@/app/api/archive/update-profile/route'
+// part 7 — fix/cron-secret-batch-3, the two routes with a browser caller as
+// well as a cron caller. The two cron-only routes in that batch
+// (morning-digest, contribution-alert) have no owner path and are covered in
+// app/api/cron/cron-auth.test.ts instead.
+import { POST as sendPhotoPOST }         from '@/app/api/archive/send-photo/route'
+import { POST as lifeEventPOST }         from '@/app/api/archive/life-event/route'
 
 const {
   OWNER_UID, ARCHIVE_ID, CONTRIB_ID, FOREIGN_CONTRIB_ID,
@@ -1101,5 +1110,77 @@ describe('owner-guard batch 2, commit B — medium and low (part 6b)', () => {
   it('POST /api/archive/update-profile', async () => {
     await runGuard('update-profile', h =>
       updateProfilePOST(jsonPost(`${U}/api/archive/update-profile`, { birthYear: 1950 }, h)))
+  })
+})
+
+/**
+ * part 7 — fix/cron-secret-batch-3, the two-path routes.
+ *
+ * `send-photo` and `life-event` each had two legitimate callers and no auth of
+ * any kind. The cron fan-out at app/api/cron/send-photos/route.ts reached them
+ * over plain fetch with no credential, and the owner's own browser reached them
+ * from the Preferences page and the Dates page. An anonymous POST carrying an
+ * archive UUID mailed a family's photographs to every active contributor
+ * (send-photo) or mailed the owner and every contributor a significant-date
+ * email plus a Sonnet call (life-event).
+ *
+ * Both now take the two-path shape poll-replies uses (part 5): CRON_SECRET by
+ * header or query for the cron, or a verified owner session scoped to that
+ * owner's archive. The cron half of the gate lives in
+ * app/api/cron/cron-auth.test.ts. What is asserted here is the owner half.
+ *
+ * These tests send no credential, so `isFromCron` is false on every one of them
+ * regardless of what CRON_SECRET holds in the environment: an empty header and
+ * an empty query parameter can never equal a non-empty secret, and the
+ * `!!expectedSecret` guard covers the case where it is unset.
+ *
+ * The cross-archive case on life-event is the one that is not just a guard.
+ * The handler took `dateId` from the body and looked the row up by id alone, so
+ * a verified owner could pass another archive's dateId and have that family's
+ * person_name, year, and notes rendered into an email sent to their own
+ * contributor list. The lookup is now scoped to the resolved archive, so a
+ * foreign row id misses.
+ */
+describe('cron-secret batch 3 — two-path routes, owner half (part 7)', () => {
+  const U = 'http://localhost'
+
+  it('POST /api/archive/send-photo', async () => {
+    // The archiveId in the body is ignored on the owner path, not validated.
+    // It is sent here so the dead parameter path is exercised too.
+    await runGuard('send-photo', h =>
+      sendPhotoPOST(jsonPost(`${U}/api/archive/send-photo`, { archiveId: ARCHIVE_ID }, h)))
+  })
+
+  it('POST /api/archive/send-photo — a foreign archiveId in the body is ignored, not honoured', async () => {
+    // PreferencesClient.tsx:149 still sends { archiveId }. The owner path
+    // derives the archive from the session instead, so naming someone else's
+    // archive cannot redirect the send. The owner's own run answers normally.
+    mockedSession.mockResolvedValue(OWNER_SESSION as never)
+    const res = await sendPhotoPOST(jsonPost(`${U}/api/archive/send-photo`, { archiveId: 'arch-someone-else' }))
+    console.log(`send-photo             | owner + foreign body   -> ${res.status}`)
+    expect(res.status).toBe(200)
+  })
+
+  it('POST /api/archive/life-event', async () => {
+    await runGuard('life-event', h =>
+      lifeEventPOST(jsonPost(`${U}/api/archive/life-event`,
+        { archiveId: ARCHIVE_ID, dateId: DATE_ID, force: true }, h)))
+  })
+
+  it('POST /api/archive/life-event — an owner cannot mail another archive\'s significant date', async () => {
+    // The row id is no longer authority on its own. Owning an archive plus an
+    // arbitrary date id has to miss.
+    mockedSession.mockResolvedValue(OWNER_SESSION as never)
+    const res = await lifeEventPOST(jsonPost(`${U}/api/archive/life-event`,
+      { archiveId: ARCHIVE_ID, dateId: FOREIGN_DATE_ID, force: true }))
+    console.log(`life-event             | owner + foreign dateId -> ${res.status}`)
+    expect(res.status).toBe(404)
+  })
+
+  it('POST /api/archive/life-event — a missing dateId is a 400, not a send', async () => {
+    mockedSession.mockResolvedValue(OWNER_SESSION as never)
+    const res = await lifeEventPOST(jsonPost(`${U}/api/archive/life-event`, { archiveId: ARCHIVE_ID }))
+    console.log(`life-event             | owner, no dateId       -> ${res.status}`)
+    expect(res.status).toBe(400)
   })
 })

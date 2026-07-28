@@ -292,9 +292,16 @@ export async function POST(req: Request) {
         if (savedLabel?.id) {
           try {
             const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://basalith.ai'
+            // contribution-alert now requires CRON_SECRET. This forward is
+            // server-side on both of this route's paths, so it can carry the
+            // secret whether the caller was the cron or the owner. Header,
+            // never a query parameter: URL parameters appear in server logs.
             await fetch(`${siteUrl}/api/archive/contribution-alert`, {
               method:  'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: {
+                'Content-Type':  'application/json',
+                'Authorization': `Bearer ${process.env.CRON_SECRET}`,
+              },
               body:    JSON.stringify({
                 archiveId: matchedSession.archive_id,
                 labelId:   savedLabel.id,

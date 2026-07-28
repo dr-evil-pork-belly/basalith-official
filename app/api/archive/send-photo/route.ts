@@ -8,6 +8,7 @@ import { getEmailPhotoUrl } from '@/lib/photo-url'
 import { sendWeChatPhoto } from '@/lib/wechat'
 import { getTodaysSpark } from '@/lib/dailySparks'
 import { createEmailReplySession, buildReplyAddress } from '@/lib/emailReplySessions'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 
 // ── Cadence helpers ───────────────────────────────────────────────────────────
 
@@ -110,8 +111,60 @@ function buildSparkOnlyEmail(
 
 export async function POST(req: NextRequest) {
   try {
-    const { archiveId } = await req.json()
-    if (!archiveId) return NextResponse.json({ error: 'archiveId required' }, { status: 400 })
+    // Auth. Two legitimate callers, two paths, the shape poll-replies uses.
+    //
+    // Cron path: CRON_SECRET by authorization header or ?secret= query
+    // parameter. The two branches are an independent OR, so a stale query
+    // parameter never shadows a good header during a rotation, and the
+    // !!expectedSecret guard means an unset CRON_SECRET authorizes nobody
+    // rather than making '' === '' true for every anonymous caller. The
+    // nightly fan-out at app/api/cron/send-photos/route.ts sends the header and
+    // names the archive in the body, because it runs archive-wide.
+    //
+    // Owner path: a Supabase owner session, with ownership verified against the
+    // archives table. A session carrying an archiveId is not proof of ownership
+    // (getSessionUser fills archiveId for successors too). The archiveId in the
+    // body is ignored on this path, not validated, so the Preferences "send a
+    // test" button can only ever mail the caller's own archive.
+    //
+    // Before this change the route had no auth at all: an anonymous POST
+    // carrying any archive UUID mailed that family's photographs to every
+    // active contributor and burned their send queue.
+    const { searchParams } = new URL(req.url)
+    const expectedSecret = process.env.CRON_SECRET || ''
+    const headerSecret   = (req.headers.get('authorization') || '').replace('Bearer ', '')
+    const secretParam    = searchParams.get('secret') || ''
+
+    const isFromCron = !!expectedSecret && (
+      headerSecret === expectedSecret ||
+      secretParam  === expectedSecret
+    )
+
+    let body: { archiveId?: string } = {}
+    try { body = await req.json() } catch { body = {} }
+
+    let archiveId: string
+
+    if (isFromCron) {
+      if (!body.archiveId) return NextResponse.json({ error: 'archiveId required' }, { status: 400 })
+      archiveId = body.archiveId
+    } else {
+      const session = await getSessionUser()
+      if (!session?.archiveId) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+
+      const { data: ownerRow } = await supabaseAdmin
+        .from('archives')
+        .select('owner_user_id')
+        .eq('id', session.archiveId)
+        .maybeSingle()
+      if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      }
+
+      archiveId = session.archiveId
+    }
 
     // 1. Get archive and preferences
     const [{ data: archive }, { data: prefs }] = await Promise.all([

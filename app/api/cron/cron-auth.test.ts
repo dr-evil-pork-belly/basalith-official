@@ -87,6 +87,12 @@ vi.mock('elevenlabs', () => ({
   },
 }))
 vi.mock('@/lib/generateMirror', () => ({ generateMirror: async () => null }))
+// The two-path fan-out children (send-photo, life-event) fall through to a
+// Supabase owner session when no cron secret is presented. Pin that to "no
+// session" so what this file measures is the cron branch alone, and so a
+// rejection is a real 401 rather than a throw out of the cookie store. The
+// owner branch is asserted in app/api/archive/unauth-access.test.ts.
+vi.mock('@/lib/auth/getSessionUser', () => ({ getSessionUser: async () => null }))
 vi.mock('@/lib/trainingPipeline', () => ({
   createTrainingPairFromDeposit: vi.fn(async () => {}),
   createTrainingPairsFromVoice:  vi.fn(async () => {}),
@@ -116,6 +122,16 @@ import { GET as entityLetter }        from './entity-letter/route'
 import { GET as voicePortrait }       from './voice-portrait/route'
 import { GET as weeklyReplay }        from './weekly-replay/route'
 import { GET as weeklyMirror }        from './weekly-mirror/route'
+
+// ── The send-photos fan-out children ──────────────────────────────────────────
+// These are NOT vercel.json crons[] entries and must stay out of ROUTES, which
+// is asserted to match crons[] one for one. They are POST routes that
+// send-photos (and, for contribution-alert, poll-replies) reaches over HTTP,
+// and until fix/cron-secret-batch-3 every one of them was unauthenticated.
+import { POST as sendPhoto }         from '@/app/api/archive/send-photo/route'
+import { POST as morningDigest }     from '@/app/api/archive/morning-digest/route'
+import { POST as contributionAlert } from '@/app/api/archive/contribution-alert/route'
+import { POST as lifeEvent }         from '@/app/api/archive/life-event/route'
 
 type Handler = (req: NextRequest) => Promise<Response>
 
@@ -229,6 +245,151 @@ describe('every cron route authenticates by Authorization header', () => {
       const emptyQuery = await decide(handler, `${U}${routePath}?secret=`)
       console.log(`${label.padEnd(22)} | empty secret + query   -> ${emptyQuery}`)
       expect(emptyQuery).toBe(401)
+    })
+  }
+})
+
+/**
+ * The send-photos fan-out children — fix/cron-secret-batch-3.
+ *
+ * `send-photos` is gated, but until this change it fanned out over plain fetch
+ * with no credential on three of its calls, and the children accepted that. All
+ * four routes below had NO auth of any kind: an anonymous POST carrying an
+ * archive UUID mailed a family's photographs to every active contributor
+ * (send-photo), mailed the owner a digest of recent label text and a photograph
+ * (morning-digest), mailed the owner a quoted contributor memory
+ * (contribution-alert), or mailed the owner and every contributor a
+ * significant-date email plus a Sonnet call (life-event).
+ *
+ * Each now verifies CRON_SECRET with the same normalized block as the scheduled
+ * routes above: header and query as an independent OR, guarded by
+ * `!!expectedSecret`. The callers send the header in the same commit —
+ * send-photos for three of them, poll-replies for contribution-alert — because
+ * a route that starts requiring a secret its caller does not send is a broken
+ * cron rather than a hardened one.
+ *
+ * `send-photo` and `life-event` also have a browser caller and therefore a
+ * second, owner-session path. It is pinned to "no session" here (see the mock
+ * above) so these cases measure the cron branch only. The owner branch is part
+ * 7 of app/api/archive/unauth-access.test.ts.
+ *
+ * As above, "authorizes" is asserted as "not 401". Past the guard these routes
+ * do real work against a stubbed DB and legitimately answer 404 or a `skipped`
+ * 200. Either outcome proves the request got through.
+ */
+const CHILDREN: { path: string; handler: Handler; body: unknown }[] = [
+  { path: '/api/archive/send-photo',         handler: sendPhoto,         body: { archiveId: 'arch-1' } },
+  { path: '/api/archive/morning-digest',     handler: morningDigest,     body: { archiveId: 'arch-1' } },
+  { path: '/api/archive/contribution-alert', handler: contributionAlert, body: { archiveId: 'arch-1', labelId: 'label-1' } },
+  { path: '/api/archive/life-event',         handler: lifeEvent,         body: { archiveId: 'arch-1', dateId: 'date-1', force: true } },
+]
+
+async function decidePost(
+  handler: Handler,
+  url:     string,
+  body:    unknown,
+  headers: Record<string, string> = {},
+) {
+  try {
+    const res = await handler(new NextRequest(url, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json', ...headers },
+      body:    JSON.stringify(body),
+    }))
+    return res.status === 401 ? 401 : `pass(${res.status})`
+  } catch {
+    return 'pass(threw)'
+  }
+}
+
+describe('send-photos fan-out children require CRON_SECRET', () => {
+  it('the children are deliberately not vercel.json crons[] entries', () => {
+    // They are reached server to server, not by the scheduler. This assertion
+    // exists so that adding one to crons[] without moving it into ROUTES fails
+    // loudly rather than shipping unverified.
+    const cfg = JSON.parse(
+      readFileSync(path.resolve(process.cwd(), 'vercel.json'), 'utf8'),
+    ) as { crons: { path: string }[] }
+    const scheduled = new Set(cfg.crons.map(c => c.path))
+    for (const c of CHILDREN) expect(scheduled.has(c.path)).toBe(false)
+  })
+
+  for (const { path: routePath, handler, body } of CHILDREN) {
+    const label = routePath.replace('/api/archive/', '')
+
+    it(`${label} — header authorizes, wrong and empty secrets reject`, async () => {
+      vi.stubEnv('CRON_SECRET', SECRET)
+
+      // 1. What the fan-out now sends.
+      const ok = await decidePost(handler, `${U}${routePath}`, body, { authorization: `Bearer ${SECRET}` })
+      console.log(`${label.padEnd(22)} | valid header           -> ${ok}`)
+      expect(ok).not.toBe(401)
+
+      // 2. Wrong header.
+      const wrong = await decidePost(handler, `${U}${routePath}`, body, { authorization: 'Bearer wrong-secret' })
+      console.log(`${label.padEnd(22)} | wrong header           -> ${wrong}`)
+      expect(wrong).toBe(401)
+
+      // 3. Nothing at all. This is the shape that used to succeed.
+      const bare = await decidePost(handler, `${U}${routePath}`, body)
+      console.log(`${label.padEnd(22)} | no credential          -> ${bare}`)
+      expect(bare).toBe(401)
+
+      // 4. The query branch stays live for this deploy, matching the scheduled
+      //    routes. It is removed from all of them in a later commit.
+      const query = await decidePost(handler, `${U}${routePath}?secret=${SECRET}`, body)
+      console.log(`${label.padEnd(22)} | query secret           -> ${query}`)
+      expect(query).not.toBe(401)
+
+      // 5. Rotation recovery: a stale query parameter must not shadow a good
+      //    header. The branches are an independent OR, not `query || header`.
+      const both = await decidePost(handler, `${U}${routePath}?secret=${STALE}`, body, {
+        authorization: `Bearer ${SECRET}`,
+      })
+      console.log(`${label.padEnd(22)} | stale query + header   -> ${both}`)
+      expect(both).not.toBe(401)
+
+      // 6 and 7. An unset CRON_SECRET authorizes nobody. Without
+      //          `!!expectedSecret &&` these two would make '' === '' true and
+      //          every anonymous caller would take the cron path.
+      vi.stubEnv('CRON_SECRET', '')
+
+      const emptyHeader = await decidePost(handler, `${U}${routePath}`, body, { authorization: 'Bearer ' })
+      console.log(`${label.padEnd(22)} | empty secret + header  -> ${emptyHeader}`)
+      expect(emptyHeader).toBe(401)
+
+      const emptyQuery = await decidePost(handler, `${U}${routePath}?secret=`, body)
+      console.log(`${label.padEnd(22)} | empty secret + query   -> ${emptyQuery}`)
+      expect(emptyQuery).toBe(401)
+    })
+  }
+})
+
+describe('the fan-out callers send the secret', () => {
+  // The other half of the fix. A route that starts requiring a secret its
+  // caller does not send is a broken cron. This reads the two caller files and
+  // asserts every fetch into a hardened child carries an Authorization header,
+  // and that none of them puts the secret in the URL, where it would land in
+  // every request line the platform logs.
+  const CALLERS = [
+    'app/api/cron/send-photos/route.ts',
+    'app/api/archive/poll-replies/route.ts',
+  ]
+
+  for (const file of CALLERS) {
+    it(`${file} — every child fetch carries a Bearer header and no ?secret=`, () => {
+      const src = readFileSync(path.resolve(process.cwd(), file), 'utf8')
+      for (const { path: routePath } of CHILDREN) {
+        const at = src.indexOf(routePath)
+        if (at === -1) continue
+        // The options object of that fetch call: from the path to the end of
+        // the call. Close enough to catch a missing header without parsing.
+        const call = src.slice(at, at + 400)
+        console.log(`${file.padEnd(42)} ${routePath.padEnd(34)} header=${/Authorization/.test(call)} urlSecret=${new RegExp('secret=').test(call)}`)
+        // [\s\S] rather than the `s` flag, which this tsconfig target rejects.
+        expect(call).toMatch(/Authorization[\s\S]*Bearer \$\{process\.env\.CRON_SECRET\}/)
+        expect(call).not.toMatch(/secret=/)
+      }
     })
   }
 })

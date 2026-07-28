@@ -3,15 +3,71 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
 import { NextResponse } from 'next/server'
 import { getEmailPhotoUrl } from '@/lib/photo-url'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 
 const anthropic = new Anthropic()
 
 // ── POST — trigger a life event send ──────────────────────────────────────
 export async function POST(req: Request) {
   try {
-    const { archiveId, dateId, force } = await req.json()
+    // Auth. Two legitimate callers, two paths, the shape poll-replies uses.
+    //
+    // Cron path: CRON_SECRET by authorization header or ?secret= query
+    // parameter. The two branches are an independent OR, so a stale query
+    // parameter never shadows a good header during a rotation, and the
+    // !!expectedSecret guard means an unset CRON_SECRET authorizes nobody. The
+    // nightly fan-out at app/api/cron/send-photos/route.ts sends the header and
+    // names both the archive and the date, because it sweeps every archive.
+    //
+    // Owner path: a Supabase owner session, with ownership verified against the
+    // archives table. A session carrying an archiveId is not proof of ownership
+    // (getSessionUser fills archiveId for successors too). The archiveId in the
+    // body is ignored on this path, not validated, so the Dates page "test
+    // send" button can only ever mail the caller's own archive.
+    //
+    // Before this change the route had no auth at all: an anonymous POST
+    // carrying an archive UUID and a date id mailed the owner and every active
+    // contributor, and spent a Sonnet call doing it.
+    const { searchParams } = new URL(req.url)
+    const expectedSecret = process.env.CRON_SECRET || ''
+    const headerSecret   = (req.headers.get('authorization') || '').replace('Bearer ', '')
+    const secretParam    = searchParams.get('secret') || ''
 
-    if (!archiveId || !dateId) {
+    const isFromCron = !!expectedSecret && (
+      headerSecret === expectedSecret ||
+      secretParam  === expectedSecret
+    )
+
+    let body: { archiveId?: string; dateId?: string; force?: boolean } = {}
+    try { body = await req.json() } catch { body = {} }
+
+    const { dateId, force } = body
+    let archiveId: string
+
+    if (isFromCron) {
+      if (!body.archiveId) {
+        return NextResponse.json({ error: 'archiveId and dateId required' }, { status: 400 })
+      }
+      archiveId = body.archiveId
+    } else {
+      const session = await getSessionUser()
+      if (!session?.archiveId) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+
+      const { data: ownerRow } = await supabaseAdmin
+        .from('archives')
+        .select('owner_user_id')
+        .eq('id', session.archiveId)
+        .maybeSingle()
+      if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      }
+
+      archiveId = session.archiveId
+    }
+
+    if (!dateId) {
       return NextResponse.json({ error: 'archiveId and dateId required' }, { status: 400 })
     }
 
@@ -33,10 +89,16 @@ export async function POST(req: Request) {
       }
     }
 
-    // Fetch archive + significant date
+    // Fetch archive + significant date. The date lookup is scoped to the
+    // resolved archive, so a row id is never authority on its own: without the
+    // archive_id filter an owner could pass another archive's dateId and have
+    // that family's person_name, year, and notes rendered into an email sent to
+    // their own contributor list. The cron path always passes a matching pair
+    // (send-photos selects id and archive_id from the same row), so the filter
+    // costs it nothing.
     const [{ data: archive }, { data: dateRow }] = await Promise.all([
       supabaseAdmin.from('archives').select('*').eq('id', archiveId).single(),
-      supabaseAdmin.from('significant_dates').select('*').eq('id', dateId).single(),
+      supabaseAdmin.from('significant_dates').select('*').eq('id', dateId).eq('archive_id', archiveId).maybeSingle(),
     ])
 
     if (!archive) return NextResponse.json({ error: 'Archive not found' }, { status: 404 })
