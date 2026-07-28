@@ -1,15 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { inngest } from '@/lib/inngest'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
   try {
-    const { archiveId, storagePath, fileName, fileSize, fileType, uploadedBy } =
+    // Auth: Supabase owner session only. Ownership is verified against the
+    // archives table — a session carrying an archiveId is not proof of ownership
+    // (getSessionUser fills archiveId for successors too).
+    const session = await getSessionUser()
+    if (!session?.archiveId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    const archiveId = session.archiveId
+
+    const { data: ownerRow } = await supabaseAdmin
+      .from('archives')
+      .select('owner_user_id')
+      .eq('id', archiveId)
+      .maybeSingle()
+    if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    const { storagePath, fileName, fileSize, fileType, uploadedBy } =
       await req.json()
 
-    if (!archiveId || !storagePath) {
+    if (!storagePath) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 

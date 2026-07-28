@@ -1,11 +1,24 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 
-export async function GET(req: NextRequest) {
-  const archiveId = req.nextUrl.searchParams.get('archiveId')
+export async function GET() {
+  // Auth: Supabase owner session only. Ownership is verified against the
+  // archives table — a session carrying an archiveId is not proof of ownership
+  // (getSessionUser fills archiveId for successors too).
+  const session = await getSessionUser()
+  if (!session?.archiveId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  const archiveId = session.archiveId
 
-  if (!archiveId) {
-    return NextResponse.json({ error: 'archiveId required' }, { status: 400 })
+  const { data: ownerRow } = await supabaseAdmin
+    .from('archives')
+    .select('owner_user_id')
+    .eq('id', archiveId)
+    .maybeSingle()
+  if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
   const { data, error } = await supabaseAdmin

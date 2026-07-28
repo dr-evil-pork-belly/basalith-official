@@ -6,9 +6,24 @@ import { createTrainingPairFromDeposit } from '@/lib/trainingPipeline'
 import { classifyDeposit } from '@/lib/classifyDeposit'
 
 export async function POST(req: NextRequest) {
-  const session   = await getSessionUser()
-  const archiveId = session?.archiveId
-  if (!archiveId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  // Auth: Supabase owner session only. Ownership is verified against the
+  // archives table — a session carrying an archiveId is not proof of ownership
+  // (getSessionUser fills archiveId for successors too). Without this a
+  // successor could write founder positions into the training corpus.
+  const session = await getSessionUser()
+  if (!session?.archiveId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  const archiveId = session.archiveId
+
+  const { data: ownerRow } = await supabaseAdmin
+    .from('archives')
+    .select('owner_user_id')
+    .eq('id', archiveId)
+    .maybeSingle()
+  if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
 
   let body: { scenarioId?: string; response?: string }
   try { body = await req.json() } catch { return NextResponse.json({ error: 'Invalid request' }, { status: 400 }) }

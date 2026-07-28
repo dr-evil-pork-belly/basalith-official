@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 
 const VALID_CADENCES  = ['daily', 'three_weekly', 'weekly', 'paused']
 const VALID_TIMEZONES = [
@@ -8,9 +9,24 @@ const VALID_TIMEZONES = [
 ]
 
 // GET — fetch preferences for an archive
-export async function GET(req: NextRequest) {
-  const archiveId = req.nextUrl.searchParams.get('archiveId')
-  if (!archiveId) return NextResponse.json({ error: 'archiveId required' }, { status: 400 })
+export async function GET() {
+  // Auth: Supabase owner session only. Ownership is verified against the
+  // archives table — a session carrying an archiveId is not proof of ownership
+  // (getSessionUser fills archiveId for successors too).
+  const session = await getSessionUser()
+  if (!session?.archiveId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  const archiveId = session.archiveId
+
+  const { data: ownerRow } = await supabaseAdmin
+    .from('archives')
+    .select('owner_user_id')
+    .eq('id', archiveId)
+    .maybeSingle()
+  if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
 
   const { data, error } = await supabaseAdmin
     .from('email_preferences')
@@ -28,10 +44,28 @@ export async function GET(req: NextRequest) {
 // POST — upsert preferences
 export async function POST(req: NextRequest) {
   try {
-    const body      = await req.json()
-    const { archiveId, cadence, send_time, timezone } = body
+    // Auth: Supabase owner session only. Ownership is verified against the
+    // archives table — a session carrying an archiveId is not proof of ownership
+    // (getSessionUser fills archiveId for successors too). Setting
+    // cadence: 'paused' silences an archive's whole email programme.
+    const session = await getSessionUser()
+    if (!session?.archiveId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    const archiveId = session.archiveId
 
-    if (!archiveId) return NextResponse.json({ error: 'archiveId required' }, { status: 400 })
+    const { data: ownerRow } = await supabaseAdmin
+      .from('archives')
+      .select('owner_user_id')
+      .eq('id', archiveId)
+      .maybeSingle()
+    if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    const body      = await req.json()
+    const { cadence, send_time, timezone } = body
+
     if (cadence    && !VALID_CADENCES.includes(cadence))   return NextResponse.json({ error: 'Invalid cadence' }, { status: 400 })
     if (timezone   && !VALID_TIMEZONES.includes(timezone)) return NextResponse.json({ error: 'Invalid timezone' }, { status: 400 })
 

@@ -6,15 +6,25 @@ import { classifyDeposit } from '@/lib/classifyDeposit'
 
 export const dynamic = 'force-dynamic'
 
-async function getArchiveId(): Promise<string | null> {
-  const session = await getSessionUser()
-  return session?.archiveId ?? null
-}
-
 // GET — owner views all exchanges
 export async function GET() {
-  const archiveId = await getArchiveId()
-  if (!archiveId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  // Auth: Supabase owner session only. Ownership is verified against the
+  // archives table — a session carrying an archiveId is not proof of ownership
+  // (getSessionUser fills archiveId for successors too).
+  const session = await getSessionUser()
+  if (!session?.archiveId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  const archiveId = session.archiveId
+
+  const { data: ownerRow } = await supabaseAdmin
+    .from('archives')
+    .select('owner_user_id')
+    .eq('id', archiveId)
+    .maybeSingle()
+  if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
 
   const { data: exchanges } = await supabaseAdmin
     .from('wisdom_exchanges')
@@ -29,8 +39,24 @@ export async function GET() {
 
 // POST — owner approves, corrects, or ignores
 export async function POST(req: NextRequest) {
-  const archiveId = await getArchiveId()
-  if (!archiveId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  // Auth: Supabase owner session only. Ownership is verified against the
+  // archives table — a session carrying an archiveId is not proof of ownership
+  // (getSessionUser fills archiveId for successors too). Without this a
+  // successor could write into the training corpus.
+  const session = await getSessionUser()
+  if (!session?.archiveId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  const archiveId = session.archiveId
+
+  const { data: ownerRow } = await supabaseAdmin
+    .from('archives')
+    .select('owner_user_id')
+    .eq('id', archiveId)
+    .maybeSingle()
+  if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
 
   const { exchangeId, action, correction } = await req.json()
   if (!exchangeId || !action) return NextResponse.json({ error: 'exchangeId and action required' }, { status: 400 })

@@ -2,11 +2,30 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
 import { NextResponse } from 'next/server'
 import { WITNESS_SESSIONS } from '@/lib/witnessSessions'
+import { getSessionUser } from '@/lib/auth/getSessionUser'
 
 export async function POST(req: Request) {
   try {
+    // Auth: Supabase owner session only. Ownership is verified against the
+    // archives table — a session carrying an archiveId is not proof of ownership
+    // (getSessionUser fills archiveId for successors too). Checked before the
+    // body is read, so an unauthenticated caller can never reach the send.
+    const session = await getSessionUser()
+    if (!session?.archiveId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    const archiveId = session.archiveId
+
+    const { data: ownerRow } = await supabaseAdmin
+      .from('archives')
+      .select('owner_user_id')
+      .eq('id', archiveId)
+      .maybeSingle()
+    if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
     const {
-      archiveId,
       contributorEmail,
       contributorName,
       relationship,
@@ -15,7 +34,7 @@ export async function POST(req: Request) {
       personalNote,
     } = await req.json()
 
-    if (!archiveId || !contributorEmail || !relationship || !subjectName || !ownerName) {
+    if (!contributorEmail || !relationship || !subjectName || !ownerName) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
@@ -25,7 +44,7 @@ export async function POST(req: Request) {
     }
 
     // Create the witness session
-    const { data: session, error: sessionErr } = await supabaseAdmin
+    const { data: witnessRow, error: sessionErr } = await supabaseAdmin
       .from('witness_sessions')
       .insert({
         archive_id:        archiveId,
@@ -43,7 +62,7 @@ export async function POST(req: Request) {
     if (sessionErr) throw sessionErr
 
     const baseUrl    = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
-    const sessionUrl = `${baseUrl}/witness/${session.id}`
+    const sessionUrl = `${baseUrl}/witness/${witnessRow.id}`
 
     // Fetch archive name
     const { data: archive } = await supabaseAdmin
@@ -129,10 +148,10 @@ export async function POST(req: Request) {
       subject:    `Witness invitation sent to ${contributorName || contributorEmail}`,
       sent_to:    contributorEmail,
       sent_at:    new Date().toISOString(),
-      metadata:   { contributorName, relationship, sessionId: session.id },
+      metadata:   { contributorName, relationship, sessionId: witnessRow.id },
     }).then(() => {})
 
-    return NextResponse.json({ sessionId: session.id, sessionUrl })
+    return NextResponse.json({ sessionId: witnessRow.id, sessionUrl })
   } catch (err: any) {
     console.error('invite-witness POST:', err)
     return NextResponse.json({ error: err.message }, { status: 500 })

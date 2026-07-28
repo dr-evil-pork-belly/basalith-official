@@ -47,6 +47,8 @@ const H = vi.hoisted(() => {
   const FOREIGN_DAILY_ID      = 'daily-9999'
   const SUCCESSOR_ROW_ID      = 'succ-1111'
   const FOREIGN_SUCCESSOR_ID  = 'succ-9999'
+  const EXCHANGE_ID           = 'exch-1111'
+  const FOREIGN_EXCHANGE_ID   = 'exch-9999'
   const ARCHIVE_ROW = {
     id: ARCHIVE_ID, owner_user_id: OWNER_UID, status: 'active',
     name: 'Test Archive', family_name: 'Test', owner_name: 'Test Owner', preferred_language: 'en',
@@ -115,6 +117,7 @@ const H = vi.hoisted(() => {
         scoped('significant_dates',     DATE_ID,          { person_name: 'A Person', active: true }) ??
         scoped('daily_sessions',        DAILY_ID,         { steps_completed: 0, deposits_added: 0, completed: false, session_date: '2026-07-28' }) ??
         scoped('successors',            SUCCESSOR_ROW_ID, { name: 'A Successor', email: 'succ@x.co' }) ??
+        scoped('wisdom_exchanges',      EXCHANGE_ID,      { question: 'A question?', entity_response: 'A reply.', contributor_id: null }) ??
         { data: null, error: null }
       )
     }
@@ -143,6 +146,7 @@ const H = vi.hoisted(() => {
     RECORDING_ID, FOREIGN_RECORDING_ID, WISDOM_ID, FOREIGN_WISDOM_ID,
     CONVO_ID, FOREIGN_CONVO_ID, DATE_ID, FOREIGN_DATE_ID,
     DAILY_ID, FOREIGN_DAILY_ID, SUCCESSOR_ROW_ID, FOREIGN_SUCCESSOR_ID,
+    EXCHANGE_ID, FOREIGN_EXCHANGE_ID,
   }
 })
 
@@ -157,6 +161,9 @@ vi.mock('@anthropic-ai/sdk', () => ({
 vi.mock('@/lib/trainingPipeline', () => ({
   createTrainingPairFromDeposit: vi.fn(async () => {}),
   createTrainingPairsFromVoice:  vi.fn(async () => {}),
+  // part 6b — training-data calls this. Without it the mocked module returns
+  // undefined for the import and the route throws instead of answering.
+  getTrainingStats:              vi.fn(async () => ({ totalPairs: 0, includedPairs: 0, averageScore: 0 })),
 }))
 vi.mock('@/lib/classifyDeposit', () => ({ classifyDeposit: vi.fn(async () => {}) }))
 vi.mock('@/lib/inngest', () => ({ inngest: { send: () => Promise.resolve() } }))
@@ -246,12 +253,27 @@ import { POST as successionRemovePOST }  from '@/app/api/archive/succession/remo
 import { POST as terminatePOST }         from '@/app/api/archive/terminate/route'
 import { GET  as journalGET, POST as journalPOST }           from '@/app/api/archive/journal/route'
 import { GET  as dailySessionGET, POST as dailySessionPOST } from '@/app/api/archive/daily-session/route'
+// part 6b — fix/owner-guard-batch-2, commit B (medium and low)
+import { GET  as entityAccuracyGET }     from '@/app/api/archive/entity-accuracy/route'
+import { GET  as preferencesGET, POST as preferencesPOST } from '@/app/api/archive/preferences/route'
+import { POST as inviteWitnessPOST }     from '@/app/api/archive/invite-witness/route'
+import { POST as registerPhotoPOST }     from '@/app/api/archive/register-photo/route'
+import { POST as uploadUrlPOST }         from '@/app/api/archive/upload-url/route'
+import { GET  as timelineGET }           from '@/app/api/archive/timeline/route'
+import { GET  as wisdomExchangeGET, POST as wisdomExchangePOST } from '@/app/api/archive/wisdom-exchange/route'
+import { POST as scenariosRespondPOST }  from '@/app/api/archive/scenarios/respond/route'
+import { GET  as processingStatusGET }   from '@/app/api/archive/processing-status/route'
+import { GET  as mobileSparkGET }        from '@/app/api/archive/mobile-spark/route'
+import { GET  as memoryMapGET }          from '@/app/api/archive/memory-map/route'
+import { GET  as trainingDataGET }       from '@/app/api/archive/training-data/route'
+import { POST as updateProfilePOST }     from '@/app/api/archive/update-profile/route'
 
 const {
   OWNER_UID, ARCHIVE_ID, CONTRIB_ID, FOREIGN_CONTRIB_ID,
   RECORDING_ID, FOREIGN_RECORDING_ID, WISDOM_ID, FOREIGN_WISDOM_ID,
   CONVO_ID, FOREIGN_CONVO_ID, DATE_ID, FOREIGN_DATE_ID,
   DAILY_ID, FOREIGN_DAILY_ID, SUCCESSOR_ROW_ID, FOREIGN_SUCCESSOR_ID,
+  EXCHANGE_ID, FOREIGN_EXCHANGE_ID,
 } = H
 const mockedSession = vi.mocked(getSessionUser)
 
@@ -974,5 +996,110 @@ describe('owner-guard batch 2, commit A — high severity (part 6a)', () => {
       { action: 'complete', sessionId: FOREIGN_DAILY_ID }))
     console.log(`daily-session complete | owner, foreign sess id -> ${res.status}`)
     expect(res.status).toBe(404)
+  })
+})
+
+/**
+ * part 6b — fix/owner-guard-batch-2, COMMIT B (medium and low severity).
+ *
+ * Same guard, lower blast radius. Five had no auth at all and took the archive
+ * from a query string or a body (entity-accuracy, preferences, invite-witness,
+ * register-photo, processing-status, mobile-spark). The rest already required a
+ * session and authorized on session.archiveId alone, so a signed-in successor
+ * passed (upload-url, timeline, wisdom-exchange, scenarios/respond, memory-map,
+ * training-data, update-profile).
+ *
+ * invite-witness sends email on the owner path. @/lib/resend is mocked at the
+ * top of this file, so nothing leaves the process in any scenario.
+ *
+ * mobile-spark is the fourth and last iOS-only route. It is guarded rather than
+ * skipped for the same reason as the three in part 6a.
+ */
+describe('owner-guard batch 2, commit B — medium and low (part 6b)', () => {
+  const U = 'http://localhost'
+
+  it('GET /api/archive/entity-accuracy (writes entity_accuracy on a GET)', async () => {
+    await runGuard('entity-accuracy', () => entityAccuracyGET())
+  })
+
+  it('GET /api/archive/preferences', async () => {
+    await runGuard('preferences GET', () => preferencesGET())
+  })
+
+  it('POST /api/archive/preferences (cadence paused silences the archive)', async () => {
+    await runGuard('preferences POST', h =>
+      preferencesPOST(jsonPost(`${U}/api/archive/preferences`,
+        { archiveId: ARCHIVE_ID, cadence: 'weekly', timezone: 'America/New_York' }, h)))
+  })
+
+  it('POST /api/archive/invite-witness (emails an arbitrary address)', async () => {
+    await runGuard('invite-witness', h =>
+      inviteWitnessPOST(jsonPost(`${U}/api/archive/invite-witness`,
+        {
+          archiveId: ARCHIVE_ID, contributorEmail: 'witness@x.co', contributorName: 'A Witness',
+          relationship: 'child', subjectName: 'Test Owner', ownerName: 'Test Owner',
+        }, h)))
+  })
+
+  it('POST /api/archive/register-photo', async () => {
+    await runGuard('register-photo', h =>
+      registerPhotoPOST(jsonPost(`${U}/api/archive/register-photo`,
+        { archiveId: ARCHIVE_ID, storagePath: `${ARCHIVE_ID}/x.jpg`, fileName: 'x.jpg' }, h)))
+  })
+
+  it('POST /api/archive/upload-url', async () => {
+    await runGuard('upload-url', h =>
+      uploadUrlPOST(jsonPost(`${U}/api/archive/upload-url`, { fileName: 'photo.jpg' }, h)))
+  })
+
+  it('GET /api/archive/timeline', async () => {
+    await runGuard('timeline', () => timelineGET())
+  })
+
+  it('GET /api/archive/wisdom-exchange', async () => {
+    await runGuard('wisdom-exchange GET', () => wisdomExchangeGET())
+  })
+
+  it('POST /api/archive/wisdom-exchange', async () => {
+    await runGuard('wisdom-exchange POST', h =>
+      wisdomExchangePOST(jsonPost(`${U}/api/archive/wisdom-exchange`,
+        { exchangeId: EXCHANGE_ID, action: 'ignore' }, h)))
+  })
+
+  it('POST wisdom-exchange — owner cannot act on another archive exchange', async () => {
+    // The row query was already scoped to the session archive. This asserts it
+    // stays that way now that the session archive is ownership-verified.
+    mockedSession.mockResolvedValue(OWNER_SESSION as never)
+    const res = await wisdomExchangePOST(jsonPost(`${U}/api/archive/wisdom-exchange`,
+      { exchangeId: FOREIGN_EXCHANGE_ID, action: 'approve' }))
+    console.log(`wisdom-exchange POST   | owner, foreign exch id -> ${res.status}`)
+    expect(res.status).toBe(404)
+  })
+
+  it('POST /api/archive/scenarios/respond', async () => {
+    await runGuard('scenarios/respond', h =>
+      scenariosRespondPOST(jsonPost(`${U}/api/archive/scenarios/respond`,
+        { scenarioId: 'key-hire', response: 'How I would actually decide this one.' }, h)))
+  })
+
+  it('GET /api/archive/processing-status', async () => {
+    await runGuard('processing-status', () => processingStatusGET())
+  })
+
+  it('GET /api/archive/mobile-spark (iOS)', async () => {
+    await runGuard('mobile-spark', () => mobileSparkGET())
+  })
+
+  it('GET /api/archive/memory-map', async () => {
+    await runGuard('memory-map', () => memoryMapGET())
+  })
+
+  it('GET /api/archive/training-data', async () => {
+    await runGuard('training-data', () => trainingDataGET())
+  })
+
+  it('POST /api/archive/update-profile', async () => {
+    await runGuard('update-profile', h =>
+      updateProfilePOST(jsonPost(`${U}/api/archive/update-profile`, { birthYear: 1950 }, h)))
   })
 })
