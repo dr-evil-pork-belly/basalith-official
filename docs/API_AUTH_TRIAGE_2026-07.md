@@ -79,8 +79,42 @@ omits `conversationId` and 400s today, so the contributor rating control has
 never worked; restoring it needs the contributor-token shape, not an owner guard.
 No client file was changed in either commit.
 
-**Still open.** Batch 3 (less `poll-replies`) and the two remaining
-needs-decision items. Batches 1, 2, 4 and 5 are now closed.
+**Closed in `5f6bcf9` (`fix/cron-secret-batch-3`), the cron-secret batch.** The
+four remaining Batch 3 routes, `send-photo`, `morning-digest`,
+`contribution-alert` and `life-event`, now verify `CRON_SECRET`. Recon
+corrected the table on one point: the table implies these routes were
+partially gated, and they were not. **All four had no auth of any kind**, not
+just `send-photo` and `morning-digest`. Each takes the block normalized in
+`08b8c6d`: header and query as an independent OR, guarded by
+`!!expectedSecret`.
+
+Both halves shipped together, because the callers were sending no credential
+at all and a guard alone would have been four broken crons.
+`app/api/cron/send-photos/route.ts` now sends `Authorization: Bearer` on its
+three fan-out calls, and `app/api/archive/poll-replies/route.ts` sends it on
+the `contribution-alert` forward. Header only, never a query parameter.
+
+`send-photo` and `life-event` have a browser caller as well and took the
+two-path shape from `a409eaf` rather than a single cron check. The owner path
+ignores the `archiveId` in the body rather than validating it and derives the
+archive from the session, so no client file needed changing.
+`morning-digest` and `contribution-alert` have no browser caller and took a
+single check.
+
+One change beyond the guard: `life-event` read its `significant_dates` row by
+`dateId` alone, so a verified owner could pass another archive's `dateId` and
+have that family's `person_name`, `year` and `notes` rendered into an email
+sent to their own contributor list. The lookup is now scoped to the resolved
+archive. Without it the owner path would not have been archive-scoped.
+
+Regression coverage is the new fan-out block in
+`app/api/cron/cron-auth.test.ts`, which also asserts both caller files send the
+header and put no secret in a URL, plus part 7 of
+`app/api/archive/unauth-access.test.ts` for the two owner paths. Preview
+deployed, not promoted.
+
+**Still open.** Only the two needs-decision items. Batches 1, 2, 3, 4 and 5 are
+now closed.
 
 ## Reference patterns used to name the fix shapes
 
@@ -128,10 +162,10 @@ needs-decision items. Batches 1, 2, 4 and 5 are now closed.
 | `setup-voice-clone` (session branch) | `app/god/GodModeClient.tsx:265` only | god | God branch is correct. Session branch deletes the existing ElevenLabs voice and rebuilds the clone from up to 5 recordings | **CLOSED in `a409eaf`**: session branch deleted, route stays live on the god path | **Medium.** Destroys an existing voice id and spends ElevenLabs quota, but produces nothing the caller can read |
 | `entity-accuracy` | `app/archive/voice/VoiceClient.tsx:82`, `app/archive/entity/EntityClient.tsx:160,198`, `app/archive/dashboard/DashboardClient.tsx:36` | owner-session | Reads all `owner_deposits`, `entity_conversations`, and `labels` to compute scores, returns scores and totals, upserts `entity_accuracy` | owner-guard. **CLOSED in commit B of `fix/owner-guard-batch-2`** (medium and low) | **Medium.** Returns numbers, not the source text, but it does write on a GET |
 | `preferences` | `app/archive/preferences/PreferencesClient.tsx:89` (GET), `:106` (POST) | owner-session | Reads and upserts `email_preferences`: cadence, send time, timezone | owner-guard. **CLOSED in commit B of `fix/owner-guard-batch-2`** (medium and low) | **Medium.** Setting `cadence: 'paused'` silences an archive's whole email programme |
-| `send-photo` | `app/api/cron/send-photos/route.ts:36`, `app/archive/preferences/PreferencesClient.tsx:149` | mixed (cron, owner-session) | Sends the photograph email to every active contributor, creates `email_sessions` and `email_reply_sessions`, records `contributor_photo_sends`, fires WeChat, advances `email_preferences` | cron-secret | **Medium.** Emails real people and burns the send queue, but sends only to addresses already in the archive |
-| `life-event` | `app/api/cron/send-photos/route.ts:121`, `app/archive/dates/DatesClient.tsx:179` | mixed (cron, owner-session) | Sonnet call, then emails the owner and every active contributor with a photograph | cron-secret | **Medium.** Email to real people plus model spend |
-| `morning-digest` | `app/api/cron/send-photos/route.ts:96` | cron | Emails the owner a digest containing recent label text and a photograph | cron-secret | **Medium.** Triggers email to a real person |
-| `contribution-alert` | `app/api/archive/poll-replies/route.ts:253` | cron (server to server, sends no credential today) | Emails the owner that a contributor added a memory, inserts `owner_notifications` | cron-secret | **Medium.** Triggers email to a real person |
+| `send-photo` | `app/api/cron/send-photos/route.ts:36`, `app/archive/preferences/PreferencesClient.tsx:149` | mixed (cron, owner-session) | Sends the photograph email to every active contributor, creates `email_sessions` and `email_reply_sessions`, records `contributor_photo_sends`, fires WeChat, advances `email_preferences` | cron-secret. **CLOSED in `5f6bcf9`** (`fix/cron-secret-batch-3`): had **no auth at all**, not partial. Cron path takes `CRON_SECRET` by header or query and keeps the archive from the body; owner path takes a verified session and derives the archive from it, ignoring the body `archiveId`. `send-photos:36` now sends the header | **Medium.** Emails real people and burns the send queue, but sends only to addresses already in the archive |
+| `life-event` | `app/api/cron/send-photos/route.ts:121`, `app/archive/dates/DatesClient.tsx:179` | mixed (cron, owner-session) | Sonnet call, then emails the owner and every active contributor with a photograph | cron-secret. **CLOSED in `5f6bcf9`**: had **no auth at all**. Same two-path shape as `send-photo`, plus the `significant_dates` lookup is now scoped to the resolved archive, so a verified owner can no longer mail another archive's date. `send-photos:121` now sends the header | **Medium.** Email to real people plus model spend |
+| `morning-digest` | `app/api/cron/send-photos/route.ts:96` | cron | Emails the owner a digest containing recent label text and a photograph | cron-secret. **CLOSED in `5f6bcf9`**: had **no auth at all**. Single cron check, no browser caller. `send-photos:96` now sends the header | **Medium.** Triggers email to a real person |
+| `contribution-alert` | `app/api/archive/poll-replies/route.ts:253` | cron (server to server, sends no credential today) | Emails the owner that a contributor added a memory, inserts `owner_notifications` | cron-secret. **CLOSED in `5f6bcf9`**: had **no auth at all**. Single cron check. `poll-replies:295` now sends the header on the forward, on both of that route's paths | **Medium.** Triggers email to a real person |
 | `invite-witness` | `app/archive/contributors/ContributorsClient.tsx:276` | owner-session | Inserts `witness_sessions` and emails a caller-supplied address a `/witness/{id}` link | owner-guard. **CLOSED in commit B of `fix/owner-guard-batch-2`** (medium and low) | **Medium.** Sends a branded invitation to an arbitrary address and creates the session it points at |
 | `deposit-prompt` | None found in either repo | none-found | Emails the owner a prompt built from the most recent contributor label, inserts `owner_notifications` | delete-route. **DELETED in `a409eaf`** | **Medium.** Triggers email to a real person |
 | `send-summary` | None found in either repo | none-found | Emails every recipient of any `email_sessions` row a digest of that session's replies | delete-route. **DELETED in `a409eaf`** | **Medium.** Replays contributor reply text to the whole recipient list of any session id |
@@ -234,6 +268,39 @@ cleaner than a guard here because a guard on a route nobody calls is dead code
 that still has to be reasoned about at the next sweep. If any of these turn out
 to be called by something outside both repos, a Postman collection or a Legacy
 Guide bookmark, deletion surfaces that immediately as a 404 rather than hiding it.
+
+### What remains in this triage
+
+Batches 1, 2, 3, 4 and 5 are closed. **Two needs-decision items are left, and
+they are not equal in weight.**
+
+1. **`receive-reply` is the substantive one.** It is the only route in the
+   document that is still reachable, still on a live path, and still
+   unverified. `app/api/resend/inbound/route.ts:366` falls through to it by
+   `fetch` for the legacy `email_sessions` reply-address pattern, so it cannot
+   simply be deleted. It reads `svix-id`, `svix-timestamp` and `svix-signature`
+   at lines 67-75, logs them, and processes regardless. It is no longer a
+   webhook target, so svix verification is the wrong fix. The choice is between
+   making it a function in `lib/` that `inbound` calls directly, and keeping the
+   route behind an internal shared secret, which is now the same shape the four
+   Batch 3 routes just took. The forward at `inbound:366` would need the header
+   in the same commit, exactly as `poll-replies` did for `contribution-alert`.
+   Worth recording alongside it: **`inbound` itself verifies no signature
+   either**, and it is the route Resend actually posts to. That is a wider
+   question than `receive-reply` and is not tracked anywhere else in this
+   document.
+
+2. **The `setup-voice-clone` and `test-voice` owner path is a product question,
+   not a security one.** `a409eaf` already deleted both session branches, so
+   nothing is open today: the routes are god-only and a successor can no longer
+   synthesize the owner's voice. What is left to decide is whether an
+   owner-initiated voice clone path should exist at all. If yes, the branch
+   comes back with the standard owner-guard. If no, nothing happens. Either way
+   no hole stays open while it waits.
+
+Outside the two, the orphan cron section above is the other thing this document
+now carries that needs David rather than an engineer, and `pay-residuals` is
+the item in it that matters.
 
 ### Batch 6, needs-decision
 
@@ -353,6 +420,65 @@ unbuilt UI rather than a retired feature. Two more are worth naming as partly
 dead rather than dead: the `ContributeClient` call into `entity-feedback` has
 never worked, and the `basalith-app` call into `timeline` cannot work, because the
 route ignores `?archiveId` and reads the session.
+
+---
+
+## The orphan crons (recon only, nothing changed)
+
+Found while doing Batch 3. Five routes under `app/api/cron/` have **no
+`vercel.json` crons[] entry, no caller that can reach them, and have therefore
+never run in production**. `vercel.json` has 19 entries; these five are not
+among them. This section exists so the finding is not lost. **No file was
+edited, nothing was scheduled, nothing was deleted.** This is input for David.
+
+Auth is not the issue with any of them: all five already validate
+`CRON_SECRET`, three of them with the older `query || header` form that
+`08b8c6d` normalized elsewhere. If any is ever scheduled, it should take the
+normalized block first.
+
+Three of the five have a **God Mode button that cannot work**. `GodModeClient.tsx`
+`CRON_BUTTONS` lists `family-reactions` (:113), `cold-storage-ping` (:118) and
+`pause-reminder` (:123), and `handleTrigger` posts to `/api/god/trigger`. That
+route's `CRON_ROUTES` map (`trigger/route.ts:11-21`) holds nine entries and
+none of these three, so the button returns 400 `Unknown route` and renders
+`✗`. So the buttons are not callers. They are evidence that someone intended
+these to be runnable and stopped halfway.
+
+| Route | What it does | Tables touched | Reads as | Anything expecting its effects |
+|---|---|---|---|---|
+| `pay-residuals` | Monthly Legacy Guide residual. For each certified guide with an active Stripe account, sums 12% of annual tier price / 12 across their `Active Client` prospects, inserts a `commissions` row, then attempts a Stripe Connect transfer and marks it paid | reads `archivists`, `prospects`; writes `commissions` | **Finished job missing a schedule.** Complete: tier table, idempotency (one residual per guide per calendar month), Stripe transfer, paid/pending state, per-guide error isolation | **Yes, and this is the one that matters.** See below |
+| `guide-quality-audit` | Scores each guide's client archives (photos, deposits, voice, contributors, archive_score) and writes an average back to the guide, flagging anyone under 50 | reads `archivists`, `prospects`, `archives`, `photographs`, `owner_deposits`, `voice_recordings`, `contributors`; writes `archivists.quality_score`, `archivists.active_archives` | **Finished job missing a schedule**, with one known-weak join (line 70 matches archives by `prospects.id`, which is a prospect id, not an archive id, so `archives` almost certainly returns nothing and every guide falls back to the flat 50) | **Yes.** `archivist/dashboard/route.ts:58` and `EarningsClient.tsx:76` both display `quality_score`. It is `DEFAULT 0` (`20260506_guide_portal.sql:40`) and **this cron is its only writer**, so every guide's quality score is permanently 0 |
+| `family-reactions` | Weekly Monday digest of contributor answers from the 7-14 day window, then marks them notified | reads `archives`, `contributor_questions`, `contributors`; writes `contributor_questions.owner_notified` | **Finished job missing a schedule.** Idempotent by the `owner_notified` flag | No. `owner_notified` is written only here; nothing reads it |
+| `cold-storage-ping` | Re-engagement email to paused/resting archives at 90/180/270 days, quoting one of the owner's own high-quality deposits | reads `archives`, `owner_deposits`; writes `owner_notifications` | **Finished job missing a schedule.** Idempotent per milestone | No |
+| `pause-reminder` | Monthly reminder to archives paused ~6 or ~12 months | reads `archives`; writes `owner_notifications` | **Finished job missing a schedule.** Idempotent per calendar month. Overlaps `cold-storage-ping` in intent | No |
+
+**None of the five reads as dead code.** Every one is complete, idempotent, and
+coherent. The shared defect is a missing `vercel.json` entry, not an unfinished
+implementation. `guide-quality-audit` is the only one with a real bug inside it
+as well.
+
+**`pay-residuals` is the one to settle.** The residual model is not just
+declared, it is *displayed*. `archivist/dashboard/route.ts:43-55` computes a
+`residualMRRCents` tile by deriving 12% of annual / 12 from the guide's active
+prospects, and its own comment says the derivation exists "so the dashboard
+tile agrees with the earnings page and with **what is paid**."
+`EarningsClient.tsx:18-37` repeats the same arithmetic, and
+`EarningsClient.tsx:239` states a Legacy archive "generates $144/year in
+residuals." Nothing is paid. The cron that would write the `commissions` rows
+has never run, so `thisMonthCents` on the same dashboard, which does read
+`commissions` (`route.ts:21,37-38`), can never include a residual.
+
+That is a live gap between what a Legacy Guide is shown and what exists, which
+puts it under the standing integrity rule in CLAUDE.md section 8, not just
+under this triage. It needs a decision from David, and the decision is a
+product one: schedule the cron, or change what the guide portal claims. It
+should not be scheduled as a side effect of an auth batch, because scheduling
+it starts moving real money through Stripe Connect on the first run.
+
+`residual_income_cents`, shown on the guide leaderboard
+(`archivist/dashboard/route.ts:23`, `LeaderboardClient.tsx:13,102`), has **no
+writer anywhere in the repo**, not even in these five. That is a separate
+finding and a smaller one.
 
 ---
 
