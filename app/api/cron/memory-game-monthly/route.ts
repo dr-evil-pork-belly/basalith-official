@@ -10,10 +10,15 @@ export const maxDuration = 120
 const REVEAL_DAYS = 7
 
 function validateCronAuth(req: NextRequest): boolean {
-  const p        = new URL(req.url).searchParams
-  const secret   = req.headers.get('authorization')?.replace('Bearer ', '') ?? p.get('secret') ?? ''
-  const expected = process.env.CRON_SECRET ?? ''
-  return !!expected && secret === expected
+  // Vercel's scheduler sends `Authorization: Bearer $CRON_SECRET`. The ?secret=
+  // query branch stays live as the recovery path during secret rotation and is
+  // removed in a later commit. Both are checked independently, so an empty or
+  // wrong Authorization header cannot shadow a valid ?secret=.
+  const p            = new URL(req.url).searchParams
+  const secretParam  = p.get('secret') ?? ''
+  const headerSecret = (req.headers.get('authorization') ?? '').replace('Bearer ', '')
+  const expected     = process.env.CRON_SECRET ?? ''
+  return !!expected && (headerSecret === expected || secretParam === expected)
 }
 
 // ── Start monthly game ─────────────────────────────────────────────────────────

@@ -8,10 +8,15 @@ export const dynamic = 'force-dynamic'
 const anthropic = new Anthropic()
 
 function validateCronAuth(req: NextRequest): boolean {
+  // Vercel's scheduler sends `Authorization: Bearer $CRON_SECRET`. The ?secret=
+  // query branch stays live as the recovery path during secret rotation and is
+  // removed in a later commit. Both are checked independently, so a stale or
+  // wrong ?secret= cannot shadow a valid header.
   const { searchParams } = new URL(req.url)
-  const secret   = searchParams.get('secret') || req.headers.get('authorization')?.replace('Bearer ', '') || ''
-  const expected = process.env.CRON_SECRET || ''
-  return !!expected && secret === expected
+  const secretParam  = searchParams.get('secret') || ''
+  const headerSecret = (req.headers.get('authorization') || '').replace('Bearer ', '')
+  const expected     = process.env.CRON_SECRET || ''
+  return !!expected && (headerSecret === expected || secretParam === expected)
 }
 
 function buildPersonSystemPrompt(ownerName: string, archiveName: string): string {
