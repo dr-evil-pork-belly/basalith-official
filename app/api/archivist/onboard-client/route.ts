@@ -1,3 +1,45 @@
+import { NextResponse } from 'next/server'
+
+/**
+ * RETIRED July 2026. Returns 410 to every caller, authenticated or not.
+ *
+ * Why: this route had no caller authentication. It read `archivistId` from the
+ * request body, confirmed only that the id named a row in `archivists` with
+ * status 'active', and then created an `archives` row, an `archive_credentials`
+ * row, a Supabase Auth user, a `commissions` row at amount_cents 100000, and a
+ * `prospects` row, and sent a client welcome email plus an admin notification.
+ * It also had no idempotency guard of any kind, so two identical posts produced
+ * two of everything. That is the most likely explanation for the four duplicate
+ * empty Calder Archive rows.
+ *
+ * Client onboarding now runs through app/api/admin/checkout, which is god-authed
+ * and generates a founding checkout. The page above this route,
+ * app/archivist/onboard/page.tsx, was already reduced to a static notice
+ * pointing at the same place, so no user interface reached this handler.
+ *
+ * Retired rather than gated on purpose. Gating it would have hardened a second
+ * live way to create archives. Removing it leaves one provisioning path,
+ * lib/billing/createArchive.ts called by provisionOnFoundingFee.
+ *
+ * The original handler is preserved below rather than deleted, so the behavior
+ * that ran in production is still readable. Two mechanical changes were needed
+ * to keep the file lint-clean and inside the repo copy rules. The imports it
+ * used were removed from the top of this file (NextRequest, supabaseAdmin,
+ * resend, createArchiveWithCredentials), and the single em dash in its comment
+ * on the welcome-email catch was normalized to a period. No executable line was
+ * altered.
+ */
+export async function POST() {
+  return NextResponse.json(
+    {
+      error: 'Client onboarding has moved. Contact your Basalith administrator to generate a founding checkout.',
+    },
+    { status: 410 },
+  )
+}
+
+/* ORIGINAL HANDLER, retired July 2026. Preserved for reference, not executed.
+
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
@@ -153,7 +195,7 @@ export async function POST(req: NextRequest) {
       })
     } catch (emailErr: unknown) {
       console.error('[onboard-client] Welcome email failed:', emailErr instanceof Error ? emailErr.message : emailErr)
-      // Non-fatal — archive is created and reachable at /archive-login regardless
+      // Non-fatal. Archive is created and reachable at /archive-login regardless
     }
 
     // ── 9. Notify admin ───────────────────────────────────────────────────────
@@ -195,3 +237,5 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
+
+*/

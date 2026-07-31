@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Security regression gate — fix/close-unauth-archive-access.
  *
  * Exercises the REAL route handlers for the six routes hardened in this hotfix.
@@ -18,7 +18,7 @@
  * owner_user_id = OWNER_UID, so the owner session (userId === OWNER_UID) passes
  * and every other session is rejected.
  */
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { NextRequest } from 'next/server'
 
 vi.mock('@/lib/auth/getSessionUser', () => ({ getSessionUser: vi.fn() }))
@@ -60,6 +60,11 @@ const H = vi.hoisted(() => {
     termination_requested_at: null, owner_birth_year: 1950, owner_birth_decade: 1950,
   }
 
+  // Every terminal query is appended here as { table, op, filters }. part 8 uses
+  // it to assert WHICH row a Guide route touched, which is the whole question on
+  // a route that used to take its identity from the request.
+  const dbCalls: { table: string; op: string; filters: Record<string, unknown> }[] = []
+
   function makeBuilder(table: string) {
     let op: 'select' | 'insert' | 'update' | 'delete' = 'select'
     // Recorded so the contributors table can honour `.eq('id', ...)`: the
@@ -75,8 +80,20 @@ const H = vi.hoisted(() => {
     b.eq = (col: string, val: unknown) => { filters[col] = val; return b }
     for (const m of ['neq', 'in', 'is', 'not', 'order', 'limit', 'range', 'gt', 'gte', 'lt', 'lte', 'contains', 'ilike', 'or', 'match']) b[m] = pass
     const terminal = () => {
+      dbCalls.push({ table, op, filters: { ...filters } })
       if (op === 'insert') return { data: { id: 'generated-id' }, error: null }
       if (table === 'archives') return { data: ARCHIVE_ROW, error: null }
+      // part 8. The Guide routes resolve their own row from the session id.
+      // Whatever id is asked for resolves, so what the test asserts is WHICH id
+      // was asked for, not whether the row happens to exist.
+      if (table === 'archivists') {
+        return {
+          data: {
+            id: filters.id, name: 'A Legacy Guide', email: 'guide@x.co', status: 'active',
+          },
+          error: null,
+        }
+      }
       // Scoped like the real table: a row resolves only when the id asked for
       // is the one that lives in ARCHIVE_ID.
       if (table === 'contributors') {
@@ -127,8 +144,12 @@ const H = vi.hoisted(() => {
     b.single = async () => terminal()
     b.maybeSingle = async () => terminal()
     // Awaitable list-style queries: `await supabaseAdmin.from(x).select(...).eq(...)`
-    b.then = (res: (v: unknown) => unknown, rej?: (e: unknown) => unknown) =>
-      Promise.resolve({ data: [], error: null, count: 0 }).then(res, rej)
+    // A bare `.update(...).eq(...)` with no .single() lands here too, which is
+    // the shape the Guide payout writes use.
+    b.then = (res: (v: unknown) => unknown, rej?: (e: unknown) => unknown) => {
+      dbCalls.push({ table, op, filters: { ...filters } })
+      return Promise.resolve({ data: [], error: null, count: 0 }).then(res, rej)
+    }
     return b
   }
 
@@ -145,6 +166,7 @@ const H = vi.hoisted(() => {
   }
 
   return {
+    dbCalls,
     OWNER_UID, ARCHIVE_ID, ARCHIVE_ROW, CONTRIB_ID, FOREIGN_CONTRIB_ID, supabaseAdmin,
     RECORDING_ID, FOREIGN_RECORDING_ID, WISDOM_ID, FOREIGN_WISDOM_ID,
     CONVO_ID, FOREIGN_CONVO_ID, DATE_ID, FOREIGN_DATE_ID,
@@ -177,6 +199,30 @@ vi.mock('@/lib/resend', () => ({ resend: { emails: { send: async () => ({}) } } 
 vi.mock('resend', () => ({
   Resend: class { emails = { send: async () => ({}) } },
 }))
+// Which Guide the mocked Stripe account claims to belong to. Mutable so the GET
+// mismatch case can point the account at a different Guide than the session.
+const STRIPE_ACCOUNT_OWNER = vi.hoisted(() => ({ value: 'guide-session-111' }))
+// part 8. connect-stripe imports the Stripe constructor at module top and
+// builds the client lazily inside getStripe(). Mocked so the Guide happy-path
+// reaches the database write instead of a network call. accounts.create stamps
+// metadata.archivistId exactly as the real call does, which is what the GET leg
+// verifies against the session.
+vi.mock('stripe', () => {
+  class MockStripe {
+    accounts = {
+      create: async (params: { metadata?: Record<string, string> }) => ({
+        id: 'acct_mock_1', metadata: params?.metadata ?? {}, charges_enabled: true,
+      }),
+      retrieve: async (id: string) => ({
+        id, metadata: { archivistId: STRIPE_ACCOUNT_OWNER.value }, charges_enabled: true,
+      }),
+    }
+    accountLinks = {
+      create: async () => ({ url: 'https://connect.stripe.test/onboard' }),
+    }
+  }
+  return { default: MockStripe, Stripe: MockStripe }
+})
 vi.mock('@/lib/entityContext', () => ({ buildEntitySystemPrompt: async () => ({ systemPrompt: 'sys', usedDepositIds: [] }) }))
 vi.mock('@/lib/entityReadiness', () => ({ calculateEntityReadiness: async () => ({ score: 42 }) }))
 // succession/add provisions a Supabase Auth user. Mocked so the owner
@@ -276,8 +322,15 @@ import { POST as updateProfilePOST }     from '@/app/api/archive/update-profile/
 // app/api/cron/cron-auth.test.ts instead.
 import { POST as sendPhotoPOST }         from '@/app/api/archive/send-photo/route'
 import { POST as lifeEventPOST }         from '@/app/api/archive/life-event/route'
+// part 8, fix/guide-route-auth. The Legacy Guide side, not the archive side.
+import {
+  POST as connectStripePOST,
+  GET  as connectStripeGET,
+} from '@/app/api/archivist/connect-stripe/route'
+import { POST as onboardClientPOST }     from '@/app/api/archivist/onboard-client/route'
 
 const {
+  dbCalls,
   OWNER_UID, ARCHIVE_ID, CONTRIB_ID, FOREIGN_CONTRIB_ID,
   RECORDING_ID, FOREIGN_RECORDING_ID, WISDOM_ID, FOREIGN_WISDOM_ID,
   CONVO_ID, FOREIGN_CONVO_ID, DATE_ID, FOREIGN_DATE_ID,
@@ -1182,5 +1235,181 @@ describe('cron-secret batch 3 — two-path routes, owner half (part 7)', () => {
     const res = await lifeEventPOST(jsonPost(`${U}/api/archive/life-event`, { archiveId: ARCHIVE_ID }))
     console.log(`life-event             | owner, no dateId       -> ${res.status}`)
     expect(res.status).toBe(400)
+  })
+})
+
+/**
+ * part 8, fix/guide-route-auth.
+ *
+ * The Legacy Guide side of the same defect. Both routes took an archivist id
+ * from the request and acted on it with no session check at all.
+ *
+ *   connect-stripe   POST created a Stripe Connect account and wrote
+ *                    stripe_account_id + stripe_account_status onto whatever
+ *                    archivist id the body named. GET did the same from the
+ *                    query string. This one attaches a payout destination, so
+ *                    it is the money-moving half.
+ *   onboard-client   no auth at all. Created an archives row, an
+ *                    archive_credentials row, a Supabase Auth user, a $1,000
+ *                    commissions row and a prospects row, and mailed a magic
+ *                    link. RETIRED to 410 rather than guarded, because gating
+ *                    it would have hardened a second live way to create an
+ *                    archive rather than removing it.
+ *
+ * These are Guide routes, not archive routes, so runGuard does not apply: there
+ * is no archive ownership dimension and therefore no successor-403 case. The
+ * gate is simply whether getSessionUser resolved an archivistId.
+ *
+ * The assertions that matter are the two cross-identity ones. They read the
+ * captured dbCalls log and assert on WHICH archivists row every query touched,
+ * because "the body id is ignored" is only true if no query ever carries it.
+ */
+describe('Legacy Guide routes, identity from session and never from request (part 8)', () => {
+  const U = 'http://localhost'
+  const SESSION_GUIDE = 'guide-session-111'
+  const BODY_GUIDE    = 'guide-other-999'
+  const GUIDE_SESSION = { userId: 'guide-uid', email: 'guide@x.co', role: 'guide', archivistId: SESSION_GUIDE }
+
+  // Every archivists-table query recorded since the last reset.
+  const guideCalls = () => dbCalls.filter(c => c.table === 'archivists')
+
+  beforeEach(() => {
+    dbCalls.length = 0
+    STRIPE_ACCOUNT_OWNER.value = SESSION_GUIDE
+    // getStripe() throws before it reaches the mocked client if the key is
+    // absent, which would turn every happy path into a 500 and hide the guard.
+    vi.stubEnv('STRIPE_SECRET_KEY', 'sk_test_mock')
+  })
+  afterEach(() => { vi.unstubAllEnvs() })
+
+  it('POST /api/archivist/connect-stripe, no session is rejected', async () => {
+    mockedSession.mockResolvedValue(null)
+    const res = await connectStripePOST()
+    console.log(`connect-stripe POST    | no session             -> ${res.status}`)
+    expect(res.status).toBe(401)
+    // The gate has to sit above the database, not beside it.
+    expect(guideCalls()).toHaveLength(0)
+  })
+
+  it('POST /api/archivist/connect-stripe, a session with no archivistId is rejected', async () => {
+    // An archive owner is signed in, but is not a Guide. getSessionUser fills
+    // archiveId for them and leaves archivistId null.
+    mockedSession.mockResolvedValue(OWNER_SESSION as never)
+    const res = await connectStripePOST()
+    console.log(`connect-stripe POST    | owner, not a guide     -> ${res.status}`)
+    expect(res.status).toBe(401)
+    expect(guideCalls()).toHaveLength(0)
+  })
+
+  it('POST /api/archivist/connect-stripe, a Guide session succeeds', async () => {
+    mockedSession.mockResolvedValue(GUIDE_SESSION as never)
+    const res = await connectStripePOST()
+    console.log(`connect-stripe POST    | guide session          -> ${res.status}`)
+    expect(res.status).toBe(200)
+    expect(await res.json()).toEqual({ url: 'https://connect.stripe.test/onboard' })
+  })
+
+  it('POST connect-stripe, a body archivistId is ignored and the session row is the one written', async () => {
+    // This is the fix. The handler no longer reads the body at all, so a caller
+    // naming another Guide cannot redirect the payout write. Asserted on the
+    // captured queries rather than on the status code, because a 200 alone would
+    // not say which row moved.
+    mockedSession.mockResolvedValue(GUIDE_SESSION as never)
+    const res = await (connectStripePOST as unknown as (r: NextRequest) => Promise<Response>)(
+      jsonPost(`${U}/api/archivist/connect-stripe`, { archivistId: BODY_GUIDE }),
+    )
+    expect(res.status).toBe(200)
+
+    const calls = guideCalls()
+    for (const c of calls) {
+      console.log(`connect-stripe POST    | ${c.op.padEnd(6)} archivists.id = ${String(c.filters.id)}`)
+    }
+
+    // Every query, read and write, went to the session Guide.
+    expect(calls.length).toBeGreaterThan(0)
+    expect(calls.every(c => c.filters.id === SESSION_GUIDE)).toBe(true)
+    // And the body id never reached the database in any form.
+    expect(calls.some(c => c.filters.id === BODY_GUIDE)).toBe(false)
+    // The payout write specifically was reached and was scoped to the session.
+    const writes = calls.filter(c => c.op === 'update')
+    expect(writes.length).toBeGreaterThan(0)
+    expect(writes.every(c => c.filters.id === SESSION_GUIDE)).toBe(true)
+  })
+
+  it('GET /api/archivist/connect-stripe, no session redirects to sign in and writes nothing', async () => {
+    // A browser navigation, so the unauthenticated answer is a redirect rather
+    // than a 401 JSON body.
+    mockedSession.mockResolvedValue(null)
+    const res = await connectStripeGET(get(`${U}/api/archivist/connect-stripe?account=acct_mock_1`))
+    console.log(`connect-stripe GET     | no session             -> ${res.status} ${res.headers.get('location')}`)
+    expect(res.status).toBe(307)
+    expect(res.headers.get('location')).toContain('/archivist-login')
+    expect(guideCalls()).toHaveLength(0)
+  })
+
+  it('GET connect-stripe, a query archivistId is ignored and the session row is the one written', async () => {
+    mockedSession.mockResolvedValue(GUIDE_SESSION as never)
+    const res = await connectStripeGET(
+      get(`${U}/api/archivist/connect-stripe?account=acct_mock_1&archivistId=${BODY_GUIDE}`),
+    )
+    console.log(`connect-stripe GET     | guide + foreign query  -> ${res.status}`)
+    expect(res.headers.get('location')).toContain('stripe_connected=1')
+
+    const calls = guideCalls()
+    for (const c of calls) {
+      console.log(`connect-stripe GET     | ${c.op.padEnd(6)} archivists.id = ${String(c.filters.id)}`)
+    }
+    expect(calls.length).toBeGreaterThan(0)
+    expect(calls.every(c => c.filters.id === SESSION_GUIDE)).toBe(true)
+    expect(calls.some(c => c.filters.id === BODY_GUIDE)).toBe(false)
+  })
+
+  it('GET connect-stripe, a Guide cannot claim an account belonging to another Guide', async () => {
+    // The account id arrives as a parameter because Stripe puts it there, so it
+    // is verified against metadata.archivistId rather than trusted. Without this
+    // a signed-in Guide could point their own row at someone else's connected
+    // account, which is the same hole one level down.
+    STRIPE_ACCOUNT_OWNER.value = BODY_GUIDE
+    mockedSession.mockResolvedValue(GUIDE_SESSION as never)
+    const res = await connectStripeGET(get(`${U}/api/archivist/connect-stripe?account=acct_someone_else`))
+    console.log(`connect-stripe GET     | foreign stripe account -> ${res.status} mismatch`)
+    expect(res.headers.get('location')).toContain('error=stripe_account_mismatch')
+    // Nothing was written.
+    expect(guideCalls().filter(c => c.op === 'update')).toHaveLength(0)
+  })
+
+  it('POST /api/archivist/onboard-client, 410 with no session', async () => {
+    mockedSession.mockResolvedValue(null)
+    const res = await onboardClientPOST()
+    console.log(`onboard-client         | no session             -> ${res.status}`)
+    expect(res.status).toBe(410)
+    expect(dbCalls).toHaveLength(0)
+  })
+
+  it('POST /api/archivist/onboard-client, 410 for an authenticated Guide too', async () => {
+    // Retired, not gated. A valid Guide session does not reopen it.
+    mockedSession.mockResolvedValue(GUIDE_SESSION as never)
+    const res = await onboardClientPOST()
+    console.log(`onboard-client         | guide session          -> ${res.status}`)
+    expect(res.status).toBe(410)
+    expect(dbCalls).toHaveLength(0)
+  })
+
+  it('POST /api/archivist/onboard-client, a full valid payload still creates nothing', async () => {
+    // The exact body that used to provision an archive, a credentials row, a
+    // $1,000 commission and a prospect. It now touches no table at all.
+    mockedSession.mockResolvedValue(GUIDE_SESSION as never)
+    const res = await (onboardClientPOST as unknown as (r: NextRequest) => Promise<Response>)(
+      jsonPost(`${U}/api/archivist/onboard-client`, {
+        archivistId: SESSION_GUIDE,
+        familyName:  'Calder',
+        clientEmail: 'calder@x.co',
+        clientName:  'A Client',
+        tier:        'estate',
+      }),
+    )
+    console.log(`onboard-client         | full valid payload     -> ${res.status}, dbCalls=${dbCalls.length}`)
+    expect(res.status).toBe(410)
+    expect(dbCalls).toHaveLength(0)
   })
 })
