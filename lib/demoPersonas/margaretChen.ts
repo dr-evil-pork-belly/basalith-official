@@ -17,6 +17,9 @@ export const margaretChen: DemoPersona = {
     successorLabel: 'the incoming managing partner',
     bioLine:        'Margaret Chen built Meridian Capital over twenty six years. She is handing the firm to the next managing partner.',
     fictionalLabel: 'Margaret Chen is a fictional founder. Every answer is grounded in her fictional archive by the same verifier that runs on real archives. When no deposit covers a question, the entity says so instead of inventing.',
+
+    pronounSubject:    'she',
+    pronounSubjectCap: 'She',
   },
 
   archiveName: 'the Margaret Chen Archive',

@@ -6,7 +6,8 @@
 
 import { margaretChen } from './margaretChen'
 import { joey } from './joey'
-import type { DemoPersona } from './types'
+import type { DemoPersona, PersonaMetadata } from './types'
+import type { GroundingBasis } from '@/lib/verifyGrounding'
 
 export type { DemoPersona, DemoPair, ContrastCard, Chip, PersonaMetadata } from './types'
 export { margaretChen } from './margaretChen'
@@ -27,10 +28,62 @@ export function getDemoPersona(id: DemoPersonaId): DemoPersona {
   return DEMO_PERSONAS[id]
 }
 
+// ── ANSWER STATE ─────────────────────────────────────────────────────────────
+
+/**
+ * Which of the three answer panels the demo renders.
+ *
+ * 'checked'     a deposit directly takes the position. The gold panel.
+ * 'reasoned'    the entity reasoned from adjacent deposits and landed no
+ *               position. Its own words survive.
+ * 'no_deposit'  the entity offered no reasoning to show. Either the verifier
+ *               replaced an overreaching draft with the templated gap, or the
+ *               basis could not be read at all.
+ *
+ * 'reasoned' and 'no_deposit' share the dim panel. Neither is grounding, and
+ * neither may ever wear the gold.
+ */
+export type DemoAnswerState = 'checked' | 'reasoned' | 'no_deposit'
+
+/**
+ * Selects the panel from the verifier's basis, and nothing else.
+ *
+ * There is no length or shape heuristic here on purpose. The two refusal
+ * shapes are two code paths in app/api/demo/succession-entity/route.ts, not
+ * two moods of one path: on 'unsupported' the draft is discarded for the
+ * template, on 'no_position' the entity's own reasoning is kept. Basis is the
+ * signal that already distinguishes them.
+ *
+ * An unreadable basis falls to 'no_deposit', the claim that asserts least.
+ *
+ * The client component and scripts/demo-refusal-probe.ts both call this, so
+ * what the gate scores is what the page renders.
+ */
+export function demoAnswerState(basis: GroundingBasis | null): DemoAnswerState {
+  if (basis === 'deposit')     return 'checked'
+  if (basis === 'no_position') return 'reasoned'
+  return 'no_deposit'
+}
+
 // ── SHARED PAGE COPY (deck section: SHARED PAGE COPY) ────────────────────────
 
-/** Fixed line under any refusal. */
+/** Tag on a 'no_deposit' answer. Rendered uppercase. */
+export const REFUSAL_TAG = 'No Deposit'
+
+/** Fixed line under a 'no_deposit' answer. */
 export const REFUSAL_EXPLAINER = 'No deposit covers this. The entity does not guess.'
+
+/** Tag on a 'reasoned' answer. */
+export const REASONED_TAG = 'REASONED, NOT DECIDED'
+
+/**
+ * Line under a 'reasoned' answer. Takes pronouns from the persona because the
+ * sentence is about one specific founder. It claims exactly what the basis
+ * establishes: no settled position, and reasoning drawn from what was settled.
+ */
+export function reasonedExplainer(m: PersonaMetadata): string {
+  return `${m.pronounSubjectCap} never settled this one. This is how ${m.pronounSubject} reasons, from what ${m.pronounSubject} did settle.`
+}
 
 /** Collapsed intro block, two-layer explanation. */
 export const COLLAPSED_INTRO =

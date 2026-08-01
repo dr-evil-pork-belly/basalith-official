@@ -5,13 +5,19 @@ import Link from 'next/link'
 import { CATEGORY_LINE } from '@/lib/copy'
 import {
   DEMO_PERSONAS,
+  demoAnswerState,
+  REFUSAL_TAG,
   REFUSAL_EXPLAINER,
+  REASONED_TAG,
+  reasonedExplainer,
   COLLAPSED_INTRO,
   SESSION_CAP_CARD,
   MAX_USER_MESSAGES,
   type DemoPersonaId,
   type ContrastCard,
+  type PersonaMetadata,
 } from '@/lib/demoPersonas'
+import type { GroundingBasis } from '@/lib/verifyGrounding'
 
 // Matches the live succession portal vocabulary and type system so the demo
 // looks like the actual product a prospect will use.
@@ -36,11 +42,27 @@ type Turn = {
   question: string
   reply:    string
   grounded: boolean
+  /** Null until the answer lands, and on any failed call. */
+  basis:    GroundingBasis | null
   pending:  boolean
   failed:   boolean
 }
 
-type CardState = { reveal: number; reply: string; grounded: boolean; pending: boolean; failed: boolean }
+type CardState = {
+  reveal:   number
+  reply:    string
+  grounded: boolean
+  basis:    GroundingBasis | null
+  pending:  boolean
+  failed:   boolean
+}
+
+const EMPTY_CARD: CardState = { reveal: 0, reply: '', grounded: false, basis: null, pending: false, failed: false }
+
+/** Guard the wire value: an unrecognized basis must never render as reasoned. */
+function toBasis(v: unknown): GroundingBasis | null {
+  return v === 'deposit' || v === 'no_position' || v === 'unsupported' ? v : null
+}
 
 const TOGGLE: { id: DemoPersonaId; label: string }[] = [
   { id: 'margaret', label: 'Succession' },
@@ -77,7 +99,10 @@ export default function SuccessionDemoClient() {
   // grounded is true only when the verifier found a deposit that directly takes
   // the position (basis 'deposit'). A 'no_position' hedge keeps the entity's own
   // words but renders as a refusal: it is not grounded in anything.
-  async function askEntity(question: string, history: Turn[]): Promise<{ reply: string; grounded: boolean; failed: boolean }> {
+  //
+  // basis is carried through as well. It is what separates the two refusal
+  // panels, and the route has always returned it.
+  async function askEntity(question: string, history: Turn[]): Promise<{ reply: string; grounded: boolean; basis: GroundingBasis | null; failed: boolean }> {
     const messages = history
       .filter(t => !t.failed)
       .flatMap(t => [
@@ -92,16 +117,16 @@ export default function SuccessionDemoClient() {
         body:    JSON.stringify({ personaId, messages, question }),
       })
       const data = await res.json()
-      if (!res.ok) return { reply: data?.error ?? 'The demo entity is unavailable right now.', grounded: false, failed: true }
-      return { reply: data.reply, grounded: data.grounded === true, failed: false }
+      if (!res.ok) return { reply: data?.error ?? 'The demo entity is unavailable right now.', grounded: false, basis: null, failed: true }
+      return { reply: data.reply, grounded: data.grounded === true, basis: toBasis(data.basis), failed: false }
     } catch {
-      return { reply: 'The demo entity is unavailable right now.', grounded: false, failed: true }
+      return { reply: 'The demo entity is unavailable right now.', grounded: false, basis: null, failed: true }
     }
   }
 
   // ── Zone 2: contrast card reveals ──────────────────────────────────────────
   async function advanceCard(card: ContrastCard) {
-    const cur = cards[card.id] ?? { reveal: 0, reply: '', grounded: false, pending: false, failed: false }
+    const cur = cards[card.id] ?? EMPTY_CARD
     if (cur.pending || cur.reveal >= 3) return
 
     const next = cur.reveal + 1
@@ -111,7 +136,7 @@ export default function SuccessionDemoClient() {
     const out = await askEntity(card.question, [])
     setCards(s => ({
       ...s,
-      [card.id]: { reveal: 3, reply: out.reply, grounded: out.grounded, pending: false, failed: out.failed },
+      [card.id]: { reveal: 3, reply: out.reply, grounded: out.grounded, basis: out.basis, pending: false, failed: out.failed },
     }))
   }
 
@@ -123,11 +148,11 @@ export default function SuccessionDemoClient() {
     setBusy(true)
     setDraft('')
     const history = turns
-    setTurns(t => [...t, { question: q, reply: '', grounded: false, pending: true, failed: false }])
+    setTurns(t => [...t, { question: q, reply: '', grounded: false, basis: null, pending: true, failed: false }])
 
     const out = await askEntity(q, history)
     setTurns(t => t.map((turn, i) =>
-      i === t.length - 1 ? { question: q, reply: out.reply, grounded: out.grounded, pending: false, failed: out.failed } : turn
+      i === t.length - 1 ? { question: q, reply: out.reply, grounded: out.grounded, basis: out.basis, pending: false, failed: out.failed } : turn
     ))
     setBusy(false)
   }
@@ -239,7 +264,7 @@ export default function SuccessionDemoClient() {
         />
         <div className="succ-grid" style={{ marginBottom: 'clamp(40px,5vw,60px)' }}>
           {persona.contrastCards.map(card => {
-            const st      = cards[card.id] ?? { reveal: 0, reply: '', grounded: false, pending: false, failed: false }
+            const st      = cards[card.id] ?? EMPTY_CARD
             const deposit = persona.pairs.find(p => p.id === card.groundedInPairId)
             return (
               <section key={card.id} style={{ background: C.panel, padding: 'clamp(20px,2.5vw,28px)' }}>
@@ -290,7 +315,7 @@ export default function SuccessionDemoClient() {
                         </p>
                         {st.pending
                           ? <Thinking />
-                          : <Answer text={st.reply} grounded={st.grounded} failed={st.failed} firstName={firstName} />}
+                          : <Answer text={st.reply} grounded={st.grounded} basis={st.basis} failed={st.failed} metadata={persona.metadata} />}
                       </div>
                     )}
 
@@ -333,7 +358,7 @@ export default function SuccessionDemoClient() {
                 </p>
                 {t.pending
                   ? <Thinking />
-                  : <Answer text={t.reply} grounded={t.grounded} failed={t.failed} firstName={firstName} />}
+                  : <Answer text={t.reply} grounded={t.grounded} basis={t.basis} failed={t.failed} metadata={persona.metadata} />}
               </div>
             ))}
             <div ref={endRef} />
@@ -472,20 +497,36 @@ function Thinking() {
 }
 
 /**
- * One entity answer.
+ * One entity answer, in one of three panels.
  *
- * The gold state means the verifier found a deposit that directly takes this
+ * The gold panel means the verifier found a deposit that directly takes this
  * position (basis 'deposit'). The badge says "checked", never "verified" or
  * "grounded in", because checking against the archive is exactly what the
  * verifier does and no more. No deposit is named: the pipeline produces no
  * per-pair attribution for a live answer.
  *
- * Everything else renders the refusal state, including the entity's own
- * in-character hedge (basis 'no_position'). A hedge is not grounding, so it
- * must never wear the gold. The refusal is styled deliberately flat: it should
- * read as discipline rather than as a failure.
+ * Everything else renders dim, because nothing else is grounding and nothing
+ * else may wear the gold. The dim panel carries two labels, chosen by basis:
+ *
+ *   'no_position'  the entity reasoned from adjacent deposits and landed no
+ *                  position. Its own words are on screen, so calling that a
+ *                  refusal misdescribes what the viewer is reading.
+ *   anything else  the entity has no reasoning on screen to describe. On
+ *                  'unsupported' the route already swapped the draft for the
+ *                  templated gap.
+ *
+ * Both dim states are styled flat and identical: this should read as
+ * discipline, not as a failure, and the distinction is in the label alone.
  */
-function Answer({ text, grounded, failed, firstName }: { text: string; grounded: boolean; failed: boolean; firstName: string }) {
+function Answer({ text, grounded, basis, failed, metadata }: {
+  text:     string
+  grounded: boolean
+  basis:    GroundingBasis | null
+  failed:   boolean
+  metadata: PersonaMetadata
+}) {
+  const firstName = metadata.name.split(' ')[0]
+
   if (failed) {
     return (
       <div style={{ borderLeft: `2px solid ${C.ghost}`, background: 'rgba(240,237,230,0.02)', borderRadius: '0 8px 8px 8px', padding: '14px 16px 14px 18px' }}>
@@ -495,17 +536,19 @@ function Answer({ text, grounded, failed, firstName }: { text: string; grounded:
   }
 
   if (!grounded) {
+    // Reasoned and no-deposit share this panel exactly. Only the label moves.
+    const reasoned = demoAnswerState(basis) === 'reasoned'
     return (
       <div style={{ borderLeft: `2px solid ${C.ghost}`, background: 'rgba(240,237,230,0.02)', borderRadius: '0 8px 8px 8px', padding: '14px 16px 14px 18px' }}>
         <p style={{ ...SERIF, fontSize: '0.96rem', fontWeight: 300, color: C.muted, lineHeight: 1.85, margin: 0, whiteSpace: 'pre-wrap' }}>
           {text}
         </p>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '14px', paddingTop: '12px', borderTop: `1px solid rgba(240,237,230,0.06)` }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', marginTop: '14px', paddingTop: '12px', borderTop: `1px solid rgba(240,237,230,0.06)` }}>
           <span style={{ ...MONO, fontSize: '0.5rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: C.dim, border: `1px solid ${C.ghost}`, padding: '3px 7px', borderRadius: '2px', whiteSpace: 'nowrap' }}>
-            No Deposit
+            {reasoned ? REASONED_TAG : REFUSAL_TAG}
           </span>
-          <span style={{ ...SERIF, fontSize: '0.85rem', fontStyle: 'italic', color: C.dim, lineHeight: 1.6 }}>
-            {REFUSAL_EXPLAINER}
+          <span style={{ ...SERIF, fontSize: '0.85rem', fontStyle: 'italic', color: C.dim, lineHeight: 1.6, minWidth: 0 }}>
+            {reasoned ? reasonedExplainer(metadata) : REFUSAL_EXPLAINER}
           </span>
         </div>
       </div>

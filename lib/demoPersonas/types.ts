@@ -42,6 +42,14 @@ export type PersonaMetadata = {
   successorLabel: string
   bioLine:        string
   fictionalLabel: string
+  /**
+   * Subject pronoun for copy written about this founder, in both the forms the
+   * page needs. Required, so a new persona cannot ship without declaring it.
+   * Both forms are stored rather than derived: capitalization is a property of
+   * the pronoun as authored, not a transform to apply at render time.
+   */
+  pronounSubject:    string
+  pronounSubjectCap: string
 }
 
 export type DemoPersona = {

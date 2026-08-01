@@ -17,6 +17,9 @@ export const joey: DemoPersona = {
     successorLabel: "the buyer's operator",
     bioLine:        'Joey Marchetti built Cork and Barrel from one store to four over nineteen years. A buyer is acquiring the chain.',
     fictionalLabel: 'Joey Marchetti is a fictional founder. Every answer is grounded in his fictional archive by the same verifier that runs on real archives. When no deposit covers a question, the entity says so instead of inventing.',
+
+    pronounSubject:    'he',
+    pronounSubjectCap: 'He',
   },
 
   archiveName: 'the Joey Marchetti Archive',
