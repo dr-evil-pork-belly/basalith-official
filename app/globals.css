@@ -491,7 +491,10 @@ input[type='range'].range-amber::-webkit-slider-thumb {
   padding:     14px 0;
   border-top:  1px solid var(--stone-rule);
 }
-.home-stone .stone-row:last-child { border-bottom: 1px solid var(--stone-rule); }
+/* Only the final stack on the page closes itself. Without this, two adjacent
+   row groups render a bottom rule and a top rule 20px apart, which reads as a
+   doubled hairline. */
+.home-stone .stone-rows-end .stone-row:last-child { border-bottom: 1px solid var(--stone-rule); }
 
 /* Full-bleed break out of the centered measure, for photographs. */
 .home-stone .stone-bleed {

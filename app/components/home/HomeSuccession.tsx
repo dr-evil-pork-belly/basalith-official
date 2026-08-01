@@ -81,8 +81,9 @@ export default function HomeSuccession() {
         ))}
       </StoneBlock>
 
-      {/* The two transitions, same hairline row without the number column. */}
-      <StoneBlock gap="0" style={{ paddingTop: 0 }}>
+      {/* The two transitions, same hairline row without the number column.
+          Final hairline stack on the page, so this one closes itself. */}
+      <StoneBlock gap="0" style={{ paddingTop: 0 }} className="stone-rows-end">
         {TRANSITIONS.map(t => (
           <StoneLabelRow key={t.label} label={t.label} body={t.body} />
         ))}

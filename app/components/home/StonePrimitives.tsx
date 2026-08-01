@@ -27,13 +27,16 @@ export function StoneBlock({
   children,
   gap = '16px',
   style,
+  className,
 }: {
-  children: ReactNode
-  gap?:     string
-  style?:   CSSProperties
+  children:   ReactNode
+  gap?:       string
+  style?:     CSSProperties
+  className?: string
 }) {
   return (
     <div
+      className={className}
       style={{
         maxWidth:      'var(--stone-measure)',
         marginInline:  'auto',
