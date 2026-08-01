@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse, after } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { createTrainingPairsFromVoice } from '@/lib/trainingPipeline'
 import { classifyDeposit } from '@/lib/classifyDeposit'
+import { verifyTwilioRequest, twilioForbidden } from '@/lib/twilioSignature'
 
 export const dynamic    = 'force-dynamic'
 export const maxDuration = 60
@@ -64,7 +65,71 @@ async function downloadRecording(
   return null
 }
 
+// The TwiML that closes a recording turn: thank the caller, then offer another
+// recording through /api/twilio/continue. Extracted because the duplicate
+// delivery path returns exactly this and writes nothing.
+async function buildContinueTwiml(
+  archiveId: string,
+  isOwner: boolean,
+  contributorId: string,
+): Promise<string> {
+  const siteUrl      = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
+  const continueBase = `${siteUrl}/api/twilio/continue`
+
+  const continueUrl = isOwner
+    ? buildActionUrl(continueBase, { archiveId, isOwner: 'true' })
+    : buildActionUrl(continueBase, { contributorId, archiveId })
+
+  const { data: archiveLang } = await supabaseAdmin
+    .from('archives')
+    .select('preferred_language')
+    .eq('id', archiveId)
+    .maybeSingle()
+
+  const isZh = archiveLang?.preferred_language === 'zh'
+
+  const continuePromptZh = isOwner
+    ? '如果您想继续录制，请按1。或者直接挂断电话。'
+    : '如果您想回答下一个问题，请按1。或者直接挂断电话。'
+  const continuePromptEn = isOwner
+    ? 'Would you like to record another memory? Press 1 to continue, or hang up when you are done.'
+    : 'Would you like to answer another question? Press 1 to continue, or hang up when you are done.'
+
+  return isZh
+    ? `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="Polly.Zhiyu">谢谢您。您的故事已经保存到档案中了。</Say>
+  <Pause length="1"/>
+  <Say voice="Polly.Zhiyu">${continuePromptZh}</Say>
+  <Gather numDigits="1" action="${continueUrl}" method="POST" timeout="10">
+  </Gather>
+  <Say voice="Polly.Zhiyu">谢谢您。再见。</Say>
+  <Hangup/>
+</Response>`
+    : `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="alice">Thank you.</Say>
+  <Pause length="1"/>
+  <Say voice="alice">Your memory has been saved to the archive.</Say>
+  <Pause length="1"/>
+  <Say voice="alice">${continuePromptEn}</Say>
+  <Gather numDigits="1" action="${continueUrl}" method="POST" timeout="10">
+  </Gather>
+  <Say voice="alice">Thank you. Goodbye.</Say>
+  <Hangup/>
+</Response>`
+}
+
 export async function POST(req: NextRequest) {
+  // Parse, verify, then act. Verification is the first statement in the handler.
+  // Nothing below runs on an unverified request: no recording download, no
+  // Supabase read, no write, and no use of the archiveId in the query string.
+  // On this route the query string is the whole authorization story, so reading
+  // it before the signature check would be trusting a forger's own input.
+  const verified = await verifyTwilioRequest(req)
+  if (!verified.ok) return twilioForbidden('twilio/recording', verified.reason)
+  const params = verified.params
+
   // ── Credential sanity check (visible in Vercel logs) ─────────────────────────
   const accountSid = process.env.TWILIO_ACCOUNT_SID ?? ''
   const authToken  = process.env.TWILIO_AUTH_TOKEN  ?? ''
@@ -86,23 +151,49 @@ export async function POST(req: NextRequest) {
   console.log('[twilio/recording] isOwner:', isOwner)
   console.log('[twilio/recording] contributorId:', contributorId)
 
-  const formData = await req.formData()
-
   // Log every param Twilio sends so we can see the exact URLs and SIDs.
   console.log('[twilio/recording] all params:')
-  for (const [key, value] of formData.entries()) {
+  for (const [key, value] of Object.entries(params)) {
     console.log(`  ${key}: ${value}`)
   }
 
-  const recordingUrl      = formData.get('RecordingUrl')      as string | null
-  const recordingSid      = formData.get('RecordingSid')      as string | null
-  const recordingDuration = formData.get('RecordingDuration') as string | null
-  const callSid           = formData.get('CallSid')           as string | null
+  const recordingUrl      = params['RecordingUrl']      ?? null
+  const recordingSid      = params['RecordingSid']      ?? null
+  const recordingDuration = params['RecordingDuration'] ?? null
+  const callSid           = params['CallSid']           ?? null
 
   console.log(`[twilio/recording] sid=${callSid} archiveId=${archiveId} duration=${recordingDuration}s recordingSid=${recordingSid}`)
 
   if (!archiveId) {
     return twimlResponse(`<?xml version="1.0" encoding="UTF-8"?><Response><Hangup/></Response>`)
+  }
+
+  // ── Idempotency: one recording, one row ───────────────────────────────────────
+  // Twilio delivers this webhook more than once. Eight RecordingSid values are
+  // already stored twice in voice_recordings, so a second delivery used to
+  // duplicate the recording, the deposit, and the notification.
+  //
+  // This is a code-level check on purpose. A UNIQUE index on
+  // twilio_recording_sid would fail to create while those eight duplicate pairs
+  // exist, and removing them is a separate decision that has not been made. Do
+  // not "improve" this into a migration without clearing the duplicates first.
+  //
+  // The check sits above the download rather than beside the insert, so a repeat
+  // delivery also skips the Twilio fetch, the storage upload and the Whisper
+  // call. maybeSingle() is reached through limit(1) because the existing
+  // duplicate pairs would otherwise make it error on multiple rows.
+  if (recordingSid) {
+    const { data: alreadyStored } = await supabaseAdmin
+      .from('voice_recordings')
+      .select('id')
+      .eq('twilio_recording_sid', recordingSid)
+      .limit(1)
+      .maybeSingle()
+
+    if (alreadyStored) {
+      console.log(`[twilio/recording] duplicate delivery for ${recordingSid}, existing row ${alreadyStored.id}, writing nothing`)
+      return twimlResponse(await buildContinueTwiml(archiveId, isOwner, contributorId))
+    }
   }
 
   // ── Download + process (non-fatal — always return TwiML) ─────────────────────
@@ -171,6 +262,11 @@ export async function POST(req: NextRequest) {
   }
 
   // ── Save voice_recordings row (always — with whatever we have) ───────────────
+  // The id is held so the training-pair step can name this exact recording
+  // instead of re-reading "the archive's newest row", which is a race when two
+  // deliveries land close together.
+  let voiceRecordingId: string | null = null
+
   try {
     console.log('[twilio/recording] saving voice_recordings row — archiveId:', archiveId, 'downloadOk:', downloadOk, 'transcriptLen:', transcript.length)
     const { data: vrRow, error: vrError } = await supabaseAdmin
@@ -187,6 +283,7 @@ export async function POST(req: NextRequest) {
       })
       .select('id')
       .single()
+    voiceRecordingId = vrRow?.id ?? null
     console.log('[twilio/recording] voice_recordings saved:', vrRow?.id)
     if (vrError) console.error('[twilio/recording] voice_recordings error:', vrError.message, vrError.details, vrError.hint)
   } catch (err: unknown) {
@@ -206,13 +303,17 @@ export async function POST(req: NextRequest) {
     if (depositText) {
       if (isOwner) {
         console.log('[twilio/recording] saving owner deposit — archiveId:', archiveId)
+        // source_type was 'phone_call', which owner_deposits rejects. Twenty-six
+        // phone calls produced zero deposits while every caller heard a
+        // confirmation, because the insert error was logged and swallowed. The
+        // owner voice path writes 'deposit', confirmed against live rows.
         const { data: deposit, error: depositError } = await supabaseAdmin
           .from('owner_deposits')
           .insert({
             archive_id:     archiveId,
             prompt:         'Phone call deposit',
             response:       depositText,
-            source_type:    'phone_call',
+            source_type:    'deposit',
             essence_status: 'pending',
           })
           .select()
@@ -221,17 +322,30 @@ export async function POST(req: NextRequest) {
         if (depositError) {
           console.error('[twilio/recording] DEPOSIT FAILED:', depositError.message, depositError.details, depositError.hint)
         } else if (deposit?.id) {
-          void classifyDeposit({ depositId: deposit.id, archiveId, text: depositText })
+          // after(), not void. A bare fire-and-forget dies on Vercel lambda
+          // freeze the moment the TwiML response resolves, so the classification
+          // never ran in production. after() defers the work until the response
+          // is sent and keeps the instance alive until it settles.
+          const depositId = deposit.id
+          after(() =>
+            classifyDeposit({ depositId, archiveId, text: depositText })
+              .catch(e => console.warn('[twilio/recording] classifyDeposit failed:', e instanceof Error ? e.message : e)),
+          )
         }
       } else {
         console.log('[twilio/recording] saving contributor deposit — archiveId:', archiveId)
+        // 'contributor' is the value the live contributor path writes
+        // (app/api/contribute/answer). contributor_id is set here too, so this
+        // row is attributable and stays out of the owner's coverage map, which
+        // is why it is deliberately not classified.
         const { data: deposit, error: depositError } = await supabaseAdmin
           .from('owner_deposits')
           .insert({
             archive_id:     archiveId,
             prompt:         'Phone call recording',
             response:       depositText,
-            source_type:    'phone_call',
+            source_type:    'contributor',
+            contributor_id: contributorId || null,
             essence_status: 'pending',
           })
           .select('id')
@@ -281,23 +395,37 @@ export async function POST(req: NextRequest) {
     console.error('[twilio/recording] deposit insert failed:', err instanceof Error ? err.message : err)
   }
 
-  // ── Training pairs from phone voice (fire-and-forget) ────────────────────────
-  if (isOwner && transcript && transcript.length > 50) {
-    void Promise.resolve(
-      supabaseAdmin.from('voice_recordings').select('id').eq('archive_id', archiveId).order('created_at', { ascending: false }).limit(1).single()
-    ).then(async ({ data: vrRow }) => {
-      if (!vrRow) return
-      const { data: arch } = await Promise.resolve(
-        supabaseAdmin.from('archives').select('owner_name, name, preferred_language').eq('id', archiveId).single()
-      )
-      if (!arch) return
-      await createTrainingPairsFromVoice(
-        { id: vrRow.id, archive_id: archiveId, transcript, prompt: 'Phone call recording' },
-        arch.owner_name || 'Unknown',
-        arch.name,
-        arch.preferred_language || 'en',
-      )
-    }).catch(e => console.warn('[twilio/recording] training pairs failed:', e instanceof Error ? e.message : e))
+  // ── Training pairs from phone voice ──────────────────────────────────────────
+  // after(), not void. The old dispatch was a bare `void Promise.resolve(...)`,
+  // which dies on Vercel lambda freeze the moment the TwiML response resolves.
+  // Every training pair that exists for a phone recording was written by a
+  // backfill on 2026-05-03, days after the call, so this step has never
+  // completed inline in production.
+  //
+  // It also names the row this request just inserted rather than re-reading the
+  // archive's newest recording, which was a race between two close deliveries.
+  if (isOwner && transcript && transcript.length > 50 && voiceRecordingId) {
+    const recordingId  = voiceRecordingId
+    const voiceTranscript = transcript
+    after(async () => {
+      try {
+        const { data: arch } = await supabaseAdmin
+          .from('archives')
+          .select('owner_name, name, preferred_language')
+          .eq('id', archiveId)
+          .single()
+        if (!arch) return
+        await createTrainingPairsFromVoice(
+          { id: recordingId, archive_id: archiveId, transcript: voiceTranscript, prompt: 'Phone call recording' },
+          arch.owner_name || 'Unknown',
+          arch.name,
+          arch.preferred_language || 'en',
+        )
+        console.log('[twilio/recording] training pairs complete for recording', recordingId)
+      } catch (e: unknown) {
+        console.warn('[twilio/recording] training pairs failed:', e instanceof Error ? e.message : e)
+      }
+    })
   }
 
   // ── Notification (always) ─────────────────────────────────────────────────────
@@ -315,51 +443,7 @@ export async function POST(req: NextRequest) {
   }
 
   // ── Return TwiML (always — Twilio is waiting) ─────────────────────────────────
-  const siteUrl      = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
-  const continueBase = `${siteUrl}/api/twilio/continue`
-
-  const continueUrl = isOwner
-    ? buildActionUrl(continueBase, { archiveId, isOwner: 'true' })
-    : buildActionUrl(continueBase, { contributorId, archiveId })
-
-  const { data: archiveLang } = await supabaseAdmin
-    .from('archives')
-    .select('preferred_language')
-    .eq('id', archiveId)
-    .maybeSingle()
-
-  const isZh = archiveLang?.preferred_language === 'zh'
-
-  const continuePromptZh = isOwner
-    ? '如果您想继续录制，请按1。或者直接挂断电话。'
-    : '如果您想回答下一个问题，请按1。或者直接挂断电话。'
-  const continuePromptEn = isOwner
-    ? 'Would you like to record another memory? Press 1 to continue, or hang up when you are done.'
-    : 'Would you like to answer another question? Press 1 to continue, or hang up when you are done.'
-
-  const twiml = isZh
-    ? `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Say voice="Polly.Zhiyu">谢谢您。您的故事已经保存到档案中了。</Say>
-  <Pause length="1"/>
-  <Say voice="Polly.Zhiyu">${continuePromptZh}</Say>
-  <Gather numDigits="1" action="${continueUrl}" method="POST" timeout="10">
-  </Gather>
-  <Say voice="Polly.Zhiyu">谢谢您。再见。</Say>
-  <Hangup/>
-</Response>`
-    : `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Say voice="alice">Thank you.</Say>
-  <Pause length="1"/>
-  <Say voice="alice">Your memory has been saved to the archive.</Say>
-  <Pause length="1"/>
-  <Say voice="alice">${continuePromptEn}</Say>
-  <Gather numDigits="1" action="${continueUrl}" method="POST" timeout="10">
-  </Gather>
-  <Say voice="alice">Thank you. Goodbye.</Say>
-  <Hangup/>
-</Response>`
+  const twiml = await buildContinueTwiml(archiveId, isOwner, contributorId)
 
   console.log('[twilio/recording] TwiML response:')
   console.log(twiml)

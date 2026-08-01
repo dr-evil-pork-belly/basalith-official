@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { verifyTwilioRequest, twilioForbidden } from '@/lib/twilioSignature'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,13 +27,19 @@ function buildActionUrl(base: string, params: Record<string, string>): string {
 }
 
 export async function POST(req: NextRequest) {
+  // Parse, verify, then act. Nothing below runs on an unverified request: not
+  // the archives read, not the contributor_questions read, and not a single
+  // query parameter. The query string carries the archive id, so reading it
+  // first would be trusting the forger's own input.
+  const verified = await verifyTwilioRequest(req)
+  if (!verified.ok) return twilioForbidden('twilio/continue', verified.reason)
+
+  const digit = verified.params['Digits'] ?? null
+
   const { searchParams } = new URL(req.url)
   const contributorId = searchParams.get('contributorId') ?? ''
   const archiveId     = searchParams.get('archiveId')     ?? ''
   const isOwner       = searchParams.get('isOwner') === 'true'
-
-  const formData = await req.formData()
-  const digit    = formData.get('Digits') as string | null
 
   const siteUrl      = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
   const recordingBase = `${siteUrl}/api/twilio/recording`

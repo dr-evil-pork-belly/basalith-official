@@ -1,20 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import twilio from 'twilio'
+import { verifyTwilioRequest, twilioForbidden } from '@/lib/twilioSignature'
 
 export const dynamic = 'force-dynamic'
 
 function twimlResponse(xml: string): NextResponse {
   return new NextResponse(xml, { headers: { 'Content-Type': 'text/xml' } })
-}
-
-function validateTwilioRequest(req: NextRequest, params: Record<string, string>): boolean {
-  const authToken = process.env.TWILIO_AUTH_TOKEN
-  if (!authToken) return true // dev: skip validation
-
-  const signature = req.headers.get('X-Twilio-Signature') ?? ''
-  const url       = `${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'}/api/twilio/voice`
-  return twilio.validateRequest(authToken, signature, url, params)
 }
 
 // Escape XML special characters so dynamic strings never break TwiML.
@@ -39,23 +30,20 @@ function buildActionUrl(base: string, params: Record<string, string>): string {
 export async function POST(req: NextRequest) {
   console.log('[twilio/voice] ===START===')
 
-  try {
-    const formData = await req.formData()
-    const params   = Object.fromEntries(formData.entries()) as Record<string, string>
+  // Parse, verify, then act. This is the first statement in the handler, so no
+  // caller reaches the archives or contributors lookup, and no <Record action>
+  // URL is minted, without a valid signature. A failed check is a 403 and no
+  // TwiML, see the tradeoff note in lib/twilioSignature.ts.
+  const verified = await verifyTwilioRequest(req)
+  if (!verified.ok) return twilioForbidden('twilio/voice', verified.reason)
+  const params = verified.params
 
+  try {
     const from    = params['From']    ?? ''
     const callSid = params['CallSid'] ?? ''
 
     console.log('[twilio/voice] from:', from)
     console.log('[twilio/voice] callSid:', callSid)
-
-    // Validation check — log result so we know if it silently rejects.
-    const valid = validateTwilioRequest(req, params)
-    console.log('[twilio/voice] signature valid:', valid)
-    if (!valid) {
-      console.error('[twilio/voice] REJECTED — signature mismatch, returning Hangup')
-      return twimlResponse(`<?xml version="1.0" encoding="UTF-8"?><Response><Hangup/></Response>`)
-    }
 
     const siteUrl      = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
     const recordingBase = `${siteUrl}/api/twilio/recording`

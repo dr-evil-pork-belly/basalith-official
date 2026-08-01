@@ -20,8 +20,21 @@
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { NextRequest } from 'next/server'
+import twilio from 'twilio'
 
 vi.mock('@/lib/auth/getSessionUser', () => ({ getSessionUser: vi.fn() }))
+
+// part 9. `after()` is the whole point of the fire-and-forget fix, and a live
+// local run cannot tell it apart from a bare `void`: a long-lived process
+// finishes both. The distinction only exists on a frozen lambda. So it is
+// asserted structurally here instead. Every deferred callback is captured and
+// run on demand, which also proves the deferred work is reached at all.
+// Everything else in next/server is passed through untouched.
+const AFTER = vi.hoisted(() => ({ callbacks: [] as Array<() => unknown> }))
+vi.mock('next/server', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('next/server')>()
+  return { ...actual, after: (fn: () => unknown) => { AFTER.callbacks.push(fn) } }
+})
 
 // DB boundary: a flexible chainable stub. The archives ownership lookup resolves
 // to ARCHIVE_ROW (owner_user_id = OWNER_UID); inserts return a generated id;
@@ -60,29 +73,45 @@ const H = vi.hoisted(() => {
     termination_requested_at: null, owner_birth_year: 1950, owner_birth_decade: 1950,
   }
 
-  // Every terminal query is appended here as { table, op, filters }. part 8 uses
-  // it to assert WHICH row a Guide route touched, which is the whole question on
-  // a route that used to take its identity from the request.
-  const dbCalls: { table: string; op: string; filters: Record<string, unknown> }[] = []
+  // part 9. Which RecordingSid values the voice_recordings table already
+  // holds. The Twilio duplicate-delivery guard queries by that column, so the
+  // test decides whether a given delivery is a repeat.
+  const EXISTING_SIDS = new Set<string>()
+
+  // Every terminal query is appended here as { table, op, filters, payload }.
+  // part 8 uses it to assert WHICH row a Guide route touched, which is the whole
+  // question on a route that used to take its identity from the request. part 9
+  // uses payload to assert WHAT a write carried, which is the whole question on
+  // a route whose insert was being rejected by a CHECK constraint.
+  const dbCalls: { table: string; op: string; filters: Record<string, unknown>; payload?: unknown }[] = []
 
   function makeBuilder(table: string) {
     let op: 'select' | 'insert' | 'update' | 'delete' = 'select'
     // Recorded so the contributors table can honour `.eq('id', ...)`: the
     // DELETE guard is only meaningful if a foreign id actually misses.
     const filters: Record<string, unknown> = {}
+    let payload: unknown = undefined
     const b: Record<string, unknown> = {}
     const pass = () => b
     b.select = pass
-    b.insert = () => { op = 'insert'; return b }
-    b.upsert = () => { op = 'insert'; return b }
-    b.update = () => { op = 'update'; return b }
+    b.insert = (v: unknown) => { op = 'insert'; payload = v; return b }
+    b.upsert = (v: unknown) => { op = 'insert'; payload = v; return b }
+    b.update = (v: unknown) => { op = 'update'; payload = v; return b }
     b.delete = () => { op = 'delete'; return b }
     b.eq = (col: string, val: unknown) => { filters[col] = val; return b }
     for (const m of ['neq', 'in', 'is', 'not', 'order', 'limit', 'range', 'gt', 'gte', 'lt', 'lte', 'contains', 'ilike', 'or', 'match']) b[m] = pass
     const terminal = () => {
-      dbCalls.push({ table, op, filters: { ...filters } })
+      dbCalls.push({ table, op, filters: { ...filters }, payload })
       if (op === 'insert') return { data: { id: 'generated-id' }, error: null }
       if (table === 'archives') return { data: ARCHIVE_ROW, error: null }
+      // part 9. The Twilio idempotency guard reads voice_recordings by
+      // twilio_recording_sid. A sid the test has not seeded must miss, or the
+      // guard would swallow every first delivery.
+      if (table === 'voice_recordings' && filters.twilio_recording_sid !== undefined) {
+        return EXISTING_SIDS.has(String(filters.twilio_recording_sid))
+          ? { data: { id: 'existing-recording-1', archive_id: ARCHIVE_ID }, error: null }
+          : { data: null, error: null }
+      }
       // part 8. The Guide routes resolve their own row from the session id.
       // Whatever id is asked for resolves, so what the test asserts is WHICH id
       // was asked for, not whether the row happens to exist.
@@ -166,7 +195,7 @@ const H = vi.hoisted(() => {
   }
 
   return {
-    dbCalls,
+    dbCalls, EXISTING_SIDS,
     OWNER_UID, ARCHIVE_ID, ARCHIVE_ROW, CONTRIB_ID, FOREIGN_CONTRIB_ID, supabaseAdmin,
     RECORDING_ID, FOREIGN_RECORDING_ID, WISDOM_ID, FOREIGN_WISDOM_ID,
     CONVO_ID, FOREIGN_CONVO_ID, DATE_ID, FOREIGN_DATE_ID,
@@ -328,9 +357,14 @@ import {
   GET  as connectStripeGET,
 } from '@/app/api/archivist/connect-stripe/route'
 import { POST as onboardClientPOST }     from '@/app/api/archivist/onboard-client/route'
+// part 9, fix/twilio-signature-verify. The phone line: three unauthenticated
+// webhook endpoints, one of which hands out the <Record action> URL.
+import { POST as twilioVoicePOST }     from '@/app/api/twilio/voice/route'
+import { POST as twilioRecordingPOST } from '@/app/api/twilio/recording/route'
+import { POST as twilioContinuePOST }  from '@/app/api/twilio/continue/route'
 
 const {
-  dbCalls,
+  dbCalls, EXISTING_SIDS,
   OWNER_UID, ARCHIVE_ID, CONTRIB_ID, FOREIGN_CONTRIB_ID,
   RECORDING_ID, FOREIGN_RECORDING_ID, WISDOM_ID, FOREIGN_WISDOM_ID,
   CONVO_ID, FOREIGN_CONVO_ID, DATE_ID, FOREIGN_DATE_ID,
@@ -1412,4 +1446,312 @@ describe('Legacy Guide routes, identity from session and never from request (par
     expect(res.status).toBe(410)
     expect(dbCalls).toHaveLength(0)
   })
+})
+
+/**
+ * part 9, fix/twilio-signature-verify.
+ *
+ * The phone line. Three webhook endpoints that Twilio calls and that nothing
+ * else should be able to call.
+ *
+ *   voice      the entry point. Looks a caller up by From, and on a match hands
+ *              back a <Record action> URL carrying that archive's id. It did
+ *              validate, but through a validator that returned true whenever
+ *              TWILIO_AUTH_TOKEN was absent, so unsetting one environment
+ *              variable turned it into an open archive-id oracle.
+ *   recording  no validation at all. Took archiveId straight from the query
+ *              string and wrote a voice_recordings row, an owner_deposits row,
+ *              a labels row and a notification against it.
+ *   continue   no validation at all. Took archiveId from the query string and
+ *              minted the next <Record action> URL from it.
+ *
+ * All three now go through lib/twilioSignature.ts, which fails closed and
+ * answers 403. The signature covers the sorted POST parameters, so the body is
+ * parsed before it can be checked. The property asserted here is the reachable
+ * one: on a rejected request no database call happens at all, which also means
+ * no query parameter was ever acted on.
+ *
+ * Three things ship in the same commit because they live in the same handler:
+ *
+ *   - owner_deposits.source_type was 'phone_call', a value the table rejects.
+ *     Twenty-six calls produced zero deposits while every caller heard a
+ *     confirmation, because the insert error was logged and swallowed. Asserted
+ *     on the captured insert payload, not on the status code, since the route
+ *     answers 200 either way. That is the load-bearing case: rejecting a
+ *     forgery only proves a guard exists, accepting a genuine signed request
+ *     proves the guard is correct.
+ *   - Twilio delivers this webhook more than once and there was no idempotency
+ *     check, so eight RecordingSid values are stored twice.
+ *   - classifyDeposit and createTrainingPairsFromVoice were bare `void`
+ *     dispatches, which die on lambda freeze.
+ */
+describe('Twilio webhooks, signature required and fail closed (part 9)', () => {
+  const SITE  = 'https://phone.test.basalith.ai'
+  // A throwaway value generated for this test. Not a credential, and not the
+  // production token, which never appears in this repo.
+  const TOKEN = 'batch1a-throwaway-test-token-000'
+  const TRANSCRIPT =
+    'My father ran the shop for thirty one years and never once let a customer leave unhappy, and that is the standard I have held to.'
+
+  const ARCHIVE_QS = `archiveId=${ARCHIVE_ID}&isOwner=true`
+  const SID        = 'REtest0000000000000000000000000a'
+
+  /**
+   * Build a Twilio-shaped POST. `sign` computes the real HMAC the same way
+   * Twilio does, over the same URL lib/twilioSignature.ts reconstructs.
+   */
+  function twilioReq(
+    path: string,
+    params: Record<string, string>,
+    opts: { sign?: boolean; token?: string } = {},
+  ): NextRequest {
+    const url  = `${SITE}${path}`
+    const body = new URLSearchParams(params).toString()
+    const headers: Record<string, string> = { 'Content-Type': 'application/x-www-form-urlencoded' }
+    if (opts.sign) {
+      headers['X-Twilio-Signature'] = twilio.getExpectedTwilioSignature(opts.token ?? TOKEN, url, params)
+    }
+    return new NextRequest(url, { method: 'POST', body, headers })
+  }
+
+  const recordingParams = (sid = SID) => ({
+    CallSid:           'CAtest0000000000000000000000000a',
+    RecordingSid:      sid,
+    RecordingUrl:      `https://api.twilio.com/2010-04-01/Accounts/ACtest/Recordings/${sid}`,
+    RecordingDuration: '42',
+  })
+
+  // The recording route downloads an MP3 from Twilio and posts it to Whisper.
+  // Both are answered here so the owner path reaches the deposit insert with a
+  // transcript long enough to be stored and long enough to train on.
+  const phoneFetch = vi.fn(async (input: RequestInfo | URL) => {
+    const url = String(input)
+    if (url.includes('api.twilio.com')) return new Response(new Uint8Array([0x49, 0x44, 0x33, 0x04]), { status: 200 })
+    if (url.includes('api.openai.com')) return new Response(JSON.stringify({ text: TRANSCRIPT }), { status: 200 })
+    return new Response('{}', { status: 200 })
+  })
+
+  // Restored by hand rather than through unstubAllGlobals, which would drop the
+  // file-level fetch stub the earlier parts rely on.
+  const OUTER_FETCH = globalThis.fetch
+
+  beforeEach(() => {
+    dbCalls.length = 0
+    AFTER.callbacks.length = 0
+    EXISTING_SIDS.clear()
+    phoneFetch.mockClear()
+    globalThis.fetch = phoneFetch as unknown as typeof fetch
+    vi.stubEnv('TWILIO_AUTH_TOKEN', TOKEN)
+    vi.stubEnv('TWILIO_ACCOUNT_SID', 'ACtest00000000000000000000000000')
+    vi.stubEnv('NEXT_PUBLIC_SITE_URL', SITE)
+  })
+  afterEach(() => {
+    globalThis.fetch = OUTER_FETCH
+    vi.unstubAllEnvs()
+  })
+
+  // ── The guard ───────────────────────────────────────────────────────────────
+
+  it('POST /api/twilio/recording, unsigned is 403 and touches no table', async () => {
+    const res = await twilioRecordingPOST(
+      twilioReq(`/api/twilio/recording?${ARCHIVE_QS}`, recordingParams()))
+    console.log(`twilio/recording       | unsigned               -> ${res.status}, dbCalls=${dbCalls.length}`)
+    expect(res.status).toBe(403)
+    // No read, no download, no write, and the archiveId in the query string was
+    // never acted on.
+    expect(dbCalls).toHaveLength(0)
+    expect(phoneFetch).not.toHaveBeenCalled()
+  })
+
+  it('POST /api/twilio/recording, a signature for the wrong token is 403', async () => {
+    // A forger who knows the shape but not the secret.
+    const res = await twilioRecordingPOST(
+      twilioReq(`/api/twilio/recording?${ARCHIVE_QS}`, recordingParams(), { sign: true, token: 'not-the-token' }))
+    console.log(`twilio/recording       | wrong-token signature  -> ${res.status}, dbCalls=${dbCalls.length}`)
+    expect(res.status).toBe(403)
+    expect(dbCalls).toHaveLength(0)
+  })
+
+  it('POST /api/twilio/recording, a signature over a different archiveId is 403', async () => {
+    // The signature covers the URL, query string included. Replaying a genuine
+    // signature against another archive breaks it, which is what makes the
+    // archiveId parameter safe to use after the check.
+    const genuine = twilio.getExpectedTwilioSignature(
+      TOKEN, `${SITE}/api/twilio/recording?${ARCHIVE_QS}`, recordingParams())
+    const res = await twilioRecordingPOST(new NextRequest(
+      `${SITE}/api/twilio/recording?archiveId=arch-someone-else&isOwner=true`,
+      {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Twilio-Signature': genuine },
+        body:    new URLSearchParams(recordingParams()).toString(),
+      }))
+    console.log(`twilio/recording       | replayed onto other id -> ${res.status}, dbCalls=${dbCalls.length}`)
+    expect(res.status).toBe(403)
+    expect(dbCalls).toHaveLength(0)
+  })
+
+  it('POST /api/twilio/continue, unsigned is 403 and touches no table', async () => {
+    const res = await twilioContinuePOST(
+      twilioReq(`/api/twilio/continue?${ARCHIVE_QS}`, { Digits: '1' }))
+    console.log(`twilio/continue        | unsigned               -> ${res.status}, dbCalls=${dbCalls.length}`)
+    expect(res.status).toBe(403)
+    expect(dbCalls).toHaveLength(0)
+  })
+
+  it('POST /api/twilio/voice, unsigned is 403 and hands out no Record action URL', async () => {
+    const res = await twilioVoicePOST(
+      twilioReq('/api/twilio/voice', { From: '+15551234567', CallSid: 'CAtest' }))
+    const bodyText = await res.text()
+    console.log(`twilio/voice           | unsigned               -> ${res.status}, dbCalls=${dbCalls.length}`)
+    expect(res.status).toBe(403)
+    expect(dbCalls).toHaveLength(0)
+    // The old answer was <Hangup/>. Either way no archive id leaks, but 403 is
+    // now the answer on all three routes. See the tradeoff note in the lib.
+    expect(bodyText).not.toContain('<Record')
+    expect(bodyText).not.toContain(ARCHIVE_ID)
+  })
+
+  it('POST /api/twilio/voice, an unset TWILIO_AUTH_TOKEN is 403, not a bypass', async () => {
+    // The old validator returned true here. This is the fail-closed assertion:
+    // even a correctly signed request is refused when the route has no token to
+    // check it against, so a missing environment variable can never open the
+    // route instead of closing it.
+    vi.stubEnv('TWILIO_AUTH_TOKEN', '')
+    const res = await twilioVoicePOST(
+      twilioReq('/api/twilio/voice', { From: '+15551234567', CallSid: 'CAtest' }, { sign: true }))
+    console.log(`twilio/voice           | no auth token          -> ${res.status}, dbCalls=${dbCalls.length}`)
+    expect(res.status).toBe(403)
+    expect(dbCalls).toHaveLength(0)
+  })
+
+  it('POST /api/twilio/recording, an unset TWILIO_AUTH_TOKEN is 403, not a bypass', async () => {
+    vi.stubEnv('TWILIO_AUTH_TOKEN', '')
+    const res = await twilioRecordingPOST(
+      twilioReq(`/api/twilio/recording?${ARCHIVE_QS}`, recordingParams(), { sign: true }))
+    console.log(`twilio/recording       | no auth token          -> ${res.status}, dbCalls=${dbCalls.length}`)
+    expect(res.status).toBe(403)
+    expect(dbCalls).toHaveLength(0)
+  })
+
+  it('POST /api/twilio/continue, an unset TWILIO_AUTH_TOKEN is 403, not a bypass', async () => {
+    vi.stubEnv('TWILIO_AUTH_TOKEN', '')
+    const res = await twilioContinuePOST(
+      twilioReq(`/api/twilio/continue?${ARCHIVE_QS}`, { Digits: '1' }, { sign: true }))
+    console.log(`twilio/continue        | no auth token          -> ${res.status}, dbCalls=${dbCalls.length}`)
+    expect(res.status).toBe(403)
+    expect(dbCalls).toHaveLength(0)
+  })
+
+  // ── The genuine request ─────────────────────────────────────────────────────
+
+  it('POST /api/twilio/voice, a signed request is answered with a Record action URL', async () => {
+    const res = await twilioVoicePOST(
+      twilioReq('/api/twilio/voice', { From: '+15551234567', CallSid: 'CAtest' }, { sign: true }))
+    const bodyText = await res.text()
+    console.log(`twilio/voice           | signed                 -> ${res.status}`)
+    expect(res.status).toBe(200)
+    expect(bodyText).toContain('<Record')
+    expect(bodyText).toContain('/api/twilio/recording')
+  })
+
+  it('POST /api/twilio/continue, a signed request is answered with TwiML', async () => {
+    const res = await twilioContinuePOST(
+      twilioReq(`/api/twilio/continue?${ARCHIVE_QS}`, { Digits: '1' }, { sign: true }))
+    const bodyText = await res.text()
+    console.log(`twilio/continue        | signed                 -> ${res.status}`)
+    expect(res.status).toBe(200)
+    expect(bodyText).toContain('<Record')
+  })
+
+  it('POST /api/twilio/recording, a signed request writes a deposit with source_type deposit', async () => {
+    const res = await twilioRecordingPOST(
+      twilioReq(`/api/twilio/recording?${ARCHIVE_QS}`, recordingParams(), { sign: true }))
+    console.log(`twilio/recording       | signed                 -> ${res.status}`)
+    expect(res.status).toBe(200)
+
+    const deposits = dbCalls.filter(c => c.table === 'owner_deposits' && c.op === 'insert')
+    for (const d of deposits) {
+      const p = d.payload as Record<string, unknown>
+      console.log(`twilio/recording       | owner_deposits insert source_type = ${String(p.source_type)}`)
+    }
+    // This is the fix. 'phone_call' is not an accepted source_type, so every one
+    // of these inserts used to be rejected by the table and swallowed by the
+    // handler while the caller heard "your memory has been saved."
+    expect(deposits).toHaveLength(1)
+    const payload = deposits[0].payload as Record<string, unknown>
+    expect(payload.source_type).toBe('deposit')
+    expect(payload.archive_id).toBe(ARCHIVE_ID)
+    expect(payload.response).toBe(TRANSCRIPT)
+
+    // And the recording itself was stored with the sid, which is what the
+    // idempotency guard reads on the next delivery.
+    const recordings = dbCalls.filter(c => c.table === 'voice_recordings' && c.op === 'insert')
+    expect(recordings).toHaveLength(1)
+    expect((recordings[0].payload as Record<string, unknown>).twilio_recording_sid).toBe(SID)
+  }, 30_000)
+
+  it('POST /api/twilio/recording, the deferred work is registered with after() and completes', async () => {
+    await twilioRecordingPOST(
+      twilioReq(`/api/twilio/recording?${ARCHIVE_QS}`, recordingParams(), { sign: true }))
+
+    // Two deferred jobs: classifyDeposit and createTrainingPairsFromVoice. Both
+    // were bare `void` dispatches, which resolve fine in a long-lived process
+    // and die on a frozen lambda, which is why the assertion is on after()
+    // having been handed the work rather than on the work having finished.
+    console.log(`twilio/recording       | after() callbacks      -> ${AFTER.callbacks.length}`)
+    expect(AFTER.callbacks).toHaveLength(2)
+
+    const { classifyDeposit }              = await import('@/lib/classifyDeposit')
+    const { createTrainingPairsFromVoice } = await import('@/lib/trainingPipeline')
+    vi.mocked(classifyDeposit).mockClear()
+    vi.mocked(createTrainingPairsFromVoice).mockClear()
+
+    await Promise.all(AFTER.callbacks.map(fn => fn()))
+
+    console.log(`twilio/recording       | classifyDeposit calls  -> ${vi.mocked(classifyDeposit).mock.calls.length}`)
+    console.log(`twilio/recording       | training pair calls    -> ${vi.mocked(createTrainingPairsFromVoice).mock.calls.length}`)
+    expect(classifyDeposit).toHaveBeenCalledTimes(1)
+    expect(createTrainingPairsFromVoice).toHaveBeenCalledTimes(1)
+    // The training pair names the recording this request just inserted, not
+    // "the archive's newest row", which was a race between two deliveries.
+    expect(vi.mocked(createTrainingPairsFromVoice).mock.calls[0][0]).toMatchObject({
+      id:         'generated-id',
+      archive_id: ARCHIVE_ID,
+      transcript: TRANSCRIPT,
+    })
+  }, 30_000)
+
+  // ── Idempotency ─────────────────────────────────────────────────────────────
+
+  it('POST /api/twilio/recording, a repeat delivery of the same sid writes nothing', async () => {
+    // Twilio delivers this webhook more than once. Eight RecordingSid values
+    // are already stored twice in production because of it.
+    EXISTING_SIDS.add(SID)
+
+    const res = await twilioRecordingPOST(
+      twilioReq(`/api/twilio/recording?${ARCHIVE_QS}`, recordingParams(), { sign: true }))
+    const bodyText = await res.text()
+
+    const writes = dbCalls.filter(c => c.op === 'insert' || c.op === 'update')
+    console.log(`twilio/recording       | duplicate sid          -> ${res.status}, writes=${writes.length}`)
+    expect(res.status).toBe(200)
+    // The caller still hears the same thing. Nothing is written, and the guard
+    // sits above the download, so the recording is not re-fetched either.
+    expect(bodyText).toContain('<Gather')
+    expect(writes).toHaveLength(0)
+    expect(phoneFetch).not.toHaveBeenCalled()
+    expect(AFTER.callbacks).toHaveLength(0)
+  })
+
+  it('POST /api/twilio/recording, a first delivery of an unseen sid is not treated as a repeat', async () => {
+    // The other half of the guard. Nothing is seeded, so this sid must miss and
+    // the write must happen. Without this the guard could swallow every call.
+    const res = await twilioRecordingPOST(
+      twilioReq(`/api/twilio/recording?${ARCHIVE_QS}`, recordingParams('REtest0000000000000000000000000b'), { sign: true }))
+    const writes = dbCalls.filter(c => c.op === 'insert')
+    console.log(`twilio/recording       | unseen sid             -> ${res.status}, inserts=${writes.length}`)
+    expect(res.status).toBe(200)
+    expect(writes.some(c => c.table === 'voice_recordings')).toBe(true)
+    expect(writes.some(c => c.table === 'owner_deposits')).toBe(true)
+  }, 30_000)
 })
