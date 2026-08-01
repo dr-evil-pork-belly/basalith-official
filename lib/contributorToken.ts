@@ -21,8 +21,6 @@ export async function getContributorByToken(token: string) {
     return null
   }
 
-  console.log('[getContributorByToken] Looking up token:', token.substring(0, 10))
-
   const { data: contributor, error: contribError } = await supabaseAdmin
     .from('contributors')
     .select('*')

@@ -9,11 +9,9 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json()
     console.log('Body keys:', Object.keys(body))
-    console.log('token preview:', body.token?.substring(0, 10))
     console.log('fileName:', body.fileName)
-    console.log('archiveId:', body.archiveId)
 
-    const { token, fileName, archiveId, fileType } = body
+    const { token, fileName, fileType } = body
 
     if (!token || !fileName) {
       console.log('Missing token or fileName')
@@ -34,7 +32,24 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
-    const resolvedArchiveId = archiveId || contributor.archive_id
+    // The archive comes from the token row and from nowhere else. This used to
+    // read `archiveId || contributor.archive_id`, so a body-supplied value won
+    // over the archive the token actually belongs to, and a contributor holding
+    // a valid token for one archive could mint a signed upload URL that writes
+    // into another family's private bucket. The sibling route
+    // app/api/contribute/upload-photo already derives it this way.
+    //
+    // The body value is deliberately not cross-checked against the token row. A
+    // route that compares a caller-supplied archive id and errors on a mismatch
+    // tells the caller whether that id is a real archive, which is the thing
+    // worth hiding here.
+    //
+    // ContributeClient.tsx does not send archiveId on either call site. It reads
+    // archiveId back off this response and forwards it to register-photo and
+    // register-media, so the response field stays. If any caller does send the
+    // field, it is now dead weight on the wire and changes nothing about which
+    // prefix gets signed.
+    const archiveId = contributor.archive_id as string
     const ext = fileName.split('.').pop()?.toLowerCase() || 'bin'
 
     const isVideo = (fileType?.startsWith('video/')) ||
@@ -47,7 +62,7 @@ export async function POST(req: NextRequest) {
     )
     const bucket = isVideo ? 'archive-videos' : isDocument ? 'archive-documents' : 'photographs'
 
-    const path = `${resolvedArchiveId}/${Date.now()}-contrib-${Math.random().toString(36).substring(2, 9)}.${ext}`
+    const path = `${archiveId}/${Date.now()}-contrib-${Math.random().toString(36).substring(2, 9)}.${ext}`
 
     console.log('[upload-url] fileType:', fileType)
     console.log('[upload-url] ext:', ext)
@@ -69,7 +84,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       uploadUrl:  data.signedUrl,
       path,
-      archiveId:  resolvedArchiveId,
+      archiveId,
       bucket,
       isVideo,
       isDocument,

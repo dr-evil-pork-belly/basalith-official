@@ -46,6 +46,11 @@ const H = vi.hoisted(() => {
   // second is what the contributors DELETE cross-archive case passes.
   const CONTRIB_ID         = 'contrib-1111'
   const FOREIGN_CONTRIB_ID = 'contrib-9999'
+  // part 10. The contribute surface authenticates on this token, not a session.
+  // FOREIGN_ARCHIVE_ID is the archive the cross-archive attempt names in the
+  // body. It must never appear in a storage key.
+  const CONTRIB_TOKEN      = 'tok-1'
+  const FOREIGN_ARCHIVE_ID = 'arch-9999-another-family'
   // part 6 — one owned row and one foreign row per by-id route, so the
   // cross-archive case (owner session + another archive's row id) can miss.
   const RECORDING_ID          = 'rec-1111'
@@ -127,6 +132,12 @@ const H = vi.hoisted(() => {
       // is the one that lives in ARCHIVE_ID.
       if (table === 'contributors') {
         if (filters.id && filters.id !== CONTRIB_ID) return { data: null, error: null }
+        // part 10. The contribute routes resolve the caller by access_token
+        // rather than by id, so an unknown token has to miss. Without this the
+        // stub would hand a contributor row to any string at all.
+        if (filters.access_token !== undefined && filters.access_token !== CONTRIB_TOKEN) {
+          return { data: null, error: null }
+        }
         return {
           data: {
             id: CONTRIB_ID, archive_id: ARCHIVE_ID, name: 'A Contributor',
@@ -182,20 +193,34 @@ const H = vi.hoisted(() => {
     return b
   }
 
+  // part 10. Which bucket and which object key every storage call asked for.
+  // On a route whose whole job is to mint a signed URL, the returned status says
+  // nothing. The prefix that got signed is the finding.
+  const storageCalls: { bucket: string; op: string; path: string }[] = []
+
   const supabaseAdmin = {
     from: (table: string) => makeBuilder(table),
     storage: {
-      from: () => ({
-        createSignedUrl:       async () => ({ data: { signedUrl: 'https://signed.test/x' },  error: null }),
-        createSignedUploadUrl: async () => ({ data: { signedUrl: 'https://signed.test/up', token: 'tok' }, error: null }),
-        upload:                async () => ({ error: null }),
+      from: (bucket: string) => ({
+        createSignedUrl:       async (path: string) => {
+          storageCalls.push({ bucket, op: 'createSignedUrl', path })
+          return { data: { signedUrl: 'https://signed.test/x' }, error: null }
+        },
+        createSignedUploadUrl: async (path: string) => {
+          storageCalls.push({ bucket, op: 'createSignedUploadUrl', path })
+          return { data: { signedUrl: 'https://signed.test/up', token: 'tok' }, error: null }
+        },
+        upload:                async (path: string) => {
+          storageCalls.push({ bucket, op: 'upload', path })
+          return { error: null }
+        },
       }),
     },
     rpc: async () => ({ data: null, error: null }),
   }
 
   return {
-    dbCalls, EXISTING_SIDS,
+    dbCalls, EXISTING_SIDS, storageCalls, CONTRIB_TOKEN, FOREIGN_ARCHIVE_ID,
     OWNER_UID, ARCHIVE_ID, ARCHIVE_ROW, CONTRIB_ID, FOREIGN_CONTRIB_ID, supabaseAdmin,
     RECORDING_ID, FOREIGN_RECORDING_ID, WISDOM_ID, FOREIGN_WISDOM_ID,
     CONVO_ID, FOREIGN_CONVO_ID, DATE_ID, FOREIGN_DATE_ID,
@@ -359,12 +384,14 @@ import {
 import { POST as onboardClientPOST }     from '@/app/api/archivist/onboard-client/route'
 // part 9, fix/twilio-signature-verify. The phone line: three unauthenticated
 // webhook endpoints, one of which hands out the <Record action> URL.
+// part 10, fix/contribute-upload-url-scope. The contributor upload surface.
+import { POST as contribUploadUrlPOST } from '@/app/api/contribute/upload-url/route'
 import { POST as twilioVoicePOST }     from '@/app/api/twilio/voice/route'
 import { POST as twilioRecordingPOST } from '@/app/api/twilio/recording/route'
 import { POST as twilioContinuePOST }  from '@/app/api/twilio/continue/route'
 
 const {
-  dbCalls, EXISTING_SIDS,
+  dbCalls, EXISTING_SIDS, storageCalls, CONTRIB_TOKEN, FOREIGN_ARCHIVE_ID,
   OWNER_UID, ARCHIVE_ID, CONTRIB_ID, FOREIGN_CONTRIB_ID,
   RECORDING_ID, FOREIGN_RECORDING_ID, WISDOM_ID, FOREIGN_WISDOM_ID,
   CONVO_ID, FOREIGN_CONVO_ID, DATE_ID, FOREIGN_DATE_ID,
@@ -1754,4 +1781,149 @@ describe('Twilio webhooks, signature required and fail closed (part 9)', () => {
     expect(writes.some(c => c.table === 'voice_recordings')).toBe(true)
     expect(writes.some(c => c.table === 'owner_deposits')).toBe(true)
   }, 30_000)
+})
+
+/**
+ * part 10, fix/contribute-upload-url-scope.
+ *
+ * The contributor upload surface. This is the first contribute route covered in
+ * this file, and the boundary it crosses is not owner versus successor inside
+ * one archive. It is one family against another.
+ *
+ * /api/contribute/upload-url authenticates on a contributor access token, then
+ * built the storage key from `archiveId || contributor.archive_id`. The body
+ * value won. A contributor holding a valid token for archive A could ask for a
+ * signed upload URL and name archive B, and the route would mint one, on the
+ * service role, against the real private bucket, at `B/{ts}-contrib-{rand}.{ext}`.
+ * The object would sit orphaned until a matching register-photo or
+ * register-media call, and both of those derive the archive from the token row,
+ * so it never became a visible row in B. It was still an unauthorized write into
+ * another family's private storage, against their quota.
+ *
+ * The archive now comes from the token row only, matching the sibling route
+ * app/api/contribute/upload-photo. The body value is not cross-checked and not
+ * rejected, because a route that errors on a mismatch tells the caller whether
+ * the id it named is a real archive.
+ *
+ * Every assertion here is on the storage key that was signed, not on the status
+ * code. This route answers 200 to the attack and 200 to the honest request. The
+ * prefix is the entire finding.
+ */
+describe('contributor upload URL, archive comes from the token row (part 10)', () => {
+  const U = 'http://localhost'
+
+  const uploadReq = (body: Record<string, unknown>) =>
+    jsonPost(`${U}/api/contribute/upload-url`, body)
+
+  const signedKeys = () => storageCalls.filter(c => c.op === 'createSignedUploadUrl')
+
+  beforeEach(() => {
+    dbCalls.length      = 0
+    storageCalls.length = 0
+  })
+
+  it('a body archiveId naming another archive does not move the signed prefix', async () => {
+    // The attack. A valid token for ARCHIVE_ID, a body pointing at someone else.
+    const res  = await contribUploadUrlPOST(uploadReq({
+      token:     CONTRIB_TOKEN,
+      fileName:  'family-photo.jpg',
+      archiveId: FOREIGN_ARCHIVE_ID,
+    }))
+    const body = await res.json()
+
+    console.log(`contribute/upload-url  | body archiveId=${FOREIGN_ARCHIVE_ID}`)
+    console.log(`contribute/upload-url  | response path   = ${body.path}`)
+    console.log(`contribute/upload-url  | response bucket = ${body.bucket}`)
+    for (const c of signedKeys()) {
+      console.log(`contribute/upload-url  | signed key      = ${c.bucket}/${c.path}`)
+    }
+
+    expect(res.status).toBe(200)
+    // Scoped to the token's archive.
+    expect(body.path).toMatch(new RegExp(`^${ARCHIVE_ID}/`))
+    expect(body.archiveId).toBe(ARCHIVE_ID)
+    // And the key handed to storage is the same one, so the URL that comes back
+    // is physically bound to this prefix.
+    expect(signedKeys()).toHaveLength(1)
+    expect(signedKeys()[0].path).toMatch(new RegExp(`^${ARCHIVE_ID}/`))
+    expect(signedKeys()[0].bucket).toBe('photographs')
+    // The named archive never reached storage in any form.
+    expect(storageCalls.some(c => c.path.includes(FOREIGN_ARCHIVE_ID))).toBe(false)
+    expect(JSON.stringify(body)).not.toContain(FOREIGN_ARCHIVE_ID)
+  })
+
+  it('the same request without a body archiveId behaves identically', async () => {
+    // What ContributeClient.tsx actually sends. The body field is now inert, so
+    // present and absent have to produce the same shape.
+    const res  = await contribUploadUrlPOST(uploadReq({
+      token:    CONTRIB_TOKEN,
+      fileName: 'family-photo.jpg',
+    }))
+    const body = await res.json()
+
+    console.log(`contribute/upload-url  | no body archiveId`)
+    console.log(`contribute/upload-url  | response path   = ${body.path}`)
+    console.log(`contribute/upload-url  | signed key      = ${signedKeys()[0]?.bucket}/${signedKeys()[0]?.path}`)
+
+    expect(res.status).toBe(200)
+    expect(body.path).toMatch(new RegExp(`^${ARCHIVE_ID}/`))
+    expect(body.archiveId).toBe(ARCHIVE_ID)
+    expect(body.bucket).toBe('photographs')
+    expect(signedKeys()).toHaveLength(1)
+    expect(signedKeys()[0].path).toMatch(new RegExp(`^${ARCHIVE_ID}/`))
+  })
+
+  it('every bucket the route can reach stays on the token archive', async () => {
+    // Bucket selection is by file type and is orthogonal to the archive. All
+    // three have to hold under the cross-archive body, or the fix only closes
+    // the photograph path.
+    const cases: [string, string | undefined, string][] = [
+      ['snapshot.jpg', 'image/jpeg',       'photographs'],
+      ['reunion.mov',  'video/quicktime',  'archive-videos'],
+      ['letter.pdf',   'application/pdf',  'archive-documents'],
+    ]
+
+    for (const [fileName, fileType, expectedBucket] of cases) {
+      storageCalls.length = 0
+      const res  = await contribUploadUrlPOST(uploadReq({
+        token:     CONTRIB_TOKEN,
+        fileName,
+        fileType,
+        archiveId: FOREIGN_ARCHIVE_ID,
+      }))
+      const body = await res.json()
+      console.log(`contribute/upload-url  | ${fileName.padEnd(14)} -> ${body.bucket}/${body.path}`)
+
+      expect(res.status).toBe(200)
+      expect(body.bucket).toBe(expectedBucket)
+      expect(signedKeys()[0].bucket).toBe(expectedBucket)
+      expect(signedKeys()[0].path).toMatch(new RegExp(`^${ARCHIVE_ID}/`))
+      expect(storageCalls.some(c => c.path.includes(FOREIGN_ARCHIVE_ID))).toBe(false)
+    }
+  })
+
+  it('an unknown token is 401 and signs nothing', async () => {
+    // The gate above the prefix. A caller with no valid token must not reach
+    // storage at all, whatever archive they name.
+    const res = await contribUploadUrlPOST(uploadReq({
+      token:     'not-a-real-token',
+      fileName:  'family-photo.jpg',
+      archiveId: FOREIGN_ARCHIVE_ID,
+    }))
+    console.log(`contribute/upload-url  | unknown token   -> ${res.status}, storageCalls=${storageCalls.length}`)
+    expect(res.status).toBe(401)
+    expect(storageCalls).toHaveLength(0)
+  })
+
+  it('a missing token or fileName is 400 and signs nothing', async () => {
+    let res = await contribUploadUrlPOST(uploadReq({ fileName: 'x.jpg', archiveId: FOREIGN_ARCHIVE_ID }))
+    console.log(`contribute/upload-url  | no token        -> ${res.status}, storageCalls=${storageCalls.length}`)
+    expect(res.status).toBe(400)
+
+    res = await contribUploadUrlPOST(uploadReq({ token: CONTRIB_TOKEN }))
+    console.log(`contribute/upload-url  | no fileName     -> ${res.status}, storageCalls=${storageCalls.length}`)
+    expect(res.status).toBe(400)
+
+    expect(storageCalls).toHaveLength(0)
+  })
 })
