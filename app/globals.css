@@ -424,3 +424,79 @@ input[type='range'].range-amber::-webkit-slider-thumb {
     transition-duration:      0.01ms !important;
   }
 }
+
+/* ── Stone register, homepage only ────────────────────────────────────────────
+   Scoped re-point on the same pattern as `.b2b-paper`. Wrapping the homepage in
+   `.home-stone` retints every `var(--color-*)` beneath it to the stone palette
+   with no edits to any :root token definition and no effect on other routes.
+
+   Palette values are read from the approved design direction 1d. Type family and
+   the gold accent are NOT taken from 1d; they stay on the existing stack per
+   CLAUDE.md section 9. --font-cormorant re-points to Newsreader exactly as
+   .b2b-paper does, so the homepage display face is unchanged by this build.
+
+   Do not use for anything other than the homepage. /succession keeps .b2b-paper. */
+.home-stone {
+  /* Stone scale, direction 1d */
+  --stone-bg:          #F2F0EC;
+  --stone-ink:         #14120F;
+  --stone-body:        #3A352E;
+  --stone-secondary:   #5C574F;
+  --stone-label:       #8A847B;
+  --stone-rule:        #DDD9D2;
+  --stone-rule-soft:   #E5E1DA;
+  --stone-card:        #FFFFFF;
+  --stone-card-line:   #D6D1C9;
+  --stone-inset:       #F4F2EE;
+  --stone-invert-bg:   #14120F;
+  --stone-invert-fg:   #F7F5F1;
+  --stone-invert-body: #C7C1B8;
+
+  /* The on-dark gold, held locally because the scope below re-points
+     --color-gold to the on-light value for the stone surface. Inverted blocks
+     point back at this so their accent keeps ~7.4:1 instead of ~2.7:1. */
+  --stone-gold-on-dark: #B8963E;
+
+  /* Layout rhythm, direction 1d. Flat 20px gutter on mobile, modest growth up. */
+  --stone-gutter:      clamp(20px, 5vw, 32px);
+  --stone-measure:     720px;
+
+  /* Shared-token re-point */
+  --color-bg:            var(--stone-bg);
+  --color-surface:       var(--stone-card);
+  --color-surface-alt:   var(--stone-inset);
+  --color-text-primary:  var(--stone-ink);
+  --color-text-secondary: var(--stone-body);
+  --color-text-muted:    var(--stone-secondary);
+  --color-text-faint:    var(--stone-label);
+  --color-gold:          var(--color-gold-on-light);
+  --color-border:        var(--stone-rule);
+  --color-border-medium: var(--stone-card-line);
+  --font-cormorant:      var(--font-newsreader);
+
+  background: var(--stone-bg);
+
+  /* Nav is position:fixed and opaque, so the photograph needs its own clearance
+     or it renders behind the bar. --nav-height matches the unscrolled bar. */
+  padding-top: var(--nav-height);
+}
+
+/* Inverted ink block. Gold points back to the on-dark value. */
+.home-stone .stone-invert { --color-gold: var(--stone-gold-on-dark); }
+
+/* Hairline row, the numbered-list primitive from 1d. Last row closes the stack. */
+.home-stone .stone-row {
+  display:     flex;
+  gap:         12px;
+  padding:     14px 0;
+  border-top:  1px solid var(--stone-rule);
+}
+.home-stone .stone-row:last-child { border-bottom: 1px solid var(--stone-rule); }
+
+/* Full-bleed break out of the centered measure, for photographs. */
+.home-stone .stone-bleed {
+  width:        100vw;
+  margin-left:  50%;
+  transform:    translateX(-50%);
+  max-width:    100vw;
+}

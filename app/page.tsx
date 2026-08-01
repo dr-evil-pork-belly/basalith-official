@@ -6,12 +6,17 @@ export const metadata: Metadata = {
 }
 
 import Nav               from './components/Nav'
-import HeroSection       from './components/HeroSection'
-import SuccessionSection from './components/SuccessionSection'
-import SecondDoorSection from './components/SecondDoorSection'
-import ContrastDemo      from './components/ContrastDemo'
-import ClosingSection    from './components/ClosingSection'
 import Footer            from './components/Footer'
+
+// Stone direction, homepage only. Every section below is built from the block
+// types in approved design direction 1d and carries live copy unchanged.
+// The shared components these replace are left in place and untouched, because
+// /succession still renders ContrastDemo and Section.
+import HomeHero          from './components/home/HomeHero'
+import HomeSuccession    from './components/home/HomeSuccession'
+import HomeContrastDemo  from './components/home/HomeContrastDemo'
+import HomeSecondDoor    from './components/home/HomeSecondDoor'
+import HomeClosing       from './components/home/HomeClosing'
 
 const ORG_SCHEMA = {
   '@context': 'https://schema.org',
@@ -55,12 +60,13 @@ export default function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(ORG_SCHEMA) }}
       />
       <Nav />
-      <main>
-        <div className="b2b-paper"><HeroSection /></div>
-        <div className="b2b-paper"><SuccessionSection /></div>
-        <div className="b2b-paper"><ContrastDemo /></div>
-        <SecondDoorSection />
-        <ClosingSection />
+      <main className="home-stone">
+        <HomeHero />
+        <HomeSuccession />
+        {/* Photograph slot 2 sits here in 1d. Deliberately empty this build. */}
+        <HomeContrastDemo />
+        <HomeSecondDoor />
+        <HomeClosing />
       </main>
       <Footer />
     </>
