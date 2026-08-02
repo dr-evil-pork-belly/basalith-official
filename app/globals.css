@@ -167,28 +167,47 @@ body {
 }
 
 /*
-CONTRAST RULES — READ BEFORE USING
+CONTRAST RULES. READ BEFORE USING.
+
+Every ratio below is measured, not estimated. The previous version of this
+table carried estimates, and three of them were wrong in the unsafe
+direction. rgba(250,248,244,0.4) was documented as passing at roughly 6:1.
+It is 3.62:1 and it fails. The footer took its link color from that line and
+shipped failing text on 29 routes. If you change a value here, measure it.
+
+AA is 4.5:1 for body text. 3:1 applies only at 24px, or 18.66px bold.
+Almost nothing in this design system is large enough to use the 3:1 floor,
+so treat 4.5:1 as the bar unless you have checked the rendered size.
+
+Ratios are quoted against the worst case of the listed backgrounds.
 
 ON DARK BACKGROUNDS (#0A0908, #0D0C0A):
-  Primary text:   rgba(250,248,244,0.9)  ✓  ~16:1
-  Secondary text: rgba(250,248,244,0.5)  ✓  ~8:1
-  Faint text:     rgba(250,248,244,0.4)  ✓  ~6:1
-  Gold accent:    #B8963E               ✓  ~7.4:1
-  NEVER USE:      var(--color-text-primary)   #1A1814  ✗  1.8:1
-  NEVER USE:      var(--color-text-secondary) #4A4640  ✗  3.5:1
+  Primary text:   rgba(250,248,244,0.9)  PASS  15.09:1
+  Secondary text: rgba(250,248,244,0.5)  PASS   5.11:1
+  Gold accent:    #B8963E                PASS   7.08:1
+  NEVER USE:      rgba(250,248,244,0.4)  FAIL   3.62:1  (was documented ~6:1)
+  NEVER USE:      var(--color-text-primary)   #1A1814  FAIL  1.12:1
+  NEVER USE:      var(--color-text-secondary) #4A4640  FAIL  2.12:1
+  NEVER USE:      var(--color-text-muted)     #6A6660  FAIL  3.49:1
+                  Light-mode token. It was never listed here, which is how
+                  the footer tagline shipped at 3.49:1.
+  Lowest passing alpha on this background is 0.46. Use 0.55 or higher.
 
 ON LIGHT BACKGROUNDS (#FAFAF8, #FFFFFF, #F5F3EE):
-  Primary text:   #1A1814  ✓  14:1
-  Secondary text: #4A4640  ✓  7.5:1
-  Muted text:     #6A6660  ✓  4.6:1
-  NEVER USE:      #9A9690  ✗  2.8:1  (var(--color-text-faint))
-  NEVER USE:      #B8963E  ✗  2.7:1  (var(--color-gold) on light)
-  Gold adjusted:  #8A6E30  ✓  4.6:1  (var(--color-gold-on-light))
+  Primary text:   #1A1814  PASS  15.99:1
+  Secondary text: #4A4640  PASS   8.45:1
+  Muted text:     #6A6660  PASS   5.14:1
+  NEVER USE:      #9A9690  FAIL   2.65:1  (var(--color-text-faint))
+  NEVER USE:      #B8963E  FAIL   2.54:1  (var(--color-gold) on light)
+  Gold adjusted:  #8A6E30  MIXED         (var(--color-gold-on-light))
+                  4.82:1 on #FFFFFF and 4.62:1 on #FAFAF8, both pass.
+                  4.35:1 on #F5F3EE, which fails. Do not use it for text on
+                  --color-surface-alt.
 
 ON GOLD BUTTON (#B8963E):
-  ONLY USE:       #0A0908  ✓  7.25:1
-  NEVER USE:      #FAFAF8  ✗  2.7:1
-  NEVER USE:      #FFFFFF  ✗  2.8:1
+  ONLY USE:       #0A0908  PASS  7.08:1
+  NEVER USE:      #FAFAF8  FAIL  2.69:1
+  NEVER USE:      #FFFFFF  FAIL  2.81:1
 */
 
 /* ── Contrast-safe section utilities ── */

@@ -35,6 +35,14 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   reactCompiler: true,
 
+  // Inlined at build time. The footer copyright previously called
+  // new Date().getFullYear() inside a client component, so the year came from
+  // the visitor's system clock. Footer is bundled into a client tree on 9 of
+  // its 29 routes, so dropping 'use client' alone does not fix that.
+  env: {
+    NEXT_PUBLIC_COPYRIGHT_YEAR: String(new Date().getFullYear()),
+  },
+
   images: {
     formats: ['image/avif', 'image/webp'],
     // Next 16 rejects any quality not listed here (default is [75]). 60 is the

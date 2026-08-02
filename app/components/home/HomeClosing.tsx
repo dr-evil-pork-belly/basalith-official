@@ -6,8 +6,10 @@ import { scrollToAudience } from '@/lib/scrollToAudience'
 import { useAudience, type Audience } from '@/lib/useAudience'
 import { mono, serif, StoneBlock } from './StonePrimitives'
 
-// Live copy, unchanged, from ClosingSection. Direction 1d's close shape: a
-// rule above, the heading stack, an outlined CTA.
+// Live copy, unchanged. Direction 1d's close shape: a rule above, the heading
+// stack, an outlined CTA. This is now the only component that renders the
+// locked tagline. The Footer used to repeat it a screen later and no longer
+// does, and the three unused components that also carried it are deleted.
 //
 // 1d closes on a "BASALITH.AI" wordmark. Live copy has no equivalent string and
 // the shared Footer already carries the brand, so that slot is left empty
