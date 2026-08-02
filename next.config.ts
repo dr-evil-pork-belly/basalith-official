@@ -37,6 +37,9 @@ const nextConfig: NextConfig = {
 
   images: {
     formats: ['image/avif', 'image/webp'],
+    // Next 16 rejects any quality not listed here (default is [75]). 60 is the
+    // hero; 75 stays available for everything else.
+    qualities: [60, 75],
   },
 
   async headers() {

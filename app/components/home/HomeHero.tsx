@@ -35,6 +35,7 @@ export default function HomeHero() {
           alt="Folded rock strata in a gorge wall."
           fill
           priority
+          quality={60}
           sizes="100vw"
           style={{ objectFit: 'cover' }}
         />
