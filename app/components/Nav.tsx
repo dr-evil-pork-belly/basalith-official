@@ -11,14 +11,13 @@ const DESKTOP_LINKS = [
 ]
 
 const MOBILE_LINKS = [
-  { href: '/pricing',         label: 'Pricing'               },
-  { href: '/succession',      label: 'For Business'          },
-  { href: '/about',           label: 'About'                 },
-  { href: '/method',          label: 'The Method'            },
-  { href: '/founding-session',label: 'Founding Session'      },
-  { href: '/join-archivists', label: 'Become a Legacy Guide' },
-  { href: '/apply',           label: 'Apply'                 },
-  { href: '/archive-login',   label: 'Client Login'          },
+  { href: '/pricing',         label: 'Pricing'          },
+  { href: '/succession',      label: 'For Business'     },
+  { href: '/about',           label: 'About'            },
+  { href: '/method',          label: 'The Method'       },
+  { href: '/founding-session',label: 'Founding Session' },
+  { href: '/apply',           label: 'Apply'            },
+  { href: '/archive-login',   label: 'Client Login'     },
 ]
 
 export default function Nav() {

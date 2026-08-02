@@ -14,12 +14,11 @@ const COLS: { heading: string; links: { label: string; href?: string }[] }[] = [
   {
     heading: 'Company',
     links: [
-      { label: 'About',                 href: '/about'           },
-      { label: 'The Method',            href: '/method'          },
-      { label: 'For Business',          href: '/succession'      },
-      { label: 'Become a Legacy Guide', href: '/join-archivists' },
-      { label: 'Apply',                 href: '/apply'           },
-      { label: 'Press',                 href: '/press'           },
+      { label: 'About',        href: '/about'      },
+      { label: 'The Method',   href: '/method'     },
+      { label: 'For Business', href: '/succession' },
+      { label: 'Apply',        href: '/apply'      },
+      { label: 'Press',        href: '/press'      },
     ],
   },
   {
