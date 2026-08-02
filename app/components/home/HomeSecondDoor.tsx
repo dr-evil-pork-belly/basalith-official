@@ -16,7 +16,7 @@ export default function HomeSecondDoor() {
         <h2
           style={{
             ...serif,
-            fontSize:      'clamp(25px, 6.4vw, 34px)',
+            fontSize:      'var(--stone-fs-h2-door)',
             fontWeight:    300,
             lineHeight:    1.14,
             letterSpacing: '-0.02em',
@@ -30,7 +30,7 @@ export default function HomeSecondDoor() {
         <p
           style={{
             ...serif,
-            fontSize:   '16px',
+            fontSize:   'var(--stone-fs-body)',
             fontStyle:  'italic',
             fontWeight: 300,
             lineHeight: 1.55,
@@ -43,6 +43,7 @@ export default function HomeSecondDoor() {
 
         <Link
           href="/families"
+          className="stone-cta"
           style={{
             ...mono,
             display:        'block',

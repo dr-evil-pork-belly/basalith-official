@@ -105,7 +105,7 @@ function HomeContrastDemoSection({
         <h2
           style={{
             ...serif,
-            fontSize:      'clamp(24px, 6.2vw, 34px)',
+            fontSize:      'var(--stone-fs-h2)',
             fontWeight:    300,
             lineHeight:    1.14,
             letterSpacing: '-0.02em',
@@ -148,7 +148,7 @@ function HomeContrastDemoSection({
         <p
           style={{
             ...serif,
-            fontSize:   'clamp(19px, 4.8vw, 24px)',
+            fontSize:   'var(--stone-fs-question)',
             fontWeight: 300,
             lineHeight: 1.3,
             color:      'var(--stone-ink)',
@@ -185,6 +185,7 @@ function HomeContrastDemoSection({
           type="button"
           onClick={onSubmit}
           disabled={!canSubmit}
+          className="stone-cta"
           style={{
             ...mono,
             display:    'block',
@@ -213,7 +214,7 @@ function HomeContrastDemoSection({
                 <p
                   style={{
                     ...serif,
-                    fontSize:   '16px',
+                    fontSize:   'var(--stone-fs-body)',
                     fontWeight: 300,
                     lineHeight: 1.5,
                     color:      'var(--stone-ink)',
@@ -223,7 +224,7 @@ function HomeContrastDemoSection({
                 >
                   {answered}
                 </p>
-                <p style={{ ...serif, fontSize: '14px', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.45, color: 'var(--stone-secondary)', margin: 0 }}>
+                <p style={{ ...serif, fontSize: 'var(--stone-fs-note)', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.45, color: 'var(--stone-secondary)', margin: 0 }}>
                   {LEFT_NOTE}
                 </p>
               </StoneCard>
@@ -242,22 +243,22 @@ function HomeContrastDemoSection({
                   {illustration.map((para, i) => (
                     <p
                       key={i}
-                      style={{ ...serif, fontSize: '16px', fontWeight: 300, lineHeight: 1.5, color: 'var(--stone-ink)', margin: 0 }}
+                      style={{ ...serif, fontSize: 'var(--stone-fs-body)', fontWeight: 300, lineHeight: 1.5, color: 'var(--stone-ink)', margin: 0 }}
                     >
                       {para}
                     </p>
                   ))}
                 </div>
-                <p style={{ ...mono, fontSize: '9.5px', color: 'var(--stone-label)', margin: 0 }}>
+                <p style={{ ...mono, fontSize: 'var(--stone-fs-mono-sm)', color: 'var(--stone-label)', margin: 0 }}>
                   {ILLUSTRATION_CAPTION}
                 </p>
               </StoneCard>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '8px' }}>
-                <p style={{ ...serif, fontSize: 'clamp(21px, 5.4vw, 28px)', fontWeight: 300, lineHeight: 1.2, color: 'var(--stone-ink)', margin: 0 }}>
+                <p style={{ ...serif, fontSize: 'var(--stone-fs-h3)', fontWeight: 300, lineHeight: 1.2, color: 'var(--stone-ink)', margin: 0 }}>
                   {CLOSING_LINE}
                 </p>
-                <p style={{ ...serif, fontSize: '16px', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.5, color: 'var(--stone-body)', margin: 0 }}>
+                <p style={{ ...serif, fontSize: 'var(--stone-fs-body)', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.5, color: 'var(--stone-body)', margin: 0 }}>
                   {CLOSING_SUB}
                 </p>
               </div>

@@ -23,7 +23,7 @@ export default function HomeHero() {
     <section aria-label="Basalith: knowledge transfer at a change of control">
 
       <div
-        className="stone-bleed"
+        className="stone-bleed stone-hero"
         style={{
           position:    'relative',
           width:       '100%',
@@ -37,7 +37,12 @@ export default function HomeHero() {
           priority
           quality={60}
           sizes="100vw"
-          style={{ objectFit: 'cover' }}
+          // The box is capped by height on desktop (see .stone-hero), so cover
+          // takes a crop there. Pulled up off center to 38% because the read of
+          // this photograph is the cave mouth and the fold above it, which sit
+          // in the upper third. A centered crop keeps the plain lower wall and
+          // loses the subject. At 390px nothing is cropped and this is inert.
+          style={{ objectFit: 'cover', objectPosition: '50% 38%' }}
         />
 
         {/* Scrim sits over the lower 62% only. */}
@@ -54,15 +59,21 @@ export default function HomeHero() {
         />
 
         <h1
+          className="stone-hero-h1"
           style={{
             ...serif,
             position:      'absolute',
             left:          0,
             right:         0,
             bottom:        0,
-            margin:        0,
+            // Block axis only. An inline `margin: 0` would also set the inline
+            // axis and outrank the stylesheet, which is what kept the desktop
+            // `margin-inline: auto` from centering this onto the measure.
+            // Tailwind preflight already zeroes h1 margins, so 0 still holds
+            // on the inline axis at mobile.
+            marginBlock:   0,
             padding:       'var(--stone-gutter)',
-            fontSize:      'clamp(33px, 8.5vw, 46px)',
+            fontSize:      'var(--stone-fs-h1)',
             fontWeight:    400,
             lineHeight:    1.07,
             letterSpacing: '-0.02em',
@@ -97,7 +108,7 @@ export default function HomeHero() {
         <p
           style={{
             ...serif,
-            fontSize:   '16px',
+            fontSize:   'var(--stone-fs-body)',
             fontWeight: 300,
             lineHeight: 1.5,
             color:      'var(--stone-body)',
@@ -110,6 +121,7 @@ export default function HomeHero() {
 
         <Link
           href="/succession"
+          className="stone-cta"
           style={{
             ...mono,
             display:        'block',

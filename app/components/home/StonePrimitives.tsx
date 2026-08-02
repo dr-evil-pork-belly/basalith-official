@@ -11,11 +11,15 @@ import type { CSSProperties, ReactNode } from 'react'
 // Type family comes from the existing stack, not from 1d. Sizes and spacing
 // come from 1d. Gold is retained per CLAUDE.md section 9.
 
+// Sizes are carried as --stone-fs-* tokens rather than literals. The token
+// value at 390px is the literal that used to sit here, so mobile is unchanged;
+// the desktop steps are set by media query in globals.css. An inline style
+// outranks a stylesheet rule, so a token is what makes those steps reachable.
 export const mono: CSSProperties = {
   fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
   textTransform: 'uppercase',
   letterSpacing: '0.1em',
-  fontSize:      '10.5px',
+  fontSize:      'var(--stone-fs-mono)',
   lineHeight:    1.5,
 }
 
@@ -94,10 +98,10 @@ export function StoneRow({
         {n}
       </span>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-        <span style={{ ...serif, fontWeight: 600, fontSize: '15.5px', lineHeight: 1.25, color: 'var(--stone-ink)' }}>
+        <span style={{ ...serif, fontWeight: 600, fontSize: 'var(--stone-fs-row-title)', lineHeight: 1.25, color: 'var(--stone-ink)' }}>
           {title}
         </span>
-        <span style={{ ...serif, fontWeight: 300, fontSize: '14px', lineHeight: 1.45, color: 'var(--stone-secondary)' }}>
+        <span style={{ ...serif, fontWeight: 300, fontSize: 'var(--stone-fs-row-body)', lineHeight: 1.45, color: 'var(--stone-secondary)' }}>
           {body}
         </span>
       </div>
@@ -121,7 +125,7 @@ export function StoneLabelRow({
       <span
         style={{
           ...serif,
-          fontSize:   '16px',
+          fontSize:   'var(--stone-fs-body)',
           fontStyle:  'italic',
           fontWeight: 300,
           lineHeight: 1.5,
@@ -160,7 +164,7 @@ export function StoneCard({
           gap:            '12px',
           padding:        '10px 13px',
           borderBottom:   '1px solid var(--stone-rule-soft)',
-          fontSize:       '9.5px',
+          fontSize:       'var(--stone-fs-mono-sm)',
           color:          'var(--stone-label)',
         }}
       >

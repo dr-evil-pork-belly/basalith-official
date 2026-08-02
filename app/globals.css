@@ -461,6 +461,33 @@ input[type='range'].range-amber::-webkit-slider-thumb {
   --stone-gutter:      clamp(20px, 5vw, 32px);
   --stone-measure:     720px;
 
+  /* Type scale. Every value here is the 1d value as drawn at 390px, so the
+     mobile rendering is unchanged by definition. The desktop steps live in the
+     media queries at the bottom of this file.
+
+     These are held as custom properties because the homepage sections carry
+     their sizes as React inline styles, and an inline style outranks any
+     stylesheet rule. A token is the only way a media query can reach them
+     without an !important on every line. */
+  --stone-fs-h1:        clamp(33px, 8.5vw, 46px);
+  --stone-fs-h2:        clamp(24px, 6.2vw, 34px);
+  /* The second door block was drawn a half step larger than the other h2s and
+     keeps that relationship. Held separately so 390px stays at its own 25px. */
+  --stone-fs-h2-door:   clamp(25px, 6.4vw, 34px);
+  --stone-fs-h3:        clamp(21px, 5.4vw, 28px);
+  --stone-fs-question:  clamp(19px, 4.8vw, 24px);
+  --stone-fs-body:      16px;
+  --stone-fs-lead:      18px;
+  --stone-fs-row-title: 15.5px;
+  --stone-fs-row-body:  14px;
+  --stone-fs-note:      14px;
+  --stone-fs-mono:      10.5px;
+  --stone-fs-mono-sm:   9.5px;
+
+  /* Desktop ceiling for the CTA boxes. Full width is right at 390px and wrong
+     across a 796px measure, so the buttons stop growing at the tablet step. */
+  --stone-cta-max:      none;
+
   /* Shared-token re-point */
   --color-bg:            var(--stone-bg);
   --color-surface:       var(--stone-card);
@@ -502,4 +529,86 @@ input[type='range'].range-amber::-webkit-slider-thumb {
   margin-left:  50%;
   transform:    translateX(-50%);
   max-width:    100vw;
+}
+
+/* CTA boxes. Full width at 390px, which is correct there and is the base. The
+   desktop ceiling arrives with --stone-cta-max at the tablet step. */
+.home-stone .stone-cta { max-width: var(--stone-cta-max); }
+
+/* ── Desktop adaptation ───────────────────────────────────────────────────────
+   Everything below is gated at min-width 768px and above, so the 390px
+   rendering cannot be reached by any of it. The mobile-first build stands as
+   the base; these are steps on top of it.
+
+   Three defects are addressed: the hero had no height ceiling and pushed the h1
+   below the fold, the measure was drawn for 390px and never widened, and the
+   type scale was fixed at the 390px sizes at every width. */
+
+/* Tablet. */
+@media (min-width: 768px) {
+  .home-stone {
+    --stone-measure:      780px;
+    --stone-cta-max:      300px;
+
+    --stone-fs-h1:        52px;
+    --stone-fs-h2:        38px;
+    --stone-fs-h2-door:   39px;
+    --stone-fs-h3:        30px;
+    --stone-fs-question:  26px;
+    --stone-fs-body:      17px;
+    --stone-fs-lead:      20px;
+    --stone-fs-row-title: 16.5px;
+    --stone-fs-row-body:  15px;
+    --stone-fs-note:      15px;
+    --stone-fs-mono:      11px;
+    --stone-fs-mono-sm:   10px;
+  }
+
+  /* Defect 1. The photograph is 100vw at a locked 3022:2083, so its height is a
+     function of viewport width alone and runs away on a wide screen: 992px at
+     1440, 1323px at 1920, 1565px at 2270. The h1 is anchored to the bottom of
+     that box, so it left the fold entirely.
+
+     The ceiling is viewport height minus the fixed nav minus 96px, so a band of
+     the block below always shows and the page reads as scrollable. The 820px
+     stop keeps the photograph from dominating on a tall desktop window.
+
+     The source ratio is untouched. aspect-ratio still sets the box; this only
+     caps it, and object-fit: cover takes the crop from there. */
+  .home-stone .stone-hero {
+    max-height: min(calc(100svh - var(--nav-height) - 96px), 820px);
+    overflow:   hidden;
+  }
+
+  /* Defect 2. The h1 was the actual left-anchored element. It lives inside the
+     full-bleed photograph at left:0/right:0, so its text sat one gutter from the
+     viewport edge (x=32 at 2270) while the centered column below it started at
+     x=807. That 775px mismatch is what read as a broken column. Both margins
+     resolve to auto here, so max-width centers it onto the same measure as the
+     body copy and the two left edges line up. */
+  .home-stone .stone-hero-h1 {
+    max-width:     var(--stone-measure);
+    margin-inline: auto;
+  }
+}
+
+/* Desktop. */
+@media (min-width: 1280px) {
+  .home-stone {
+    --stone-measure:      860px;
+    --stone-cta-max:      320px;
+
+    --stone-fs-h1:        62px;
+    --stone-fs-h2:        44px;
+    --stone-fs-h2-door:   45px;
+    --stone-fs-h3:        34px;
+    --stone-fs-question:  28px;
+    --stone-fs-body:      18px;
+    --stone-fs-lead:      21px;
+    --stone-fs-row-title: 17.5px;
+    --stone-fs-row-body:  16px;
+    --stone-fs-note:      15px;
+    --stone-fs-mono:      11.5px;
+    --stone-fs-mono-sm:   10.5px;
+  }
 }

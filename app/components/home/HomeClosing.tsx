@@ -65,7 +65,7 @@ function HomeClosingView({ audience }: { audience: Audience | null }) {
         <p
           style={{
             ...serif,
-            fontSize:      'clamp(24px, 6.2vw, 34px)',
+            fontSize:      'var(--stone-fs-h2)',
             fontWeight:    300,
             lineHeight:    1.14,
             letterSpacing: '-0.02em',
@@ -81,7 +81,7 @@ function HomeClosingView({ audience }: { audience: Audience | null }) {
         <p
           style={{
             ...serif,
-            fontSize:   '16px',
+            fontSize:   'var(--stone-fs-body)',
             fontStyle:  'italic',
             fontWeight: 300,
             lineHeight: 1.55,
@@ -102,7 +102,7 @@ function HomeClosingView({ audience }: { audience: Audience | null }) {
         <div
           style={{
             ...serif,
-            fontSize:   'clamp(21px, 5.4vw, 28px)',
+            fontSize:   'var(--stone-fs-h3)',
             fontWeight: 300,
             fontStyle:  'italic',
             lineHeight: 1.45,
@@ -115,6 +115,7 @@ function HomeClosingView({ audience }: { audience: Audience | null }) {
 
         <Link
           href={variant.href}
+          className="stone-cta"
           style={{
             ...mono,
             display:        'block',
