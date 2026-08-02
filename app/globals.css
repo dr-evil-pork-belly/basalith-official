@@ -547,7 +547,11 @@ input[type='range'].range-amber::-webkit-slider-thumb {
 /* Tablet. */
 @media (min-width: 768px) {
   .home-stone {
-    --stone-measure:      780px;
+    /* The measure deliberately does NOT move at this step. A 780px measure is
+       wider than a 768px viewport, which would push the column edge to edge and
+       cut its outer margin from 56px to the 32px gutter. The tablet band gets
+       the type step only; the measure widens at 1024 where there is room to
+       spend. */
     --stone-cta-max:      300px;
 
     --stone-fs-h1:        52px;
@@ -590,6 +594,12 @@ input[type='range'].range-amber::-webkit-slider-thumb {
     max-width:     var(--stone-measure);
     margin-inline: auto;
   }
+}
+
+/* Small desktop and landscape tablet. First width with room to widen the
+   measure and still keep a real outer margin on both sides. */
+@media (min-width: 1024px) {
+  .home-stone { --stone-measure: 800px; }
 }
 
 /* Desktop. */
