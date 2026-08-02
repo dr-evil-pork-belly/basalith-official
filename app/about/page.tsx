@@ -251,25 +251,9 @@ export default function AboutPage() {
               who conduct Founding Sessions and maintain archive relationships over time.
             </p>
             <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>The technology handles the complexity. The Guide handles the humanity.</p>
-            <p style={{ ...BODY, color: 'rgba(250,248,244,0.85)', fontStyle: 'italic', marginBottom: '36px' }}>
+            <p style={{ ...BODY, color: 'rgba(250,248,244,0.85)', fontStyle: 'italic' }}>
               Every archive is a relationship, not a subscription.
             </p>
-            <a
-              href="/join-archivists"
-              style={{
-                ...MONO,
-                fontSize:       'var(--text-caption)',
-                display:        'inline-flex',
-                alignItems:     'center',
-                gap:            '8px',
-                color:          'var(--color-gold)',
-                textDecoration: 'none',
-                border:         '1px solid rgba(196,162,74,0.4)',
-                padding:        '12px 24px',
-              }}
-            >
-              Become a Legacy Guide <span aria-hidden="true">→</span>
-            </a>
           </div>
         </section>
 
