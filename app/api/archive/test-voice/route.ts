@@ -1,3 +1,9 @@
+// DISABLED. The ElevenLabs subscription was cancelled in August 2026.
+// This route synthesizes arbitrary text in an archive's cloned voice and is
+// reachable only from god mode, where its button is now disabled. It is
+// retained, not deleted, so the diagnostic path exists when a replacement voice
+// provider is wired. Every call fails until then: 503 if ELEVENLABS_API_KEY is
+// unset, 500 from the catch below if the key is set but the account is dead.
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { supabaseAdmin } from '@/lib/supabase-admin'

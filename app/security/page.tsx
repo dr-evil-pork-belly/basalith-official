@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title:       'Security · Basalith',
-  description: 'How Basalith protects your archive. Encryption, access control, voice clone security, and infrastructure transparency.',
+  description: 'How Basalith protects your archive. Encryption, access control, and infrastructure transparency.',
 }
 
 const EYEBROW: React.CSSProperties = {
@@ -60,7 +60,7 @@ const INFRA = [
   { label: 'File storage',  value: 'Supabase Storage (AWS S3)' },
   { label: 'Application',   value: 'Vercel (AWS/GCP edge network)' },
   { label: 'AI processing', value: 'Anthropic API' },
-  { label: 'Voice synthesis', value: 'ElevenLabs API' },
+  { label: 'Transcription', value: 'OpenAI Whisper API' },
 ]
 
 export default function SecurityPage() {
@@ -96,7 +96,7 @@ export default function SecurityPage() {
               color:         'var(--color-text-faint)',
               marginBottom:  '48px',
             }}>
-              Last updated: May 2026
+              Last updated: August 2026
             </p>
 
             <div aria-hidden="true" style={{ height: '1px', background: 'var(--color-border)', marginBottom: '48px' }} />
@@ -106,7 +106,6 @@ export default function SecurityPage() {
             <p style={BODY}>Your data is encrypted at rest and in transit.</p>
             <p style={BODY}><strong>At rest:</strong> Supabase encrypts all data at rest using <span style={CODE}>AES-256</span> encryption. Your voice recordings, photographs, and deposits are stored in private storage buckets, not publicly accessible under any circumstances.</p>
             <p style={BODY}><strong>In transit:</strong> All data transmitted between your devices and Basalith uses <span style={CODE}>TLS 1.3</span> encryption. No data travels unencrypted.</p>
-            <p style={BODY}><strong>Voice clone data:</strong> Your ElevenLabs voice clone is stored under your archive&rsquo;s private identifier. The voice ID is never publicly accessible. Voice portraits are served through time-limited signed URLs that expire after 1 hour.</p>
 
             {/* 2 — Access Control */}
             <h2 style={H2}>2. Access Control</h2>
@@ -124,16 +123,8 @@ export default function SecurityPage() {
               ))}
             </ul>
 
-            {/* 3 — Voice Clone */}
-            <h2 style={H2}>3. Voice Clone Security</h2>
-            <p style={BODY}>Voice clone data is one of the most sensitive assets in your archive. We treat it accordingly.</p>
-            <p style={BODY}>Your voice clone is created from recordings you provide. The clone is stored under a private identifier associated only with your archive.</p>
-            <p style={BODY}>Voice portraits are delivered via time-limited signed URLs. They cannot be forwarded or accessed after expiry.</p>
-            <p style={BODY}>We do not use your voice clone for any purpose other than generating your voice portraits. It is not accessible to other archives, other users, or third parties.</p>
-            <p style={BODY}>If you suspect your voice data has been compromised contact us immediately: <a href="mailto:security@basalith.ai" style={{ color: '#C4A24A', textDecoration: 'none' }}>security@basalith.ai</a></p>
-
-            {/* 4 — Infrastructure */}
-            <h2 style={H2}>4. Cloud Infrastructure</h2>
+            {/* 3 — Infrastructure */}
+            <h2 style={H2}>3. Cloud Infrastructure</h2>
             <p style={BODY}>Basalith processes data on cloud infrastructure. We are transparent about this.</p>
             <p style={{ ...BODY, marginBottom: '8px' }}>Where your data lives:</p>
             <div style={{ marginBottom: '16px' }}>
@@ -146,10 +137,11 @@ export default function SecurityPage() {
             </div>
             <p style={BODY}>Each platform has its own security certifications (SOC 2, ISO 27001).</p>
             <p style={BODY}>Anthropic does not train on API data by default. Your deposits and entity conversations do not improve Anthropic&rsquo;s general models.</p>
+            <p style={BODY}>Voice and video recordings are sent to OpenAI for transcription. This covers voice recorded in the portal and the iOS app, deposits left on the phone line, and video you upload. Video is sent as a complete file and transcribed from its audio. The spoken language is detected automatically. Transcription is the only use. No other archive content is sent to OpenAI.</p>
             <p style={BODY}>For enterprise clients with specific data residency requirements contact <a href="mailto:enterprise@basalith.ai" style={{ color: '#C4A24A', textDecoration: 'none' }}>enterprise@basalith.ai</a></p>
 
-            {/* 5 — MFA */}
-            <h2 style={H2}>5. Multi-Factor Authentication</h2>
+            {/* 4 — MFA */}
+            <h2 style={H2}>4. Multi-Factor Authentication</h2>
             <p style={{ ...BODY, color: 'var(--color-gold)', fontStyle: 'italic' }}>Coming Q3 2026.</p>
             <p style={BODY}>Multi-factor authentication for archive login is on our roadmap. Until MFA is available:</p>
             <ul style={{ paddingLeft: 0, margin: '0 0 12px' }}>

@@ -100,7 +100,18 @@ const HEALTH_BORDER = {
   red:   'rgba(196,74,74,0.6)',
 }
 
-const CRON_BUTTONS = [
+// Voice synthesis is decommissioned. The ElevenLabs subscription was cancelled in
+// August 2026 and no replacement provider is wired. The controls below are disabled
+// rather than deleted so the wiring survives the vendor change. To bring voice back:
+// flip this to false, then update the three routes that still import the ElevenLabs
+// SDK (app/api/cron/voice-portrait, app/api/archive/setup-voice-clone,
+// app/api/archive/test-voice) and restore the cron entry in vercel.json.
+// Annotated as boolean, not inferred as the literal `true`, so the code paths below
+// stay statically reachable and nothing is dead-code eliminated or lint-flagged.
+const VOICE_SYNTHESIS_DISABLED: boolean = true
+const VOICE_DISABLED_REASON    = 'Voice synthesis decommissioned August 2026. ElevenLabs subscription cancelled, no replacement provider wired. This control will fail until one is.'
+
+const CRON_BUTTONS: { label: string; route: string; group: string; disabled?: boolean }[] = [
   // Daily
   { label: 'DAILY PHOTOS',        route: 'send-photos',            group: 'daily'     },
   { label: 'DAILY REFLECTION',    route: 'daily-reflection',       group: 'daily'     },
@@ -123,7 +134,7 @@ const CRON_BUTTONS = [
   { label: 'PAUSE REMINDER',      route: 'pause-reminder',         group: 'monthly'   },
   // Quarterly / Annual
   { label: 'ENTITY LETTER',       route: 'entity-letter',          group: 'quarterly' },
-  { label: 'VOICE PORTRAIT',      route: 'voice-portrait',         group: 'quarterly' },
+  { label: 'VOICE PORTRAIT',      route: 'voice-portrait',         group: 'quarterly', disabled: VOICE_SYNTHESIS_DISABLED },
 ]
 
 // ── Action handler ─────────────────────────────────────────────────────────────
@@ -274,6 +285,22 @@ function VoiceCloneButton({ archiveId, hasVoice, voiceId, samplesCount }: { arch
     setTimeout(() => { setState('idle'); setResult('') }, 4000)
   }
 
+  // Disabled, not deleted. See VOICE_SYNTHESIS_DISABLED at the top of this file.
+  // The archive still carries its voice id, so that stays visible as the record of
+  // which archives had a clone. Only the rebuild action is withdrawn.
+  if (VOICE_SYNTHESIS_DISABLED) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }} title={VOICE_DISABLED_REASON}>
+        <p style={{ ...mono, fontSize: '0.32rem', color: '#3A3F44', letterSpacing: '0.1em', margin: 0 }}>
+          🎙 {hasVoice ? `VOICE CLONE ON RECORD · ${voiceId?.slice(0, 12)}…` : `${samplesCount} SAMPLES ON RECORD`}
+        </p>
+        <span style={{ ...mono, fontSize: '0.3rem', letterSpacing: '0.1em', border: '1px dashed rgba(255,255,255,0.09)', borderRadius: '2px', padding: '2px 6px', color: '#3A3F44' }}>
+          SYNTHESIS OFF · AUG 2026
+        </span>
+      </div>
+    )
+  }
+
   if (hasVoice) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
@@ -319,6 +346,15 @@ function VoiceTestButton({ archiveId }: { archiveId: string }) {
       if (res.ok && data.audioUrl) { setState('done'); setAudioUrl(data.audioUrl) }
       else { setState('error'); setErrMsg(data.detail ?? data.error ?? 'failed') }
     } catch { setState('error'); setErrMsg('network error') }
+  }
+
+  // Disabled, not deleted. See VOICE_SYNTHESIS_DISABLED at the top of this file.
+  if (VOICE_SYNTHESIS_DISABLED) {
+    return (
+      <button disabled title={VOICE_DISABLED_REASON} style={{ ...mono, fontSize: '0.3rem', letterSpacing: '0.1em', background: 'transparent', border: '1px dashed rgba(255,255,255,0.09)', borderRadius: '2px', padding: '2px 6px', color: '#3A3F44', cursor: 'not-allowed' }}>
+        TEST VOICE · OFF
+      </button>
+    )
   }
 
   if (!open) {
@@ -1134,8 +1170,30 @@ export default function GodModeClient() {
                       {group.toUpperCase()}
                     </p>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
-                      {buttons.map(({ label, route }) => {
+                      {buttons.map(({ label, route, disabled }) => {
                         const state = triggerStates[route]
+                        if (disabled) {
+                          return (
+                            <button
+                              key={route}
+                              disabled
+                              title={VOICE_DISABLED_REASON}
+                              style={{
+                                background:    'transparent',
+                                border:        '1px dashed rgba(255,255,255,0.09)',
+                                borderRadius:  '2px',
+                                padding:       '5px 12px',
+                                ...mono,
+                                fontSize:      '0.36rem',
+                                letterSpacing: '0.15em',
+                                color:         '#3A3F44',
+                                cursor:        'not-allowed',
+                              }}
+                            >
+                              {label} · OFF
+                            </button>
+                          )
+                        }
                         return (
                           <button
                             key={route}

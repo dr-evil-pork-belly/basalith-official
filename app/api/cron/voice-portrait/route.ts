@@ -1,3 +1,13 @@
+// DISABLED. The ElevenLabs subscription was cancelled in August 2026.
+// The Vercel cron entry for this route was removed from vercel.json at the same
+// time, so nothing invokes it on a schedule. It is retained, not deleted, for
+// its provider-independent logic: the per-language script generation, the
+// portrait email, and the monthly idempotency guard all survive a vendor change.
+// Every call fails at the text-to-speech step until a replacement voice provider
+// is wired. If ELEVENLABS_API_KEY is unset the route returns early and does no
+// work. If the key is still set it will spend one Anthropic call per cloned
+// archive before failing, which is why the cron entry had to go.
+// Already-generated portraits are unaffected. They live in Supabase Storage.
 import { NextRequest } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { ElevenLabsClient } from 'elevenlabs'

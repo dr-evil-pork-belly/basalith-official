@@ -89,8 +89,9 @@ Repos:
 - `basalith-xyz`. White paper. Git-wired, push to main deploys.
 
 Stack: Next.js App Router with TypeScript, Tailwind, Supabase (Postgres and Storage),
-Anthropic API, Resend for email, Inngest for background jobs, Vercel for hosting and
-crons, ElevenLabs for voice, Expo and EAS for iOS.
+Anthropic API, OpenAI Whisper for audio transcription, Resend for email, Inngest for
+background jobs, Vercel for hosting and crons, Expo and EAS for iOS. There is no voice
+synthesis vendor. See section 6.
 
 Versions, VERIFIED from package.json July 2026: next 16.1.6 and eslint-config-next 16.1.6, both pinned exact. react and react-dom 19.2.3, pinned. tailwindcss 3.4.x, not v4. React Compiler is on via babel-plugin-react-compiler. Tests run with vitest (npm test runs vitest run). Next 16 renamed middleware.ts to proxy.ts, which is why proxy.ts sits at the repo root.
 
@@ -259,6 +260,27 @@ Flag and ask.
 - Outbound emails send HTML only. There is no plain-text fallback.
 - `any` appears throughout `lib/selectNextQuestion.ts` on Supabase row mapping.
 - Input validation is hand-rolled per route. There is no schema validation layer. Confirmed by absence: no zod or equivalent is installed.
+
+**Voice synthesis is decommissioned.** VERIFIED August 2026. The ElevenLabs
+subscription was cancelled. The Vercel cron entry for `/api/cron/voice-portrait` was
+removed, the god mode voice buttons were disabled, and the ElevenLabs copy was pulled
+from `/security`. Three routes still import the SDK and are retained on purpose:
+`app/api/cron/voice-portrait`, `app/api/archive/test-voice`, and
+`app/api/archive/setup-voice-clone`. Keep them. The sample-selection logic in
+`setup-voice-clone` is provider independent and is the expensive part to rebuild. All
+three fail until a replacement provider is wired: 503 when `ELEVENLABS_API_KEY` is
+unset, 500 when it is set but the account is dead. The `elevenlabs_voice_id`,
+`voice_cloned_at`, and `voice_samples_count` columns and the `voice_portraits` table
+stay as the record of which archives had clones. Two archives did, Hoa Le Tran and Dr
+Ha. Their four generated MP3s are intact in Supabase Storage and are unaffected. The
+voice models themselves lived on ElevenLabs servers and are gone. The 33 source
+`voice_recordings` are the real asset and a clone can be rebuilt from them on any
+provider. Two follow-ups are open and are not done: contributors on those two archives
+stopped receiving the monthly portrait email after June 15 with no notice, and the
+signed URLs in the May and June emails have expired, so those families cannot currently
+reach audio we still hold. Unrelated to all of this, the Cantonese path on
+`app/api/twilio/voice/route.ts` uses a Twilio-hosted Google voice and never touched
+ElevenLabs.
 
 **Other open conflicts.** FROM DOCS, each needs its own session. Inclusion threshold is
 50 in `trainingPipeline.ts` and 60 in the god scoring route. Dimension taxonomy is 10 vs

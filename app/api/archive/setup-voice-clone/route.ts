@@ -1,3 +1,13 @@
+// DISABLED. The ElevenLabs subscription was cancelled in August 2026.
+// This route is retained, not deleted, because the sample-selection logic below
+// is provider independent and is the part worth keeping: prefer recordings of 60
+// seconds or more, fall back to 30 seconds when fewer than three qualify,
+// deduplicate by storage path and again by buffer size, and require three unique
+// samples. Any replacement voice provider reuses all of it. Only the client call
+// changes. Every call fails until then: 503 if ELEVENLABS_API_KEY is unset, 500
+// from the catch below if the key is set but the account is dead.
+// A failed call cannot corrupt stored state. The archives update runs only after
+// a successful clone, so archives.elevenlabs_voice_id survives a failed retry.
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { supabaseAdmin } from '@/lib/supabase-admin'
