@@ -49,7 +49,7 @@ const SECTIONS = [
     num:   '05',
     title: 'Intellectual Property',
     body: [
-      'Your archive content — including all deposits, voice recordings, photographs, and the cognitive reference model derived from them — remains your intellectual property at all times. Heritage Nexus Inc. claims no intellectual property rights over your archive content.',
+      'Your archive content, including all deposits, voice recordings, photographs, and the cognitive reference model derived from them, remains your intellectual property at all times. Heritage Nexus Inc. claims no intellectual property rights over your archive content.',
       'You grant Heritage Nexus Inc. a limited license to process your archive content solely for the purpose of operating and improving your specific archive. This license does not extend to using your content to train general models, sharing with other users, or commercializing in any form.',
       'Your deposits, entity conversations, and voice data are your property. You may export them at any time in open formats. You may use them with any compatible platform.',
     ],
@@ -67,7 +67,7 @@ const SECTIONS = [
     num:   '07',
     title: 'Company Dissolution',
     body: [
-      'In the event Heritage Nexus Inc. ceases operations: (a) Users will receive a minimum of 90 days advance notice where circumstances permit. (b) Complete data export will be made available to all users during the notice period. (c) Archive data will not be sold to third parties as part of any dissolution, acquisition, or bankruptcy proceeding without explicit user consent. (d) Any acquiring entity must agree to honor these same commitments as a condition of acquiring Heritage Nexus Inc. assets.',
+      'In the event Heritage Nexus Inc. ceases operations: (a) Users will receive advance notice where circumstances permit. (b) Complete data export will be made available to all users, fulfilled within 30 business days of request. (c) Archive data will not be sold to third parties as part of any dissolution, acquisition, or bankruptcy proceeding. This prohibition is absolute. It is not subject to user consent, waiver, or any other exception. (d) Any acquiring entity must agree to honor these same commitments as a condition of acquiring Heritage Nexus Inc. assets.',
       'These commitments are not merely contractual. We are building technical export infrastructure to ensure they are enforceable independent of corporate continuity.',
     ],
   },
@@ -240,7 +240,7 @@ export default function TermsPage() {
               . Questions about your Basalith agreement should reference your archive number.
             </p>
             <div className="flex items-center justify-center gap-5 flex-wrap">
-              <a href="/privacy-policy" className="btn-monolith-ghost">Privacy Policy</a>
+              <a href="/privacy" className="btn-monolith-ghost">Privacy Policy</a>
               <a href="/data-ownership" className="btn-monolith-ghost">Data Ownership Charter</a>
             </div>
           </div>

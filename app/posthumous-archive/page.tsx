@@ -381,7 +381,9 @@ function Pricing() {
           </div>
           <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'italic', fontSize: '0.85rem', color: '#5C6166', lineHeight: 1.75, margin: 0 }}>
             Archive begins after The Witness Founding is complete. Renews annually.
-            Cancel at any time. Archive accessible for 90 days after cancellation.
+            Cancel at any time. Cancelling ends the subscription. It does not delete the
+            archive. Your content is preserved, and permanent deletion happens only
+            through a verified written request.
           </p>
         </div>
 
