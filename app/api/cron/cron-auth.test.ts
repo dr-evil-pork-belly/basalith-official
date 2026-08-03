@@ -101,7 +101,7 @@ vi.mock('@/lib/trainingPipeline', () => ({
 // gate never leaves the process.
 vi.stubGlobal('fetch', vi.fn(async () => new Response('{}', { status: 200 })))
 
-// ── The routes under test, one per vercel.json crons[] entry ──────────────────
+// ── The routes under test, one per vercel.json crons[] entry, plus UNSCHEDULED ─
 
 import { GET as sendPhotos }          from './send-photos/route'
 import { GET as dailyReflection }     from './daily-reflection/route'
@@ -119,9 +119,15 @@ import { GET as contributorMirror }   from './contributor-mirror/route'
 import { GET as memoryGameMonthly }   from './memory-game-monthly/route'
 import { GET as gratitudeNote }       from './gratitude-note/route'
 import { GET as entityLetter }        from './entity-letter/route'
-import { GET as voicePortrait }       from './voice-portrait/route'
 import { GET as weeklyReplay }        from './weekly-replay/route'
 import { GET as weeklyMirror }        from './weekly-mirror/route'
+
+// Deployed but no longer scheduled. voice-portrait lost its vercel.json entry
+// when ElevenLabs was decommissioned in August 2026, and the route was retained
+// on purpose. It is still a live GET on the deployed app, so it still has to
+// reject an anonymous caller. It is asserted below with the same seven cases,
+// but it stays out of ROUTES, which is pinned one for one to vercel.json crons[].
+import { GET as voicePortrait }       from './voice-portrait/route'
 
 // ── The send-photos fan-out children ──────────────────────────────────────────
 // These are NOT vercel.json crons[] entries and must stay out of ROUTES, which
@@ -152,9 +158,13 @@ const ROUTES: { path: string; handler: Handler }[] = [
   { path: '/api/cron/memory-game-monthly',  handler: memoryGameMonthly   },
   { path: '/api/cron/gratitude-note',       handler: gratitudeNote       },
   { path: '/api/cron/entity-letter',        handler: entityLetter        },
-  { path: '/api/cron/voice-portrait',       handler: voicePortrait       },
   { path: '/api/cron/weekly-replay',        handler: weeklyReplay        },
   { path: '/api/cron/weekly-mirror',        handler: weeklyMirror        },
+]
+
+// Not in vercel.json crons[], still deployed. See the import note above.
+const UNSCHEDULED: { path: string; handler: Handler }[] = [
+  { path: '/api/cron/voice-portrait',       handler: voicePortrait       },
 ]
 
 const SECRET = 'test-cron-secret'
@@ -201,7 +211,7 @@ describe('vercel.json crons[] carry no secret in the path', () => {
 })
 
 describe('every cron route authenticates by Authorization header', () => {
-  for (const { path: routePath, handler } of ROUTES) {
+  for (const { path: routePath, handler } of [...ROUTES, ...UNSCHEDULED]) {
     const label = routePath.replace('/api/cron/', '')
 
     it(`${label} — header authorizes, wrong and empty secrets reject`, async () => {

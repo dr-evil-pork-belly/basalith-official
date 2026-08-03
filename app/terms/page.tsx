@@ -32,7 +32,7 @@ const SECTIONS = [
       'You may cancel your annual subscription at any time by providing written notice to legacy@basalith.xyz. Cancellation takes effect at the end of the current billing period. No partial refunds are issued for unused subscription time.',
       'Upon cancellation, you retain full rights to a complete export of your archive in open, portable formats. This export right is unconditional and does not require a reason. Export requests are fulfilled within 30 business days.',
       'Cancellation of a subscription is distinct from dissolution of your archive. Dissolution, meaning the permanent deletion of all archive content from our systems, is a separate, deliberate act. It requires a verified written request from the designated Custodian, or from an executor with documented authority. After the request is verified, Heritage Nexus Inc. holds the archive for 12 months, then permanently deletes it and confirms in writing.',
-      'You retain full ownership of your archive at all times. Heritage Nexus Inc. is the custodian, not the owner. If Basalith ceases operations for any reason, you may export your archive in full, in open and portable formats, at any time. Because the archive is always yours to hold, no closure can strand your data. The terms of this arrangement are specified in your Basalith agreement.',
+      'You retain full ownership of your archive at all times. Heritage Nexus Inc. is the custodian, not the owner. If Basalith ceases operations for any reason, you may request a complete export of your archive in open and portable formats, fulfilled within 30 business days. Because the archive is always yours to hold, no closure can strand your data. The terms of this arrangement are specified in your Basalith agreement.',
     ],
   },
   {
@@ -51,7 +51,7 @@ const SECTIONS = [
     body: [
       'Your archive content, including all deposits, voice recordings, photographs, and the cognitive reference model derived from them, remains your intellectual property at all times. Heritage Nexus Inc. claims no intellectual property rights over your archive content.',
       'You grant Heritage Nexus Inc. a limited license to process your archive content solely for the purpose of operating and improving your specific archive. This license does not extend to using your content to train general models, sharing with other users, or commercializing in any form.',
-      'Your deposits, entity conversations, and voice data are your property. You may export them at any time in open formats. You may use them with any compatible platform.',
+      'Your deposits, entity conversations, and voice data are your property. You may request an export of them in open formats, fulfilled within 30 business days. You may use them with any compatible platform.',
     ],
   },
   {
@@ -68,7 +68,6 @@ const SECTIONS = [
     title: 'Company Dissolution',
     body: [
       'In the event Heritage Nexus Inc. ceases operations: (a) Users will receive advance notice where circumstances permit. (b) Complete data export will be made available to all users, fulfilled within 30 business days of request. (c) Archive data will not be sold to third parties as part of any dissolution, acquisition, or bankruptcy proceeding. This prohibition is absolute. It is not subject to user consent, waiver, or any other exception. (d) Any acquiring entity must agree to honor these same commitments as a condition of acquiring Heritage Nexus Inc. assets.',
-      'These commitments are not merely contractual. We are building technical export infrastructure to ensure they are enforceable independent of corporate continuity.',
     ],
   },
   {
