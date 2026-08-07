@@ -4,8 +4,24 @@ import { resend } from '@/lib/resend'
 import { createTrainingPairFromDeposit } from '@/lib/trainingPipeline'
 import { classifyDeposit } from '@/lib/classifyDeposit'
 import { triggerMemoryChain } from '@/lib/memoryChain'
+import { resolveReplySession } from '@/lib/emailReplySessions'
+import { sendReplyExpiredNotice } from '@/lib/emails/replyExpired'
+import { ingestPhotoReply } from '@/lib/photoReplyIngest'
 
 export const dynamic = 'force-dynamic'
+
+/**
+ * The single response returned for every token that does not resolve to a live
+ * session: unknown, expired, or already used. Byte-identical in all three cases,
+ * so nothing about which one occurred leaves the handler.
+ *
+ * An expired token is told apart from an unknown one only internally, and only
+ * so the courtesy notice can go to an address already on file. See
+ * lib/emails/replyExpired.ts for why that is not an oracle.
+ */
+function rejectToken() {
+  return NextResponse.json({ ok: true, skipped: 'unknown token' })
+}
 
 // ── Strip quoted reply text ───────────────────────────────────────────────────
 
@@ -141,26 +157,53 @@ export async function POST(req: NextRequest) {
     if (tokenMatch) {
       const token = tokenMatch[1]
 
-      const { data: session } = await supabaseAdmin
-        .from('email_reply_sessions')
-        .select('*, archives(id, name, owner_name, preferred_language), contributors(id, name, email)')
-        .eq('token', token)
-        .maybeSingle()
+      const resolved = await resolveReplySession(token)
 
-      if (!session) {
+      // A database failure is not an unknown token. It used to arrive here as
+      // `session = null` and be reported as a bogus token, which silently
+      // discarded a real family reply. Return 500 so the failure is visible and
+      // Resend retries, rather than swallowing a memory.
+      if (resolved.status === 'error') {
+        console.error('[inbound]', resolved.message)
+        return NextResponse.json({ error: 'Internal error' }, { status: 500 })
+      }
+
+      if (resolved.status === 'unknown') {
         console.log('[inbound] unknown token:', token)
-        return NextResponse.json({ ok: true, skipped: 'unknown token' })
+        return rejectToken()
       }
 
-      if (session.replied) {
+      if (resolved.status === 'expired') {
+        const s = resolved.session
+        console.log('[inbound] expired token:', token,
+          'archive:', String(s.archive_id).substring(0, 8),
+          'created:', s.created_at, 'expired:', s.expires_at)
+
+        // The write is refused. Separately, and only if this sender is already
+        // on file for the archive, tell them their words were not lost.
+        const senderEmail = parseEmailAddress(from)
+        const notice = await sendReplyExpiredNotice({
+          archiveId:   s.archive_id,
+          senderEmail,
+          replyText,
+          siteUrl:     process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai',
+        })
+        console.log('[inbound] expired-token notice:',
+          notice.sent ? `sent to on-file address` : `not sent (${notice.reason}${notice.detail ? ': ' + notice.detail : ''})`)
+
+        return rejectToken()
+      }
+
+      if (resolved.status === 'replied') {
         console.log('[inbound] already replied:', token)
-        return NextResponse.json({ ok: true, skipped: 'already replied' })
+        return rejectToken()
       }
 
+      const session       = resolved.session
       const archiveId     = session.archive_id
       const contributorId = session.contributor_id
-      const archive       = session.archives as { id: string; name: string; owner_name: string | null; preferred_language: string | null } | null
-      const contributor   = session.contributors as { id: string; name: string; email: string } | null
+      const archive       = session.archives ?? null
+      const contributor   = session.contributors ?? null
 
       if (contributorId) {
         console.log('[inbound] contributor reply — contributor:', contributorId, 'archive:', archiveId)
@@ -329,11 +372,16 @@ export async function POST(req: NextRequest) {
         triggerMemoryChain(archiveId, contributorId, promptText, replyText, archive.owner_name ?? '').catch(() => {})
       }
 
-      // Mark session replied
-      await supabaseAdmin
+      // Mark session replied. The deposit is already saved, so this cannot fail
+      // the request, but it is the whole of the single-use guard: if it does not
+      // land the token stays live and can be redeemed again. Surface it.
+      const { error: markErr } = await supabaseAdmin
         .from('email_reply_sessions')
         .update({ replied: true, replied_at: new Date().toISOString() })
         .eq('token', token)
+      if (markErr) {
+        console.error('[inbound] token not marked replied, it remains redeemable:', markErr.message)
+      }
 
       // Confirmation email
       const senderEmail = parseEmailAddress(from)
@@ -354,24 +402,42 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Route 2: Legacy photo-reply pattern (existing email_sessions) ─────────
-    const { data: emailSession } = await supabaseAdmin
-      .from('email_sessions')
-      .select('id, archive_id, photograph_id, recipients')
-      .eq('reply_address', to.toLowerCase())
-      .maybeSingle()
+    // Called directly. This used to be an HTTP fetch to our own public
+    // /api/archive/receive-reply, which is now deleted. See lib/photoReplyIngest.ts
+    // for why. ingestPhotoReply enforces email_sessions.reply_window_closes on
+    // entry, which nothing on this path has ever done.
+    const photo = await ingestPhotoReply({ from, replyAddress: to.toLowerCase(), rawText })
 
-    if (emailSession) {
-      // Forward to existing receive-reply handler logic
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
-      await fetch(`${siteUrl}/api/archive/receive-reply`, {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ from, to, text: rawText }),
-      })
-      return NextResponse.json({ ok: true, forwarded: 'receive-reply' })
+    if (photo.status === 'error') {
+      console.error('[inbound] photo reply ingest failed:', photo.message)
+      return NextResponse.json({ error: 'Internal error' }, { status: 500 })
     }
 
-    console.log('[inbound] no matching session for:', to)
+    if (photo.status === 'expired') {
+      console.log('[inbound] photo reply past its window — address:', to,
+        'closed:', photo.windowClosedAt)
+
+      const senderEmail = parseEmailAddress(from)
+      const notice = await sendReplyExpiredNotice({
+        archiveId:   photo.archiveId,
+        senderEmail,
+        replyText,
+        siteUrl:     process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai',
+      })
+      console.log('[inbound] expired-window notice:',
+        notice.sent ? 'sent to on-file address' : `not sent (${notice.reason})`)
+
+      // Same uniform shape as an unmatched address.
+      return NextResponse.json({ ok: true, skipped: 'no matching session' })
+    }
+
+    if (photo.status === 'saved') {
+      console.log('[inbound] photo reply saved — reply:', photo.replyId, 'count:', photo.replyCount)
+      return NextResponse.json({ ok: true, saved: 'photo_reply' })
+    }
+
+    // unknown_address and empty_reply both land here and are reported the same.
+    console.log('[inbound] no matching session for:', to, `(${photo.status})`)
     return NextResponse.json({ ok: true, skipped: 'no matching session' })
 
   } catch (err) {

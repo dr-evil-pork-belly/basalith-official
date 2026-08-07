@@ -90,6 +90,10 @@ import { POST } from '@/app/api/resend/inbound/route'
 
 const TOKEN = 'abc123def456'
 
+const DAY = 24 * 60 * 60 * 1000
+export const FUTURE = () => new Date(Date.now() + 7 * DAY).toISOString()
+export const PAST   = () => new Date(Date.now() - 1 * DAY).toISOString()
+
 function baseSession(over: Record<string, unknown> = {}) {
   return {
     id:                  'session-1',
@@ -102,7 +106,11 @@ function baseSession(over: Record<string, unknown> = {}) {
     photograph_id:       null,
     replied:             false,
     question_history_id: null,
-    archives:            { id: H.ARCHIVE_ID, name: 'The Dr Ha Archive', owner_name: 'David Yin Ha', preferred_language: 'en' },
+    // Live by default. resolveReplySession treats a missing or past expires_at
+    // as expired, so every fixture has to state its lifetime.
+    created_at:          new Date(Date.now() - 1 * 60 * 1000).toISOString(),
+    expires_at:          FUTURE(),
+    archives:            { id: H.ARCHIVE_ID, name: 'The Dr Ha Archive', owner_name: 'David Yin Ha', owner_email: 'owner@example.com', preferred_language: 'en' },
     contributors:        null,
     ...over,
   }

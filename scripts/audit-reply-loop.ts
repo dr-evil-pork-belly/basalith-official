@@ -8,6 +8,7 @@ import { Resend } from 'resend'
 import * as dotenv from 'dotenv'
 import * as path from 'path'
 import * as fs from 'fs'
+import { replyTokenExpiry } from '../lib/emailReplySessions'
 
 // Load .env.local
 const envPath = path.resolve(process.cwd(), '.env.local')
@@ -189,6 +190,10 @@ async function main() {
   const replyTo  = `reply+${token}@${replyDomain}`
   const subject  = `Today's question · ${archive.name}`
 
+  // This script writes the row directly rather than through
+  // createEmailReplySession, so it has to set expires_at itself. The column also
+  // carries a database default, but a mint path that does not state the lifetime
+  // it intends is how the original gap happened.
   const { error: insertErr } = await supabase.from('email_reply_sessions').insert({
     token,
     archive_id:     TARGET_ARCHIVE_ID,
@@ -197,6 +202,7 @@ async function main() {
     spark_id:       question.substring(0, 200),
     prompt_id:      null,
     photograph_id:  null,
+    expires_at:     replyTokenExpiry(),
   })
 
   if (insertErr) {
