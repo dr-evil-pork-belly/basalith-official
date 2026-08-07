@@ -8,6 +8,7 @@ import { resolveReplySession } from '@/lib/emailReplySessions'
 import { sendReplyExpiredNotice } from '@/lib/emails/replyExpired'
 import { ingestPhotoReply } from '@/lib/photoReplyIngest'
 import { verifyResendWebhook, resendUnauthorized } from '@/lib/resendSignature'
+import { fetchReceivedEmail } from '@/lib/receivedEmail'
 
 export const dynamic = 'force-dynamic'
 
@@ -145,19 +146,40 @@ export async function POST(req: NextRequest) {
     const to   = extractAddress(email.to)
     const from = extractAddress(email.from)
 
-    // Some inbound webhook payloads carry only an email_id with no body content.
-    // When that happens, fetch the full email from the Resend API.
+    // A real inbound webhook carries no body, only an email_id, so this fetch is
+    // the only route to what the family wrote. Test payloads that inline the
+    // text skip it. See lib/receivedEmail.ts.
     let emailText: string = email.text ?? email.plain_text ?? ''
     let emailHtml: string = email.html ?? ''
     if (!emailText && !emailHtml && email.email_id) {
-      const resendRes   = await fetch(
-        `https://api.resend.com/emails/receiving/${email.email_id}`,
-        { headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}` } },
-      )
-      const resendEmail = await resendRes.json()
-      console.log('[inbound] receiving API response:', JSON.stringify(resendEmail).substring(0, 500))
-      emailText = resendEmail.text ?? resendEmail.plain_text ?? resendEmail.body ?? resendEmail.content ?? ''
-      emailHtml = resendEmail.html ?? ''
+      const fetched = await fetchReceivedEmail(email.email_id)
+
+      // A FAILED FETCH IS NOT AN EMPTY REPLY. It used to be indistinguishable
+      // from one: the old guessing chain degraded a Resend error envelope to '',
+      // which fell into the empty-reply skip below and answered 200. Resend
+      // treats 200 as delivered and never retries, so a family's memory was
+      // discarded permanently with nothing but a log line to show for it.
+      //
+      // Know what the 500 buys. It makes the failure loud, not recoverable. The
+      // signature check that runs before this code enforces a five minute Svix
+      // timestamp tolerance, so most of Resend's ladder (5m, 30m, 2h, 5h, 10h)
+      // will be refused as stale on the way back in. That is accepted, and it is
+      // still strictly better than a 200 that guarantees silent loss. Do not
+      // widen the tolerance to compensate. See lib/resendSignature.ts.
+      if (!fetched.ok) {
+        console.error('[inbound] receiving API fetch failed, returning 500 — email_id:',
+          email.email_id, 'reason:', fetched.reason)
+        return NextResponse.json({ error: 'Internal error' }, { status: 500 })
+      }
+
+      emailText = fetched.text
+      emailHtml = fetched.html
+
+      // Lengths only. The previous line here logged up to 500 characters of the
+      // raw response, which for a successful fetch is the family's own words
+      // sitting in the Vercel log.
+      console.log('[inbound] receiving API ok — text_len:', emailText.length,
+        'html_len:', emailHtml.length)
     }
 
     const rawText = emailText
@@ -326,8 +348,28 @@ export async function POST(req: NextRequest) {
         })
         .select('id, archive_id, prompt, response, source_type')
         .single()
-      if (depositError) console.error('[inbound] deposit save failed:', depositError.message)
-      else console.log('[inbound] owner_deposits saved — id:', deposit?.id?.substring(0, 8))
+      // owner_deposits is the permanent fallback for every email path, so when
+      // it fails nothing else caught the reply. The code used to log that and
+      // carry on, which meant the token below was marked replied (burning its
+      // single use forever) and the family was emailed "Your memory has been
+      // saved" with nothing saved. The comment above states the intent; this is
+      // it implemented.
+      //
+      // Leave the token live, send no confirmation, and let Resend see a
+      // failure. Same tolerance caveat as the fetch above: this makes the
+      // failure loud, not reliably recoverable.
+      //
+      // FLAGGED, not fixed here: the type-specific writes further up (spark,
+      // label) already ran and are not idempotent, so a retry that does verify
+      // could duplicate one of those rows. A duplicate row is a far smaller harm
+      // than a lost memory, and moving the deposit insert above that block would
+      // change the sibling-write ordering, which is out of scope for this change.
+      if (depositError || !deposit) {
+        console.error('[inbound] deposit save failed, token left live and no confirmation sent:',
+          depositError?.message ?? 'insert returned no row')
+        return NextResponse.json({ error: 'Internal error' }, { status: 500 })
+      }
+      console.log('[inbound] owner_deposits saved — id:', deposit.id.substring(0, 8))
 
       // Elicitation engine: attach this deposit to the question it answers.
       // Owner replies only. A contributor reply is not an answer to the owner's
@@ -340,7 +382,7 @@ export async function POST(req: NextRequest) {
       // wrong whenever a reply arrives out of order. Those sessions are already
       // in flight and must still resolve, so the fallback is annotated, not
       // deleted. It warns so the two cases are distinguishable in the logs.
-      if (deposit && !contributorId) {
+      if (!contributorId) {
         const servedHistoryId = session.question_history_id as number | null
 
         let targetHistoryId: number | null = servedHistoryId
@@ -376,12 +418,12 @@ export async function POST(req: NextRequest) {
       }
 
       // Domain classification — owner deposits only, fire-and-forget
-      if (deposit && !contributorId) {
+      if (!contributorId) {
         void classifyDeposit({ depositId: deposit.id, archiveId, text: replyText })
       }
 
       // Training pair
-      if (deposit && archive) {
+      if (archive) {
         createTrainingPairFromDeposit(
           deposit,
           archive.owner_name ?? '',

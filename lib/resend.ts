@@ -19,5 +19,11 @@ export const resend = {
   emails: {
     send: (...args: Parameters<Resend['emails']['send']>) =>
       getResend().emails.send(...args),
+    // Inbound. The email.received webhook carries no body, so the only way to
+    // reach what a family actually wrote is to fetch it by id. See
+    // lib/receivedEmail.ts.
+    receiving: {
+      get: (id: string) => getResend().emails.receiving.get(id),
+    },
   },
 }

@@ -165,12 +165,30 @@ on that route is stale. VERIFIED July 2026.
 Reply-to format is `reply+{token}@reply.basalith.ai`, built by
 `lib/emailReplySessions.ts`. The inbound handler is `app/api/resend/inbound/route.ts`.
 
-CRITICAL: the Resend inbound webhook payload does NOT include the email body. Fetch it
-from `https://api.resend.com/emails/receiving/{email_id}`. The regular
-`/emails/{email_id}` endpoint returns empty for inbound.
+CRITICAL: the Resend inbound webhook payload does NOT include the email body. The
+`email.received` data is `email_id`, `created_at`, `from`, `to`, `bcc`, `cc`,
+`message_id`, `subject`, `attachments`, and nothing else. Fetch the body with
+`resend.emails.receiving.get(email_id)`, typed, shipped in resend 6.9.4, wrapped by
+`lib/receivedEmail.ts`. VERIFIED August 2026 by live call: it returns 200 with `text`
+and `html`.
+
+The regular `/emails/{email_id}` endpoint does NOT return empty for inbound, which is
+what this file used to say. It 404s with a JSON error body,
+`{"statusCode":404,"message":"Email not found","name":"not_found"}`. The distinction
+mattered: the old hand-rolled fetch read `text ?? plain_text ?? body ?? content` off
+whatever came back, an error envelope has none of those four keys, so a failed fetch
+degraded to the empty string and became indistinguishable from an email with no body.
+That path answered 200, Resend never retried, and the reply was gone. A failed fetch
+now returns 500. Never reintroduce a shape-guessing chain over a vendor response.
 
 `owner_deposits` is the permanent fallback for every email path. Nothing is lost if a
-type-specific save fails.
+type-specific save fails, because the deposit catches it. That is exactly why a failed
+deposit insert is different in kind from a failed sibling write: nothing catches the
+fallback. It returns 500, leaves the reply token live, and sends no confirmation. The
+handler used to log it and carry on, which burned the single-use token and emailed the
+family "Your memory has been saved" with nothing saved. The four type-specific writes
+(`contributor_questions`, `daily_spark_responses`, `contributor_story_prompts`,
+`labels`) are still log-and-continue on purpose. Do not "fix" them to match.
 
 ---
 
