@@ -7,8 +7,28 @@ import { triggerMemoryChain } from '@/lib/memoryChain'
 import { resolveReplySession } from '@/lib/emailReplySessions'
 import { sendReplyExpiredNotice } from '@/lib/emails/replyExpired'
 import { ingestPhotoReply } from '@/lib/photoReplyIngest'
+import { verifyResendWebhook, resendUnauthorized } from '@/lib/resendSignature'
 
 export const dynamic = 'force-dynamic'
+
+/**
+ * The verified inbound payload.
+ *
+ * Resend has shipped several shapes of this event: fields at the top level or
+ * wrapped under `data`, addresses as strings, arrays of strings, or arrays of
+ * `{ email, name }`. The normalisers below absorb that, so the type stays as
+ * loose as the wire format actually is. What makes the payload safe to read is
+ * that its signature verified, not that it was typed.
+ */
+type InboundEmail = {
+  to?:         unknown
+  from?:       unknown
+  text?:       string
+  plain_text?: string
+  html?:       string
+  email_id?:   string
+  data?:       InboundEmail
+}
 
 /**
  * The single response returned for every token that does not resolve to a live
@@ -97,9 +117,16 @@ function buildConfirmationEmail(archiveName: string, firstName: string): string 
 // ── Main handler ──────────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
+  // Signature first, before anything else in this file runs. Not a parse, not a
+  // token lookup, not a read. The reply token in the To address says who may
+  // write; the Svix signature says the request came from Resend at all. Without
+  // this the token was the whole of the auth and could be replayed straight at
+  // the route. See lib/resendSignature.ts.
+  const verified = await verifyResendWebhook(req)
+  if (!verified.ok) return resendUnauthorized('inbound', verified.reason)
+
   try {
-    const body = await req.json().catch(() => null)
-    if (!body) return NextResponse.json({ error: 'Invalid body' }, { status: 400 })
+    const body = verified.payload as InboundEmail
 
     // Resend wraps the email fields under body.data in their inbound webhook v2.
     // Fall back to body directly for any older or test payloads.

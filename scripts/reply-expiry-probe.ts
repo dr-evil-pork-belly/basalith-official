@@ -17,8 +17,10 @@
  * safe to run repeatedly against production. It writes only to the Founder Test
  * Archive.
  *
- * Requires the dev server on localhost:3000 and CRON_SECRET-free access (the
- * inbound route has no auth by design; that is a separate finding).
+ * Requires the dev server on localhost:3000 and RESEND_INBOUND_WEBHOOK_SECRET in
+ * .env.local. The route verifies the Svix signature before it parses anything,
+ * so the probe signs every POST the way Resend does. An unsigned probe would
+ * 401 on every gate and prove nothing about expiry.
  *
  * Run: npx tsx scripts/reply-expiry-probe.ts
  */
@@ -27,6 +29,7 @@ import { createClient } from '@supabase/supabase-js'
 import * as dotenv from 'dotenv'
 import * as path from 'path'
 import { replyTokenExpiry, generateReplyToken, REPLY_TOKEN_TTL_DAYS } from '../lib/emailReplySessions'
+import { signResendPayload } from '../lib/resendSignatureTestUtils'
 
 dotenv.config({ path: path.resolve(process.cwd(), '.env.local') })
 
@@ -43,11 +46,21 @@ function check(name: string, pass: boolean, detail: string) {
   if (!pass) failures++
 }
 
+const WEBHOOK_SECRET = process.env.RESEND_INBOUND_WEBHOOK_SECRET ?? ''
+if (!WEBHOOK_SECRET) {
+  console.error('ERROR: RESEND_INBOUND_WEBHOOK_SECRET is not set. The inbound route verifies the Svix signature before parsing, so every gate would 401.')
+  process.exit(1)
+}
+
 async function post(to: string, text: string) {
+  const raw  = JSON.stringify({ from: `Probe <${SENTINEL.toLowerCase()}@example.com>`, to, text })
   const res  = await fetch(`${BASE}/api/resend/inbound`, {
     method:  'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body:    JSON.stringify({ from: `Probe <${SENTINEL.toLowerCase()}@example.com>`, to, text }),
+    headers: {
+      'Content-Type': 'application/json',
+      ...signResendPayload(raw, WEBHOOK_SECRET),
+    },
+    body: raw,
   })
   const body = await res.text()
   return { status: res.status, body }

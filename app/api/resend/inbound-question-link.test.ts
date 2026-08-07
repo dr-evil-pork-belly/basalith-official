@@ -22,6 +22,7 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { NextRequest } from 'next/server'
+import { signResendPayload } from '@/lib/resendSignatureTestUtils'
 
 const H = vi.hoisted(() => {
   const ARCHIVE_ID     = 'arch-dr-ha'
@@ -116,15 +117,22 @@ function baseSession(over: Record<string, unknown> = {}) {
   }
 }
 
+// Signed the way Resend signs it. The handler verifies before it parses, so an
+// unsigned fixture would 401 before any linking logic ran. The signature itself
+// is covered in inbound-signature.test.ts.
 function inboundRequest() {
+  const raw = JSON.stringify({
+    to:   `reply+${TOKEN}@reply.basalith.ai`,
+    from: 'David Yin Ha <mrdavidha@gmail.com>',
+    text: 'It smelled like eucalyptus and the diesel from my fathers truck.',
+  })
   return new NextRequest('https://basalith.ai/api/resend/inbound', {
     method:  'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body:    JSON.stringify({
-      to:   `reply+${TOKEN}@reply.basalith.ai`,
-      from: 'David Yin Ha <mrdavidha@gmail.com>',
-      text: 'It smelled like eucalyptus and the diesel from my fathers truck.',
-    }),
+    headers: {
+      'Content-Type': 'application/json',
+      ...signResendPayload(raw, process.env.RESEND_INBOUND_WEBHOOK_SECRET!),
+    },
+    body: raw,
   })
 }
 

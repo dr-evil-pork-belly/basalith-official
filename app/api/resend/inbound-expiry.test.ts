@@ -10,6 +10,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { signResendPayload } from '@/lib/resendSignatureTestUtils'
 
 const H = vi.hoisted(() => {
   const ARCHIVE_ID = 'archive-under-test'
@@ -96,9 +97,19 @@ function session(over: Record<string, unknown> = {}) {
   }
 }
 
+// Every request through this file is signed the way Resend signs it. The
+// handler verifies before it parses, so an unsigned fixture would 401 and none
+// of the expiry assertions below would ever be reached. The signature itself is
+// covered in inbound-signature.test.ts.
 function req(body: Record<string, unknown>) {
+  const raw = JSON.stringify(body)
   return new Request('http://localhost/api/resend/inbound', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+    method:  'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...signResendPayload(raw, process.env.RESEND_INBOUND_WEBHOOK_SECRET!),
+    },
+    body: raw,
   }) as unknown as Parameters<typeof POST>[0]
 }
 
