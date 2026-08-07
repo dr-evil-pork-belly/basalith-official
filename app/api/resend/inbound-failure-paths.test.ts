@@ -155,6 +155,15 @@ const markedReplied = () =>
 const insertedDeposit = () =>
   H.calls.some(c => c.table === 'owner_deposits' && c.op === 'insert')
 
+/** The four type-specific writes, by the table each one touches. */
+const TYPE_SPECIFIC = ['contributor_questions', 'daily_spark_responses', 'contributor_story_prompts', 'labels']
+
+const typeSpecificWrites = () =>
+  H.calls.filter(c => TYPE_SPECIFIC.includes(c.table) && c.op !== 'select')
+
+const indexOf = (table: string, op: string) =>
+  H.calls.findIndex(c => c.table === table && c.op === op)
+
 beforeEach(() => {
   H.reset()
   H.sent.length = 0
@@ -302,5 +311,90 @@ describe('2. a failed owner_deposits insert', () => {
     expect(H.sent).toHaveLength(1)
     expect(String(H.sent[0].subject)).toContain('Your memory has been saved')
     expect(H.calls.some(c => c.table === 'question_history' && c.op === 'update')).toBe(true)
+  })
+})
+
+/**
+ * The deposit is the only write here that can fail the request, so it has to be
+ * the first one. Everything after it is log-and-continue, and two of the four
+ * type-specific writes (daily_spark_responses, labels) are plain inserts with no
+ * conflict guard. When the deposit ran last, a deposit failure answered 500
+ * having already written a spark response or a photo label, and the Resend retry
+ * duplicated that row.
+ *
+ * What is asserted is the shape that makes the handler retryable: on a deposit
+ * failure the archive is left exactly as the request found it.
+ */
+describe('3. the deposit lands before the type-specific writes', () => {
+  const CONTRIB = 'contributor-1'
+  const contributorRow = { id: CONTRIB, name: 'Sender Name', email: 'sender@example.com' }
+
+  const cases = [
+    {
+      name:  'spark (non-idempotent insert into daily_spark_responses)',
+      over:  { email_type: 'spark', spark_id: 'child_home', contributor_id: CONTRIB, contributors: contributorRow },
+      table: 'daily_spark_responses',
+      op:    'insert',
+    },
+    {
+      name:  'photograph (non-idempotent insert into labels)',
+      over:  { email_type: 'photograph', photograph_id: 'photo-1', contributor_id: CONTRIB, contributors: contributorRow },
+      table: 'labels',
+      op:    'insert',
+    },
+    {
+      name:  'contributor_question (guarded update)',
+      over:  { email_type: 'contributor_question', prompt_id: 'cq-1', contributor_id: CONTRIB, contributors: contributorRow },
+      table: 'contributor_questions',
+      op:    'update',
+    },
+    {
+      name:  'story_prompt (guarded update)',
+      over:  { email_type: 'story_prompt', prompt_id: 'sp-1', contributor_id: CONTRIB, contributors: contributorRow },
+      table: 'contributor_story_prompts',
+      op:    'update',
+    },
+  ]
+
+  for (const c of cases) {
+    it(`writes nothing to ${c.table} when the deposit fails — ${c.name}`, async () => {
+      H.setSession(session(c.over))
+      H.failDeposit(true)
+
+      const res = await POST(inlined())
+
+      expect(res.status).toBe(500)
+      expect(insertedDeposit()).toBe(true)          // attempted
+      expect(typeSpecificWrites()).toEqual([])      // and nothing downstream ran
+      expect(markedReplied()).toBe(false)
+      expect(H.sent).toHaveLength(0)
+    })
+
+    it(`runs the deposit first on the happy path — ${c.name}`, async () => {
+      H.setSession(session(c.over))
+
+      const res = await POST(inlined())
+
+      expect(res.status).toBe(200)
+      const depositAt = indexOf('owner_deposits', 'insert')
+      const siblingAt = indexOf(c.table, c.op)
+      expect(depositAt).toBeGreaterThanOrEqual(0)
+      expect(siblingAt).toBeGreaterThanOrEqual(0)
+      expect(depositAt).toBeLessThan(siblingAt)
+    })
+  }
+
+  it('leaves an owner reply with no type-specific sibling untouched', async () => {
+    // owner_daily has no sibling write at all. Nothing to order, and the deposit
+    // failure must still be clean.
+    H.setSession(session())
+    H.failDeposit(true)
+
+    const res = await POST(inlined())
+
+    expect(res.status).toBe(500)
+    expect(typeSpecificWrites()).toEqual([])
+    expect(H.calls.filter(c => c.op !== 'select').map(c => `${c.table}.${c.op}`))
+      .toEqual(['owner_deposits.insert'])
   })
 })

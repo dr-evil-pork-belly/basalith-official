@@ -258,7 +258,68 @@ export async function POST(req: NextRequest) {
         console.log('[inbound] contributor reply — contributor:', contributorId, 'archive:', archiveId)
       }
 
-      // Save the reply
+      // Log owner replies explicitly. 'mirror' replies (the weekly "keep going"
+      // thread) need no special casing: they fall through to the generic
+      // owner_deposits save + training pair below, exactly like owner_daily.
+      if (session.email_type === 'owner_daily' || session.email_type === 'owner_weekly' || session.email_type === 'conversational' || session.email_type === 'mirror') {
+        console.log('[inbound] owner reply received — type:', session.email_type, 'archive:', archiveId.substring(0, 8))
+      }
+
+      // Pre-Echo conversational prompts are tagged distinctly so the onboarding
+      // path is trackable. They still flow through owner_deposits and the
+      // training pipeline below exactly like any other owner reply.
+      const depositSourceType = session.email_type === 'conversational'
+        ? 'conversational'
+        : 'email_reply'
+
+      // ── The deposit lands first ───────────────────────────────────────────
+      //
+      // owner_deposits is the permanent fallback for every email path, and it is
+      // the only write in this handler that can fail the request. Everything
+      // after it is log-and-continue. That is what makes the order matter: a 500
+      // from here leaves the archive exactly as the request found it, so a Resend
+      // retry replays the whole sequence from a clean state.
+      //
+      // This used to run last, after the four type-specific writes. Two of those
+      // (daily_spark_responses and labels) are plain inserts with no conflict
+      // guard, so a deposit failure answered 500 having already written a spark
+      // response or a photo label, and the retry duplicated the row.
+      //
+      // When the insert fails: leave the token live, send no confirmation, and
+      // let Resend see a failure. The code used to log it and carry on, which
+      // marked the single-use token replied (burning it forever) and emailed the
+      // family "Your memory has been saved" with nothing saved.
+      //
+      // Know what the 500 buys. It makes the failure loud, not reliably
+      // recoverable. The signature check that runs before this code enforces a
+      // five minute Svix timestamp tolerance, so most of Resend's retry ladder
+      // will be refused as stale on the way back in. Still strictly better than a
+      // 200 that guarantees silent loss. Do not widen the tolerance to compensate.
+      const { data: deposit, error: depositError } = await supabaseAdmin
+        .from('owner_deposits')
+        .insert({
+          archive_id:     archiveId,
+          prompt:         session.prompt_id || session.spark_id || 'Email reply',
+          response:       replyText,
+          source_type:    depositSourceType,
+          contributor_id: contributorId ?? null,
+        })
+        .select('id, archive_id, prompt, response, source_type')
+        .single()
+      if (depositError || !deposit) {
+        console.error('[inbound] deposit save failed, nothing written, token left live and no confirmation sent:',
+          depositError?.message ?? 'insert returned no row')
+        return NextResponse.json({ error: 'Internal error' }, { status: 500 })
+      }
+      console.log('[inbound] owner_deposits saved — id:', deposit.id.substring(0, 8))
+
+      // ── Type-specific writes ──────────────────────────────────────────────
+      //
+      // The deposit above already caught the reply, so nothing here can lose it.
+      // These four stay log-and-continue on purpose: a failure costs a derived
+      // row on a secondary surface, not the memory itself. Do not "fix" them into
+      // 500s. Two of them are non-idempotent inserts, and a 500 raised after one
+      // of them has run is exactly the duplicate-on-retry this ordering removes.
       if (session.email_type === 'contributor_question') {
         if (session.prompt_id) {
           const { error: cqError } = await supabaseAdmin
@@ -320,56 +381,6 @@ export async function POST(req: NextRequest) {
           }
         }
       }
-
-      // Log owner replies explicitly. 'mirror' replies (the weekly "keep going"
-      // thread) need no special casing: they fall through to the generic
-      // owner_deposits save + training pair below, exactly like owner_daily.
-      if (session.email_type === 'owner_daily' || session.email_type === 'owner_weekly' || session.email_type === 'conversational' || session.email_type === 'mirror') {
-        console.log('[inbound] owner reply received — type:', session.email_type, 'archive:', archiveId.substring(0, 8))
-      }
-
-      // Pre-Echo conversational prompts are tagged distinctly so the onboarding
-      // path is trackable. They still flow through owner_deposits and the
-      // training pipeline below exactly like any other owner reply.
-      const depositSourceType = session.email_type === 'conversational'
-        ? 'conversational'
-        : 'email_reply'
-
-      // Always save to owner_deposits — no reply is ever lost even if the
-      // type-specific save above failed or the session had null IDs
-      const { data: deposit, error: depositError } = await supabaseAdmin
-        .from('owner_deposits')
-        .insert({
-          archive_id:     archiveId,
-          prompt:         session.prompt_id || session.spark_id || 'Email reply',
-          response:       replyText,
-          source_type:    depositSourceType,
-          contributor_id: contributorId ?? null,
-        })
-        .select('id, archive_id, prompt, response, source_type')
-        .single()
-      // owner_deposits is the permanent fallback for every email path, so when
-      // it fails nothing else caught the reply. The code used to log that and
-      // carry on, which meant the token below was marked replied (burning its
-      // single use forever) and the family was emailed "Your memory has been
-      // saved" with nothing saved. The comment above states the intent; this is
-      // it implemented.
-      //
-      // Leave the token live, send no confirmation, and let Resend see a
-      // failure. Same tolerance caveat as the fetch above: this makes the
-      // failure loud, not reliably recoverable.
-      //
-      // FLAGGED, not fixed here: the type-specific writes further up (spark,
-      // label) already ran and are not idempotent, so a retry that does verify
-      // could duplicate one of those rows. A duplicate row is a far smaller harm
-      // than a lost memory, and moving the deposit insert above that block would
-      // change the sibling-write ordering, which is out of scope for this change.
-      if (depositError || !deposit) {
-        console.error('[inbound] deposit save failed, token left live and no confirmation sent:',
-          depositError?.message ?? 'insert returned no row')
-        return NextResponse.json({ error: 'Internal error' }, { status: 500 })
-      }
-      console.log('[inbound] owner_deposits saved — id:', deposit.id.substring(0, 8))
 
       // Elicitation engine: attach this deposit to the question it answers.
       // Owner replies only. A contributor reply is not an answer to the owner's
