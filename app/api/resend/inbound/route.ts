@@ -22,6 +22,7 @@ export const dynamic = 'force-dynamic'
  * that its signature verified, not that it was typed.
  */
 type InboundEmail = {
+  type?:       unknown
   to?:         unknown
   from?:       unknown
   text?:       string
@@ -132,6 +133,52 @@ export async function POST(req: NextRequest) {
     // Resend wraps the email fields under body.data in their inbound webhook v2.
     // Fall back to body directly for any older or test payloads.
     const email = body.data ?? body
+
+    // ── Event type gate, before the fetch ────────────────────────────────────
+    //
+    // This endpoint is subscribed to EVERY event Resend emits, not just
+    // email.received. Verified against the live subscription rather than the
+    // docs: GET /webhooks returns 18 types on this endpoint, including
+    // email.sent, email.delivered, email.bounced, email.opened, and the
+    // contact.* and domain.* families.
+    //
+    // Why that reached the fetch at all. Every outbound email event carries an
+    // email_id under `data` (BaseEmailEventData in resend@6.9.4), exactly where
+    // an inbound event carries its own. So the handler read an OUTBOUND id and
+    // asked the RECEIVING store for it, which legitimately 404s. Once a failed
+    // fetch became a 500, every delivery notification turned into a permanent
+    // Resend retry loop. On 2026-08-07 one send-photos run produced 13 outbound
+    // emails, 13 phantom "inbound" ids, and 101 failing requests across four
+    // retry rounds. No family reply was involved in any of them.
+    //
+    // 200, not 500. An event we subscribe to and do not act on is not a failure.
+    // A non-200 asks Resend to retry a delivery notification forever, which is
+    // the loop this gate exists to end. The skip is logged with its type so the
+    // subscription breadth stays visible in the logs.
+    //
+    // Read both levels. resend@6.9.4 types every event with `type` at the top
+    // level, sibling to `data`, and that is what this reads first. The fallback
+    // exists because this file already absorbs Resend shipping the same fields
+    // wrapped and unwrapped, and a gate that inspects only one level fails open
+    // on the other.
+    //
+    // NO TYPE AT ALL PROCEEDS. That is deliberate, and it is the safe direction
+    // here. The only irreversible outcome in this handler is losing a family
+    // memory, so an unrecognised payload that might be a reply must reach the
+    // token gate rather than be dropped at the door. An untyped payload that is
+    // not a reply costs nothing: it resolves to no live token and writes
+    // nothing. Treating absence as "not email.received" would also hollow out
+    // scripts/inbound-signature-probe.ts, whose accepted case posts an untyped
+    // body and proves the handler ran by getting past this point.
+    const eventType =
+      typeof body.type  === 'string' ? body.type
+      : typeof email.type === 'string' ? email.type
+      : null
+
+    if (eventType !== null && eventType !== 'email.received') {
+      console.log('[inbound] skipping, not an inbound reply — type:', eventType)
+      return NextResponse.json({ ok: true, skipped: 'event type not handled' })
+    }
 
     // Normalise to/from: Resend may send strings, arrays of strings, or arrays
     // of objects ({ email, name }) depending on webhook version.

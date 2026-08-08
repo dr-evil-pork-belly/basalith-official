@@ -78,6 +78,32 @@ async function postWebhook(emailId: string, to: string) {
   return { status: res.status, body: await res.text() }
 }
 
+/**
+ * An OUTBOUND email event, in the shape resend@6.9.4 declares for it: `type` at
+ * the top level, `email_id` under `data`. `inline` decides whether the payload
+ * carries its own text, which is what separates the two things Gate C proves.
+ */
+async function postOutboundEvent(type: string, emailId: string, to: string, inline?: string) {
+  const raw = JSON.stringify({
+    type,
+    created_at: new Date().toISOString(),
+    data: {
+      email_id:   emailId,
+      created_at: new Date().toISOString(),
+      from:       'The Hoa Le Tran Archive <archive@basalith.xyz>',
+      to:         [to],
+      subject:    'A question from the archive',
+      ...(inline ? { text: inline } : {}),
+    },
+  })
+  const res = await fetch(`${BASE}/api/resend/inbound`, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json', ...signResendPayload(raw, SECRET) },
+    body:    raw,
+  })
+  return { status: res.status, body: await res.text() }
+}
+
 const show = (r: { status: number; body: string }) => `HTTP ${r.status} ${JSON.stringify(r.body)}`
 
 async function main() {
@@ -97,9 +123,37 @@ async function main() {
     a.status === 500, show(a))
   check('and it is not the old silent 200', a.status !== 200, show(a))
 
+  // ── Gate C: an event we do not handle never reaches the fetch ─────────────
+  //
+  // This endpoint is subscribed to every event Resend emits, verified live:
+  // GET /webhooks reports 18 types on it, including email.sent and
+  // email.delivered. Outbound events carry an email_id under `data` in exactly
+  // the place an inbound event carries its own, so without the type gate the
+  // handler asked the RECEIVING store for an OUTBOUND id and got a legitimate
+  // 404. Once a failed fetch became a 500, every delivery notification became a
+  // permanent retry loop. On 2026-08-07 one send-photos run produced 13 outbound
+  // emails and 101 failing requests across four retry rounds.
+  //
+  // The id below is one of those 13. It is a real outbound id, so it genuinely
+  // 404s on the receiving store, which is what makes this a reproduction rather
+  // than a mock: without the gate this case is a 500.
+  console.log('\nGate C  an outbound event is skipped with 200, before the fetch')
+
+  const OUTBOUND_ID = '58e5b958-7f6b-42e6-ad60-a7af29254e30'
+  const c1 = await postOutboundEvent('email.delivered', OUTBOUND_ID, `reply+${'0'.repeat(24)}@${DOMAIN}`)
+  check('email.delivered is skipped, not fetched (a 500 here means the gate is gone)',
+    c1.status === 200 && c1.body.includes('event type not handled'), show(c1))
+
+  const c1b = await postOutboundEvent('email.sent', OUTBOUND_ID, `reply+${'0'.repeat(24)}@${DOMAIN}`)
+  check('email.sent likewise', c1b.status === 200 && c1b.body.includes('event type not handled'), show(c1b))
+
+  const c1c = await postOutboundEvent('contact.created', OUTBOUND_ID, `reply+${'0'.repeat(24)}@${DOMAIN}`)
+  check('so is a non-email event the endpoint is also subscribed to',
+    c1c.status === 200 && c1c.body.includes('event type not handled'), show(c1c))
+
   if (!TOKEN) {
-    console.log('\nGate B  skipped, no token argument given (it spends a live token)')
-    console.log(`\n${failures === 0 ? 'GATE A PASSED' : `${failures} CHECK(S) FAILED`}\n`)
+    console.log('\nGates C2 and B  skipped, no token argument given (they use a live token)')
+    console.log(`\n${failures === 0 ? 'GATES A AND C PASSED' : `${failures} CHECK(S) FAILED`}\n`)
     process.exit(failures === 0 ? 0 : 1)
   }
 
@@ -117,6 +171,34 @@ async function main() {
       `replied=${session.replied} expires=${session.expires_at}`)
     process.exit(1)
   }
+
+  // ── Gate C2: the gate returns before any database contact ─────────────────
+  //
+  // C1 proves the fetch is not attempted. This proves nothing is read or written
+  // either, and it uses the genuinely live token about to be spent by Gate B.
+  // The payload inlines its own text, so there is no fetch to fail behind: if
+  // the gate were absent this would resolve the token, write a deposit, burn the
+  // token, and email a confirmation. The token still being unreplied afterwards
+  // is the assertion.
+  console.log('\nGate C2  an outbound event does not touch a live token')
+
+  const depositCount = async () => (await db.from('owner_deposits')
+    .select('id', { count: 'exact', head: true }).eq('archive_id', session.archive_id)).count ?? 0
+
+  const beforeC2 = await depositCount()
+  const c2 = await postOutboundEvent(
+    'email.delivered', OUTBOUND_ID, `reply+${TOKEN}@${DOMAIN}`,
+    'THIS MUST NEVER BECOME A DEPOSIT',
+  )
+  const { data: afterC2 } = await db.from('email_reply_sessions')
+    .select('replied').eq('token', TOKEN).maybeSingle()
+  const afterC2Count = await depositCount()
+
+  check('skipped with 200 and the live token is untouched',
+    c2.status === 200 && c2.body.includes('event type not handled') && afterC2?.replied === false,
+    `${show(c2)} | replied=${afterC2?.replied}`)
+  check('and nothing was written to the archive',
+    afterC2Count === beforeC2, `deposits ${beforeC2} -> ${afterC2Count}`)
 
   // A genuine inbound Resend still holds, so the fetch returns real content.
   const lr = await fetch('https://api.resend.com/emails/receiving', {
