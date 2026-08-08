@@ -440,12 +440,25 @@ server-only inside an Inngest function and never reaches a client bundle.
 
 ## 4. MANIFEST DDL
 
-Two tables. Both service role only, RLS on, no policy, which is the same posture as
-`archive-exports` and the same reasoning: with RLS enabled and no policy, anon and
-authenticated are denied everything and only the service role, which bypasses RLS, can
-read or write.
+Two tables. Both service role only.
 
-Prepared for the Supabase editor. Not run from here.
+**Corrected August 8, from reading the convention rather than recalling it.** This section
+said "RLS on, no policy, the same posture as `archive-exports`." That was wrong, and the
+migration does not follow it. "No policy" is the right answer for `storage.objects`, which
+Supabase owns and every bucket shares, where a policy cannot be scoped to one bucket without
+affecting the rest. It is not the convention for a table we create.
+
+The table convention, read live in `20260502_training_pipeline.sql:34-36` and mirrored by
+`20260717_grounding_gaps.sql:41-44`, is RLS enabled **plus** an explicit
+`service_role_full_access` policy. Both new tables carry it.
+
+The access control is the same either way. `service_role` holds `BYPASSRLS`, so the policy
+is never evaluated for it, and what denies anon and authenticated is RLS being on with no
+policy matching them. The explicit policy is carried because every sibling table has it and
+a table that looks different invites someone to change it.
+
+Prepared for the Supabase editor as `supabase/migrations/20260808_storage_backup_manifest.sql`.
+Not run from here.
 
 ### 4.1 `storage_backup_objects`
 
