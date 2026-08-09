@@ -1,15 +1,33 @@
-import { NextRequest, NextResponse } from 'next/server'
+/**
+ * Archive export request.
+ *
+ * POST enqueues. It does not build. A 362 MB archive cannot be assembled and
+ * delivered inside a request, and the previous implementation of this route
+ * did not deliver bytes at all: it shipped a manifest whose media links
+ * resolved to nothing on 316/316 photographs and 33/33 recordings, because it
+ * constructed Storage paths instead of reading them.
+ *
+ * The work happens in lib/inngest/exportFunctions.ts. The owner gets an email
+ * with a signed link when the zip is ready. See
+ * docs/EXPORT_ROUTE_RECON_2026-08.md.
+ *
+ * AUTH IS UNCHANGED. Owner Supabase session only, ownership re-verified against
+ * archives.owner_user_id, because getSessionUser fills archiveId for successors
+ * too and a session carrying an archiveId is not proof of ownership.
+ */
+import { NextResponse } from 'next/server'
+import { randomUUID } from 'node:crypto'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth/getSessionUser'
-import JSZip from 'jszip'
+import { inngest } from '@/lib/inngest'
+import { EXPORT_BUCKET } from '@/lib/archiveExportStorage'
 
 export const dynamic = 'force-dynamic'
-export const maxDuration = 60 // seconds — export can take time for large archives
 
-export async function GET(req: NextRequest) {
-  // Auth: Supabase owner session only. archiveId comes from the session and is
-  // verified against the archives table below — a session carrying an archiveId
-  // is not proof of ownership (getSessionUser fills archiveId for successors too).
+/** Debounce window. A double-clicked button must not build two 362 MB zips. */
+const RECENT_REQUEST_MS = 10 * 60 * 1000
+
+export async function POST() {
   const session = await getSessionUser()
   if (!session?.archiveId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -18,151 +36,50 @@ export async function GET(req: NextRequest) {
 
   const { data: ownerRow } = await supabaseAdmin
     .from('archives')
-    .select('owner_user_id')
+    .select('owner_user_id, name, owner_email')
     .eq('id', archiveId)
     .maybeSingle()
+
   if (!ownerRow || ownerRow.owner_user_id !== session.userId) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
-  // Fetch all data in parallel
-  const [
-    archiveRes,
-    depositsRes,
-    trainingRes,
-    voiceRes,
-    photosRes,
-    contribsRes,
-    datesRes,
-    conversationsRes,
-  ] = await Promise.allSettled([
-    supabaseAdmin.from('archives').select('name, owner_name, created_at, tier, preferred_language, family_name').eq('id', archiveId).single(),
-    supabaseAdmin.from('owner_deposits').select('prompt, response, created_at, source_type, essence_status').eq('archive_id', archiveId).order('created_at'),
-    supabaseAdmin.from('training_pairs').select('prompt, completion, quality_score, dimension, included_in_training, source_type').eq('archive_id', archiveId).order('created_at'),
-    supabaseAdmin.from('voice_recordings').select('id, prompt, transcript, duration_seconds, created_at, transcript_status').eq('archive_id', archiveId).order('created_at'),
-    supabaseAdmin.from('photographs').select('id, original_name, ai_era_estimate, status, created_at, labels(what_was_happening, labelled_by, year_taken, location)').eq('archive_id', archiveId).order('created_at'),
-    supabaseAdmin.from('contributors').select('name, relationship, status, created_at').eq('archive_id', archiveId),
-    supabaseAdmin.from('significant_dates').select('label, date_type, month, day, year, notes').eq('archive_id', archiveId).eq('active', true).order('year'),
-    supabaseAdmin.from('entity_conversations').select('role, content, created_at, session_id').eq('archive_id', archiveId).order('created_at').limit(500),
-  ])
+  // An owner with no email on file would get a zip nobody could tell them about.
+  if (!ownerRow.owner_email) {
+    return NextResponse.json(
+      { error: 'No email address is on file for this archive. Contact hello@basalith.xyz and we will send your export directly.' },
+      { status: 409 },
+    )
+  }
 
-  const get = <T>(r: PromiseSettledResult<{ data: T | null }>): T =>
-    r.status === 'fulfilled' ? (r.value.data ?? [] as unknown as T) : [] as unknown as T
+  // Debounce. Storage is the source of truth for "did we just do this", so
+  // there is no separate table row that can drift away from the object.
+  const { data: existing } = await supabaseAdmin.storage
+    .from(EXPORT_BUCKET)
+    .list(archiveId, { limit: 100 })
 
-  const archive       = archiveRes.status === 'fulfilled' ? archiveRes.value.data : null
-  const deposits      = get(depositsRes)       as any[]
-  const training      = get(trainingRes)       as any[]
-  const voiceRecs     = get(voiceRes)          as any[]
-  const photos        = get(photosRes)         as any[]
-  const contributors  = get(contribsRes)       as any[]
-  const dates         = get(datesRes)          as any[]
-  const conversations = get(conversationsRes)  as any[]
-
-  const exportDate = new Date().toISOString().substring(0, 10)
-
-  const zip = new JSZip()
-  const root = zip.folder('basalith-export')!
-
-  // archive-info.json
-  root.file('archive-info.json', JSON.stringify({
-    name:       archive?.name         ?? '',
-    owner:      archive?.owner_name   ?? '',
-    family:     archive?.family_name  ?? '',
-    created:    archive?.created_at   ?? '',
-    tier:       archive?.tier         ?? '',
-    language:   archive?.preferred_language ?? 'en',
-    exportedAt: new Date().toISOString(),
-  }, null, 2))
-
-  // deposits/deposits.json
-  const depositsFolder = root.folder('deposits')!
-  depositsFolder.file('deposits.json', JSON.stringify(deposits, null, 2))
-
-  // training-pairs/training-pairs.json
-  const trainingFolder = root.folder('training-pairs')!
-  trainingFolder.file('training-pairs.json', JSON.stringify(training, null, 2))
-
-  // voice-recordings/recordings.json + signed URLs
-  const voiceFolder = root.folder('voice-recordings')!
-  const voiceWithUrls = await Promise.all(
-    voiceRecs.map(async (r: any) => {
-      if (!r.id) return r
-      try {
-        const { data } = await supabaseAdmin.storage.from('voice_recordings').createSignedUrl(
-          `${archiveId}/${r.id}.m4a`, 86400 // 24 hours
-        )
-        return { ...r, downloadUrl: data?.signedUrl ?? null }
-      } catch { return r }
-    })
+  const cutoff = Date.now() - RECENT_REQUEST_MS
+  const recent = (existing ?? []).find((o: { created_at?: string }) =>
+    o.created_at ? new Date(o.created_at).getTime() > cutoff : false,
   )
-  voiceFolder.file('recordings.json', JSON.stringify(voiceWithUrls, null, 2))
-
-  // photographs/photos.json + signed URLs
-  const photosFolder = root.folder('photographs')!
-  const photosWithUrls = await Promise.all(
-    photos.map(async (p: any) => {
-      if (!p.id) return p
-      try {
-        const { data: signed } = await supabaseAdmin.storage.from('photographs').createSignedUrl(
-          `${archiveId}/${p.id}.jpg`, 86400
-        )
-        return { ...p, downloadUrl: signed?.signedUrl ?? null }
-      } catch { return p }
+  if (recent) {
+    return NextResponse.json({
+      queued:  false,
+      already: true,
+      message: 'An export for this archive was prepared in the last few minutes. Check your email. If it has not arrived, wait a moment and try again.',
     })
-  )
-  photosFolder.file('photos.json', JSON.stringify(photosWithUrls, null, 2))
+  }
 
-  // contributors/contributors.json — no emails or tokens
-  const contribFolder = root.folder('contributors')!
-  contribFolder.file('contributors.json', JSON.stringify(contributors, null, 2))
+  const exportId = randomUUID()
 
-  // significant-dates/dates.json
-  const datesFolder = root.folder('significant-dates')!
-  datesFolder.file('dates.json', JSON.stringify(dates, null, 2))
+  await inngest.send({
+    name: 'archive/export.requested',
+    data: { archiveId, exportId, requestedBy: session.userId },
+  })
 
-  // entity-conversations/conversations.json
-  const convoFolder = root.folder('entity-conversations')!
-  convoFolder.file('conversations.json', JSON.stringify(conversations, null, 2))
-
-  // README.txt
-  root.file('README.txt', `BASALITH ARCHIVE EXPORT
-Generated: ${exportDate}
-Archive: ${archive?.name ?? archiveId}
-
-Your data belongs to you.
-
-This export contains everything Basalith has stored for your archive in open,
-readable formats.
-
-FILES INCLUDED:
-  archive-info.json          Archive metadata
-  deposits/                  All owner deposits (prompts and responses)
-  training-pairs/            Entity training data (prompt/completion pairs)
-  voice-recordings/          Voice recording metadata and download links
-  photographs/               Photograph metadata, captions, and download links
-  contributors/              Family contributors (no emails or tokens)
-  significant-dates/         Important dates in your archive
-  entity-conversations/      Entity chat history (last 500 exchanges)
-
-ABOUT YOUR DATA:
-  Training pairs can be used to fine-tune any compatible language model.
-  Voice recordings are in M4A format and can be used with any voice synthesis platform.
-  Photographs are in JPEG format.
-  Download links in JSON files expire after 24 hours.
-
-For questions: hello@basalith.xyz
-Security concerns: security@basalith.ai
-
-Heritage Nexus Inc.
-`)
-
-  const zipBuffer = await zip.generateAsync({ type: 'nodebuffer', compression: 'DEFLATE', compressionOptions: { level: 6 } })
-
-  return new Response(zipBuffer.buffer as ArrayBuffer, {
-    headers: {
-      'Content-Type':        'application/zip',
-      'Content-Disposition': `attachment; filename="basalith-archive-${exportDate}.zip"`,
-      'Content-Length':      String(zipBuffer.length),
-    },
+  return NextResponse.json({
+    queued:   true,
+    exportId,
+    message:  'Your export is being prepared. It will arrive by email when it is ready, usually within a few minutes.',
   })
 }

@@ -169,24 +169,22 @@ export default function PreferencesClient({ archiveId }: { archiveId: string }) 
   const [exporting, setExporting] = useState(false)
   const [exportMsg, setExportMsg] = useState<string | null>(null)
 
+  // The export is assembled in the background and delivered by email. It is not
+  // a download from this request: a full archive runs to hundreds of megabytes
+  // and cannot be built and transferred inside one HTTP response.
   async function handleExport() {
     setExporting(true)
     setExportMsg(null)
     try {
-      const res = await fetch('/api/archive/export')
-      if (!res.ok) { setExportMsg('Export failed. Please try again.'); return }
-      const blob = await res.blob()
-      const url  = URL.createObjectURL(blob)
-      const a    = document.createElement('a')
-      const date = new Date().toISOString().substring(0, 10)
-      a.href     = url
-      a.download = `basalith-archive-${date}.zip`
-      a.click()
-      URL.revokeObjectURL(url)
-      setExportMsg('Download started.')
-      setTimeout(() => setExportMsg(null), 5000)
+      const res  = await fetch('/api/archive/export', { method: 'POST' })
+      const data = await res.json().catch(() => null)
+      if (!res.ok) {
+        setExportMsg(data?.error ?? 'Export request failed. Please try again.')
+        return
+      }
+      setExportMsg(data?.message ?? 'Your export is being prepared and will arrive by email.')
     } catch {
-      setExportMsg('Export failed. Please try again.')
+      setExportMsg('Export request failed. Please try again.')
     } finally {
       setExporting(false)
     }
@@ -351,9 +349,15 @@ export default function PreferencesClient({ archiveId }: { archiveId: string }) 
 
       <div className="rounded-sm border border-[rgba(255,255,255,0.06)] px-6 py-6" style={{ background: '#111112' }}>
         <p className="font-sans text-[0.6rem] font-bold tracking-[0.18em] uppercase text-[#5C6166] mb-2">Complete Archive Export</p>
+        <p className="font-sans text-[0.75rem] mb-5" style={{ color: '#9DA3A8' }}>
+          Your export is one zip file holding the actual contents of your archive.
+          Your photographs, recordings, and video as real files, plus every record
+          in plain JSON. It opens with no account and no connection to Basalith.
+        </p>
         <p className="font-sans text-[0.75rem] mb-5" style={{ color: '#5C6166' }}>
-          Your export includes all deposits, voice recordings, photographs, significant dates,
-          and conversation history in open formats (JSON, signed URLs). Download links in the export expire after 24 hours.
+          We assemble it in the background and email you a download link when it is
+          ready, usually within a few minutes. The link works for 7 days, and you can
+          request another export at any time.
         </p>
         <div className="flex items-center gap-4 flex-wrap">
           <button
@@ -362,7 +366,7 @@ export default function PreferencesClient({ archiveId }: { archiveId: string }) 
             className="btn-monolith-ghost disabled:opacity-50"
             style={{ borderColor: 'rgba(196,162,74,0.4)', color: '#C4A24A' }}
           >
-            {exporting ? 'Generating…' : 'Download Complete Archive →'}
+            {exporting ? 'Requesting…' : 'Request Archive Export →'}
           </button>
           {exportMsg && (
             <p className="font-sans text-[0.72rem]" style={{ color: '#9DA3A8' }}>{exportMsg}</p>

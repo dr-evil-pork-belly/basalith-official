@@ -24,6 +24,10 @@
 .DS_Store
 *.pem
 
+# probe output. scripts/export-probe.ts writes a rendered email here. It
+# carries a live signed URL to a full archive export, so it never gets committed.
+/.probe-out/
+
 # debug
 npm-debug.log*
 yarn-debug.log*

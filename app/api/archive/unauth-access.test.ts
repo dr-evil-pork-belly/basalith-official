@@ -214,6 +214,13 @@ const H = vi.hoisted(() => {
           storageCalls.push({ bucket, op: 'upload', path })
           return { error: null }
         },
+        // The export route lists its own bucket to debounce a double-clicked
+        // button. Empty means "no recent export", so the guard test reaches the
+        // enqueue path rather than the already-prepared short circuit.
+        list:                  async (prefix: string) => {
+          storageCalls.push({ bucket, op: 'list', path: prefix })
+          return { data: [], error: null }
+        },
       }),
     },
     rpc: async () => ({ data: null, error: null }),
@@ -290,7 +297,10 @@ vi.mock('@/lib/auth/getOrCreateAuthUser', () => ({ getOrCreateAuthUser: vi.fn(as
 vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({ text: '', language: '' }), { status: 200 })))
 
 import { getSessionUser } from '@/lib/auth/getSessionUser'
-import { GET  as exportGET }        from '@/app/api/archive/export/route'
+// Export moved from GET-returns-a-zip to POST-enqueues in the August 2026
+// rebuild. The guard it is asserted against is unchanged: owner session only,
+// ownership re-verified against archives.owner_user_id.
+import { POST as exportPOST }       from '@/app/api/archive/export/route'
 import { POST as ownerDepositPOST } from '@/app/api/archive/owner-deposit/route'
 import { POST as randomThoughtPOST } from '@/app/api/archive/random-thought/route'
 import { POST as uploadPOST }       from '@/app/api/archive/upload/route'
@@ -488,8 +498,8 @@ async function runGuard(
 beforeEach(() => { mockedSession.mockReset() })
 
 describe('archive routes — unauthenticated-access hole closed + ownership enforced', () => {
-  it('GET /api/archive/export', async () => {
-    await runGuard('export', h => exportGET(get('http://localhost/api/archive/export', h)))
+  it('POST /api/archive/export', async () => {
+    await runGuard('export', () => exportPOST())
   })
 
   it('POST /api/archive/owner-deposit', async () => {
