@@ -11,7 +11,8 @@ deleted after the run, per the recon doc's own instruction.
 **Revision, August 8, later the same day.** Four corrections, from a second read-only pass
 against the same project and the same path. `vault-files` moved from the allowlist to
 EXCLUDED, so the allowlist is four buckets and in-scope volume is 377 objects and
-1076.17 MB (sections 0.5 and 2). `archives.termination_requested_at` confirmed live, which
+1076.17 MB (sections 0.5 and 2), restated August 9 to 376 objects and 1073.09 MB.
+`archives.termination_requested_at` confirmed live, which
 section 2.1 and the section 9 copy work both depend on and section 0 had not covered
 (section 0.4). The open month-to-date egress figure is in and all thresholds hold unchanged
 (sections 1.1 and 6.3). And the tenet 04 draft replacement is withdrawn, because it made two
@@ -30,6 +31,17 @@ rule for which ones to delete, and it now has one. And the dry walk cannot be a
 before-first-sync gate, because it needs a backup to exist, so **the seed is split in four,
 agreed by David, at build order 9a through 9d.** The only prerequisite still open is the dry
 walk itself, now correctly placed at 9b.
+
+**Third revision, August 9.** The export reaper is committed and this branch is rebased onto
+it, which closes section 0.3. The two 196.33 MB export objects are deleted. **In-scope volume
+is restated to 376 objects and 1073.09 MB**, superseding the 377 and 1076.17 MB above and
+everywhere else in this document. Two separate corrections produced that: the export objects
+leaving, and an orphan photograph David deleted on August 8 whose now-empty prefix holds a
+zero byte `.emptyFolderPlaceholder`. Sections 0.2, 2, 3.3, 6.1, and build order 9d are
+updated. No threshold moves. The placeholder is the one finding here that changes code and
+not just figures: nothing filters it, so the first sync would copy a zero byte non-file into
+a 90 day lock keyed to an archive id that does not exist. Section 2.1 gains a second filter.
+Sections 7 and 5 are also corrected for alarms A7, A9, and A10.
 
 ---
 
@@ -92,6 +104,11 @@ still counted `vault-files` and predates its exclusion. Restated on today's basi
 number is 375 objects and 1075.00 MB, so the delta is 2 objects and 1.17 MB, both in
 `voice-recordings`. The curve is still flat.
 
+> **SUPERSEDED, August 9.** The reading above is left as taken. Two things moved under it:
+> the two `archive-exports` objects were deleted, and one orphan photograph was deleted on
+> August 8 leaving a zero byte `.emptyFolderPlaceholder` that this walk counted as an object.
+> **In scope is now 376 real objects and 1073.09 MB.** Full reconciliation in section 0.3.
+
 Two numbers that bind the build:
 
 - **The largest in-scope object is 12.05 MB.** No object needs streaming or multipart
@@ -100,6 +117,10 @@ Two numbers that bind the build:
   50 MB bucket cap keeps that true going forward.
 - **32 of 380 objects carry a multipart eTag.** The recon found this on a sample. It holds
   at 8.4% of the property. eTag is change detection on the source side and nothing more.
+  Re-measured August 9: **30 of 377 real objects, 8.0%,** and 30 of the 376 in scope. The
+  two that left were the deleted export zips, both large enough to have been uploaded
+  multipart. The deleted 3.2 MB photograph was under the threshold and carried a plain
+  eTag, so it did not move this count. The argument is unchanged.
 
 ### 0.3 The export reaper is not deployed, and there are two full archive copies sitting in Storage
 
@@ -138,28 +159,60 @@ paragraph above was written.
 Section 0.2 is restated from a live read taken August 9 after the deletion:
 
 ```
-=== OBJECT COUNTS AND BYTES PER BUCKET (August 9, 2026) ===
+=== RECONCILED PER BUCKET, placeholders excluded (August 9, 2026) ===
 vault-files             1 objs       4.06 MB
 voice-recordings       36 objs      22.37 MB
-photographs           337 objs    1006.87 MB
+photographs           336 objs    1006.87 MB  (+1 placeholder)
 archive-videos          4 objs      43.85 MB
 archive-documents       0 objs       0.00 MB
 archive-exports         0 objs       0.00 MB
-GRAND TOTAL           378 objs    1077.15 MB  (1129471244 bytes)
+GRAND TOTAL           377 objs    1077.15 MB  (1129471244 bytes)
 ```
 
-**In scope for the sync: 377 objects, 1073.09 MB**, the four allowlist buckets. The grand
-total fell by exactly the two deleted objects. The in-scope figure fell by 3.08 MB, which
-the deletion does not explain.
+**In scope for the sync: 376 objects, 1073.09 MB** (1125215480 bytes), the four allowlist
+buckets. Every figure in this document that read 377 objects and 1076.17 MB is superseded by
+this pair.
 
-**Open, and not explained here.** `photographs` reads 1006.87 MB today against 1009.95 MB
-on August 8, at an identical object count of 337. Same number of objects, 3.08 MB lighter.
-That is either a re-upload that replaced an object with a smaller one, or a difference in
-how the two walks measured, and this session did not establish which. It is small and it
-does not move any threshold in section 6, but a content bucket losing bytes without losing
-objects is exactly the kind of thing this build exists to notice, so it is recorded rather
-than smoothed over. First sync will fix the basis either way, because the manifest hashes
-what is actually there.
+#### The photographs count, reconciled
+
+The first Aug 9 read of this bucket said 337 objects and 1006.87 MB, against 337 objects and
+1009.95 MB on Aug 8. The bytes moved and the count did not, which is not a shape a single
+deletion can produce. Both numbers were right and they were counting different things.
+
+David deleted one orphan photograph in prefix `f44f1818-8f17-499d-8f27-23e286e923f7` on
+August 8, 3,231,579 bytes, before the manifest migration. It was not an in-place overwrite.
+The arithmetic closes exactly:
+
+```
+1055781697 bytes (Aug 9 photographs) + 3231579 (the deleted object) = 1059013276
+1059013276 / 1024 / 1024 = 1009.95 MB   <- the Aug 8 figure, to the cent
+```
+
+That deletion emptied the prefix, and Supabase wrote a zero byte marker into it:
+
+```
+photographs/f44f1818-8f17-499d-8f27-23e286e923f7/.emptyFolderPlaceholder
+  size=0  mimetype=application/octet-stream  created=2026-08-08T21:26:23.193Z
+```
+
+So photographs is **336 real objects plus 1 placeholder**. A walk that does not filter the
+marker returns 337 and always will, which is why the count looked frozen. `f44f1818` is not
+an archive. There are 9 rows in `archives` and it is not one of them, so this is an orphan
+prefix that now contains nothing but its own marker.
+
+#### This changes the sync, and section 2 has a new filter because of it
+
+`walkBucket` in `lib/inngest/storageBackupFunctions.ts` keys on `id === null` to tell a
+folder from an object. A `.emptyFolderPlaceholder` has a real id, so it is currently
+returned as a real object and **would be copied to B2 on the first sync, under the 90 day
+COMPLIANCE lock, with a manifest row, keyed to an archive id that does not exist.** It is
+zero bytes and holds no family content, so this is not an exposure. It is a permanent
+undeletable non-file in the copy of last resort, and a row that V6 pointer reconciliation
+would report as an orphan on every run forever.
+
+Nothing filters it today. A repo-wide search for `emptyFolderPlaceholder` returns no
+matches outside this document. **This is open and is the one thing found here that changes
+code rather than figures.** See section 2.1, which gains a second filter.
 
 ### 0.4 `archives.termination_requested_at` exists live. VERIFIED August 8
 
@@ -258,8 +311,10 @@ From `backblaze.com/cloud-storage/pricing`, read August 8, 2026:
 | Class A, B, C transactions | free on pay-as-you-go |
 | Class D transactions | $0.004 per 10,000, first 2,500 per day free |
 
-At 1076 MB stored, storage costs about **$0.0075 per month** and the free egress allowance
-is about **3.23 GB per month**.
+At 1073 MB stored, storage costs about **$0.0075 per month** and the free egress allowance
+is about **3.22 GB per month**. Both figures are unchanged in substance by the August 9
+restatement from 1076 MB. The section 1.3 arithmetic below is left on its 1.076 GB basis,
+because a 3 MB shift does not move a $0.014 result.
 
 ### 1.3 A correction to the recon doc
 
@@ -281,18 +336,22 @@ carried forward.
 ## 2. SCOPE, THE ALLOWLIST
 
 ```
-ALLOWLIST  (synced)                            four buckets
-  photographs         337 objs   1009.95 MB
+ALLOWLIST  (synced)                            four buckets   [August 9 basis]
+  photographs         336 objs   1006.87 MB    +1 placeholder, see 2.1
   voice-recordings     36 objs     22.37 MB
   archive-videos        4 objs     43.85 MB
   archive-documents     0 objs      0.00 MB
                       ----------------------
-  in scope            377 objs   1076.17 MB
+  in scope            376 objs   1073.09 MB    (1125215480 bytes)
 
 EXCLUDED  (named, permanent, asserted in a test)
-  archive-exports       2 objs    392.67 MB    derived, and retention-managed elsewhere
+  archive-exports       0 objs      0.00 MB    derived, and retention-managed elsewhere
   vault-files           1 obj       4.06 MB    not archive-scoped, cannot be dissolved
 ```
+
+`archive-exports` reads empty rather than 2 objects and 392.67 MB because the reaper is
+committed and the two probe artifacts are deleted, per section 0.3. It stays permanently
+excluded regardless of what it holds. An empty bucket is not a reason to relax the rule.
 
 The two exclusions are not the same exclusion and must not be collapsed into one reason in
 the code comment or the test.
@@ -359,6 +418,45 @@ no row means no termination timestamp means not excluded.
 
 The filter is also the reason `vault-files` cannot be in scope. It matches on an archive id
 prefix, and no vault object has one. Section 2's exclusion note carries that argument.
+
+### 2.2 A second filter, found August 9: the empty folder placeholder
+
+**Not built. This is the one open code change in the August 9 revision.**
+
+Supabase writes a zero byte object named `.emptyFolderPlaceholder` into a prefix that would
+otherwise have no objects in it. One exists today, created the moment David deleted the last
+photograph out of the `f44f1818` prefix on August 8:
+
+```
+photographs/f44f1818-8f17-499d-8f27-23e286e923f7/.emptyFolderPlaceholder
+  size=0  mimetype=application/octet-stream  created=2026-08-08T21:26:23.193Z
+```
+
+`walkBucket` distinguishes a folder from an object by `id === null`. A placeholder has a
+real id, so it is returned as a real object. Left alone, the first sync copies it to B2
+under the 90 day COMPLIANCE lock, writes a manifest row for it, and keys that row to
+`f44f1818`, which is not a row in `archives`.
+
+It is zero bytes and it holds no family content, so this is not an exposure and it is not
+urgent. It is three smaller wrongs that do not expire:
+
+- A permanent undeletable non-file in the copy of last resort. Nothing about a placeholder
+  is worth 90 days of immutability.
+- A manifest row and a V6 orphan report line, on every verify run, forever.
+- Precedent. Every future prefix that empties out adds another one, and the first sync is
+  the cheapest moment to decide they never enter.
+
+**The filter is a name match in `walkBucket`, skipping any entry named
+`.emptyFolderPlaceholder`, and it belongs on the source walk rather than in the diff so the
+object never enters `SourceObject[]` at all.** It must not be written as a zero byte filter.
+A zero byte real upload is a different thing and should still be copied and still reconcile,
+because a content file that has become zero bytes is a fact worth backing up and noticing.
+
+Related, and separate: `photographs` holds 336 objects against 316 rows in the `photographs`
+table, so 20 orphan objects under live archive prefixes. Those are real image bytes and they
+stay in scope by design, per constraint 4 and the filter argument above. The count of 22
+used elsewhere in this document predates the August 8 deletion and was never re-derived
+per-bucket here.
 
 ---
 
@@ -434,7 +532,10 @@ exist. Step 4 inside the same step body is safe on retry: the insert is keyed on
 `inngest.com/docs/usage-limits/inngest`. Step output is capped at 4 MiB, which the
 `list-source` step approaches only past roughly 20,000 objects.
 
-The seed run is 377 copy steps plus 4, so 381. That fits, with 2.6x headroom and no more.
+The seed run is 376 copy steps plus 4, so 380 on the August 9 basis. That fits, with 2.6x
+headroom and no more. It was 381 before the two deletions in section 0.3, and it becomes 381
+again if the `.emptyFolderPlaceholder` filter in section 2.2 is not built, because the
+placeholder would take a copy step of its own.
 So the copy list is capped at `MAX_COPIES_PER_RUN = 300`, and a run with more work than
 that emits `storage/backup.sync.continue` and lets a fresh run take the rest. The seed
 takes two runs. This is the mechanism that keeps the design working at 10,000 objects
@@ -621,8 +722,8 @@ we ever say to a family about this.
 
 **V1. Manifest at write time.** SHA-256 computed by us over the bytes as they stream,
 recorded with the real body length. Source eTag stored alongside and explicitly not used as
-an integrity check. 32 of 380 objects carry a multipart eTag today, so this is not a
-theoretical concern.
+an integrity check. 30 of the 377 objects on the property carry a multipart eTag, measured
+August 9, so this is not a theoretical concern.
 
 **V2. Structural diff, every run, three ways.** Source path set, destination path set, and
 manifest path set, compared pairwise.
@@ -674,7 +775,7 @@ the run row as the run proceeds.
 What normal looks like:
 
 ```
-initial seed          1076 MB    once, flagged 'seed', exempt from the per-run ceiling
+initial seed          1073 MB    once, flagged 'seed', exempt from the per-run ceiling
 daily sync, typical    < 1 MB    list responses only, nothing new to copy
 daily sync, busy day     78 MB   the worst single month since March was June at 77.7 MB
 weekly verify             0 MB   reads from B2, not from Supabase
@@ -1142,10 +1243,12 @@ Nothing moves a byte until steps 1 through 4 are done.
      wrong. Sign and date its section 1.4. Paste the output.
    - **9c. Redraft `/data-ownership` tenet 04 to point at the proven runbook.** You approve
      it. It lands. Only now is there a sentence backed by something that has been executed.
-   - **9d. Seed the real property, 377 objects, `kind = 'seed'`,** exempt from the per-run
-     ceiling. Paste the run row and the object count.
+   - **9d. Seed the real property, 376 objects and 1073.09 MB, `kind = 'seed'`,** exempt
+     from the per-run ceiling. Paste the run row and the object count. If the count comes
+     back 377, the section 2.2 placeholder filter was not built and a zero byte non-file
+     just went under a 90 day lock.
 
-   The cost is one extra seed run and a throwaway archive. Against 1076 MB and a $0.0075
+   The cost is one extra seed run and a throwaway archive. Against 1073 MB and a $0.0075
    monthly storage line, that is nothing. The thing it buys is that the first execution of
    the deletion procedure is never a real family's dissolution.
 10. First verify run. Paste the three way diff and the re-hash result.
