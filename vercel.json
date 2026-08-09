@@ -5,7 +5,8 @@
     "app/api/archive/process-video/route.ts":       { "maxDuration": 120 },
     "app/api/archive/setup-voice-clone/route.ts":   { "maxDuration": 60  },
     "app/api/cron/voice-portrait/route.ts":         { "maxDuration": 300 },
-    "app/api/cron/weekly-mirror/route.ts":          { "maxDuration": 300 }
+    "app/api/cron/weekly-mirror/route.ts":          { "maxDuration": 300 },
+    "app/api/inngest/route.ts":                     { "maxDuration": 300, "memory": 3009 }
   },
   "crons": [
     {
@@ -79,6 +80,14 @@
     {
       "path": "/api/cron/weekly-mirror",
       "schedule": "0 17 * * 0"
+    },
+    {
+      "path": "/api/cron/export-reaper",
+      "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/storage-backup-heartbeat",
+      "schedule": "0 6 * * *"
     }
   ]
 }

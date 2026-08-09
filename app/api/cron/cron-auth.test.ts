@@ -121,6 +121,8 @@ import { GET as gratitudeNote }       from './gratitude-note/route'
 import { GET as entityLetter }        from './entity-letter/route'
 import { GET as weeklyReplay }        from './weekly-replay/route'
 import { GET as weeklyMirror }        from './weekly-mirror/route'
+import { GET as exportReaper }        from './export-reaper/route'
+import { GET as storageBackupHeartbeat } from './storage-backup-heartbeat/route'
 
 // Deployed but no longer scheduled. voice-portrait lost its vercel.json entry
 // when ElevenLabs was decommissioned in August 2026, and the route was retained
@@ -160,6 +162,8 @@ const ROUTES: { path: string; handler: Handler }[] = [
   { path: '/api/cron/entity-letter',        handler: entityLetter        },
   { path: '/api/cron/weekly-replay',        handler: weeklyReplay        },
   { path: '/api/cron/weekly-mirror',        handler: weeklyMirror        },
+  { path: '/api/cron/export-reaper',        handler: exportReaper        },
+  { path: '/api/cron/storage-backup-heartbeat', handler: storageBackupHeartbeat },
 ]
 
 // Not in vercel.json crons[], still deployed. See the import note above.
