@@ -1306,8 +1306,49 @@ Nothing moves a byte until steps 1 through 4 are done.
 
 Carried from the brief, plus what today's recon added.
 
-- The export reaper is uncommitted and not deployed. Two 196 MB unencrypted full copies of
-  the Dr Ha archive become overdue on August 11. Section 0.3.
+- ~~The export reaper is uncommitted and not deployed. Two 196 MB unencrypted full copies of
+  the Dr Ha archive become overdue on August 11.~~ **Closed August 9.** Reaper committed and
+  live, both objects deleted. Section 0.3.
+- **This repo is git-wired and was never CLI-only. Every push to `main` since February 2026
+  was a production deploy.** FINDING, August 9, 2026. Not a backup finding. Recorded here
+  because this is the open list that gets read, and because it changes how the last step of
+  build order 11 is executed.
+
+  CLAUDE.md section 1 said "`git push` does NOT deploy this repo." A memory said the same,
+  citing a June 19 check. Both were false and both were acted on. Pushing
+  `ce856a5..b384519` to `main` produced `dpl_DUnVS84QSzQMBKE2uGnEyrcAn2as`, target
+  production, status Ready, created 09:33:51 PDT roughly twenty seconds after the push,
+  carrying `basalith.ai`, `www.basalith.ai`, and
+  `basalith-official-git-main-dr-evil-pork-bellys-projects.vercel.app`. Nobody ran
+  `vercel --prod` for it. The `git-main` alias is the tell: a CLI deploy never carries it.
+
+  The scope is not recent. `git reflog show origin/main` holds **362 `update by push`
+  entries**, the oldest at **2026-02-20 20:46 PDT**. The Vercel project was created
+  **2026-02-20 20:49:23**, three minutes later. The repo and the project were wired up in
+  the same sitting. 46 of those pushes fall after June 16, the oldest date a surviving
+  `basalith-official-git-*` alias proves git integration was live.
+
+  So every session that pushed to `main` was deploying to production at push time,
+  whatever it believed it was doing. A session that pushed before promoting had already
+  shipped; the later `vercel --prod` was a second deploy of code that was already live.
+
+  **Consequence for the July promote-then-merge rule.** "After any `vercel --prod`, merge
+  the deployed branch to `main` in the same session" is not bookkeeping. The merge push is
+  itself a second production deploy. It is safe only when `main` fast-forwards to exactly
+  the commit that was promoted, which is the normal case and was the case on August 9
+  (`b384519`, clean fast-forward, no merge commit). If `main` would carry anything the
+  promoted build did not, the push ships it, unreviewed and unpromoted.
+
+  Two things this finding does not establish. The Git connection date is not readable from
+  the CLI, since `vercel project inspect` exposes no Git field; it needs the Vercel
+  dashboard under Settings → Git. And whether historical `main` pushes produced production
+  rather than preview builds is inferred from Vercel's model and the project timeline, not
+  measured, because `gh` is not on PATH and the GitHub deployment history was not read.
+
+  No fix proposed. CLAUDE.md sections 1 and 2 and
+  `docs/BASALITH_SUCCESSION_TEST_LOOP.md` are corrected to state what is true.
+  `BUILD_CONTEXT.md` working rule 6 and the B2B pivot doc's standing rules carry the same
+  false claim and are not in this repo, so they are still wrong.
 - **`vault-files` is now unbacked, and that is a gap, not a resolution.** Excluded in
   section 2 because no vault object can be tied to an archive id, so the dissolution filter
   cannot reach it. One 4 MB object on a "Test Vault" today, so the exposure is near zero and

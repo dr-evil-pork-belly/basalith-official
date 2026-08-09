@@ -386,5 +386,14 @@ succession consult route only; B2C owner chat untouched. Committed (e1d6d21) and
 at basalith.ai. Open gap: the live authenticated route was not exercised end-to-end (it needs a
 successor session, which is gated on the still-unbuilt successor-login flow); the harness on the
 byte-identical config is the current assurance, and the live smoke test should be folded into the
-successor-login work. Rollback is `vercel rollback`. Prod deploys are CLI-only (`vercel --prod`);
-git push does not deploy.
+successor-login work. Rollback is `vercel rollback`.
+
+**CORRECTED August 9, 2026.** This line used to read "Prod deploys are CLI-only
+(`vercel --prod`); git push does not deploy." That was false. **This repo is git-wired:
+`git push origin main` triggers a production build and it takes the `basalith.ai` alias.**
+Verified by a push of `ce856a5..b384519` producing `dpl_DUnVS84QSzQMBKE2uGnEyrcAn2as`,
+target production, Ready, created 09:33:51 PDT about twenty seconds after the push, with
+`basalith.ai`, `www.basalith.ai`, and
+`basalith-official-git-main-dr-evil-pork-bellys-projects.vercel.app` on it. Nobody ran
+`vercel --prod`. The `git-main` alias is the tell. `vercel --prod` is the other route to
+production, not the only one.

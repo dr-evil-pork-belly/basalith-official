@@ -54,9 +54,27 @@ env file, is a stop-and-ask. Never log an env var. Never echo a secret into outp
 **SQL.** Migrations are never run from the sandbox or the CLI, and never applied programmatically. David pastes every migration into the Supabase editor himself. This is a policy, not a limitation. The repo has pg installed as a devDependency, so raw Postgres access may be technically possible. That does not authorize schema changes. Read-only queries for recon are fine and are the correct way to read CHECK constraints, which PostgREST cannot expose. Any instruction to use the Supabase CLI for schema changes is wrong and predates this rule.
 
 **Deploys.** Claude Code deploys to preview only, with `vercel`. Never `vercel --prod`.
-David alone promotes. `git push` does NOT deploy this repo. Rollback is
-`vercel rollback`. Never commit straight to the default branch from a build step.
-Always branch off main.
+David alone promotes. Rollback is `vercel rollback`. Never commit straight to the
+default branch from a build step. Always branch off main.
+
+**This repo IS git-wired. `git push origin main` triggers a production build and it
+takes the `basalith.ai` alias.** Pushing to main is therefore a production deploy and
+is David's call, exactly like `vercel --prod`. Merging a branch to main and pushing it
+ships that code to production. There is no separate promotion step and no confirmation
+prompt. The tell is the `basalith-official-git-main-...vercel.app` alias on the
+resulting deployment: a CLI deploy never carries it, a git-triggered one always does.
+
+This paragraph used to say `git push` does NOT deploy this repo. That was false and it
+was acted on. VERIFIED August 9, 2026: a push of `ce856a5..b384519` to main produced
+`dpl_DUnVS84QSzQMBKE2uGnEyrcAn2as`, target production, status Ready, created
+09:33:51 PDT, roughly twenty seconds after the push, carrying `basalith.ai`,
+`www.basalith.ai`, and `basalith-official-git-main-dr-evil-pork-bellys-projects.vercel.app`.
+Nobody ran `vercel --prod` for it. Do not soften this back into "may deploy."
+
+Consequence worth holding: the standing rule to merge the deployed branch to main after
+a promotion is itself a second production deploy. It is safe only when main resolves to
+the same commit that was promoted, which is the normal case after a fast-forward. If
+main would carry anything the promoted build did not, the push ships it.
 
 **Recon before implementation.** Read the live codebase and paste literal output before
 any edit. Context docs go stale, including this one. Live code and live schema win on
@@ -83,7 +101,9 @@ data.
 Windows and PowerShell. Use `Get-ChildItem` and `Select-String`. No `grep`, no `find`.
 
 Repos:
-- `basalith-official` (this repo). Web app and basalith.ai. CLI-only deploys.
+- `basalith-official` (this repo). Web app and basalith.ai. Git-wired: a push to main
+  deploys to production and takes the basalith.ai alias. `vercel --prod` also promotes.
+  Both are David's call. See section 1.
 - `basalith-app` at `C:\Users\mrdav\basalith-app`. iOS, Expo and React Native.
   Reference by full path. Do not edit unless the task says to.
 - `basalith-xyz`. White paper. Git-wired, push to main deploys.
