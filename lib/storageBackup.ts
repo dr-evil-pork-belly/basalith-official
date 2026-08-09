@@ -65,6 +65,40 @@ export function isExcluded(bucket: string): bucket is ExcludedBucket {
   return bucket in EXCLUDED
 }
 
+/**
+ * The marker Supabase writes into a prefix that would otherwise hold no objects.
+ *
+ * One exists today, created the moment the last photograph was deleted out of
+ * `photographs/f44f1818-8f17-499d-8f27-23e286e923f7/` on August 8, 2026.
+ */
+export const EMPTY_FOLDER_PLACEHOLDER = '.emptyFolderPlaceholder'
+
+/**
+ * True for a Supabase empty-folder marker, matched on its name and nothing else.
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * THIS IS A NAME MATCH. IT MUST NEVER BECOME A ZERO BYTE FILTER.
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * A placeholder is zero bytes, so "skip anything at 0 bytes" looks like the same
+ * rule and is a different rule. A real upload that landed at zero bytes is a
+ * content file that has gone wrong, and that is a fact worth copying and worth
+ * surfacing in reconciliation. Filtering it by size would hide exactly the
+ * failure the backup exists to notice, and hide it silently, because a skipped
+ * object raises nothing.
+ *
+ * The name is the only thing that identifies a placeholder as not-a-file.
+ *
+ * Applied on the source walk, in `walkBucket`, so a placeholder never enters
+ * `SourceObject[]` at all. Not in the diff. An object filtered at the diff has
+ * already been counted as source, and the three way diff would then read it as
+ * present in the destination and absent from source, which is the shape A2
+ * exists to alarm on. See docs/STORAGE_BACKUP_SKELETON_2026-08.md section 2.2.
+ */
+export function isEmptyFolderPlaceholder(name: string): boolean {
+  return name === EMPTY_FOLDER_PLACEHOLDER || name.endsWith(`/${EMPTY_FOLDER_PLACEHOLDER}`)
+}
+
 // ── Thresholds ───────────────────────────────────────────────────────────────
 
 /**

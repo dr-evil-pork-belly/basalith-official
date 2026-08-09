@@ -38,10 +38,16 @@ is restated to 376 objects and 1073.09 MB**, superseding the 377 and 1076.17 MB 
 everywhere else in this document. Two separate corrections produced that: the export objects
 leaving, and an orphan photograph David deleted on August 8 whose now-empty prefix holds a
 zero byte `.emptyFolderPlaceholder`. Sections 0.2, 2, 3.3, 6.1, and build order 9d are
-updated. No threshold moves. The placeholder is the one finding here that changes code and
-not just figures: nothing filters it, so the first sync would copy a zero byte non-file into
-a 90 day lock keyed to an archive id that does not exist. Section 2.1 gains a second filter.
-Sections 7 and 5 are also corrected for alarms A7, A9, and A10.
+updated. No threshold moves. Sections 7 and 5 are corrected for alarms A7, A9, and A10.
+
+Two code changes came out of this revision and both are built. **The placeholder filter,
+section 2.2**, because without it the first sync copies a zero byte non-file into a 90 day
+lock keyed to an archive id that does not exist. And **the cron on `storage-backup-sync` is
+removed**, section 3 and build order 9d, because leaving it there meant the first production
+deploy seeded the entire property overnight, ahead of the dissolution dry walk, ahead of
+`dissolution-purge.ts` existing, and ahead of the tenet 04 redraft. The seed is now sent by
+hand at 9d. Verify and the heartbeat keep their crons. Both changes carry tests that fail if
+they regress.
 
 ---
 
@@ -421,7 +427,8 @@ prefix, and no vault object has one. Section 2's exclusion note carries that arg
 
 ### 2.2 A second filter, found August 9: the empty folder placeholder
 
-**Not built. This is the one open code change in the August 9 revision.**
+**BUILT, August 9.** `isEmptyFolderPlaceholder` in `lib/storageBackup.ts`, applied in
+`walkBucket`. 16 cases in `lib/inngest/storageBackupWalk.test.ts`.
 
 Supabase writes a zero byte object named `.emptyFolderPlaceholder` into a prefix that would
 otherwise have no objects in it. One exists today, created the moment David deleted the last
@@ -452,6 +459,17 @@ object never enters `SourceObject[]` at all.** It must not be written as a zero 
 A zero byte real upload is a different thing and should still be copied and still reconcile,
 because a content file that has become zero bytes is a fact worth backing up and noticing.
 
+The diff is the wrong place for a second reason worth writing down. An object filtered there
+has already been counted as source. The three way diff would then see it present in the
+destination and absent from source, which is the exact shape `A2_UNKNOWN_IN_DEST` exists to
+alarm on, so filtering late would manufacture the alarm it was meant to avoid.
+
+Six of the sixteen test cases are pointed the other way, at the zero byte reading rather than
+the placeholder: a real object of zero bytes is kept, an object named
+`.emptyFolderPlaceholder.jpg` is kept, and an object with no metadata at all is kept and
+recorded as zero bytes. A filter that drops any of those is hiding a content failure in
+silence, because a skipped object raises nothing.
+
 Related, and separate: `photographs` holds 336 objects against 316 rows in the `photographs`
 table, so 20 orphan objects under live archive prefixes. Those are real image bytes and they
 stay in scope by design, per constraint 4 and the filter argument above. The count of 22
@@ -467,15 +485,32 @@ on a different scheduler.
 
 | Unit | Where | Schedule | Job |
 |---|---|---|---|
-| `storage-backup-sync` | Inngest cron | daily `0 4 * * *` UTC | list, diff, copy what is new or changed |
+| `storage-backup-sync` | Inngest | **event only, no cron yet** | list, diff, copy what is new or changed |
 | `storage-backup-verify` | Inngest cron | weekly `0 5 * * 0` UTC | structural diff plus full re-hash of the destination |
 | `storage-backup-heartbeat` | Vercel cron route | daily `0 6 * * *` UTC | read the run log, alarm on silence |
 
 Plus one quarterly unit, `storage-backup-drill`, Inngest cron `0 7 1 1,4,7,10 *`, covered in
-section 5.
+section 5. Not built, see section 7 on A7.
 
-04:00 UTC puts the sync after the 03:00 export reaper and clear of the 08:00 and 09:00 cron
-cluster. 05:00 Sunday is clear of `weekly-replay` at 09:00 and `weekly-mirror` at 17:00.
+**The sync intentionally has no cron until build order 9d.** It was specified as daily
+`0 4 * * *` and shipped without it. Registering a cron-triggered sync means the first
+production deploy seeds the whole property overnight, unattended, into a 90 day COMPLIANCE
+lock that nobody can shorten. The per-run byte ceiling does not stop it, because 1073 MB
+against a 3.5 GB ceiling passes. Build order 9a through 9d puts the dissolution dry walk,
+`dissolution-purge.ts`, and the tenet 04 redraft ahead of the first write to B2, and an
+unattended seed inverts all three. So the seed is sent by hand at 9d and the daily cron goes
+on afterwards, as its own commit. `lib/storageBackup.test.ts` fails if a cron reappears here
+before then.
+
+When it is added, 04:00 UTC puts the sync after the 03:00 export reaper and clear of the
+08:00 and 09:00 cron cluster. 05:00 Sunday is clear of `weekly-replay` at 09:00 and
+`weekly-mirror` at 17:00.
+
+Verify and the heartbeat keep their crons from day one. Neither writes to B2. Verify reads
+the destination and re-hashes, and with an empty manifest it has nothing to do, so it is safe
+to have running before the seed. The heartbeat reporting a red `A5_SILENCE` every day until
+9d is correct, not a fault: no successful sync has happened, and that is exactly what the
+alarm is for.
 
 ### 3.1 Why the heartbeat is a Vercel cron and not an Inngest function
 
@@ -533,9 +568,9 @@ exist. Step 4 inside the same step body is safe on retry: the insert is keyed on
 `list-source` step approaches only past roughly 20,000 objects.
 
 The seed run is 376 copy steps plus 4, so 380 on the August 9 basis. That fits, with 2.6x
-headroom and no more. It was 381 before the two deletions in section 0.3, and it becomes 381
-again if the `.emptyFolderPlaceholder` filter in section 2.2 is not built, because the
-placeholder would take a copy step of its own.
+headroom and no more. It was 381 before the two deletions in section 0.3. It would be 381
+again without the section 2.2 placeholder filter, which is built, because the placeholder
+would otherwise take a copy step of its own.
 So the copy list is capped at `MAX_COPIES_PER_RUN = 300`, and a run with more work than
 that emits `storage/backup.sync.continue` and lets a fresh run take the rest. The seed
 takes two runs. This is the mechanism that keeps the design working at 10,000 objects
@@ -1245,8 +1280,19 @@ Nothing moves a byte until steps 1 through 4 are done.
      it. It lands. Only now is there a sentence backed by something that has been executed.
    - **9d. Seed the real property, 376 objects and 1073.09 MB, `kind = 'seed'`,** exempt
      from the per-run ceiling. Paste the run row and the object count. If the count comes
-     back 377, the section 2.2 placeholder filter was not built and a zero byte non-file
+     back 377, the section 2.2 placeholder filter has regressed and a zero byte non-file
      just went under a 90 day lock.
+
+     **The seed is sent by hand. `storage-backup-sync` carries no cron.** It is event
+     triggered only, so nothing seeds on its own, and this step is where the first write to
+     B2 happens on purpose rather than overnight. Send `storage/backup.sync.requested` with
+     `{ "kind": "seed" }`. Run it once with `{ "dryRun": true }` first: a dry run writes
+     nothing at all, not even a run row, so it cannot let the heartbeat read the backup as
+     healthy while nothing has been copied.
+
+     Adding the daily `0 4 * * *` cron is a separate commit, after this run is green and the
+     runbook is signed. A test in `lib/storageBackup.test.ts` fails if a cron reappears on
+     the sync before then.
 
    The cost is one extra seed run and a throwaway archive. Against 1073 MB and a $0.0075
    monthly storage line, that is nothing. The thing it buys is that the first execution of

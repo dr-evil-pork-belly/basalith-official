@@ -242,6 +242,45 @@ describe('the B2 client cannot delete', () => {
   })
 })
 
+describe('the sync does not run itself', () => {
+  // storage-backup-sync is event triggered until build order 9d sends the seed
+  // by hand. A cron here would seed the whole property into a 90 day COMPLIANCE
+  // lock the night after the first deploy, before the dissolution dry walk,
+  // before dissolution-purge.ts exists, and before /data-ownership tenet 04 is
+  // redrafted. Nothing can shorten a COMPLIANCE retention, including the
+  // account root, so this is not a mistake that can be undone next week.
+  //
+  // Asserted on the source because the alternative, importing the module to
+  // read its triggers, pulls a live Inngest client. Same approach as the
+  // vercel.json read in app/api/cron/cron-auth.test.ts.
+  const src = readFileSync(path.resolve(process.cwd(), 'lib/inngest/storageBackupFunctions.ts'), 'utf8')
+
+  const block = (name: string): string => {
+    const start = src.indexOf(`export const ${name} = inngest.createFunction(`)
+    expect(start, `${name} not found`).toBeGreaterThan(-1)
+    const body = src.slice(start)
+    const end = body.indexOf('\n  async ({')
+    expect(end, `${name} config block not found`).toBeGreaterThan(-1)
+    return body.slice(0, end)
+  }
+
+  it('storage-backup-sync declares no cron trigger', () => {
+    expect(block('storageBackupSync')).not.toMatch(/\bcron\s*:/)
+  })
+
+  it('storage-backup-sync is still reachable by event', () => {
+    const b = block('storageBackupSync')
+    expect(b).toMatch(/event:\s*'storage\/backup\.sync\.requested'/)
+    expect(b).toMatch(/event:\s*'storage\/backup\.sync\.continue'/)
+  })
+
+  it('storage-backup-verify keeps its weekly cron, so this gate discriminates', () => {
+    // Without this the two assertions above would pass on a file that had lost
+    // every trigger, or on a block matcher that silently matched nothing.
+    expect(block('storageBackupVerify')).toMatch(/cron:\s*'0 5 \* \* 0'/)
+  })
+})
+
 describe('the diff copies what is new or changed and nothing else', () => {
   const src = (over: Partial<SourceObject> = {}): SourceObject => ({
     bucket: 'photographs',

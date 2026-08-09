@@ -29,6 +29,7 @@ import {
   checkBudget,
   checkRoster,
   diffSourceAgainstManifest,
+  isEmptyFolderPlaceholder,
   manifestSnapshotKey,
   threeWayDiff,
   toSnapshotEntry,
@@ -83,8 +84,14 @@ async function alertAdmin(subject: string, lines: string[]): Promise<void> {
 
 // ── Shared I/O helpers ───────────────────────────────────────────────────────
 
-/** Recursive, paginated listing of one bucket. Supabase caps a page at 1000. */
-async function walkBucket(bucket: string, prefix: string, out: SourceObject[]): Promise<void> {
+/**
+ * Recursive, paginated listing of one bucket. Supabase caps a page at 1000.
+ *
+ * Exported for lib/inngest/storageBackupWalk.test.ts. It is the only place the
+ * placeholder filter is applied, so it is the only place that can be tested for
+ * having it.
+ */
+export async function walkBucket(bucket: string, prefix: string, out: SourceObject[]): Promise<void> {
   const PAGE = 1000
   for (let offset = 0; ; offset += PAGE) {
     const { data, error } = await supabaseAdmin.storage
@@ -98,6 +105,13 @@ async function walkBucket(bucket: string, prefix: string, out: SourceObject[]): 
       // A folder placeholder has a null id. A real object does not.
       if ((entry as { id?: string | null }).id === null) {
         await walkBucket(bucket, full, out)
+      } else if (isEmptyFolderPlaceholder(entry.name)) {
+        // Supabase's empty-prefix marker. It has a real id, so the id check
+        // above does not catch it, and without this it is copied to B2 under a
+        // 90 day lock as a zero byte non-file. Dropped here on the source walk
+        // so it never becomes a SourceObject and never reaches the diff.
+        // Name match only. See isEmptyFolderPlaceholder for why not by size.
+        continue
       } else {
         const md = entry.metadata as { size?: number; eTag?: string } | null
         out.push({
@@ -188,8 +202,26 @@ export const storageBackupSync = inngest.createFunction(
     // One at a time. Two syncs racing would double-read the same objects
     // against a metered egress line and interleave their byte accounting.
     concurrency: { limit: 1 },
+    // EVENT TRIGGERED ONLY, DELIBERATELY. There is no cron here yet.
+    //
+    // A '0 4 * * *' cron was specified and is not wired, because registering
+    // this function would then have seeded the whole property on its own, the
+    // night after the first production deploy. The seed writes every in-scope
+    // object into B2 under a 90 day COMPLIANCE lock, which nobody can shorten,
+    // including the account root. The per-run byte ceiling does not stop it:
+    // 1073 MB against a 3.5 GB ceiling passes.
+    //
+    // Build order 9a through 9d in docs/STORAGE_BACKUP_SKELETON_2026-08.md puts
+    // three things before that first write: the dissolution dry walk on a
+    // throwaway archive, dissolution-purge.ts existing and proven, and the
+    // /data-ownership tenet 04 redraft. An unattended seed inverts all three
+    // and falsifies a published promise while it does it.
+    //
+    // So the seed is sent by hand at 9d, as
+    // `storage/backup.sync.requested` with `{ kind: 'seed' }`. The daily cron
+    // goes on AFTER that run is green and the runbook is signed, and adding it
+    // is a deliberate commit of its own, not a line someone uncomments.
     triggers: [
-      { cron: '0 4 * * *' },
       { event: 'storage/backup.sync.requested' },
       { event: 'storage/backup.sync.continue' },
     ],
