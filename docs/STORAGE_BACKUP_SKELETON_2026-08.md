@@ -116,6 +116,51 @@ This is not a backup problem and it does not block this build. It is named here 
 is live now, it is the most concentrated sensitive data on the property, and the branch
 that fixes it is sitting uncommitted in the same working tree this build will branch from.
 
+**CLOSED, August 9, 2026.** Both objects were deleted before their August 11 deadline, as an
+explicit one-off rather than by the reaper, and `archive-exports` is now empty. Neither was a
+family-requested export. Both were probe artifacts, which is what made deleting them
+directly safe and what decoupled the deadline from the deploy schedule.
+
+```
+=== BEFORE ===
+  a38e4503-.../probe-20260804175819.zip   196.33 MB  created=2026-08-04T17:59:48.881Z
+  a38e4503-.../probe-20260804180747.zip   196.33 MB  created=2026-08-04T18:09:08.918Z
+  total objects: 2
+=== AFTER ===
+  (no objects)
+  total objects: 0
+```
+
+The reaper itself is committed as of the same day, ahead of this branch, and this branch is
+rebased onto it. It carries a dry-run mode and 19 test cases that did not exist when the
+paragraph above was written.
+
+Section 0.2 is restated from a live read taken August 9 after the deletion:
+
+```
+=== OBJECT COUNTS AND BYTES PER BUCKET (August 9, 2026) ===
+vault-files             1 objs       4.06 MB
+voice-recordings       36 objs      22.37 MB
+photographs           337 objs    1006.87 MB
+archive-videos          4 objs      43.85 MB
+archive-documents       0 objs       0.00 MB
+archive-exports         0 objs       0.00 MB
+GRAND TOTAL           378 objs    1077.15 MB  (1129471244 bytes)
+```
+
+**In scope for the sync: 377 objects, 1073.09 MB**, the four allowlist buckets. The grand
+total fell by exactly the two deleted objects. The in-scope figure fell by 3.08 MB, which
+the deletion does not explain.
+
+**Open, and not explained here.** `photographs` reads 1006.87 MB today against 1009.95 MB
+on August 8, at an identical object count of 337. Same number of objects, 3.08 MB lighter.
+That is either a re-upload that replaced an object with a smaller one, or a difference in
+how the two walks measured, and this session did not establish which. It is small and it
+does not move any threshold in section 6, but a content bucket losing bytes without losing
+objects is exactly the kind of thing this build exists to notice, so it is recorded rather
+than smoothed over. First sync will fix the basis either way, because the manifest hashes
+what is actually there.
+
 ### 0.4 `archives.termination_requested_at` exists live. VERIFIED August 8
 
 Section 2.1's dissolution filter and the section 9 copy work both rest on this column. It
@@ -706,12 +751,38 @@ send failures are caught and logged and never mask the original failure, same as
 | `A4_UNKNOWN_BUCKET` | Live bucket not in allowlist ∪ excluded | alarm | continues on the allowlist, run stays green, alarm sent |
 | `A5_SILENCE` | No successful sync in 8 days, or no successful verify in 10 days | hard | heartbeat run is red |
 | `A6_BUDGET_EXCEEDED` | Per-run or rolling 30 day source byte ceiling breached | hard | aborted, red |
-| `A7_DRILL_FAILED` | A drill object failed its structural decode | hard | red |
+| `A7_DRILL_FAILED` **(specified, not implemented)** | A drill object failed its structural decode | hard | red |
 | `A8_CAPPED` | `MAX_COPIES_PER_RUN` reached, work deferred to a continuation | notice | green, count logged |
+| `A9_ALLOWLIST_BUCKET_MISSING` | Allowlist bucket absent from `listBuckets`. Buckets named. | hard | red |
+| `A10_MANIFEST_MISSING_IN_DEST` | Manifest row with no object in B2 | hard | red |
 
 `A4` does not fail the run on purpose. A new bucket appearing is a thing to know about
 within a day, not a reason to stop backing up the four buckets on the allowlist. It must
 never be silent and it must never auto-include.
+
+`A9` is the deliberate mirror of `A4` and goes the other way. An unknown bucket appearing
+is a decision to make later. An allowlist bucket disappearing from the roster is a partial
+property, and syncing it as if it were whole is worse than not syncing: the absent bucket's
+objects drop out of the source listing, so the diff reads them as deletions rather than as
+an outage. This job does not propagate deletions, so nothing in B2 would be lost, but the
+run would report green over a backup that silently stopped covering a whole bucket. Hard
+and red.
+
+`A7` is the one row in this table with no code behind it. The other nine are emitted by
+`lib/inngest/storageBackupFunctions.ts` today. A7 belongs to the quarterly restore drill in
+section 5, **V4**, which is specified there in full and has not been built: the programmatic
+half asserting the JPEG SOI and EOI markers, the webm EBML header, and the mp4 `ftyp` box,
+and the human half putting three signed links in the alert email. Until V4 exists, nothing
+can raise A7, which means the failure it names, bytes that were written but are not
+decodable, is currently uncaught. V2 and V3 prove the bytes are present and identical. Only
+V4 proves they are usable, and that distinction is the reason the drill is in the plan
+rather than being treated as covered by re-hashing.
+
+`A10` fires in `storage-backup-verify`, not in the sync. Object Lock is supposed to make a
+manifest row with no object in B2 impossible, so it firing is not a copy that went missing.
+It is evidence that the retention lock is not doing what the design assumes, which is the
+one belief the entire additive-only posture rests on. Hard and red, and it is the alarm
+that should trigger a look at the bucket's lock configuration rather than a re-run.
 
 Every failure path throws so the run is red in Inngest rather than quietly green, which is
 the pattern `buildArchiveExportJob` already uses.
