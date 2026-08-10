@@ -3,6 +3,21 @@
 --
 -- Paste into the Supabase SQL editor. Do not run from a sandbox or the CLI.
 --
+-- ── HOW TO RUN THIS. DO NOT PASTE THE WHOLE FILE AT ONCE ─────────────────────
+--
+-- Four separate runs, in this order:
+--
+--   1. Section 0 alone. Read the constraint name it returns before continuing.
+--   2. Sections 1 through 4 together. That is the whole migration.
+--   3. Sections 5a through 5d together. All four are read-only.
+--   4. Sections 5e through 5j ONE BLOCK AT A TIME.
+--
+-- Step 4 matters. 5f, 5g, and 5h are SUPPOSED to raise an error, and in the
+-- Supabase editor an error aborts every statement after it in the same run. Sent
+-- as one paste, the first expected error would swallow the blocks that follow and
+-- the run would look like a failed migration instead of three passing negative
+-- tests. Send each block on its own and read its result before the next.
+--
 -- Spec:     docs/STORAGE_BACKUP_SKELETON_2026-08.md build order 9a.
 -- Parent:   supabase/migrations/20260808_storage_backup_manifest.sql
 -- Code:     lib/storageBackup.ts SCOPED_RUN_KIND and applyArchiveScope.
