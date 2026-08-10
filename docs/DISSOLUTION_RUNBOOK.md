@@ -121,10 +121,53 @@ archive's photos live under the B2 prefix `photographs/{archive_id}/`.
 
 ### 1.4 Before first use, once, ever
 
+- [ ] Read 1.5, so the red verify that follows 9a is expected rather than investigated.
 - [ ] Walk section 4 against a disposable test archive with real objects in it, and correct
       every command that does not work as written. Record the date of that walk here:
 
       Dry walk completed on: ________________  by: ________________
+
+### 1.5 The alarm you will see during the drill, and the date it must stop
+
+Between build order 9a and 9d the weekly verify goes red every Sunday, on purpose. This
+section exists because it was written before 9a was run, not after the first email arrived.
+
+**What fires.** `storage-backup-verify`, Inngest cron `0 5 * * 0`, raises
+`A1_MISSING_IN_DEST`. After 9a the manifest holds the disposable archive alone while the
+source still holds the whole property, so the three way diff reports every other object as
+present in source and absent from B2. That is roughly 376 objects.
+
+**What it does.** A1 is a hard alarm. It is not in `SOFT_ALARMS`, so the run closes
+`ok = false`, sends the admin email, and then throws. `storage-backup-verify` carries
+`retries: 2`, so one Sunday produces up to three red runs and three emails. Expect that.
+It is one fault reported three times, not three faults.
+
+**A5 as well.** A red verify never records a successful verify, so the heartbeat keeps
+reporting `A5_SILENCE` on the verify side for the whole window. The sync side stays silent
+too, because a scoped run carries `kind = 'scoped'` and the heartbeat counts only `sync`
+and `seed`. Neither is a second problem.
+
+**How to tell it is the expected one.** The email says so itself. While the window is open,
+A1's detail carries a sentence beginning `EXPECTED DURING THIS WINDOW ONLY`, generated from
+`storage_backup_runs` rather than from anyone's memory of the date. The condition is exactly
+this: a successful `kind = 'scoped'` run exists and no successful `kind = 'seed'` run does.
+
+**The rule, and it has no exceptions.**
+
+- A1 **without** that sentence is real. Treat it as the failure the backup exists to catch.
+- A1 **with** that sentence, after 9d has run, is real too. The sentence cannot appear once
+  a successful seed exists, so reading one means either something wrote a seed row that did
+  not seed, or the window query is wrong. Both are worse than the alarm.
+- A1 is never "fine." It is expected inside one named window, which closes at 9d.
+
+**When it stops.** At the first successful `kind = 'seed'` run. If A1 still fires on the
+Sunday after 9d, the seed did not cover the property, and that is the alarm working.
+
+**Close this out.** Record the window, so nobody reconstructs it from memory later:
+
+      9a scoped run completed on:  ________________
+      9d full seed completed on:   ________________
+      First green verify after 9d: ________________
 
 ---
 

@@ -24,6 +24,8 @@ import {
   LOCK_RETENTION_DAYS,
   MAX_COPIES_PER_RUN,
   ROLLING_WINDOW_DAYS,
+  SCOPED_RUN_KIND,
+  a1MissingDetail,
   archiveIdFromPath,
   b2Key,
   checkBudget,
@@ -570,12 +572,41 @@ export const storageBackupVerify = inngest.createFunction(
         manifestKeys: manifest.map((m) => m.b2_key),
       })
 
+      // Is the build order 9a to 9d window open? A scoped run has completed and
+      // no full seed has. Read from the run table, not inferred from the shape
+      // of the manifest: a property that genuinely held one archive would look
+      // identical from the manifest and would get an excuse it has not earned.
+      //
+      // This does NOT downgrade A1. A1 stays hard, the run still closes ok:false
+      // and still throws. It only makes the email say why it is expected today
+      // and when it stops being expected. Skeleton build order 9a, runbook 1.5.
+      const scopedSeedWindow = await step.run('scoped-seed-window', async () => {
+        const [scoped, seeded] = await Promise.all([
+          supabaseAdmin
+            .from('storage_backup_runs')
+            .select('id')
+            .eq('kind', SCOPED_RUN_KIND)
+            .eq('ok', true)
+            .limit(1),
+          supabaseAdmin
+            .from('storage_backup_runs')
+            .select('id')
+            .eq('kind', 'seed')
+            .eq('ok', true)
+            .limit(1),
+        ])
+        if (scoped.error) throw new Error(`scoped-seed-window scoped: ${scoped.error.message}`)
+        if (seeded.error) throw new Error(`scoped-seed-window seed: ${seeded.error.message}`)
+        return (scoped.data?.length ?? 0) > 0 && (seeded.data?.length ?? 0) === 0
+      })
+
       if (diff.inSourceNotDest.length) {
         alarms.push({
           code: ALARM.A1_MISSING_IN_DEST,
-          detail: `${diff.inSourceNotDest.length} object(s) in source, absent from B2: ${diff.inSourceNotDest
-            .slice(0, 20)
-            .join(', ')}`,
+          detail: a1MissingDetail({
+            missingKeys: diff.inSourceNotDest,
+            scopedSeedWindow,
+          }),
         })
       }
       if (diff.inDestNotManifest.length) {
