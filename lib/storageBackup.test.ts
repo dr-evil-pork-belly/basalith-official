@@ -32,6 +32,10 @@ import {
   MAX_COPIES_PER_RUN,
   PER_RUN_SOURCE_BYTE_CEILING,
   ROLLING_30D_SOURCE_BYTE_CEILING,
+  SCOPED_RUN_KIND,
+  SCOPED_SEED_WINDOW_NOTE,
+  a1MissingDetail,
+  applyArchiveScope,
   archiveIdFromPath,
   b2Key,
   checkBudget,
@@ -353,6 +357,92 @@ describe('the diff copies what is new or changed and nothing else', () => {
   })
 })
 
+describe('A1 explains the scoped seed window without becoming excusable', () => {
+  const keys = ['photographs/aaa/1.jpg', 'photographs/aaa/2.jpg']
+
+  it('says nothing extra outside the window', () => {
+    const d = a1MissingDetail({ missingKeys: keys, scopedSeedWindow: false })
+    expect(d).toContain('2 object(s) in source, absent from B2')
+    expect(d).not.toContain('EXPECTED DURING THIS WINDOW')
+    expect(d).not.toContain('9a')
+  })
+
+  it('explains itself inside the window', () => {
+    const d = a1MissingDetail({ missingKeys: keys, scopedSeedWindow: true })
+    expect(d).toContain('2 object(s) in source, absent from B2')
+    expect(d).toContain(SCOPED_SEED_WINDOW_NOTE)
+  })
+
+  it('the note states its own expiry, so it cannot teach that A1 is ever just fine', () => {
+    // The failure to guard against is not the alarm firing. It is an operator
+    // learning across a few weeks that A1 is sometimes acceptable and carrying
+    // that past 9d. The note has to close itself.
+    expect(SCOPED_SEED_WINDOW_NOTE).toMatch(/disappears/i)
+    expect(SCOPED_SEED_WINDOW_NOTE).toMatch(/A1 without this sentence is real/i)
+    expect(SCOPED_SEED_WINDOW_NOTE).toMatch(/after the full seed has run, is also real/i)
+  })
+
+  it('still truncates the key list at twenty', () => {
+    const many = Array.from({ length: 50 }, (_, i) => `photographs/aaa/${i}.jpg`)
+    const d = a1MissingDetail({ missingKeys: many, scopedSeedWindow: false })
+    expect(d).toContain('50 object(s)')
+    expect(d.match(/photographs\//g) ?? []).toHaveLength(20)
+  })
+
+  it('the note does not downgrade A1 to a soft alarm', () => {
+    // A1 must stay hard: the run closes ok:false and throws. The note changes
+    // the wording of the email and nothing about the severity.
+    const fns = readFileSync(
+      path.resolve(process.cwd(), 'lib/inngest/storageBackupFunctions.ts'),
+      'utf8',
+    )
+    // Match past the ] in the AlarmCode[] type annotation to the array literal.
+    const soft = fns.match(/const SOFT_ALARMS[^=]*=\s*\[[^\]]*\]/)?.[0] ?? ''
+    expect(soft).toBeTruthy() // control: the line was actually found
+    expect(soft).toMatch(/A4_UNKNOWN_BUCKET/)
+    expect(soft).not.toMatch(/A1_MISSING_IN_DEST/)
+  })
+})
+
+describe('the change detection key cannot be forged by the content it separates', () => {
+  it('does not merge two objects that a space separated key would collide', () => {
+    // Under a space both sides render 'photographs a 1 2 3'. The diff would read
+    // this source object as already in the manifest and never copy it, which is
+    // a real object silently absent from the backup. Supabase paths do contain
+    // spaces. This test fails if the \0 separator becomes ' '.
+    const source: SourceObject[] = [
+      { bucket: 'photographs', path: 'a 1', size: 2, etag: '3', createdAt: null },
+    ]
+    const manifest = [{ bucket: 'photographs', path: 'a', size_bytes: 1, source_etag: '2 3' }]
+
+    const d = diffSourceAgainstManifest(source, manifest)
+    expect(d.toCopy).toHaveLength(1)
+    expect(d.unchanged).toBe(0)
+  })
+
+  it('still recognises an object that genuinely is unchanged', () => {
+    // Control. Without it the assertion above would also pass on a key function
+    // that returned something different on every call.
+    const source: SourceObject[] = [
+      { bucket: 'photographs', path: 'a 1', size: 2, etag: '3', createdAt: null },
+    ]
+    const manifest = [{ bucket: 'photographs', path: 'a 1', size_bytes: 2, source_etag: '3' }]
+
+    expect(diffSourceAgainstManifest(source, manifest).unchanged).toBe(1)
+  })
+
+  it('the source file holds no raw NUL byte, so ripgrep can still search it', () => {
+    // Three literal 0x00 bytes lived on the changeKey line until August 9, 2026.
+    // Byte identical at runtime, and invisible in review because they render as
+    // spaces. The cost was that ripgrep classified the whole module as binary
+    // and returned NO MATCHES for any search against it, which silently breaks
+    // recon on the file that defines the backup's scope rules.
+    const src = readFileSync(path.resolve(process.cwd(), 'lib/storageBackup.ts'), 'utf8')
+    expect(src).not.toContain('\u0000')
+    expect(src).toContain('${bucket}\\0${path}')
+  })
+})
+
 describe('the three way structural diff classifies each set correctly', () => {
   const d = threeWayDiff({
     sourceKeys: ['photographs/a/1.jpg', 'photographs/a/2.jpg'],
@@ -508,5 +598,192 @@ describe('keys, paths, and the snapshot shape', () => {
 describe('KNOWN_BUCKETS is the union the roster alarm compares against', () => {
   it('is the allowlist plus the excluded list, with nothing else', () => {
     expect([...KNOWN_BUCKETS].sort()).toEqual([...LIVE_BUCKETS].sort())
+  })
+})
+
+describe('the archive scope narrows the source set before the diff', () => {
+  // Real ids from CLAUDE.md section 11, plus the f44f1818 prefix, which has
+  // objects in Storage and no archives row.
+  const HA = 'a38e4503-c7d2-4af3-af8c-cacd66974e0b'
+  const FOUNDER = '6c0722d3-719a-423f-9024-621ba0072d6f'
+  const ORPHAN = 'f44f1818-8f17-499d-8f27-23e286e923f7'
+
+  const obj = (p: string): SourceObject => ({
+    bucket: 'photographs',
+    path: p,
+    size: 100,
+    etag: 'e',
+    createdAt: '2026-08-01T00:00:00Z',
+  })
+
+  const SOURCE = [
+    obj(`${HA}/one.jpeg`),
+    obj(`${HA}/two.jpeg`),
+    obj(`${FOUNDER}/three.jpeg`),
+    obj(`${ORPHAN}/four.jpeg`),
+    obj('legacy-import/five.jpeg'), // no uuid first segment at all
+  ]
+
+  const paths = (r: { kept: SourceObject[] }) => r.kept.map((o) => o.path)
+
+  it('keeps everything when no scope is given, so wiring it in changes nothing today', () => {
+    const r = applyArchiveScope(SOURCE)
+    expect(r.kept).toHaveLength(5)
+    expect(r.droppedOutOfScope).toBe(0)
+    expect(r.droppedTerminated).toBe(0)
+  })
+
+  // ── The dissolution filter ────────────────────────────────────────────────
+
+  it('drops every object belonging to a terminated archive', () => {
+    const r = applyArchiveScope(SOURCE, { terminatedArchiveIds: [HA] })
+    expect(paths(r)).not.toContain(`${HA}/one.jpeg`)
+    expect(paths(r)).not.toContain(`${HA}/two.jpeg`)
+    expect(r.droppedTerminated).toBe(2)
+  })
+
+  it('keeps an object with no uuid prefix, because it can never be terminated', () => {
+    // The asymmetry that matters. An object with no archives row cannot be the
+    // subject of a termination request, so dropping it would shrink the backup
+    // with no alarm anywhere. Skeleton 2.1.
+    const r = applyArchiveScope(SOURCE, { terminatedArchiveIds: [HA] })
+    expect(paths(r)).toContain('legacy-import/five.jpeg')
+  })
+
+  it('leaves archives that are not terminated alone', () => {
+    const r = applyArchiveScope(SOURCE, { terminatedArchiveIds: [HA] })
+    expect(paths(r)).toContain(`${FOUNDER}/three.jpeg`)
+    expect(paths(r)).toContain(`${ORPHAN}/four.jpeg`)
+  })
+
+  it('matches a terminated id whatever case it arrives in', () => {
+    const r = applyArchiveScope(SOURCE, { terminatedArchiveIds: [HA.toUpperCase()] })
+    expect(r.droppedTerminated).toBe(2)
+  })
+
+  // ── The 9a single archive scope ───────────────────────────────────────────
+
+  it('keeps only the target archive', () => {
+    const r = applyArchiveScope(SOURCE, { onlyArchiveId: HA })
+    expect(paths(r)).toEqual([`${HA}/one.jpeg`, `${HA}/two.jpeg`])
+    expect(r.droppedOutOfScope).toBe(3)
+  })
+
+  it('drops an object with no uuid prefix, because only this archive means only this archive', () => {
+    const r = applyArchiveScope(SOURCE, { onlyArchiveId: HA })
+    expect(paths(r)).not.toContain('legacy-import/five.jpeg')
+  })
+
+  it('accepts an uppercase target id', () => {
+    const r = applyArchiveScope(SOURCE, { onlyArchiveId: HA.toUpperCase() })
+    expect(r.kept).toHaveLength(2)
+  })
+
+  // ── Precedence ────────────────────────────────────────────────────────────
+
+  it('drops an archive that is both the scope target and terminated', () => {
+    // No explicit request may override a termination. A COMPLIANCE lock cannot
+    // be shortened by anyone, including the account root, so this is the one
+    // ordering in the file that is not a preference.
+    const r = applyArchiveScope(SOURCE, { onlyArchiveId: HA, terminatedArchiveIds: [HA] })
+    expect(r.kept).toHaveLength(0)
+    expect(r.droppedTerminated).toBe(2)
+  })
+
+  it('attributes an object that is both out of scope and terminated to the termination', () => {
+    // The only case where the two counters could disagree. Both filters are
+    // continue guards, so which one drops it does not change what is copied,
+    // but it does change what the run row reports. Terminated is the stronger
+    // fact about an object and is the one worth reading in the log.
+    const r = applyArchiveScope(SOURCE, { onlyArchiveId: FOUNDER, terminatedArchiveIds: [HA] })
+    expect(paths(r)).toEqual([`${FOUNDER}/three.jpeg`])
+    expect(r.droppedTerminated).toBe(2)
+    expect(r.droppedOutOfScope).toBe(2) // the orphan and the non-uuid path
+  })
+
+  // ── Malformed input throws, in both directions ────────────────────────────
+
+  it('throws on a malformed onlyArchiveId rather than seeding the whole property', () => {
+    expect(() => applyArchiveScope(SOURCE, { onlyArchiveId: 'not-a-uuid' })).toThrow(/not a uuid/)
+  })
+
+  it('throws on an empty onlyArchiveId, which would otherwise read as no scope', () => {
+    // The classic falsy footgun. '' must not quietly mean "copy everything".
+    expect(() => applyArchiveScope(SOURCE, { onlyArchiveId: '' })).toThrow(/not a uuid/)
+  })
+
+  it('throws on a malformed terminated id rather than copying a family that asked to be forgotten', () => {
+    expect(() => applyArchiveScope(SOURCE, { terminatedArchiveIds: ['nonsense'] })).toThrow(
+      /not a uuid/,
+    )
+  })
+
+  it('treats an explicit null onlyArchiveId as no scoping', () => {
+    expect(applyArchiveScope(SOURCE, { onlyArchiveId: null }).kept).toHaveLength(5)
+  })
+})
+
+describe('a scoped run cannot read as a full sync', () => {
+  // The whole safety argument for build order 9a. The heartbeat clears
+  // A5_SILENCE from the latest ok run of kind 'sync' or 'seed' and reads
+  // started_at only, never objects_copied. A scoped run wearing either kind
+  // would report the backup healthy for 8 days having copied one archive.
+  const heartbeat = readFileSync(
+    path.resolve(process.cwd(), 'app/api/cron/storage-backup-heartbeat/route.ts'),
+    'utf8',
+  )
+
+  it('the scoped kind is neither of the two kinds that clear silence', () => {
+    expect(SCOPED_RUN_KIND).not.toBe('seed')
+    expect(SCOPED_RUN_KIND).not.toBe('sync')
+  })
+
+  it('the heartbeat still counts sync and seed, so this gate discriminates', () => {
+    expect(heartbeat).toMatch(/lastSuccess\('sync'\)/)
+    expect(heartbeat).toMatch(/\.eq\('kind', 'seed'\)/)
+  })
+
+  it('the heartbeat filters by kind at all', () => {
+    // The dangerous regression is not adding 'scoped' to the heartbeat. It is
+    // dropping the kind filter, after which every run of every kind clears
+    // silence and the two assertions above still pass.
+    expect(heartbeat).toMatch(/\.eq\('kind', kind\)/)
+  })
+
+  it('the heartbeat never counts a scoped run toward silence', () => {
+    // Both spellings. The literal is the likely one, the imported constant is
+    // the one a careful person reaches for, and only checking the literal would
+    // let the careful version through.
+    expect(heartbeat).not.toMatch(new RegExp(`'${SCOPED_RUN_KIND}'`))
+    expect(heartbeat).not.toMatch(/SCOPED_RUN_KIND/)
+  })
+
+  const migration = readFileSync(
+    path.resolve(process.cwd(), 'supabase/migrations/20260809_storage_backup_scoped_kind.sql'),
+    'utf8',
+  )
+
+  it('the migration allows the kind the code intends to write', () => {
+    // A typo between the constant and the CHECK would not surface until an
+    // insert failed in production, mid run, after objects were already in B2.
+    expect(migration).toMatch(new RegExp(`CHECK \\(kind IN \\([^)]*'${SCOPED_RUN_KIND}'`))
+  })
+
+  it('the migration forces a scoped run to name the archive it covered', () => {
+    // Provenance, not safety. The kind carries the safety property. This one
+    // closes the case the derivation cannot reach: a scoped run that copied zero
+    // objects has no rows in storage_backup_objects to join to, and a zero-copy
+    // run is exactly what someone would be investigating.
+    expect(migration).toMatch(/storage_backup_runs_scope_matches_kind/)
+    expect(migration).toMatch(
+      /CHECK \(\(kind = 'scoped'\) = \(scope_archive_id IS NOT NULL\)\)/,
+    )
+  })
+
+  it('the migration adds no foreign key from scope_archive_id to archives', () => {
+    // A cascade would erase the record of the run at the moment the archive is
+    // deleted, which for a disposable 9a archive is the moment the run row
+    // becomes the only surviving evidence of the drill. Parent migration 2a.
+    expect(migration).not.toMatch(/scope_archive_id\s+UUID\s+REFERENCES/i)
   })
 })

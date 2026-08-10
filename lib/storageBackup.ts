@@ -165,6 +165,43 @@ export interface Alarm {
   detail: string
 }
 
+/**
+ * Appended to A1's detail while the build order 9a to 9d window is open, and
+ * never at any other time.
+ *
+ * A1 is the alarm the whole system exists to raise, and between 9a and 9d it
+ * fires every Sunday for a reason that is expected: one disposable archive is in
+ * the manifest and the rest of the property has deliberately not been copied
+ * yet. The risk is not the alarm. It is an operator learning across a few weeks
+ * that A1 is sometimes fine, and carrying that lesson past 9d.
+ *
+ * So the note is conditional, not permanent. It states its own expiry, and it is
+ * computed from storage_backup_runs rather than from anyone's memory of what
+ * month it is. The moment a successful seed run exists, this sentence stops
+ * appearing and A1 goes back to meaning exactly one thing.
+ */
+export const SCOPED_SEED_WINDOW_NOTE =
+  'EXPECTED DURING THIS WINDOW ONLY. A kind=scoped run has completed and no full ' +
+  'seed has, which is build order 9a to 9d: the manifest holds one disposable ' +
+  'archive on purpose and the rest of the property has never been copied. This ' +
+  'sentence is generated from the run table and disappears the moment a ' +
+  'successful seed exists. A1 without this sentence is real. A1 with it, after ' +
+  'the full seed has run, is also real. See docs/DISSOLUTION_RUNBOOK.md 1.5.'
+
+/**
+ * A1's detail line. Pure, so the wording and the condition are testable without
+ * a Supabase client or a B2 client.
+ */
+export function a1MissingDetail(params: {
+  missingKeys: readonly string[]
+  scopedSeedWindow: boolean
+}): string {
+  const head =
+    `${params.missingKeys.length} object(s) in source, absent from B2: ` +
+    params.missingKeys.slice(0, 20).join(', ')
+  return params.scopedSeedWindow ? `${head}. ${SCOPED_SEED_WINDOW_NOTE}` : head
+}
+
 // ── Keys and paths ───────────────────────────────────────────────────────────
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -239,6 +276,126 @@ export function checkRoster(liveBuckets: string[]): RosterResult {
   }
 }
 
+// ── Archive scope ────────────────────────────────────────────────────────────
+
+/**
+ * The run kind written by a scoped run. NOT 'seed' and NOT 'sync', deliberately.
+ *
+ * app/api/cron/storage-backup-heartbeat/route.ts clears A5_SILENCE from the
+ * latest ok run of kind 'sync' or 'seed', and reads started_at only. It never
+ * looks at objects_copied. So a scoped run recorded as a seed would turn the
+ * heartbeat green for 8 days on the strength of having copied one archive,
+ * which is the silence failure the dryRun branch of storageBackupSync already
+ * refuses to commit, in its partial form.
+ *
+ * Carrying a kind the heartbeat does not query means that property holds by
+ * construction rather than by a filter someone has to remember. 'drill' already
+ * behaves this way. Allowed by the CHECK on storage_backup_runs.kind as of
+ * supabase/migrations/20260809_storage_backup_scoped_kind.sql.
+ */
+export const SCOPED_RUN_KIND = 'scoped'
+
+export interface ArchiveScope {
+  /**
+   * Build order 9a. Keep only objects under this archive id. Undefined or null
+   * means no scoping at all.
+   */
+  onlyArchiveId?: string | null
+  /**
+   * Archive ids carrying a non-null archives.termination_requested_at. Their
+   * objects leave the source set.
+   */
+  terminatedArchiveIds?: readonly string[]
+}
+
+export interface ArchiveScopeResult {
+  kept: SourceObject[]
+  /** Dropped by onlyArchiveId. Reported so a scoped run can log its own narrowness. */
+  droppedOutOfScope: number
+  /** Dropped by the dissolution filter. */
+  droppedTerminated: number
+}
+
+function requireUuid(value: string, field: string): string {
+  if (!UUID_RE.test(value)) {
+    throw new Error(
+      `[storage-backup] ${field} is not a uuid: ${JSON.stringify(value)}. Refusing to run ` +
+        `rather than applying a filter that matches nothing.`,
+    )
+  }
+  return value.toLowerCase()
+}
+
+/**
+ * Two filters on the source set, both keyed on the archive id in the object
+ * path, applied together between the walk and the diff.
+ *
+ * They exist for opposite reasons, and they treat a missing archive id
+ * oppositely. That asymmetry is the part that goes wrong silently if it is not
+ * written down:
+ *
+ *   terminatedArchiveIds  The dissolution filter. Skeleton 2.1, and
+ *                         DISSOLUTION_RUNBOOK.md section 3 already states this
+ *                         behaviour as live. An object whose path carries no
+ *                         uuid prefix is KEPT. An object with no archives row
+ *                         can never be the subject of a termination request,
+ *                         and dropping it would shrink the backup with no alarm
+ *                         anywhere, which is the one thing this job must not do.
+ *
+ *   onlyArchiveId         Build order 9a. An object whose path carries no uuid
+ *                         prefix is DROPPED, because only this archive means
+ *                         only this archive. The 22 orphans and the f44f1818
+ *                         prefix are out of a scoped run by definition.
+ *
+ * Terminated wins. An id that is both the scope target and terminated is
+ * dropped. Writing a terminated archive into a 90 day COMPLIANCE lock is the
+ * one outcome here that nobody can undo, including the account root, so no
+ * explicit request is allowed to override it.
+ *
+ * A malformed id throws rather than filtering nothing. Both silent-failure
+ * directions are unacceptable in different ways: a bad onlyArchiveId would turn
+ * a scoped run into a full property seed, and a bad terminated id would keep
+ * copying a family that asked to be forgotten. A red run is the correct amount
+ * of noise for either.
+ *
+ * The sync is additive, so this stops FUTURE copies and does nothing to what is
+ * already in B2. Those objects come out only through DISSOLUTION_RUNBOOK.md
+ * section 4. Never read a clean result here as "the backup no longer holds it."
+ */
+export function applyArchiveScope(
+  objects: readonly SourceObject[],
+  scope: ArchiveScope = {},
+): ArchiveScopeResult {
+  const only =
+    scope.onlyArchiveId === undefined || scope.onlyArchiveId === null
+      ? null
+      : requireUuid(scope.onlyArchiveId, 'onlyArchiveId')
+
+  const terminated = new Set(
+    (scope.terminatedArchiveIds ?? []).map((id) => requireUuid(id, 'terminatedArchiveIds entry')),
+  )
+
+  const kept: SourceObject[] = []
+  let droppedOutOfScope = 0
+  let droppedTerminated = 0
+
+  for (const object of objects) {
+    const archiveId = archiveIdFromPath(object.path)
+
+    if (archiveId !== null && terminated.has(archiveId)) {
+      droppedTerminated += 1
+      continue
+    }
+    if (only !== null && archiveId !== only) {
+      droppedOutOfScope += 1
+      continue
+    }
+    kept.push(object)
+  }
+
+  return { kept, droppedOutOfScope, droppedTerminated }
+}
+
 // ── Diff ─────────────────────────────────────────────────────────────────────
 
 export interface SourceObject {
@@ -266,9 +423,32 @@ export interface ManifestEntry {
  * Known limit: an overwrite that keeps the same byte length AND produces the
  * same eTag would be missed. Supabase returns an eTag on every object, so this
  * needs the storage backend to reuse one, which it does not do in practice.
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * THE SEPARATOR IS \0 AND IT MUST NOT BECOME A SPACE.
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * NUL is the one byte that cannot occur in a bucket name, an object path, or an
+ * eTag, so it is the only separator that cannot be forged by the content it
+ * separates. A space can. Under a space these two are the same key:
+ *
+ *   path 'a 1', size 2, etag '3'      ->  'photographs a 1 2 3'
+ *   path 'a',   size 1, etag '2 3'    ->  'photographs a 1 2 3'
+ *
+ * and the diff would read a real, uncopied object as already backed up and
+ * never copy it. Supabase paths do contain spaces.
+ *
+ * Written as the \0 ESCAPE, never as a literal NUL byte in the source. Until
+ * August 9, 2026 this line held three raw 0x00 bytes. They behaved identically
+ * at runtime and were invisible three ways: they render as spaces in most
+ * editors and in review, git called the file text because its binary sniff only
+ * reads the first 8000 bytes and these sat at 11565, and ripgrep called the file
+ * binary and returned NO MATCHES for any search against it, which silently
+ * breaks recon on the module. lib/storageBackup.test.ts asserts both that the
+ * collision above does not happen and that this file contains no raw NUL.
  */
 function changeKey(bucket: string, path: string, size: number, etag: string | null): string {
-  return `${bucket} ${path} ${size} ${etag ?? ''}`
+  return `${bucket}\0${path}\0${size}\0${etag ?? ''}`
 }
 
 export interface DiffResult {
