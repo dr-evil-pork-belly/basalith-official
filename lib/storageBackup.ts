@@ -295,6 +295,73 @@ export function checkRoster(liveBuckets: string[]): RosterResult {
  */
 export const SCOPED_RUN_KIND = 'scoped'
 
+export type RunKind = 'seed' | 'sync' | typeof SCOPED_RUN_KIND
+
+export interface ResolvedRunScope {
+  kind: RunKind
+  onlyArchiveId: string | null
+}
+
+/**
+ * Turn a storage/backup.sync.requested payload into a kind and a scope, or
+ * throw. Pure, so the rules are testable without an Inngest client.
+ *
+ * Every invalid combination throws rather than coercing. A coercion here is how
+ * a run ends up wearing a kind that describes something it did not do, and the
+ * heartbeat reads that kind and nothing else.
+ *
+ *   kind: 'scoped'                 rejected. The kind is DERIVED from
+ *                                  onlyArchiveId. Accepting a requested one
+ *                                  would let an event claim a scoped run's
+ *                                  heartbeat exemption while restricting
+ *                                  nothing.
+ *   kind: 'seed' + onlyArchiveId   rejected. A seed is the whole property and a
+ *                                  scope is one archive. The two readings of
+ *                                  that event differ by every other family's
+ *                                  objects under a 90 day lock nobody can lift,
+ *                                  so the sender says which they meant.
+ *   a malformed onlyArchiveId      rejected, by applyArchiveScope's validator.
+ *                                  A scope that silently matched nothing would
+ *                                  become a full property seed.
+ */
+export function resolveRunScope(data: {
+  kind?: unknown
+  onlyArchiveId?: unknown
+}): ResolvedRunScope {
+  const { kind, onlyArchiveId } = data
+
+  if (kind !== undefined && kind !== 'seed' && kind !== 'sync') {
+    throw new Error(
+      `[storage-backup] kind must be 'seed' or 'sync', got ${JSON.stringify(kind)}. ` +
+        `'${SCOPED_RUN_KIND}' is derived from onlyArchiveId and cannot be requested.`,
+    )
+  }
+
+  if (onlyArchiveId !== undefined && onlyArchiveId !== null && typeof onlyArchiveId !== 'string') {
+    throw new Error(
+      `[storage-backup] onlyArchiveId must be a string, got ${JSON.stringify(onlyArchiveId)}.`,
+    )
+  }
+
+  const scoped =
+    onlyArchiveId === undefined || onlyArchiveId === null
+      ? null
+      : requireUuid(onlyArchiveId, 'onlyArchiveId')
+
+  if (scoped !== null && kind === 'seed') {
+    throw new Error(
+      `[storage-backup] refusing an event carrying both kind:'seed' and ` +
+        `onlyArchiveId:${scoped}. A seed covers the whole property and a scope covers ` +
+        `one archive. Send one or the other.`,
+    )
+  }
+
+  return {
+    kind: scoped !== null ? SCOPED_RUN_KIND : kind === 'seed' ? 'seed' : 'sync',
+    onlyArchiveId: scoped,
+  }
+}
+
 export interface ArchiveScope {
   /**
    * Build order 9a. Keep only objects under this archive id. Undefined or null

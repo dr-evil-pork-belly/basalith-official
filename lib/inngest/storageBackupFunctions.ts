@@ -26,7 +26,9 @@ import {
   ROLLING_WINDOW_DAYS,
   SCOPED_RUN_KIND,
   a1MissingDetail,
+  applyArchiveScope,
   archiveIdFromPath,
+  resolveRunScope,
   b2Key,
   checkBudget,
   checkRoster,
@@ -191,9 +193,23 @@ async function closeRun(
 // ── storage-backup-sync ──────────────────────────────────────────────────────
 
 interface SyncEventData {
+  /**
+   * 'seed' or 'sync' only. 'scoped' is DERIVED from onlyArchiveId and can never
+   * be requested, so an event cannot claim a kind the run did not earn.
+   */
   kind?: 'seed' | 'sync'
   dryRun?: boolean
   continuedFrom?: string
+  /**
+   * Build order 9a. Restrict this run to the one archive named here. Every other
+   * object leaves the source set before the diff, including every object whose
+   * path carries no uuid prefix.
+   *
+   * Setting this forces kind to SCOPED_RUN_KIND, which the heartbeat does not
+   * count toward silence, and writes the id to storage_backup_runs.scope_archive_id,
+   * which the CHECK added in 20260809_storage_backup_scoped_kind.sql requires.
+   */
+  onlyArchiveId?: string
 }
 
 export const storageBackupSync = inngest.createFunction(
@@ -230,9 +246,20 @@ export const storageBackupSync = inngest.createFunction(
   },
   async ({ event, step }) => {
     const data = (event?.data ?? {}) as SyncEventData
-    const kind: 'seed' | 'sync' = data.kind === 'seed' ? 'seed' : 'sync'
     const dryRun = data.dryRun === true
     const alarms: Alarm[] = []
+
+    // ── 0. Resolve the kind, and refuse a contradictory event. ───────────────
+    //
+    // Pure and unit tested in lib/storageBackup.ts. Throws on an event asking
+    // for kind 'scoped' directly, on kind 'seed' alongside a scope, and on a
+    // malformed archive id. It never coerces, because a coercion here produces
+    // a run wearing a kind that describes something it did not do, and the
+    // heartbeat reads that kind and nothing else.
+    //
+    // Thrown before the walk, so a contradictory event does no work and leaves
+    // no run row.
+    const { kind, onlyArchiveId } = resolveRunScope(data)
 
     // ── 1. Source listing and roster check. ──────────────────────────────────
     const source = await step.run('list-source', async () => {
@@ -264,6 +291,31 @@ export const storageBackupSync = inngest.createFunction(
       })
     }
 
+    // ── 1b. Archive scope, applied between the walk and the diff. ────────────
+    //
+    // BEFORE the dry run branch on purpose. A dry walk whose output described an
+    // unfiltered source set would prove nothing about the filters, and build
+    // order 9b uses exactly that output to confirm the dissolution filter drops
+    // a terminated prefix.
+    //
+    // Two filters, one predicate, opposite treatment of a path with no uuid
+    // prefix. See applyArchiveScope. The dissolution exclusion runs on EVERY
+    // run, seed and sync alike. The single archive scope runs only when asked.
+    const terminatedArchiveIds = await step.run('load-terminated-archives', async () => {
+      const { data: rows, error } = await supabaseAdmin
+        .from('archives')
+        .select('id')
+        .not('termination_requested_at', 'is', null)
+      // Throw, never default to an empty list. An empty list on a failed read is
+      // indistinguishable from "nobody has asked to be forgotten", and it would
+      // copy a terminated family into a lock nobody can lift.
+      if (error) throw new Error(`load-terminated-archives: ${error.message}`)
+      return (rows ?? []).map((r) => (r as { id: string }).id)
+    })
+
+    const scope = applyArchiveScope(source.objects, { onlyArchiveId, terminatedArchiveIds })
+    const inScope = scope.kept
+
     // ── 2. A dry run stops here and writes nothing at all. ───────────────────
     // Not even a run row. A dry run that recorded itself as a completed sync
     // would let the heartbeat read the backup as healthy while nothing is being
@@ -271,14 +323,22 @@ export const storageBackupSync = inngest.createFunction(
     // Build order step 8 uses this.
     if (dryRun) {
       const manifest = await step.run('load-manifest', loadManifest)
-      const diff = diffSourceAgainstManifest(source.objects, manifest)
+      const diff = diffSourceAgainstManifest(inScope, manifest)
       const summary = {
         dryRun: true,
+        kind,
+        onlyArchiveId,
         buckets: source.names,
         roster: source.roster,
         alarms,
-        sourceObjects: source.objects.length,
-        sourceBytes: source.objects.reduce((n, o) => n + o.size, 0),
+        // Walked, then what survived each filter. 9b reads these three lines and
+        // terminatedArchiveIds below to confirm the dissolution filter worked.
+        sourceWalked: source.objects.length,
+        sourceInScope: inScope.length,
+        droppedOutOfScope: scope.droppedOutOfScope,
+        droppedTerminated: scope.droppedTerminated,
+        terminatedArchiveIds,
+        sourceBytes: inScope.reduce((n, o) => n + o.size, 0),
         manifestRows: manifest.length,
         wouldCopy: diff.toCopy.length,
         wouldCopyBytes: diff.toCopy.reduce((n, o) => n + o.size, 0),
@@ -296,7 +356,15 @@ export const storageBackupSync = inngest.createFunction(
         .from('storage_backup_runs')
         .insert({
           kind,
-          objects_source: source.objects.length,
+          // Post-scope: what this run actually treated as its source, not what
+          // the walk returned. The walked total and both drop counts go to the
+          // summary and the log. A scoped run recording 377 here would read as a
+          // run that lost 371 objects rather than one that excluded them.
+          objects_source: inScope.length,
+          // The CHECK in 20260809_storage_backup_scoped_kind.sql requires this to
+          // be non-null exactly when kind is 'scoped', which the resolution above
+          // guarantees. A mismatch is rejected by the database, not logged.
+          scope_archive_id: onlyArchiveId,
           continued_from: data.continuedFrom ?? null,
         })
         .select('id')
@@ -326,7 +394,7 @@ export const storageBackupSync = inngest.createFunction(
         )
       })
 
-      const diff = diffSourceAgainstManifest(source.objects, manifest, MAX_COPIES_PER_RUN)
+      const diff = diffSourceAgainstManifest(inScope, manifest, MAX_COPIES_PER_RUN)
 
       if (diff.deferred > 0) {
         alarms.push({
@@ -458,7 +526,18 @@ export const storageBackupSync = inngest.createFunction(
       if (diff.deferred > 0) {
         await step.sendEvent('continue', {
           name: 'storage/backup.sync.continue',
-          data: { kind, continuedFrom: run.id },
+          // onlyArchiveId MUST travel with the continuation. Without it the
+          // resumed run resolves to kind 'sync' with no scope and copies the
+          // whole property, which is the exact outcome 9a exists to avoid, three
+          // hundred objects into a run that was supposed to touch one archive.
+          // kind is not forwarded: it is re-derived from onlyArchiveId, and a
+          // continuation carrying kind:'scoped' would now be rejected by the
+          // kind guard above.
+          data: {
+            kind: kind === 'seed' ? 'seed' : 'sync',
+            onlyArchiveId: onlyArchiveId ?? undefined,
+            continuedFrom: run.id,
+          },
         })
       }
 
@@ -484,6 +563,14 @@ export const storageBackupSync = inngest.createFunction(
         ok: !hard,
         runId: run.id,
         kind,
+        onlyArchiveId,
+        // What the walk found, what survived the two filters, and why the rest
+        // did not. objects_source on the run row carries sourceInScope alone, so
+        // this log line is the only place the exclusions are counted.
+        sourceWalked: source.objects.length,
+        sourceInScope: inScope.length,
+        droppedOutOfScope: scope.droppedOutOfScope,
+        droppedTerminated: scope.droppedTerminated,
         copied,
         deferred: diff.deferred,
         unchanged: diff.unchanged,
@@ -561,13 +648,40 @@ export const storageBackupVerify = inngest.createFunction(
         return rows
       })
 
+      // The dissolution filter applies to verify's SOURCE side too, and only the
+      // source side.
+      //
+      // Once the sync stops copying a terminated archive, any object of that
+      // archive still sitting in Supabase and never copied is legitimately
+      // absent from B2. Without this it lands in inSourceNotDest and raises A1,
+      // a hard alarm, every Sunday for the up to 365 days between the request
+      // and the deletion. The sync change in this commit is what makes that
+      // reachable, so the two belong together.
+      //
+      // destKeys and manifestKeys stay complete on purpose. Objects already
+      // copied for that archive are still in B2 under lock, still in the
+      // manifest, and still re-hashed every run, so nothing stops being
+      // verified. They simply move into inDestNotSource, which V2 classifies as
+      // normal and expected because deletions do not propagate.
+      const verifyTerminated = await step.run('load-terminated-archives', async () => {
+        const { data: rows, error } = await supabaseAdmin
+          .from('archives')
+          .select('id')
+          .not('termination_requested_at', 'is', null)
+        if (error) throw new Error(`load-terminated-archives: ${error.message}`)
+        return (rows ?? []).map((r) => (r as { id: string }).id)
+      })
+      const verifyScope = applyArchiveScope(source.objects, {
+        terminatedArchiveIds: verifyTerminated,
+      })
+
       // Three way structural diff, in plain code, no step.
       // The manifest snapshots under _manifest/ are written by this job but are
       // not objects it copied, so they are excluded from the comparison rather
       // than reported as unknown every single run.
       const destKeys = dest.map((d) => d.key).filter((k) => !k.startsWith('_manifest/'))
       const diff = threeWayDiff({
-        sourceKeys: source.objects.map((o) => b2Key(o.bucket, o.path)),
+        sourceKeys: verifyScope.kept.map((o) => b2Key(o.bucket, o.path)),
         destKeys,
         manifestKeys: manifest.map((m) => m.b2_key),
       })
@@ -714,6 +828,9 @@ export const storageBackupVerify = inngest.createFunction(
         ok: !hard,
         runId: run.id,
         source: source.objects.length,
+        // Excluded from the source side of the diff only, never from the rehash.
+        sourceExcludedTerminated: verifyScope.droppedTerminated,
+        terminatedArchiveIds: verifyTerminated,
         destination: destKeys.length,
         manifest: manifest.length,
         rehashed,

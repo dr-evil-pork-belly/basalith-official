@@ -211,7 +211,24 @@ there is nothing to dissolve. Stop and find out why.
 The backup sync excludes any archive with a non-null `termination_requested_at`. It is
 automatic. This step confirms it worked, because every date in this runbook depends on it.
 
-**Wait for the next daily sync run, which is 04:00 UTC.** Then run:
+**CONFIRMED August 9, 2026.** The filter is `applyArchiveScope` in `lib/storageBackup.ts`,
+applied in `lib/inngest/storageBackupFunctions.ts` between the source walk and the diff, on
+every run, seed and sync alike, and on the dry run too. The terminated list is read fresh at
+the start of each run, and a failed read throws rather than defaulting to an empty list,
+because an empty list is indistinguishable from "nobody has asked to be forgotten." Covered
+by `lib/storageBackup.test.ts`. Until August 9 this paragraph stated an intention rather
+than code, and the sync would have copied a terminated archive like any other.
+
+**Two things it does not do.** It does not remove what is already in B2. The sync is
+additive, so objects copied before the request keep their locks and come out only through
+section 4. And an object with no uuid prefix in its path is deliberately kept, because it
+has no archives row and can never be the subject of a termination request.
+
+**Wait for the next sync, or trigger one.** After build order 9d adds the daily cron the
+sync runs at 04:00 UTC. Until then `storage-backup-sync` carries no cron and nothing runs on
+its own, so waiting for a nightly run would wait forever. Send
+`storage/backup.sync.requested` with `{}` and let it finish. Either way, confirm a sync has
+actually completed after the request timestamp before trusting the query below. Then run:
 
 ```sql
 select count(*) as rows_written_since_request

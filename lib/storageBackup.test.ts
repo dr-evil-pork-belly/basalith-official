@@ -36,6 +36,7 @@ import {
   SCOPED_SEED_WINDOW_NOTE,
   a1MissingDetail,
   applyArchiveScope,
+  resolveRunScope,
   archiveIdFromPath,
   b2Key,
   checkBudget,
@@ -354,6 +355,149 @@ describe('the diff copies what is new or changed and nothing else', () => {
     // 377 in-scope objects on August 8, plus the fixed steps.
     const SEED_OBJECTS = 377
     expect(Math.min(SEED_OBJECTS, MAX_COPIES_PER_RUN) + 6).toBeLessThan(1000)
+  })
+})
+
+describe('the sync event resolves to a kind, or is refused outright', () => {
+  const ID = 'a38e4503-c7d2-4af3-af8c-cacd66974e0b'
+
+  it('an empty event is an ordinary sync', () => {
+    expect(resolveRunScope({})).toEqual({ kind: 'sync', onlyArchiveId: null })
+  })
+
+  it('kind seed stays a seed', () => {
+    expect(resolveRunScope({ kind: 'seed' })).toEqual({ kind: 'seed', onlyArchiveId: null })
+  })
+
+  it('an archive id derives the scoped kind', () => {
+    expect(resolveRunScope({ onlyArchiveId: ID })).toEqual({
+      kind: SCOPED_RUN_KIND,
+      onlyArchiveId: ID,
+    })
+  })
+
+  it('kind sync alongside a scope resolves to scoped, which is how a continuation resumes', () => {
+    // The continuation event sends kind:'sync' plus the id. If this resolved to
+    // a plain sync, a capped scoped run would resume by copying the whole
+    // property, three hundred objects at a time, under a 90 day lock.
+    expect(resolveRunScope({ kind: 'sync', onlyArchiveId: ID }).kind).toBe(SCOPED_RUN_KIND)
+  })
+
+  it('lowercases the id so it matches what archiveIdFromPath returns', () => {
+    expect(resolveRunScope({ onlyArchiveId: ID.toUpperCase() }).onlyArchiveId).toBe(ID)
+  })
+
+  it('refuses kind seed alongside a scope rather than coercing either way', () => {
+    expect(() => resolveRunScope({ kind: 'seed', onlyArchiveId: ID })).toThrow(/one or the other/)
+  })
+
+  it('refuses an event asking for the scoped kind directly', () => {
+    // Otherwise an event claims a scoped run's heartbeat exemption while
+    // restricting nothing, which is the silence failure with a new spelling.
+    expect(() => resolveRunScope({ kind: SCOPED_RUN_KIND })).toThrow(/cannot be requested/)
+  })
+
+  it('refuses any other kind', () => {
+    expect(() => resolveRunScope({ kind: 'drill' })).toThrow(/must be 'seed' or 'sync'/)
+  })
+
+  it('refuses a malformed archive id rather than silently syncing everything', () => {
+    expect(() => resolveRunScope({ onlyArchiveId: 'not-a-uuid' })).toThrow(/not a uuid/)
+    expect(() => resolveRunScope({ onlyArchiveId: '' })).toThrow(/not a uuid/)
+  })
+
+  it('refuses a non-string archive id', () => {
+    expect(() => resolveRunScope({ onlyArchiveId: 123 })).toThrow(/must be a string/)
+  })
+
+  it('can never produce a pair the database CHECK would reject', () => {
+    // storage_backup_runs_scope_matches_kind is
+    //   (kind = 'scoped') = (scope_archive_id IS NOT NULL)
+    // Asserted here in code so a resolver change fails in vitest rather than at
+    // an insert in production, mid run, with objects already in B2.
+    const inputs = [
+      {},
+      { kind: 'seed' },
+      { kind: 'sync' },
+      { onlyArchiveId: ID },
+      { kind: 'sync', onlyArchiveId: ID },
+    ]
+    for (const input of inputs) {
+      const r = resolveRunScope(input)
+      expect(r.kind === SCOPED_RUN_KIND).toBe(r.onlyArchiveId !== null)
+    }
+  })
+})
+
+describe('the sync wiring applies the scope where it actually matters', () => {
+  const raw = readFileSync(
+    path.resolve(process.cwd(), 'lib/inngest/storageBackupFunctions.ts'),
+    'utf8',
+  )
+
+  // Line comments stripped before every assertion below. This file is heavily
+  // commented, and the comments explaining a guarantee use the same identifiers
+  // as the code providing it. A window-based match around a deleted line will
+  // happily match the paragraph that describes it, which is a guard that passes
+  // on prose. Found by mutation: deleting the continuation's onlyArchiveId went
+  // undetected until this line existed.
+  const code = raw.replace(/^\s*\/\/.*$/gm, '')
+
+  it('the comment strip left the code intact', () => {
+    // Control. Without it every assertion below could pass on an empty string.
+    expect(code).toMatch(/export const storageBackupSync = inngest\.createFunction\(/)
+    expect(code).toMatch(/export const storageBackupVerify = inngest\.createFunction\(/)
+    expect(code).not.toMatch(/^\s*\/\/ /m)
+  })
+
+  it('the copy diff runs on the scoped set, never on the raw walk', () => {
+    expect(code).toMatch(/diffSourceAgainstManifest\(inScope, manifest, MAX_COPIES_PER_RUN\)/)
+    expect(code).not.toMatch(/diffSourceAgainstManifest\(source\.objects/)
+  })
+
+  it('the scope is applied before the dry run returns, so 9b proves the filters', () => {
+    // A dry walk reporting an unfiltered source set would confirm nothing about
+    // the dissolution filter, which is the whole purpose of the 9b dry walk.
+    const scopeAt = code.indexOf('applyArchiveScope(source.objects, { onlyArchiveId')
+    const dryAt = code.indexOf('if (dryRun) {')
+    expect(scopeAt).toBeGreaterThan(-1)
+    expect(dryAt).toBeGreaterThan(-1)
+    expect(scopeAt).toBeLessThan(dryAt)
+    expect(code).toMatch(/diffSourceAgainstManifest\(inScope, manifest\)/)
+  })
+
+  it('open-run records the scope the CHECK requires', () => {
+    expect(code).toMatch(/scope_archive_id: onlyArchiveId/)
+    expect(code).toMatch(/objects_source: inScope\.length/)
+  })
+
+  it('the continuation carries the scope forward', () => {
+    // Without this a capped scoped run resumes with no scope and copies the
+    // whole property. Asserted on the assignment, not the identifier, so the
+    // paragraph above it in the source cannot satisfy this on its own.
+    const at = code.indexOf("name: 'storage/backup.sync.continue'")
+    expect(at).toBeGreaterThan(-1)
+    expect(code.slice(at, at + 400)).toMatch(/onlyArchiveId: onlyArchiveId/)
+  })
+
+  it('a failed terminated-archive read throws instead of defaulting to empty', () => {
+    // An empty list on a failed read is indistinguishable from "nobody asked to
+    // be forgotten", and it copies a terminated family into an unbreakable lock.
+    expect(code).toMatch(/load-terminated-archives/)
+    expect(code).toMatch(/throw new Error\(`load-terminated-archives/)
+  })
+
+  it('verify filters its source side by the same list', () => {
+    // Otherwise a terminated archive's uncopied objects raise a hard A1 every
+    // Sunday for the up to 365 days between the request and the deletion.
+    expect(code).toMatch(/sourceKeys: verifyScope\.kept\.map/)
+  })
+
+  it('verify does not filter the destination or the manifest', () => {
+    // Objects already copied for that archive stay under lock, stay in the
+    // manifest, and stay re-hashed every run. Nothing stops being verified.
+    expect(code).toMatch(/manifestKeys: manifest\.map\(\(m\) => m\.b2_key\)/)
+    expect(code).toMatch(/const toRehash = manifest\.slice\(0, MAX_COPIES_PER_RUN\)/)
   })
 })
 
