@@ -320,6 +320,24 @@ reach audio we still hold. Unrelated to all of this, the Cantonese path on
 `app/api/twilio/voice/route.ts` uses a Twilio-hosted Google voice and never touched
 ElevenLabs.
 
+**Inngest was registered against the old domain, and nobody noticed for months.** VERIFIED
+August 11, 2026. The app's serve URL in Inngest was `https://basalith.xyz/api/inngest`, left
+from before the switch to `.ai`. Every deploy since that switch failed to update function
+definitions, silently, because Inngest was syncing against a URL this repo no longer serves.
+Older functions kept working on whatever was registered before the switch, which is exactly
+why it went unnoticed. Corrected to `https://basalith.ai/api/inngest`; eleven functions now
+registered.
+
+Two consequences. `storage-backup-sync` and `storage-backup-verify` were never registered at
+all despite shipping August 9, so the weekly verify cron did not exist and the status brief
+calling it "running" was false. It had never run once. And more broadly, **nothing shipped
+between the domain switch and August 11 ever reached Inngest**, so any Inngest function added
+or changed in that window was serving an older definition. Nobody has audited what that
+covers. Do that before trusting any Inngest behaviour dated in that window. The diagnostic
+that found it: send an event, then read `GET /v1/events/{id}/runs` with the signing key. An
+empty `data` array means no function is registered for that trigger, which a green deploy and
+a 200 from `/api/inngest` will both hide.
+
 **Other open conflicts.** FROM DOCS, each needs its own session. Inclusion threshold is
 50 in `trainingPipeline.ts` and 60 in the god scoring route. Dimension taxonomy is 10 vs
 9 vs 12 across subsystems. The Calder Archive was provisioned four times as empty
