@@ -750,11 +750,17 @@ customer-facing copy is never written as though it did.
 **The backup job's key cannot perform any deletion in this runbook, and must never be
 changed so that it can.**
 
-That key is scoped to `listBuckets`, `listFiles`, `readFiles`, `writeFiles`, deliberately
-without `deleteFiles`. It is the key that runs unattended every day. Because it cannot
-delete, no bug in the backup job and no compromise of the Vercel environment can destroy the
-copy of last resort. That property is worth more than the convenience of using one key for
-everything.
+That key is scoped to `listBuckets`, `listFiles`, `readFiles`, `writeFiles`,
+`writeFileRetentions`, `readFileRetentions`, deliberately without `deleteFiles`. It is the
+key that runs unattended every day. Because it cannot delete, no bug in the backup job and no
+compromise of the Vercel environment can destroy the copy of last resort. That property is
+worth more than the convenience of using one key for everything.
+
+`writeFileRetentions` sets a retention, it does not shorten or remove one, and a COMPLIANCE
+retention cannot be reduced by any key including the account root. So it does not weaken the
+paragraph above. **CORRECTED August 11, 2026:** the two retention capabilities were absent
+from the original spec, which meant the job key could not create the lock at all. Every write
+failed `AccessDenied: not entitled`. Found by the build order 9a drill.
 
 So the deletion uses a **second, separate B2 application key**, and it lives under these
 rules:
@@ -763,7 +769,9 @@ rules:
       permanently live delete key on the backup bucket is the single most dangerous
       credential on the property.
 - [ ] Scoped to the **one backup bucket**, with `deleteFiles` added to the same permissions
-      the job key has.
+      the job key has, which as of August 11, 2026 means `listBuckets`, `listFiles`,
+      `readFiles`, `writeFiles`, `writeFileRetentions`, `readFileRetentions`, plus
+      `deleteFiles`.
 - [ ] **Never in Vercel. Never in `.env.local`. Never committed to the repo.** No code path
       takes it. It is typed by a person into a shell or the console and used for the minutes
       the deletion takes.
