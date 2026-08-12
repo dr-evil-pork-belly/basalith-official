@@ -29,6 +29,7 @@ import {
   a1MissingDetail,
   applyArchiveScope,
   archiveIdFromPath,
+  buildSnapshotEntries,
   resolveRunScope,
   b2Key,
   checkBudget,
@@ -37,11 +38,11 @@ import {
   isEmptyFolderPlaceholder,
   manifestSnapshotKey,
   threeWayDiff,
-  toSnapshotEntry,
   type Alarm,
   type AlarmCode,
   type AllowlistBucket,
   type ManifestEntry,
+  type SnapshotSourceRow,
   type SourceObject,
 } from '@/lib/storageBackup'
 import { getObjectBytes, listAll, putLocked } from '@/lib/storageBackupB2'
@@ -538,17 +539,26 @@ export const storageBackupSync = inngest.createFunction(
         // a 90 day offsite lock. Skeleton 4.3 and 9.4.5, settled August 8.
         const snapshot = await step.run('write-manifest-json', async () => {
           const PAGE = 1000
-          const entries = []
+          const rows: SnapshotSourceRow[] = []
           for (let from = 0; ; from += PAGE) {
-            const { data: rows, error } = await supabaseAdmin
+            const { data: page, error } = await supabaseAdmin
               .from('storage_backup_objects')
               .select('bucket, path, sha256, size_bytes, b2_locked_until')
               .range(from, from + PAGE - 1)
             if (error) throw new Error(`snapshot read: ${error.message}`)
-            const page = (rows ?? []) as Parameters<typeof toSnapshotEntry>[0][]
-            entries.push(...page.map(toSnapshotEntry))
-            if (page.length < PAGE) break
+            const rowsPage = (page ?? []) as SnapshotSourceRow[]
+            rows.push(...rowsPage)
+            if (rowsPage.length < PAGE) break
           }
+
+          // The dissolution filter, second half. This read is NOT the source
+          // walk, so applyArchiveScope above did nothing for it: manifest rows
+          // for a terminated archive live on until the operator runs runbook
+          // 4.8 at X+365, and without this every sync in between wrote them
+          // offsite again under a fresh lock. Pure and unit tested in
+          // lib/storageBackup.ts. Same parser, same lowercasing, same rule that
+          // a path with no uuid prefix is kept.
+          const entries = buildSnapshotEntries(rows, terminatedArchiveIds)
 
           const isoDate = new Date().toISOString().slice(0, 10)
           const key = manifestSnapshotKey(isoDate)
@@ -561,7 +571,10 @@ export const storageBackupSync = inngest.createFunction(
             contentType: 'application/json',
             retainUntil: new Date(Date.now() + LOCK_RETENTION_DAYS * 86_400_000),
           })
-          return { key, entries: entries.length }
+          // rows is the table count and entries is what was written offsite.
+          // They were the same number until this filter existed, and the run row
+          // wants the first while the log wants both.
+          return { key, rows: rows.length, entries: entries.length }
         })
 
         // ── 6. Continuation, if this run was capped. ───────────────────────────
@@ -587,7 +600,10 @@ export const storageBackupSync = inngest.createFunction(
         await closeRun(run.id, {
           ok: !hard,
           objects_copied: copied,
-          objects_manifest: snapshot.entries,
+          // The table count, matching the column's meaning and matching what
+          // verify writes. Not snapshot.entries, which is now smaller than the
+          // table whenever an archive is terminated.
+          objects_manifest: snapshot.rows,
           objects_deferred: diff.deferred,
           bytes_read_source: bytesRead,
           bytes_written_dest: bytesRead,
@@ -620,7 +636,11 @@ export const storageBackupSync = inngest.createFunction(
           deferred: diff.deferred,
           unchanged: diff.unchanged,
           bytesRead,
-          manifestRows: snapshot.entries,
+          manifestRows: snapshot.rows,
+          // The gap between these two is the terminated archives' rows, held in
+          // Postgres until runbook 4.8 and deliberately not written offsite.
+          snapshotEntries: snapshot.entries,
+          snapshotExcludedTerminated: snapshot.rows - snapshot.entries,
           snapshotKey: snapshot.key,
           alarms,
         }
