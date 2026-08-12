@@ -671,21 +671,65 @@ version was refused, and its `b2_locked_until` from the CSV.
 
 ### Step 4.6. Delete the stale manifest snapshots from B2
 
+**NOT WALKED.** No snapshot has ever been deleted from B2 by anyone. See 1.4.
+
 The backup writes a full inventory snapshot to `_manifest/{date}.json` after each successful
-sync. **These are not under the archive's prefix, so step 4.5 did not touch them,** and
-every snapshot written before day X lists this archive's paths and hashes.
+sync. **These are not under the archive's prefix, so step 4.5 did not touch them,** and a
+snapshot that lists this archive carries its paths and hashes.
 
 They contain no captions and no descriptions, by design. They carry only bucket, path,
 sha256, size, and lock expiry. But a per-file inventory of a dissolved archive is still a
 record of that archive, so it goes.
 
-**Delete every snapshot dated before this archive's `termination_requested_at`. Keep every
-snapshot dated after it.**
+#### Which snapshots list a terminated archive, and why the answer changed
+
+**This section said, until August 12, 2026: "Snapshots written after day X do not list this
+archive at all, because it left scope on day X." That was false, and it was false in the
+direction that matters.** Leaving scope stopped the archive being COPIED. The snapshot was
+never built from the source walk. It was built by reading `storage_backup_objects` whole,
+and this archive's manifest rows survive until step 4.8, at X+365. So every sync between day
+X and the deletion wrote a fresh snapshot listing the archive, each under a new lock dated
+from its own write day. Deleting one by hand did not help, because the next sync regenerated
+it from the same rows. Worse, the second checkbox below told the operator to keep the newest
+one. The procedure preserved the leak on purpose.
+
+The filter now exists. `buildSnapshotEntries` in `lib/storageBackup.ts` drops any row whose
+path carries a terminated archive's uuid, and the `write-manifest-json` step in
+`lib/inngest/storageBackupFunctions.ts` calls it with the same terminated list the sync
+already loaded for `applyArchiveScope`. Covered by `lib/storageBackup.test.ts`, in
+`the snapshot read honours the dissolution filter too`.
+
+**PENDING DEPLOY.** Committed on `fix/b2-key-spec-and-loud-failures` as `4a0b1a0`. Until that
+reaches production, every sync is still writing archive-listing snapshots, and the paragraph
+above describes code that is not yet the code that runs. **Record the deploy date here before
+relying on the cut-off below:**
+
+      4a0b1a0 in production on: ________________
+
+#### The rule
+
+**Delete every snapshot dated before the CUT-OFF. Keep every snapshot dated on or after it.**
+
+> **CUT-OFF = the LATER of this archive's `termination_requested_at` and the date `4a0b1a0`
+> reached production.**
+
+Two dates, because two different things make a snapshot dirty:
+
+- A snapshot written **before day X** lists the archive because the archive was live then.
+  Correct at the time, and it goes.
+- A snapshot written **by pre-fix code** lists the archive whatever its date, because that
+  code did not filter. A snapshot dated after day X is not evidence of anything if the deploy
+  had not happened when it was written.
+
+If the deploy date is later than day X, the cut-off is the deploy date and you will be
+deleting snapshots dated after the termination request. That is correct. Do not "fix" it back
+to day X.
 
 Nothing is lost by this. Each snapshot is a full inventory, not a delta, and the manifest is
 additive, so a newer snapshot contains everything an older one did for every archive still
-live. Snapshots written after day X do not list this archive at all, because it left scope
-on day X.
+live.
+
+#### Doing it
 
 ```bash
 aws s3api list-object-versions \
@@ -696,13 +740,30 @@ aws s3api list-object-versions \
   --output text
 ```
 
-Delete only the entries whose date in the filename is **earlier than**
-`termination_requested_at`, one at a time, using the same `delete-object` call as step 4.5.
+Delete only the entries whose date in the filename is **earlier than the cut-off**, one at a
+time, using the same `delete-object` call as step 4.5.
 
-- [ ] Snapshots older than the request date are gone.
-- [ ] At least one snapshot newer than the request date still exists. **If you have deleted
+**Count versions, not dates.** The bucket is versioned and the key carries only a date, so two
+successful syncs on one date produce two locked versions under one `_manifest/{date}.json`
+key. The listing above and the delete loop both enumerate versions and handle this correctly.
+What does not is a count taken by reading filenames: it undercounts by every same-day rerun,
+and a log entry saying 40 against 47 real deletions is the kind of discrepancy that reads as
+a failed deletion a year later. **The number in the log is the number of `delete-object` calls
+that succeeded.**
+
+- [ ] Cut-off date computed, from the later of the two dates, and written in the log.
+- [ ] Every snapshot version dated before the cut-off is gone.
+- [ ] At least one snapshot dated on or after the cut-off still exists. **If you have deleted
       every snapshot, you have destroyed the offsite inventory for every other family on the
       property.** Stop and raise it.
+- [ ] Re-run the listing and confirm no remaining key is dated before the cut-off.
+
+**One residual this step cannot close, and no step can.** A snapshot cannot be deleted before
+its own lock expires, and it is written under the same retention as everything else. That is
+not a constraint here, because a snapshot written on or before day X unlocks long before
+X+365. It is worth knowing anyway, in case a dissolution is ever performed early against a
+snapshot that is still locked: the refusal will look exactly like step 4.5's, and the box at
+the top of 4.5 is how you tell it apart from a broken key.
 
 ### Step 4.7. Verify B2 is empty for this archive
 
@@ -899,7 +960,9 @@ DAY X+365
   [ ] 4.3 Postgres rows                  BLOCKED, no cascade document. Outstanding.
   [ ] 4.4 delete list exported           rows: __________
   [ ] 4.5 B2 versions deleted            versions deleted: __________
-  [ ] 4.6 stale snapshots deleted        snapshots deleted: __________
+  [ ] 4.6 stale snapshots deleted        cut-off: __________
+      (VERSIONS deleted, not dates. Same-day reruns share one key. Step 4.6.)
+      versions deleted: __________
   [ ] 4.7 B2 verified empty, all four prefixes
   [ ] 4.8 manifest rows deleted          rows: __________
   [ ] 4.9 deletion key revoked           created: __________ revoked: __________
