@@ -5,11 +5,25 @@
  * that reaches a client bundle.
  *
  * THE KEY THIS USES CANNOT DELETE. It is scoped to listBuckets, listFiles,
- * readFiles, writeFiles, explicitly without deleteFiles, so that a bug in the
- * sync cannot destroy the copy of last resort. There is deliberately no delete
- * function in this file. Deletion at the end of a dissolution is performed by a
- * separate key, by hand, and is documented in docs/DISSOLUTION_RUNBOOK.md
- * sections 4.5 and 5. Do not add a delete helper here.
+ * readFiles, writeFiles, writeFileRetentions, readFileRetentions, explicitly
+ * without deleteFiles, so that a bug in the sync cannot destroy the copy of last
+ * resort. There is deliberately no delete function in this file. Deletion at the
+ * end of a dissolution is performed by a separate key, by hand, and is
+ * documented in docs/DISSOLUTION_RUNBOOK.md sections 4.5 and 5. Do not add a
+ * delete helper here.
+ *
+ * CORRECTED August 11, 2026. This list previously read listBuckets, listFiles,
+ * readFiles, writeFiles and nothing else. That key could not create the
+ * compliance lock the entire design rests on: putLocked sends ObjectLockMode and
+ * ObjectLockRetainUntilDate on every write, and B2 requires writeFileRetentions
+ * for that. readFileRetentions is here because DISSOLUTION_RUNBOOK.md step 2.3
+ * reads the real expiry off the object rather than calculating it.
+ *
+ * The original spec was wrong in the one way that mattered and looked complete
+ * while being wrong, because nothing had ever written to B2. Build order 9a is
+ * what surfaced it: the first real PUT failed with AccessDenied: not entitled,
+ * against six synthetic files on a disposable archive rather than against 376
+ * family objects.
  */
 import {
   S3Client,

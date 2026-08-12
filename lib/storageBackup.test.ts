@@ -36,6 +36,7 @@ import {
   SCOPED_SEED_WINDOW_NOTE,
   a1MissingDetail,
   applyArchiveScope,
+  buildSnapshotEntries,
   resolveRunScope,
   archiveIdFromPath,
   b2Key,
@@ -499,6 +500,41 @@ describe('the sync wiring applies the scope where it actually matters', () => {
     expect(code).toMatch(/manifestKeys: manifest\.map\(\(m\) => m\.b2_key\)/)
     expect(code).toMatch(/const toRehash = manifest\.slice\(0, MAX_COPIES_PER_RUN\)/)
   })
+
+  it('the snapshot is filtered and its own count is reported separately', () => {
+    // The dissolution filter's second half. Asserted on the call with both
+    // arguments, because buildSnapshotEntries(rows) with the list forgotten
+    // compiles, passes every unit test of the function itself, and writes the
+    // terminated archive offsite exactly as before.
+    expect(code).toMatch(/const entries = buildSnapshotEntries\(rows, terminatedArchiveIds\)/)
+    expect(code).toMatch(/snapshotExcludedTerminated: snapshot\.rows - snapshot\.entries/)
+  })
+
+  it('objects_manifest is the table count in BOTH writers, never the filtered one', () => {
+    // This column has two writers and zero readers. The heartbeat reads
+    // started_at, the budget window reads bytes_read_source, the scoped-seed
+    // check reads id, and nothing else on the property touches the table. So a
+    // wrong value here raises nothing and is invisible until somebody compares a
+    // sync row against a verify row, which happens for the first time during a
+    // dissolution, a year after the row was written.
+    //
+    // snapshot.rows is the unfiltered read, which is what the column means:
+    // "counted in storage_backup_objects". snapshot.entries is what survived the
+    // dissolution filter, and it is smaller the moment any archive is terminated.
+    // Writing entries here would make the sync's number disagree with verify's,
+    // which computes the same quantity from its own unfiltered read, and the
+    // disagreement would look like a backup fault rather than a units mistake.
+    //
+    // Asserted as the exhaustive list rather than two toMatch calls, so a third
+    // writer added later has to come back through this test.
+    const writes = code.match(/objects_manifest: [^,\n]+/g) ?? []
+    console.log(`objects_manifest writes: ${JSON.stringify(writes)}`)
+    expect(writes).toEqual([
+      'objects_manifest: snapshot.rows',   // sync
+      'objects_manifest: manifest.length', // verify
+    ])
+    expect(code).not.toMatch(/objects_manifest: snapshot\.entries/)
+  })
 })
 
 describe('A1 explains the scoped seed window without becoming excusable', () => {
@@ -864,6 +900,92 @@ describe('the archive scope narrows the source set before the diff', () => {
 
   it('treats an explicit null onlyArchiveId as no scoping', () => {
     expect(applyArchiveScope(SOURCE, { onlyArchiveId: null }).kept).toHaveLength(5)
+  })
+})
+
+describe('the snapshot read honours the dissolution filter too', () => {
+  // The bug this covers: applyArchiveScope stops a terminated archive being
+  // COPIED, and the snapshot is built from storage_backup_objects instead of
+  // from the source walk. Those rows survive until runbook step 4.8 at X+365,
+  // so every sync in between wrote the terminated archive's paths, hashes and
+  // lock expiries back into B2 under a fresh lock. Deleting a snapshot by hand
+  // did not help, because the next sync regenerated it from the same rows.
+  const HA = 'a38e4503-c7d2-4af3-af8c-cacd66974e0b'
+  const FOUNDER = '6c0722d3-719a-423f-9024-621ba0072d6f'
+
+  const row = (p: string) => ({
+    bucket: 'photographs',
+    path: p,
+    sha256: 'deadbeef',
+    size_bytes: 100,
+    b2_locked_until: '2026-11-06T00:00:00Z',
+  })
+
+  const ROWS = [
+    row(`${HA}/one.jpeg`),
+    row(`${HA}/two.jpeg`),
+    row(`${FOUNDER}/three.jpeg`),
+    row('legacy-import/four.jpeg'), // no uuid first segment at all
+  ]
+
+  const paths = (entries: { path: string }[]) => entries.map((e) => e.path)
+
+  it("a terminated archive's rows are absent from the snapshot entries", () => {
+    const entries = buildSnapshotEntries(ROWS, [HA])
+    expect(paths(entries)).not.toContain(`${HA}/one.jpeg`)
+    expect(paths(entries)).not.toContain(`${HA}/two.jpeg`)
+    expect(entries).toHaveLength(2)
+    // The whole point. Nothing carrying that id may reach the offsite lock.
+    expect(JSON.stringify(entries)).not.toContain(HA)
+  })
+
+  it("a live archive's rows are present", () => {
+    const entries = buildSnapshotEntries(ROWS, [HA])
+    expect(paths(entries)).toContain(`${FOUNDER}/three.jpeg`)
+  })
+
+  it('a row whose path has no uuid prefix is present', () => {
+    // Same asymmetry as applyArchiveScope, and for the same reason. An object
+    // with no archives row can never be the subject of a termination request,
+    // so dropping it would shrink the offsite inventory with no alarm anywhere.
+    const entries = buildSnapshotEntries(ROWS, [HA])
+    expect(paths(entries)).toContain('legacy-import/four.jpeg')
+  })
+
+  it('a terminated id in different case is still excluded', () => {
+    const entries = buildSnapshotEntries(ROWS, [HA.toUpperCase()])
+    expect(entries).toHaveLength(2)
+    expect(JSON.stringify(entries)).not.toContain(HA)
+  })
+
+  it('keeps every row when nothing is terminated, so wiring it in changes nothing today', () => {
+    expect(buildSnapshotEntries(ROWS)).toHaveLength(4)
+    expect(buildSnapshotEntries(ROWS, [])).toHaveLength(4)
+  })
+
+  it('throws on a malformed terminated id rather than writing the archive offsite again', () => {
+    expect(() => buildSnapshotEntries(ROWS, ['nonsense'])).toThrow(/not a uuid/)
+  })
+
+  it('still carries five fields and never source_row', () => {
+    // The filter must not become a second, laxer path to the snapshot shape.
+    const entries = buildSnapshotEntries(
+      [
+        {
+          ...row(`${FOUNDER}/three.jpeg`),
+          ...({ source_row: { caption: 'my mother in 1962' } } as object),
+        },
+      ],
+      [HA],
+    )
+    expect(Object.keys(entries[0]).sort()).toEqual([
+      'b2_locked_until',
+      'bucket',
+      'path',
+      'sha256',
+      'size_bytes',
+    ])
+    expect(JSON.stringify(entries)).not.toContain('my mother')
   })
 })
 

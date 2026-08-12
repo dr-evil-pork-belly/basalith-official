@@ -942,8 +942,23 @@ job **also** send explicit `x-amz-object-lock-mode` and `x-amz-object-lock-retai
 headers on every PUT. Two layers on purpose. A bug that drops the header still gets the
 bucket default, and a bucket misconfiguration is still caught by the explicit header.
 
-**Key scope.** One bucket. `listBuckets`, `listFiles`, `readFiles`, `writeFiles`. Explicitly
-**not** `deleteFiles`. This is the job's key and it is the only key any code holds.
+**Key scope.** One bucket. `listBuckets`, `listFiles`, `readFiles`, `writeFiles`,
+`writeFileRetentions`, `readFileRetentions`. Explicitly **not** `deleteFiles`. This is the
+job's key and it is the only key any code holds.
+
+**CORRECTED August 11, 2026, and the correction matters.** This section previously specified
+`listBuckets`, `listFiles`, `readFiles`, `writeFiles` and nothing more. A key with those four
+capabilities **cannot create the compliance lock this entire design rests on.** Every PUT
+sends `x-amz-object-lock-mode` and `x-amz-object-lock-retain-until-date`, which B2 gates
+behind `writeFileRetentions`. Without it every write fails with `AccessDenied: not entitled`.
+`readFileRetentions` is required too, because DISSOLUTION_RUNBOOK.md step 2.3 reads the real
+expiry off the object rather than calculating it.
+
+The spec was wrong from the day it was written and looked complete, because nothing had ever
+written to B2 and no test can catch a capability a vendor grants. Build order 9a is what
+surfaced it, on six synthetic files on a disposable archive, with nothing locked and nothing
+to unpick. Had the split seed not existed, the first PUT of 376 family objects would have
+been the discovery.
 
 Deletion at the end of a dissolution is performed by a **second key that does not exist yet
 and must not be created now.** It is created at dissolution time, used by hand, and revoked
@@ -1115,9 +1130,13 @@ the step after it and destroying it early strands the rest.
 #### 9.4.4 The credential, and where it lives
 
 The job's key cannot do this and must not be changed so it can. Section 8 scopes it to
-`listBuckets`, `listFiles`, `readFiles`, `writeFiles`, explicitly without `deleteFiles`, so
-that a bug in the sync cannot destroy the backup. That property is worth more than the
-convenience of one key.
+`listBuckets`, `listFiles`, `readFiles`, `writeFiles`, `writeFileRetentions`,
+`readFileRetentions`, explicitly without `deleteFiles`, so that a bug in the sync cannot
+destroy the backup. That property is worth more than the convenience of one key.
+
+Note that `writeFileRetentions` lets the job SET a retention, not shorten or remove one. A
+COMPLIANCE retention cannot be reduced by any key, including the account root, so adding it
+does not weaken the property above.
 
 So the deletion needs a **second, separate B2 application key** with `deleteFiles` on the
 one backup bucket. Its handling rules:
@@ -1238,7 +1257,10 @@ process, with the dates and the actor it actually has.
 Nothing moves a byte until steps 1 through 4 are done.
 
 1. You create the B2 bucket with Object Lock enabled at creation, COMPLIANCE, 90 day
-   default retention. You create the scoped key, without `deleteFiles`. You set the five
+   default retention. You create the scoped key with `listBuckets`, `listFiles`, `readFiles`,
+   `writeFiles`, `writeFileRetentions`, `readFileRetentions`, and without `deleteFiles`. The
+   two retention capabilities were missing from this step until August 11, 2026, and without
+   them every PUT fails `AccessDenied: not entitled`. You set the five
    environment variables. You do **not** create the deletion key from 9.4.4.
 2. You set the Supabase 50 GB usage alert.
 3. ~~Paste the month-to-date unified egress.~~ **Done August 8.** 0.065 GB uncached against

@@ -256,6 +256,57 @@ export function toSnapshotEntry(row: {
   }
 }
 
+/** A storage_backup_objects row as the snapshot step selects it. */
+export type SnapshotSourceRow = Parameters<typeof toSnapshotEntry>[0]
+
+/**
+ * The manifest rows that go into the snapshot, with terminated archives removed.
+ *
+ * THIS IS THE DISSOLUTION FILTER'S SECOND HALF, and it was missing until
+ * August 12, 2026. applyArchiveScope stops a terminated archive being COPIED.
+ * It does nothing about the inventory snapshot, which is built from
+ * storage_backup_objects rather than from the source walk. Those rows survive
+ * until the operator runs DISSOLUTION_RUNBOOK.md step 4.8, at X+365, so every
+ * sync in between wrote a fresh _manifest/{date}.json listing the terminated
+ * archive's paths, hashes, sizes and lock expiries, each under a new COMPLIANCE
+ * lock dated from its own write day. Deleting one by hand did not help. The
+ * next sync regenerated it from the same rows.
+ *
+ * Runbook 4.6 asserted the opposite, that snapshots written after day X do not
+ * list the archive. That sentence described the source walk and was read as
+ * describing the snapshot. It is corrected in the same commit as this function.
+ *
+ * The rules match applyArchiveScope's dissolution filter exactly, and they match
+ * it because a second set of rules is a second thing to get wrong:
+ *
+ *   - keyed on archiveIdFromPath, the same parser, over the same path shape
+ *   - an object whose path carries no uuid prefix is KEPT, because an object
+ *     with no archives row can never be the subject of a termination request
+ *   - ids are compared lowercased, so the case they arrive in does not matter
+ *   - a malformed terminated id throws rather than filtering nothing, because
+ *     filtering nothing here is silently writing the archive offsite again
+ *
+ * What this does NOT do, and no code does: it does not touch snapshots already
+ * in B2. Those come out only through runbook step 4.6, by hand, once their locks
+ * have expired. This stops the bleeding. It does not clean up behind itself.
+ */
+export function buildSnapshotEntries(
+  rows: readonly SnapshotSourceRow[],
+  terminatedArchiveIds: readonly string[] = [],
+): SnapshotEntry[] {
+  const terminated = new Set(
+    terminatedArchiveIds.map((id) => requireUuid(id, 'terminatedArchiveIds entry')),
+  )
+
+  const entries: SnapshotEntry[] = []
+  for (const row of rows) {
+    const archiveId = archiveIdFromPath(row.path)
+    if (archiveId !== null && terminated.has(archiveId)) continue
+    entries.push(toSnapshotEntry(row))
+  }
+  return entries
+}
+
 // ── Roster check ─────────────────────────────────────────────────────────────
 
 export interface RosterResult {

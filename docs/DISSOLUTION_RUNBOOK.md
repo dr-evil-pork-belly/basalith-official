@@ -22,10 +22,14 @@ is presented as tested when it is not.
 |---|---|
 | **CONFIRMED** | Read live against the production project on August 8, 2026. Trust it. |
 | **UNPROVEN** | Correct by design but never executed. The dry walk in "Before first use" is where it becomes confirmed. |
+| **PROVEN** | Executed for real against the disposable drill archive, with the date. Section 1.4 lists every step that carries this and every step that does not. |
 
-**This runbook has never been executed.** Before the first real dissolution, walk the
-day X+365 section against a disposable test archive and correct whatever is wrong. A
-dissolution is a bad time to discover that a command has the wrong flag.
+**This runbook has been executed in part, once, against a disposable archive.** On
+2026-08-12 steps 4.0 through 4.4 were walked against
+`dddddddd-0000-4000-8000-000000009a01`. Steps 4.5 through 4.10, every command that touches
+B2, have still never been run by anyone. Section 1.4 records exactly which is which, and
+each step below carries its own marker. A dissolution is a bad time to discover that a
+command has the wrong flag, and half this section is still in that state.
 
 ---
 
@@ -62,7 +66,11 @@ final 90 days. That is the failure this runbook exists to prevent.
 **Two rules that follow, and that you must not work around:**
 
 1. **Never attempt the B2 deletion early.** It will fail, and a failed delete against a
-   locked version is not a partial success. Wait for the date.
+   locked version is not a partial success. Wait for the date. **But do not read every
+   failure as the lock holding.** A refused delete and a mis-scoped key both come back as
+   `AccessDenied`, and they demand opposite responses. Confirm which one you have with
+   `get-object-retention` before you either wait or start changing things. The box at the
+   top of step 4.5 has the exact call and how to read it.
 2. **Never turn off Object Lock, lower the retention, or switch the bucket to GOVERNANCE
    mode to make a deletion go through.** If a deletion is being refused, something upstream
    is wrong and section 3 tells you what. Weakening the lock to force it through destroys
@@ -121,11 +129,44 @@ archive's photos live under the B2 prefix `photographs/{archive_id}/`.
 
 ### 1.4 Before first use, once, ever
 
-- [ ] Read 1.5, so the red verify that follows 9a is expected rather than investigated.
-- [ ] Walk section 4 against a disposable test archive with real objects in it, and correct
-      every command that does not work as written. Record the date of that walk here:
+- [x] Read 1.5, so the red verify that follows 9a is expected rather than investigated.
+- [~] Walk section 4 against a disposable test archive with real objects in it, and correct
+      every command that does not work as written.
 
-      Dry walk completed on: ________________  by: ________________
+      **PARTIALLY WALKED, 2026-08-12, by Claude Code.** Against the disposable drill
+      archive `dddddddd-0000-4000-8000-000000009a01`, six synthetic objects across
+      `photographs`, `voice-recordings` and `archive-documents`. **Not signed off, because
+      the walk is not finished.** Steps 4.5 through 4.10 have not been executed.
+
+      Countersigned by: ________________  date: ________________
+
+**Exactly what was walked, and what was not.** Read this before trusting any step below.
+
+| Step | State after 2026-08-12 |
+|---|---|
+| 4.0 date gate | **Verified blocking, not exercised passing.** Ran against the drill archive and it correctly refused: `ok_to_proceed false`, 365 days early. Nothing was backdated to get past it. What is proven is that the gate stops you. What is NOT proven is the path after it opens. |
+| 4.1 Supabase Storage purge | **Exercised for real.** Dry pass listed 6, `--confirm` deleted 6, every bucket reported `verified empty`. `scripts/dissolution-purge.ts` is committed and no longer UNPROVEN. |
+| 4.2 independent verify | **Half done.** Two API angles confirm the objects are gone. The `storage.objects` SQL in this step was NOT run, because it needs the Supabase SQL editor. Still owed. |
+| 4.3 Postgres rows | **Still blocked**, unchanged. No cascade map exists. |
+| 4.4 B2 work list | **Exercised.** Six rows, matching the six manifest rows, one lock date. |
+| 4.5 listings | **Exercised**, with a real deletion key created and revoked in one session. Four prefix listings returned 3, 2, 0, 1, one version per key, nothing from any other archive. |
+| 4.5 refusal | **Exercised, and it refused.** `delete-object` against one locked version returned `AccessDenied`. `get-object-retention` confirmed `Mode: COMPLIANCE`, `RetainUntilDate: 2026-11-10T01:17:03.934000+00:00`, matching the manifest. Re-listing showed 3 versions and `DeleteMarkers: null`. **COMPLIANCE is enforcing.** |
+| 4.5 deletes that succeed | **NOT WALKED, and cannot be before 2026-11-10.** Every lock on the drill objects expires that day. This is the earliest any successful B2 delete can be rehearsed. |
+| 4.6 to 4.8 | **NOT WALKED.** They need versions whose locks have expired, so they wait on the same date. |
+| 4.9, 4.10 | **Partly.** The key was created and revoked in one session and confirmed dead, which is what 4.9 asks. The close-out at 4.10 belongs to a real dissolution. |
+
+**Deletion key, 2026-08-12.** Created with the four capabilities now stated literally in
+section 5, used for the 4.5 listings and the refusal, revoked in the console the same
+session, and confirmed dead by re-running a listing and receiving an auth failure. Nothing
+left live overnight.
+
+**The one thing this drill found that a real dissolution would have found the hard way:**
+`AccessDenied` is returned both when the lock is holding and when the key is wrong, and the
+two demand opposite responses. The disambiguator is in the box at the top of step 4.5. It
+exists because we hit both causes on the same day, four hours apart.
+
+The drill archive's objects are in B2 under a COMPLIANCE lock until **2026-11-10**, which is
+what 4.5 will be tested against.
 
 ### 1.5 The alarm you will see during the drill, and the date it must stop
 
@@ -386,96 +427,37 @@ where  id = 'ARCHIVE_ID_HERE';
 
 - [ ] `ok_to_proceed` is true.
 
+**Drill note, 2026-08-12. This gate was verified blocking, not exercised passing.** Run
+against the drill archive it returned `ok_to_proceed false`, 365 days early, and the walk
+went no further through this step. Nothing was backdated to open it, because a gate you
+can talk your way past is not a gate and a drill that edits the date is testing the edit.
+So the steps below have been walked with the gate deliberately left shut, and what happens
+on a real X+365 morning when it opens is still unobserved.
+
 ### Step 4.1. Delete the objects from Supabase Storage
 
-**UNPROVEN.** The script below has not been run. Prove it in the dry walk.
+**PROVEN August 12, 2026.** Executed for real against the drill archive: dry pass listed 6,
+`--confirm` deleted 6, every bucket reported `verified empty`.
 
 Do not use the SQL editor for this. `delete from storage.objects` removes the database row
 that points at a file and can leave the file itself behind in the storage backend. That
 would leave you with a dissolution that reports success and bytes that still exist. Use the
 Storage API, which deletes both.
 
-Save this as `scripts/dissolution-purge.ts`:
+The script is committed at **`scripts/dissolution-purge.ts`**. It is not reproduced here,
+because a second copy in this document would drift from the one that actually runs.
 
-```ts
-/**
- * Deletes one archive's objects from Supabase Storage across the five
- * archive-scoped buckets. Dissolution only. See docs/DISSOLUTION_RUNBOOK.md.
- *
- *   npx tsx scripts/dissolution-purge.ts <archive-id>             lists, deletes nothing
- *   npx tsx scripts/dissolution-purge.ts <archive-id> --confirm   deletes
- */
-import './load-env'
-import { createClient } from '@supabase/supabase-js'
+**PROVEN August 12, 2026** against the drill archive. It was UNPROVEN until then.
 
-const BUCKETS = [
-  'photographs',
-  'voice-recordings',
-  'archive-videos',
-  'archive-documents',
-  'archive-exports',
-] as const
+**One change from the version this runbook originally listed: a safety gate.** The script
+refuses unless the target archive has a non-null `termination_requested_at`. Its only
+function is destruction and its only input is a uuid typed by a person, and nothing in the
+original stopped it running against a live family archive on a mistyped id. Verified during
+the drill: pointed at Founder Test, it refused and exited before listing a single object.
 
-const archiveId = process.argv[2]
-const confirmed = process.argv.includes('--confirm')
-
-if (!archiveId || !/^[0-9a-f-]{36}$/i.test(archiveId)) {
-  console.error('usage: npx tsx scripts/dissolution-purge.ts <archive-uuid> [--confirm]')
-  process.exit(1)
-}
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { auth: { persistSession: false } }
-)
-
-async function walk(bucket: string, prefix: string, out: string[]): Promise<void> {
-  const { data, error } = await supabase.storage.from(bucket).list(prefix, { limit: 1000 })
-  if (error) throw new Error(`list ${bucket}/${prefix}: ${error.message}`)
-  for (const entry of data ?? []) {
-    const full = prefix ? `${prefix}/${entry.name}` : entry.name
-    // A folder placeholder has a null id. A real object does not.
-    if ((entry as { id?: string | null }).id === null) await walk(bucket, full, out)
-    else out.push(full)
-  }
-}
-
-async function main() {
-  let grandTotal = 0
-
-  for (const bucket of BUCKETS) {
-    const paths: string[] = []
-    await walk(bucket, archiveId, paths)
-
-    console.log(`\n${bucket}: ${paths.length} object(s) under ${archiveId}/`)
-    for (const p of paths) console.log(`  ${p}`)
-    grandTotal += paths.length
-    if (!paths.length) continue
-
-    if (!confirmed) continue
-
-    // remove() takes up to 1000 paths per call.
-    for (let i = 0; i < paths.length; i += 500) {
-      const batch = paths.slice(i, i + 500)
-      const { error } = await supabase.storage.from(bucket).remove(batch)
-      if (error) throw new Error(`remove ${bucket}: ${error.message}`)
-      console.log(`  deleted ${batch.length}`)
-    }
-
-    // Verify this bucket is empty for the prefix before moving to the next.
-    const after: string[] = []
-    await walk(bucket, archiveId, after)
-    if (after.length) throw new Error(`${bucket}: ${after.length} object(s) survived deletion`)
-    console.log(`  verified empty`)
-  }
-
-  console.log(`\n${confirmed ? 'DELETED' : 'WOULD DELETE'} ${grandTotal} object(s) total`)
-  if (!confirmed) console.log('Dry run. Re-run with --confirm to delete.')
-}
-
-main().then(() => process.exit(0)).catch((e) => { console.error(e); process.exit(1) })
-```
+It deliberately does **not** check `scheduled_deletion_at`. That date is step 4.0's gate.
+Duplicating it inside the script would make the script impossible to rehearse against a
+drill archive, which is the only way this runbook ever gets proven. Do not add it later.
 
 Run the dry pass first, always:
 
@@ -558,7 +540,49 @@ when the version was written. Always delete by key and version together.
 
 ### Step 4.5. Delete the versions from B2
 
-**UNPROVEN.** Prove these commands in the dry walk.
+**PARTLY PROVEN, 2026-08-12.** The listings below and the refusal were executed for real
+against the drill archive, with a real deletion key created and revoked the same session.
+The deletes that **succeed** are still unproven and cannot be rehearsed before a lock
+expires. See 1.4.
+
+---
+
+#### READ THIS BEFORE YOU BELIEVE AN AccessDenied
+
+**A refused delete and a broken key produce the same error class, and they demand opposite
+responses.** Both surface as `AccessDenied`. One means wait, the other means fix the key.
+Guess wrong in the safe direction and you wait months for nothing. Guess wrong in the other
+and you start weakening the lock to force a deletion through, which section 0 forbids
+precisely because it destroys the protection for every other family on the property.
+
+Two real strings, both observed on 2026-08-12 against this bucket:
+
+| Cause | What came back |
+|---|---|
+| Key lacked a capability (`writeFileRetentions`, during the 9a seed) | `AccessDenied: not entitled` |
+| Lock holding, delete correctly refused (this step) | `An error occurred (AccessDenied) when calling the DeleteObject operation: Access Denied` |
+
+B2 does appear to say `not entitled` for a missing capability and plain `Access Denied` for
+a lock. **Do not rely on that.** Two samples, from two different clients, and a vendor
+message string is not a contract.
+
+**Disambiguate in one call instead:**
+
+```
+aws s3api get-object-retention --bucket "$B2_BUCKET" --key "THE_KEY" --version-id "THE_B2_FILE_ID" --endpoint-url "$B2_ENDPOINT"
+```
+
+| It returns | Meaning | Do |
+|---|---|---|
+| `RetainUntilDate` in the future | The lock is holding. The refusal is correct. | Wait. Recompute the date from step 2.3. |
+| `RetainUntilDate` in the past, or no retention | The lock is not what is stopping you. | Your key is wrong. Check `deleteFiles` and the bucket scope. |
+| `AccessDenied` on this call too | You cannot diagnose anything. | The key is missing `readFileRetentions`. Reissue it with the four capabilities in section 5. |
+
+That third row is why `readFileRetentions` is on the deletion key at all. Without it an
+operator cannot tell the two failures apart, which is the situation this box exists to
+prevent.
+
+---
 
 Authenticate with the deletion key from section 5. Confirm you are pointed at the right
 bucket before deleting anything:
@@ -572,6 +596,27 @@ aws s3api list-object-versions \
 ```
 
 - [ ] Output lists this archive's objects and nothing else.
+
+**PROVEN 2026-08-12.** Against the drill archive the four listings returned 3, 2, 0 and 1
+versions, one version per key, six total, matching the step 4.4 work list exactly and
+containing nothing belonging to any other archive. A bucket-wide listing returned seven
+keys: those six plus `_manifest/2026-08-12.json`, the inventory snapshot, which is written
+by the sync and is not archive-scoped. **Do not delete the snapshot here.** Step 4.6 covers
+it, and it is shared across every archive.
+
+**The refusal is PROVEN.** One `delete-object` against one locked version returned:
+
+```
+An error occurred (AccessDenied) when calling the DeleteObject operation: Access Denied
+```
+
+and `get-object-retention` on the same version returned `Mode: COMPLIANCE`,
+`RetainUntilDate: 2026-11-10T01:17:03.934000+00:00`, matching the manifest row exactly.
+Re-listing afterwards showed 3 versions still present and `DeleteMarkers: null`, so nothing
+was removed and no delete marker was created.
+
+COMPLIANCE is enforcing. The dates in section 0 rest on a property that has now been
+observed rather than assumed.
 
 Repeat that listing for each of the four backed up buckets, changing only the prefix:
 
@@ -626,21 +671,65 @@ version was refused, and its `b2_locked_until` from the CSV.
 
 ### Step 4.6. Delete the stale manifest snapshots from B2
 
+**NOT WALKED.** No snapshot has ever been deleted from B2 by anyone. See 1.4.
+
 The backup writes a full inventory snapshot to `_manifest/{date}.json` after each successful
-sync. **These are not under the archive's prefix, so step 4.5 did not touch them,** and
-every snapshot written before day X lists this archive's paths and hashes.
+sync. **These are not under the archive's prefix, so step 4.5 did not touch them,** and a
+snapshot that lists this archive carries its paths and hashes.
 
 They contain no captions and no descriptions, by design. They carry only bucket, path,
 sha256, size, and lock expiry. But a per-file inventory of a dissolved archive is still a
 record of that archive, so it goes.
 
-**Delete every snapshot dated before this archive's `termination_requested_at`. Keep every
-snapshot dated after it.**
+#### Which snapshots list a terminated archive, and why the answer changed
+
+**This section said, until August 12, 2026: "Snapshots written after day X do not list this
+archive at all, because it left scope on day X." That was false, and it was false in the
+direction that matters.** Leaving scope stopped the archive being COPIED. The snapshot was
+never built from the source walk. It was built by reading `storage_backup_objects` whole,
+and this archive's manifest rows survive until step 4.8, at X+365. So every sync between day
+X and the deletion wrote a fresh snapshot listing the archive, each under a new lock dated
+from its own write day. Deleting one by hand did not help, because the next sync regenerated
+it from the same rows. Worse, the second checkbox below told the operator to keep the newest
+one. The procedure preserved the leak on purpose.
+
+The filter now exists. `buildSnapshotEntries` in `lib/storageBackup.ts` drops any row whose
+path carries a terminated archive's uuid, and the `write-manifest-json` step in
+`lib/inngest/storageBackupFunctions.ts` calls it with the same terminated list the sync
+already loaded for `applyArchiveScope`. Covered by `lib/storageBackup.test.ts`, in
+`the snapshot read honours the dissolution filter too`.
+
+**PENDING DEPLOY.** Committed on `fix/b2-key-spec-and-loud-failures` as `4a0b1a0`. Until that
+reaches production, every sync is still writing archive-listing snapshots, and the paragraph
+above describes code that is not yet the code that runs. **Record the deploy date here before
+relying on the cut-off below:**
+
+      4a0b1a0 in production on: ________________
+
+#### The rule
+
+**Delete every snapshot dated before the CUT-OFF. Keep every snapshot dated on or after it.**
+
+> **CUT-OFF = the LATER of this archive's `termination_requested_at` and the date `4a0b1a0`
+> reached production.**
+
+Two dates, because two different things make a snapshot dirty:
+
+- A snapshot written **before day X** lists the archive because the archive was live then.
+  Correct at the time, and it goes.
+- A snapshot written **by pre-fix code** lists the archive whatever its date, because that
+  code did not filter. A snapshot dated after day X is not evidence of anything if the deploy
+  had not happened when it was written.
+
+If the deploy date is later than day X, the cut-off is the deploy date and you will be
+deleting snapshots dated after the termination request. That is correct. Do not "fix" it back
+to day X.
 
 Nothing is lost by this. Each snapshot is a full inventory, not a delta, and the manifest is
 additive, so a newer snapshot contains everything an older one did for every archive still
-live. Snapshots written after day X do not list this archive at all, because it left scope
-on day X.
+live.
+
+#### Doing it
 
 ```bash
 aws s3api list-object-versions \
@@ -651,13 +740,30 @@ aws s3api list-object-versions \
   --output text
 ```
 
-Delete only the entries whose date in the filename is **earlier than**
-`termination_requested_at`, one at a time, using the same `delete-object` call as step 4.5.
+Delete only the entries whose date in the filename is **earlier than the cut-off**, one at a
+time, using the same `delete-object` call as step 4.5.
 
-- [ ] Snapshots older than the request date are gone.
-- [ ] At least one snapshot newer than the request date still exists. **If you have deleted
+**Count versions, not dates.** The bucket is versioned and the key carries only a date, so two
+successful syncs on one date produce two locked versions under one `_manifest/{date}.json`
+key. The listing above and the delete loop both enumerate versions and handle this correctly.
+What does not is a count taken by reading filenames: it undercounts by every same-day rerun,
+and a log entry saying 40 against 47 real deletions is the kind of discrepancy that reads as
+a failed deletion a year later. **The number in the log is the number of `delete-object` calls
+that succeeded.**
+
+- [ ] Cut-off date computed, from the later of the two dates, and written in the log.
+- [ ] Every snapshot version dated before the cut-off is gone.
+- [ ] At least one snapshot dated on or after the cut-off still exists. **If you have deleted
       every snapshot, you have destroyed the offsite inventory for every other family on the
       property.** Stop and raise it.
+- [ ] Re-run the listing and confirm no remaining key is dated before the cut-off.
+
+**One residual this step cannot close, and no step can.** A snapshot cannot be deleted before
+its own lock expires, and it is written under the same retention as everything else. That is
+not a constraint here, because a snapshot written on or before day X unlocks long before
+X+365. It is worth knowing anyway, in case a dissolution is ever performed early against a
+snapshot that is still locked: the refusal will look exactly like step 4.5's, and the box at
+the top of 4.5 is how you tell it apart from a broken key.
 
 ### Step 4.7. Verify B2 is empty for this archive
 
@@ -750,11 +856,17 @@ customer-facing copy is never written as though it did.
 **The backup job's key cannot perform any deletion in this runbook, and must never be
 changed so that it can.**
 
-That key is scoped to `listBuckets`, `listFiles`, `readFiles`, `writeFiles`, deliberately
-without `deleteFiles`. It is the key that runs unattended every day. Because it cannot
-delete, no bug in the backup job and no compromise of the Vercel environment can destroy the
-copy of last resort. That property is worth more than the convenience of using one key for
-everything.
+That key is scoped to `listBuckets`, `listFiles`, `readFiles`, `writeFiles`,
+`writeFileRetentions`, `readFileRetentions`, deliberately without `deleteFiles`. It is the
+key that runs unattended every day. Because it cannot delete, no bug in the backup job and no
+compromise of the Vercel environment can destroy the copy of last resort. That property is
+worth more than the convenience of using one key for everything.
+
+`writeFileRetentions` sets a retention, it does not shorten or remove one, and a COMPLIANCE
+retention cannot be reduced by any key including the account root. So it does not weaken the
+paragraph above. **CORRECTED August 11, 2026:** the two retention capabilities were absent
+from the original spec, which meant the job key could not create the lock at all. Every write
+failed `AccessDenied: not entitled`. Found by the build order 9a drill.
 
 So the deletion uses a **second, separate B2 application key**, and it lives under these
 rules:
@@ -762,8 +874,41 @@ rules:
 - [ ] **Created on the day of the deletion. Not before.** It is not a standing credential. A
       permanently live delete key on the backup bucket is the single most dangerous
       credential on the property.
-- [ ] Scoped to the **one backup bucket**, with `deleteFiles` added to the same permissions
-      the job key has.
+- [ ] Scoped to the **one backup bucket**, with exactly these four capabilities and no
+      others:
+
+      ```
+      listBuckets
+      listFiles
+      deleteFiles
+      readFileRetentions
+      ```
+
+      **Never `writeFiles`, never `writeFileRetentions`, never `bypassGovernance`.**
+
+      **CORRECTED 2026-08-12.** This item used to define the deletion key by reference, as
+      "the same permissions the job key has, plus `deleteFiles`". That was wrong twice over.
+      A key whose only job is a handful of deletes does not need to write objects, and a
+      delete-capable key that can also set retentions can extend a COMPLIANCE lock, which is
+      a denial of deletion nobody can undo, including the account root. Defining it by
+      reference also meant that correcting the job key on August 11 silently widened this
+      key without anyone deciding to. It is now stated literally so it cannot drift again.
+
+      `bypassGovernance` does nothing against COMPLIANCE and must still be withheld. A key
+      carrying it would work against a GOVERNANCE bucket, and that is not a habit to build
+      on the credential that can destroy the copy of last resort.
+
+      `readFileRetentions` is not optional. It is the only way to tell a refused delete apart
+      from a broken key. See the box at the top of step 4.5.
+
+      A B2 name prefix restriction cannot narrow this to one archive. The objects sit under
+      `photographs/{id}/`, `voice-recordings/{id}/` and `archive-documents/{id}/`, and B2
+      takes a single prefix string. No prefix covers those three and excludes other
+      families. Do not spend time trying.
+
+- [ ] **Used on 2026-08-12** for the 9a drill: created, used for the step 4.5 listings and
+      the refusal test, revoked in the console the same session, and confirmed dead by
+      re-running a listing and getting an auth failure. Nothing was left live overnight.
 - [ ] **Never in Vercel. Never in `.env.local`. Never committed to the repo.** No code path
       takes it. It is typed by a person into a shell or the console and used for the minutes
       the deletion takes.
@@ -815,7 +960,9 @@ DAY X+365
   [ ] 4.3 Postgres rows                  BLOCKED, no cascade document. Outstanding.
   [ ] 4.4 delete list exported           rows: __________
   [ ] 4.5 B2 versions deleted            versions deleted: __________
-  [ ] 4.6 stale snapshots deleted        snapshots deleted: __________
+  [ ] 4.6 stale snapshots deleted        cut-off: __________
+      (VERSIONS deleted, not dates. Same-day reruns share one key. Step 4.6.)
+      versions deleted: __________
   [ ] 4.7 B2 verified empty, all four prefixes
   [ ] 4.8 manifest rows deleted          rows: __________
   [ ] 4.9 deletion key revoked           created: __________ revoked: __________
