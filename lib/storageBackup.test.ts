@@ -500,6 +500,41 @@ describe('the sync wiring applies the scope where it actually matters', () => {
     expect(code).toMatch(/manifestKeys: manifest\.map\(\(m\) => m\.b2_key\)/)
     expect(code).toMatch(/const toRehash = manifest\.slice\(0, MAX_COPIES_PER_RUN\)/)
   })
+
+  it('the snapshot is filtered and its own count is reported separately', () => {
+    // The dissolution filter's second half. Asserted on the call with both
+    // arguments, because buildSnapshotEntries(rows) with the list forgotten
+    // compiles, passes every unit test of the function itself, and writes the
+    // terminated archive offsite exactly as before.
+    expect(code).toMatch(/const entries = buildSnapshotEntries\(rows, terminatedArchiveIds\)/)
+    expect(code).toMatch(/snapshotExcludedTerminated: snapshot\.rows - snapshot\.entries/)
+  })
+
+  it('objects_manifest is the table count in BOTH writers, never the filtered one', () => {
+    // This column has two writers and zero readers. The heartbeat reads
+    // started_at, the budget window reads bytes_read_source, the scoped-seed
+    // check reads id, and nothing else on the property touches the table. So a
+    // wrong value here raises nothing and is invisible until somebody compares a
+    // sync row against a verify row, which happens for the first time during a
+    // dissolution, a year after the row was written.
+    //
+    // snapshot.rows is the unfiltered read, which is what the column means:
+    // "counted in storage_backup_objects". snapshot.entries is what survived the
+    // dissolution filter, and it is smaller the moment any archive is terminated.
+    // Writing entries here would make the sync's number disagree with verify's,
+    // which computes the same quantity from its own unfiltered read, and the
+    // disagreement would look like a backup fault rather than a units mistake.
+    //
+    // Asserted as the exhaustive list rather than two toMatch calls, so a third
+    // writer added later has to come back through this test.
+    const writes = code.match(/objects_manifest: [^,\n]+/g) ?? []
+    console.log(`objects_manifest writes: ${JSON.stringify(writes)}`)
+    expect(writes).toEqual([
+      'objects_manifest: snapshot.rows',   // sync
+      'objects_manifest: manifest.length', // verify
+    ])
+    expect(code).not.toMatch(/objects_manifest: snapshot\.entries/)
+  })
 })
 
 describe('A1 explains the scoped seed window without becoming excusable', () => {
