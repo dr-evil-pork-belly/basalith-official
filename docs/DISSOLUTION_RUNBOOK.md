@@ -704,7 +704,7 @@ reaches production, every sync is still writing archive-listing snapshots, and t
 above describes code that is not yet the code that runs. **Record the deploy date here before
 relying on the cut-off below:**
 
-      4a0b1a0 in production on: ________________
+      4a0b1a0 in production on: 2026-08-12
 
 #### The rule
 
