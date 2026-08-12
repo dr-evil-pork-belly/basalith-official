@@ -22,6 +22,7 @@ is presented as tested when it is not.
 |---|---|
 | **CONFIRMED** | Read live against the production project on August 8, 2026. Trust it. |
 | **UNPROVEN** | Correct by design but never executed. The dry walk in "Before first use" is where it becomes confirmed. |
+| **PROVEN** | Executed for real against the disposable drill archive, with the date. Section 1.4 lists every step that carries this and every step that does not. |
 
 **This runbook has been executed in part, once, against a disposable archive.** On
 2026-08-12 steps 4.0 through 4.4 were walked against
@@ -65,7 +66,11 @@ final 90 days. That is the failure this runbook exists to prevent.
 **Two rules that follow, and that you must not work around:**
 
 1. **Never attempt the B2 deletion early.** It will fail, and a failed delete against a
-   locked version is not a partial success. Wait for the date.
+   locked version is not a partial success. Wait for the date. **But do not read every
+   failure as the lock holding.** A refused delete and a mis-scoped key both come back as
+   `AccessDenied`, and they demand opposite responses. Confirm which one you have with
+   `get-object-retention` before you either wait or start changing things. The box at the
+   top of step 4.5 has the exact call and how to read it.
 2. **Never turn off Object Lock, lower the retention, or switch the bucket to GOVERNANCE
    mode to make a deletion go through.** If a deletion is being refused, something upstream
    is wrong and section 3 tells you what. Weakening the lock to force it through destroys
@@ -144,7 +149,21 @@ archive's photos live under the B2 prefix `photographs/{archive_id}/`.
 | 4.2 independent verify | **Half done.** Two API angles confirm the objects are gone. The `storage.objects` SQL in this step was NOT run, because it needs the Supabase SQL editor. Still owed. |
 | 4.3 Postgres rows | **Still blocked**, unchanged. No cascade map exists. |
 | 4.4 B2 work list | **Exercised.** Six rows, matching the six manifest rows, one lock date. |
-| 4.5 to 4.10 | **NOT WALKED.** Every one needs the section 5 deletion key, which is created at dissolution time and revoked the same day. The `aws s3api` commands remain UNPROVEN, and the 90 day lock refusal has not been tested. |
+| 4.5 listings | **Exercised**, with a real deletion key created and revoked in one session. Four prefix listings returned 3, 2, 0, 1, one version per key, nothing from any other archive. |
+| 4.5 refusal | **Exercised, and it refused.** `delete-object` against one locked version returned `AccessDenied`. `get-object-retention` confirmed `Mode: COMPLIANCE`, `RetainUntilDate: 2026-11-10T01:17:03.934000+00:00`, matching the manifest. Re-listing showed 3 versions and `DeleteMarkers: null`. **COMPLIANCE is enforcing.** |
+| 4.5 deletes that succeed | **NOT WALKED, and cannot be before 2026-11-10.** Every lock on the drill objects expires that day. This is the earliest any successful B2 delete can be rehearsed. |
+| 4.6 to 4.8 | **NOT WALKED.** They need versions whose locks have expired, so they wait on the same date. |
+| 4.9, 4.10 | **Partly.** The key was created and revoked in one session and confirmed dead, which is what 4.9 asks. The close-out at 4.10 belongs to a real dissolution. |
+
+**Deletion key, 2026-08-12.** Created with the four capabilities now stated literally in
+section 5, used for the 4.5 listings and the refusal, revoked in the console the same
+session, and confirmed dead by re-running a listing and receiving an auth failure. Nothing
+left live overnight.
+
+**The one thing this drill found that a real dissolution would have found the hard way:**
+`AccessDenied` is returned both when the lock is holding and when the key is wrong, and the
+two demand opposite responses. The disambiguator is in the box at the top of step 4.5. It
+exists because we hit both causes on the same day, four hours apart.
 
 The drill archive's objects are in B2 under a COMPLIANCE lock until **2026-11-10**, which is
 what 4.5 will be tested against.
@@ -521,7 +540,49 @@ when the version was written. Always delete by key and version together.
 
 ### Step 4.5. Delete the versions from B2
 
-**UNPROVEN.** Prove these commands in the dry walk.
+**PARTLY PROVEN, 2026-08-12.** The listings below and the refusal were executed for real
+against the drill archive, with a real deletion key created and revoked the same session.
+The deletes that **succeed** are still unproven and cannot be rehearsed before a lock
+expires. See 1.4.
+
+---
+
+#### READ THIS BEFORE YOU BELIEVE AN AccessDenied
+
+**A refused delete and a broken key produce the same error class, and they demand opposite
+responses.** Both surface as `AccessDenied`. One means wait, the other means fix the key.
+Guess wrong in the safe direction and you wait months for nothing. Guess wrong in the other
+and you start weakening the lock to force a deletion through, which section 0 forbids
+precisely because it destroys the protection for every other family on the property.
+
+Two real strings, both observed on 2026-08-12 against this bucket:
+
+| Cause | What came back |
+|---|---|
+| Key lacked a capability (`writeFileRetentions`, during the 9a seed) | `AccessDenied: not entitled` |
+| Lock holding, delete correctly refused (this step) | `An error occurred (AccessDenied) when calling the DeleteObject operation: Access Denied` |
+
+B2 does appear to say `not entitled` for a missing capability and plain `Access Denied` for
+a lock. **Do not rely on that.** Two samples, from two different clients, and a vendor
+message string is not a contract.
+
+**Disambiguate in one call instead:**
+
+```
+aws s3api get-object-retention --bucket "$B2_BUCKET" --key "THE_KEY" --version-id "THE_B2_FILE_ID" --endpoint-url "$B2_ENDPOINT"
+```
+
+| It returns | Meaning | Do |
+|---|---|---|
+| `RetainUntilDate` in the future | The lock is holding. The refusal is correct. | Wait. Recompute the date from step 2.3. |
+| `RetainUntilDate` in the past, or no retention | The lock is not what is stopping you. | Your key is wrong. Check `deleteFiles` and the bucket scope. |
+| `AccessDenied` on this call too | You cannot diagnose anything. | The key is missing `readFileRetentions`. Reissue it with the four capabilities in section 5. |
+
+That third row is why `readFileRetentions` is on the deletion key at all. Without it an
+operator cannot tell the two failures apart, which is the situation this box exists to
+prevent.
+
+---
 
 Authenticate with the deletion key from section 5. Confirm you are pointed at the right
 bucket before deleting anything:
@@ -535,6 +596,27 @@ aws s3api list-object-versions \
 ```
 
 - [ ] Output lists this archive's objects and nothing else.
+
+**PROVEN 2026-08-12.** Against the drill archive the four listings returned 3, 2, 0 and 1
+versions, one version per key, six total, matching the step 4.4 work list exactly and
+containing nothing belonging to any other archive. A bucket-wide listing returned seven
+keys: those six plus `_manifest/2026-08-12.json`, the inventory snapshot, which is written
+by the sync and is not archive-scoped. **Do not delete the snapshot here.** Step 4.6 covers
+it, and it is shared across every archive.
+
+**The refusal is PROVEN.** One `delete-object` against one locked version returned:
+
+```
+An error occurred (AccessDenied) when calling the DeleteObject operation: Access Denied
+```
+
+and `get-object-retention` on the same version returned `Mode: COMPLIANCE`,
+`RetainUntilDate: 2026-11-10T01:17:03.934000+00:00`, matching the manifest row exactly.
+Re-listing afterwards showed 3 versions still present and `DeleteMarkers: null`, so nothing
+was removed and no delete marker was created.
+
+COMPLIANCE is enforcing. The dates in section 0 rest on a property that has now been
+observed rather than assumed.
 
 Repeat that listing for each of the four backed up buckets, changing only the prefix:
 
@@ -731,10 +813,41 @@ rules:
 - [ ] **Created on the day of the deletion. Not before.** It is not a standing credential. A
       permanently live delete key on the backup bucket is the single most dangerous
       credential on the property.
-- [ ] Scoped to the **one backup bucket**, with `deleteFiles` added to the same permissions
-      the job key has, which as of August 11, 2026 means `listBuckets`, `listFiles`,
-      `readFiles`, `writeFiles`, `writeFileRetentions`, `readFileRetentions`, plus
-      `deleteFiles`.
+- [ ] Scoped to the **one backup bucket**, with exactly these four capabilities and no
+      others:
+
+      ```
+      listBuckets
+      listFiles
+      deleteFiles
+      readFileRetentions
+      ```
+
+      **Never `writeFiles`, never `writeFileRetentions`, never `bypassGovernance`.**
+
+      **CORRECTED 2026-08-12.** This item used to define the deletion key by reference, as
+      "the same permissions the job key has, plus `deleteFiles`". That was wrong twice over.
+      A key whose only job is a handful of deletes does not need to write objects, and a
+      delete-capable key that can also set retentions can extend a COMPLIANCE lock, which is
+      a denial of deletion nobody can undo, including the account root. Defining it by
+      reference also meant that correcting the job key on August 11 silently widened this
+      key without anyone deciding to. It is now stated literally so it cannot drift again.
+
+      `bypassGovernance` does nothing against COMPLIANCE and must still be withheld. A key
+      carrying it would work against a GOVERNANCE bucket, and that is not a habit to build
+      on the credential that can destroy the copy of last resort.
+
+      `readFileRetentions` is not optional. It is the only way to tell a refused delete apart
+      from a broken key. See the box at the top of step 4.5.
+
+      A B2 name prefix restriction cannot narrow this to one archive. The objects sit under
+      `photographs/{id}/`, `voice-recordings/{id}/` and `archive-documents/{id}/`, and B2
+      takes a single prefix string. No prefix covers those three and excludes other
+      families. Do not spend time trying.
+
+- [ ] **Used on 2026-08-12** for the 9a drill: created, used for the step 4.5 listings and
+      the refusal test, revoked in the console the same session, and confirmed dead by
+      re-running a listing and getting an auth failure. Nothing was left live overnight.
 - [ ] **Never in Vercel. Never in `.env.local`. Never committed to the repo.** No code path
       takes it. It is typed by a person into a shell or the console and used for the minutes
       the deletion takes.
