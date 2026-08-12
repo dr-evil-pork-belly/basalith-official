@@ -23,9 +23,12 @@ is presented as tested when it is not.
 | **CONFIRMED** | Read live against the production project on August 8, 2026. Trust it. |
 | **UNPROVEN** | Correct by design but never executed. The dry walk in "Before first use" is where it becomes confirmed. |
 
-**This runbook has never been executed.** Before the first real dissolution, walk the
-day X+365 section against a disposable test archive and correct whatever is wrong. A
-dissolution is a bad time to discover that a command has the wrong flag.
+**This runbook has been executed in part, once, against a disposable archive.** On
+2026-08-12 steps 4.0 through 4.4 were walked against
+`dddddddd-0000-4000-8000-000000009a01`. Steps 4.5 through 4.10, every command that touches
+B2, have still never been run by anyone. Section 1.4 records exactly which is which, and
+each step below carries its own marker. A dissolution is a bad time to discover that a
+command has the wrong flag, and half this section is still in that state.
 
 ---
 
@@ -121,11 +124,30 @@ archive's photos live under the B2 prefix `photographs/{archive_id}/`.
 
 ### 1.4 Before first use, once, ever
 
-- [ ] Read 1.5, so the red verify that follows 9a is expected rather than investigated.
-- [ ] Walk section 4 against a disposable test archive with real objects in it, and correct
-      every command that does not work as written. Record the date of that walk here:
+- [x] Read 1.5, so the red verify that follows 9a is expected rather than investigated.
+- [~] Walk section 4 against a disposable test archive with real objects in it, and correct
+      every command that does not work as written.
 
-      Dry walk completed on: ________________  by: ________________
+      **PARTIALLY WALKED, 2026-08-12, by Claude Code.** Against the disposable drill
+      archive `dddddddd-0000-4000-8000-000000009a01`, six synthetic objects across
+      `photographs`, `voice-recordings` and `archive-documents`. **Not signed off, because
+      the walk is not finished.** Steps 4.5 through 4.10 have not been executed.
+
+      Countersigned by: ________________  date: ________________
+
+**Exactly what was walked, and what was not.** Read this before trusting any step below.
+
+| Step | State after 2026-08-12 |
+|---|---|
+| 4.0 date gate | **Verified blocking, not exercised passing.** Ran against the drill archive and it correctly refused: `ok_to_proceed false`, 365 days early. Nothing was backdated to get past it. What is proven is that the gate stops you. What is NOT proven is the path after it opens. |
+| 4.1 Supabase Storage purge | **Exercised for real.** Dry pass listed 6, `--confirm` deleted 6, every bucket reported `verified empty`. `scripts/dissolution-purge.ts` is committed and no longer UNPROVEN. |
+| 4.2 independent verify | **Half done.** Two API angles confirm the objects are gone. The `storage.objects` SQL in this step was NOT run, because it needs the Supabase SQL editor. Still owed. |
+| 4.3 Postgres rows | **Still blocked**, unchanged. No cascade map exists. |
+| 4.4 B2 work list | **Exercised.** Six rows, matching the six manifest rows, one lock date. |
+| 4.5 to 4.10 | **NOT WALKED.** Every one needs the section 5 deletion key, which is created at dissolution time and revoked the same day. The `aws s3api` commands remain UNPROVEN, and the 90 day lock refusal has not been tested. |
+
+The drill archive's objects are in B2 under a COMPLIANCE lock until **2026-11-10**, which is
+what 4.5 will be tested against.
 
 ### 1.5 The alarm you will see during the drill, and the date it must stop
 
@@ -386,96 +408,37 @@ where  id = 'ARCHIVE_ID_HERE';
 
 - [ ] `ok_to_proceed` is true.
 
+**Drill note, 2026-08-12. This gate was verified blocking, not exercised passing.** Run
+against the drill archive it returned `ok_to_proceed false`, 365 days early, and the walk
+went no further through this step. Nothing was backdated to open it, because a gate you
+can talk your way past is not a gate and a drill that edits the date is testing the edit.
+So the steps below have been walked with the gate deliberately left shut, and what happens
+on a real X+365 morning when it opens is still unobserved.
+
 ### Step 4.1. Delete the objects from Supabase Storage
 
-**UNPROVEN.** The script below has not been run. Prove it in the dry walk.
+**PROVEN August 12, 2026.** Executed for real against the drill archive: dry pass listed 6,
+`--confirm` deleted 6, every bucket reported `verified empty`.
 
 Do not use the SQL editor for this. `delete from storage.objects` removes the database row
 that points at a file and can leave the file itself behind in the storage backend. That
 would leave you with a dissolution that reports success and bytes that still exist. Use the
 Storage API, which deletes both.
 
-Save this as `scripts/dissolution-purge.ts`:
+The script is committed at **`scripts/dissolution-purge.ts`**. It is not reproduced here,
+because a second copy in this document would drift from the one that actually runs.
 
-```ts
-/**
- * Deletes one archive's objects from Supabase Storage across the five
- * archive-scoped buckets. Dissolution only. See docs/DISSOLUTION_RUNBOOK.md.
- *
- *   npx tsx scripts/dissolution-purge.ts <archive-id>             lists, deletes nothing
- *   npx tsx scripts/dissolution-purge.ts <archive-id> --confirm   deletes
- */
-import './load-env'
-import { createClient } from '@supabase/supabase-js'
+**PROVEN August 12, 2026** against the drill archive. It was UNPROVEN until then.
 
-const BUCKETS = [
-  'photographs',
-  'voice-recordings',
-  'archive-videos',
-  'archive-documents',
-  'archive-exports',
-] as const
+**One change from the version this runbook originally listed: a safety gate.** The script
+refuses unless the target archive has a non-null `termination_requested_at`. Its only
+function is destruction and its only input is a uuid typed by a person, and nothing in the
+original stopped it running against a live family archive on a mistyped id. Verified during
+the drill: pointed at Founder Test, it refused and exited before listing a single object.
 
-const archiveId = process.argv[2]
-const confirmed = process.argv.includes('--confirm')
-
-if (!archiveId || !/^[0-9a-f-]{36}$/i.test(archiveId)) {
-  console.error('usage: npx tsx scripts/dissolution-purge.ts <archive-uuid> [--confirm]')
-  process.exit(1)
-}
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { auth: { persistSession: false } }
-)
-
-async function walk(bucket: string, prefix: string, out: string[]): Promise<void> {
-  const { data, error } = await supabase.storage.from(bucket).list(prefix, { limit: 1000 })
-  if (error) throw new Error(`list ${bucket}/${prefix}: ${error.message}`)
-  for (const entry of data ?? []) {
-    const full = prefix ? `${prefix}/${entry.name}` : entry.name
-    // A folder placeholder has a null id. A real object does not.
-    if ((entry as { id?: string | null }).id === null) await walk(bucket, full, out)
-    else out.push(full)
-  }
-}
-
-async function main() {
-  let grandTotal = 0
-
-  for (const bucket of BUCKETS) {
-    const paths: string[] = []
-    await walk(bucket, archiveId, paths)
-
-    console.log(`\n${bucket}: ${paths.length} object(s) under ${archiveId}/`)
-    for (const p of paths) console.log(`  ${p}`)
-    grandTotal += paths.length
-    if (!paths.length) continue
-
-    if (!confirmed) continue
-
-    // remove() takes up to 1000 paths per call.
-    for (let i = 0; i < paths.length; i += 500) {
-      const batch = paths.slice(i, i + 500)
-      const { error } = await supabase.storage.from(bucket).remove(batch)
-      if (error) throw new Error(`remove ${bucket}: ${error.message}`)
-      console.log(`  deleted ${batch.length}`)
-    }
-
-    // Verify this bucket is empty for the prefix before moving to the next.
-    const after: string[] = []
-    await walk(bucket, archiveId, after)
-    if (after.length) throw new Error(`${bucket}: ${after.length} object(s) survived deletion`)
-    console.log(`  verified empty`)
-  }
-
-  console.log(`\n${confirmed ? 'DELETED' : 'WOULD DELETE'} ${grandTotal} object(s) total`)
-  if (!confirmed) console.log('Dry run. Re-run with --confirm to delete.')
-}
-
-main().then(() => process.exit(0)).catch((e) => { console.error(e); process.exit(1) })
-```
+It deliberately does **not** check `scheduled_deletion_at`. That date is step 4.0's gate.
+Duplicating it inside the script would make the script impossible to rehearse against a
+drill archive, which is the only way this runbook ever gets proven. Do not add it later.
 
 Run the dry pass first, always:
 
