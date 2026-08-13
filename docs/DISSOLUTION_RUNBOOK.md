@@ -490,7 +490,7 @@ order  by bucket_id;
 
 **Verify: zero rows returned.** Any row is an object the script missed.
 
-- [ ] Zero rows.
+- [X] Zero rows.
 
 ### Step 4.3. Delete the archive's Postgres rows
 
