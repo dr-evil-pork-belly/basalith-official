@@ -248,7 +248,7 @@ export default function TermsPage() {
             </p>
             <div className="flex items-center justify-center gap-5 flex-wrap">
               <a href="/privacy" className="btn-monolith-ghost">Privacy Policy</a>
-              <a href="/data-ownership" className="btn-monolith-ghost">Data Ownership Charter</a>
+              <a href="/data-ownership" className="btn-monolith-ghost">Data Ownership Commitments</a>
             </div>
           </div>
         </section>

@@ -107,7 +107,7 @@ export default function TrainingPage() {
               { step: '03', title: 'Archive Architecture',      desc: 'The digital estate structure is configured. Storage, access tiers, and generational transfer settings are established.' },
               { step: '04', title: 'Family Network Setup',      desc: 'Up to 15 family contributors are onboarded. Roles are assigned. Access levels are configured and documented.' },
               { step: '05', title: 'Founding Essence Session',  desc: 'The first live labeling session, 90 minutes. This is where it becomes real. A Senior Legacy Guide guides the family.' },
-              { step: '06', title: 'Custodian Designation',     desc: 'The archive\'s legal custodian is formally assigned and documented with estate standing. The Founding is complete.' },
+              { step: '06', title: 'Custodian Designation',     desc: 'The archive\'s custodian is assigned and documented with Heritage Nexus Inc. The Founding is complete.' },
             ].map(({ step, title, desc }) => (
               <div key={step} className="flex gap-5">
                 <span className="font-sans text-[0.62rem] font-bold tracking-[0.12em] flex-shrink-0 mt-0.5 w-7" style={{ color: '#C4A24A' }}>{step}</span>

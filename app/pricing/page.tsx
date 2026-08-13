@@ -103,7 +103,7 @@ const FOUNDING_DELIVERABLES = [
   { n: '03', title: 'Contributor Network Setup',       desc: 'Onboarding for up to 15 contributors. Roles assigned. Access levels configured.' },
   { n: '04', title: 'Founding Session',                desc: 'Your first guided session, led by a Senior Legacy Guide. This is where it becomes real.' },
   { n: '05', title: 'Data Migration',                  desc: 'Your records filtered, deduplicated, dated, and sequenced before they reach the labeling interface.' },
-  { n: '06', title: 'Custodian Designation',           desc: "Your archive's custodian assigned and formally documented." },
+  { n: '06', title: 'Custodian Designation',           desc: "Your archive's custodian assigned and documented." },
 ]
 
 const TRUST_BADGES: { icon: IconName; label: string }[] = [
@@ -357,7 +357,7 @@ export default function PricingPage() {
                   <p style={{ ...MONO, fontSize: '0.48rem', color: 'var(--color-gold)', marginBottom: '16px' }}>Business founding, one-time</p>
                   <p style={{ ...SERIF, fontSize: '0.88rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.3)', lineHeight: 1.7 }}>
                     Individual and family founding is $2,500. Annual plan selected separately.
-                    Executed by a Senior Legacy Guide.
+                    Delivered by a Legacy Guide.
                   </p>
                 </div>
               </div>

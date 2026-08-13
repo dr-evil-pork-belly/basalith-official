@@ -39,8 +39,9 @@ const ITEMS: Item[] = [
   },
   {
     q: 'Can my family access the archive after I am gone?',
-    a: `Yes. This is one of the core purposes of the archive. Your designated Custodian has formal estate
-      standing to govern the archive after your passing. Contributors retain their access. The archive
+    a: `Yes. This is one of the core purposes of the archive. Your designated Custodian carries out your
+      directions for the archive. Their legal authority comes from your own will or trust, so name them
+      there as well. Contributors retain their access. The archive
       continues. Your entity, if initialized, remains available to your family indefinitely.
       The Legacy tier includes specific provisions for multi-generational access and inheritance.`,
   },

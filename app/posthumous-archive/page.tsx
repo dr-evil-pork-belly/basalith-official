@@ -260,7 +260,7 @@ const STEPS = [
   {
     n:    '06',
     name: 'Entity Initialization',
-    body: 'The entity is built from everything collected. Initialized. Tested with the family. Delivered with full archive access and legal custodian designation.',
+    body: 'The entity is built from everything collected. Initialized. Tested with the family. Delivered with full archive access and custodian designation.',
   },
 ]
 
