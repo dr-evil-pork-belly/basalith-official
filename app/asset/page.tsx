@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title:       'The Asset',
-  description: 'The your archive, the Digital Clone, the legal archive. The most valuable thing you own is not on your balance sheet.',
+  description: 'The your archive, the Digital Clone, the archive itself. The most valuable thing you own is not on your balance sheet.',
 }
 
 const eyebrow: React.CSSProperties = {
@@ -133,7 +133,7 @@ export default function AssetPage() {
             who come after you. Their legal authority comes from your estate documents, so name
             them there too.
           </p>
-          <p style={body}>This is what makes Basalith an estate instrument and not a subscription service.</p>
+          <p style={body}>This is what makes Basalith an asset and not a subscription service.</p>
 
           <div style={divider} />
 
