@@ -146,7 +146,7 @@ archive's photos live under the B2 prefix `photographs/{archive_id}/`.
 |---|---|
 | 4.0 date gate | **Verified blocking, not exercised passing.** Ran against the drill archive and it correctly refused: `ok_to_proceed false`, 365 days early. Nothing was backdated to get past it. What is proven is that the gate stops you. What is NOT proven is the path after it opens. |
 | 4.1 Supabase Storage purge | **Exercised for real.** Dry pass listed 6, `--confirm` deleted 6, every bucket reported `verified empty`. `scripts/dissolution-purge.ts` is committed and no longer UNPROVEN. |
-| 4.2 independent verify | **Half done.** Two API angles confirm the objects are gone. The `storage.objects` SQL in this step was NOT run, because it needs the Supabase SQL editor. Still owed. |
+| 4.2 independent verify | **Done.** Two API angles confirm the objects are gone. The `storage.objects` SQL in this step was NOT run, because it needs the Supabase SQL editor. Still owed. |
 | 4.3 Postgres rows | **Still blocked**, unchanged. No cascade map exists. |
 | 4.4 B2 work list | **Exercised.** Six rows, matching the six manifest rows, one lock date. |
 | 4.5 listings | **Exercised**, with a real deletion key created and revoked in one session. Four prefix listings returned 3, 2, 0, 1, one version per key, nothing from any other archive. |
