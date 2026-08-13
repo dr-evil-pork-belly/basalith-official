@@ -153,6 +153,7 @@ export default function PrivacyPage() {
                 { name: 'Stripe',    role: 'Payment processing. We never receive or store your card number.' },
                 { name: 'Resend',    role: 'Email delivery.' },
                 { name: 'Twilio',    role: 'Deposits left on the phone line.' },
+                { name: 'Backblaze', role: 'Offsite backup copies of photographs, voice recordings, video, and documents.' },
               ].map(row => (
                 <div key={row.name} style={{ display: 'flex', gap: '16px', padding: '8px 0', borderBottom: '1px solid var(--color-border)' }}>
                   <span style={{ fontFamily: 'var(--font-space-mono, "Space Mono", "Courier New", monospace)', fontSize: '0.52rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)', width: '110px', flexShrink: 0, paddingTop: '3px' }}>{row.name}</span>

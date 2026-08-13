@@ -35,11 +35,11 @@ const TENETS = [
   {
     num:     '04',
     tenet:   'Right of Dissolution',
-    tagline: 'You can close the archive. Completely. Permanently.',
+    tagline: 'You can close the archive. Permanently.',
     body: [
-      'At any time, you or your designated Custodian may invoke the Right of Dissolution. This initiates the permanent, verified deletion of all archive content from our systems: every file, every annotation, every model weight derived from your data.',
-      'Dissolution is irreversible. We have no backup of your archive that survives a dissolution request. This is a deliberate architectural choice. You are not dissolving a subscription. You are exercising the right to be forgotten in the most complete sense we can technically implement.',
-      'A dissolution request must be verified against your Basalith agreement. After it is verified, Heritage Nexus holds the archive for 12 months, then permanently deletes it and confirms in writing. We maintain no shadow copy, no training residual, and no commercial derivative of deleted archives.',
+      'At any time, you or your designated Custodian may invoke the Right of Dissolution. This is a request for the permanent deletion of your archive. It is separate from canceling a subscription, and it is verified before anything is deleted.',
+      'Dissolution is irreversible. Your archive is copied to a second location so that a failure at one provider cannot lose it. An archive that has requested dissolution leaves that copy scope and is not copied again. The offsite copy is deleted as part of the deletion, on the same written process, not left behind.',
+      'A dissolution request must be verified before it proceeds. After it is verified, Heritage Nexus holds the archive for 12 months, then deletes it and confirms in writing. Your archive is never sold, never shared with third parties, and never used to train another person\'s entity. That holds while the archive is live and after it is gone.',
     ],
   },
 ]

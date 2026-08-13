@@ -58,6 +58,7 @@ const CODE: React.CSSProperties = {
 const INFRA = [
   { label: 'Database',      value: 'Supabase (PostgreSQL on AWS)' },
   { label: 'File storage',  value: 'Supabase Storage (AWS S3)' },
+  { label: 'Offsite backup', value: 'Backblaze B2' },
   { label: 'Application',   value: 'Vercel (AWS/GCP edge network)' },
   { label: 'AI processing', value: 'Anthropic API' },
   { label: 'Transcription', value: 'OpenAI Whisper API' },
