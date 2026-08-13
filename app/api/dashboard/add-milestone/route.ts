@@ -42,6 +42,24 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: 'Trigger value is required.' }, { status: 422 })
   }
 
+  // beneficiary_id is optional and stays optional. When it is present it arrives from the
+  // request body, so confirm it names a curator in the caller's own vault before it is
+  // written. The scope lives in the query, so another vault's curator does not resolve.
+  const beneficiaryId = beneficiary_id && typeof beneficiary_id === 'string' ? beneficiary_id : null
+
+  if (beneficiaryId) {
+    const { data: beneficiary, error: beneficiaryError } = await supabaseAdmin
+      .from('curators')
+      .select('id')
+      .eq('id',       beneficiaryId)
+      .eq('vault_id', vault.id)
+      .maybeSingle()
+
+    if (beneficiaryError || !beneficiary) {
+      return NextResponse.json({ ok: false, error: 'Beneficiary not found in this vault.' }, { status: 403 })
+    }
+  }
+
   const { data, error } = await supabaseAdmin.from('milestones').insert([{
     vault_id:            vault.id,
     title:               (title as string).trim(),
@@ -49,7 +67,7 @@ export async function POST(req: NextRequest) {
     category,
     trigger_type,
     trigger_value:       (trigger_value as string).trim(),
-    beneficiary_id:      beneficiary_id && typeof beneficiary_id === 'string' ? beneficiary_id : null,
+    beneficiary_id:      beneficiaryId,
     requires_key_holder: Boolean(requires_key_holder),
     status:              'armed',
   }]).select('id').single()
