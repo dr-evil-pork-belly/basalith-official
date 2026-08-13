@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient }  from '@/lib/supabase-server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 
+// Trim and lowercase, and nothing beyond that. Plus-addressing and dots distinguish
+// real, different mailboxes at some providers, so stripping them would collapse two
+// distinct addresses onto one value and let one person accept another's invite.
+function normalizeEmail(value: unknown): string {
+  return typeof value === 'string' ? value.trim().toLowerCase() : ''
+}
+
 export async function POST(req: NextRequest) {
   // Verify session
   const supabase = await createClient()
@@ -24,7 +31,7 @@ export async function POST(req: NextRequest) {
   // Find the pending curator record
   const { data: curator, error: findError } = await supabaseAdmin
     .from('curators')
-    .select('id, vault_id, invite_accepted')
+    .select('id, vault_id, invite_accepted, email')
     .eq('invite_token', token.trim())
     .maybeSingle()
 
@@ -36,7 +43,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: 'This invitation has already been accepted.' }, { status: 409 })
   }
 
-  // Update curator record — link to this user
+  // The token alone must not decide which vault the caller joins. Confirm the invite was
+  // issued to this user before anything is written. Both addresses are required: a missing
+  // user.email or a missing invitee email refuses rather than falling through to the
+  // writes below, because an empty string would otherwise compare equal to an empty string.
+  const callerEmail  = normalizeEmail(user.email)
+  const inviteeEmail = normalizeEmail(curator.email)
+
+  if (!callerEmail || !inviteeEmail || callerEmail !== inviteeEmail) {
+    return NextResponse.json({ ok: false, error: 'This invitation was not issued to this account.' }, { status: 403 })
+  }
+
+  // Update curator record, link to this user
   const { error: curatorError } = await supabaseAdmin
     .from('curators')
     .update({

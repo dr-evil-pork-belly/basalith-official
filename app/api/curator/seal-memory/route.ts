@@ -41,6 +41,21 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: 'You do not have access to this vault.' }, { status: 403 })
   }
 
+  // file_id arrives in the request body, so confirm the file belongs to this vault before
+  // either write below touches it. The scope lives in the query itself rather than in a
+  // JS comparison, so a file in another vault simply does not resolve. This guard covers
+  // both the essence_sessions insert and the vault_files update that follows it.
+  const { data: file, error: fileLookupError } = await supabaseAdmin
+    .from('vault_files')
+    .select('id')
+    .eq('id',       file_id)
+    .eq('vault_id', vault_id)
+    .maybeSingle()
+
+  if (fileLookupError || !file) {
+    return NextResponse.json({ ok: false, error: 'File not found in this vault.' }, { status: 403 })
+  }
+
   // Insert essence session
   const { error: sessionError } = await supabaseAdmin
     .from('essence_sessions')
@@ -67,10 +82,17 @@ export async function POST(req: NextRequest) {
   const { error: fileError } = await supabaseAdmin
     .from('vault_files')
     .update({ essence_tagged: true })
-    .eq('id', file_id)
+    .eq('id',       file_id)
+    .eq('vault_id', vault_id)
 
   if (fileError) {
+    // Known inconsistency, flagged rather than fixed. The essence_sessions row above is
+    // already committed and is deliberately not rolled back, so a session row can outlive
+    // a failed tag. Making these two writes atomic needs a transaction and is a separate
+    // change. What matters here is that the caller no longer receives ok: true and a
+    // percent for a file that was never tagged.
     console.error('[seal-memory] file update error:', fileError.message)
+    return NextResponse.json({ ok: false, error: 'Failed to seal this memory.' }, { status: 500 })
   }
 
   // Recalculate essence_percent for the vault
