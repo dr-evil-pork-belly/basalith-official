@@ -1,7 +1,6 @@
 import Nav    from '../components/Nav'
 import Footer from '../components/Footer'
 
-// [STATE OF INCORPORATION — CONFIRM IF NOT DELAWARE]
 const GOVERNING_STATE = 'Delaware'
 
 const SECTIONS = [
@@ -11,7 +10,20 @@ const SECTIONS = [
     body: [
       'Basalith is a personal legacy preservation service operated by Heritage Nexus Inc. ("we", "us", "the Company"). By creating an archive or submitting an application, you ("the Subscriber") agree to be bound by these Terms of Service in their entirety.',
       'Basalith provides a governed digital archive infrastructure, including secure storage, family contributor tools, AI-assisted Essence Mapping, and Digital Clone access, as described in the service tier documentation current at the time of your Founding.',
-      'These Terms govern the commercial relationship between you and Heritage Nexus Inc. The separate Basalith agreement, executed at the time of your Founding, governs the ownership, governance, and continuity of your archive as a legal asset. In any conflict between these Terms and your Basalith agreement, the Basalith agreement takes precedence in respect of archive content and ownership rights.',
+      // REMOVED 2026-08-12: two sentences that referred the Subscriber to a
+      // "separate Basalith agreement, executed at the time of your Founding" for
+      // ownership, governance, and continuity, and gave that document precedence
+      // over these Terms on archive content and ownership rights. No such
+      // document has ever been drafted. See the note at the removed notice
+      // section below.
+      //
+      // The sentence that remains was widened on the same day, from "govern the
+      // commercial relationship between you and Heritage Nexus Inc." to what is
+      // below. The removed sentences were the only thing in section 01 that
+      // spoke to the archive as an asset, so leaving the narrow wording said
+      // these Terms cover the commercial relationship and left nothing covering
+      // the archive. Ownership itself is stated in sections 03, 05, and 06.
+      'These Terms govern your use of the Basalith service in full, including your archive.',
       'We reserve the right to update these Terms. Material changes will be communicated by email no fewer than 30 days before taking effect. Continued use of the service after that date constitutes acceptance.',
     ],
   },
@@ -32,7 +44,7 @@ const SECTIONS = [
       'You may cancel your annual subscription at any time by providing written notice to legacy@basalith.xyz. Cancellation takes effect at the end of the current billing period. No partial refunds are issued for unused subscription time.',
       'Upon cancellation, you retain full rights to a complete export of your archive in open, portable formats. This export right is unconditional and does not require a reason. Export requests are fulfilled within 30 business days.',
       'Cancellation of a subscription is distinct from dissolution of your archive. Dissolution, meaning the permanent deletion of all archive content from our systems, is a separate, deliberate act. It requires a verified written request from the designated Custodian, or from an executor with documented authority. After the request is verified, Heritage Nexus Inc. holds the archive for 12 months, then permanently deletes it and confirms in writing.',
-      'You retain full ownership of your archive at all times. Heritage Nexus Inc. is the custodian, not the owner. If Basalith ceases operations for any reason, you may request a complete export of your archive in open and portable formats, fulfilled within 30 business days. Because the archive is always yours to hold, no closure can strand your data. The terms of this arrangement are specified in your Basalith agreement.',
+      'You retain full ownership of your archive at all times. Heritage Nexus Inc. is the custodian, not the owner. If Basalith ceases operations for any reason, you may request a complete export of your archive in open and portable formats, fulfilled within 30 business days. Because the archive is always yours to hold, no closure can strand your data.',
     ],
   },
   {
@@ -71,13 +83,13 @@ const SECTIONS = [
     ],
   },
   {
-    num:   '09',
+    num:   '08',
     title: 'Governing Law',
     body: [
       `These Terms of Service are governed by and construed in accordance with the laws of the State of ${GOVERNING_STATE}, United States of America, without regard to its conflict of law provisions.`,
-      `Any dispute arising out of or relating to these Terms, your Basalith agreement, or the Basalith service shall be subject to the exclusive jurisdiction of the courts of the State of ${GOVERNING_STATE} and the federal courts located therein, and you consent to personal jurisdiction in those courts.`,
+      `Any dispute arising out of or relating to these Terms or the Basalith service shall be subject to the exclusive jurisdiction of the courts of the State of ${GOVERNING_STATE} and the federal courts located therein, and you consent to personal jurisdiction in those courts.`,
       'If any provision of these Terms is found to be unenforceable, the remaining provisions will continue in full force and effect.',
-      'These Terms, together with your Basalith agreement, constitute the entire agreement between you and Heritage Nexus Inc. in respect of the Basalith service, and supersede all prior agreements, representations, and understandings.',
+      'These Terms constitute the entire agreement between you and Heritage Nexus Inc. in respect of the Basalith service, and supersede all prior agreements, representations, and understandings.',
     ],
   },
 ]
@@ -96,13 +108,10 @@ export default function TermsPage() {
         [data-theme-terms] .text-amber { color: var(--color-gold) !important; }
         [data-theme-terms] .text-amber-dim { color: var(--color-gold) !important; }
         [data-theme-terms] .text-amber\\/20 { color: rgba(184,150,62,0.15) !important; }
-        [data-theme-terms] .border-border-amber { border-color: var(--color-gold-border) !important; }
-        [data-theme-terms] .via-border-amber { --tw-gradient-stops: transparent, var(--color-gold-border), transparent !important; }
-        [data-theme-terms] .via-amber\\/45 { --tw-gradient-stops: transparent, rgba(184,150,62,0.3), transparent !important; }
-        [data-theme-terms] div[style*="linear-gradient(160deg,#221F14"] {
-          background: var(--color-surface) !important;
-          border-color: var(--color-gold-border) !important;
-        }
+        /* REMOVED 2026-08-12 with the Basalith Agreement notice section: the
+           rules for .border-border-amber, .via-border-amber, .via-amber/45, and
+           the 160deg gradient card selector. That section was their only
+           consumer in this file. */
         [data-theme-terms] .eyebrow { color: var(--color-gold); }
         [data-theme-terms] .btn-monolith-ghost {
           color: var(--color-text-secondary) !important;
@@ -146,40 +155,39 @@ export default function TermsPage() {
               </em>
             </h1>
             <p className="font-sans font-light text-body-base text-text-secondary leading-[1.82] max-w-xl mx-auto">
-              These terms govern the commercial relationship between you and Heritage Nexus Inc.
-              Your Basalith agreement, a separate binding document, governs your archive as a legal asset.
+              These terms govern your use of the Basalith service in full, including your archive.
             </p>
             <p className="font-sans text-[0.75rem] text-text-muted mt-6">
-              Last updated: March 2026 &nbsp;·&nbsp; Governing law: {GOVERNING_STATE}
+              Last updated: August 2026 &nbsp;·&nbsp; Governing law: {GOVERNING_STATE}
             </p>
           </div>
         </section>
 
-        {/* ── BASALITH AGREEMENT NOTICE ── */}
-        <section className="relative bg-obsidian-deep px-8 md:px-16 lg:px-24 py-16 overflow-hidden">
-          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-border-amber to-transparent" />
-          <div className="max-w-5xl mx-auto">
-            <div
-              className="rounded-sm border border-border-amber p-8 md:p-10 relative overflow-hidden"
-              style={{ background: 'linear-gradient(160deg,#221F14,#1D1B11)' }}
-            >
-              <div className="absolute top-0 left-[10%] right-[10%] h-px bg-gradient-to-r from-transparent via-amber/45 to-transparent" />
-              <div className="ai-badge mb-5"><span className="ai-dot" />Separate Binding Instrument</div>
-              <h2
-                className="font-serif font-semibold text-text-primary leading-tight tracking-[-0.025em] mb-4"
-                style={{ fontSize: 'clamp(1.5rem,2.5vw,2rem)' }}
-              >
-                The Basalith Agreement
-              </h2>
-              <p className="font-sans font-light text-body-base text-text-secondary leading-[1.85]">
-                Every Basalith archive is governed by a Basalith agreement, a separate legal instrument executed at The Founding.
-                The Charter establishes your absolute ownership of the archive, the terms of its inheritance, the rights of your designated Custodian,
-                and the conditions under which dissolution may occur. These Terms of Service govern the commercial subscription.
-                The Basalith Agreement governs the archive as a legal asset. Where they conflict, the Basalith agreement prevails.
-              </p>
-            </div>
-          </div>
-        </section>
+        {/*
+          REMOVED 2026-08-12: the Basalith Agreement notice section.
+
+          It rendered a bordered card, badged "Separate Binding Instrument" and
+          headed "The Basalith Agreement", asserting that every archive is
+          governed by a separate legal instrument executed at The Founding, that
+          the instrument establishes ownership, inheritance, and Custodian
+          rights, that it sets the conditions under which dissolution may occur,
+          and that it prevails over these Terms in any conflict.
+
+          No such instrument has ever been drafted. These Terms are binding and
+          cannot point a subscriber at a document that does not exist.
+
+          The heading and the badge were removed with the paragraph rather than
+          left behind, because every element in the section existed only to
+          present that claim, and a card headed "The Basalith Agreement" over an
+          empty body would assert the same thing more weakly.
+
+          Second pass, same day: the six surviving references were removed too,
+          in sections 01, 03, and 08, the hero, and the closing block, along with
+          the four style rules this section was the only consumer of. The
+          operative one was in section 01, which gave the undrafted document
+          precedence over these Terms on ownership rights. No reference to a
+          Basalith agreement remains in rendered copy on this page.
+        */}
 
         {/* ── SECTIONS ── */}
         {SECTIONS.map(({ num, title, body }, i) => (
@@ -236,7 +244,7 @@ export default function TermsPage() {
               <a href="mailto:legacy@basalith.xyz" className="text-amber-dim hover:text-amber transition-colors duration-200">
                 legacy@basalith.xyz
               </a>
-              . Questions about your Basalith agreement should reference your archive number.
+              . Please include your archive number.
             </p>
             <div className="flex items-center justify-center gap-5 flex-wrap">
               <a href="/privacy" className="btn-monolith-ghost">Privacy Policy</a>
