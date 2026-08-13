@@ -43,7 +43,7 @@ const SECTIONS = [
     body: [
       'You may cancel your annual subscription at any time by providing written notice to legacy@basalith.xyz. Cancellation takes effect at the end of the current billing period. No partial refunds are issued for unused subscription time.',
       'Upon cancellation, you retain full rights to a complete export of your archive in open, portable formats. This export right is unconditional and does not require a reason. Export requests are fulfilled within 30 business days.',
-      'Cancellation of a subscription is distinct from dissolution of your archive. Dissolution, meaning the permanent deletion of all archive content from our systems, is a separate, deliberate act. It requires a verified written request from the designated Custodian, or from an executor with documented authority. After the request is verified, Heritage Nexus Inc. holds the archive for 12 months, then permanently deletes it and confirms in writing.',
+      'Cancellation of a subscription is distinct from dissolution of your archive. Dissolution is the permanent deletion of your archive, and it is a separate, deliberate act. It requires a verified written request from the designated Custodian, or from an executor with documented authority. After the request is verified, Heritage Nexus Inc. holds the archive for 12 months, then deletes it and confirms in writing. Deletion covers the archive held with our storage provider and the offsite backup copy.',
       'You retain full ownership of your archive at all times. Heritage Nexus Inc. is the custodian, not the owner. If Basalith ceases operations for any reason, you may request a complete export of your archive in open and portable formats, fulfilled within 30 business days. Because the archive is always yours to hold, no closure can strand your data.',
     ],
   },
@@ -71,7 +71,7 @@ const SECTIONS = [
     title: 'Death and Succession',
     body: [
       'Upon your death your archive transfers to your designated heirs or estate. Your archive is treated as a private digital asset for the purposes of estate administration.',
-      'Heritage Nexus Inc. will work with your estate to facilitate archive transfer, continued access under the Legacy tier, or complete data export and deletion as directed by your estate.',
+      'Heritage Nexus Inc. will work with your estate to facilitate archive transfer, continued access under the Legacy tier, or data export and dissolution as directed by your estate.',
       'Heritage Nexus Inc. does not acquire any rights to your archive data upon your death. We are the custodian. Your heirs are the beneficiaries.',
     ],
   },
