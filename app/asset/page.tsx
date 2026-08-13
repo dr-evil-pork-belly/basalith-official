@@ -122,16 +122,16 @@ export default function AssetPage() {
             Basalith changes that.
           </p>
 
-          <h2 style={h2}>A legal asset with formal estate standing.</h2>
+          <h2 style={h2}>Built to be named in your estate plan.</h2>
           <p style={body}>
-            The Basalith archive is not a cloud storage account. It is a legal asset documented
-            in your estate plan with a designated Custodian who has formal standing to govern it
-            after your passing or incapacity.
+            The Basalith archive is not a cloud storage account. It is something you own, and it
+            can be named in your estate plan like any other asset you leave behind.
           </p>
           <p style={body}>
-            The archive can be named in a will. It can be inherited. The Custodian can grant and
-            revoke access, manage plans, and ensure the archive continues for the
-            generations that follow.
+            The archive can be named in a will. It can be inherited. The Custodian you name can
+            grant and revoke access, manage plans, and keep the archive running for the people
+            who come after you. Their legal authority comes from your estate documents, so name
+            them there too.
           </p>
           <p style={body}>This is what makes Basalith an estate instrument and not a subscription service.</p>
 

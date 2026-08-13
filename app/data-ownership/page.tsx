@@ -7,9 +7,9 @@ const TENETS = [
     tenet:   'Absolute Ownership',
     tagline: 'Your archive is yours. Not ours.',
     body: [
-      'From the moment of creation, your archive is a legal asset in your name. Not licensed to you. Not held in trust by us on your behalf. Owned by you, with the same structural clarity as a property deed.',
+      'From the moment of creation, your archive is yours. Not licensed to you. Not held in trust by us on your behalf. Owned by you.',
       'We do not have a claim on your archive\'s content, commercial value, or intellectual property. Heritage Nexus Inc. provides the infrastructure. You own what is built on it.',
-      'This is documented in your Basalith agreement and, at your direction, can be formalized in your estate plan with the help of your attorney.\n\nYour ownership of your archive content is not a marketing claim. It is the foundational principle of how Heritage Nexus Inc. operates.',
+      'At your direction, your ownership of the archive can be named in your estate plan, with the help of your attorney.\n\nYour ownership of your archive content is not a marketing claim. It is the foundational principle of how Heritage Nexus Inc. operates.',
     ],
   },
   {
@@ -28,8 +28,8 @@ const TENETS = [
     tagline: 'You decide who inherits. You decide for how long.',
     body: [
       'You determine the terms of your archive\'s continuity during your lifetime. Who may access it. Who may contribute to it. Under what conditions your entity may be queried. For how long after your death it remains active.',
-      'These terms are documented in your Basalith agreement and enforced by your designated Custodian, an individual or institutional trustee you name, with the same legal standing as a financial executor.',
-      'No representative of Heritage Nexus Inc. can override the continuity terms you set. No acquisition, restructuring, or change in our business can alter the rights your agreement establishes. Those rights exist in a documented instrument that predates and survives any change in our corporate status.',
+      'You name a Custodian to carry out these terms. Legal authority over your estate comes from your own will or trust, so name your Custodian there as well if you want their authority to be enforceable.',
+      'No representative of Heritage Nexus Inc. can override the continuity terms you set. No acquisition, restructuring, or change in our business alters them. This commitment binds any company that acquires Heritage Nexus Inc. assets, and it is stated in our Terms of Service.',
     ],
   },
   {
@@ -91,7 +91,7 @@ export default function DataOwnershipPage() {
               </em>
             </h1>
             <p className="font-sans font-light text-body-lg text-text-secondary leading-[1.82] max-w-2xl mx-auto">
-              Four commitments. Absolute. Structural. Formalized in your Basalith agreement at The Founding.
+              Four commitments. Absolute. Structural.
             </p>
           </div>
         </section>
@@ -184,9 +184,9 @@ export default function DataOwnershipPage() {
             </p>
 
             <p className="font-sans font-light text-body-base text-text-secondary leading-[1.82] mb-14 max-w-xl mx-auto">
-              Your Basalith agreement is executed at The Founding and exists independently of your subscription.
-              It survives cancellation, corporate change, and time.
-              If you are ready to formalize yours, we are ready to begin.
+              These commitments exist independently of your subscription.
+              They survive cancellation, corporate change, and time.
+              If you are ready to begin, we are.
             </p>
 
             <div className="flex items-center justify-center gap-5 flex-wrap">

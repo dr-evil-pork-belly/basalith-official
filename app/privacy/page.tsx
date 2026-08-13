@@ -199,7 +199,7 @@ export default function PrivacyPage() {
             <h3 style={{ ...H2, fontSize: '1.1rem', marginTop: '24px' }}>Enquiry data</h3>
             <p style={BODY}>Archive applications and contact form submissions are enquiry data. They are not archive content, and the archive commitments above do not apply to them.</p>
             <p style={BODY}>We retain enquiry data for as long as is necessary to manage your enquiry and keep a record of our correspondence. If an enquiry does not result in an active archive, we delete the submission within 24 months of your last interaction with us, or sooner on a verified deletion request. Send deletion requests to <a href="mailto:privacy@basalith.xyz" style={{ color: '#C4A24A', textDecoration: 'none' }}>privacy@basalith.xyz</a> from the address associated with your submission. We confirm receipt within 5 business days and complete the deletion within 30 days, unless we are legally required to retain the data for longer.</p>
-            <p style={BODY}>Deleting enquiry data does not affect an active archive, which is governed by your Basalith agreement.</p>
+            <p style={BODY}>Deleting enquiry data does not affect an active archive. The commitments above apply to archive content and are unchanged by it.</p>
 
             {/* 9 */}
             <h2 style={H2}>9. Your Rights</h2>
