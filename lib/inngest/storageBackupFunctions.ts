@@ -817,9 +817,20 @@ export const storageBackupVerify = inngest.createFunction(
         const toRehash = manifest.slice(0, MAX_COPIES_PER_RUN)
         const deferred = Math.max(0, manifest.length - MAX_COPIES_PER_RUN)
         if (deferred > 0) {
+          // This used to read "deferred to a continuation", which was false in
+          // the reassuring direction: it told an operator coverage was delayed
+          // when it is absent. Corrected August 14, 2026 alongside the removal
+          // of the self-emitted continuation. See the block above closeRun.
           alarms.push({
             code: ALARM.A8_CAPPED,
-            detail: `${deferred} object(s) not re-hashed this run, deferred to a continuation.`,
+            detail:
+              `${deferred} of ${manifest.length} manifest row(s) were NOT re-hashed this run, ` +
+              `and NOTHING WILL PICK THEM UP. No continuation is emitted. Weekly verification ` +
+              `currently covers only the first ${MAX_COPIES_PER_RUN} rows of an UNORDERED read ` +
+              `of storage_backup_objects: the query carries no ORDER BY, so which rows those ` +
+              `are is not determined by this code and can change between runs. This is a ` +
+              `standing coverage gap, not a delay. Closing it needs a stable cursor over the ` +
+              `manifest plus per-object verification state, neither of which exists yet.`,
           })
         }
 
@@ -865,12 +876,62 @@ export const storageBackupVerify = inngest.createFunction(
           return report
         })
 
-        if (deferred > 0) {
-          await step.sendEvent('continue', {
-            name: 'storage/backup.verify.continue',
-            data: { continuedFrom: run.id },
-          })
-        }
+        // NO CONTINUATION IS EMITTED HERE, AND THAT IS THE POINT. Removed
+        // August 14, 2026. This is containment, not the fix.
+        //
+        // What was here: `if (deferred > 0) step.sendEvent('continue', {
+        // name: 'storage/backup.verify.continue', data: { continuedFrom: run.id } })`,
+        // copied from the sync's continuation at the top of this file.
+        //
+        // Why it never terminated. The sync's version works because the quantity
+        // it tests shrinks: diff.toCopy is recomputed against a manifest that
+        // grows as objects land, so each continuation has less to do and the
+        // chain ends. Verify has no shrinking quantity. `deferred` is
+        // `manifest.length - MAX_COPIES_PER_RUN`, recomputed every run from a
+        // manifest.length that is identical between runs, and `toRehash` is
+        // always `manifest.slice(0, MAX_COPIES_PER_RUN)`. Nothing is carried
+        // forward: the handler reads `continuedFrom` and writes it to the run
+        // row, and reads nothing else off the event. So every continuation
+        // re-hashed the same first 300 rows, recomputed the same deferred count,
+        // and emitted another continuation. There was no depth counter, no
+        // offset, and no termination condition of any kind.
+        //
+        // Why nothing would have caught it running. Three independent reasons,
+        // and each one alone is enough:
+        //   1. This emit sat BEFORE closeRun and before the `if (hard) throw`
+        //      below, so even a run that failed hard emitted its successor
+        //      first. Going red did not stop the chain.
+        //   2. A8_CAPPED is in SOFT_ALARMS, so a run whose only alarm was A8
+        //      closed ok: true. The heartbeat's lastSuccess filters
+        //      .eq('ok', true) and reads started_at, so an unbounded loop of
+        //      A8-only runs reports the backup healthy on every iteration.
+        //   3. There is no byte budget on this path. checkBudget is called only
+        //      in the sync's copy loop and it meters bytes_read_source, which is
+        //      Supabase egress. Nothing anywhere meters or caps B2 egress, and
+        //      each iteration re-downloaded the same ~300 objects from B2.
+        //
+        // It never executed in production. Until the 9d seed on August 13, 2026
+        // the manifest held only the 9a drill rows, so manifest.length was under
+        // MAX_COPIES_PER_RUN, `deferred` was 0, and this branch was never taken.
+        // The first cron firing with a seeded manifest would have been the first
+        // execution. That is why this is going in ahead of it rather than after.
+        //
+        // The 'storage/backup.verify.continue' trigger is deliberately still
+        // declared on this function. Removing a declared trigger is a signature
+        // change with its own consequences, and a hand-sent continue event is
+        // still a legitimate way to run a verify. What had to stop is the job
+        // emitting one to itself.
+        //
+        // WHAT THIS DOES NOT FIX. Weekly verification still covers only the
+        // first MAX_COPIES_PER_RUN rows of an unordered read, and every row past
+        // that is never re-hashed by anything. Containing the loop does not
+        // close that gap, it stops the gap being paid for in unbounded B2 egress
+        // while reporting healthy. The real fix is a stable cursor over the
+        // manifest plus per-object verification state, so a run can resume where
+        // the last one stopped. Neither exists today: nothing records that an
+        // object was verified, as opposed to copied, and the only record of a
+        // run's coverage is the objects_rehashed count on the run row. That work
+        // needs design and is not this change.
 
         const hard = isHard(alarms)
         await closeRun(run.id, {
