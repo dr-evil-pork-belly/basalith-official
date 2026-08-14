@@ -287,6 +287,73 @@ describe('the sync does not run itself', () => {
   })
 })
 
+describe('verify does not emit its own continuation', () => {
+  // CONTAINMENT, August 14, 2026. storageBackupVerify used to send itself
+  // 'storage/backup.verify.continue' whenever deferred > 0. deferred is
+  // manifest.length - MAX_COPIES_PER_RUN, recomputed every run from a
+  // manifest.length that does not change between runs, and toRehash is always
+  // the same slice, so every continuation emitted another continuation and
+  // nothing terminated the chain. Three things hid it: the emit sat before the
+  // throw, so a red run still emitted its successor; A8_CAPPED is soft, so an
+  // A8-only run closed ok:true and the heartbeat read the backup as healthy;
+  // and there is no byte budget on this path, so the repeated B2 downloads were
+  // unmetered. It never executed in production, because the manifest held only
+  // the 9a drill rows until the 9d seed on 2026-08-13.
+  //
+  // NOTE ON THE EXTRACTION. The schedule tests above use block(), which stops
+  // at '\n  async ({' and therefore returns the CONFIG only. sendEvent lives in
+  // the handler body, so block() cannot see it and an assertion written against
+  // it would have passed identically before and after this fix. This describe
+  // takes the whole function instead, and proves discrimination the same way
+  // the schedule block does.
+  const raw = readFileSync(path.resolve(process.cwd(), 'lib/inngest/storageBackupFunctions.ts'), 'utf8')
+
+  // Comments stripped, for the reason the guarantees describe below already
+  // documents: the record left in place of the removed emit quotes the code it
+  // removed, verbatim, and an assertion that matched prose would pass on a file
+  // that still emitted.
+  const whole = (name: string): string => {
+    const start = raw.indexOf(`export const ${name} = inngest.createFunction(`)
+    expect(start, `${name} not found`).toBeGreaterThan(-1)
+    const end = raw.indexOf('\nexport const ', start + 1)
+    expect(end, `${name} end boundary not found`).toBeGreaterThan(start)
+    return raw.slice(start, end).replace(/^\s*\/\/.*$/gm, '')
+  }
+
+  it('the extraction captures one function and the strip left the code intact', () => {
+    // Control. Without it every assertion below could pass on an empty string,
+    // or on a slice that had silently captured the wrong function.
+    expect(whole('storageBackupVerify')).toMatch(/id: 'storage-backup-verify'/)
+    expect(whole('storageBackupVerify')).not.toMatch(/id: 'storage-backup-sync'/)
+    expect(whole('storageBackupSync')).toMatch(/id: 'storage-backup-sync'/)
+    expect(whole('storageBackupSync')).not.toMatch(/id: 'storage-backup-verify'/)
+  })
+
+  it('storage-backup-verify sends no event at all', () => {
+    // The containment itself. Asserted on sendEvent rather than on the event
+    // name, because the name legitimately survives as a declared trigger and as
+    // the record of what was removed.
+    expect(whole('storageBackupVerify')).not.toMatch(/sendEvent/)
+  })
+
+  it('storage-backup-sync still emits its continuation, so this gate discriminates', () => {
+    // The sync's continuation advances correctly, because diff.toCopy shrinks as
+    // objects land in the manifest. Without this assertion a whole() that
+    // returned nothing, or a strip that ate the code, would make the assertion
+    // above pass on an empty string.
+    const sync = whole('storageBackupSync')
+    expect(sync).toMatch(/await step\.sendEvent\('continue', \{/)
+    expect(sync).toMatch(/name: 'storage\/backup\.sync\.continue'/)
+  })
+
+  it('the verify.continue trigger is still declared, so a hand-sent event still runs one', () => {
+    // Removing the emit is not removing the trigger. Dropping a declared trigger
+    // is a signature change with its own consequences, and a hand-sent continue
+    // remains a legitimate way to run a verify.
+    expect(whole('storageBackupVerify')).toMatch(/event:\s*'storage\/backup\.verify\.continue'/)
+  })
+})
+
 describe('the diff copies what is new or changed and nothing else', () => {
   const src = (over: Partial<SourceObject> = {}): SourceObject => ({
     bucket: 'photographs',
@@ -495,8 +562,20 @@ describe('the sync wiring applies the scope where it actually matters', () => {
   })
 
   it('verify does not filter the destination or the manifest', () => {
-    // Objects already copied for that archive stay under lock, stay in the
-    // manifest, and stay re-hashed every run. Nothing stops being verified.
+    // What this asserts is FILTERING, not coverage. The manifest side is
+    // deliberately unfiltered: a terminated archive's already-copied objects
+    // stay under lock, stay in the manifest, and stay eligible for re-hashing,
+    // so the dissolution filter never removes anything from verification.
+    //
+    // Whether the manifest is actually COVERED is a separate matter and it is
+    // currently broken. toRehash is the first MAX_COPIES_PER_RUN rows of a read
+    // with no ORDER BY, every row past that is re-hashed by nothing, and as of
+    // August 14, 2026 no continuation is emitted to pretend otherwise. This
+    // comment used to claim objects "stay re-hashed every run, nothing stops
+    // being verified", which was false. See the block above closeRun in
+    // storageBackupFunctions.ts's verify handler for the full record and for
+    // what the real fix requires. Do not read the second assertion below as a
+    // statement that the cap is correct. It pins the line's current shape only.
     expect(code).toMatch(/manifestKeys: manifest\.map\(\(m\) => m\.b2_key\)/)
     expect(code).toMatch(/const toRehash = manifest\.slice\(0, MAX_COPIES_PER_RUN\)/)
   })
