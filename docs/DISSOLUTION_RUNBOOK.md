@@ -130,6 +130,9 @@ archive's photos live under the B2 prefix `photographs/{archive_id}/`.
 ### 1.4 Before first use, once, ever
 
 - [x] Read 1.5, so the red verify that follows 9a is expected rather than investigated.
+- [ ] Read 1.6, so the red verify that section 4 itself causes is expected rather than
+      investigated, and so you know the rule for telling it from real destination loss
+      before you are standing in the middle of an irreversible step.
 - [~] Walk section 4 against a disposable test archive with real objects in it, and correct
       every command that does not work as written.
 
@@ -209,6 +212,130 @@ Sunday after 9d, the seed did not cover the property, and that is the alarm work
       9a scoped run completed on:  ________________
       9d full seed completed on:   ________________
       First green verify after 9d: ________________
+
+### 1.6 The alarm section 4 causes, and how to tell it from real destination loss
+
+**Read this before you start step 4.5, not after the email arrives.** Performing a
+dissolution makes `storage-backup-verify` report `A10_MANIFEST_MISSING_IN_DEST`, which is one
+of the two failures the backup exists to catch. It is caused by the procedure, it is
+expected, and it is indistinguishable from the real thing unless you check. An operator who
+does not know this will either panic in the middle of an irreversible step, or learn to wave
+off A10, and the second is worse: A10 is how you would find out that Object Lock is not
+holding.
+
+**The window.** It opens at step 4.5, the moment the first B2 version is deleted. It closes
+at step 4.8, when the manifest rows are deleted. In between, `storage_backup_objects`
+describes objects that are no longer in B2, which is the exact condition A10 detects. **The
+window is as long as you take.** It stays open across an overnight pause, a weekend, or a
+stop after 4.7 to re-check a count. Verify runs at 05:00 UTC on Sunday, so any window that
+covers one Sunday morning will be seen.
+
+**What fires.** `storage-backup-verify`, Inngest cron `0 5 * * 0`, raises
+`A10_MANIFEST_MISSING_IN_DEST`. The predicate is `inManifestNotDest` in `threeWayDiff`,
+`lib/storageBackup.ts`, and it is exactly this: every `storage_backup_objects.b2_key` that
+does not appear in the current-version listing of the backup bucket. Deleting versions at 4.5
+while the rows wait for 4.8 satisfies it by construction, once per object you delete.
+
+**What it does.** A10 is hard. `SOFT_ALARMS` in `lib/inngest/storageBackupFunctions.ts` is
+`[A4_UNKNOWN_BUCKET, A8_CAPPED]` and A10 is not in it, so the run closes `ok = false` and the
+handler throws. The function carries `retries: 2`, so expect up to three failed attempts and
+up to three emails for one Sunday. That is one fault reported three times, not three faults.
+
+**The re-hash loop throws, and it changes what evidence you get.** This matters more than the
+alarm itself. `getObjectBytes` in `lib/storageBackupB2.ts` sends a plain `GetObjectCommand`
+with no error handling, so a key you have deleted makes the AWS SDK's `send()` reject before
+the `!res.Body` guard is ever reached. B2 returns 404 `NoSuchKey` through its S3 layer.
+**UNPROVEN:** no locked object has ever been deleted by anyone, so the exact error name has
+not been observed. Its caller is the loop over
+`toRehash = manifest.slice(0, MAX_COPIES_PER_RUN)`, the first 300 manifest rows, and the
+`load-manifest` step issues no `order by`, so *which* 300 is not specified. Two outcomes
+follow, and you need to recognize both:
+
+- **A deleted key falls inside those 300.** The loop throws part way through. Everything that
+  records the alarm runs *after* the loop, so it never runs. The inner `catch` closes the run
+  with `ok = false` and `error` set to the thrown message and **writes no alarms at all**, so
+  `storage_backup_runs.alarms` is `null` for that run even though A10 was computed correctly
+  a few lines earlier. The email comes from `alertOnCrash` and carries a `NoSuchKey` message
+  and eight stack lines, naming one key. **No alarm code appears anywhere.**
+- **No deleted key falls inside those 300.** The loop completes, and you get the ordinary
+  path: `alarms` written to the run row including A10, and an email listing
+  `A10_MANIFEST_MISSING_IN_DEST` with up to 20 keys.
+
+Both close the run red. **Both produce the same subject line,** `[basalith] storage backup
+verify FAILED`, because `alertAdmin` and `alertOnCrash` build it the same way. Only the body
+differs. Do not sort these by subject.
+
+**Do not expect the email to reach you.** As of August 13, 2026 mail from the alert sender is
+landing in spam at the admin alert address. Treat a silent inbox as telling you nothing.
+Every rule below is executable against the database, on purpose, because the inbox is not
+currently a channel you can trust.
+
+**The rule. Three checks, in order, and all three must pass.**
+
+1. **Confirm you are actually in the window.** Read your own log entry in section 6. You are
+   in the window only if you have started 4.5 and have not completed 4.8. If you have not
+   started 4.5, or 4.8 is already checked off, **this is not the expected alarm. Stop and
+   treat it as real destination loss.**
+2. **Confirm every missing key is one you deleted.** Your step 4.4 CSV is the authoritative
+   list of exactly which `b2_key` values you removed. Every key named in the alarm must
+   appear in it. In the alarm-email case, check the listed keys. In the `NoSuchKey` case,
+   the key is in the error message and in the Inngest step name, `rehash:<b2_key>`. **Any key
+   not in your CSV is real loss and this stops being the expected alarm.**
+3. **Confirm nothing outside this archive is missing.** The email lists at most 20 keys and
+   the crash case lists one, so neither is a complete picture. Read the run row instead:
+
+   ```sql
+   select id, started_at, finished_at, ok,
+          objects_manifest, objects_destination, objects_rehashed, objects_deferred,
+          alarms, error
+   from   storage_backup_runs
+   where  kind = 'verify'
+   order  by started_at desc
+   limit  5;
+   ```
+
+   `objects_manifest - objects_destination` is the size of the gap the run saw. It must equal
+   the number of objects you have deleted so far and nothing more. If it is larger, something
+   outside your delete list is gone from B2. Note that `objects_destination` excludes
+   `_manifest/` keys and `objects_manifest` never contains them, so snapshots do not skew
+   this. In the crash case these columns are null, because the run never reached `closeRun`
+   with its counts. Fall back to running step 4.7's `list-object-versions` loop against
+   **another** archive's id and confirming it returns non-zero.
+
+**When it stops.** At the first verify after step 4.8 is complete. Once the rows are gone the
+manifest no longer describes the deleted objects, `inManifestNotDest` is empty for them, and
+the alarm clears on its own. **Confirm this rather than assuming it.** A verify that is still
+red on the Sunday after 4.8 is a real alarm and you have a genuine problem.
+
+**Can the window be narrowed? Not by reordering.** The ordering is load bearing and cannot be
+changed by an operator. Step 4.4 builds the B2 delete list by querying
+`storage_backup_objects`, step 4.5 deletes by the `b2_key` and `b2_file_id` from that list,
+and step 4.8's own verification compares its count back against the 4.4 CSV. Deleting the
+manifest rows earlier strands all three. Section 4's preamble already states this: the
+manifest is the map you use to perform the deletion.
+
+What you can do costs nothing:
+
+- **Do 4.5 through 4.8 in one sitting.** The window is your working time. A dissolution
+  finished the same day is rarely seen by a verify at all.
+- **Do not start 4.5 on a Saturday.** It is the one start day that guarantees the window
+  covers a Sunday 05:00 UTC.
+- **If you know the window will span a Sunday, write it in the log before it does,** with the
+  date, so the red run has a written explanation that predates it rather than one
+  reconstructed afterwards.
+
+A code fix would be to mark rows pending deletion so verify excludes them from
+`inManifestNotDest`, the way `applyArchiveScope` already excludes terminated archives from
+the source side. **That is not built.** Naming it here so nobody mistakes the operational
+advice above for the permanent answer.
+
+**Close this out.** Record it, for the same reason 1.5 does:
+
+      4.5 started on:                    ________________
+      4.8 completed on:                  ________________
+      Window spanned a Sunday:           yes / no
+      Red verify runs seen, if any:      ________________
+      First green verify after 4.8:      ________________
 
 ---
 
@@ -436,6 +563,13 @@ This is the only section that destroys anything. Work top to bottom. **Do not re
 
 The order is: primary data, then backup, then the manifest last. The manifest is the map you
 use to perform the B2 deletion, so deleting it early strands the step that needs it.
+
+**Read 1.6 before step 4.5 if you have not already.** That ordering has a consequence: from
+the moment you delete the first B2 version until you delete the manifest rows at 4.8, the
+weekly verify will report `A10_MANIFEST_MISSING_IN_DEST`, one of the failures the backup
+exists to catch. It is caused by this procedure and it is expected. 1.6 has the rule for
+telling it apart from real destination loss, and the rule is executable from SQL, because the
+alert emails are currently landing in spam.
 
 ### Step 4.0. Confirm you are on or past the date
 
