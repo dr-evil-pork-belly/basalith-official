@@ -265,11 +265,36 @@ additive, so objects copied before the request keep their locks and come out onl
 section 4. And an object with no uuid prefix in its path is deliberately kept, because it
 has no archives row and can never be the subject of a termination request.
 
-**Wait for the next sync, or trigger one.** After build order 9d adds the daily cron the
-sync runs at 04:00 UTC. Until then `storage-backup-sync` carries no cron and nothing runs on
-its own, so waiting for a nightly run would wait forever. Send
-`storage/backup.sync.requested` with `{}` and let it finish. Either way, confirm a sync has
-actually completed after the request timestamp before trusting the query below. Then run:
+**Wait for the next sync, or trigger one.** **The daily cron went on August 13, 2026, after
+the 9d seed.** `storage-backup-sync` is on Inngest cron `0 4 * * *`, so a run arrives at
+04:00 UTC on its own. `storage-backup-verify` is on `0 5 * * 0`, 05:00 UTC Sunday. Until
+August 13 the sync carried no cron and nothing ran on its own, which is why this step used to
+say that waiting for a nightly run would wait forever. That is no longer true. You can wait
+for 04:00, or send `storage/backup.sync.requested` with `{}` and let it finish, which is
+faster. Either way, confirm a sync has actually completed after the request timestamp before
+trusting the query below.
+
+**What the daily cron means once you are working through section 4.** Nothing to schedule
+around. That is a property of the code, not of timing, and it rests on two things. The sync
+is additive: it copies what is new or changed and never deletes, so it cannot undo section
+4's work. And a terminated archive is out of scope on every run, so an overnight sync in the
+middle of a dissolution does not re-copy the archive you are deleting. Two filters implement
+that, both reading the same terminated list, read fresh at the start of every run:
+
+- `applyArchiveScope` in `lib/storageBackup.ts` drops the archive's objects from the source
+  walk, between the walk and the diff, so none of them are copied to B2. This is the filter
+  step 2.2 above confirms.
+- `buildSnapshotEntries` in `lib/storageBackup.ts` drops the archive's rows from the
+  `_manifest/{date}.json` inventory. That inventory is built by reading
+  `storage_backup_objects` whole, not from the source walk, so it needs its own filter: the
+  archive's manifest rows survive until step 4.8 and would otherwise be written offsite again
+  every night. See step 4.6, which is where this matters and where a hand-deleted snapshot
+  used to reappear the next morning.
+
+A nightly sync does still write one new snapshot per day under a fresh 90 day lock while a
+dissolution is open. That is expected and it is not a leak: those snapshots do not list this
+archive, and step 4.6's cut-off rule already keeps every snapshot dated on or after the
+filter's deploy date. Then run:
 
 ```sql
 select count(*) as rows_written_since_request

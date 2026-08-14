@@ -248,13 +248,20 @@ describe('the B2 client cannot delete', () => {
   })
 })
 
-describe('the sync does not run itself', () => {
-  // storage-backup-sync is event triggered until build order 9d sends the seed
-  // by hand. A cron here would seed the whole property into a 90 day COMPLIANCE
-  // lock the night after the first deploy, before the dissolution dry walk,
-  // before dissolution-purge.ts exists, and before /data-ownership tenet 04 is
-  // redrafted. Nothing can shorten a COMPLIANCE retention, including the
-  // account root, so this is not a mistake that can be undone next week.
+describe('both jobs keep their schedules', () => {
+  // This block used to hold a guard, 'storage-backup-sync declares no cron
+  // trigger', which failed the suite if anyone wired the daily cron. It was
+  // correct for exactly as long as the seed was unsent: a cron before then would
+  // have seeded the whole property into a 90 day COMPLIANCE lock the night after
+  // the first deploy, ahead of the dissolution dry walk, ahead of
+  // dissolution-purge.ts, and ahead of the /data-ownership tenet 04 redraft.
+  // Nothing can shorten a COMPLIANCE retention, including the account root.
+  //
+  // The 9d seed ran green by hand on August 13, 2026, 376 objects over two runs,
+  // so the guard was removed with the cron it was guarding against. What is left
+  // is the positive half: both jobs still declare the schedule they are supposed
+  // to have, and the sync is still reachable by event for a hand-sent seed or a
+  // continuation.
   //
   // Asserted on the source because the alternative, importing the module to
   // read its triggers, pulls a live Inngest client. Same approach as the
@@ -270,8 +277,8 @@ describe('the sync does not run itself', () => {
     return body.slice(0, end)
   }
 
-  it('storage-backup-sync declares no cron trigger', () => {
-    expect(block('storageBackupSync')).not.toMatch(/\bcron\s*:/)
+  it('storage-backup-sync declares the daily cron', () => {
+    expect(block('storageBackupSync')).toMatch(/cron:\s*'0 4 \* \* \*'/)
   })
 
   it('storage-backup-sync is still reachable by event', () => {
@@ -280,10 +287,11 @@ describe('the sync does not run itself', () => {
     expect(b).toMatch(/event:\s*'storage\/backup\.sync\.continue'/)
   })
 
-  it('storage-backup-verify keeps its weekly cron, so this gate discriminates', () => {
-    // Without this the two assertions above would pass on a file that had lost
-    // every trigger, or on a block matcher that silently matched nothing.
+  it('storage-backup-verify keeps its weekly cron, unchanged by the sync cron', () => {
+    // Read separately from the sync block so a stray edit that gave verify the
+    // sync's schedule, or dropped verify's trigger list entirely, still fails.
     expect(block('storageBackupVerify')).toMatch(/cron:\s*'0 5 \* \* 0'/)
+    expect(block('storageBackupVerify')).not.toMatch(/cron:\s*'0 4 \* \* \*'/)
   })
 })
 

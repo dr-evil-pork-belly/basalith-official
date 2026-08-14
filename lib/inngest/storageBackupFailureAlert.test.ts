@@ -7,7 +7,9 @@
  * run row saying "not entitled", and silence. The next signal would have been
  * A5_SILENCE from the heartbeat up to 8 days later, which is inside the designed
  * threshold and still wrong for a design whose whole posture is that failures
- * are loud. It matters more once the daily cron goes on at build order 9d.
+ * are loud. It matters more now that the daily cron is on, added August 13, 2026
+ * after the 9d seed, because an unattended nightly run is one nobody is watching
+ * the Inngest dashboard for.
  *
  * These tests drive the REAL handler bodies with a step shim that throws, the
  * way a failing step does, and assert an email goes out.

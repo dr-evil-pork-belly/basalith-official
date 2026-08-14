@@ -97,7 +97,8 @@ async function alertAdmin(subject: string, lines: string[]): Promise<void> {
  * accurate error string, and silence. The next signal would have been
  * A5_SILENCE from the heartbeat, up to SILENCE_SYNC_DAYS later, which is within
  * the designed threshold and still wrong for a design whose whole posture is
- * that failures are loud. It matters more once the daily cron goes on after 9d.
+ * that failures are loud. It matters more now that the daily cron is on, because
+ * an unattended run is one nobody is watching the Inngest dashboard for.
  *
  * The alertState flag is what stops a hard-alarm run sending twice: the alarm
  * paths set it before they throw, and this returns early when they have.
@@ -260,26 +261,44 @@ export const storageBackupSync = inngest.createFunction(
     // One at a time. Two syncs racing would double-read the same objects
     // against a metered egress line and interleave their byte accounting.
     concurrency: { limit: 1 },
-    // EVENT TRIGGERED ONLY, DELIBERATELY. There is no cron here yet.
+    // DAILY CRON, ADDED August 13, 2026, once build order 9d was green.
     //
-    // A '0 4 * * *' cron was specified and is not wired, because registering
-    // this function would then have seeded the whole property on its own, the
-    // night after the first production deploy. The seed writes every in-scope
-    // object into B2 under a 90 day COMPLIANCE lock, which nobody can shorten,
-    // including the account root. The per-run byte ceiling does not stop it:
-    // 1073 MB against a 3.5 GB ceiling passes.
+    // The '0 4 * * *' cron was specified from the start and deliberately left
+    // unwired, because registering this function with a cron would have seeded
+    // the whole property on its own, the night after the first production
+    // deploy. The seed writes every in-scope object into B2 under a 90 day
+    // COMPLIANCE lock, which nobody can shorten, including the account root. The
+    // per-run byte ceiling does not stop it: 1073 MB against a 3.5 GB ceiling
+    // passes. Build order 9a through 9d in
+    // docs/STORAGE_BACKUP_SKELETON_2026-08.md put three things before that first
+    // write: the dissolution dry walk on a throwaway archive,
+    // dissolution-purge.ts existing and proven, and the /data-ownership tenet 04
+    // redraft. An unattended seed would have inverted all three and falsified a
+    // published promise while it did it.
     //
-    // Build order 9a through 9d in docs/STORAGE_BACKUP_SKELETON_2026-08.md puts
-    // three things before that first write: the dissolution dry walk on a
-    // throwaway archive, dissolution-purge.ts existing and proven, and the
-    // /data-ownership tenet 04 redraft. An unattended seed inverts all three
-    // and falsifies a published promise while it does it.
+    // That reason is now spent. The 9d seed was sent by hand on August 13, 2026
+    // as `storage/backup.sync.requested` with `{ kind: 'seed' }`. It completed
+    // green across two runs, 376 objects and 1,125,215,480 bytes: the first run
+    // copied MAX_COPIES_PER_RUN=300 and raised A8_CAPPED as designed, and the
+    // continuation it emitted picked up the remaining 76. The snapshot at
+    // _manifest/2026-08-13.json carries 376 entries and zero drill paths, so the
+    // dissolution filter is proven against the live property rather than against
+    // a fixture.
     //
-    // So the seed is sent by hand at 9d, as
-    // `storage/backup.sync.requested` with `{ kind: 'seed' }`. The daily cron
-    // goes on AFTER that run is green and the runbook is signed, and adding it
-    // is a deliberate commit of its own, not a line someone uncomments.
+    // What the cron now triggers is an incremental sync, not another seed. kind
+    // resolves to 'sync' with no scope, and diffSourceAgainstManifest copies only
+    // what is new or changed, so a nightly run against an unchanged property
+    // copies nothing and reads nothing from Supabase egress. It still writes one
+    // manifest snapshot per day under the same 90 day lock, which is the intended
+    // record and is excluded from the verify diff by the _manifest/ prefix.
+    //
+    // 04:00 UTC is deliberately an hour ahead of the weekly verify at
+    // '0 5 * * 0'. Nothing enforces that ordering, because concurrency:1 is
+    // per-function and the two do not gate each other, so a long Sunday sync can
+    // still overlap the verify. The gap is there to make the common case the one
+    // where verify reads a manifest the sync has already finished writing.
     triggers: [
+      { cron: '0 4 * * *' },
       { event: 'storage/backup.sync.requested' },
       { event: 'storage/backup.sync.continue' },
     ],
