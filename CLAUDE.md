@@ -320,6 +320,53 @@ reach audio we still hold. Unrelated to all of this, the Cantonese path on
 `app/api/twilio/voice/route.ts` uses a Twilio-hosted Google voice and never touched
 ElevenLabs.
 
+**Inngest never synced on deploy, and nobody noticed for months.** VERIFIED August 12, 2026
+from the Inngest dashboard. The serve URL read `https://basalith.ai/api/inngest` and was
+correct. The Vercel integration was installed and enabled, path `/api/inngest`. What failed
+was the request itself. Vercel Deployment Protection blocked Inngest's post-deploy call, so
+every automatic sync failed silently. Only manually triggered syncs ever landed. That is why
+the August 10 sync entry exists at all, why nothing appears after it, and why deploys
+between August 10 and August 12 also failed to register. The August 10 resync was a manual
+push, not a repair.
+
+Fixed by setting Custom Production Domain to `basalith.ai` on the Inngest Vercel integration
+page, plus a deployment protection bypass key. Confirmed working: the app page now shows
+commit metadata and populated Vercel project and deployment fields, where both previously
+read `-`. Eleven functions registered.
+
+This paragraph used to say the serve URL was `https://basalith.xyz/api/inngest`, left from
+the May 19 domain switch, and that 83 days of deploys failed because of it. That was wrong.
+The URL was never wrong. Do not send anyone after the domain again.
+
+What did not register. Unchanged by the cause being different, because each stands on its
+own. The five billing functions (`provision-on-founding-fee`, `record-renewal`,
+`log-payment-failed`, `log-payment-recovered`, `log-subscription-canceled`) were unregistered
+from June 26. `build-archive-export` was never registered. `storage-backup-sync` and
+`storage-backup-verify` were never registered despite shipping August 9, so the weekly verify
+cron did not exist and the status brief calling it "running" was false. It had never run
+once. No customer was harmed by the billing gap: all 15 `stripe_events` rows are
+`livemode: false`.
+
+**The open question is wider than it looked, not narrower.** It used to read "what shipped in
+the 83 day window since the domain switch." If deploy-triggered syncing never worked at all,
+the real question is **what has ever synced automatically**, and the answer may reach back to
+the integration's installation rather than to May 19. Nobody has established when, or
+whether, an automatic sync ever landed. Do not treat the domain switch as the boundary of the
+audit. Unresolved.
+
+What proves a sync landed, because this is the trap that hid it. Inngest compares function
+signatures, not bodies, so most deploys legitimately report "No change" and that is not
+evidence of failure. The commit metadata on the app page is what tells you a sync happened.
+A signature change is what makes a real change visible: adding the daily cron to
+`storage-backup-sync` on August 13, 2026 altered its trigger list, so a landed sync had to
+show it.
+
+**Standing check: after a production deploy, confirm the Inngest app page shows the deployed
+commit.** This failed silently for months and nothing else would have surfaced it. A green
+Vercel deploy and a 200 from `/api/inngest` both hide it. The per-function diagnostic: send
+that function's event, then read `GET /v1/events/{id}/runs` with the signing key. An empty
+`data` array means no function is registered for that trigger.
+
 **Other open conflicts.** FROM DOCS, each needs its own session. Inclusion threshold is
 50 in `trainingPipeline.ts` and 60 in the god scoring route. Dimension taxonomy is 10 vs
 9 vs 12 across subsystems. The Calder Archive was provisioned four times as empty
