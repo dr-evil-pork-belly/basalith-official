@@ -73,10 +73,15 @@ async function main() {
   const result = await runCoverage({
     archiveId,
     triggerSource: 'manual',
-    onProbe: (_key, _domain, basis) => {
+    onProbe: (r) => {
       done += 1
-      // + landed on a deposit, ! reached past the archive, . declined
-      process.stdout.write(basis === 'deposit' ? '+' : basis === 'unsupported' ? '!' : '.')
+      // + deposit, ! reached past, . declined, x verifier failed and was discarded.
+      // The x case became renderable in slice 2.2, when onProbe widened to the
+      // whole ProbeResult. Before that a discarded verdict printed as ! here, which
+      // showed a parse failure as the entity reaching past the archive.
+      process.stdout.write(
+        r.verifierErrored ? 'x' : r.basis === 'deposit' ? '+' : r.basis === 'unsupported' ? '!' : '.',
+      )
       if (done % COVERAGE_PROBES.length === 0) process.stdout.write('\n')
     },
   })

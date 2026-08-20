@@ -131,6 +131,29 @@ export async function withApiRetry<T>(label: string, fn: () => Promise<T>): Prom
 /** Probes carry no successor context. Coverage is a property of the frozen layer. */
 const NO_CONTEXT = 'No contextual layer injected yet.'
 
+/**
+ * The frozen layer ceiling, applied to EVERY content source.
+ *
+ * app/api/succession/entity/chat/route.ts caps the layer it sends, and coverage
+ * exists to measure the path that ships. So the cap is applied here, after the
+ * content is read, rather than only in the SQL. A caller that injects content
+ * gets truncated exactly as the archive path does.
+ *
+ * WHY THIS IS NOT TIDINESS. Before slice 2.2 the fixture probe passed persona
+ * pairs uncapped while the archive path capped at 20. Both personas hold 15, so
+ * the paths agreed by coincidence. A persona grown to 21 would have measured a
+ * frozen layer no successor ever receives, silently, with no gate firing. That
+ * is the measurement diverging from production, which is the class of defect
+ * this whole surface is being built to catch.
+ *
+ * The archive path orders by quality_score before truncating. An injected source
+ * has no such column, so WHICH 20 survive is undefined there. That is why
+ * scripts/coverage-fixture-probe.ts asserts its personas sit under the cap: the
+ * cap defends the general case, the assertion guarantees it never silently
+ * engages where the ordering would be meaningless.
+ */
+export const FROZEN_LAYER_LIMIT = 20
+
 export type TriggerSource = 'manual' | 'cron' | 'transition'
 
 /**
@@ -142,13 +165,282 @@ export type RunStep = <T>(id: string, fn: () => Promise<T>) => Promise<T>
 
 export const passThroughStep: RunStep = (_id, fn) => fn()
 
-type FingerprintPairRow = { prompt: string; completion: string }
+export type FingerprintPairRow = { prompt: string; completion: string }
 
 /**
- * Explicit, so the failure branches and the success branch stay a discriminated
- * union. Left to inference, TypeScript merges them into one shape with an
- * optional `error`, and the narrowing below silently stops working.
+ * WHAT THE RUN IS ABOUT, separated from WHERE THE RUN IS READ FROM.
+ *
+ * Supplying this skips the `archives` read and the `training_pairs` read. It
+ * does NOT skip the in-flight check, which belongs to the store rather than to
+ * the content: the check exists to stop two writers interleaving upserts into
+ * archive_coverage, so whether it is needed is a property of the sink.
+ *
+ * `segment` is carried rather than derived. The archive path computes it from
+ * `archives.tier`; an injected source states it. off_label is then computed the
+ * same way on both paths, from segment alone, so the column keeps exactly one
+ * meaning: the probe set does not match the segment. It is NOT a fixture flag.
+ * Fiction is separated from reality by which table a run lands in, not by a
+ * boolean, and overloading this column would make every future query on it
+ * ambiguous.
  */
+export type CoverageContent = {
+  ownerName:   string
+  archiveName: string
+  /** 'succession' or 'b2c'. The only input to off_label, on every path. */
+  segment:     string
+  pairs:       FingerprintPairRow[]
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// THE STORE PORT
+//
+// Every database touch runCoverage makes, behind one interface. Methods are
+// named for what they mean, not for the SQL underneath, so a second
+// implementation does not have to pretend to be Postgres.
+//
+// TYPED NARROWLY ON PURPOSE. lib/archiveExport.ts:131 declares `Queryable` as
+// `from(table: string): QueryBuilder`, which accepts literally any table and any
+// row shape, and the cost shows up at lib/inngest/exportFunctions.ts:79 as
+// `buildArchiveExport(supabaseAdmin as never, ...)`. A cast to `never` is the
+// type system reporting that the interface stopped carrying information. Here
+// each method takes a named, concrete input, so the Supabase implementation
+// satisfies it without a cast and a wrong sink cannot be passed at all.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type OpenRunInput = {
+  archiveId:       string
+  probeSetVersion: string
+  segment:         string
+  offLabel:        boolean
+  triggerSource:   TriggerSource
+}
+
+/**
+ * Explicit union, so the failure branch and the success branch stay
+ * discriminated. Left to inference, TypeScript merges them into one shape with
+ * an optional `error` and the narrowing silently stops working.
+ */
+export type OpenRunOutcome = { runId: string } | { error: string }
+
+export type ProbeRecord = {
+  runId:    string
+  domain:   string
+  probeKey: string
+  basis:    ProbeResult['basis']
+  topic:    string
+  reply:    string
+}
+
+export type PriorCoverage = {
+  domain:          string
+  state:           CoverageState
+  probeSetVersion: string
+}
+
+/** The close for a run that produced results. */
+export type RunTotals = {
+  runId:           string
+  finishedAt:      string
+  complete:        boolean
+  error:           string | null
+  probesTotal:     number
+  probesDeposit:   number
+  probesOverreach: number
+  probesDeclined:  number
+  probesErrored:   number
+  modelCalls:      number
+}
+
+/**
+ * The close for a run that produced nothing. Separate from finishRun because the
+ * two write different column sets, and collapsing them would put per-basis
+ * counts on a row that measured no bases.
+ */
+export type RunFailure = {
+  runId:      string
+  finishedAt: string
+  error:      string
+}
+
+export type CoverageRowWrite = {
+  archiveId:       string
+  domain:          string
+  state:           CoverageState
+  overreach:       DomainRollup['overreach']
+  probesDeposit:   number
+  probesErrored:   number
+  probesOverreach: number
+  probesDeclined:  number
+  probesTotal:     number
+  damped:          boolean
+  probeSetVersion: string
+  lastRunId:       string
+  computedAt:      string
+}
+
+export interface CoverageStore {
+  /** Opens a run row. The Supabase implementation also refuses a concurrent run. */
+  openRun(input: OpenRunInput): Promise<OpenRunOutcome>
+  /** One probe's verdict and draft. Idempotent on (run, probe). */
+  recordProbe(record: ProbeRecord): Promise<void>
+  /** Current per-domain state, for hysteresis. */
+  readPriorCoverage(archiveId: string): Promise<PriorCoverage[]>
+  /** The map itself. Idempotent on (archive, domain). */
+  writeCoverage(rows: CoverageRowWrite[]): Promise<void>
+  /** Closes a run that produced results. */
+  finishRun(totals: RunTotals): Promise<void>
+  /** Closes a run that produced none. Leaves the map untouched. */
+  failRun(failure: RunFailure): Promise<void>
+}
+
+/**
+ * The default store. This is the pre-2.2 SQL moved, not rewritten: same tables,
+ * same column names, same conflict keys, same order. The neutrality test in
+ * lib/coverageRun.test.ts asserts that by mocking supabaseAdmin and reading the
+ * calls back, because "extracted rather than rewritten" is a claim worth
+ * checking rather than asserting.
+ */
+export const supabaseCoverageStore: CoverageStore = {
+  async openRun(input) {
+    // The in-flight check is the front line; the partial unique index
+    // coverage_runs_one_in_flight is the backstop. Two concurrent runs would
+    // interleave upserts into archive_coverage and leave a map matching neither.
+    const { data: inFlight } = await supabaseAdmin
+      .from('coverage_runs')
+      .select('id')
+      .eq('archive_id', input.archiveId)
+      .is('finished_at', null)
+      .maybeSingle()
+
+    if (inFlight) return { error: `run ${inFlight.id} already in flight` }
+
+    const { data: run, error } = await supabaseAdmin
+      .from('coverage_runs')
+      .insert({
+        archive_id:        input.archiveId,
+        probe_set_version: input.probeSetVersion,
+        segment:           input.segment,
+        off_label:         input.offLabel,
+        trigger_source:    input.triggerSource,
+      })
+      .select('id')
+      .single()
+
+    if (error || !run) return { error: error?.message ?? 'could not open run' }
+    return { runId: run.id as string }
+  },
+
+  async recordProbe(record) {
+    await supabaseAdmin.from('coverage_probe_results').upsert(
+      {
+        run_id:    record.runId,
+        domain:    record.domain,
+        probe_key: record.probeKey,
+        basis:     record.basis,
+        topic:     record.topic,
+        reply:     record.reply,
+      },
+      { onConflict: 'run_id,probe_key' },
+    )
+  },
+
+  async readPriorCoverage(archiveId) {
+    const { data } = await supabaseAdmin
+      .from('archive_coverage')
+      .select('domain, state, probe_set_version')
+      .eq('archive_id', archiveId)
+
+    return (data ?? []).map(row => ({
+      domain:          row.domain as string,
+      state:           row.state as CoverageState,
+      probeSetVersion: row.probe_set_version as string,
+    }))
+  },
+
+  async writeCoverage(rows) {
+    await supabaseAdmin.from('archive_coverage').upsert(
+      rows.map(r => ({
+        archive_id:        r.archiveId,
+        domain:            r.domain,
+        state:             r.state,
+        overreach:         r.overreach,
+        probes_deposit:    r.probesDeposit,
+        probes_errored:    r.probesErrored,
+        probes_overreach:  r.probesOverreach,
+        probes_declined:   r.probesDeclined,
+        probes_total:      r.probesTotal,
+        damped:            r.damped,
+        probe_set_version: r.probeSetVersion,
+        last_run_id:       r.lastRunId,
+        computed_at:       r.computedAt,
+      })),
+      { onConflict: 'archive_id,domain' },
+    )
+  },
+
+  async finishRun(t) {
+    await supabaseAdmin
+      .from('coverage_runs')
+      .update({
+        finished_at:      t.finishedAt,
+        ok:               true,
+        complete:         t.complete,
+        error:            t.error,
+        probes_total:     t.probesTotal,
+        probes_deposit:   t.probesDeposit,
+        probes_overreach: t.probesOverreach,
+        probes_declined:  t.probesDeclined,
+        probes_errored:   t.probesErrored,
+        model_calls:      t.modelCalls,
+      })
+      .eq('id', t.runId)
+  },
+
+  async failRun(f) {
+    await supabaseAdmin
+      .from('coverage_runs')
+      .update({
+        finished_at:  f.finishedAt,
+        ok:           false,
+        complete:     false,
+        error:        f.error,
+        probes_total: 0,
+        model_calls:  0,
+      })
+      .eq('id', f.runId)
+  },
+}
+
+/** Reads identity and the frozen layer for a real archive. The default source. */
+async function loadArchiveContent(archiveId: string): Promise<CoverageContent | { error: string }> {
+  const { data: archive } = await supabaseAdmin
+    .from('archives')
+    .select('id, name, owner_name, tier')
+    .eq('id', archiveId)
+    .maybeSingle()
+
+  if (!archive) return { error: 'archive not found' }
+
+  const { data: pairs } = await supabaseAdmin
+    .from('training_pairs')
+    .select('prompt, completion')
+    .eq('archive_id', archiveId)
+    .eq('included_in_training', true)
+    .order('quality_score', { ascending: false })
+    .limit(FROZEN_LAYER_LIMIT)
+
+  return {
+    ownerName:   (archive.owner_name ?? archive.name) as string,
+    archiveName: archive.name as string,
+    // The b2b probe set against a non-succession archive is diagnostic only. It
+    // is allowed, because waiting for a real succession archive means the map
+    // cannot be judged against real data at all, but it is labeled at the row so
+    // nothing downstream can mistake it for a customer-facing result.
+    segment:     archive.tier === 'succession' ? 'succession' : 'b2c',
+    pairs:       (pairs ?? []) as FingerprintPairRow[],
+  }
+}
+
 type OpenRunResult =
   | { error: string }
   | {
@@ -175,71 +467,57 @@ export async function runCoverage(params: {
   archiveId:      string
   triggerSource?: TriggerSource
   runStep?:       RunStep
-  /** Called after each probe resolves. Progress only, never control flow. */
-  onProbe?:       (probeKey: string, domain: string, basis: ProbeResult['basis']) => void
+  /**
+   * Supply identity and the frozen layer directly instead of reading an archive.
+   * Absent, the run reads `archives` and `training_pairs` as it always has.
+   */
+  content?:       CoverageContent
+  /** Where the run is written. Absent, it goes to Supabase as it always has. */
+  store?:         CoverageStore
+  /**
+   * Called after each probe resolves. Progress only, never control flow.
+   *
+   * Carries the whole ProbeResult rather than three loose fields, because
+   * `verifierErrored` is needed to render a discarded verdict distinctly and a
+   * caller that cannot see it prints a wrong glyph. Widened in slice 2.2; it is
+   * typed, so a caller that does not match fails at compile time.
+   */
+  onProbe?:       (result: ProbeResult) => void
 }): Promise<CoverageRunResult> {
   const { archiveId } = params
   const triggerSource = params.triggerSource ?? 'manual'
   const runStep       = params.runStep ?? passThroughStep
+  const store         = params.store ?? supabaseCoverageStore
 
   if (!archiveId) return { skipped: 'no archiveId' }
 
   // ── Open the run ───────────────────────────────────────────────────────────
-  // The in-flight check is the front line; the partial unique index
-  // coverage_runs_one_in_flight is the backstop. Two concurrent runs would
-  // interleave upserts into archive_coverage and leave a map matching neither.
+  // Content first, then the run row. On the default path both content reads now
+  // precede the in-flight check, where before the check sat between them. No
+  // write moved and no outcome changed; a run that is refused for being in
+  // flight simply costs one extra read before it is refused.
   const opened = await runStep('open-run', async (): Promise<OpenRunResult> => {
-    const { data: archive } = await supabaseAdmin
-      .from('archives')
-      .select('id, name, owner_name, tier')
-      .eq('id', archiveId)
-      .maybeSingle()
+    const content = params.content ?? (await loadArchiveContent(archiveId))
+    if ('error' in content) return { error: content.error }
 
-    if (!archive) return { error: 'archive not found' }
+    const offLabel = content.segment !== 'succession'
 
-    const { data: inFlight } = await supabaseAdmin
-      .from('coverage_runs')
-      .select('id')
-      .eq('archive_id', archiveId)
-      .is('finished_at', null)
-      .maybeSingle()
+    const outcome = await store.openRun({
+      archiveId,
+      probeSetVersion: PROBE_SET_VERSION,
+      segment:         content.segment,
+      offLabel,
+      triggerSource,
+    })
 
-    if (inFlight) return { error: `run ${inFlight.id} already in flight` }
-
-    // The b2b probe set against a non-succession archive is diagnostic only. It
-    // is allowed, because waiting for a real succession archive means the map
-    // cannot be judged against real data at all, but it is labeled at the row so
-    // nothing downstream can mistake it for a customer-facing result.
-    const segment  = archive.tier === 'succession' ? 'succession' : 'b2c'
-    const offLabel = segment !== 'succession'
-
-    const { data: run, error } = await supabaseAdmin
-      .from('coverage_runs')
-      .insert({
-        archive_id:        archiveId,
-        probe_set_version: PROBE_SET_VERSION,
-        segment,
-        off_label:         offLabel,
-        trigger_source:    triggerSource,
-      })
-      .select('id')
-      .single()
-
-    if (error || !run) return { error: error?.message ?? 'could not open run' }
-
-    const { data: pairs } = await supabaseAdmin
-      .from('training_pairs')
-      .select('prompt, completion')
-      .eq('archive_id', archiveId)
-      .eq('included_in_training', true)
-      .order('quality_score', { ascending: false })
-      .limit(20)
+    if ('error' in outcome) return { error: outcome.error }
 
     return {
-      runId:       run.id as string,
-      ownerName:   (archive.owner_name ?? archive.name) as string,
-      archiveName: archive.name as string,
-      pairs:       (pairs ?? []) as FingerprintPairRow[],
+      runId:       outcome.runId,
+      ownerName:   content.ownerName,
+      archiveName: content.archiveName,
+      // Applied to every source. See FROZEN_LAYER_LIMIT.
+      pairs:       content.pairs.slice(0, FROZEN_LAYER_LIMIT),
       offLabel,
     }
   })
@@ -282,28 +560,26 @@ export async function runCoverage(params: {
           console.warn(`[coverage] verifier failsafe on ${probe.key}, discarding this verdict`)
         }
 
-        await supabaseAdmin.from('coverage_probe_results').upsert(
-          {
-            run_id:    runId,
-            domain:    probe.domain,
-            probe_key: probe.key,
-            basis:     verdict.basis,
-            topic:     errored ? 'verifier failsafe, verdict discarded' : verdict.topic,
-            reply,
-          },
-          { onConflict: 'run_id,probe_key' },
-        )
+        await store.recordProbe({
+          runId,
+          domain:   probe.domain,
+          probeKey: probe.key,
+          basis:    verdict.basis,
+          topic:    errored ? 'verifier failsafe, verdict discarded' : verdict.topic,
+          reply,
+        })
 
         return { basis: verdict.basis, errored }
       })
 
-      results.push({
+      const result: ProbeResult = {
         probeKey:        probe.key,
         domain:          probe.domain,
         basis:           out.basis,
         verifierErrored: out.errored,
-      })
-      params.onProbe?.(probe.key, probe.domain, out.basis)
+      }
+      results.push(result)
+      params.onProbe?.(result)
     } catch (err) {
       hardError = err instanceof Error ? err.message : String(err)
     }
@@ -317,17 +593,11 @@ export async function runCoverage(params: {
     const now = new Date().toISOString()
 
     if (results.length === 0) {
-      await supabaseAdmin
-        .from('coverage_runs')
-        .update({
-          finished_at:  now,
-          ok:           false,
-          complete:     false,
-          error:        hardError ?? 'no probe results',
-          probes_total: 0,
-          model_calls:  0,
-        })
-        .eq('id', runId)
+      await store.failRun({
+        runId,
+        finishedAt: now,
+        error:      hardError ?? 'no probe results',
+      })
 
       return {
         runId, ok: false, complete: false, offLabel,
@@ -336,58 +606,49 @@ export async function runCoverage(params: {
       }
     }
 
-    const { data: prior } = await supabaseAdmin
-      .from('archive_coverage')
-      .select('domain, state, probe_set_version')
-      .eq('archive_id', archiveId)
+    const prior = await store.readPriorCoverage(archiveId)
 
     // Hysteresis applies only within a probe set version. A prior state computed
     // under a different set is not a comparable observation, so it does not get
     // to damp this one.
     const previousByDomain: Record<string, CoverageState> = {}
-    for (const row of prior ?? []) {
-      if (row.probe_set_version === PROBE_SET_VERSION) {
-        previousByDomain[row.domain as string] = row.state as CoverageState
+    for (const row of prior) {
+      if (row.probeSetVersion === PROBE_SET_VERSION) {
+        previousByDomain[row.domain] = row.state
       }
     }
 
     const rollups  = rollUpRun(results, previousByDomain)
     const complete = isRunComplete(rollups)
 
-    await supabaseAdmin.from('archive_coverage').upsert(
-      rollups.map(r => ({
-        archive_id:        archiveId,
-        domain:            r.domain,
-        state:             r.state,
-        overreach:         r.overreach,
-        probes_deposit:    r.probesDeposit,
-        probes_errored:    r.probesErrored,
-        probes_overreach:  r.probesOverreach,
-        probes_declined:   r.probesDeclined,
-        probes_total:      r.probesTotal,
-        damped:            r.damped,
-        probe_set_version: PROBE_SET_VERSION,
-        last_run_id:       runId,
-        computed_at:       now,
-      })),
-      { onConflict: 'archive_id,domain' },
-    )
+    await store.writeCoverage(rollups.map(r => ({
+      archiveId,
+      domain:          r.domain,
+      state:           r.state,
+      overreach:       r.overreach,
+      probesDeposit:   r.probesDeposit,
+      probesErrored:   r.probesErrored,
+      probesOverreach: r.probesOverreach,
+      probesDeclined:  r.probesDeclined,
+      probesTotal:     r.probesTotal,
+      damped:          r.damped,
+      probeSetVersion: PROBE_SET_VERSION,
+      lastRunId:       runId,
+      computedAt:      now,
+    })))
 
-    await supabaseAdmin
-      .from('coverage_runs')
-      .update({
-        finished_at:    now,
-        ok:             true,
-        complete,
-        error:          hardError,
-        probes_total:     results.length,
-        probes_deposit:   results.filter(r => !r.verifierErrored && r.basis === 'deposit').length,
-        probes_overreach: results.filter(r => !r.verifierErrored && r.basis === 'unsupported').length,
-        probes_declined:  results.filter(r => !r.verifierErrored && r.basis === 'no_position').length,
-        probes_errored:   results.filter(r =>  r.verifierErrored).length,
-        model_calls:      results.length * 2,
-      })
-      .eq('id', runId)
+    await store.finishRun({
+      runId,
+      finishedAt:      now,
+      complete,
+      error:           hardError,
+      probesTotal:     results.length,
+      probesDeposit:   results.filter(r => !r.verifierErrored && r.basis === 'deposit').length,
+      probesOverreach: results.filter(r => !r.verifierErrored && r.basis === 'unsupported').length,
+      probesDeclined:  results.filter(r => !r.verifierErrored && r.basis === 'no_position').length,
+      probesErrored:   results.filter(r =>  r.verifierErrored).length,
+      modelCalls:      results.length * 2,
+    })
 
     return { runId, ok: true, complete, offLabel, error: hardError, rollups, results }
   })

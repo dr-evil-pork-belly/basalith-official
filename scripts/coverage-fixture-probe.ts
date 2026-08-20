@@ -47,35 +47,51 @@
  *           anything and the column is decoration.
  *
  * The personas hold no real archive data and nothing here writes to any table.
- * The map is computed through the same lib/coverage.ts core the Inngest job
- * uses, so a green fixture and a shipped map cannot diverge.
+ *
+ * ── 2026-08-19, slice 2.2. THE FORK IS GONE ─────────────────────────────────
+ *
+ * This file used to claim the map was computed through the same core the Inngest
+ * job uses. That was only half true and the half that was false is the half that
+ * mattered. Roll-up came from lib/coverage.ts, shared. But the RUN did not: a
+ * local `probeOnce` reimplemented runCoverage's probe loop by hand, under a
+ * comment reading "Mirrors lib/coverageRun.ts exactly" over four re-declared
+ * constants. So every gate below judged code that does not deploy.
+ *
+ * A diff before collapsing it found the constants and the verifier handling
+ * genuinely identical, and two differences that were not:
+ *
+ *   Probe failure. runCoverage catches a failed probe and continues with a short
+ *   set. probeOnce had no catch and aborted the whole run with exit 2. Both are
+ *   right for their own caller, so the behavior now lives in runFixturePass
+ *   rather than in the shipped path. See the note there.
+ *
+ *   Frozen layer size. runCoverage capped at 20 pairs, probeOnce passed personas
+ *   whole. Both personas hold 15, so the paths agreed by coincidence rather than
+ *   by construction. The cap now applies to every source in runCoverage, and
+ *   assertPersonasUnderCap keeps it from engaging where it would truncate by
+ *   arbitrary array order.
+ *
+ * Runs now go through runCoverage with content injected and an in-memory store,
+ * so a green fixture and a shipped map cannot diverge. Figures produced before
+ * this change are NOT comparable to figures produced after it, because the code
+ * under measurement is not the same code.
  *
  * Run: npx tsx scripts/coverage-fixture-probe.ts
  */
 
-import Anthropic from '@anthropic-ai/sdk'
 import * as dotenv from 'dotenv'
 import * as path from 'path'
 import * as fs from 'fs'
-import { buildEntitySystemPrompt, formatFingerprintSection } from '../lib/entitySystemPrompt'
-import { verifyGrounding } from '../lib/verifyGrounding'
 import { margaretChen } from '../lib/demoPersonas/margaretChen'
 import { joey } from '../lib/demoPersonas/joey'
 import type { DemoPersona } from '../lib/demoPersonas/types'
 import { COVERAGE_PROBES, PROBE_SET_VERSION } from '../lib/coverageProbes'
 import { rollUpRun, domainStateDrift, depositSpread, type ProbeResult, type DomainRollup } from '../lib/coverage'
-import { withApiRetry } from '../lib/coverageRun'
+import { runCoverage, FROZEN_LAYER_LIMIT, type CoverageContent } from '../lib/coverageRun'
+import { createInMemoryCoverageStore } from '../lib/coverageStoreMemory'
 
 const envPath = path.resolve(process.cwd(), '.env.local')
 if (fs.existsSync(envPath)) dotenv.config({ path: envPath })
-
-const anthropic = new Anthropic()
-
-// Mirrors lib/coverageRun.ts exactly.
-const EMPTY_CONTEXT    = 'No contextual layer injected yet.'
-const VOICE_MODEL       = 'claude-sonnet-4-6'
-const VOICE_MAX_TOKENS  = 1000
-const VOICE_TEMPERATURE = 0
 
 /** GATE 4 threshold. One of eight domains may move; two means the map is noise. */
 const MAX_DOMAIN_DRIFT = 1
@@ -122,44 +138,116 @@ const MIN_DEPOSIT_SPREAD = 3
  */
 const MARGARET_HOLE = 'Capital'
 
-async function probeOnce(persona: DemoPersona, systemPrompt: string): Promise<ProbeResult[]> {
-  const out: ProbeResult[] = []
+/**
+ * A persona, shaped as the shipped core reads an archive.
+ *
+ * `segment` is 'succession' because these are succession-shaped B2B founders and
+ * the b2b probe set is therefore ON label for them. off_label means the probe set
+ * does not match the segment, and nothing else. It is NOT a fixture flag: fiction
+ * is kept apart from reality by which store a run is given, not by a boolean, and
+ * setting this true would overload the column with a second meaning and make every
+ * future query on it ambiguous.
+ */
+function personaContent(persona: DemoPersona): CoverageContent {
+  return {
+    ownerName:   persona.metadata.name,
+    archiveName: persona.archiveName,
+    segment:     'succession',
+    pairs:       persona.pairs,
+  }
+}
 
-  for (const probe of COVERAGE_PROBES) {
-    // Pinned, matching lib/coverageRun.ts. Draft variance was the dominant
-    // noise source in the unpinned v2 run.
-    const draft = await withApiRetry(`voice ${probe.key}`, () => anthropic.messages.create({
-      model:       VOICE_MODEL,
-      max_tokens:  VOICE_MAX_TOKENS,
-      temperature: VOICE_TEMPERATURE,
-      system:      systemPrompt,
-      messages:    [{ role: 'user', content: probe.question }],
-    }))
+/**
+ * The cap must never silently engage here.
+ *
+ * lib/coverageRun.ts truncates every content source to FROZEN_LAYER_LIMIT so the
+ * fixture cannot measure a frozen layer larger than the one a successor receives.
+ * The archive path orders by quality_score before truncating. A persona has no
+ * such column, so if one ever grew past the cap, WHICH pairs survived would be
+ * decided by array order, which carries no meaning. The gates would then be
+ * reading an arbitrary subset and would not say so.
+ *
+ * So the cap defends the general case and this assertion guarantees it stays
+ * unreached on the one path where the ordering would be meaningless.
+ */
+function assertPersonasUnderCap(personas: DemoPersona[]): void {
+  for (const p of personas) {
+    if (p.pairs.length > FROZEN_LAYER_LIMIT) {
+      throw new Error(
+        `persona ${p.metadata.id} holds ${p.pairs.length} pairs, over FROZEN_LAYER_LIMIT ` +
+        `of ${FROZEN_LAYER_LIMIT}. The cap would truncate by array order, which is arbitrary ` +
+        `for a persona. Trim the persona or give it an explicit ranking before running gates.`,
+      )
+    }
+  }
+}
 
-    const reply = draft.content[0]?.type === 'text' ? draft.content[0].text : ''
+/**
+ * One fixture pass, through the SHIPPED core.
+ *
+ * Before slice 2.2 this function was a hand-written copy of runCoverage's probe
+ * loop, so every gate below judged code that does not deploy. It now calls the
+ * real thing with content injected and an in-memory store, which is why a green
+ * fixture and a shipped map can no longer diverge.
+ *
+ * THE EXIT-2 CONTRACT LIVES HERE, DELIBERATELY, AND NOT IN runCoverage.
+ *
+ * runCoverage catches a probe that exhausts its retries, records it as a miss,
+ * and carries on with a short result set. That is correct for the monthly sweep,
+ * where a degraded map beats no map. It is wrong for a gate suite: the six gates
+ * below divide by per-domain probe counts, so a dropped probe silently changes a
+ * denominator and the suite would report a verdict on a set it did not fully
+ * measure. That is the failure exit code 2 exists to prevent.
+ *
+ * Which behavior is right is a property of what the CALLER is doing, not of the
+ * run, so it is enforced here rather than added to the shipped path as a flag
+ * only one caller would ever set.
+ *
+ * Length is checked rather than `complete`, because length is the primitive the
+ * gate denominators actually depend on and `complete` is derived from it. Both
+ * are checked anyway, since it costs nothing, and the message names which fired.
+ */
+async function runFixturePass(persona: DemoPersona, label: string): Promise<ProbeResult[]> {
+  const { store } = createInMemoryCoverageStore({
+    runId: `fixture:${persona.metadata.id}:${label}`,
+  })
 
-    // verifyGrounding swallows its own errors and fails safe, so it cannot throw
-    // here. The retry is on the voice call, which can.
-    const verdict = await verifyGrounding({
-      pairs:    persona.pairs,
-      question: probe.question,
-      answer:   reply,
-    })
-
-    // Mirrors isVerifierFailsafe in lib/coverageRun.ts. A parse failure returns
-    // basis 'unsupported' by design, which is right for production and wrong as
-    // measurement, so it is discarded rather than counted as overreach.
-    const errored = verdict.basis === 'unsupported' && verdict.position === 'unknown' && verdict.topic === 'this'
-
-    out.push({ probeKey: probe.key, domain: probe.domain, basis: verdict.basis, verifierErrored: errored })
+  const result = await runCoverage({
+    archiveId:     `fixture:${persona.metadata.id}`,
+    triggerSource: 'manual',
+    content:       personaContent(persona),
+    store,
     // + deposit, ! reached past, . declined, x verifier failed and was discarded
-    process.stdout.write(
-      errored ? 'x' : verdict.basis === 'deposit' ? '+' : verdict.basis === 'unsupported' ? '!' : '.',
+    onProbe: (r) => process.stdout.write(
+      r.verifierErrored ? 'x' : r.basis === 'deposit' ? '+' : r.basis === 'unsupported' ? '!' : '.',
+    ),
+  })
+
+  process.stdout.write('\n')
+
+  if ('skipped' in result) {
+    throw new Error(`${persona.metadata.id} ${label}: the run never opened (${result.skipped})`)
+  }
+
+  const expected    = COVERAGE_PROBES.length
+  const shortSet    = result.results.length !== expected
+  const notComplete = !result.complete
+
+  if (shortSet || notComplete) {
+    const fired = [
+      shortSet    ? `results.length ${result.results.length} of ${expected}` : null,
+      notComplete ? 'complete=false'                                        : null,
+    ].filter(Boolean).join(' and ')
+
+    throw new Error(
+      `${persona.metadata.id} ${label}: incomplete run, ${fired}. ` +
+      `${result.error ? `Last probe error: ${result.error}. ` : ''}` +
+      `A gate suite cannot judge a short set, because every gate below divides by a ` +
+      `per-domain probe count. The map is UNJUDGED, not wrong.`,
     )
   }
 
-  process.stdout.write('\n')
-  return out
+  return result.results
 }
 
 function printMap(label: string, rollups: DomainRollup[]): void {
@@ -184,20 +272,16 @@ async function runPersona(persona: DemoPersona): Promise<{ outcomes: Outcome[]; 
   console.log(`${name.toUpperCase()}  (${persona.pairs.length} fictional deposits, probe set ${PROBE_SET_VERSION})`)
   console.log('='.repeat(84))
 
-  const systemPrompt = buildEntitySystemPrompt({
-    ownerName:          name,
-    archiveName:        persona.archiveName,
-    fingerprintSection: formatFingerprintSection(persona.pairs),
-    contextSection:     EMPTY_CONTEXT,
-  })
-
-  console.log(`\n  run 1 (${COVERAGE_PROBES.length} probes. + deposit, ! reached past, . declined)`)
-  const first = await probeOnce(persona, systemPrompt)
+  // No prompt assembly here. runCoverage builds it from the injected content
+  // using the same buildEntitySystemPrompt the succession route uses, so there is
+  // no second copy left in this file to drift from the shipped one.
+  console.log(`\n  run 1 (${COVERAGE_PROBES.length} probes. + deposit, ! reached past, . declined, x discarded)`)
+  const first = await runFixturePass(persona, 'run1')
   const mapA  = rollUpRun(first)
   printMap('run 1 map', mapA)
 
   console.log(`\n  run 2 (stability check)`)
-  const second = await probeOnce(persona, systemPrompt)
+  const second = await runFixturePass(persona, 'run2')
   const mapB   = rollUpRun(second)
   printMap('run 2 map', mapB)
 
@@ -267,6 +351,12 @@ async function main() {
   console.log('COVERAGE FIXTURE PROBE')
   console.log(`probe set ${PROBE_SET_VERSION}, ${COVERAGE_PROBES.length} probes, ${COVERAGE_PROBES.length * 2} model calls per run`)
   console.log('Fictional personas, known ground truth, nothing written to any table.')
+  console.log('Runs through lib/coverageRun.ts, the same core the Inngest job runs.')
+
+  // Before any model call, because a cap that engaged silently would make every
+  // figure below a reading of an arbitrary subset. See assertPersonasUnderCap.
+  assertPersonasUnderCap([margaretChen, joey])
+  console.log(`frozen layer cap ${FROZEN_LAYER_LIMIT}, personas at ${margaretChen.pairs.length} and ${joey.pairs.length} pairs, cap unreached.`)
 
   const m = await runPersona(margaretChen)
   const j = await runPersona(joey)
