@@ -133,7 +133,7 @@ $probeOut   = Join-Path (Get-Location) '.probe-out'
 # pasting, not source, and must never enter the tree.
 if (-not (Test-Path $probeOut)) { New-Item -ItemType Directory -Path $probeOut | Out-Null }
 
-$transcript = Join-Path (Get-Location) "coverage-acceptance-$stamp.txt"
+$transcript = Join-Path $probeOut "coverage-acceptance-$stamp.txt"
 
 # Floor for "non-trivially sized". A gate that produced nothing writes a zero byte
 # file; the loud-fail stub writes about 110 bytes; a real probe writes kilobytes.
