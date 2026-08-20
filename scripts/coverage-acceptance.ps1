@@ -98,6 +98,20 @@
 # returned 7, and the silent exit-0 case returned 0 with zero lines captured. Do
 # not take that on faith if you change the construct. Re-run the check.
 #
+# SentinelSource CARRIES A LINE NUMBER AND LINE NUMBERS DRIFT. It is display
+# only: the gate matches on the regex, so a stale label cannot make a gate pass
+# or fail wrongly. But the label exists so an operator whose sentinel stopped
+# matching knows where to look, and a wrong number sends them to the wrong place
+# at the exact moment they are debugging.
+#
+# It has already gone stale once. Slice 2.2 grew coverage-fixture-probe.ts and
+# edited coverage-drive.ts, moving both terminal lines, and all three labels
+# below (including the loud stub's) were wrong within the same commit that wrote
+# them. GATE 2 still passed, which is the point: nothing catches this.
+#
+# So when you touch a wrapped script, re-check its label:
+#   Select-String -Path .\scripts\coverage-fixture-probe.ts -Pattern "console\.log\('SUMMARY'\)"
+#
 # THE SELF-TEST IS PERMANENT. -SelfTest runs two stub scripts that cost nothing
 # and prove both failure paths: _stub-silent-zero.ts (exit 0, no output, must fail
 # on evidence) and _stub-loud-fail.ts (output on both streams, exit 1, must fail
@@ -358,7 +372,7 @@ if ($SelfTest) {
   $s2 = Invoke-Gate -Name 'selftest-loud-fail' `
                     -Script 'scripts/_stub-loud-fail.ts' `
                     -Sentinel '^STUB-SENTINEL-STDOUT' `
-                    -SentinelSource 'scripts/_stub-loud-fail.ts:23 (console.log)'
+                    -SentinelSource 'scripts/_stub-loud-fail.ts:22 (console.log)'
 
   # stderr is checked separately. two-layer-probe.ts:205 writes progress with
   # console.error, so a construct that dropped stderr would lose real probe output.
@@ -503,7 +517,7 @@ Write-Host ''
 $g2 = Invoke-Gate -Name 'gate2-fixture' `
                   -Script 'scripts/coverage-fixture-probe.ts' `
                   -Sentinel '^SUMMARY$' `
-                  -SentinelSource 'scripts/coverage-fixture-probe.ts:300'
+                  -SentinelSource 'scripts/coverage-fixture-probe.ts:390'
 $fixtureExit = $g2.ExitCode
 
 # Exit code 2 is the harness failing, not a gate failing. The distinction is
@@ -549,7 +563,7 @@ if ($SkipDrive) {
                     -Script 'scripts/coverage-drive.ts' `
                     -ScriptArgs @($ArchiveId) `
                     -Sentinel '^DONE in .+ run .+ ok=' `
-                    -SentinelSource 'scripts/coverage-drive.ts:246'
+                    -SentinelSource 'scripts/coverage-drive.ts:251'
   if (-not $g3.Pass) {
     Write-Host ''
     Write-Host "  gate failed on: $($g3.Reasons -join '; ')"
