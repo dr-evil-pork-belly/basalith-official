@@ -46,7 +46,34 @@
  *           level other than 'none', or the second dimension is not measuring
  *           anything and the column is decoration.
  *
- * The personas hold no real archive data and nothing here writes to any table.
+ * The personas hold no real archive data.
+ *
+ * ── 2026-08-20, slice 2.3. THIS NOW WRITES TO TWO TABLES ────────────────────
+ *
+ * The line above used to end "and nothing here writes to any table." That became
+ * false on this date and is corrected rather than quietly dropped.
+ *
+ * Each pass now writes to verification_runs and verification_probe_results, via
+ * lib/verificationStore.ts. Those two tables carry NO foreign key to `archives`
+ * and no path to one, so the older claim's real content, that a fixture run
+ * cannot touch customer data, is now enforced by the schema instead of by the
+ * absence of a write. coverage_runs, coverage_probe_results and archive_coverage
+ * are untouched by this path.
+ *
+ * WHY PERSIST AT ALL. Drift was computed here and thrown away. Every drift
+ * figure this project had ever taken lived in a terminal scrollback, and before
+ * slice 2.1 the acceptance transcript did not capture even that. Drift is the
+ * number a skeptic would assume was being hidden, so it has to survive the run.
+ *
+ * Drift is still NOT stored as a number. Both passes' probe verdicts are stored
+ * under one run_group_id with distinct pass_number, and drift is derived by
+ * diffing basis per probe_key. See scripts/verification-drift.sql. The in-memory
+ * computation below is unchanged and still feeds the printout and GATE 4;
+ * persistence is purely additive to it.
+ *
+ * Rows are written with published = false. Only a scheduled run may publish, and
+ * nothing schedules this yet, so a local run stays visible internally and can
+ * never reach the public number.
  *
  * ── 2026-08-19, slice 2.2. THE FORK IS GONE ─────────────────────────────────
  *
@@ -88,7 +115,8 @@ import type { DemoPersona } from '../lib/demoPersonas/types'
 import { COVERAGE_PROBES, PROBE_SET_VERSION } from '../lib/coverageProbes'
 import { rollUpRun, domainStateDrift, depositSpread, type ProbeResult, type DomainRollup } from '../lib/coverage'
 import { runCoverage, FROZEN_LAYER_LIMIT, type CoverageContent } from '../lib/coverageRun'
-import { createInMemoryCoverageStore } from '../lib/coverageStoreMemory'
+import { createVerificationStore, resolveCommitSha } from '../lib/verificationStore'
+import { randomUUID } from 'node:crypto'
 
 const envPath = path.resolve(process.cwd(), '.env.local')
 if (fs.existsSync(envPath)) dotenv.config({ path: envPath })
@@ -207,9 +235,26 @@ function assertPersonasUnderCap(personas: DemoPersona[]): void {
  * gate denominators actually depend on and `complete` is derived from it. Both
  * are checked anyway, since it costs nothing, and the message names which fired.
  */
-async function runFixturePass(persona: DemoPersona, label: string): Promise<ProbeResult[]> {
-  const { store } = createInMemoryCoverageStore({
-    runId: `fixture:${persona.metadata.id}:${label}`,
+async function runFixturePass(
+  persona:    DemoPersona,
+  label:      string,
+  runGroupId: string,
+  passNumber: number,
+  commitSha:  string | null,
+): Promise<ProbeResult[]> {
+  // Writes to verification_runs and verification_probe_results. Never to
+  // coverage_runs or archive_coverage, and the schema carries no path there.
+  //
+  // published: false, unconditionally. Only a scheduled run may publish, and
+  // nothing schedules this yet. A local run must not be able to move a public
+  // figure, so this is a literal rather than a parameter with a default.
+  const store = createVerificationStore({
+    fixtureId:     persona.metadata.id,
+    runGroupId,
+    passNumber,
+    published:     false,
+    commitSha,
+    triggerSource: 'manual',
   })
 
   const result = await runCoverage({
@@ -265,8 +310,17 @@ function printMap(label: string, rollups: DomainRollup[]): void {
 
 type Outcome = { label: string; pass: boolean; detail: string }
 
-async function runPersona(persona: DemoPersona): Promise<{ outcomes: Outcome[]; map: DomainRollup[] }> {
+async function runPersona(
+  persona:   DemoPersona,
+  commitSha: string | null,
+): Promise<{ outcomes: Outcome[]; map: DomainRollup[] }> {
   const name = persona.metadata.name
+
+  // One group per persona per invocation. Both passes share it, and drift is
+  // defined across them. Generated here rather than in the store, because the
+  // store is constructed once per pass and the two must agree before either row
+  // is written.
+  const runGroupId = randomUUID()
   console.log('')
   console.log('='.repeat(84))
   console.log(`${name.toUpperCase()}  (${persona.pairs.length} fictional deposits, probe set ${PROBE_SET_VERSION})`)
@@ -275,13 +329,15 @@ async function runPersona(persona: DemoPersona): Promise<{ outcomes: Outcome[]; 
   // No prompt assembly here. runCoverage builds it from the injected content
   // using the same buildEntitySystemPrompt the succession route uses, so there is
   // no second copy left in this file to drift from the shipped one.
+  console.log(`  run group ${runGroupId}`)
+
   console.log(`\n  run 1 (${COVERAGE_PROBES.length} probes. + deposit, ! reached past, . declined, x discarded)`)
-  const first = await runFixturePass(persona, 'run1')
+  const first = await runFixturePass(persona, 'run1', runGroupId, 1, commitSha)
   const mapA  = rollUpRun(first)
   printMap('run 1 map', mapA)
 
   console.log(`\n  run 2 (stability check)`)
-  const second = await runFixturePass(persona, 'run2')
+  const second = await runFixturePass(persona, 'run2', runGroupId, 2, commitSha)
   const mapB   = rollUpRun(second)
   printMap('run 2 map', mapB)
 
@@ -296,7 +352,10 @@ async function runPersona(persona: DemoPersona): Promise<{ outcomes: Outcome[]; 
   const reaching = mapA.filter(r => r.overreach !== 'none').length
 
   console.log('')
-  console.log(`  probe drift: ${probeDrift.length} of ${first.length} probes changed basis`)
+  // The figure scripts/verification-drift.sql query 1 must reproduce for this
+  // group. If the stored number and this number disagree, persistence is not
+  // faithful and nothing derived from those rows can be trusted.
+  console.log(`  probe drift: ${probeDrift.length} of ${first.length} probes changed basis   [group ${runGroupId}]`)
   for (const d of probeDrift) {
     console.log(`    ${d.probeKey.padEnd(16)} ${d.basis} -> ${secondByKey.get(d.probeKey)}`)
   }
@@ -350,7 +409,7 @@ async function runPersona(persona: DemoPersona): Promise<{ outcomes: Outcome[]; 
 async function main() {
   console.log('COVERAGE FIXTURE PROBE')
   console.log(`probe set ${PROBE_SET_VERSION}, ${COVERAGE_PROBES.length} probes, ${COVERAGE_PROBES.length * 2} model calls per run`)
-  console.log('Fictional personas, known ground truth, nothing written to any table.')
+  console.log('Fictional personas, known ground truth. No archive table is touched.')
   console.log('Runs through lib/coverageRun.ts, the same core the Inngest job runs.')
 
   // Before any model call, because a cap that engaged silently would make every
@@ -358,8 +417,16 @@ async function main() {
   assertPersonasUnderCap([margaretChen, joey])
   console.log(`frozen layer cap ${FROZEN_LAYER_LIMIT}, personas at ${margaretChen.pairs.length} and ${joey.pairs.length} pairs, cap unreached.`)
 
-  const m = await runPersona(margaretChen)
-  const j = await runPersona(joey)
+  // Resolved once and stamped on all four run rows, so every row of one
+  // invocation agrees about which code produced it. Null is a legitimate answer
+  // and the surface renders it as unknown. See resolveCommitSha for what null
+  // means and why a dirty worktree deliberately produces it.
+  const commitSha = resolveCommitSha()
+  console.log(`commit_sha ${commitSha ?? 'null (unresolved, see resolveCommitSha)'}`)
+  console.log('Writes verification_runs and verification_probe_results, published = false.')
+
+  const m = await runPersona(margaretChen, commitSha)
+  const j = await runPersona(joey, commitSha)
 
   // ── GATE 6, the cross fixture check ─────────────────────────────────────────
   // The strongest assertion available, because it uses known ground truth on BOTH
