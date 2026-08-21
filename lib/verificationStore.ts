@@ -164,6 +164,12 @@ export function createVerificationStore(ctx: VerificationRunContext): CoverageSt
           domain:            record.domain,
           probe_key:         record.probeKey,
           basis:             record.basis,
+          // Structural, not recovered from the topic string. A failsafe writes
+          // basis 'unsupported', so without this column a row-level count of
+          // basis='unsupported' would include discarded verdicts while
+          // verification_runs.probes_overreach excludes them. Every per-basis
+          // derivation in scripts/verification-drift.sql filters on this.
+          verifier_errored:  record.verifierErrored,
           topic:             record.topic,
           reply:             record.reply,
         },

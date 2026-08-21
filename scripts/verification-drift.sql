@@ -22,6 +22,28 @@
 -- basis drift is the honest, larger number, and it is the one a skeptic would
 -- assume was being hidden. Publishing the coarse one instead would be exactly
 -- the move this surface exists to refuse.
+--
+-- ── verifier_errored: READ THIS BEFORE WRITING A NEW QUERY HERE ──────────────
+--
+-- The grounding verifier fails safe. On a parse or call failure it returns basis
+-- 'unsupported', which is correct for production (never ship an unverified
+-- founder position) and wrong as measurement (a JSON parse error is not the
+-- entity reaching past the archive).
+--
+-- lib/coverageRun.ts therefore computes the run totals as
+-- `!verifierErrored && basis === 'unsupported'`, excluding discarded verdicts.
+-- ANY QUERY HERE THAT COUNTS basis WITHOUT FILTERING verifier_errored WILL
+-- DISAGREE WITH THE RUN ROW the moment probes_errored is above zero, and it will
+-- do so silently. Every per-basis query below carries `WHERE NOT
+-- verifier_errored` for that reason, and query 5 asserts the agreement rather
+-- than assuming it.
+--
+-- Drift itself (queries 1 to 3) is deliberately computed over ALL probes,
+-- discarded included. Drift measures whether a verdict CHANGED between two
+-- identical passes, and a verdict that changed because the verifier failed once
+-- and not the other time is a real instability worth counting. Excluding it
+-- would flatter the number. The two conventions differ on purpose: coverage asks
+-- what the archive supports, drift asks whether the instrument holds still.
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 1. PER RUN GROUP. One row per persona per invocation.
@@ -128,4 +150,82 @@ SELECT
   (SELECT COUNT(*) FROM verification_runs)                          AS runs_total,
   (SELECT COUNT(*) FROM verification_probe_results)                 AS probe_rows_total,
   (SELECT COUNT(*) FROM verification_runs WHERE published)          AS runs_published,
-  (SELECT COUNT(DISTINCT run_group_id) FROM verification_runs)      AS run_groups;
+  (SELECT COUNT(DISTINCT run_group_id) FROM verification_runs)      AS run_groups,
+  (SELECT COUNT(*) FROM verification_probe_results
+     WHERE verifier_errored)                                        AS probe_rows_discarded;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 5. PER BASIS, DERIVED FROM ROWS, CHECKED AGAINST THE RUN ROW.
+--
+--    THIS IS THE AGREEMENT GATE. The run row stores probes_deposit,
+--    probes_overreach and probes_declined. This derives the same three from the
+--    probe rows using the SAME rule lib/coverageRun.ts applies, which is to
+--    exclude discarded verdicts. All three `*_match` columns must be true for
+--    every run.
+--
+--    If any is false, the stored counts and the rows disagree and no figure
+--    derived from either can be trusted until it is understood. The most likely
+--    cause is a query somewhere that forgot `WHERE NOT verifier_errored`.
+--
+--    probes_total on the run row is results.length, which counts every probe
+--    that returned including discarded ones, so it is compared against the
+--    unfiltered row count rather than the filtered one.
+-- ─────────────────────────────────────────────────────────────────────────────
+WITH derived AS (
+  SELECT
+    run_id,
+    COUNT(*)                                                                   AS rows_all,
+    COUNT(*) FILTER (WHERE NOT verifier_errored AND basis = 'deposit')         AS d_deposit,
+    COUNT(*) FILTER (WHERE NOT verifier_errored AND basis = 'unsupported')     AS d_overreach,
+    COUNT(*) FILTER (WHERE NOT verifier_errored AND basis = 'no_position')     AS d_declined,
+    COUNT(*) FILTER (WHERE verifier_errored)                                   AS d_errored
+  FROM verification_probe_results
+  GROUP BY run_id
+)
+SELECT
+  r.fixture_id,
+  r.pass_number,
+  r.run_group_id,
+  r.published,
+  r.probes_total,      d.rows_all,     (r.probes_total     = d.rows_all)     AS total_match,
+  r.probes_deposit,    d.d_deposit,    (r.probes_deposit   = d.d_deposit)    AS deposit_match,
+  r.probes_overreach,  d.d_overreach,  (r.probes_overreach = d.d_overreach)  AS overreach_match,
+  r.probes_declined,   d.d_declined,   (r.probes_declined  = d.d_declined)   AS declined_match,
+  r.probes_errored,    d.d_errored,    (r.probes_errored   = d.d_errored)    AS errored_match
+FROM verification_runs r
+JOIN derived d ON d.run_id = r.id
+ORDER BY r.fixture_id, r.pass_number;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 6. THE SAME AGREEMENT AS A SINGLE VERDICT.
+--    Expect one row reading all_match = true and mismatched_runs = 0.
+-- ─────────────────────────────────────────────────────────────────────────────
+WITH derived AS (
+  SELECT
+    run_id,
+    COUNT(*)                                                                   AS rows_all,
+    COUNT(*) FILTER (WHERE NOT verifier_errored AND basis = 'deposit')         AS d_deposit,
+    COUNT(*) FILTER (WHERE NOT verifier_errored AND basis = 'unsupported')     AS d_overreach,
+    COUNT(*) FILTER (WHERE NOT verifier_errored AND basis = 'no_position')     AS d_declined,
+    COUNT(*) FILTER (WHERE verifier_errored)                                   AS d_errored
+  FROM verification_probe_results
+  GROUP BY run_id
+)
+SELECT
+  COUNT(*)                                    AS runs_checked,
+  COUNT(*) FILTER (WHERE NOT (
+        r.probes_total     = d.rows_all
+    AND r.probes_deposit   = d.d_deposit
+    AND r.probes_overreach = d.d_overreach
+    AND r.probes_declined  = d.d_declined
+    AND r.probes_errored   = d.d_errored
+  ))                                          AS mismatched_runs,
+  BOOL_AND(
+        r.probes_total     = d.rows_all
+    AND r.probes_deposit   = d.d_deposit
+    AND r.probes_overreach = d.d_overreach
+    AND r.probes_declined  = d.d_declined
+    AND r.probes_errored   = d.d_errored
+  )                                           AS all_match
+FROM verification_runs r
+JOIN derived d ON d.run_id = r.id;

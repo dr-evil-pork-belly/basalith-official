@@ -106,6 +106,7 @@ async function fullRun(overrides: Partial<VerificationRunContext> = {}) {
   await store.recordProbe({
     runId: opened.runId, domain: 'Capital', probeKey: 'capital-01',
     basis: 'no_position', topic: 'a topic', reply: 'a draft',
+    verifierErrored: false,
   })
   await store.writeCoverage([])
   await store.finishRun({
@@ -175,10 +176,47 @@ describe('verification store', () => {
       domain:            'Capital',
       probe_key:         'capital-01',
       basis:             'no_position',
+      verifier_errored:  false,
       topic:             'a topic',
       reply:             'a draft',
     })
     expect(probe.options).toEqual({ onConflict: 'run_id,probe_key' })
+  })
+
+  /**
+   * The reason verifier_errored exists as a column.
+   *
+   * A discarded verdict carries basis 'unsupported'. If the flag were not
+   * written, a row-level count of basis='unsupported' would include it while
+   * verification_runs.probes_overreach excludes it, and the two numbers would
+   * disagree silently whenever probes_errored is above zero.
+   */
+  it('records a discarded verdict structurally, not only in the topic string', async () => {
+    const store = createVerificationStore(CTX)
+    const opened = await store.openRun({
+      archiveId: 'fixture:margaret', probeSetVersion: 'v2',
+      segment: 'succession', offLabel: false, triggerSource: 'manual',
+    })
+    if ('error' in opened) throw new Error(opened.error)
+
+    await store.recordProbe({
+      runId: opened.runId, domain: 'Risk', probeKey: 'risk-03',
+      basis: 'unsupported',
+      topic: 'verifier failsafe, verdict discarded',
+      reply: 'a draft',
+      verifierErrored: true,
+    })
+
+    const probe = H.state.calls.find(c => c.table === 'verification_probe_results')!
+    const row = probe.payload as Row
+    console.log('  discarded verdict row:', JSON.stringify({
+      basis: row.basis, verifier_errored: row.verifier_errored, topic: row.topic,
+    }))
+
+    // basis is still the failsafe's 'unsupported'. The flag is what tells a
+    // per-basis query to exclude it.
+    expect(row.basis).toBe('unsupported')
+    expect(row.verifier_errored).toBe(true)
   })
 
   it('writes no coverage map, because it is derivable from the probe rows', async () => {
@@ -218,7 +256,7 @@ describe('verification store', () => {
     H.state.upsertError = 'connection reset'
     await expect(store.recordProbe({
       runId: opened.runId, domain: 'Capital', probeKey: 'capital-02',
-      basis: 'deposit', topic: 't', reply: 'r',
+      basis: 'deposit', topic: 't', reply: 'r', verifierErrored: false,
     })).rejects.toThrow(/capital-02.*connection reset/)
   })
 

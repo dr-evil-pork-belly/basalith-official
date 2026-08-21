@@ -130,13 +130,34 @@ CREATE TABLE IF NOT EXISTS verification_probe_results (
   basis             TEXT        NOT NULL
     CHECK (basis IN ('deposit','no_position','unsupported')),
 
-  -- The auditor's one-line reading. When lib/verifyGrounding.ts returned its
-  -- catch-path failsafe rather than a verdict, lib/coverageRun.ts writes the
-  -- literal 'verifier failsafe, verdict discarded' here. The per-probe discarded
-  -- flag is NOT a separate column: carrying it would require widening the
-  -- CoverageStore contract, which slice 2.3 is not permitted to change. The
-  -- per-run count is on verification_runs.probes_errored, and drift is defined
-  -- on basis alone, so nothing here depends on the missing flag.
+  -- TRUE when lib/verifyGrounding.ts returned its catch-path failsafe rather
+  -- than an auditor verdict. Excluded from both coverage dimensions: not
+  -- evidence in either direction.
+  --
+  -- THIS COLUMN IS WHY THE RUN ROW AND THE ROW LEVEL DERIVATION CANNOT DISAGREE.
+  -- The failsafe writes basis 'unsupported'. runCoverage computes
+  -- probes_overreach as `!verifierErrored && basis === 'unsupported'`, excluding
+  -- discarded verdicts. A derivation that counted basis='unsupported' off these
+  -- rows without this flag would INCLUDE them, so the stored count and the
+  -- derived count would diverge silently whenever probes_errored > 0.
+  --
+  -- That divergence is latent rather than absent: recent runs happen to show
+  -- zero errored verdicts, so the two numbers agree by circumstance rather than
+  -- by construction, with nothing checking. This column removes the
+  -- circumstance. Every per-basis query in scripts/verification-drift.sql
+  -- filters on it, and the acceptance gate asserts derived equals stored for
+  -- all four runs.
+  --
+  -- NOT NULL with a default rather than nullable: a null here would be a third
+  -- state that means nothing, and row semantics are the irreversible class.
+  -- Added before any row existed, so there is no ambiguous history.
+  verifier_errored  BOOLEAN     NOT NULL DEFAULT FALSE,
+
+  -- The auditor's one-line reading. When the failsafe fired, lib/coverageRun.ts
+  -- writes the literal 'verifier failsafe, verdict discarded' here. That string
+  -- is a human-readable message and NOT the carrier of the fact. Read
+  -- verifier_errored instead. Recovering a semantic fact by string-matching a
+  -- message is not a foundation for a published figure.
   topic             TEXT,
 
   -- The entity's draft answer. Stored because when a domain reads open, the
@@ -155,6 +176,12 @@ CREATE UNIQUE INDEX IF NOT EXISTS verification_probe_results_run_probe
 -- The index the drift derivation actually walks.
 CREATE INDEX IF NOT EXISTS verification_probe_results_group_probe_idx
   ON verification_probe_results (run_group_id, probe_key, pass_number);
+
+-- The per-basis derivation walks this one. Partial, because every per-basis
+-- query filters discarded verdicts out, so the index only has to cover the rows
+-- those queries can actually return.
+CREATE INDEX IF NOT EXISTS verification_probe_results_basis_idx
+  ON verification_probe_results (run_id, basis) WHERE NOT verifier_errored;
 
 CREATE INDEX IF NOT EXISTS verification_probe_results_group_domain_idx
   ON verification_probe_results (run_group_id, domain);
@@ -177,6 +204,8 @@ COMMENT ON COLUMN verification_runs.commit_sha IS
   'The commit the measured code was at, or NULL when it could not be resolved. Never a placeholder or a branch name.';
 COMMENT ON TABLE verification_probe_results IS
   'One probe verdict per pass. Drift is derived from these rows, never stored. See scripts/verification-drift.sql.';
+COMMENT ON COLUMN verification_probe_results.verifier_errored IS
+  'TRUE when the grounding verifier returned its catch-path failsafe rather than a verdict. The failsafe writes basis=unsupported, so every per-basis derivation must exclude these rows or it will disagree with the counts on verification_runs.';
 
 -- ── Verification. Run after pasting. ──────────────────────────────────────────
 -- Expect two rows, each with rls_enabled = true.

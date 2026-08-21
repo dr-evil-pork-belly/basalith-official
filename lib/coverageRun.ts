@@ -229,6 +229,27 @@ export type ProbeRecord = {
   basis:    ProbeResult['basis']
   topic:    string
   reply:    string
+  /**
+   * TRUE when verifyGrounding returned its catch-path failsafe rather than an
+   * auditor verdict. Carried to the store as a first-class fact.
+   *
+   * WHY THIS IS REQUIRED AND NOT OPTIONAL. The failsafe writes basis
+   * 'unsupported', so any row-level derivation that counts basis='unsupported'
+   * silently includes discarded verdicts, while the run row computes
+   * probes_overreach as `!verifierErrored && basis === 'unsupported'` and
+   * excludes them. The two numbers then disagree whenever probes_errored > 0,
+   * with nothing checking. They agree today only because recent runs happen to
+   * have zero errored verdicts, which is agreement by circumstance rather than
+   * by construction.
+   *
+   * The only other carrier is the `topic` literal 'verifier failsafe, verdict
+   * discarded'. Recovering a semantic fact by string-matching a human-readable
+   * message is not a foundation for a published figure.
+   *
+   * Not optional, because an optional boolean on a semantic field invites a
+   * third state that means nothing. Every caller states it.
+   */
+  verifierErrored: boolean
 }
 
 export type PriorCoverage = {
@@ -331,6 +352,17 @@ export const supabaseCoverageStore: CoverageStore = {
   },
 
   async recordProbe(record) {
+    // record.verifierErrored IS DELIBERATELY NOT WRITTEN HERE.
+    //
+    // coverage_probe_results has no such column, and slice 2.3 does not alter
+    // that table. Do not add one casually: coverage_runs.probes_errored already
+    // carries the per-run count for this path, the table holds live archive
+    // results, and adding a column to it is a migration with its own review
+    // rather than a side effect of a store change.
+    //
+    // The verification tables DO record it, because a published figure is
+    // derived from those rows and the run row and the row-level derivation must
+    // agree by construction. See lib/verificationStore.ts.
     await supabaseAdmin.from('coverage_probe_results').upsert(
       {
         run_id:    record.runId,
@@ -567,6 +599,10 @@ export async function runCoverage(params: {
           basis:    verdict.basis,
           topic:    errored ? 'verifier failsafe, verdict discarded' : verdict.topic,
           reply,
+          // The same `errored` the run totals below exclude from probes_overreach.
+          // Passing it means a store can record the distinction structurally
+          // instead of a reader having to recover it from the topic string.
+          verifierErrored: errored,
         })
 
         return { basis: verdict.basis, errored }

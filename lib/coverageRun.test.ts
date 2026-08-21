@@ -213,6 +213,27 @@ describe('runCoverage default path, store neutrality', () => {
     expect(first.options).toEqual({ onConflict: 'run_id,probe_key' })
   })
 
+  /**
+   * ProbeRecord gained a required `verifierErrored` in slice 2.3 so the
+   * verification tables can record a discarded verdict structurally. This path
+   * must be unaffected: coverage_probe_results has no such column, and adding
+   * one is a migration against a table holding live archive results, not a side
+   * effect of a store change.
+   *
+   * The key-set assertion above already fails if it appears. This says why, so a
+   * future reader does not "fix" the omission.
+   */
+  it('does not write verifierErrored to coverage_probe_results', async () => {
+    await runCoverage({ archiveId: ARCHIVE })
+
+    const first = H.state.calls.find(c => c.table === 'coverage_probe_results')!
+    const keys = Object.keys(first.payload as Row)
+    console.log('\n  coverage_probe_results keys:', keys.join(', '))
+
+    expect(keys).not.toContain('verifier_errored')
+    expect(keys).not.toContain('verifierErrored')
+  })
+
   it('writes the map with the same columns and the same conflict key', async () => {
     await runCoverage({ archiveId: ARCHIVE })
 
