@@ -19,7 +19,9 @@
 #         so `npm test` does NOT collect them. That was stated wrongly twice and
 #         is why this gate now exists in the harness instead of in someone's
 #         memory. Roughly 10 minutes of model calls.
-# GATE 2  fixture probe. Fictional personas, known ground truth, writes nothing.
+# GATE 2  fixture probe. Fictional personas, known ground truth. Writes to
+#         verification_runs and verification_probe_results only, published=false.
+#         Touches no archive table; those tables carry no path to `archives`.
 #         Two model calls per probe, run twice per persona. At probe set v2 that
 #         is 192 calls per persona. Budget 20 to 30 minutes.
 # GATE 3  live drive against a real archive. WRITES REAL ROWS to coverage_runs,
@@ -511,7 +513,7 @@ if ($OnlyRegression) {
 }
 
 # ── GATE 2 ────────────────────────────────────────────────────────────────────
-Write-Gate 'GATE 2  fixture probe (fictional personas, nothing written)'
+Write-Gate 'GATE 2  fixture probe (fictional personas, no archive table touched)'
 Write-Host 'Two runs per persona so domain stability can be gated. Budget 20 to 30 minutes.'
 Write-Host ''
 $g2 = Invoke-Gate -Name 'gate2-fixture' `
