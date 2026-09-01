@@ -72,7 +72,31 @@ const POINTER_TABLE: Record<AllowlistBucket, string> = {
 type PointerRow = Record<string, unknown>
 type PointerMap = Record<string, Record<string, PointerRow>>
 
-async function alertAdmin(subject: string, lines: string[]): Promise<void> {
+/**
+ * The admin alert for the jobs in this file. Exported 2026-09-01 so the weekly
+ * verify cron can reuse it rather than carry a second copy.
+ *
+ * Two other copies of this shape already exist on the property:
+ * lib/inngest/exportFunctions.ts has its own alertAdmin on a different
+ * signature, and app/api/cron/storage-backup-heartbeat/route.ts inlines the
+ * same send. Neither is folded in here. Doing that would change their behavior,
+ * and this slice changes no behavior.
+ *
+ * IF YOU IMPORT THIS, IMPORT alertOnCrash WITH IT. The alerted flag that
+ * alertOnCrash carries is the only thing stopping a hard-alarm run from sending
+ * two emails for one failure: the alarm paths raise the flag before they throw,
+ * and alertOnCrash returns early once they have. A caller that takes this
+ * function on its own puts the duplicate back.
+ *
+ * THE ALARM HAS A KNOWN HOLE AND IT IS STILL OPEN. A lambda OOM or a timeout
+ * kills the invocation without unwinding, so no catch in this file runs and
+ * nothing here fires. Inngest still marks the run failed, so the failure is
+ * visible on the dashboard and it is the email that is lost. An onFailure
+ * handler on the function would close that class. It is not built. A caller
+ * treating this email as its only signal is relying on something with a
+ * documented gap.
+ */
+export async function alertAdmin(subject: string, lines: string[]): Promise<void> {
   try {
     await resend.emails.send({
       from: RESEND_FROM,
@@ -107,7 +131,7 @@ async function alertAdmin(subject: string, lines: string[]): Promise<void> {
  * marks the run failed. An `onFailure` handler on the function would cover that
  * class and is the obvious next step, not built here.
  */
-async function alertOnCrash(
+export async function alertOnCrash(
   label: string,
   state: { alerted: boolean },
   err: unknown,
