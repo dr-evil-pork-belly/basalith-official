@@ -68,6 +68,9 @@
  * probe move is signal rather than noise. That is what made a same-day A/B
  * decisive when one was finally run.
  *
+ * THAT ZERO VARIANCE CLAIM NO LONGER HOLDS. It was true of the runs it
+ * describes and it is not true today. See the A/B at the end of this header.
+ *
  * ── THE STANDING METHOD FOR ANY EDIT TO THIS FILE ───────────────────────────
  *
  * Same-day control arm, or the result does not count.
@@ -210,6 +213,49 @@
  *
  * If you are here because you noticed a banned word in the prompt and wanted to
  * clean it up: that is the thing this block exists to stop.
+ *
+ * ── THE A/B, 2026-09-01. FOUR DRIVES ON a38e4503 AT v2, ONE SESSION ─────────
+ *
+ * Two control arms and two treatment arms. Two treatment arms rather than one,
+ * because 2.4b ran a single arm and its deposit reading stayed ambiguous for
+ * want of a second.
+ *
+ *   control    00d7d42e   deposit 4   overreach 9   declined 35
+ *   control    7117fafd   deposit 3   overreach 9   declined 36
+ *   treatment  67e7dd67   deposit 6   overreach 2   declined 40
+ *   treatment  9a98fc14   deposit 5   overreach 3   declined 40
+ *
+ * Control spread deposit 3 to 4, overreach 9 to 9. Both treatment arms sit
+ * above the control on deposit and far below it on overreach. That is the
+ * result the standing method asks for and that neither earlier attempt got:
+ * overreach down with deposit UP, rather than overreach bought with deposit.
+ *
+ * READ THE CONTROL BEFORE READING THE TREATMENT. The control moved. This
+ * header records August 31 at deposit 5 overreach 8, and 2.4b's control at
+ * deposit 5 and 5. The unmodified prompt returned 4 and 3 today, and a third
+ * same-day run, 1834544f at 04:12, read deposit 3 overreach 5. Scored against
+ * the stored 5 this slice would have read as a flat deposit and a wash. It is
+ * the same-session control that makes it a verdict, which is the whole reason
+ * the method exists.
+ *
+ * Gates: demo-refusal-probe RED to ALL PASS, BANNED and every assertion
+ * byte-identical, covered controls 10 of 10 on both personas. two-layer-probe
+ * flip 0/10 on all three uncovered domains, hiring control decisive at 10/10
+ * NO-HIRE with NEU 0/10. Full fixture ALL PASS, Margaret Capital 0 of 6, Joey
+ * Capital 4 of 6, both GATE 1 spreads 4 against a threshold of 3.
+ *
+ * WHAT THE LEAK NUMBERS DO NOT PROVE. The before run leaked on 'inject',
+ * 'contextual layer' and 'consulting me', and NOT ONCE on 'the fingerprint'.
+ * The labels and the frame are what closed the leak. The noun is what keeps
+ * the body coherent once the section is renamed, and its effect shows up in
+ * coverage rather than in that gate. Do not credit the noun with the gate.
+ *
+ * THE NOUN WAS ADOPTED, NOT PARROTED, which is what decides whether it reads
+ * as his word or the template's. 'record' appears 5 times per treatment drive
+ * against 2 and 3 times per CONTROL drive, where the prompt never contained
+ * it. The model was already reaching for the word, and it takes it possessive
+ * unprompted: "I don't have anything in my record about how I handled account
+ * transitions". A template being echoed spikes. This drifted.
  */
 
 /** A frozen-layer training pair, shaped as the succession entity reads it. */
