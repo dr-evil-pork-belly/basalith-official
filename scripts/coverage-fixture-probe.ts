@@ -525,8 +525,11 @@ async function main() {
     {
       label:  `GATE 6 cross fixture: Margaret has less ${MARGARET_HOLE} coverage than Joey`,
       pass:   mCap.probesDeposit < jCap.probesDeposit,
+      // No deposit count in this string. It said "he has two" and went stale the
+      // day joey-16 and joey-17 landed, which is the same defect class this
+      // suite exists to catch, one layer up in its own output.
       detail: `Margaret ${mCap.probesDeposit}/${mCap.probesTotal} vs Joey ${jCap.probesDeposit}/${jCap.probesTotal}.` +
-        ` She has no capital allocation deposits; he has two.`,
+        ` She has no capital allocation deposits and he does.`,
     },
   ]
 
