@@ -52,14 +52,25 @@
  * ── THIS GATE IS RED ON MAIN, ON PURPOSE ────────────────────────────────────
  *
  * It is not broken and it is not flaky. The defect it measures is live and
- * unfixed. Measured August 31 against the prompt as it stands:
+ * unfixed. Two runs against the prompt as it stands, August 31:
  *
- *   JOEY leak probe       leaked(model) 10/10
- *   MARGARET leak probe   leaked(model)  4/10
- *   MARGARET refuse chip  leaked(model)  2/10   "the fingerprint does not
- *                                                settle this one"
+ *                          run 1    run 2
+ *   JOEY leak probe        10/10     8/10
+ *   MARGARET leak probe     4/10     5/10
+ *   MARGARET refuse chip    2/10     1/10
+ *   JOEY refuse chip        5/10     0/10
  *
- * The last of those is the demo's headline refusal beat, in front of a prospect.
+ * Both runs are shown because these are samples, not constants. The leak rate
+ * moves by two or three between identical runs, and the refuse chips move more
+ * than that: which persona shows the chip leak is noise. Do not read a different
+ * number as a change. What is stable across every run taken is that the two leak
+ * probes fail and the covered controls hold 10 of 10.
+ *
+ * The refuse chip is the demo's headline refusal beat, in front of a prospect.
+ * Both of its leaks were the entity naming the frozen layer: "the fingerprint
+ * does not settle this one", and "I am not going to manufacture one from the
+ * fingerprint I left behind." The second is from the first live run of the
+ * narrowed bigram, which is the evidence that narrowing kept the true positives.
  *
  * A containment clause in lib/entitySystemPrompt.ts took all three to zero and
  * was rejected, because a same-day A/B on a38e4503 showed it cost deposit

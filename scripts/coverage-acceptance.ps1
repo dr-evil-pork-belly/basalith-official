@@ -475,7 +475,7 @@ if ($SkipRegression) {
 
   Write-Host ''
   Write-Host '--- scripts/demo-refusal-probe.ts (the sales demo refusal beat) ---'
-  # Sentinel: the last UNCONDITIONAL literal. demo-refusal-probe.ts:350 prints
+  # Sentinel: the last UNCONDITIONAL literal. demo-refusal-probe.ts:361 prints
   # either 'ALL PASS' or a failure string, so keying on it would conflate "the
   # probe produced nothing" with "the probe ran and failed". Those are the two
   # states this slice exists to separate, so the sentinel sits one line earlier.
@@ -488,7 +488,7 @@ if ($SkipRegression) {
   $g1bB = Invoke-Gate -Name 'gate1b-demo-refusal' `
                       -Script 'scripts/demo-refusal-probe.ts' `
                       -Sentinel '^SUMMARY$' `
-                      -SentinelSource 'scripts/demo-refusal-probe.ts:345'
+                      -SentinelSource 'scripts/demo-refusal-probe.ts:356'
   if (-not $g1bB.Pass) {
     Write-Host ''
     Write-Host "  gate failed on: $($g1bB.Reasons -join '; ')"
