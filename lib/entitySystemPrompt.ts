@@ -47,9 +47,51 @@
  * same rule, which is the point.
  *
  * Regression gates for any further edit here: scripts/two-layer-probe.ts and
- * scripts/demo-refusal-probe.ts. The measurement is a coverage run before and
- * after, comparing coverage_runs.probes_overreach on the same archive at the
- * same probe_set_version. Baseline to beat: 28 of 48 on a38e4503 at v2.
+ * scripts/demo-refusal-probe.ts.
+ *
+ * This comment used to name "28 of 48 on a38e4503 at v2" as the baseline to
+ * beat. That was the pre-August-17 reading. It went stale the day the
+ * thin-fingerprint instruction above replaced the one that produced it, and it
+ * then carried forward unchallenged for two weeks. That is the ordinary way a
+ * number in a comment goes wrong: nothing recomputes it, and nothing fails when
+ * it drifts.
+ *
+ * Live reading on a38e4503 at v2, measured August 31 2026:
+ *
+ *   probes_deposit 5    probes_overreach 8    probes_declined 35
+ *
+ * Those reproduced run eb1761c3 exactly on all three figures, eleven days and
+ * three merged slices later.
+ *
+ * The reproduction matters more than the figures. Variance on this archive was
+ * zero across that span, so the instrument is stable enough here that a seven
+ * probe move is signal rather than noise. That is what made a same-day A/B
+ * decisive when one was finally run.
+ *
+ * ── THE STANDING METHOD FOR ANY EDIT TO THIS FILE ───────────────────────────
+ *
+ * Same-day control arm, or the result does not count.
+ *
+ * Run the coverage drive twice on the same archive on the same day, once with
+ * the edit and once without it, and compare those two runs. Do not compare a
+ * fresh run against a stored baseline, and that includes the figures above. A
+ * stored baseline goes stale the moment anything upstream of it changes, nothing
+ * recomputes it, and nothing fails when it drifts. That is exactly how 28 of 48
+ * survived in this header. The control arm costs one extra drive, about seven
+ * minutes and 96 model calls, and it is the difference between a number and a
+ * verdict.
+ *
+ * A single before-and-after cannot resolve a change smaller than pass-to-pass
+ * variance either way. The fixture returned overreach 7 then 5 on Margaret
+ * minutes apart on identical code, and 3 then 5 on Joey. Anchor a verdict on the
+ * ground-truth anchored figures instead, the ones with a known right answer:
+ * Margaret's Capital domain read 0 of 6 across the 2.2 to 2.3 comparison, Joey's
+ * read 2 of 6, and the covered controls held 10 of 10. Report the aggregates and
+ * watch them. Do not rule on them.
+ *
+ * A worked example, including a prompt edit this method rejected and the full
+ * A/B that rejected it, is on branch slice-2.4-prompt-containment in this file's
+ * header there. Read it before adding a constraint to the prompt below.
  *
  * The risk to watch is over-correction. An entity that declines everything
  * scores a perfect overreach number and is worthless. Coverage state is the
