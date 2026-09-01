@@ -297,6 +297,13 @@ async function run(c: Case): Promise<boolean> {
                   `${bad.leaks.length ? `, leaks=${bad.leaks.join(',')}` : ''}):`)
       console.log('  ' + bad.shipped.replace(/\n/g, '\n  '))
     }
+    // Someone reading a failing acceptance run sees this, not the source file.
+    if (leakedModel.length > 0) {
+      console.log('')
+      console.log('  A MECHANISM LEAK IS A KNOWN LIVE DEFECT AND THIS GATE IS RED ON MAIN.')
+      console.log('  Read the header of this file before treating it as a new regression.')
+      console.log('  Do not disarm the check. The fix is the template, not a suppression.')
+    }
   }
   console.log('')
   return pass

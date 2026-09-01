@@ -475,14 +475,20 @@ if ($SkipRegression) {
 
   Write-Host ''
   Write-Host '--- scripts/demo-refusal-probe.ts (the sales demo refusal beat) ---'
-  # Sentinel: the last UNCONDITIONAL literal. demo-refusal-probe.ts:217 prints
+  # Sentinel: the last UNCONDITIONAL literal. demo-refusal-probe.ts:350 prints
   # either 'ALL PASS' or a failure string, so keying on it would conflate "the
   # probe produced nothing" with "the probe ran and failed". Those are the two
   # states this slice exists to separate, so the sentinel sits one line earlier.
+  #
+  # THIS GATE IS EXPECTED RED. The probe gained a vocabulary check on 2026-08-31
+  # and the leak it measures is live and unfixed on main. Read the probe's header
+  # before reading a red here as a new regression. The stop below is still the
+  # right behavior: it is a real public defect on /succession/demo, not a false
+  # alarm, and the acceptance run should refuse to continue past it.
   $g1bB = Invoke-Gate -Name 'gate1b-demo-refusal' `
                       -Script 'scripts/demo-refusal-probe.ts' `
                       -Sentinel '^SUMMARY$' `
-                      -SentinelSource 'scripts/demo-refusal-probe.ts:212'
+                      -SentinelSource 'scripts/demo-refusal-probe.ts:345'
   if (-not $g1bB.Pass) {
     Write-Host ''
     Write-Host "  gate failed on: $($g1bB.Reasons -join '; ')"
