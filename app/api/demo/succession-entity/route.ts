@@ -1,7 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { NextResponse, type NextRequest } from 'next/server'
 import { checkRateLimit, getClientIP, sanitizedError } from '@/lib/apiSecurity'
-import { buildEntitySystemPrompt, formatFingerprintSection } from '@/lib/entitySystemPrompt'
+import { buildEntitySystemPrompt, formatFingerprintSection, EMPTY_CONTEXT } from '@/lib/entitySystemPrompt'
 import { verifyGrounding, groundingGapReply } from '@/lib/verifyGrounding'
 import { getDemoPersona, isDemoPersonaId, MAX_USER_MESSAGES } from '@/lib/demoPersonas'
 
@@ -11,9 +11,9 @@ const ONE_HOUR_MS       = 60 * 60 * 1000
 const MAX_QUESTION_CHARS = 500
 const MAX_TRANSCRIPT_CHARS = 20_000
 
-// Matches the succession entity route: an empty mutable layer is this exact
-// string. The v1 demo runs the frozen layer only.
-const EMPTY_CONTEXT = 'No contextual layer injected yet.'
+// EMPTY_CONTEXT is imported, not copied: it is part of the model's input, so a
+// local copy would let this route drift from what the probes measure. The v1
+// demo runs the frozen layer only and always passes it.
 
 type ChatMessage = { role: 'user' | 'assistant'; content: string }
 

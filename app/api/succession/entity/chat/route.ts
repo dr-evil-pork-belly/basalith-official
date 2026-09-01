@@ -4,7 +4,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { verifyGrounding, groundingGapReply } from '@/lib/verifyGrounding'
 import { logGroundingGap } from '@/lib/groundingGapLog'
-import { buildEntitySystemPrompt, formatFingerprintSection } from '@/lib/entitySystemPrompt'
+import { buildEntitySystemPrompt, formatFingerprintSection, EMPTY_CONTEXT } from '@/lib/entitySystemPrompt'
 
 const anthropic = new Anthropic()
 
@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
     ? contexts.map(c =>
         `[${labelContextType(c.context_type)}, ${formatDate(c.created_at)}]:\n${c.content}`
       ).join('\n\n')
-    : 'No contextual layer injected yet.'
+    : EMPTY_CONTEXT
 
   const systemPrompt = buildEntitySystemPrompt({ ownerName, archiveName, fingerprintSection, contextSection })
 

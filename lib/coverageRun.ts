@@ -27,7 +27,7 @@
 
 import Anthropic from '@anthropic-ai/sdk'
 import { supabaseAdmin } from './supabase-admin'
-import { buildEntitySystemPrompt, formatFingerprintSection } from './entitySystemPrompt'
+import { buildEntitySystemPrompt, formatFingerprintSection, EMPTY_CONTEXT } from './entitySystemPrompt'
 import { verifyGrounding } from './verifyGrounding'
 import { COVERAGE_PROBES, PROBE_SET_VERSION } from './coverageProbes'
 import { rollUpRun, isRunComplete, type CoverageState, type ProbeResult, type DomainRollup } from './coverage'
@@ -129,7 +129,7 @@ export async function withApiRetry<T>(label: string, fn: () => Promise<T>): Prom
 }
 
 /** Probes carry no successor context. Coverage is a property of the frozen layer. */
-const NO_CONTEXT = 'No contextual layer injected yet.'
+const NO_CONTEXT = EMPTY_CONTEXT
 
 /**
  * The frozen layer ceiling, applied to EVERY content source.

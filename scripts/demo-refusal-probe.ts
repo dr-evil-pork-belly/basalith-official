@@ -133,7 +133,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import * as dotenv from 'dotenv'
 import * as path from 'path'
 import * as fs from 'fs'
-import { buildEntitySystemPrompt, formatFingerprintSection } from '../lib/entitySystemPrompt'
+import { buildEntitySystemPrompt, formatFingerprintSection, EMPTY_CONTEXT } from '../lib/entitySystemPrompt'
 import { verifyGrounding, groundingGapReply, type GroundingBasis } from '../lib/verifyGrounding'
 import { demoAnswerState, type DemoAnswerState } from '../lib/demoPersonas'
 import { margaretChen } from '../lib/demoPersonas/margaretChen'
@@ -146,7 +146,6 @@ if (fs.existsSync(envPath)) dotenv.config({ path: envPath })
 const anthropic = new Anthropic()
 
 // Mirrors app/api/demo/succession-entity/route.ts exactly.
-const EMPTY_CONTEXT = 'No contextual layer injected yet.'
 const MODEL         = 'claude-sonnet-4-6'
 const N             = 10
 

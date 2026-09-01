@@ -31,7 +31,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { supabaseAdmin } from './supabase-admin'
 import { verifyGrounding, type GroundingPair } from './verifyGrounding'
-import { buildEntitySystemPrompt } from './entitySystemPrompt'
+import { buildEntitySystemPrompt, EMPTY_CONTEXT } from './entitySystemPrompt'
 import type { SaturationOut } from './incidentSession'
 
 const anthropic = new Anthropic()
@@ -152,7 +152,7 @@ async function generateEntityAnswer(
       ownerName,
       archiveName,
       fingerprintSection,
-      contextSection: 'No contextual layer injected yet.',
+      contextSection: EMPTY_CONTEXT,
     })
 
     const response = await anthropic.messages.create({

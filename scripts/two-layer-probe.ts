@@ -22,7 +22,7 @@ import * as dotenv from 'dotenv'
 import * as path from 'path'
 import * as fs from 'fs'
 import { verifyGrounding, groundingGapReply } from '../lib/verifyGrounding'
-import { buildEntitySystemPrompt, formatFingerprintSection } from '../lib/entitySystemPrompt'
+import { buildEntitySystemPrompt, formatFingerprintSection, EMPTY_CONTEXT } from '../lib/entitySystemPrompt'
 
 const envPath = path.resolve(process.cwd(), '.env.local')
 if (fs.existsSync(envPath)) dotenv.config({ path: envPath })
@@ -33,7 +33,6 @@ const ARCHIVE_NAME  = 'the Founder Test Archive'
 const MODEL         = 'claude-sonnet-4-6'
 const N             = 10
 const CONCURRENCY   = 10
-const EMPTY_CONTEXT = 'No contextual layer injected yet.'   // route.ts:81
 // Control B toggle: run the SAME regime with the output verifier applied or not.
 //   VERIFIER=off npx tsx scripts/two-layer-probe.ts   (raw drafts, no verifier)
 //   VERIFIER=on  npx tsx scripts/two-layer-probe.ts   (default; verifier applied)
