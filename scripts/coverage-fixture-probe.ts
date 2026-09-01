@@ -48,6 +48,67 @@
  *
  * The personas hold no real archive data.
  *
+ * ── 2026-09-01, JOEY'S GATE 1 WAS A COIN FLIP. READ THIS BEFORE BLAMING A ───
+ * ── PROMPT CHANGE FOR A JOEY RED. ───────────────────────────────────────────
+ *
+ * This is a measurement fact, and it is separate from the persona fix below.
+ *
+ * Joey's deposit spread, every run recorded in verification_probe_results,
+ * computed from the stored rows rather than from any transcript:
+ *
+ *   2, 2, 3, 3, 3, 3, 4, 5
+ *
+ * The threshold is 3. Those eight runs span THREE different prompts, and the
+ * variation within a single prompt is as large as the variation between them.
+ * Two invocations of identical code returned 3 and 5. Another pair of identical
+ * invocations returned 3 and 2, which is a pass and a fail on the same bytes.
+ *
+ * GATE 1 reads run 1 only (mapA). So on four fixture invocations its Joey input
+ * was 3, 3, 2, 2: pass, pass, fail, fail, with the prompt uncorrelated.
+ *
+ * THE CONSEQUENCE. Until Joey's extremes are clean, a Joey GATE 1 result is not
+ * evidence about a prompt change in either direction. It was read as one during
+ * slice 2.4b, where a spread of 2 was taken as "discrimination did not survive
+ * the relabel". That reading was unsupported: 2 sits inside a range that had
+ * already produced 2 through 5 before the relabel existed.
+ *
+ * WHY IT WAS A COIN FLIP: contamination, not flatness. Joey was not evenly
+ * spread. His pairs ranged 0 to 4 per domain against Margaret's 0 to 5. What he
+ * lacked was a CLEAN extreme. Margaret's Capital hole is categorical, nothing in
+ * her fifteen deposits touches firm capital allocation, so all six probes fail
+ * cleanly and it reads 0/6 every time. Joey's thin domains were all thin-but-
+ * adjacent: he had no Succession pair, but joey-15 addresses a buyer directly
+ * and joey-12 is about delegated authority, so Succession probes landed in the
+ * band where the verifier can go either way. Six marginal coin flips per domain,
+ * eight domains, is exactly a spread that oscillates between 2 and 5.
+ *
+ * A calibration standard is only a standard where ground truth is unambiguous.
+ *
+ * THE FIX, and what it does and does not buy. joey-16 and joey-17 were added
+ * 2026-09-01 to give him a clean Capital peak, taking primary Capital coverage
+ * from 2 pairs to 4. Capital was chosen because GATE 6 depends on it and that
+ * gate had been passing at 1/6 against 0/6, a one-probe margin on the strongest
+ * assertion in the suite.
+ *
+ * It buys margin, NOT stability. Seven of his eight domains are still in the
+ * marginal band. Expect his spread to remain noisier than Margaret's, and do not
+ * read a one-probe Joey move as a signal about anything.
+ *
+ * ── AND WATCH WHICH DIRECTION A GOOD SPREAD CAME FROM ───────────────────────
+ *
+ * GATE 1 has two failure modes and only one of them is a low number. The other
+ * is the ceiling: if every domain reads backed, the verifier is rubber-stamping
+ * and the spread can look healthy while the map means nothing.
+ *
+ * joey-16 and joey-17 are deliberately strong, specific, position-taking
+ * answers, because that is what a clean extreme requires. That is also exactly
+ * the shape that could push Capital past 'clean peak' into 'rubber-stamped'. So:
+ * if Joey's Capital reads 5 or 6 of 6, treat it as a FLAG, not a win, and check
+ * the verifier before celebrating the spread. Two pairs were added rather than
+ * three for this reason. A third draft (joey-18, a profitable-but-flat store)
+ * was cut both for this risk and because it straddled Capital and Strategy,
+ * which is the contamination this slice exists to correct.
+ *
  * ── 2026-08-20, slice 2.3. THIS NOW WRITES TO TWO TABLES ────────────────────
  *
  * The line above used to end "and nothing here writes to any table." That became
@@ -143,6 +204,23 @@ const MAX_DOMAIN_DRIFT = 1
  * coverage are the clearest true positive and true negative in the fixture, and
  * a map that cannot separate those two by half its probes is not reading the
  * archive.
+ *
+ * SAY THE CALIBRATION OUT LOUD, BECAUSE IT DOES NOT TRANSFER. This number was
+ * chosen against ONE persona and two named domains: Margaret's Capital hole,
+ * which is zero deposits, and her People coverage, which is five. Both are clean
+ * extremes, which is why her spread holds still at 4 to 6 across every recorded
+ * run.
+ *
+ * It does not follow that 3 is the right bar for a persona without a clean
+ * extreme. Joey had none until 2026-09-01, and his spread returned 2, 2, 3, 3,
+ * 3, 3, 4, and 5 across eight recorded runs spanning three different prompts.
+ * The threshold sat inside his own noise band, so his GATE 1 was deciding
+ * nothing. See the coin-flip note in the header.
+ *
+ * The fix was to give Joey a clean extreme, not to move this number. A
+ * per-persona threshold set on a fixture that cannot hold a measurement still is
+ * a number chosen to pass, which is the thing the note below already warns
+ * against.
  */
 const MIN_DEPOSIT_SPREAD = 3
 

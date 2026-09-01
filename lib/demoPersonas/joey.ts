@@ -100,6 +100,21 @@ export const joey: DemoPersona = {
       prompt:     'What does the P and L not show about this business?',
       completion: "About thirty regulars per store who buy cases every month and show up as walk-ins in the numbers. The P and L calls them retail traffic. They are actually accounts, they just do not know it. Denny knows their names, their bottles, and their kids' colleges. If a buyer runs these stores off the P and L, that revenue looks durable right up until the person who knows the names leaves. The names are the asset. The register tape is the shadow of it.",
     },
+    // joey-16 and joey-17 are model-facing only: no contrast card, no chip, no
+    // groundedInPairId. They exist to give Joey a clean Capital peak against
+    // Margaret's documented Capital hole, which is what GATE 6 asserts across
+    // the two fixtures. Added 2026-09-01, see the header of
+    // scripts/coverage-fixture-probe.ts for why the fixture needed it.
+    {
+      id:         'joey-16',
+      prompt:     'What will you borrow for?',
+      completion: "Buildings and coolers. Never inventory, never payroll. A building I can sell if I am wrong. A pallet of tequila I bought with borrowed money in a bad December is a lender's problem that becomes mine at nine percent. In 2011 my banker offered me a line for seasonal inventory and I took forty thousand of it. I paid it back over fourteen months on wine that moved in six weeks. The interest was not the lesson. The lesson was that borrowing to buy something that turns is borrowing to hide a forecasting problem. I borrow for things that are still there in five years.",
+    },
+    {
+      id:         'joey-17',
+      prompt:     'When do you hold cash instead of putting it to work?',
+      completion: 'I hold one December. Whatever the biggest holiday order across four stores costs me, that number sits in the account and does not get deployed. Right now that is about three hundred thousand. Below two hundred thousand I sleep badly and I stop looking at anything new. The reason is not caution, it is negotiating position. A distributor knows which accounts need terms in October, and the accounts that need terms do not get allocation on the good stuff. Cash in November is what buys the bourbon everyone else is begging for. Money that protects an allocation is not idle money.',
+    },
   ],
 
   contrastCards: [
