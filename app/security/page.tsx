@@ -97,7 +97,7 @@ export default function SecurityPage() {
               color:         'var(--color-text-faint)',
               marginBottom:  '48px',
             }}>
-              Last updated: August 2026
+              Last updated: September 2026
             </p>
 
             <div aria-hidden="true" style={{ height: '1px', background: 'var(--color-border)', marginBottom: '48px' }} />
@@ -113,7 +113,7 @@ export default function SecurityPage() {
             <p style={BODY}>Only designated people can access your archive.</p>
             <ul style={{ paddingLeft: 0, margin: '0 0 12px' }}>
               {[
-                'Archive owners: Authenticated via bcrypt-hashed passwords with 12 salt rounds, the same standard used by banks.',
+                'Archive owners: Authenticated via bcrypt-hashed passwords with 12 salt rounds.',
                 'Contributors: Authenticated via 64-character cryptographically random tokens generated using crypto.getRandomValues, not guessable by brute force.',
                 'Database isolation: Row Level Security is enforced on every table at the database level, not just the application level. Even a misconfigured application cannot access data across archive boundaries.',
                 'No shared access: Your archive data is never visible to other archive owners, contributors of other archives, or Basalith employees in the normal course of operations.',
@@ -126,7 +126,7 @@ export default function SecurityPage() {
 
             {/* 3 — Infrastructure */}
             <h2 style={H2}>3. Cloud Infrastructure</h2>
-            <p style={BODY}>Basalith processes data on cloud infrastructure. We are transparent about this.</p>
+            <p style={BODY}>Basalith processes data on cloud infrastructure. Here is exactly where.</p>
             <p style={{ ...BODY, marginBottom: '8px' }}>Where your data lives:</p>
             <div style={{ marginBottom: '16px' }}>
               {INFRA.map(row => (
@@ -143,8 +143,8 @@ export default function SecurityPage() {
 
             {/* 4 — MFA */}
             <h2 style={H2}>4. Multi-Factor Authentication</h2>
-            <p style={{ ...BODY, color: 'var(--color-gold)', fontStyle: 'italic' }}>Coming Q3 2026.</p>
-            <p style={BODY}>Multi-factor authentication for archive login is on our roadmap. Until MFA is available:</p>
+            <p style={{ ...BODY, color: 'var(--color-gold)', fontStyle: 'italic' }}>Not yet available.</p>
+            <p style={BODY}>Multi-factor authentication for archive login is on our roadmap. We will update this page when it ships. Until then:</p>
             <ul style={{ paddingLeft: 0, margin: '0 0 12px' }}>
               {[
                 'Use a unique, strong password for your Basalith archive.',

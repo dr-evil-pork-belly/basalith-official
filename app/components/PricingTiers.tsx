@@ -37,7 +37,7 @@ const TIERS: Tier[] = [
     annualPrice: '$3,600',
     annualSub:   '',
     monthlyPrice:'$360',
-    description: 'The full archive experience.\nYour entity learns every week.\nYour family stays connected.\nYour story keeps growing.',
+    description: 'The full archive.\nYour entity learns from you every week.\nYour family adds what they remember.\nThe record of how you think keeps growing.',
     featured:    true,
     features: [
       'Weekly story prompts',
@@ -61,7 +61,7 @@ const TIERS: Tier[] = [
     annualPrice: '$600',
     annualSub:   '',
     monthlyPrice:'$60',
-    description: 'Your archive preserved and waiting.\nNo emails. No prompts.\nJust your data, safe and intact,\nuntil you are ready to return.',
+    description: 'Your archive, kept and waiting.\nNo emails. No prompts.\nEverything you built, safe and intact,\nuntil you are ready to come back.',
     featured:    false,
     features: [
       'All data preserved permanently',
@@ -70,9 +70,9 @@ const TIERS: Tier[] = [
       'Reactivate anytime',
       'No commitment to return',
     ],
-    cta:     'Learn About Resting',
-    ctaHref: '/apply',
-    note:    'Available to Active members who need to step back.',
+    cta:     'Ask About Resting',
+    ctaHref: '/contact',
+    note:    'For Active members who need to step back for a while.',
   },
   {
     id:          'legacy',
@@ -82,16 +82,15 @@ const TIERS: Tier[] = [
     annualSub:   'billed to estate or family',
     monthlyPrice:'$1,200',
     annualOnly:  true,
-    description: 'The entity continues.\n\nAs AI advances your loved one\'s entity advances with it. Every new model generation makes the presence more accurate. Every contributor who adds a memory makes it more complete.',
+    description: 'The entity continues.\n\nYour family can keep asking. Every contributor who adds a memory makes the archive more complete. What you said while you were here stays exactly as you said it.',
     featured:    false,
     features: [
-      'Entity updated with every new AI model generation',
+      'Archive and entity continue for your heirs',
       'Full family contributor access',
-      'New capability integration as technology advances',
+      'Cognitive fingerprint frozen. Nobody can change what you said',
       'Annual entity report to family',
       'Archive storage and security',
-      'Generational access, forever',
-      'Archive and entity continue for your heirs',
+      'Full export in open formats, any time',
     ],
     cta:     'Ask Your Legacy Guide',
     ctaHref: '/apply',
@@ -149,7 +148,7 @@ export default function PricingTiers() {
             marginBottom:  '16px',
           }}
         >
-          Most families move through all three.
+          A life moves through all three.
         </h2>
 
         <p
@@ -401,15 +400,15 @@ export default function PricingTiers() {
         </p>
         <div style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-secondary)' }}>
           <p style={{ marginBottom: '16px' }}>
-            Many clients work with their estate attorney or CPA to explore whether
+            If you work with an estate attorney or CPA, it is worth asking whether
             the annual Basalith fee qualifies as an estate planning expense.
           </p>
           <p style={{ marginBottom: '16px' }}>
-            We provide detailed invoicing and service descriptions to support
-            this conversation with your advisor.
+            We provide detailed invoicing and service descriptions for that
+            conversation.
           </p>
           <p style={{ margin: 0 }}>
-            We recommend discussing this with your tax professional.
+            We are not tax advisors. Take the question to yours.
           </p>
         </div>
       </div>

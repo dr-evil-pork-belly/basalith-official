@@ -19,7 +19,7 @@ const TENETS = [
     body: [
       'Heritage Nexus Inc. will never use the content of your archive to train AI models, inform advertising, generate commercial derivatives, or enrich any dataset beyond the one we are building for you.',
       'This prohibition is absolute. It applies to your photographs, voice recordings, written materials, family annotations, and entity interactions. None of it will be used to benefit any party other than you and your designated beneficiaries.',
-      'We built Basalith in direct opposition to the model the technology industry has normalized, one in which your personal data is extracted, generalized, and sold. We have no interest in that model. We have structural commitments that prevent us from pursuing it even if we wanted to.',
+      'Most of the technology industry runs on the opposite idea: your personal data is extracted, generalized, and sold. We have no interest in that model. These commitments exist so we cannot drift toward it, even if someday we wanted to.',
     ],
   },
   {
@@ -91,7 +91,7 @@ export default function DataOwnershipPage() {
               </em>
             </h1>
             <p className="font-sans font-light text-body-lg text-text-secondary leading-[1.82] max-w-2xl mx-auto">
-              Four commitments. Absolute. Structural.
+              Four commitments. Plain enough to hold us to.
             </p>
           </div>
         </section>
@@ -184,14 +184,14 @@ export default function DataOwnershipPage() {
             </p>
 
             <p className="font-sans font-light text-body-base text-text-secondary leading-[1.82] mb-14 max-w-xl mx-auto">
-              These commitments exist independently of your subscription.
+              These commitments do not depend on your subscription.
               They survive cancellation, corporate change, and time.
-              If you are ready to begin, we are.
+              If you are ready to begin, so are we.
             </p>
 
             <div className="flex items-center justify-center gap-5 flex-wrap">
               <a href="/pricing" className="btn-monolith-amber group">
-                View Plans
+                See pricing
                 <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
               </a>
             </div>

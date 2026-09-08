@@ -9,7 +9,8 @@ import Nav               from './components/Nav'
 import Footer            from './components/Footer'
 
 // Stone direction, homepage only. Every section below is built from the block
-// types in approved design direction 1d and carries live copy unchanged.
+// types in approved design direction 1d. Copy was revised in the September 2026
+// site-wide copy pass (see docs/COPY_PASS_2026-09-08.md).
 // The shared components these replace are left in place and untouched, because
 // /succession still renders ContrastDemo and Section.
 import HomeHero          from './components/home/HomeHero'

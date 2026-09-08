@@ -5,7 +5,7 @@ import type { Metadata }  from 'next'
 
 export const metadata: Metadata = {
   title:       'The Founding Session · Basalith',
-  description: 'The beginning of something that will outlast you.',
+  description: 'Every Basalith archive begins with a Founding Session. A Legacy Guide sits with you, not to interview you, but to start listening to how you think.',
 }
 
 const SERIF: React.CSSProperties = {
@@ -50,7 +50,11 @@ export default function FoundingSessionPage() {
           </h1>
 
           <p style={P}>
-            The Founding Session is 90 minutes.
+            The Founding Session is where the archive starts.
+            <br />
+            For a person, it is 90 minutes.
+            <br />
+            For a business, it runs longer, because the first thing we capture is the hardest calls the operator ever made.
           </p>
 
           <p style={P}>
@@ -58,7 +62,7 @@ export default function FoundingSessionPage() {
             <br />
             Not to interview you.
             <br />
-            To begin listening to how you think.
+            To start listening to how you think.
           </p>
 
           <p style={P}>
@@ -73,19 +77,19 @@ export default function FoundingSessionPage() {
           />
 
           <p style={P}>
-            The session establishes the foundation
+            The session lays the foundation
             <br />
             of your entity.
             <br />
-            Everything that follows builds on this.
+            Everything that follows builds on it.
           </p>
 
           <p style={{ ...P, marginBottom: '56px' }}>
-            Come prepared to talk.
+            Come ready to talk. About anything.
             <br />
-            About anything.
+            Nothing you say has to be important.
             <br />
-            The entity is already listening.
+            The ordinary things are usually the ones that show how you think.
           </p>
 
           <a
@@ -103,7 +107,7 @@ export default function FoundingSessionPage() {
               borderRadius:  'var(--radius-sm)',
             }}
           >
-            Begin
+            Request a Founding Session
           </a>
         </section>
 
@@ -120,16 +124,16 @@ export default function FoundingSessionPage() {
             style={{ width: '40px', height: '1px', background: 'var(--color-gold)', margin: '0 0 40px' }}
           />
           <p style={{ ...P }}>
-            The contributor network works because the friction is near zero.
+            After the session, the people around you start adding what they remember. It works because we took the friction out.
           </p>
           <p style={{ ...P }}>
-            Your contributors never need to log in, remember a password, or learn a new interface.
-            They receive an email. They hit reply. Their memory is added.
-            Or they hold a button in the app and speak for two minutes.
-            That is all we ask.
+            Your contributors never log in, never remember a password, never learn a new interface.
+            They get an email. They hit reply. Their memory is added.
+            Or they hold a button in the app and talk for two minutes.
+            That is all we ask of them.
           </p>
           <p style={{ ...P, marginBottom: 0 }}>
-            The archive grows because we made contributing feel like a conversation, not a task.
+            The archive grows because contributing feels like a conversation, not a task.
           </p>
         </section>
 

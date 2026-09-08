@@ -19,10 +19,10 @@ import { mono, serif, StoneBlock } from './StonePrimitives'
 // colors are hardcoded rgba(250,248,244,...) for a dark surface and would drop
 // to roughly 1.3:1 on stone.
 
-const VARIANT: Record<'default' | Audience, { eyebrow: string; href: string }> = {
-  default: { eyebrow: 'For the forward-thinking',     href: '/apply' },
-  family:  { eyebrow: 'For individuals and families', href: '/apply' },
-  founder: { eyebrow: 'For founders and successors',  href: '/succession' },
+const VARIANT: Record<'default' | Audience, { eyebrow: string; href: string; cta: string }> = {
+  default: { eyebrow: 'For the forward-thinking',     href: '/apply',                  cta: 'Begin your archive'       },
+  family:  { eyebrow: 'For individuals and families', href: '/apply',                  cta: 'Begin a family archive'   },
+  founder: { eyebrow: 'For founders and successors',  href: '/apply?type=succession',  cta: 'Tell us about the handoff' },
 }
 
 const NAME: Record<Audience, string> = {
@@ -91,7 +91,7 @@ function HomeClosingView({ audience }: { audience: Audience | null }) {
             margin:     0,
           }}
         >
-          The only question is whether you capture it while you still can.
+          The only question is whether you capture it while you are still the one who can.
         </p>
 
         <div
@@ -130,7 +130,7 @@ function HomeClosingView({ audience }: { audience: Audience | null }) {
             boxSizing:      'border-box',
           }}
         >
-          Begin
+          {variant.cta}
         </Link>
       </StoneBlock>
     </section>

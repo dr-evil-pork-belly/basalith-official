@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title:       'The Witness Archive',
-  description: 'Build a permanent AI entity from the memories of everyone who loved them. The Witness Archive by Basalith.',
+  description: 'For someone who has already passed. The Witness Archive builds a Basalith archive from everything that remains and everything the people who loved them remember.',
 }
 
 // ── shared tokens ────────────────────────────────────────────────────────────
@@ -80,8 +80,7 @@ function Opening() {
         </p>
 
         <p style={BODY}>
-          The combination of both produces the most accurate possible representation
-          of a human life.
+          Together they produce something neither side could produce alone.
         </p>
 
         <p style={BODY}>
@@ -167,9 +166,8 @@ function WhatWeCanBuild() {
         <p style={BODY}>
           A witness archive built from thousands of labeled photographs, transcribed
           letters, guided family sessions, voicemails, and structured witness
-          observations, produces an entity of genuine depth. One that speaks
-          in recognizable patterns. That carries known opinions, specific memories,
-          a particular way of thinking about the world.
+          observations, can carry real depth. Recognizable patterns of expression.
+          Known opinions, specific memories, a particular way of looking at the world.
         </p>
 
         <p style={BODY}>A sparse witness archive produces a sparser entity.</p>
@@ -211,10 +209,10 @@ function MissingPiece() {
         </p>
 
         <p style={BODY}>
-          When five people who loved the same person each answer the question
+          Five people who loved the same person each answer the question
           &ldquo;Describe a moment when you watched them handle something difficult.&rdquo;
-          The entity that emerges from those five answers is more accurate than
-          anything the subject alone could have produced.
+          Those five answers, together, hold something the person alone could never
+          have given you.
         </p>
 
         <p style={BODY}>
@@ -354,16 +352,15 @@ function Pricing() {
             $3,600 <span style={{ fontSize: '1.2rem', fontWeight: 300 }}>/ year</span>
           </p>
           <p style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.44rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#5C6166', marginBottom: '0.75rem' }}>
-            $300 / month equivalent
+            Billed annually
           </p>
           <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'italic', fontSize: '0.85rem', color: '#9DA3A8', lineHeight: 1.65, marginBottom: '1.5rem' }}>
-            Full Estate tier access, the same infrastructure as any active Basalith archive.
+            The same infrastructure as any Active Basalith archive.
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginBottom: '1.5rem' }}>
             {[
               'Permanent secure archive storage',
-              'AI entity active and accessible',
-              'Annual AI model updates applied',
+              'Entity active and accessible',
               'Up to 10 family contributors',
               'Nightly photograph emails continue',
               'Custodian designation maintained',
@@ -395,7 +392,7 @@ function Pricing() {
         </p>
 
         <a
-          href="mailto:legacy@basalith.xyz?subject=Witness%20Archive%20Enquiry"
+          href="/apply"
           style={{
             display:        'inline-block',
             fontFamily:     "'Space Mono', monospace",

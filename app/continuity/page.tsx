@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title:       'Continuity',
-  description: 'The entity does not stop when you do. It improves. Built for centuries, not decades.',
+  description: 'The archive is the permanent asset. The model is only the instrument. Why a Basalith archive is built to outlast the tools that built it, and what happens if we ever close.',
 }
 
 const body: React.CSSProperties = {
@@ -66,7 +66,7 @@ export default function ContinuityPage() {
             letterSpacing: '-0.025em',
             marginBottom:  '20px',
           }}>
-            Built for centuries.<br />Not decades.
+            Built to outlast<br />the tools that built it.
           </h1>
           <p style={{
             fontFamily:  'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
@@ -78,7 +78,7 @@ export default function ContinuityPage() {
             maxWidth:    '480px',
             lineHeight:  1.7,
           }}>
-            The entity does not stop when you do.<br />It improves.
+            The archive is the permanent asset.<br />The model is only the instrument.
           </p>
         </section>
 
@@ -86,25 +86,25 @@ export default function ContinuityPage() {
         <section style={{ maxWidth: '720px', margin: '0 auto', padding: 'clamp(40px,6vw,64px) clamp(24px,6vw,48px)' }}>
 
           {/* Section 1 */}
-          <h2 style={h2style}>Your entity becomes more accurate over time.</h2>
+          <h2 style={h2style}>The archive outlasts the model.</h2>
 
           <p style={body}>
-            When you initialize your archive today the AI that trains your entity is the best available.
-            In ten years that AI will be significantly more capable. In twenty years, more still.
+            Every deposit you make is kept in full, in open formats, whatever model happens
+            to be reading it this year.
           </p>
           <p style={body}>
-            Every major advancement in AI is applied to your entity automatically.
-            What begins as a reasonable representation of how you think becomes, over decades,
-            something far more accurate.
+            That matters because the tools will change. The model that trains your entity
+            today will not be the best one in ten years. When a better instrument exists,
+            the archive is ready for it. Nothing has to be collected again, which is the
+            point, because the people who gave it may no longer be here to give it twice.
           </p>
           <p style={body}>
-            Your grandchildren will interact with a more complete version of your entity than your children will.
-            Your great-grandchildren will interact with a more complete version still.
+            We will not promise what the tools of the future will be able to do.
+            We can promise the archive will be there, whole, to use them.
           </p>
           <p style={body}>
             The archive compounds.<br />
-            The entity deepens.<br />
-            Time works in your favor.
+            Time works in its favor.
           </p>
 
           <div style={rule} />
@@ -128,12 +128,13 @@ export default function ContinuityPage() {
             Basalith changes that.
           </p>
           <p style={body}>
-            Your grandchildren will be able to ask your entity how you thought about a hard decision.
+            Your grandchildren can ask your entity how you thought about a hard decision.
             What you learned from failure. What you believed about people. What took you thirty years
             to understand.
           </p>
           <p style={body}>
-            The entity answers from your archive. From your actual documented history of thinking and deciding.
+            The entity answers from your archive, from what you actually said about how you think and decide.
+            And where you never took a position, it is built to say so instead of guessing.
           </p>
           <p style={body}>
             That is generational wealth in its truest form.
@@ -204,7 +205,7 @@ export default function ContinuityPage() {
             </p>
 
             <a
-              href="/pricing"
+              href="/apply"
               style={{
                 display:       'inline-block',
                 background:    'var(--color-gold)',
@@ -218,7 +219,7 @@ export default function ContinuityPage() {
                 borderRadius:  '2px',
               }}
             >
-              Begin Your Archive
+              Begin your archive
             </a>
           </div>
 

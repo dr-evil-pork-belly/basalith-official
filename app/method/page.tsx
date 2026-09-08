@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title:       'The Method · Basalith',
-  description: 'We are not building memory. We are building cognition. Two sources of data that together capture not just what an operator decided, but how they reasoned.',
+  description: 'We are not building memory. We are building cognition. How Basalith captures the way an operator reasons, from two sources of data, and checks every deposit before it counts.',
 }
 
 const SERIF: React.CSSProperties = {
@@ -42,35 +42,35 @@ const RULE: React.CSSProperties = {
 const STEPS = [
   {
     n:     '01',
-    title: 'What the operator deposits',
+    title: 'What the operator puts in',
     body:  [
-      'The model learns directly from the operator. Recorded sessions, decision frameworks, scenario responses, written deposits.',
-      'First-person reasoning: how they work a problem, what they weigh, what they took from the calls that went wrong. The specific logic of how this particular mind decides.',
+      'The model learns from the operator first. Recorded sessions, decision frameworks, scenario responses, written deposits.',
+      'First-person reasoning. How they work a problem, what they weigh, what they took from the calls that went wrong. The specific logic of how this one mind decides.',
     ],
   },
   {
     n:     '02',
-    title: 'What the people who worked alongside them observe',
+    title: 'What the people around them saw',
     body:  [
-      'The people who watched the operator decide see what the operator would never think to record. A co-founder remembers how a deal was reasoned through. A long-tenured exec remembers the hire everyone else doubted.',
-      'The outside view captures patterns the operator takes for granted. In a family, this is a daughter noticing how her father handled pressure. Same mechanism.',
+      'The people who watched the operator decide notice what the operator would never think to record. A co-founder remembers how a deal got reasoned through. A long-tenured exec remembers the hire everyone else doubted.',
+      'The outside view catches the patterns the operator takes for granted. In a family, it is a daughter noticing how her father handled pressure. Same mechanism.',
     ],
   },
   {
     n:     '03',
-    title: 'The combination builds a cognitive model',
+    title: 'Together, they make a model of how the person thinks',
     body:  [
-      'Inside data plus outside data equals something neither could produce alone.',
-      'The archive becomes training data for the entity. The entity learns not just what they said but how they think. Not just their opinions but their reasoning patterns.',
-      'This is the distinction between memory and cognition. Memory stores facts. The entity captures how a specific mind works.',
+      'The inside view plus the outside view gives you something neither could produce alone.',
+      'The archive becomes training data. The entity learns not just what they said but how they reason. Not their opinions. Their patterns.',
+      'That is the difference between memory and cognition. Memory stores facts. The entity holds how a specific mind works.',
     ],
   },
   {
     n:     '04',
-    title: 'How the archive accumulates',
+    title: 'How the archive grows',
     body:  [
-      'Capture is ongoing, not a single interview. The operator works through 20 real business scenarios and a sequence of 29 decision questions across the 8 domains that built the company.',
-      'Each response adds depth. The longer the active period runs before a transition, the more the model has to work with. Begin before the handoff is on the calendar, not after.',
+      'This is not a single interview. The operator works through 20 real business scenarios and 29 decision questions across the 8 domains that built the company.',
+      'Every answer adds depth. The longer the active period runs before a transition, the more the model has to work with. Start before the handoff is on the calendar, not after.',
     ],
   },
 ]
@@ -124,8 +124,9 @@ export default function MethodPage() {
               maxWidth:  '520px',
             }}
           >
-            Two sources of data. Together they capture not just what an operator
-            decided, but how they reasoned.
+            Two sources of data. One from the operator, one from the people who
+            watched them work. Together they capture not just what was decided,
+            but how.
           </p>
         </section>
         </div>
@@ -149,7 +150,7 @@ export default function MethodPage() {
           {/* CTA */}
           <div style={{ textAlign: 'center', paddingTop: '32px', borderTop: '1px solid var(--color-border)' }}>
             <p style={{ ...BODY, fontStyle: 'italic', textAlign: 'center' }}>
-              The archive begins with The Founding, a 90-minute guided session with a Senior Legacy Guide.
+              Every archive begins with The Founding, a guided session with a Senior Legacy Guide.
             </p>
             <a
               href="/founding-session"
@@ -208,7 +209,7 @@ export default function MethodPage() {
 
             <div style={{ maxWidth: '680px', textAlign: 'center', padding: '16px 0', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
               <p style={{ ...MONO, fontSize: '0.44rem', color: 'rgba(250,248,244,0.35)', letterSpacing: '0.2em' }}>
-                Only after both systems agree does a deposit influence your entity
+                A deposit shapes your entity only after it has passed review
               </p>
             </div>
 
@@ -223,14 +224,17 @@ export default function MethodPage() {
         <section className="b2b-paper" style={{ padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,80px)' }}>
           <div style={{ maxWidth: 'calc(var(--max-width-text) + 160px)', margin: '0 auto' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '3rem 1fr', gap: '32px' }}>
-              <p style={{ ...MONO, fontSize: '0.52rem', color: 'var(--color-gold)', paddingTop: '4px' }}>06</p>
+              <p style={{ ...MONO, fontSize: '0.52rem', color: 'var(--color-gold)', paddingTop: '4px' }}>05</p>
               <div>
                 <h2 style={{ ...H2, marginTop: 0 }}>Two layers, one handoff</h2>
                 <p style={BODY}>
                   The fingerprint is frozen at transition, fixed from the operator&rsquo;s own deposits. It does not drift.
                 </p>
+                <p style={BODY}>
+                  A living layer lets the successor add today&rsquo;s context. The judgment stays the operator&rsquo;s.
+                </p>
                 <p style={{ ...BODY, marginBottom: '28px' }}>
-                  A living layer lets the successor add today&rsquo;s context, while the judgment stays the operator&rsquo;s.
+                  And where the operator never took a position, the entity says so instead of guessing.
                 </p>
                 <a
                   href="/succession"
@@ -253,11 +257,11 @@ export default function MethodPage() {
               Where this began: families.
             </h2>
             <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)', marginBottom: '24px' }}>
-              Basalith started as a way for families to preserve how someone thinks while they are still here to get it right.
-              The method is identical. The operator becomes a parent. The colleagues become the family. The scenario library becomes everyday memory.
+              Basalith started as a way for families to keep how someone thinks while they are still here to get it right.
+              The method is the same. The operator becomes a parent. The colleagues become the family. The scenario library becomes the stories told at the table.
             </p>
             <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)', marginBottom: '36px' }}>
-              For family archives, an upload pipeline filters and ranks photographs before labeling, so the family only sees what is worth their time.
+              For family archives, photographs are filtered and ranked before anyone is asked to label them, so the family only sees what is worth their time.
             </p>
             <a
               href="/apply"

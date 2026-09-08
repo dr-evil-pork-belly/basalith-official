@@ -8,10 +8,10 @@ type Intent = 'general' | 'pricing' | 'partner' | 'press'
 type Status = 'idle' | 'loading' | 'success' | 'error'
 
 const INTENTS: { value: Intent; label: string }[] = [
-  { value: 'general', label: 'General Enquiry' },
-  { value: 'pricing', label: 'Pricing Question' },
-  { value: 'partner', label: 'Partner Program'  },
-  { value: 'press',   label: 'Press'             },
+  { value: 'general', label: 'A question about Basalith' },
+  { value: 'pricing', label: 'Pricing'                   },
+  { value: 'partner', label: 'Becoming a Legacy Guide'   },
+  { value: 'press',   label: 'Press'                     },
 ]
 
 const SERIF: React.CSSProperties = {
@@ -96,11 +96,11 @@ export default function ContactPage() {
             <span style={{ display: 'block', width: '24px', height: '1px', background: 'var(--color-gold)', flexShrink: 0 }} aria-hidden="true" />
           </p>
           <h1 style={{ ...SERIF, fontWeight: 300, fontSize: 'var(--text-h1)', color: 'var(--color-text-primary)', letterSpacing: '-0.025em', lineHeight: 1.1, marginBottom: '20px' }}>
-            Every Legacy Begins{' '}
-            <em style={{ fontStyle: 'italic', color: 'var(--color-gold)' }}>With a Conversation.</em>
+            Tell us what is changing.{' '}
+            <em style={{ fontStyle: 'italic', color: 'var(--color-gold)' }}>We will tell you if this fits.</em>
           </h1>
-          <p style={{ ...SERIF, fontStyle: 'italic', fontWeight: 300, fontSize: '1.1rem', color: 'var(--color-text-secondary)', lineHeight: 1.8, maxWidth: '440px', margin: '0 auto' }}>
-            We are a small, deliberate team. If you are serious about building an archive for your family, we want to hear from you.
+          <p style={{ ...SERIF, fontStyle: 'italic', fontWeight: 300, fontSize: '1.1rem', color: 'var(--color-text-secondary)', lineHeight: 1.8, maxWidth: '460px', margin: '0 auto' }}>
+            We are a small team and we read every message ourselves. A business handing over, a parent whose thinking you want to keep, a question about how any of this works. Start here.
           </p>
         </section>
 
@@ -112,18 +112,18 @@ export default function ContactPage() {
               <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderTop: '2px solid var(--color-gold)', padding: '48px 40px', textAlign: 'center' }}>
                 <div style={{ width: '40px', height: '1px', background: 'var(--color-gold)', margin: '0 auto 32px' }} aria-hidden="true" />
                 <h2 style={{ ...SERIF, fontSize: '1.75rem', fontWeight: 500, color: 'var(--color-text-primary)', marginBottom: '16px' }}>
-                  We&apos;ll Be In Touch.
+                  Got it. We will be in touch.
                 </h2>
                 <p style={{ ...SERIF, fontStyle: 'italic', fontWeight: 300, fontSize: '1rem', color: 'var(--color-text-secondary)', lineHeight: 1.8 }}>
-                  Thank you for reaching out. We respond to every message personally within 48 hours.
+                  Thank you for writing. A real person reads every message and replies within 48 hours.
                 </p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} noValidate style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderTop: '2px solid var(--color-gold-border)', padding: 'clamp(32px,5vw,48px)', display: 'flex', flexDirection: 'column', gap: '28px' }}>
 
                 <div>
-                  <h2 style={{ ...SERIF, fontSize: '1.4rem', fontWeight: 500, color: 'var(--color-text-primary)', marginBottom: '4px' }}>Send a Message</h2>
-                  <p style={{ ...SERIF, fontStyle: 'italic', fontWeight: 300, fontSize: '0.95rem', color: 'var(--color-text-muted)' }}>We respond personally within 48 hours.</p>
+                  <h2 style={{ ...SERIF, fontSize: '1.4rem', fontWeight: 500, color: 'var(--color-text-primary)', marginBottom: '4px' }}>Send a message</h2>
+                  <p style={{ ...SERIF, fontStyle: 'italic', fontWeight: 300, fontSize: '0.95rem', color: 'var(--color-text-muted)' }}>A real person replies within 48 hours.</p>
                 </div>
 
                 <div>
@@ -137,7 +137,7 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="c-intent" style={LABEL}>Nature of Enquiry</label>
+                  <label htmlFor="c-intent" style={LABEL}>What is this about</label>
                   <select id="c-intent" name="intent" value={form.intent} onChange={handleChange} className="contact-input" style={{ ...INPUT, cursor: 'pointer', appearance: 'none' as const }}>
                     <option value="" disabled>Select a topic…</option>
                     {INTENTS.map(({ value, label }) => (
@@ -148,7 +148,7 @@ export default function ContactPage() {
 
                 <div>
                   <label htmlFor="c-message" style={LABEL}>Message <span style={{ fontFamily: 'inherit', textTransform: 'none', letterSpacing: 0, fontSize: '0.85rem', fontStyle: 'italic', color: 'var(--color-text-faint)' }}>(optional)</span></label>
-                  <textarea id="c-message" name="message" value={form.message} onChange={handleChange} placeholder="Tell us what you have in mind…" rows={5} className="contact-input" style={{ ...INPUT, resize: 'none' as const, lineHeight: 1.75 }} />
+                  <textarea id="c-message" name="message" value={form.message} onChange={handleChange} placeholder="What is changing, and when. A sentence or two is enough." rows={5} className="contact-input" style={{ ...INPUT, resize: 'none' as const, lineHeight: 1.75 }} />
                 </div>
 
                 {status === 'error' && error && (

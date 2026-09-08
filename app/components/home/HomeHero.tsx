@@ -116,7 +116,7 @@ export default function HomeHero() {
             textWrap:   'pretty',
           }}
         >
-          Basalith builds a cognitive reference model of the operator while they are still running the company. How they price risk, how they read people, the calls they make without thinking. It transfers with the business, through an acquisition or a succession.
+          The operator knows when to walk from a deal, which hire to trust over the resume, how much risk is too much. None of it is written down. Basalith captures how they reason while they are still running the company, so it transfers with the business. Through an acquisition or a succession.
         </p>
 
         <Link
@@ -135,7 +135,7 @@ export default function HomeHero() {
             boxSizing:      'border-box',
           }}
         >
-          For Business
+          See how it transfers
         </Link>
       </StoneBlock>
     </section>
