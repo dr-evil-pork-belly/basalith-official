@@ -7,7 +7,7 @@ import PricingTiers from '../components/PricingTiers'
 
 export const metadata: Metadata = {
   title: 'Pricing · Basalith',
-  description: 'Pricing for a business transition. Succession at $12,000 a year plus a one-time founding session. Individual and family archives also available.',
+  description: 'Basalith pricing, in full. Succession at $12,000 a year plus a one-time founding session. Acquisition engagements from $50,000. Individual and family archives from $2,500 to begin.',
 }
 
 const MONO: React.CSSProperties = {
@@ -126,7 +126,7 @@ const SUCCESSION_FEATURES = [
   '20+ scenario training library',
   'Successor access portal',
   'Quarterly calibration sessions',
-  'Annual entity accuracy report',
+  'Annual accuracy report',
   'Board-level reporting',
   'Priority support',
 ]
@@ -187,7 +187,7 @@ export default function PricingPage() {
               margin:     '0 auto',
             }}
           >
-            Succession pricing for a business handoff. Individual and family archives below.
+            Business engagements first. Individual and family plans below. Every archive begins with a founding session.
           </p>
         </section>
 
@@ -223,10 +223,10 @@ export default function PricingPage() {
               Succession
             </h2>
             <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: 'rgba(250,248,244,0.55)', marginBottom: '16px' }}>
-              For founders and key knowledge holders preparing a handoff.
+              For founders and partners preparing to step back.
             </p>
             <p style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: 'rgba(250,248,244,0.5)', marginBottom: '48px' }}>
-              The unwritten pattern recognition. The risk calibration built over decades. The judgment that cannot be put in a handbook. That is what Basalith captures before a founder steps back.
+              The pattern recognition nobody wrote down. The sense of risk built over decades. The judgment no handbook can hold. That is what Basalith captures before the founder steps back, and what the successor gets to consult after.
             </p>
 
             <div style={{ border: '1px solid rgba(184,150,62,0.35)', borderTop: '2px solid rgba(196,162,74,0.7)', padding: 'clamp(32px,5vw,52px)', background: 'rgba(184,150,62,0.04)', marginBottom: '24px' }}>
@@ -240,7 +240,7 @@ export default function PricingPage() {
                 ))}
               </div>
               <Link
-                href="/contact"
+                href="/apply?type=succession"
                 className="pricing-cta"
                 style={{ ...MONO, fontSize: 'var(--text-caption)', display: 'block', textAlign: 'center', textDecoration: 'none', background: 'var(--color-gold)', color: '#0A0908', padding: '16px 32px', transition: 'background 250ms ease' }}
               >
@@ -249,7 +249,7 @@ export default function PricingPage() {
             </div>
 
             <p style={{ ...SERIF, fontSize: '0.95rem', fontStyle: 'italic', color: 'rgba(250,248,244,0.4)', lineHeight: 1.8 }}>
-              After transition: $3,600/year. Institutional access continues for the successor.
+              After transition: $3,600 a year keeps successor access open. No active sessions required.
             </p>
             <Link href="/succession" className="pricing-ghost-link" style={{ ...MONO, fontSize: '0.46rem', color: 'rgba(196,162,74,0.7)', textDecoration: 'none', display: 'inline-block', marginTop: '16px' }}>
               How succession works &rarr;
@@ -268,7 +268,7 @@ export default function PricingPage() {
               When you buy the company, you buy how it was run.
             </h2>
             <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: 'var(--color-text-secondary)', marginBottom: '40px' }}>
-              For buyers. When the deal closes, the seller&rsquo;s judgment usually leaves with them. Basalith captures how the operator reasons before the handoff, so the earnout assumptions survive the transition.
+              For buyers. Quality of earnings tells you what the numbers were. Nothing in diligence tells you how the operator decided, and the earnout assumes that judgment comes with the building. Basalith captures it before the handoff, so what you paid for is still in the room after closing.
             </p>
 
             <div style={{ borderTop: '1px solid rgba(196,162,74,0.18)', paddingTop: '36px', marginBottom: '40px' }}>
@@ -276,7 +276,7 @@ export default function PricingPage() {
                 Engagements start at $50,000, scaled to the size and complexity of the transaction.
               </p>
               <p style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-secondary)', margin: 0 }}>
-                Priced against the value at risk in the deal, as part of diligence, not as software.
+                Priced against the value at risk in the deal, as part of diligence, not as software. The buyer pays, because the buyer is the one holding the risk.
               </p>
             </div>
 
@@ -285,7 +285,7 @@ export default function PricingPage() {
               className="pricing-cta-paper"
               style={{ ...MONO, fontSize: 'var(--text-caption)', display: 'inline-block', textDecoration: 'none', background: 'var(--b2b-btn)', color: '#0A0908', padding: '16px 32px', transition: 'background 250ms ease' }}
             >
-              Talk to us about a transaction.
+              Talk to us about a transaction
             </Link>
           </div>
         </section>
@@ -324,12 +324,12 @@ export default function PricingPage() {
               <p style={{ marginBottom: '20px' }}>Every archive begins with a Founding Session.</p>
               <p style={{ marginBottom: '20px' }}>
                 For a business, the operator works through the decision frameworks that
-                built the company in an extended guided session with a Senior Legacy Guide.
+                built the company, in an extended guided session with a Senior Legacy Guide.
                 For an individual or a family, the session captures voice, values, and the
-                specific way someone sees the world.
+                particular way someone sees the world.
               </p>
               <p style={{ marginBottom: '20px' }}>
-                It establishes the foundation of the archive. Everything that follows builds on it.
+                It is the foundation. Everything that follows builds on it.
               </p>
               <p style={{ ...SERIF, fontSize: '0.88rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.28)', lineHeight: 1.85, margin: 0 }}>
                 Your archive runs on two permanent layers: one that holds every fact and memory you have deposited, and one that learns how you express, reason, and decide. Neither replaces the other.
@@ -381,7 +381,7 @@ export default function PricingPage() {
               For a life, not a business.
             </h2>
             <p style={{ ...SERIF, fontSize: '1.05rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-secondary)', margin: 0 }}>
-              The same method, for preserving how a person thinks.
+              The same method, pointed at a person instead of a company. Three plans, built to move with you as life changes.
             </p>
           </div>
         </section>
@@ -445,7 +445,7 @@ export default function PricingPage() {
         {/* CTA */}
         <section style={{ background: 'var(--color-void)', padding: 'clamp(80px,12vw,120px) clamp(24px,6vw,80px)', textAlign: 'center' }}>
           <p style={{ ...SERIF, fontSize: 'clamp(1.6rem,3vw,2.4rem)', fontWeight: 300, fontStyle: 'italic', lineHeight: 1.4, color: 'rgba(250,248,244,0.85)', maxWidth: '620px', margin: '0 auto 40px' }}>
-            Every transition starts with a conversation. Tell us what is changing and we will tell you whether Basalith fits.
+            Every archive starts with a conversation. Tell us what is changing and we will tell you, plainly, whether Basalith fits.
           </p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
             <a href="/contact" className="pricing-cta" style={{ ...MONO, fontSize: 'var(--text-caption)', display: 'inline-block', textDecoration: 'none', background: 'var(--color-gold)', color: '#0A0908', padding: '16px 32px', borderRadius: 'var(--radius-sm)', transition: 'background 250ms ease' }}>

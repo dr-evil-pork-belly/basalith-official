@@ -11,21 +11,19 @@ const ITEMS: Item[] = [
   {
     q: 'What exactly is The Founding?',
     a: <>
-      The Founding is a one-time setup investment covering the full onboarding process: archive architecture,
-      legal framework review, and your initial Essence Mapping session. It is paid once at the start of your
-      relationship with Basalith. Your annual plan begins after The Founding is complete.
+      The Founding is the one-time fee that sets up your archive: the archive structure, a review of your
+      existing estate or succession documents, and your first guided session with a Legacy Guide. You pay
+      it once, at the start. Your annual plan begins after The Founding is complete.
       {' '}<a href="/founding-session" style={{ color: '#C4A24A', textDecoration: 'none' }}>
-        Learn more about what happens in your Founding session →
+        What happens in a Founding Session →
       </a>
     </>,
   },
   {
     q: 'What happens to my archive if Basalith ceases to exist?',
     a: <>
-      You own your archive. Basalith is the custodian, not the owner. You can export the complete
-      archive, in open and portable formats, at any time you ask. Because the full archive is always
-      yours to hold, no closure can strand your data. Your archive does not depend on our continued
-      existence.
+      You keep everything. You own the archive and Basalith is the custodian, not the owner. You can
+      export the complete archive in open formats any time you ask, so a closure cannot strand your data.
       {' '}<a href="/data-ownership" style={{ color: '#C4A24A', textDecoration: 'none' }}>
         Read our data ownership commitments →
       </a>
@@ -33,26 +31,25 @@ const ITEMS: Item[] = [
   },
   {
     q: 'Who owns my archive content?',
-    a: `You do. Completely. Basalith holds a limited license to store and process your content for the
-      purpose of providing the service to you. We make no claim of ownership over your photographs,
-      stories, or memories. You can export your complete archive at any time.`,
+    a: `You do. Basalith holds a limited license to store and process your content so we can provide the
+      service to you, and nothing more. We make no claim on your photographs, stories, or memories. You
+      can export the complete archive at any time.`,
   },
   {
     q: 'Can my family access the archive after I am gone?',
-    a: `Yes. This is one of the core purposes of the archive. Your designated Custodian carries out your
-      directions for the archive. Their legal authority comes from your own will or trust, so name them
-      there as well. Contributors retain their access. The archive
-      continues. Your entity, if initialized, remains available to your family indefinitely.
-      The Legacy tier includes specific provisions for multi-generational access and inheritance.`,
+    a: `Yes. That is much of the point. The Custodian you name carries out your directions for the archive.
+      Their legal authority comes from your own will or trust, so name them there as well. Contributors
+      keep their access. The archive continues. Under the Legacy plan, your entity stays available to your
+      family and your cognitive fingerprint is frozen, so nobody can change what you said.`,
   },
   {
     q: 'What is the entity and how does it work?',
-    a: `Your entity is a cognitive reference model trained exclusively on your archive content: your labeled
-      photographs, voice recordings, written deposits, and the stories your family has contributed over
-      time. It speaks in the patterns of your voice, carries your known opinions and values, and references
-      your specific memories. It is not a simulation. It is not a chatbot. It is the most faithful record
-      of how you think, decide, and see the world, built from everything you chose to deposit. The richer
-      the archive, the richer the entity.`,
+    a: `Your entity is a cognitive reference model trained only on your archive: your labeled photographs,
+      voice recordings, written deposits, and the stories your family has contributed over time. It
+      answers in the patterns of your expression, carries the opinions and values you recorded, and
+      points back to your specific memories. It is not a simulation of you and it is not a general
+      chatbot. It is a record of how you reason, built from what you chose to deposit. The richer the
+      archive, the richer the entity.`,
   },
 ]
 

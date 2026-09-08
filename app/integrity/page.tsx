@@ -45,7 +45,7 @@ const DATA_CARDS = [
   },
   {
     headline: 'We will never sell your archive.',
-    body:     'Not to advertisers. Not to a data broker. Not as part of a bankruptcy or acquisition. Your archive is not an asset we own. It is property we hold in trust for you.',
+    body:     'Not to advertisers. Not to a data broker. Not as part of a bankruptcy or acquisition. Your archive is not an asset we own. It is yours, and we are its custodian.',
   },
 ]
 
@@ -74,8 +74,8 @@ export default function IntegrityPage() {
             <em style={{ fontStyle: 'italic', color: 'var(--color-gold)' }}>Forever. Without exception.</em>
           </h1>
           <p style={{ ...BODY, fontSize: '1.2rem', maxWidth: '560px' }}>
-            We are going to tell you exactly what happens to your archive while you are alive,
-            after you pass, and if we ever close our doors. No legal language. Plain truth.
+            Here is exactly what happens to your archive while you are alive, after you pass,
+            and if we ever close our doors. No legal language. Nothing we cannot point to.
           </p>
         </section>
 
@@ -186,9 +186,9 @@ export default function IntegrityPage() {
                 <p style={{ ...MONO, fontSize: '0.48rem', color: 'var(--color-gold-on-light)', marginBottom: '16px' }}>The Memory Vault</p>
                 <p style={{ ...BODY, margin: 0 }}>
                   Every deposit you make is stored permanently. When your entity answers a question
-                  it retrieves your actual words, not a guess.
+                  it reaches for your actual words first.
                   <br /><br />
-                  This is why your entity will never tell your grandchildren something you never said.
+                  And when there is no deposit behind a question, the entity is built to say so instead of guessing. A gap is better than something that sounds like you but is not from you.
                 </p>
               </div>
               <div style={{ border: '1px solid rgba(196,162,74,0.3)', padding: 'clamp(24px,3vw,36px)', background: 'rgba(196,162,74,0.03)' }}>
@@ -197,7 +197,7 @@ export default function IntegrityPage() {
                   As your archive grows a second system learns how you say things: your phrasing,
                   your characteristic way of expressing uncertainty, the specific words you reach for.
                   <br /><br />
-                  This is why your entity starts to sound like you, not just inform like you.
+                  This is why, as the archive deepens, the entity starts to sound like you and not just report on you.
                 </p>
               </div>
             </div>
@@ -210,8 +210,8 @@ export default function IntegrityPage() {
             These are not marketing claims.
           </p>
           <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.5)', marginBottom: '40px', lineHeight: 1.85 }}>
-            They are the principles this company was built on.
-            If you have a question we have not answered here, ask us directly.
+            They are the rules this company runs on.
+            If there is a question we have not answered here, ask us directly. You will get a straight answer.
           </p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
             <a href="mailto:hello@basalith.xyz"

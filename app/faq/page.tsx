@@ -4,49 +4,82 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title:       'FAQ · Basalith',
-  description: 'Answers to the most common questions about Basalith and the archive.',
+  description: 'Plain answers to the questions people ask before they begin a Basalith archive. What it is, what it costs, who owns the data, and what it will not do.',
 }
 
-const QA = [
+const LINK: React.CSSProperties = { color: 'var(--color-gold)', textDecoration: 'none' }
+
+// Every answer here states only what is live. Prices come from the pricing
+// page, milestones from the four-stage system, languages from
+// lib/emailTranslations.ts. If any of those change, change this too.
+const QA: { q: string; a: React.ReactNode }[] = [
   {
     q: 'What is Basalith?',
-    a: 'Basalith builds a living AI entity trained on how you specifically think. While you are alive it learns from you. Long after you are gone it continues.',
+    a: 'Basalith builds a cognitive reference model of one person, from what they deposit and from what the people around them observe. For a business, that person is the operator, and the model transfers with the company through an acquisition or a succession. For a family, it is a parent or a grandparent, and the model stays with the people who relied on their judgment.',
+  },
+  {
+    q: 'Is this a chatbot trained on someone’s old emails?',
+    a: 'No. Nothing is reconstructed after the fact. The archive is built while the person is here and taking part. Every model is trained only on that one person’s deposits. No general AI speaks for the archive. And when the person never took a position on something, the entity is built to say so instead of guessing.',
   },
   {
     q: 'How does it work?',
-    a: 'Your Legacy Guide conducts a 90-minute Founding Session to establish the foundation of your entity. From there your archive builds daily through photographs, voice recordings, and contributions from your family.',
+    a: <>
+      It starts with a Founding Session with a Legacy Guide. From there the archive grows through guided questions, real scenarios, voice recordings, photographs, and contributions from the people around them. Every deposit is scored before it can shape the model.
+      {' '}<a href="/method" style={LINK}>Read the method &rarr;</a>
+    </>,
   },
   {
     q: 'What is the difference between the archive and the entity?',
-    a: 'The archive is the training ground. Every photograph labeled, every voice recorded, every story captured teaches your entity something specific about how you think. The entity is the product. The archive makes it possible.',
+    a: 'The archive is everything deposited: the answers, the recordings, the labeled photographs, the observations from others. The entity is the model trained on it. The archive is the permanent asset. The entity is the instrument. If the technology changes, the archive is what carries forward.',
   },
   {
     q: 'How long does it take?',
-    a: 'The entity begins learning immediately. It becomes meaningfully accurate within the first year. The longer it learns the more distinctly it speaks in your voice and reasoning.',
+    a: 'The archive starts with the first deposit and there is no finish line. Milestones mark depth: 10 deposits, then 50, then 200, then 500. The longer someone deposits, the more the model has to work with. That is why the best time to start is before a transition is on the calendar.',
+  },
+  {
+    q: 'What happens when a business changes hands?',
+    a: <>
+      The operator’s cognitive fingerprint is frozen at transition. The successor or acquirer gets portal access and can add today’s context, but nobody can rewrite what the operator said.
+      {' '}<a href="/succession" style={LINK}>How the handoff works &rarr;</a>
+    </>,
   },
   {
     q: 'What happens when I am gone?',
-    a: 'Your entity continues. Your family can talk to it. Ask it questions. Seek its counsel. The entity answers the way you would. Not from memory. From learned cognitive patterns built over time.',
+    a: 'Under the Legacy plan, your entity continues and your family can keep asking it questions. Your cognitive fingerprint is frozen at that point, so what you said stays exactly as you said it. Heirs can add context. Nobody can change what you built.',
   },
   {
     q: 'What does it cost?',
-    a: 'The Archive begins at $1,800 per year. The Estate is $3,600 per year. The Dynasty is $9,600 per year. A one-time founding fee of $2,500 applies to all tiers.',
+    a: <>
+      For a business succession, $12,000 a year plus a one-time $5,000 founding session. Acquisition engagements start at $50,000, scaled to the transaction. For individuals and families, a one-time $2,500 founding fee, then Active at $3,600 a year, Resting at $600 a year, or Legacy at $1,200 a year.
+      {' '}<a href="/pricing" style={LINK}>See pricing in full &rarr;</a>
+    </>,
   },
   {
-    q: 'How do my family members contribute?',
-    a: 'Each contributor receives a personal portal link. No account needed. They can upload photographs, record voice memories, and answer questions about you. Every contribution makes your entity more accurate.',
+    q: 'How do family members or colleagues contribute?',
+    a: 'Each contributor gets a personal link. No account, no password. They get an email and hit reply. Or they hold a button in the app and talk for two minutes. Every contribution adds something the person would never have thought to say about themselves.',
   },
   {
     q: 'What languages does Basalith support?',
-    a: 'Basalith supports English, Cantonese, Mandarin, Japanese, Spanish, Vietnamese, Tagalog, and Korean. Your entity speaks in the language of your family.',
+    a: 'English, Cantonese, Mandarin, Japanese, Spanish, Vietnamese, Tagalog, and Korean.',
   },
   {
-    q: 'Is my data secure?',
-    a: 'Your archive is encrypted and governed with the same seriousness as an estate. Your data belongs to you and your designated heirs. It is never sold or shared.',
+    q: 'Who owns the data, and is it secure?',
+    a: <>
+      You own it. Basalith is the custodian, not the owner. The archive is encrypted at rest and in transit, kept in private storage, and never shared, sold, or used to train another company’s model. You can export all of it in open formats any time you ask, so nothing is stranded if we ever close.
+      {' '}<a href="/data-ownership" style={LINK}>Data ownership &rarr;</a>
+      {' '}<a href="/security" style={LINK}>Security &rarr;</a>
+    </>,
+  },
+  {
+    q: 'Can I try it before I commit?',
+    a: <>
+      Yes. The demo runs on a fictional founder and the same pipeline as production. Ask it something. Then ask it something the founder never answered, and watch what it does.
+      {' '}<a href="/succession/demo" style={LINK}>Open the demo &rarr;</a>
+    </>,
   },
   {
     q: 'How do I begin?',
-    a: 'Submit an application. A Legacy Guide will be in touch within 48 hours to schedule your Founding Session.',
+    a: 'Apply. We review every application ourselves, and a Legacy Guide will be in touch within 48 hours to schedule your Founding Session.',
   },
 ]
 
@@ -97,9 +130,9 @@ export default function FAQPage() {
               marginBottom:  '64px',
             }}
           >
-            Questions about
+            The questions people ask
             <br />
-            Basalith and the archive.
+            before they begin.
           </h1>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
@@ -158,9 +191,9 @@ export default function FAQPage() {
                 marginBottom: '28px',
               }}
             >
-              Still have questions? Your Legacy Guide will answer them
+              Still have a question? Ask it in the application.
               <br />
-              before your Founding Session.
+              Your Legacy Guide will answer it before your Founding Session.
             </p>
             <a
               href="/apply"
@@ -175,7 +208,7 @@ export default function FAQPage() {
                 borderRadius:   'var(--radius-sm)',
               }}
             >
-              Begin
+              Apply to begin
             </a>
           </div>
         </section>

@@ -5,7 +5,7 @@ import Footer from '../components/Footer'
 
 export const metadata: Metadata = {
   title:       'For Individuals and Families · Basalith',
-  description: 'Photographs hold a face. Letters hold a moment. Neither holds how a person reasoned. Basalith preserves how a person thinks, decides, and sees the world, captured while they are active and fully present.',
+  description: 'You will have the photographs. You will not have the way they thought. Basalith keeps how a person thinks, decides, and sees the world, captured while they are here and fully present.',
 }
 
 const MONO: React.CSSProperties = {
@@ -37,7 +37,7 @@ const KEPT = [
 
 const LOST = [
   'The way they weighed a hard decision',
-  'The counsel they would give you now',
+  'The advice they would give you right now',
   'How they read people and situations',
   'The reasoning behind everything they built',
 ]
@@ -46,22 +46,22 @@ const STEPS = [
   {
     n:     '01',
     title: 'The Founding.',
-    body:  'An extended guided session captures the frameworks a person uses to think and to decide.',
+    body:  'A 90-minute guided session with a Legacy Guide. Not an interview. A conversation about how they think, and the first deposit in the archive.',
   },
   {
     n:     '02',
     title: 'Guided capture.',
-    body:  'They work through real scenarios and questions across the domains that shaped them. Their responses train the model.',
+    body:  'A photograph in the evening. A question each week. A story told into the phone for two minutes. They answer across the parts of life that shaped them, and every answer trains the model.',
   },
   {
     n:     '03',
-    title: 'Verification.',
-    body:  'Every response is scored before it influences the model, and lower-confidence responses are escalated for a closer pass, so the archive reflects how the person actually reasoned.',
+    title: 'The check.',
+    body:  'Every response is scored before it can shape the model. Lower-confidence responses get a closer pass. The archive reflects how the person actually reasoned.',
   },
   {
     n:     '04',
     title: 'Presence.',
-    body:  'The people who rely on them consult the archive for that judgment, long after the person has stepped back.',
+    body:  'The people who rely on them can ask the archive for that judgment, long after the person has stepped back. Where they never took a position, it is built to say so rather than guess.',
   },
 ]
 
@@ -103,7 +103,7 @@ export default function FamiliesPage() {
             Basalith for Individuals and Families
           </p>
           <p style={{ ...MONO, fontSize: '0.46rem', color: 'rgba(196,162,74,0.7)', lineHeight: 1.8, marginBottom: '36px', maxWidth: '640px' }}>
-            The preservation of a person. How they think, decide, and see the world.
+            How a person thinks, decides, and sees the world. Kept.
           </p>
           <h1 style={{
             ...SERIF,
@@ -115,11 +115,32 @@ export default function FamiliesPage() {
             marginBottom:  '36px',
             maxWidth:      '820px',
           }}>
-            A person is more than the records they keep.
+            You will have the photographs. You will not have the way they thought.
           </h1>
           <p style={{ ...GEORGIA, fontSize: '1.2rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: ON_DARK_2, maxWidth: '660px', margin: 0 }}>
-            Photographs hold a face. Letters hold a moment. Neither holds the way a person reasoned, the counsel they give, or the judgment the people around them rely on. Basalith preserves how a person thinks, captured while they are active and fully present.
+            Photographs hold a face. Letters hold a moment. Neither holds how a person reasoned, the advice they would give you, or the judgment the people around them lean on. Basalith keeps how a person thinks, captured while they are here and fully present.
           </p>
+          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'center', marginTop: '44px' }}>
+            <Link
+              href="/apply"
+              className="families-cta"
+              style={{
+                ...MONO,
+                fontSize:       'var(--text-caption)',
+                display:        'inline-block',
+                color:          '#0A0908',
+                textDecoration: 'none',
+                background:     'var(--color-gold)',
+                padding:        '16px 32px',
+                transition:     'background 250ms ease',
+              }}
+            >
+              Begin a family archive
+            </Link>
+            <Link href="/pricing" style={{ ...MONO, fontSize: '0.46rem', color: 'var(--color-gold)', textDecoration: 'none' }}>
+              See pricing <span aria-hidden="true">&rarr;</span>
+            </Link>
+          </div>
         </section>
 
         {/* ── Section 2: The gap ── */}
@@ -171,14 +192,14 @@ export default function FamiliesPage() {
               Basalith began here
             </p>
             <p style={{ ...GEORGIA, fontSize: '1.15rem', fontWeight: 300, lineHeight: 1.9, color: ON_DARK, marginBottom: '32px' }}>
-              Before Basalith was a way to hand forward how a business is run, it was a way to preserve how a person thinks. The method has not changed. We build a cognitive reference model of the person while they are active and fully present. Not a biography. Not a recorded interview. A system that holds how they reason, what they weigh, and how they decide, and makes it available to the people who come after.
+              Before Basalith was a way to hand forward how a business is run, it was a way to keep how a person thinks. The method has not changed. We build a cognitive reference model of the person while they are here and fully present. It is not a biography or a set of recorded interviews. It is a record of how they reason, what they weigh, and how they decide, that the people who come after can ask.
             </p>
             <div style={{ borderLeft: '2px solid rgba(196,162,74,0.4)', paddingLeft: '24px', marginTop: '40px' }}>
               <p style={{ ...MONO, fontSize: '0.42rem', color: 'rgba(196,162,74,0.6)', marginBottom: '12px' }}>
                 Built from them, not about them
               </p>
               <p style={{ ...GEORGIA, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: ON_DARK_2, margin: 0 }}>
-                An archive built from the person is not the same as an archive built about them. The difference can only come from the person, while they are active and giving it themselves.
+                An archive built from the person is not the same as an archive built about them. The difference can only come from the person, while they are here to give it and to correct it.
               </p>
             </div>
           </div>
@@ -275,7 +296,7 @@ export default function FamiliesPage() {
                 transition:     'background 250ms ease',
               }}
             >
-              Begin a personal archive
+              Begin a family archive
             </Link>
             <p style={{ ...GEORGIA, fontSize: '0.95rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: ON_DARK_3, margin: '28px 0 0' }}>
               Personal archives are accepted by application. We review every one ourselves.

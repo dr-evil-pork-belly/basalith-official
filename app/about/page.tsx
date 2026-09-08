@@ -81,28 +81,21 @@ export default function AboutPage() {
           </h1>
 
           <p style={BODY}>
-            When a business changes hands, by acquisition or succession, the assets
-            transfer and the judgment that built them does not. Basalith captures how
-            the operator reasons while they are still running the company, so it
-            transfers too.
-          </p>
-          <p style={BODY}>Most of what a person knows never gets written down.</p>
-          <p style={BODY}>
-            Not because they do not want to share it. Because nobody built
-            the right way to capture it while they were still here
-            to make sure it was right.
-          </p>
-          <p style={BODY}>Basalith is that infrastructure.</p>
-          <p style={BODY}>
-            For businesses whose founders carry thirty years of judgment
-            in their heads and nowhere else.
+            When a business changes hands, the assets transfer and the judgment
+            that built them does not. Basalith captures how the operator reasons
+            while they are still running the company, so it transfers too.
           </p>
           <p style={BODY}>
-            For families who want to preserve how someone thinks, not just what they owned.
+            Most of what a person knows never gets written down. Not because they
+            will not share it. Because nobody built a good way to capture it while
+            they were still here to make sure it was right.
           </p>
+          <p style={BODY}>That is what Basalith is for.</p>
           <p style={{ ...BODY, marginBottom: 0 }}>
-            For the generations that follow, who deserve access to the real
-            version of the people who shaped them.
+            For a founder carrying thirty years of judgment in their head and nowhere
+            else. For a family that wants to keep how someone thinks, not just what
+            they owned. For the people who come after, who deserve the real version
+            of the people who shaped them.
           </p>
         </section>
         </div>
@@ -247,8 +240,8 @@ export default function AboutPage() {
             </p>
             <h2 style={{ ...H2, color: 'rgba(250,248,244,0.9)' }}>The people who make this real.</h2>
             <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>
-              Basalith is built by a network of Legacy Guides, trained professionals
-              who conduct Founding Sessions and maintain archive relationships over time.
+              Every archive is opened by a Legacy Guide, a trained person who runs
+              the Founding Session and stays with the archive as it grows.
             </p>
             <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>The technology handles the complexity. The Guide handles the humanity.</p>
             <p style={{ ...BODY, color: 'rgba(250,248,244,0.85)', fontStyle: 'italic' }}>
@@ -265,12 +258,12 @@ export default function AboutPage() {
             </p>
             <p style={BODY}>
               The architecture behind Basalith draws on peer-reviewed research in
-              organizational succession planning, cognitive fingerprinting, personalized
-              language model fine-tuning, and oral history preservation.
+              succession planning, knowledge loss in organizations, personalized
+              language model fine-tuning, and oral history.
             </p>
             <p style={{ ...BODY, marginBottom: '36px' }}>
-              The technical foundation is documented at basalith.xyz for anyone who wants
-              to understand how this works, not just what it does.
+              All of it is documented at basalith.xyz, including what this technology
+              cannot do. Read it if you want to know how this works, not just what it does.
             </p>
             <a
               href="https://basalith.xyz"
@@ -298,11 +291,11 @@ export default function AboutPage() {
               The second door
             </p>
             <p style={{ ...BODY, color: 'rgba(250,248,244,0.55)', marginBottom: '24px' }}>
-              Basalith began as a family product, and that path is still open. The same
-              method, for preserving how a person thinks rather than how a business is run.
+              Basalith began with families, and that door is still open. The same
+              method, for keeping how a person thinks rather than how a business is run.
             </p>
             <a
-              href="/apply"
+              href="/families"
               style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
             >
               For individuals and families <span aria-hidden="true">→</span>
@@ -323,11 +316,8 @@ export default function AboutPage() {
             <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.5)', lineHeight: 1.85, marginBottom: '8px' }}>
               Every year you begin is a year the entity has more to work with.
             </p>
-            <p style={{ ...SERIF, fontSize: '1.15rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.85)', lineHeight: 1.85, marginBottom: '32px' }}>
+            <p style={{ ...SERIF, fontSize: '1.15rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.85)', lineHeight: 1.85, marginBottom: '40px' }}>
               Every year you wait is a year it has less.
-            </p>
-            <p style={{ ...SERIF, fontSize: '0.88rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.25)', lineHeight: 1.85, marginBottom: '40px', maxWidth: '420px', margin: '0 auto 40px' }}>
-              Your archive runs on two permanent layers: one that holds every fact and memory you have deposited, and one that learns how you express, reason, and decide. Neither replaces the other.
             </p>
             <a
               href="/apply"

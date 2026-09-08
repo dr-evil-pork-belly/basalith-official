@@ -7,7 +7,7 @@ import { CATEGORY_LINE } from '@/lib/copy'
 
 export const metadata: Metadata = {
   title:       'For Business · Basalith',
-  description: 'When a business changes hands, the judgment that built it usually does not transfer. Basalith captures how the operator reasons during the active years, so it transfers through an acquisition or a succession.',
+  description: 'When a business changes hands, the judgment that built it usually does not transfer. Basalith captures how the operator reasons while they still run the company, so it transfers through an acquisition or a succession. Engagements begin with one conversation.',
 }
 
 const MONO: React.CSSProperties = {
@@ -24,27 +24,31 @@ const GEORGIA: React.CSSProperties = {
 const PAD = 'clamp(24px,6vw,80px)'
 
 const DOCUMENTED = [
-  'Strategic direction and long-range plans',
-  'Process documentation and playbooks',
-  'Org structure and reporting lines',
-  'Financial models and unit economics',
+  'Strategy and the long-range plan',
+  'Playbooks and process documents',
+  'The org chart and who reports to whom',
+  'The financial model and unit economics',
 ]
 
 const WALKS_OUT = [
-  'Risk calibration built over decades',
-  'Pattern recognition that preceded every major decision',
-  'The unspoken veto logic applied to deals and hires',
-  'The judgment that shaped every outcome',
+  'How much risk is too much, learned over decades',
+  'The pattern they saw before every big call',
+  'The quiet veto on certain deals and certain hires',
+  'Why the business made the choices it made',
 ]
 
 const TRANSITIONS = [
   {
     label: 'Acquisition',
-    body:  'You bought the company because of how it was run. The operator’s judgment is the asset you paid for, and the earnout assumes it transfers. Most of it lives in one person’s head and leaves on their last day. Basalith captures it during the active years, so what you valued in diligence is still in the room after the operator is gone.',
+    href:  '/apply?type=acquisition',
+    cta:   'Talk to us about an acquisition',
+    body:  'You paid a multiple for how the company was run. The earnout assumes the operator’s judgment comes with the building. Most of it lives in one head and leaves on their last day. Basalith captures it before that day, so what you valued in diligence is still in the room after the operator is gone.',
   },
   {
     label: 'Succession',
-    body:  'The founder is stepping back, or a partner is retiring. The successor inherits the systems and the client list. Not the reasoning that built them. Basalith hands forward the thinking behind the structure, so the next person can ask how the founder would have decided instead of guessing.',
+    href:  '/apply?type=succession',
+    cta:   'Talk to us about a succession',
+    body:  'The founder is stepping back, or a partner is retiring. The successor gets the systems and the client list. Not the reasoning behind them. Basalith hands the thinking forward, so the next person can ask how the founder would have decided instead of guessing.',
   },
 ]
 
@@ -52,29 +56,29 @@ const HANDOFF = [
   {
     n:     '01',
     title: 'The Founding.',
-    body:  'An extended guided session captures the decision frameworks the operator uses most.',
+    body:  'An extended guided session with a Senior Legacy Guide. We start with the hardest calls the operator ever made and work outward to the frameworks they use every day.',
   },
   {
     n:     '02',
     title: 'Scenario capture.',
-    body:  'The operator works through 20 real business scenarios and 29 decision questions across 8 domains. Their responses train the model.',
+    body:  'The operator works through 20 real business scenarios and 29 decision questions across 8 domains. Every response becomes training data.',
   },
   {
     n:     '03',
-    title: 'Verification.',
-    body:  'Responses are evaluated before they influence the model, so the system reflects how the operator actually decided.',
+    title: 'The check.',
+    body:  'Every response is scored before it can shape the model. What comes through reflects how the operator actually decided.',
   },
   {
     n:     '04',
-    title: 'Handoff.',
-    body:  'The successor or acquirer gets portal access and consults the model on the calls that matter, long after the operator has stepped back.',
+    title: 'The handoff.',
+    body:  'The successor or acquirer gets portal access and can consult the model on the calls that matter, long after the operator has stepped back. Where the archive holds no position, the model says so.',
   },
 ]
 
 const TRUST = [
   {
     title: 'Not reconstructed after the fact.',
-    body:  'Basalith is built while the operator is active and fully participating. Not assembled from old messages once they are gone.',
+    body:  'Built while the operator is active and in the room. Not pieced together from old emails once they are gone.',
   },
   {
     title: 'Not a wrapper on a general AI.',
@@ -86,11 +90,11 @@ const TRUST = [
   },
   {
     title: 'You own the archive.',
-    body:  'You own the archive and can export all of it at any time. Nothing is stranded if we ever close.',
+    body:  'Export all of it, any time, in open formats. Nothing is stranded if we ever close.',
   },
   {
     title: 'Frozen at transition.',
-    body:  'The fingerprint is frozen at transition. The new owner can add context. Nobody can rewrite what the operator said.',
+    body:  'The fingerprint is locked at transition. The new owner can add context. Nobody can rewrite what the operator said.',
   },
 ]
 
@@ -145,7 +149,45 @@ export default function SuccessionPage() {
             maxWidth:   '660px',
             margin:     0,
           }}>
-            Basalith builds a cognitive reference model of the operator while they are still running the company. How they price risk, how they read people, the calls they make without thinking. It captures the reasoning behind the decisions, so it transfers with the business, through an acquisition or a succession.
+            The operator knows when to walk from a deal, which hire to trust over the resume, how much risk is too much. None of it is in the data room. Basalith captures how they reason while they are still running the company, so it transfers with the business. Through an acquisition or a succession.
+          </p>
+
+          <div className="succession-hero-ctas" style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginTop: '44px', alignItems: 'center' }}>
+            <Link
+              href="/apply?type=succession"
+              className="succession-cta-paper"
+              style={{
+                ...MONO,
+                fontSize:       'var(--text-caption)',
+                display:        'inline-block',
+                color:          '#0A0908',
+                textDecoration: 'none',
+                background:     'var(--b2b-btn)',
+                padding:        '16px 32px',
+                transition:     'background 250ms ease',
+              }}
+            >
+              Tell us about the transition
+            </Link>
+            <Link
+              href="/succession/demo"
+              className="succession-cta-ghost"
+              style={{
+                ...MONO,
+                fontSize:       'var(--text-caption)',
+                display:        'inline-block',
+                color:          'var(--color-text-primary)',
+                textDecoration: 'none',
+                border:         '1px solid var(--b2b-rule)',
+                padding:        '15px 32px',
+                transition:     'border-color 250ms ease',
+              }}
+            >
+              See the demo
+            </Link>
+          </div>
+          <p style={{ ...GEORGIA, fontSize: '0.95rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.7, color: 'var(--color-text-muted)', marginTop: '18px', marginBottom: 0, maxWidth: '560px' }}>
+            The demo runs on a fictional founder. Ask it something they never answered and watch it decline to guess.
           </p>
         </section>
         </div>
@@ -225,19 +267,28 @@ export default function SuccessionPage() {
               A business changes hands two ways. Both lose the same thing.
             </h2>
             <div className="succession-transitions" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-              {TRANSITIONS.map(({ label, body }) => (
+              {TRANSITIONS.map(({ label, body, href, cta }) => (
                 <div key={label} style={{
                   border:     '1px solid rgba(196,162,74,0.2)',
                   borderTop:  '2px solid rgba(196,162,74,0.6)',
                   background: 'rgba(196,162,74,0.03)',
                   padding:    'clamp(28px,4vw,44px)',
+                  display:    'flex',
+                  flexDirection: 'column',
                 }}>
                   <p style={{ ...MONO, fontSize: '0.46rem', color: 'var(--color-gold)', marginBottom: '20px' }}>
                     {label}
                   </p>
-                  <p style={{ ...GEORGIA, fontSize: '1.05rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: 'var(--color-text-secondary)', margin: 0 }}>
+                  <p style={{ ...GEORGIA, fontSize: '1.05rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: 'var(--color-text-secondary)', margin: '0 0 28px' }}>
                     {body}
                   </p>
+                  <Link
+                    href={href}
+                    className="succession-inline-link"
+                    style={{ ...MONO, fontSize: '0.46rem', color: 'var(--color-gold-on-light)', textDecoration: 'none', marginTop: 'auto' }}
+                  >
+                    {cta} &rarr;
+                  </Link>
                 </div>
               ))}
             </div>
@@ -248,11 +299,14 @@ export default function SuccessionPage() {
         <section style={{ background: 'var(--color-void)', padding: `clamp(80px,10vw,120px) ${PAD}` }}>
           <div style={{ maxWidth: '700px', margin: '0 auto' }}>
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '40px' }}>
-              How Basalith Solves It
+              What Basalith does about it
             </p>
 
+            <p style={{ ...GEORGIA, fontSize: '1.15rem', fontWeight: 300, lineHeight: 1.9, color: 'var(--color-text-primary)', marginBottom: '24px' }}>
+              Basalith builds a cognitive reference model of the operator while they are still active. Not a biography or a set of recorded interviews. A working record of how they reason, what they weigh, and how they decide, that a successor can put questions to.
+            </p>
             <p style={{ ...GEORGIA, fontSize: '1.15rem', fontWeight: 300, lineHeight: 1.9, color: 'var(--color-text-primary)', marginBottom: '32px' }}>
-              Basalith builds a cognitive reference model of the founder while they are still active. Not a biography. Not a recorded interview series. A system that captures how they reason, what they weigh, and how they decide. Then makes that available to successors as an active intelligence resource.
+              And when the operator never took a position on something, it says so. It will not fill the gap with an answer that sounds like them. In a handoff, a confident wrong answer is worse than no answer at all.
             </p>
 
             <div style={{
@@ -264,7 +318,7 @@ export default function SuccessionPage() {
                 The Architecture
               </p>
               <p style={{ ...GEORGIA, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: 'var(--color-text-secondary)', margin: 0 }}>
-                Two permanent layers: one holds every fact and decision deposited, one learns the reasoning patterns behind them. Successors query the system the same way they would consult the founder.
+                Two permanent layers. One holds every fact and decision deposited. One learns the reasoning patterns behind them. Successors ask it the way they would have asked the founder.
               </p>
             </div>
           </div>
@@ -274,7 +328,7 @@ export default function SuccessionPage() {
         <section style={{ background: 'var(--color-void)', padding: `0 ${PAD} clamp(80px,10vw,120px)` }}>
           <div style={{ maxWidth: '900px', margin: '0 auto' }}>
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '48px' }}>
-              Succession Governance
+              Two layers. One rule.
             </p>
             <div className="succession-layers" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
 
@@ -299,10 +353,10 @@ export default function SuccessionPage() {
                   The Cognitive Fingerprint Layer
                 </h3>
                 <p style={{ ...GEORGIA, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-secondary)', marginBottom: '16px' }}>
-                  The founder&rsquo;s lifetime logic. Locked at transition. Cannot be altered.
+                  The founder&rsquo;s reasoning, fixed from their own deposits. Locked at transition. Nobody can rewrite it.
                 </p>
                 <p style={{ ...GEORGIA, fontSize: '0.9rem', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-muted)', margin: 0 }}>
-                  Every decision, position, and judgment captured during the active years. Immutable after the founder steps back.
+                  Every decision, position, and judgment captured during the active years. It does not drift after the founder steps back.
                 </p>
               </div>
 
@@ -327,10 +381,10 @@ export default function SuccessionPage() {
                   The Contextual Intelligence Layer
                 </h3>
                 <p style={{ ...GEORGIA, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-secondary)', marginBottom: '16px' }}>
-                  Successors inject current business context. The system combines the founder&rsquo;s reasoning with present facts.
+                  Successors add today&rsquo;s facts. The new customer, the changed market, the hire that did not work out. The system reads the founder&rsquo;s reasoning against the present.
                 </p>
                 <p style={{ ...GEORGIA, fontSize: '0.9rem', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-muted)', margin: 0 }}>
-                  The archive does not freeze in time. It meets the present.
+                  The judgment stays fixed. The context stays current.
                 </p>
               </div>
 
@@ -418,11 +472,11 @@ export default function SuccessionPage() {
               </div>
 
               <p style={{ ...GEORGIA, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-secondary)', marginBottom: '28px' }}>
-                Onboarding begins with a founding session. Start the conversation below.
+                Every engagement begins with a founding session. Tell us about the transition and we will tell you whether Basalith fits.
               </p>
 
               <Link
-                href="/contact"
+                href="/apply?type=succession"
                 className="succession-cta-paper"
                 style={{
                   ...MONO,
@@ -440,9 +494,27 @@ export default function SuccessionPage() {
               </Link>
             </div>
 
-            <p style={{ ...GEORGIA, fontSize: '0.9rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-faint)' }}>
-              Post-transition access: $3,600/year. Institutional query access for the successor continues. No active sessions required.
+            <p style={{ ...GEORGIA, fontSize: '0.9rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-muted)', marginBottom: '56px' }}>
+              After transition: $3,600 a year keeps successor access open. No active sessions required.
             </p>
+
+            {/* Acquisition. Published floor only, per the standing integrity rule. */}
+            <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '20px' }}>
+              Buying the company?
+            </p>
+            <p style={{ ...GEORGIA, fontSize: '1.05rem', fontWeight: 300, lineHeight: 1.85, color: 'var(--color-text-primary)', marginBottom: '12px' }}>
+              Acquisition engagements start at $50,000, scaled to the size and complexity of the transaction.
+            </p>
+            <p style={{ ...GEORGIA, fontSize: '0.95rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-secondary)', marginBottom: '24px' }}>
+              Priced against the value at risk in the deal, as part of diligence, not as software. The buyer pays, because the buyer is the one holding the risk.
+            </p>
+            <Link
+              href="/apply?type=acquisition"
+              className="succession-inline-link"
+              style={{ ...MONO, fontSize: '0.46rem', color: 'var(--color-gold-on-light)', textDecoration: 'none' }}
+            >
+              Talk to us about a transaction &rarr;
+            </Link>
           </div>
         </section>
 
@@ -463,8 +535,11 @@ export default function SuccessionPage() {
             }}>
               The judgment that built the company is the one thing diligence cannot copy. Capture it while the person making the calls is still making them.
             </p>
+            <p style={{ ...GEORGIA, fontSize: '1.05rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: 'rgba(250,248,244,0.6)', marginBottom: '40px', maxWidth: '520px', marginLeft: 'auto', marginRight: 'auto' }}>
+              One conversation tells you whether this fits. Start there.
+            </p>
             <Link
-              href="/contact"
+              href="/apply?type=succession"
               className="succession-cta"
               style={{
                 ...MONO,
@@ -488,6 +563,8 @@ export default function SuccessionPage() {
       <style>{`
         .succession-cta:hover       { background: var(--color-gold-light) !important; }
         .succession-cta-paper:hover { background: var(--b2b-btn-hover) !important; }
+        .succession-cta-ghost:hover { border-color: var(--color-gold-on-light) !important; }
+        .succession-inline-link:hover { text-decoration: underline !important; text-underline-offset: 4px; }
         @media (max-width: 680px) {
           .succession-contrast    { grid-template-columns: 1fr !important; }
           .succession-layers      { grid-template-columns: 1fr !important; }

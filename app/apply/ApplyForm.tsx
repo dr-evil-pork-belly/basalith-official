@@ -103,12 +103,12 @@ export default function ApplyForm({ initialType = 'legacy' }: { initialType?: st
             <div style={{ textAlign: 'center' }}>
               <div aria-hidden="true" style={{ width: '40px', height: '1px', background: 'var(--color-gold)', margin: '0 auto 40px' }} />
               <h1 style={{ ...SERIF, fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: 500, color: 'var(--color-text-primary)', marginBottom: '20px', lineHeight: 1.2 }}>
-                {isBusiness ? 'Your succession inquiry has been received.' : 'Your application has been received.'}
+                Received. We will be in touch.
               </h1>
               <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--color-text-secondary)', lineHeight: 1.9, maxWidth: '420px', margin: '0 auto 32px' }}>
                 {isBusiness
-                  ? 'A Legacy Guide will be in touch within 48 hours to discuss your succession requirements.'
-                  : <>We review every application personally. If your archive is a good fit you will hear from us within 48 hours with your next steps and Legacy Guide assignment.<br /><br />We will not follow up with rejections.</>}
+                  ? 'A Legacy Guide will contact you within 48 hours to talk through the transition and tell you plainly whether Basalith fits.'
+                  : <>We read every application ourselves. If your archive is a good fit, you will hear from us within 48 hours with next steps and your Legacy Guide.<br /><br />If it is not a fit, we will not chase you.</>}
               </p>
               <p style={{ ...MONO, fontSize: '0.48rem', color: 'var(--color-gold)' }}>Basalith · Heritage Nexus Inc.</p>
             </div>
@@ -120,7 +120,7 @@ export default function ApplyForm({ initialType = 'legacy' }: { initialType?: st
 
               {/* Type selector */}
               <div style={{ marginBottom: '40px' }}>
-                <p style={{ ...LABEL, marginBottom: '12px' }}>I am applying for</p>
+                <p style={{ ...LABEL, marginBottom: '12px' }}>This archive is for</p>
                 <div style={{ display: 'flex', gap: '10px' }}>
                   {(['legacy', 'succession', 'acquisition'] as ApplyType[]).map(type => (
                     <button key={type} type="button" className="type-btn"
@@ -132,7 +132,7 @@ export default function ApplyForm({ initialType = 'legacy' }: { initialType?: st
                         color:      applyType === type ? 'var(--color-surface)' : 'var(--color-text-muted)',
                         cursor: 'pointer', borderRadius: 'var(--radius-sm)',
                       }}>
-                      {type === 'legacy' ? 'Personal Legacy' : type === 'succession' ? 'Business Succession' : 'Business Acquisition'}
+                      {type === 'legacy' ? 'A person or family' : type === 'succession' ? 'A business succession' : 'A business acquisition'}
                     </button>
                   ))}
                 </div>
@@ -140,7 +140,7 @@ export default function ApplyForm({ initialType = 'legacy' }: { initialType?: st
 
               {isBusiness && (
                 <p style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: 'var(--color-text-secondary)', marginBottom: '40px' }}>
-                  A Legacy Guide will contact you within 48 hours to discuss your founder&rsquo;s succession program.
+                  A few details and a Legacy Guide will contact you within 48 hours. No deck, no pitch. A conversation about the transition and whether this fits.
                 </p>
               )}
 
@@ -219,7 +219,7 @@ export default function ApplyForm({ initialType = 'legacy' }: { initialType?: st
                 <div>
                   <label style={LABEL} htmlFor="apply-reason">{applyType === 'succession' ? 'Tell us about your succession situation' : applyType === 'acquisition' ? 'Tell us about the transaction' : 'What brings you to Basalith'}</label>
                   <textarea id="apply-reason" rows={5} required
-                    placeholder={isBusiness ? 'Describe the founder, the business, and what you are hoping to preserve.' : 'Tell us what you are hoping to preserve and why now.'}
+                    placeholder={isBusiness ? 'The founder, the business, what is changing, and when.' : 'Who this is for, what you want to keep, and why now.'}
                     value={form.reason} onChange={set('reason')}
                     className="apply-input" style={{ ...INPUT, resize: 'none' as const, lineHeight: 1.75 }} />
                 </div>
@@ -261,7 +261,7 @@ export default function ApplyForm({ initialType = 'legacy' }: { initialType?: st
                   onMouseEnter={e => { if (!submitting) (e.currentTarget as HTMLElement).style.background = 'var(--color-gold-light)' }}
                   onMouseLeave={e => { if (!submitting) (e.currentTarget as HTMLElement).style.background = 'var(--color-gold)' }}
                 >
-                  {submitting ? 'Submitting...' : isBusiness ? 'Submit Succession Inquiry' : 'Submit Application'}
+                  {submitting ? 'Sending...' : isBusiness ? 'Start the conversation' : 'Request a Founding Session'}
                 </button>
 
               </form>
