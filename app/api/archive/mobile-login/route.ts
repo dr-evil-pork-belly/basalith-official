@@ -1,72 +1,25 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase-admin'
-import bcrypt from 'bcryptjs'
+import { NextResponse } from 'next/server'
 
-// Mobile login — email + password, looks up archive by owner_email then checks
-// archive_credentials for that specific archive. No credential scanning.
+// RETIRED 2026-09-08. This was the pre-Supabase-Auth mobile shim: an
+// unauthenticated bcrypt password check that returned an archive id and
+// minted no session. The July 2026 auth sweep closed every route it fed, and
+// docs/API_AUTH_TRIAGE_2_2026-07.md section 1 recorded it as a password
+// oracle with no rate limit. The iOS app now signs in with a Supabase email
+// OTP and sends `Authorization: Bearer <access token>` (see
+// lib/auth/getSessionUser.ts). Nothing calls this route any more.
 //
-// DEPRECATED — this is a mobile shim, not a Supabase session. Kept for the
-// existing iOS build until the Phase 7 OTP build ships, then removed in
-// Phase 8.
+// Kept as a 410 rather than deleted so an old app build gets a clear
+// message instead of a 404, and so the path cannot be silently reintroduced.
 
-export async function POST(req: NextRequest) {
-  const { email, password } = await req.json()
+const GONE = {
+  error: 'This sign-in method has been retired. Please update the Basalith app and sign in with the code sent to your email.',
+  code:  'MOBILE_LOGIN_RETIRED',
+}
 
-  if (!email || !password) {
-    return NextResponse.json({ error: 'Email and password required' }, { status: 400 })
-  }
+export async function POST() {
+  return NextResponse.json(GONE, { status: 410 })
+}
 
-  // Find archive by owner email
-  const { data: archive } = await supabaseAdmin
-    .from('archives')
-    .select('id, name, family_name, owner_name, status, preferred_language')
-    .eq('owner_email', email.toLowerCase().trim())
-    .maybeSingle()
-
-  if (!archive) {
-    return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
-  }
-
-  if (archive.status && archive.status !== 'active') {
-    return NextResponse.json({ error: 'Archive is not active' }, { status: 403 })
-  }
-
-  // Check credential for this archive
-  const { data: credential } = await supabaseAdmin
-    .from('archive_credentials')
-    .select('password_hash')
-    .eq('archive_id', archive.id)
-    .eq('is_active', true)
-    .maybeSingle()
-
-  if (!credential) {
-    return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
-  }
-
-  const valid = await bcrypt.compare(password, credential.password_hash)
-  if (!valid) {
-    return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
-  }
-
-  // Update last_used_at (non-blocking)
-  supabaseAdmin
-    .from('archive_credentials')
-    .update({ last_used_at: new Date().toISOString() })
-    .eq('archive_id', archive.id)
-    .then(() => {})
-
-  console.log('[mobile-login] archive:', archive.name, 'preferred_language:', archive.preferred_language)
-
-  const preferredLanguage = archive.preferred_language || 'en'
-
-  const payload = {
-    success:           true,
-    archiveId:         archive.id,
-    archiveName:       archive.name,
-    familyName:        archive.family_name,
-    ownerName:         archive.owner_name,
-    preferredLanguage,
-  }
-  console.log('[mobile-login] response:', JSON.stringify(payload))
-  return NextResponse.json(payload)
+export async function GET() {
+  return NextResponse.json(GONE, { status: 410 })
 }
