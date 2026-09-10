@@ -114,15 +114,32 @@ vi.mock('./verifyGrounding', () => ({
   groundingGapReply: (t: string) => `gap:${t}`,
 }))
 
+// Every model call in the run goes through this one class: the voice call from
+// coverageRun.ts and, over the cap, the retrieval call from frozenLayer.ts. The
+// two are told apart by model, and every call is recorded so a test can count
+// them and read the system prompt each probe was sent.
+const M = vi.hoisted(() => ({
+  calls: [] as { model: string; system: unknown }[],
+  /** What the retriever answers. 1-based positions, as the real model returns. */
+  retrieverReply: '{"selected":[1]}',
+}))
+
 vi.mock('@anthropic-ai/sdk', () => ({
   default: class {
-    messages = { create: async () => ({ content: [{ type: 'text', text: 'a draft' }] }) }
+    messages = {
+      create: async (params: { model: string; system: unknown }) => {
+        M.calls.push({ model: params.model, system: params.system })
+        const text = params.model.includes('haiku') ? M.retrieverReply : 'a draft'
+        return { content: [{ type: 'text', text }] }
+      },
+    }
   },
 }))
 
 import { runCoverage } from './coverageRun'
 import { COVERAGE_PROBES, PROBE_SET_VERSION } from './coverageProbes'
 import { B2B_DOMAINS } from './b2bDomains'
+import { RETRIEVAL_MODEL, FROZEN_LAYER_CANDIDATE_LIMIT } from './frozenLayer'
 
 const ARCHIVE = 'arc-1'
 
@@ -132,6 +149,8 @@ beforeEach(() => {
   H.state.pairs = [{ prompt: 'p1', completion: 'c1' }]
   H.state.inFlight = null
   H.state.prior = []
+  M.calls = []
+  M.retrieverReply = '{"selected":[1]}'
 })
 
 /** Table calls only, in order, for readable sequence assertions. */
@@ -184,19 +203,37 @@ describe('runCoverage default path, store neutrality', () => {
     })
   })
 
-  it('reads the frozen layer with the same filters, ordering, and cap', async () => {
+  /**
+   * CHANGED 2026-09-10. This test used to pin `select(prompt, completion)` and
+   * `limit(20)`: the cap lived in the SQL. Now the read returns the whole
+   * included corpus with ids, and the cap is applied per probe by
+   * lib/frozenLayer.ts, exactly as the route applies it. The filters and the
+   * ordering are what the route sends, which is the claim this pins.
+   */
+  it('reads the whole included corpus with the same filters and ordering the route uses', async () => {
     await runCoverage({ archiveId: ARCHIVE })
 
     const pairs = H.state.calls.find(c => c.table === 'training_pairs')!
     console.log('\n  training_pairs read:', pairs.filters.join(' . '))
 
     expect(pairs.filters).toEqual([
-      'select(prompt, completion)',
+      'select(id, prompt, completion)',
       `eq(archive_id,${ARCHIVE})`,
       'eq(included_in_training,true)',
       'order(quality_score,desc)',
-      'limit(20)',
+      'order(id,asc)',
+      `limit(${FROZEN_LAYER_CANDIDATE_LIMIT})`,
     ])
+  })
+
+  it('makes no retrieval call for an archive under the cap', async () => {
+    await runCoverage({ archiveId: ARCHIVE })
+
+    const retrievals = M.calls.filter(c => c.model === RETRIEVAL_MODEL)
+    console.log(`  model calls ${M.calls.length}, retrieval calls ${retrievals.length}`)
+
+    expect(retrievals.length).toBe(0)
+    expect(M.calls.length).toBe(COVERAGE_PROBES.length)
   })
 
   it('writes each probe result with the same columns and the same conflict key', async () => {
@@ -332,7 +369,15 @@ describe('runCoverage injected path', () => {
     expect('skipped' in result).toBe(false)
   })
 
-  it('truncates an injected frozen layer to the cap, as the archive path does', async () => {
+  /**
+   * CHANGED 2026-09-10. This used to assert only that an oversized injected
+   * layer still completed, because truncation was array order and there was
+   * nothing else to pin. Now an oversized source goes through retrieval per
+   * probe, as an archive over the cap does on the route, so there are three
+   * things to pin: one retrieval call per probe, a layer at the cap containing
+   * the retriever's pick, and the run row counting the extra calls.
+   */
+  it('selects an oversized injected layer per probe through retrieval, at the cap, and counts the calls', async () => {
     const { createInMemoryCoverageStore } = await import('./coverageStoreMemory')
     const { FROZEN_LAYER_LIMIT } = await import('./coverageRun')
     const mem = createInMemoryCoverageStore()
@@ -340,6 +385,8 @@ describe('runCoverage injected path', () => {
     const oversized = Array.from({ length: FROZEN_LAYER_LIMIT + 5 }, (_, i) => ({
       prompt: `p${i}`, completion: `c${i}`,
     }))
+    // The retriever picks the LAST pair, which quality order alone would drop.
+    M.retrieverReply = `{"selected":[${oversized.length}]}`
 
     const result = await runCoverage({
       archiveId: 'fixture:oversized',
@@ -349,8 +396,69 @@ describe('runCoverage injected path', () => {
       store: mem.store,
     })
 
-    console.log(`  injected ${oversized.length} pairs, cap is ${FROZEN_LAYER_LIMIT}, run completed:`, !('skipped' in result))
+    const retrievals = M.calls.filter(c => c.model === RETRIEVAL_MODEL)
+    const voices     = M.calls.filter(c => c.model !== RETRIEVAL_MODEL)
+    const lastVoice  = voices[voices.length - 1].system as string
+    const layerSize  = (lastVoice.match(/^Q: p\d+$/gm) ?? []).length
+
+    console.log(`  injected ${oversized.length} pairs, cap ${FROZEN_LAYER_LIMIT}: retrieval calls ${retrievals.length}, voice calls ${voices.length}, layer in last prompt ${layerSize}`)
+
     expect('skipped' in result).toBe(false)
+    expect(retrievals.length).toBe(COVERAGE_PROBES.length)
+    expect(voices.length).toBe(COVERAGE_PROBES.length)
+    expect(layerSize).toBe(FROZEN_LAYER_LIMIT)
+    // The retriever's pick is in the layer; the pair it displaced is not.
+    expect(lastVoice).toContain(`Q: p${oversized.length - 1}\n`)
+    expect(lastVoice).not.toContain(`Q: p${FROZEN_LAYER_LIMIT - 1}\n`)
+    // Voice + verifier per probe, plus one retrieval per probe.
+    const close = mem.calls.find(c => c.method === 'finishRun')
+    expect(close).toBeDefined()
+    if (close?.method !== 'finishRun') throw new Error('unreachable')
+    expect(close.totals.modelCalls).toBe(COVERAGE_PROBES.length * 3)
+    expect(close.totals.error).toBeNull()
+    if ('skipped' in result) throw new Error('unreachable')
+    expect(result.retrievalCalls).toBe(COVERAGE_PROBES.length)
+    expect(result.retrievalFallbacks).toBe(0)
+  })
+
+  /**
+   * A retrieval that fails measures the pre-2026-09-10 layer. That must be
+   * visible on the result AND on the run row, never only in a console warning,
+   * or a run of fallbacks reads as a measurement of retrieval.
+   */
+  it('counts retrieval fallbacks and writes them to the run row error', async () => {
+    const { createInMemoryCoverageStore } = await import('./coverageStoreMemory')
+    const { FROZEN_LAYER_LIMIT } = await import('./coverageRun')
+    const mem = createInMemoryCoverageStore()
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    const oversized = Array.from({ length: FROZEN_LAYER_LIMIT + 5 }, (_, i) => ({
+      prompt: `p${i}`, completion: `c${i}`,
+    }))
+    M.retrieverReply = 'not json at all'
+
+    const result = await runCoverage({
+      archiveId: 'fixture:fallback',
+      content: { ownerName: 'X', archiveName: 'Y', segment: 'succession', pairs: oversized },
+      store: mem.store,
+    })
+    warn.mockRestore()
+
+    if ('skipped' in result) throw new Error('unexpected skip')
+    const close = mem.calls.find(c => c.method === 'finishRun')
+    if (close?.method !== 'finishRun') throw new Error('unreachable')
+    console.log(`  fallbacks ${result.retrievalFallbacks} of ${COVERAGE_PROBES.length}, run row error: "${close.totals.error}"`)
+
+    expect(result.ok).toBe(true)
+    expect(result.complete).toBe(true)
+    expect(result.retrievalFallbacks).toBe(COVERAGE_PROBES.length)
+    expect(close.totals.error).toContain(`retrieval fell back to quality order on ${COVERAGE_PROBES.length} of ${COVERAGE_PROBES.length} probes`)
+    // A failed call is still a call, and is still counted.
+    expect(close.totals.modelCalls).toBe(COVERAGE_PROBES.length * 3)
+    // The layer each probe saw is the quality-order top of the cap.
+    const lastVoice = M.calls.filter(c => c.model !== RETRIEVAL_MODEL).pop()!.system as string
+    expect(lastVoice).toContain(`Q: p${FROZEN_LAYER_LIMIT - 1}\n`)
+    expect(lastVoice).not.toContain(`Q: p${oversized.length - 1}\n`)
   })
 
   it('returns per-probe detail rich enough to roll up, including verifierErrored', async () => {

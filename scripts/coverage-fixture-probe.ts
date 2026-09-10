@@ -266,23 +266,24 @@ function personaContent(persona: DemoPersona): CoverageContent {
 /**
  * The cap must never silently engage here.
  *
- * lib/coverageRun.ts truncates every content source to FROZEN_LAYER_LIMIT so the
- * fixture cannot measure a frozen layer larger than the one a successor receives.
- * The archive path orders by quality_score before truncating. A persona has no
- * such column, so if one ever grew past the cap, WHICH pairs survived would be
- * decided by array order, which carries no meaning. The gates would then be
- * reading an arbitrary subset and would not say so.
+ * Since 2026-09-10 lib/coverageRun.ts selects the frozen layer per probe through
+ * lib/frozenLayer.ts. At or under FROZEN_LAYER_LIMIT no retrieval call is made
+ * and the whole persona is the layer, byte-identical to every run before that
+ * date. Over the cap the retriever would engage, with array order standing in
+ * for quality order as the fill and presentation order, and the fixture would
+ * measure a retrieval path with an extra model call per probe that the gates
+ * were not written for.
  *
- * So the cap defends the general case and this assertion guarantees it stays
- * unreached on the one path where the ordering would be meaningless.
+ * So this assertion guarantees the fixtures stay a measurement of the whole
+ * persona, with no retrieval in the loop.
  */
 function assertPersonasUnderCap(personas: DemoPersona[]): void {
   for (const p of personas) {
     if (p.pairs.length > FROZEN_LAYER_LIMIT) {
       throw new Error(
         `persona ${p.metadata.id} holds ${p.pairs.length} pairs, over FROZEN_LAYER_LIMIT ` +
-        `of ${FROZEN_LAYER_LIMIT}. The cap would truncate by array order, which is arbitrary ` +
-        `for a persona. Trim the persona or give it an explicit ranking before running gates.`,
+        `of ${FROZEN_LAYER_LIMIT}. Retrieval would engage and the gates would measure a ` +
+        `different path. Trim the persona before running gates.`,
       )
     }
   }

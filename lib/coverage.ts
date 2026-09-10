@@ -245,11 +245,14 @@ export function isRunComplete(rollups: DomainRollup[]): boolean {
  *
  * This is what the fixture gate should test, and testing a `backed` threshold
  * instead was a mistake. `backed` requires every probe in a domain to land on a
- * deposit, and the succession route caps the frozen layer at 20 training pairs
- * (route.ts limit(20)). Spread across eight domains that is between two and
- * three pairs per domain, so a six-of-six domain is unreachable for ANY archive,
- * however dense. A gate keyed to it can never pass and says nothing about the
- * map when it fails.
+ * deposit, and the succession route caps the frozen layer at 20 training pairs.
+ * Until 2026-09-10 those were the top 20 by quality_score for every question
+ * (route.ts limit(20)); spread across eight domains that was between two and
+ * three pairs per domain, so a six-of-six domain was unreachable for ANY
+ * archive, however dense. Since then the 20 are selected per question through
+ * lib/frozenLayer.ts, which lifts that ceiling on archives over the cap, but
+ * the argument for spread still holds: a gate keyed to `backed` says nothing
+ * about the map when it fails.
  *
  * What the map actually has to do is say DIFFERENT things about different
  * domains. Spread measures that directly and does not depend on where the

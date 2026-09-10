@@ -19,8 +19,10 @@
  * match that segment and a diagnostic result must not be mistaken for a
  * customer-facing one.
  *
- * COST. Two model calls per probe. At probe set v2 that is 96 calls and roughly
- * six minutes.
+ * COST. Two model calls per probe, plus one retrieval call per probe when the
+ * archive holds more included pairs than the frozen layer cap (see
+ * lib/frozenLayer.ts). At probe set v2 that is 96 calls, or up to 144 over the
+ * cap, and roughly six to eight minutes.
  *
  * Run:
  *   npx tsx scripts/coverage-drive.ts <archiveId>
@@ -31,7 +33,7 @@ import * as dotenv from 'dotenv'
 import * as path from 'path'
 import * as fs from 'fs'
 import { supabaseAdmin } from '../lib/supabase-admin'
-import { runCoverage } from '../lib/coverageRun'
+import { runCoverage, FROZEN_LAYER_LIMIT } from '../lib/coverageRun'
 import { PROBE_SET_VERSION, COVERAGE_PROBES } from '../lib/coverageProbes'
 import { coverageStateLabel, overreachLabel, OVERREACH_EXPLAINER, rollUpRun, type ProbeResult } from '../lib/coverage'
 
@@ -64,7 +66,7 @@ async function main() {
   rule()
   console.log('COVERAGE DRIVE')
   console.log(`archive     ${archiveId}`)
-  console.log(`probe set   ${PROBE_SET_VERSION} (${COVERAGE_PROBES.length} probes, ${COVERAGE_PROBES.length * 2} model calls)`)
+  console.log(`probe set   ${PROBE_SET_VERSION} (${COVERAGE_PROBES.length} probes, ${COVERAGE_PROBES.length * 2} model calls, plus one retrieval call per probe over the frozen layer cap)`)
   rule()
 
   const started = Date.now()
@@ -125,6 +127,41 @@ async function main() {
   console.log('coverage_runs ROW')
   rule()
   console.log(JSON.stringify(runRow, null, 2))
+
+  // ── 2b. The frozen layer ────────────────────────────────────────────────────
+  // Since 2026-09-10 the layer is selected per probe from the whole included
+  // corpus (lib/frozenLayer.ts). The run row's model_calls carries the count:
+  // anything above two per probe is retrieval. Printed so the pasted output
+  // shows whether retrieval engaged on this archive at all.
+  const { count: includedPairs } = await supabaseAdmin
+    .from('training_pairs')
+    .select('id', { count: 'exact', head: true })
+    .eq('archive_id', archiveId)
+    .eq('included_in_training', true)
+  const retrievalCalls = (runRow?.model_calls ?? 0) - result.results.length * 2
+
+  console.log('')
+  rule()
+  console.log('FROZEN LAYER')
+  rule()
+  console.log(`  included pairs   ${includedPairs ?? '?'}`)
+  console.log(`  cap              ${FROZEN_LAYER_LIMIT}`)
+  console.log(`  retrieval calls  ${retrievalCalls} of ${result.results.length} probes` +
+    ((includedPairs ?? 0) > FROZEN_LAYER_LIMIT
+      ? '  (over the cap: each probe selected its own layer)'
+      : '  (at or under the cap: every probe saw the whole corpus, no retrieval)'))
+  console.log(`  fallbacks        ${result.retrievalFallbacks}`)
+  if (result.retrievalFallbacks > 0) {
+    console.log('')
+    console.log(`  RETRIEVAL FELL BACK on ${result.retrievalFallbacks} probes. Those probes measured the`)
+    console.log('  quality-order layer, not the retrieval path. The run row carries this in')
+    console.log('  `error`. Do not read this map as a measurement of retrieval.')
+  }
+  if (process.env.FROZEN_LAYER_RETRIEVAL?.trim().toLowerCase() === 'off') {
+    console.log('')
+    console.log('  FROZEN_LAYER_RETRIEVAL=off. This is the control arm: every probe saw the')
+    console.log('  quality-order layer on purpose. Compare against a same-day run with it on.')
+  }
 
   if (runRow?.off_label) {
     console.log('')

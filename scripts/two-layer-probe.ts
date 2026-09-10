@@ -23,6 +23,9 @@ import * as path from 'path'
 import * as fs from 'fs'
 import { verifyGrounding, groundingGapReply } from '../lib/verifyGrounding'
 import { buildEntitySystemPrompt, formatFingerprintSection, EMPTY_CONTEXT } from '../lib/entitySystemPrompt'
+import {
+  selectFrozenLayer, describeSelection, FROZEN_LAYER_CANDIDATE_LIMIT, type FrozenLayerCandidate,
+} from '../lib/frozenLayer'
 
 const envPath = path.resolve(process.cwd(), '.env.local')
 if (fs.existsSync(envPath)) dotenv.config({ path: envPath })
@@ -120,7 +123,8 @@ const REGIMES: Regime[] = ['RAW']
 
 // RAW mirrors production exactly: same shared builder, the injected note as the
 // ACTIVE CONTEXTUAL LAYER, no provenance block. This IS app/api/succession/
-// entity/chat/route.ts's prompt.
+// entity/chat/route.ts's prompt. Since 2026-09-10 the fingerprint is also
+// selected per question through the same lib/frozenLayer.ts the route uses.
 function buildSystemPrompt(fingerprint: string, d: Dom, nk: NoteKey): string {
   return buildEntitySystemPrompt({
     ownerName:          OWNER_NAME,
@@ -174,25 +178,43 @@ async function pool(tasks: Task[], worker: (t: Task) => Promise<Res>, c: number)
 }
 
 async function main() {
-  const { data: pairs, error } = await supabaseAdmin
-    .from('training_pairs').select('prompt, completion')
+  // The same read the route makes: the whole included corpus in quality order.
+  // The frozen layer is then selected per domain question, as the route does
+  // per successor question, through the same function.
+  const { data: candidateRows, error } = await supabaseAdmin
+    .from('training_pairs').select('id, prompt, completion')
     .eq('archive_id', ARCHIVE_ID).eq('included_in_training', true)
-    .order('quality_score', { ascending: false }).limit(20)
+    .order('quality_score', { ascending: false }).order('id', { ascending: true }).limit(FROZEN_LAYER_CANDIDATE_LIMIT)
   if (error) { console.error('query failed:', error.message); process.exit(1) }
-  const frozen = pairs ?? []
-  const fingerprint = formatFingerprintSection(frozen)
+  const candidates: FrozenLayerCandidate[] = candidateRows ?? []
+
+  // One selection per domain (the question is fixed per domain), so the N
+  // samples in a cell share a layer exactly as they shared one before.
+  const layers = await Promise.all(DOMS.map(d => selectFrozenLayer({ question: d.question, candidates })))
 
   const tasks: Task[] = []
   for (let di = 0; di < DOMS.length; di++) for (const nk of NOTE_KEYS) for (const r of REGIMES) for (let s = 0; s < N; s++) tasks.push({ di, nk, r, s })
 
   console.log('='.repeat(82))
-  console.log(`MODEL ${MODEL} | FROZEN ${frozen.length} | REGIMES ${REGIMES.join(',')} | VERIFIER ${VERIFIER_ON ? 'ON' : 'OFF'} | ${DOMS.length} domains x 3 notes x ${REGIMES.length} regime x n=${N} = ${tasks.length} gens`)
+  console.log(`MODEL ${MODEL} | CANDIDATES ${candidates.length} | REGIMES ${REGIMES.join(',')} | VERIFIER ${VERIFIER_ON ? 'ON' : 'OFF'} | ${DOMS.length} domains x 3 notes x ${REGIMES.length} regime x n=${N} = ${tasks.length} gens`)
+  for (let di = 0; di < DOMS.length; di++) console.log(`  ${DOMS[di].name.padEnd(26)} ${describeSelection(layers[di])}`)
   console.log('='.repeat(82))
+  // A domain whose retrieval fell back measured the pre-2026-09-10 layer. This
+  // gate's output must never be pasted as evidence for the retrieval path when
+  // that happened, so it stops here rather than printing a plausible table.
+  // 'disabled' is different: that is the explicit control arm and it runs.
+  const fellBack = DOMS.filter((_, di) => layers[di].method === 'fallback_quality')
+  if (fellBack.length > 0) {
+    console.error(`RETRIEVAL FELL BACK on ${fellBack.length} of ${DOMS.length} domains (${fellBack.map(d => d.name).join(', ')}).`)
+    console.error('This run would measure the quality-order layer, not the retrieval path. Fix the cause and re-run.')
+    process.exit(1)
+  }
   let done = 0
   const results = await pool(tasks, async (t) => {
-    const sys = buildSystemPrompt(fingerprint, DOMS[t.di], t.nk)
+    const frozen = layers[t.di].pairs
+    const sys = buildSystemPrompt(formatFingerprintSection(frozen), DOMS[t.di], t.nk)
     const draft = await generate(sys, DOMS[t.di].question)
-    // Control B — same output verifier the route ships. When ON, score the
+    // Control B, the same output verifier the route ships. When ON, score the
     // POST-verifier output (route and harness share one verifier, no drift).
     // When OFF, score the raw draft to measure the prompt alone.
     let response = draft

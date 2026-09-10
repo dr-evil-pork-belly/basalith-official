@@ -12,10 +12,11 @@ import { runCoverage, type RunStep, type TriggerSource } from '@/lib/coverageRun
 // and step.run as the unit-of-work wrapper so a retry replays one probe rather
 // than the whole set.
 //
-// COST. Two model calls per probe, so 2 * COVERAGE_PROBES.length per run. At
-// probe set v2 that is 96 calls. That is why this is a background job on a
-// monthly cron writing to a cached table, and why no surface recomputes on
-// render.
+// COST. Two model calls per probe, so 2 * COVERAGE_PROBES.length per run, plus
+// one retrieval call per probe on an archive over the frozen layer cap
+// (lib/frozenLayer.ts). At probe set v2 that is 96 calls, up to 144. That is
+// why this is a background job on a monthly cron writing to a cached table,
+// and why no surface recomputes on render.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const computeCoverage = inngest.createFunction(

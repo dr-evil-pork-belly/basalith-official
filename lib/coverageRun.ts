@@ -13,16 +13,20 @@
  * and killed. That difference is injected as `runStep` rather than duplicated,
  * which is what keeps the two paths honestly identical.
  *
- * THE MECHANISM, stated once. For each probe in the current set: build
- * the SAME system prompt the production succession route builds, generate a
- * draft in the founder's voice, then run the SAME verifier the production route
- * runs. A domain is backed because the verifier said basis='deposit', not
- * because deposits were counted. There is no second prompt builder and no demo
- * shortcut verifier here.
+ * THE MECHANISM, stated once. For each probe in the current set: select the
+ * SAME frozen layer the production succession route selects for that question,
+ * build the SAME system prompt, generate a draft in the founder's voice, then
+ * run the SAME verifier the production route runs. A domain is backed because
+ * the verifier said basis='deposit', not because deposits were counted. There
+ * is no second prompt builder, no second retriever, and no demo shortcut
+ * verifier here.
  *
- * COST. Two model calls per probe, so 2 * COVERAGE_PROBES.length per run. At
- * probe set v2 that is 48 probes and 96 calls. Never restate those numbers as
- * literals anywhere; read them off the set.
+ * COST. Two model calls per probe, so 2 * COVERAGE_PROBES.length per run, plus
+ * one retrieval call per probe when the archive holds more pairs than the
+ * frozen layer cap (lib/frozenLayer.ts). At probe set v2 that is 48 probes and
+ * 96 calls, or up to 144 on an archive over the cap. The fixtures sit under the
+ * cap and make no retrieval calls. Never restate those numbers as literals
+ * anywhere; read them off the set and off the run row's model_calls.
  */
 
 import Anthropic from '@anthropic-ai/sdk'
@@ -31,6 +35,7 @@ import { buildEntitySystemPrompt, formatFingerprintSection, EMPTY_CONTEXT } from
 import { verifyGrounding } from './verifyGrounding'
 import { COVERAGE_PROBES, PROBE_SET_VERSION } from './coverageProbes'
 import { rollUpRun, isRunComplete, type CoverageState, type ProbeResult, type DomainRollup } from './coverage'
+import { selectFrozenLayer, FROZEN_LAYER_LIMIT, FROZEN_LAYER_CANDIDATE_LIMIT } from './frozenLayer'
 
 // Lazy client, for the same reason lib/verifyGrounding.ts:44 is lazy. The local
 // driver loads ANTHROPIC_API_KEY via dotenv at runtime, after imports are
@@ -132,12 +137,14 @@ export async function withApiRetry<T>(label: string, fn: () => Promise<T>): Prom
 const NO_CONTEXT = EMPTY_CONTEXT
 
 /**
- * The frozen layer ceiling, applied to EVERY content source.
+ * The frozen layer ceiling, applied to EVERY content source, per probe.
  *
- * app/api/succession/entity/chat/route.ts caps the layer it sends, and coverage
- * exists to measure the path that ships. So the cap is applied here, after the
- * content is read, rather than only in the SQL. A caller that injects content
- * gets truncated exactly as the archive path does.
+ * Defined in lib/frozenLayer.ts since 2026-09-10 and re-exported here so the
+ * scripts that import it from this module keep working. The cap is no longer a
+ * SQL limit on the read. The read returns the whole included corpus in quality
+ * order, and selectFrozenLayer applies the cap per question, exactly as
+ * app/api/succession/entity/chat/route.ts does. Coverage exists to measure the
+ * path that ships, so it selects through the same function.
  *
  * WHY THIS IS NOT TIDINESS. Before slice 2.2 the fixture probe passed persona
  * pairs uncapped while the archive path capped at 20. Both personas hold 15, so
@@ -146,13 +153,13 @@ const NO_CONTEXT = EMPTY_CONTEXT
  * is the measurement diverging from production, which is the class of defect
  * this whole surface is being built to catch.
  *
- * The archive path orders by quality_score before truncating. An injected source
- * has no such column, so WHICH 20 survive is undefined there. That is why
- * scripts/coverage-fixture-probe.ts asserts its personas sit under the cap: the
- * cap defends the general case, the assertion guarantees it never silently
- * engages where the ordering would be meaningless.
+ * An injected source over the cap now goes through retrieval like an archive
+ * would, with its array order standing in for quality order. That is why
+ * scripts/coverage-fixture-probe.ts still asserts its personas sit under the
+ * cap: under the cap no retrieval call is made and the fixtures measure the
+ * whole persona, byte-identical to every run before this date.
  */
-export const FROZEN_LAYER_LIMIT = 20
+export { FROZEN_LAYER_LIMIT }
 
 export type TriggerSource = 'manual' | 'cron' | 'transition'
 
@@ -165,7 +172,8 @@ export type RunStep = <T>(id: string, fn: () => Promise<T>) => Promise<T>
 
 export const passThroughStep: RunStep = (_id, fn) => fn()
 
-export type FingerprintPairRow = { prompt: string; completion: string }
+/** `id` is present on the archive path and absent for injected fixtures. */
+export type FingerprintPairRow = { id?: string; prompt: string; completion: string }
 
 /**
  * WHAT THE RUN IS ABOUT, separated from WHERE THE RUN IS READ FROM.
@@ -453,13 +461,20 @@ async function loadArchiveContent(archiveId: string): Promise<CoverageContent | 
 
   if (!archive) return { error: 'archive not found' }
 
+  // The whole included corpus, in quality order. The frozen layer is selected
+  // from it per probe. Mirrors the route's read exactly.
   const { data: pairs } = await supabaseAdmin
     .from('training_pairs')
-    .select('prompt, completion')
+    .select('id, prompt, completion')
     .eq('archive_id', archiveId)
     .eq('included_in_training', true)
     .order('quality_score', { ascending: false })
-    .limit(FROZEN_LAYER_LIMIT)
+    // quality_score is an integer, so ties are the common case. A second key
+    // makes the candidate order reproducible between requests, which is what
+    // lets the retriever's prompt cache hit and keeps "same layer" meaning the
+    // same layer. Mirrors the route's read exactly.
+    .order('id', { ascending: true })
+    .limit(FROZEN_LAYER_CANDIDATE_LIMIT)
 
   return {
     ownerName:   (archive.owner_name ?? archive.name) as string,
@@ -493,6 +508,10 @@ export type CoverageRunResult =
       error:    string | null
       rollups:  DomainRollup[]
       results:  ProbeResult[]
+      /** Probes that made a retrieval call. Zero at or under the frozen layer cap. */
+      retrievalCalls:     number
+      /** Probes whose retrieval failed and measured the quality-order layer instead. */
+      retrievalFallbacks: number
     }
 
 export async function runCoverage(params: {
@@ -544,38 +563,56 @@ export async function runCoverage(params: {
 
     if ('error' in outcome) return { error: outcome.error }
 
+    // The whole candidate set is returned from this step and, on the Inngest
+    // path, memoized and replayed into every later step's request. It was
+    // twenty rows before 2026-09-10 and is now the included corpus. Logged so
+    // the size is visible in the run output; the ceiling is Inngest's step
+    // output limit and Vercel's request body limit, not this code.
+    console.log(`[coverage] ${archiveId} frozen layer candidates ${content.pairs.length} pairs, ${JSON.stringify(content.pairs).length} bytes serialized`)
+
     return {
       runId:       outcome.runId,
       ownerName:   content.ownerName,
       archiveName: content.archiveName,
-      // Applied to every source. See FROZEN_LAYER_LIMIT.
-      pairs:       content.pairs.slice(0, FROZEN_LAYER_LIMIT),
+      // The candidate set, whole. The cap is applied per probe by
+      // selectFrozenLayer below. See FROZEN_LAYER_LIMIT.
+      pairs:       content.pairs,
       offLabel,
     }
   })
 
   if ('error' in opened) return { skipped: opened.error }
 
-  const { runId, ownerName, archiveName, pairs, offLabel } = opened
-
-  const systemPrompt = buildEntitySystemPrompt({
-    ownerName,
-    archiveName,
-    fingerprintSection: formatFingerprintSection(pairs),
-    contextSection:     NO_CONTEXT,
-  })
+  const { runId, ownerName, archiveName, pairs: candidates, offLabel } = opened
 
   // ── Probe ──────────────────────────────────────────────────────────────────
   // Each probe writes its own row before returning: a timeout partway through
   // must lose one probe, not the whole run. A probe that exhausts its retries is
   // recorded as a miss and the run continues, so one failure does not cost the
   // rest of the set. The run is then flagged incomplete rather than full.
+  //
+  // The system prompt is built per probe, because the frozen layer is selected
+  // per question. Under the cap every probe gets the identical prompt it always
+  // did. Over the cap each probe gets the layer the route would send a successor
+  // asking that question.
   const results: ProbeResult[] = []
   let hardError: string | null = null
+  let retrievalCalls     = 0
+  let retrievalFallbacks = 0
 
   for (const probe of COVERAGE_PROBES) {
     try {
       const out = await runStep(`probe:${probe.key}`, async () => {
+        const selection = await selectFrozenLayer({ question: probe.question, candidates })
+        const pairs     = selection.pairs
+
+        const systemPrompt = buildEntitySystemPrompt({
+          ownerName,
+          archiveName,
+          fingerprintSection: formatFingerprintSection(pairs),
+          contextSection:     NO_CONTEXT,
+        })
+
         const draft = await withApiRetry(`voice ${probe.key}`, () => client().messages.create({
           model:       VOICE_MODEL,
           max_tokens:  VOICE_MAX_TOKENS,
@@ -586,6 +623,7 @@ export async function runCoverage(params: {
 
         const reply = draft.content[0]?.type === 'text' ? draft.content[0].text : ''
 
+        // Verified against the SAME selected layer the draft was generated from.
         const verdict = await verifyGrounding({ pairs, question: probe.question, answer: reply })
         const errored = isVerifierFailsafe(verdict)
         if (errored) {
@@ -605,8 +643,21 @@ export async function runCoverage(params: {
           verifierErrored: errored,
         })
 
-        return { basis: verdict.basis, errored }
+        // JSON-safe on purpose: this value crosses the Inngest step boundary.
+        return {
+          basis:           verdict.basis,
+          errored,
+          retrievalCalled: selection.retrievalCalled,
+          retrievalMethod: selection.method,
+        }
       })
+
+      if (out.retrievalCalled) retrievalCalls++
+      // A probe whose retrieval fell back measured the pre-2026-09-10 layer,
+      // not the one the route would send. Counted, carried on the result, and
+      // written to the run row, so a run of fallbacks can never be read as a
+      // measurement of retrieval.
+      if (out.retrievalMethod === 'fallback_quality') retrievalFallbacks++
 
       const result: ProbeResult = {
         probeKey:        probe.key,
@@ -639,8 +690,17 @@ export async function runCoverage(params: {
         runId, ok: false, complete: false, offLabel,
         error: hardError ?? 'no probe results',
         rollups: [] as DomainRollup[], results,
+        retrievalCalls, retrievalFallbacks,
       }
     }
+
+    // A retrieval fallback is not a probe failure, so it does not touch
+    // `complete`. It is recorded in `error` so the run row itself says the map
+    // was not measured on the retrieval path, rather than only the console.
+    const fallbackNote = retrievalFallbacks > 0
+      ? `retrieval fell back to quality order on ${retrievalFallbacks} of ${results.length} probes`
+      : null
+    const runError = hardError ?? fallbackNote
 
     const prior = await store.readPriorCoverage(archiveId)
 
@@ -677,15 +737,17 @@ export async function runCoverage(params: {
       runId,
       finishedAt:      now,
       complete,
-      error:           hardError,
+      error:           runError,
       probesTotal:     results.length,
       probesDeposit:   results.filter(r => !r.verifierErrored && r.basis === 'deposit').length,
       probesOverreach: results.filter(r => !r.verifierErrored && r.basis === 'unsupported').length,
       probesDeclined:  results.filter(r => !r.verifierErrored && r.basis === 'no_position').length,
       probesErrored:   results.filter(r =>  r.verifierErrored).length,
-      modelCalls:      results.length * 2,
+      // Voice plus verifier per probe, plus one retrieval call per probe that
+      // made one. Under the cap the third term is zero and this is what it was.
+      modelCalls:      results.length * 2 + retrievalCalls,
     })
 
-    return { runId, ok: true, complete, offLabel, error: hardError, rollups, results }
+    return { runId, ok: true, complete, offLabel, error: runError, rollups, results, retrievalCalls, retrievalFallbacks }
   })
 }

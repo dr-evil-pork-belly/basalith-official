@@ -5,6 +5,7 @@ import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { verifyGrounding, groundingGapReply } from '@/lib/verifyGrounding'
 import { logGroundingGap } from '@/lib/groundingGapLog'
 import { buildEntitySystemPrompt, formatFingerprintSection, EMPTY_CONTEXT } from '@/lib/entitySystemPrompt'
+import { selectFrozenLayer, describeSelection, FROZEN_LAYER_CANDIDATE_LIMIT } from '@/lib/frozenLayer'
 
 const anthropic = new Anthropic()
 
@@ -59,6 +60,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
   }
 
+  // The whole included corpus, in quality order, is the candidate set. The
+  // frozen layer the entity sees is selected from it per question below. Until
+  // 2026-09-10 this query ended in .limit(20), which sent the same twenty rows
+  // to every question regardless of topic. See lib/frozenLayer.ts.
   const [archiveResult, trainingResult, contextsResult] = await Promise.all([
     supabaseAdmin
       .from('archives')
@@ -67,11 +72,15 @@ export async function POST(req: NextRequest) {
       .single(),
     supabaseAdmin
       .from('training_pairs')
-      .select('prompt, completion')
+      .select('id, prompt, completion')
       .eq('archive_id', archiveId)
       .eq('included_in_training', true)
       .order('quality_score', { ascending: false })
-      .limit(20),
+      // quality_score is an integer, so ties are the common case. The second
+      // key makes the candidate order reproducible across turns, which is what
+      // lets the retriever's prompt cache hit.
+      .order('id', { ascending: true })
+      .limit(FROZEN_LAYER_CANDIDATE_LIMIT),
     supabaseAdmin
       .from('successor_contexts')
       .select('content, context_type, created_at')
@@ -79,9 +88,9 @@ export async function POST(req: NextRequest) {
       .order('created_at', { ascending: false }),
   ])
 
-  const archive  = archiveResult.data
-  const pairs    = trainingResult.data ?? []
-  const contexts = contextsResult.data ?? []
+  const archive    = archiveResult.data
+  const candidates = trainingResult.data ?? []
+  const contexts   = contextsResult.data ?? []
 
   if (!archive) {
     return NextResponse.json({ error: 'Archive not found' }, { status: 404 })
@@ -89,6 +98,21 @@ export async function POST(req: NextRequest) {
 
   const ownerName   = archive.owner_name ?? archive.name
   const archiveName = archive.name
+
+  // The question is the last user turn. Earlier user turns ride along as
+  // retrieval context only, so a follow-up still selects against the thread.
+  const userTurns = messages
+    .filter(m => m.role === 'user')
+    .map(m => messageText(m.content))
+  const lastUserMessage = userTurns[userTurns.length - 1] ?? ''
+  const priorQuestions  = userTurns.slice(0, -1)
+
+  // Select the frozen layer for THIS question. At or under the cap this returns
+  // every pair with no model call. Over the cap it retrieves, and on any
+  // retrieval failure it degrades to the pre-2026-09-10 quality-order layer.
+  const selection = await selectFrozenLayer({ question: lastUserMessage, priorQuestions, candidates })
+  const pairs     = selection.pairs
+  console.log(`[succession-entity] ${archiveId} ${describeSelection(selection)}`)
 
   const fingerprintSection = formatFingerprintSection(pairs)
 
@@ -109,13 +133,14 @@ export async function POST(req: NextRequest) {
 
   let reply = aiResponse.content[0].type === 'text' ? aiResponse.content[0].text : ''
 
-  // Control B — output-side grounding verifier. The whole draft is in hand here
+  // Control B, output-side grounding verifier. The whole draft is in hand here
   // (non-streamed), so audit it before it ships. If the draft commits a founder
   // position the frozen deposits do not directly support, replace it with the
   // templated honest gap rather than putting words in the founder's mouth.
-  const lastUserMessage = messageText(
-    [...messages].reverse().find(m => m.role === 'user')?.content
-  )
+  //
+  // `pairs` is the SAME selected layer the entity was shown, not the whole
+  // corpus. "Checked against the archive" therefore describes exactly what the
+  // entity had in front of it.
   const verdict = await verifyGrounding({ pairs, question: lastUserMessage, answer: reply })
 
   // Grounding gap log (Slice A). Every non-'deposit' verdict is a question the
