@@ -8,8 +8,14 @@ const SECTIONS = [
     num:   '01',
     title: 'The Service',
     body: [
-      'Basalith is a personal legacy preservation service operated by Heritage Nexus Inc. ("we", "us", "the Company"). By creating an archive or submitting an application, you ("the Subscriber") agree to be bound by these Terms of Service in their entirety.',
-      'Basalith provides a governed digital archive infrastructure, including secure storage, family contributor tools, AI-assisted Essence Mapping, and Digital Clone access, as described in the service tier documentation current at the time of your Founding.',
+      // REVISED 2026-09-10: the two sentences below previously described a
+      // "personal legacy preservation service" offering "AI-assisted Essence
+      // Mapping" and "Digital Clone access". Those product terms were retired
+      // from every other surface months ago, and the business product was not
+      // covered at all. Wording aligned to the live product; no change to the
+      // legal substance of the section.
+      'Basalith is a service that captures how a person reasons and decides, for individuals and families and for businesses changing hands. It is operated by Heritage Nexus Inc. ("we", "us", "the Company"). By creating an archive or submitting an application, you ("the Subscriber") agree to be bound by these Terms of Service in their entirety.',
+      'Basalith provides a governed digital archive, including secure storage, contributor tools, guided capture sessions, and access to the cognitive reference model (the "entity") built from your archive, as described in the pricing and service documentation current at the time of your Founding.',
       // REMOVED 2026-08-12: two sentences that referred the Subscriber to a
       // "separate Basalith agreement, executed at the time of your Founding" for
       // ownership, governance, and continuity, and gave that document precedence
@@ -31,9 +37,17 @@ const SECTIONS = [
     num:   '02',
     title: 'Payment Terms',
     body: [
-      'All Basalith archives require a one-time Founding fee, currently $2,500, due at the commencement of your archive. The Founding fee covers initial archive architecture, legal framework configuration, and your first Essence Mapping session. It is non-refundable once The Founding process has commenced.',
-      'Following The Founding, archives are maintained on an annual subscription basis at the rate applicable to your chosen tier: The Archive ($1,200/year), The Estate ($3,600/year), or The Dynasty ($9,600/year). Prices are denominated in US dollars and are exclusive of any taxes, duties, or levies that may apply in your jurisdiction.',
-      'Annual subscriptions are billed on the anniversary of your Founding date. Payment is processed by Stripe. Your Family Trust, estate entity, or personal account may be designated as the billing party at any time.',
+      // REVISED 2026-09-10: the Founding fee previously read "currently $2,500"
+      // with no business figure, and the tier sentence named "The Archive
+      // ($1,200/year), The Estate ($3,600/year), or The Dynasty ($9,600/year)",
+      // none of which exist. Figures below match /pricing on the same date.
+      // "Essence Mapping session" became "Founding Session". The acquisition
+      // sentence is new, because /pricing publishes that floor and the Terms
+      // were silent on it. Monthly billing and its 12-month minimum are stated
+      // because /pricing offers them.
+      'All Basalith archives require a one-time Founding fee, due at the commencement of your archive: currently $2,500 for an individual or family archive and $5,000 for a business succession archive. The Founding fee covers initial archive architecture, legal framework configuration, and your first Founding Session. It is non-refundable once The Founding process has commenced. Business acquisition engagements are priced per transaction, starting at $50,000, and are invoiced separately under a written engagement rather than under the subscription terms below.',
+      'Following The Founding, archives are maintained on a subscription basis at the rate applicable to your chosen plan. Individual and family plans: Active ($3,600 per year, or $360 per month), Resting ($600 per year, or $60 per month), and Legacy ($1,200 per year, billed annually). Business succession: $12,000 per year, with post-transition successor access at $3,600 per year. Monthly plans carry a 12-month minimum commitment. Prices are denominated in US dollars and are exclusive of any taxes, duties, or levies that may apply in your jurisdiction.',
+      'Annual subscriptions are billed on the anniversary of your Founding date. Monthly subscriptions are billed monthly from that date. Payment is processed by Stripe. Your Family Trust, estate entity, or personal account may be designated as the billing party at any time.',
       'Invoices are issued 14 days before each renewal date. If payment is not received, your archive moves to Resting status. Your content is preserved in full during Resting, and your entity remains intact. Active features are suspended until payment resumes. We do not delete an archive for non-payment. Permanent deletion occurs only through the deliberate process described in the Cancellation section below.',
     ],
   },
@@ -54,7 +68,7 @@ const SECTIONS = [
       'To the maximum extent permitted by applicable law, Heritage Nexus Inc. shall not be liable for any indirect, incidental, consequential, punitive, or special damages arising from or related to your use of the Basalith service, including but not limited to loss of data, loss of business, or loss of anticipated savings, even if we have been advised of the possibility of such damages.',
       'Our total aggregate liability to you for any claim arising out of or in connection with these Terms or the service shall not exceed the total fees paid by you to Heritage Nexus Inc. in the twelve months preceding the event giving rise to the claim.',
       'Nothing in these Terms excludes or limits our liability for death or personal injury caused by our negligence, fraud, or any other liability that cannot be excluded or limited by law.',
-      'Basalith is a data preservation and archival service. We make no representation that the Digital Clone or AI Presence features constitute a legally recognized representation of any person for the purposes of any legal proceeding, estate administration, or contractual obligation.',
+      'Basalith is a data preservation and archival service. We make no representation that the entity, or any output of the cognitive reference model built from your archive, constitutes a legally recognized representation of any person for the purposes of any legal proceeding, estate administration, or contractual obligation.',
     ],
   },
   {
@@ -158,7 +172,7 @@ export default function TermsPage() {
               These terms govern your use of the Basalith service in full, including your archive.
             </p>
             <p className="font-sans text-[0.75rem] text-text-muted mt-6">
-              Last updated: August 2026 &nbsp;·&nbsp; Governing law: {GOVERNING_STATE}
+              Last updated: September 2026 &nbsp;·&nbsp; Governing law: {GOVERNING_STATE}
             </p>
           </div>
         </section>

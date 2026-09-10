@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title:       'The Asset',
-  description: 'The your archive, the Digital Clone, the archive itself. The most valuable thing you own is not on your balance sheet.',
+  description: 'The most valuable thing you own is not on your balance sheet. It is the way you think. A Basalith archive is built to be owned, inherited, and named in your estate plan.',
 }
 
 const eyebrow: React.CSSProperties = {
@@ -80,31 +80,30 @@ export default function AssetPage() {
 
           <div style={divider} />
 
-          <h2 style={h2}>The your archive.</h2>
+          <h2 style={h2}>The archive.</h2>
           <p style={body}>
             Every photograph labeled by the people who were present when it was taken. Every story
-            preserved in the voice of the person who lived it. Every decade of a life documented
-            by the family that witnessed it.
+            kept in the voice of the person who lived it. Every decade of a life recorded
+            by the family that watched it happen.
           </p>
           <p style={body}>
-            The result is the most accurate record of a human life ever assembled. Not a curated
-            highlight reel. The actual texture of a specific life: the hard years, the ordinary
-            years, the years that defined everything that came after.
+            Not a highlight reel. The actual texture of a specific life: the hard years, the ordinary
+            years, the years that decided everything that came after.
           </p>
 
-          <h2 style={h2}>The Digital Clone.</h2>
+          <h2 style={h2}>The entity.</h2>
           <p style={body}>
-            An AI entity trained on the your archive. It speaks in the patterns of the person
-            it was built from. It carries their documented opinions, their specific memories,
-            their particular way of thinking about the world.
+            A cognitive reference model trained only on your archive. It answers in the patterns
+            of the person it was built from, carries the opinions and memories they recorded, and
+            holds their particular way of looking at the world.
           </p>
           <p style={body}>
-            It is not a simulation. It is a preservation of everything the archive contains
-            about how a specific person actually thought.
+            It is not a simulation of the person. It is a record of how they reasoned, built from
+            what they chose to deposit. Where they never took a position, it is built to say so.
           </p>
           <p style={body}>
-            Your grandchildren will be able to ask it questions. It will answer from decades of
-            documented wisdom. Not what you looked like. Not what you did. How you thought.
+            Your grandchildren can ask it questions, and it answers from what you actually said.
+            Not what you looked like. Not what you did. How you thought.
           </p>
 
           <h2 style={h2}>Every generation inherits the mind, not just the money.</h2>
@@ -139,10 +138,10 @@ export default function AssetPage() {
 
           <div style={{ textAlign: 'center', padding: '3rem 0' }}>
             <p style={{ ...body, fontStyle: 'italic', textAlign: 'center', marginBottom: '2rem' }}>
-              See the entity that lives at the center of every archive.
+              See how an archive is built, and what it will not do.
             </p>
             <a
-              href="https://basalith.ai"
+              href="/method"
               style={{
                 fontFamily:     "'Space Mono', monospace",
                 fontSize:       '0.44rem',
@@ -154,7 +153,7 @@ export default function AssetPage() {
                 marginBottom:   '1.5rem',
               }}
             >
-              Explore the AI Presence → basalith.ai
+              Read the method →
             </a>
             <a
               href="/pricing"
