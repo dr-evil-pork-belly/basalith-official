@@ -1,9 +1,51 @@
 # iOS app rebuild, 2026-09-08
 
 Runbook and record for the Basalith iOS app rebuild. Two repos changed:
-`basalith-app` (the whole app) and `basalith-official` (four files under
-`lib/auth` and `app/api`). Nothing is deployed or built yet. This document is
-the order of operations to get it to TestFlight.
+`basalith-app` (the whole app) and `basalith-official` (five files under
+`lib/auth` and `app/api`). Server deployed to production and the app signed
+in end to end on 2026-09-09. Section 0 records the one thing that went wrong
+between writing and shipping.
+
+## 0. What actually blocked the first three builds (read this first)
+
+The first production build launched to a pure black screen: no splash logo, no
+spinner, no crash log. Three rounds of JavaScript guards (module-load
+try/catch in `index.ts`, an error boundary, a session watchdog) changed
+nothing, because the failure was below all of them.
+
+A development client (`eas.json` profile `diagnose`: dev client, TestFlight
+distribution, Debug config) connected to Metro showed it in one line:
+
+    [runtime not ready]: Error: Cannot find native module 'ExpoAsset'
+
+Cause: `@expo/vector-icons` was added with the SDK 54 range `^15.0.3`. npm
+resolved 15.1.1, published for SDK 57, whose peer `expo-font >=14.0.4` pulled
+`expo-font@57.0.3` and `expo-asset@57.0.16` to the top of `node_modules`,
+above the SDK 54 copies `expo` itself depends on. The JavaScript from those
+two packages asks for a native `ExpoAsset` module the SDK 54 native build
+never produced. On the new architecture that is not a crash; the root view
+stays empty.
+
+Fix, in `package.json`: `@expo/vector-icons` pinned exactly to `15.0.3`, and
+`expo-asset ~12.0.13` and `expo-font ~14.0.12` added as direct dependencies
+so they win hoisting. `npm ls expo-asset expo-font` must show one version
+each, all deduped. Use `npm ci`, never a bare `npm install`, before a build.
+
+Lesson, general: `bundledNativeModules.json` ranges are not safe to install
+by range once the next SDK has shipped. Pin exact versions for anything with
+native code, and after any install run the mismatch scan:
+
+    for d in node_modules/expo-* node_modules/@expo/*; do
+      node -e "try{const v=require('./$d/package.json').version;if(/^5[5-9]\./.test(v))console.log('$d',v)}catch{}"
+    done
+
+Diagnostic path that worked, for next time: `eas build --profile diagnose`,
+install from TestFlight, `npx expo start --dev-client --tunnel`, scan the QR.
+The red screen on the phone is the answer. Expo Go cannot be used: the App
+Store Expo Go is SDK 57 and refuses SDK 54 projects.
+
+Second, smaller: the project's Supabase **Email OTP Length** was 8. The app
+expects 6. Changed to 6 in Authentication -> Sign In / Providers -> Email.
 
 ## 1. Why the app was dark
 
@@ -77,22 +119,24 @@ Project `zmoauexzjfjloqxrkuma`.
 
 1. Authentication -> Providers -> Email: enabled. "Confirm email" can stay
    as is. Nothing here creates users; `shouldCreateUser` is false in the app.
-2. Authentication -> Email Templates -> **Magic Link**. The web portal uses
-   `{{ .ConfirmationURL }}` and must keep working. Add the code to the same
+2. Authentication -> Emails -> **Magic link or OTP**. The web portal uses a
+   `token_hash` link (not `{{ .ConfirmationURL }}`) and must keep working. Add the code to the same
    template so one email serves both. Suggested body (no em dashes):
 
    ```html
-   <p>Your Basalith sign-in code is</p>
-   <p style="font-size:28px;letter-spacing:6px;font-family:monospace"><strong>{{ .Token }}</strong></p>
-   <p>Enter it in the Basalith app.</p>
-   <p>Signing in on the web instead? <a href="{{ .ConfirmationURL }}">Open your archive</a>.</p>
+   <h2 style="font-family:Georgia,serif;font-weight:400;color:#0A0908">Your Basalith sign-in code</h2>
+   <p style="font-size:32px;letter-spacing:8px;font-family:Menlo,Courier,monospace;font-weight:700;color:#0A0908">{{ .Token }}</p>
+   <p style="font-family:Georgia,serif;color:#4A4640">Enter it in the Basalith app.</p>
+   <p style="font-family:Georgia,serif;color:#4A4640">Signing in on the web instead? <a href="{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=email" style="color:#8A6E30">Open your archive</a>.</p>
    ```
 
-   Subject: `Your Basalith sign-in code`.
-3. Authentication -> Rate Limits: leave the defaults unless the seed
+   Subject: `Your Basalith sign-in code`. Applied 2026-09-09.
+3. Authentication -> Sign In / Providers -> Email -> **Email OTP Length: 6**
+   (was 8). Applied 2026-09-09.
+4. Authentication -> Rate Limits: leave the defaults unless the seed
    families report "too many attempts". The app enforces a 30 second resend
    cooldown on its side.
-4. Authentication -> URL Configuration: no change. The app does not use
+5. Authentication -> URL Configuration: no change. The app does not use
    redirect URLs (OTP is verified in-app with `verifyOtp`).
 
 `signInWithOtp` with `shouldCreateUser: false` returns an error for an
