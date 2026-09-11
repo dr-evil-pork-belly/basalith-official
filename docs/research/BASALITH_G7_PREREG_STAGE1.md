@@ -1,5 +1,6 @@
-OSF Registration: https://osf.io/pvw26 (registered September 2, 2026)
+OSF Registration: https://osf.io/25srd (registered September 2, 2026)
 DOI: [pending issuance]
+OSF Project (deviation log and materials): https://osf.io/pvw26
 
 # Template Contamination in Honesty Instructions
 
