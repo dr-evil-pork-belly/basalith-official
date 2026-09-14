@@ -26,8 +26,15 @@ judgment transfers rather than disappearing. The company is Heritage Nexus Inc.
 - basalith.life is the lifestyle brand (the 135 mentality).
 
 Primary market is B2B: knowledge transfer when a business changes hands, by
-acquisition or succession. Secondary is B2C: individuals and families, sold through
-Legacy Guides. The engine is the same. The lifecycle shape is not.
+acquisition or succession. Secondary is B2C: individuals and families. The engine is
+the same. The lifecycle shape is not.
+
+Sales are founder-led. There is no contractor sales force and the public site no
+longer describes one (September 14, 2026). The Guide portal under `/archivist/*` and
+`/guide-onboard` remains as internal, gated tooling. Advisors (CPAs, exit planners,
+attorneys) are a referral and partner channel, reached through the "Partnering as an
+advisor" topic on /contact. Do not reintroduce Guide recruiting copy or a "sold
+through Legacy Guides" framing anywhere public.
 
 **The customer is a living, capable person making a proactive decision.** The trigger
 is agency, not crisis and not bereavement. Never import loss or grief framing into
@@ -403,7 +410,9 @@ regressions here are not theoretical.
   supercharge, game-changer.
 - No "Golden Dataset." Say "your archive."
 - "Legacy Guide," never "Archivist," in anything user-facing. The route may still be
-  `/archivist-login`, but the copy says Legacy Guide.
+  `/archivist-login`, but the copy says Legacy Guide. As of September 14, 2026 the
+  public site does not name the role at all; delivery copy says "led in person" or
+  names the founder. The term survives only inside the gated Guide portal.
 - Locked tagline, always exactly two lines, never one, never three:
   > You never truly leave
   > if you leave enough of yourself behind.
@@ -450,8 +459,8 @@ A change is done when all of these hold.
 
 - The pasted output shows it working, not a claim that it works.
 - The relevant regression gate is green.
-- It works for a non-technical seventy year old on an iPad, and a Legacy Guide could
-  explain it to a prospect in thirty seconds.
+- It works for a non-technical seventy year old on an iPad, and it could be explained
+  to a prospect in thirty seconds.
 - It exposes no data it should not.
 - It breaks nothing that was working.
 - Any copy in it passes section 8.

@@ -12,7 +12,7 @@ const ITEMS: Item[] = [
     q: 'What exactly is The Founding?',
     a: <>
       The Founding is the one-time fee that sets up your archive: the archive structure, a review of your
-      existing estate or succession documents, and your first guided session with a Legacy Guide. You pay
+      existing estate or succession documents, and your first guided session, led in person. You pay
       it once, at the start. Your annual plan begins after The Founding is complete.
       {' '}<a href="/founding-session" style={{ color: '#C4A24A', textDecoration: 'none' }}>
         What happens in a Founding Session →

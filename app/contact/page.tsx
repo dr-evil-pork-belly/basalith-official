@@ -10,7 +10,7 @@ type Status = 'idle' | 'loading' | 'success' | 'error'
 const INTENTS: { value: Intent; label: string }[] = [
   { value: 'general', label: 'A question about Basalith' },
   { value: 'pricing', label: 'Pricing'                   },
-  { value: 'partner', label: 'Becoming a Legacy Guide'   },
+  { value: 'partner', label: 'Partnering as an advisor (CPA, exit planner, attorney)' },
   { value: 'press',   label: 'Press'                     },
 ]
 

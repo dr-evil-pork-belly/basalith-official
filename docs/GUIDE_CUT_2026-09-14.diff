@@ -1,0 +1,483 @@
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -26,8 +26,15 @@
+ - basalith.life is the lifestyle brand (the 135 mentality).
+ 
+ Primary market is B2B: knowledge transfer when a business changes hands, by
+-acquisition or succession. Secondary is B2C: individuals and families, sold through
+-Legacy Guides. The engine is the same. The lifecycle shape is not.
++acquisition or succession. Secondary is B2C: individuals and families. The engine is
++the same. The lifecycle shape is not.
++
++Sales are founder-led. There is no contractor sales force and the public site no
++longer describes one (September 14, 2026). The Guide portal under `/archivist/*` and
++`/guide-onboard` remains as internal, gated tooling. Advisors (CPAs, exit planners,
++attorneys) are a referral and partner channel, reached through the "Partnering as an
++advisor" topic on /contact. Do not reintroduce Guide recruiting copy or a "sold
++through Legacy Guides" framing anywhere public.
+ 
+ **The customer is a living, capable person making a proactive decision.** The trigger
+ is agency, not crisis and not bereavement. Never import loss or grief framing into
+@@ -403,7 +410,9 @@
+   supercharge, game-changer.
+ - No "Golden Dataset." Say "your archive."
+ - "Legacy Guide," never "Archivist," in anything user-facing. The route may still be
+-  `/archivist-login`, but the copy says Legacy Guide.
++  `/archivist-login`, but the copy says Legacy Guide. As of September 14, 2026 the
++  public site does not name the role at all; delivery copy says "led in person" or
++  names the founder. The term survives only inside the gated Guide portal.
+ - Locked tagline, always exactly two lines, never one, never three:
+   > You never truly leave
+   > if you leave enough of yourself behind.
+@@ -450,8 +459,8 @@
+ 
+ - The pasted output shows it working, not a claim that it works.
+ - The relevant regression gate is green.
+-- It works for a non-technical seventy year old on an iPad, and a Legacy Guide could
+-  explain it to a prospect in thirty seconds.
++- It works for a non-technical seventy year old on an iPad, and it could be explained
++  to a prospect in thirty seconds.
+ - It exposes no data it should not.
+ - It breaks nothing that was working.
+ - Any copy in it passes section 8.
+--- a/app/about/page.tsx
++++ b/app/about/page.tsx
+@@ -232,18 +232,23 @@
+           </div>
+         </section>
+ 
+-        {/* Section 4 — Legacy Guides */}
++        {/* Section 4. Who runs the Founding Session. Rewritten September 14,
++            2026 when the Legacy Guide recruiting surface was retired. This
++            states the founder-led delivery that is true today. The day
++            someone other than the founder runs a Founding Session, this
++            section changes. */}
+         <section style={{ background: 'var(--color-void)', padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,80px)' }}>
+           <div style={{ maxWidth: '680px', margin: '0 auto' }}>
+             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '24px' }}>
+-              The Legacy Guides
++              Who runs it
+             </p>
+-            <h2 style={{ ...H2, color: 'rgba(250,248,244,0.9)' }}>The people who make this real.</h2>
++            <h2 style={{ ...H2, color: 'rgba(250,248,244,0.9)' }}>Every archive is opened in person.</h2>
+             <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>
+-              Every archive is opened by a Legacy Guide, a trained person who runs
+-              the Founding Session and stays with the archive as it grows.
++              The founder of Basalith runs every Founding Session today. One person
++              in the room, listening to how the operator decides, and staying with
++              the archive as it grows.
+             </p>
+-            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>The technology handles the complexity. The Guide handles the humanity.</p>
++            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>The technology handles the complexity. A person handles the rest.</p>
+             <p style={{ ...BODY, color: 'rgba(250,248,244,0.85)', fontStyle: 'italic' }}>
+               Every archive is a relationship, not a subscription.
+             </p>
+--- a/app/api/apply/route.ts
++++ b/app/api/apply/route.ts
+@@ -150,7 +150,7 @@
+ 
+           <div style="margin-top: 40px; padding: 16px; background: #fffbf0; border-left: 3px solid #C4A24A;">
+             <p style="font-family: monospace; font-size: 11px; color: #888; margin: 0 0 6px; text-transform: uppercase; letter-spacing: 0.15em;">Next Step</p>
+-            <p style="margin: 0; font-size: 14px; color: #333;">Reply to this email to approve and assign a Legacy Guide. Your reply goes directly to ${name} at ${email}.</p>
++            <p style="margin: 0; font-size: 14px; color: #333;">Reply to this email to approve and schedule the Founding Session. Your reply goes directly to ${name} at ${email}.</p>
+           </div>
+         </div>
+       `,
+--- a/app/apply/ApplyForm.tsx
++++ b/app/apply/ApplyForm.tsx
+@@ -107,8 +107,8 @@
+               </h1>
+               <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--color-text-secondary)', lineHeight: 1.9, maxWidth: '420px', margin: '0 auto 32px' }}>
+                 {isBusiness
+-                  ? 'A Legacy Guide will contact you within 48 hours to talk through the transition and tell you plainly whether Basalith fits.'
+-                  : <>We read every application ourselves. If your archive is a good fit, you will hear from us within 48 hours with next steps and your Legacy Guide.<br /><br />If it is not a fit, we will not chase you.</>}
++                  ? 'We will contact you within 48 hours to talk through the transition and tell you plainly whether Basalith fits.'
++                  : <>We read every application ourselves. If your archive is a good fit, you will hear from us within 48 hours with next steps.<br /><br />If it is not a fit, we will not chase you.</>}
+               </p>
+               <p style={{ ...MONO, fontSize: '0.48rem', color: 'var(--color-gold)' }}>Basalith · Heritage Nexus Inc.</p>
+             </div>
+@@ -140,7 +140,7 @@
+ 
+               {isBusiness && (
+                 <p style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: 'var(--color-text-secondary)', marginBottom: '40px' }}>
+-                  A few details and a Legacy Guide will contact you within 48 hours. No deck, no pitch. A conversation about the transition and whether this fits.
++                  A few details and we will contact you within 48 hours. No deck, no pitch. A conversation about the transition and whether this fits.
+                 </p>
+               )}
+ 
+@@ -229,8 +229,7 @@
+                   <select id="apply-source" required value={form.referralSource} onChange={set('referralSource')}
+                     className="apply-input" style={{ ...INPUT, cursor: 'pointer', appearance: 'none' as const }}>
+                     <option value="" disabled>Select one</option>
+-                    <option>Referred by a Legacy Guide</option>
+-                    <option>Referred by an attorney or advisor</option>
++                    <option>Referred by my CPA, attorney, or advisor</option>
+                     <option>Found online</option>
+                     <option>Referred by a friend or family member</option>
+                     <option>Other</option>
+--- a/app/apply/page.tsx
++++ b/app/apply/page.tsx
+@@ -3,7 +3,7 @@
+ 
+ export const metadata: Metadata = {
+   title: 'Apply · Basalith',
+-  description: 'Apply to begin a Basalith archive, for a person, a family, or a business changing hands. A Legacy Guide replies within 48 hours.',
++  description: 'Apply to begin a Basalith archive, for a person, a family, or a business changing hands. We reply within 48 hours.',
+ }
+ 
+ // searchParams is a Promise in Next 16. It was typed and read as a plain
+--- a/app/components/PricingFAQ.tsx
++++ b/app/components/PricingFAQ.tsx
+@@ -12,7 +12,7 @@
+     q: 'What exactly is The Founding?',
+     a: <>
+       The Founding is the one-time fee that sets up your archive: the archive structure, a review of your
+-      existing estate or succession documents, and your first guided session with a Legacy Guide. You pay
++      existing estate or succession documents, and your first guided session, led in person. You pay
+       it once, at the start. Your annual plan begins after The Founding is complete.
+       {' '}<a href="/founding-session" style={{ color: '#C4A24A', textDecoration: 'none' }}>
+         What happens in a Founding Session →
+--- a/app/components/PricingTiers.tsx
++++ b/app/components/PricingTiers.tsx
+@@ -92,9 +92,9 @@
+       'Archive storage and security',
+       'Full export in open formats, any time',
+     ],
+-    cta:     'Ask Your Legacy Guide',
+-    ctaHref: '/apply',
+-    note:    'Arranged through your Legacy Guide or estate. Annual billing only.',
++    cta:     'Ask About Legacy',
++    ctaHref: '/contact',
++    note:    'Arranged with us directly, or through your estate. Annual billing only.',
+   },
+ ]
+ 
+--- a/app/contact/page.tsx
++++ b/app/contact/page.tsx
+@@ -10,7 +10,7 @@
+ const INTENTS: { value: Intent; label: string }[] = [
+   { value: 'general', label: 'A question about Basalith' },
+   { value: 'pricing', label: 'Pricing'                   },
+-  { value: 'partner', label: 'Becoming a Legacy Guide'   },
++  { value: 'partner', label: 'Partnering as an advisor (CPA, exit planner, attorney)' },
+   { value: 'press',   label: 'Press'                     },
+ ]
+ 
+--- a/app/families/page.tsx
++++ b/app/families/page.tsx
+@@ -46,7 +46,7 @@
+   {
+     n:     '01',
+     title: 'The Founding.',
+-    body:  'A 90-minute guided session with a Legacy Guide. Not an interview. A conversation about how they think, and the first deposit in the archive.',
++    body:  'A 90-minute session, led in person. Not an interview. A conversation about how they think, and the first deposit in the archive.',
+   },
+   {
+     n:     '02',
+--- a/app/faq/page.tsx
++++ b/app/faq/page.tsx
+@@ -24,7 +24,7 @@
+   {
+     q: 'How does it work?',
+     a: <>
+-      It starts with a Founding Session with a Legacy Guide. From there the archive grows through guided questions, real scenarios, voice recordings, photographs, and contributions from the people around them. Every deposit is scored before it can shape the model.
++      It starts with a Founding Session, led in person. From there the archive grows through guided questions, real scenarios, voice recordings, photographs, and contributions from the people around them. Every deposit is scored before it can shape the model.
+       {' '}<a href="/method" style={LINK}>Read the method &rarr;</a>
+     </>,
+   },
+@@ -79,7 +79,7 @@
+   },
+   {
+     q: 'How do I begin?',
+-    a: 'Apply. We review every application ourselves, and a Legacy Guide will be in touch within 48 hours to schedule your Founding Session.',
++    a: 'Apply. We review every application ourselves and will be in touch within 48 hours to schedule your Founding Session.',
+   },
+ ]
+ 
+@@ -193,7 +193,7 @@
+             >
+               Still have a question? Ask it in the application.
+               <br />
+-              Your Legacy Guide will answer it before your Founding Session.
++              We will answer it before your Founding Session.
+             </p>
+             <a
+               href="/apply"
+--- a/app/founding-session/page.tsx
++++ b/app/founding-session/page.tsx
+@@ -5,7 +5,7 @@
+ 
+ export const metadata: Metadata = {
+   title:       'The Founding Session · Basalith',
+-  description: 'Every Basalith archive begins with a Founding Session. A Legacy Guide sits with you, not to interview you, but to start listening to how you think.',
++  description: 'Every Basalith archive begins with a Founding Session. The founder of Basalith sits with you, not to interview you, but to start listening to how you think.',
+ }
+ 
+ const SERIF: React.CSSProperties = {
+@@ -58,7 +58,7 @@
+           </p>
+ 
+           <p style={P}>
+-            Your Legacy Guide sits with you.
++            The founder of Basalith sits with you.
+             <br />
+             Not to interview you.
+             <br />
+--- a/app/join-archivists/layout.tsx
++++ b/app/join-archivists/layout.tsx
+@@ -1,5 +1,7 @@
+-import type { Metadata } from 'next'
+-export const metadata: Metadata = { title: 'Become a Legacy Guide' }
+-export default function Layout({ children }: { children: React.ReactNode }) {
+-  return <>{children}</>
++// This route is a permanent redirect to /contact (see page.tsx). The layout
++// carries no metadata so the retired "Become a Legacy Guide" title cannot
++// surface anywhere. The whole directory can be deleted once the redirect has
++// lived long enough for held links to expire.
++export default function JoinArchivistsLayout({ children }: { children: React.ReactNode }) {
++  return children
+ }
+--- a/app/join-archivists/page.tsx
++++ b/app/join-archivists/page.tsx
+@@ -1,150 +1,11 @@
+-import Link   from 'next/link'
+-import Nav    from '../components/Nav'
+-import Footer from '../components/Footer'
+-import type { Metadata } from 'next'
+-
+-export const metadata: Metadata = {
+-  title:       'Become a Legacy Guide · Basalith',
+-  description: 'Legacy Guides open Basalith archives for founders and families. Read what the work is, how it pays, and how to tell us about yourself.',
+-}
+-
+-// The interest form that used to live here posted to /api/archivist-interest,
+-// which persisted nothing and notified nobody while still reporting success.
+-// Rather than show a form that goes nowhere, this page now routes prospective
+-// Guides to /contact (topic: Becoming a Legacy Guide), which does reach us.
+-// Restore a form here only once a handler exists that actually stores and
+-// notifies.
+-
+-const SERIF: React.CSSProperties = { fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)' }
+-const MONO: React.CSSProperties  = { fontFamily: 'var(--font-space-mono, "Space Mono", "Courier New", monospace)', textTransform: 'uppercase' as const, letterSpacing: '0.28em' }
+-
+-const P: React.CSSProperties = {
+-  ...SERIF,
+-  fontWeight:   300,
+-  fontSize:     '1.1rem',
+-  lineHeight:   1.9,
+-  color:        'var(--color-text-secondary)',
+-  marginBottom: '20px',
+-}
+-
+-export default function JoinArchivistsPage() {
+-  return (
+-    <>
+-      <Nav />
+-      <main style={{ background: 'var(--color-bg)' }}>
+-        <section style={{ padding: 'clamp(140px,16vw,180px) clamp(24px,6vw,80px) clamp(80px,10vw,120px)' }} aria-label="Become a Legacy Guide">
+-          <div style={{ maxWidth: '640px', margin: '0 auto' }}>
+-
+-            <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '28px' }}>
+-              Legacy Guides
+-            </p>
+-
+-            <h1
+-              style={{
+-                ...SERIF,
+-                fontWeight:    300,
+-                fontSize:      'clamp(2rem,5vw,3.5rem)',
+-                color:         'var(--color-text-primary)',
+-                lineHeight:    1.15,
+-                letterSpacing: '-0.025em',
+-                marginBottom:  '56px',
+-              }}
+-            >
+-              You will be the reason
+-              <br />
+-              someone never has to wonder.
+-            </h1>
+-
+-            <p style={P}>
+-              The hardest conversation
+-              <br />
+-              is the one that starts with:
+-            </p>
+-
+-            <p
+-              style={{
+-                ...SERIF,
+-                fontWeight:   300,
+-                fontSize:     '1.2rem',
+-                fontStyle:    'italic',
+-                lineHeight:   1.9,
+-                color:        'var(--color-gold)',
+-                marginBottom: '28px',
+-              }}
+-            >
+-              &ldquo;I should have done this sooner.&rdquo;
+-            </p>
+-
+-            <p style={P}>
+-              A Legacy Guide starts that conversation
+-              <br />
+-              before it becomes regret.
+-            </p>
+-
+-            <p style={P}>
+-              You find the people who understand what is at stake.
+-              <br />
+-              A founder a year from stepping back.
+-              <br />
+-              A family whose parent still has the sharpest mind in the room.
+-              <br />
+-              You sit with them. You help them begin.
+-            </p>
+-
+-            <div
+-              aria-hidden="true"
+-              style={{ width: '40px', height: '1px', background: 'var(--color-gold)', margin: '40px 0' }}
+-            />
+-
+-            <p style={P}>
+-              The pay reflects the work.
+-              <br />
+-              A share of every Founding Session you run.
+-              <br />
+-              A residual on every archive you open.
+-              <br />
+-              The numbers are shared during onboarding.
+-            </p>
+-
+-            <div
+-              aria-hidden="true"
+-              style={{ width: '40px', height: '1px', background: 'var(--color-border)', margin: '40px 0' }}
+-            />
+-
+-            <p style={P}>
+-              But the work is something else.
+-            </p>
+-
+-            <p style={{ ...P, marginBottom: '48px' }}>
+-              You give people something
+-              <br />
+-              they did not know was possible.
+-              <br />
+-              The chance to never have to wonder.
+-            </p>
+-
+-            <Link
+-              href="/contact"
+-              style={{
+-                ...MONO,
+-                fontSize:       'var(--text-caption)',
+-                display:        'inline-block',
+-                background:     'var(--color-gold)',
+-                color:          '#0A0908',
+-                textDecoration: 'none',
+-                padding:        '14px 32px',
+-                borderRadius:   'var(--radius-sm)',
+-              }}
+-            >
+-              Tell us about yourself
+-            </Link>
+-            <p style={{ ...SERIF, fontStyle: 'italic', fontWeight: 300, fontSize: '0.95rem', color: 'var(--color-text-muted)', lineHeight: 1.8, marginTop: '20px' }}>
+-              Choose &ldquo;Becoming a Legacy Guide,&rdquo; and tell us your background and why. We read every one ourselves, and we reply if there is a fit.
+-            </p>
+-          </div>
+-        </section>
+-      </main>
+-      <Footer />
+-    </>
+-  )
+-}
++import { permanentRedirect } from 'next/navigation'
++
++// Retired September 14, 2026. Basalith does not recruit independent
++// contractors to sell archives, so the public recruiting page is gone. The URL
++// is kept as a permanent redirect so held links do not 404. Advisors who want
++// to work with Basalith use the "Partnering as an advisor" topic on /contact.
++// Do not restore a recruiting page here. If a certified delivery role ever
++// exists, it gets its own page under a name that does not carry "archivist."
++export default function JoinArchivistsPage() {
++  permanentRedirect('/contact')
++}
+--- a/app/method/page.tsx
++++ b/app/method/page.tsx
+@@ -150,7 +150,7 @@
+           {/* CTA */}
+           <div style={{ textAlign: 'center', paddingTop: '32px', borderTop: '1px solid var(--color-border)' }}>
+             <p style={{ ...BODY, fontStyle: 'italic', textAlign: 'center' }}>
+-              Every archive begins with The Founding, a guided session with a Senior Legacy Guide.
++              Every archive begins with The Founding, a guided session led in person.
+             </p>
+             <a
+               href="/founding-session"
+--- a/app/partner/page.tsx
++++ b/app/partner/page.tsx
+@@ -1,10 +1,10 @@
+ import { redirect } from 'next/navigation'
+ 
+-// This used to land on /join-archivists. That form posts to
+-// /api/archivist-interest, which persists nothing and notifies nobody while
+-// still returning success, so the route is repointed until the handler is
+-// built. /partner is kept rather than deleted so held URLs do not 404.
+-// /partner/apply reaches this same redirect via /partner#apply.
++// This used to land on /join-archivists, which is itself a permanent redirect
++// to /contact as of September 14, 2026 (Guide recruiting retired). /partner is
++// kept rather than deleted so held URLs do not 404. /partner/apply reaches this
++// same redirect via /partner#apply. Advisors use the "Partnering as an advisor"
++// topic on /contact.
+ export default function PartnerPage() {
+   redirect('/contact')
+ }
+--- a/app/posthumous-archive/page.tsx
++++ b/app/posthumous-archive/page.tsx
+@@ -233,7 +233,7 @@
+   {
+     n:    '01',
+     name: 'Material Assessment',
+-    body: 'A Senior Legacy Guide reviews everything your family can provide: photographs, letters, documents, audio, video. We tell you honestly what we can build from it.',
++    body: 'We review everything your family can provide: photographs, letters, documents, audio, video. We tell you honestly what we can build from it.',
+   },
+   {
+     n:    '02',
+--- a/app/pricing/page.tsx
++++ b/app/pricing/page.tsx
+@@ -101,7 +101,7 @@
+   { n: '01', title: 'Archive Architecture Build',     desc: 'Your permanent archive structure, configured for transfer and long-term standing.' },
+   { n: '02', title: 'Document Compatibility Review',   desc: 'Assessment against your existing legal and succession documents. Attorney-ready output.' },
+   { n: '03', title: 'Contributor Network Setup',       desc: 'Onboarding for up to 15 contributors. Roles assigned. Access levels configured.' },
+-  { n: '04', title: 'Founding Session',                desc: 'Your first guided session, led by a Senior Legacy Guide. This is where it becomes real.' },
++  { n: '04', title: 'Founding Session',                desc: 'Your first guided session, led in person. This is where it becomes real.' },
+   { n: '05', title: 'Data Migration',                  desc: 'Your records filtered, deduplicated, dated, and sequenced before they reach the labeling interface.' },
+   { n: '06', title: 'Custodian Designation',           desc: "Your archive's custodian assigned and documented." },
+ ]
+@@ -324,7 +324,7 @@
+               <p style={{ marginBottom: '20px' }}>Every archive begins with a Founding Session.</p>
+               <p style={{ marginBottom: '20px' }}>
+                 For a business, the operator works through the decision frameworks that
+-                built the company, in an extended guided session with a Senior Legacy Guide.
++                built the company, in an extended session led in person.
+                 For an individual or a family, the session captures voice, values, and the
+                 particular way someone sees the world.
+               </p>
+@@ -357,7 +357,7 @@
+                   <p style={{ ...MONO, fontSize: '0.48rem', color: 'var(--color-gold)', marginBottom: '16px' }}>Business founding, one-time</p>
+                   <p style={{ ...SERIF, fontSize: '0.88rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.3)', lineHeight: 1.7 }}>
+                     Individual and family founding is $2,500. Annual plan selected separately.
+-                    Delivered by a Legacy Guide.
++                    Led in person.
+                   </p>
+                 </div>
+               </div>
+--- a/app/succession/page.tsx
++++ b/app/succession/page.tsx
+@@ -56,7 +56,7 @@
+   {
+     n:     '01',
+     title: 'The Founding.',
+-    body:  'An extended guided session with a Senior Legacy Guide. We start with the hardest calls the operator ever made and work outward to the frameworks they use every day.',
++    body:  'An extended session, led in person by the founder of Basalith. We start with the hardest calls the operator ever made and work outward to the frameworks they use every day.',
+   },
+   {
+     n:     '02',

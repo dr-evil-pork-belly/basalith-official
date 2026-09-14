@@ -5,7 +5,7 @@ import type { Metadata }  from 'next'
 
 export const metadata: Metadata = {
   title:       'The Founding Session · Basalith',
-  description: 'Every Basalith archive begins with a Founding Session. A Legacy Guide sits with you, not to interview you, but to start listening to how you think.',
+  description: 'Every Basalith archive begins with a Founding Session. The founder of Basalith sits with you, not to interview you, but to start listening to how you think.',
 }
 
 const SERIF: React.CSSProperties = {
@@ -58,7 +58,7 @@ export default function FoundingSessionPage() {
           </p>
 
           <p style={P}>
-            Your Legacy Guide sits with you.
+            The founder of Basalith sits with you.
             <br />
             Not to interview you.
             <br />

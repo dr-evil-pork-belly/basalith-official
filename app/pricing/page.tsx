@@ -101,7 +101,7 @@ const FOUNDING_DELIVERABLES = [
   { n: '01', title: 'Archive Architecture Build',     desc: 'Your permanent archive structure, configured for transfer and long-term standing.' },
   { n: '02', title: 'Document Compatibility Review',   desc: 'Assessment against your existing legal and succession documents. Attorney-ready output.' },
   { n: '03', title: 'Contributor Network Setup',       desc: 'Onboarding for up to 15 contributors. Roles assigned. Access levels configured.' },
-  { n: '04', title: 'Founding Session',                desc: 'Your first guided session, led by a Senior Legacy Guide. This is where it becomes real.' },
+  { n: '04', title: 'Founding Session',                desc: 'Your first guided session, led in person. This is where it becomes real.' },
   { n: '05', title: 'Data Migration',                  desc: 'Your records filtered, deduplicated, dated, and sequenced before they reach the labeling interface.' },
   { n: '06', title: 'Custodian Designation',           desc: "Your archive's custodian assigned and documented." },
 ]
@@ -324,7 +324,7 @@ export default function PricingPage() {
               <p style={{ marginBottom: '20px' }}>Every archive begins with a Founding Session.</p>
               <p style={{ marginBottom: '20px' }}>
                 For a business, the operator works through the decision frameworks that
-                built the company, in an extended guided session with a Senior Legacy Guide.
+                built the company, in an extended session led in person.
                 For an individual or a family, the session captures voice, values, and the
                 particular way someone sees the world.
               </p>
@@ -357,7 +357,7 @@ export default function PricingPage() {
                   <p style={{ ...MONO, fontSize: '0.48rem', color: 'var(--color-gold)', marginBottom: '16px' }}>Business founding, one-time</p>
                   <p style={{ ...SERIF, fontSize: '0.88rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.3)', lineHeight: 1.7 }}>
                     Individual and family founding is $2,500. Annual plan selected separately.
-                    Delivered by a Legacy Guide.
+                    Led in person.
                   </p>
                 </div>
               </div>

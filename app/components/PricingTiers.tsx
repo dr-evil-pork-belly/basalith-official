@@ -92,9 +92,9 @@ const TIERS: Tier[] = [
       'Archive storage and security',
       'Full export in open formats, any time',
     ],
-    cta:     'Ask Your Legacy Guide',
-    ctaHref: '/apply',
-    note:    'Arranged through your Legacy Guide or estate. Annual billing only.',
+    cta:     'Ask About Legacy',
+    ctaHref: '/contact',
+    note:    'Arranged with us directly, or through your estate. Annual billing only.',
   },
 ]
 

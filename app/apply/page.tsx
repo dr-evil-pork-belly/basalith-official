@@ -3,7 +3,7 @@ import ApplyForm from './ApplyForm'
 
 export const metadata: Metadata = {
   title: 'Apply · Basalith',
-  description: 'Apply to begin a Basalith archive, for a person, a family, or a business changing hands. A Legacy Guide replies within 48 hours.',
+  description: 'Apply to begin a Basalith archive, for a person, a family, or a business changing hands. We reply within 48 hours.',
 }
 
 // searchParams is a Promise in Next 16. It was typed and read as a plain

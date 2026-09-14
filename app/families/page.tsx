@@ -46,7 +46,7 @@ const STEPS = [
   {
     n:     '01',
     title: 'The Founding.',
-    body:  'A 90-minute guided session with a Legacy Guide. Not an interview. A conversation about how they think, and the first deposit in the archive.',
+    body:  'A 90-minute session, led in person. Not an interview. A conversation about how they think, and the first deposit in the archive.',
   },
   {
     n:     '02',

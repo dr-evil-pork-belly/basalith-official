@@ -232,18 +232,23 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* Section 4 — Legacy Guides */}
+        {/* Section 4. Who runs the Founding Session. Rewritten September 14,
+            2026 when the Legacy Guide recruiting surface was retired. This
+            states the founder-led delivery that is true today. The day
+            someone other than the founder runs a Founding Session, this
+            section changes. */}
         <section style={{ background: 'var(--color-void)', padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,80px)' }}>
           <div style={{ maxWidth: '680px', margin: '0 auto' }}>
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '24px' }}>
-              The Legacy Guides
+              Who runs it
             </p>
-            <h2 style={{ ...H2, color: 'rgba(250,248,244,0.9)' }}>The people who make this real.</h2>
+            <h2 style={{ ...H2, color: 'rgba(250,248,244,0.9)' }}>Every archive is opened in person.</h2>
             <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>
-              Every archive is opened by a Legacy Guide, a trained person who runs
-              the Founding Session and stays with the archive as it grows.
+              The founder of Basalith runs every Founding Session today. One person
+              in the room, listening to how the operator decides, and staying with
+              the archive as it grows.
             </p>
-            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>The technology handles the complexity. The Guide handles the humanity.</p>
+            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>The technology handles the complexity. A person handles the rest.</p>
             <p style={{ ...BODY, color: 'rgba(250,248,244,0.85)', fontStyle: 'italic' }}>
               Every archive is a relationship, not a subscription.
             </p>

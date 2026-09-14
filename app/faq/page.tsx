@@ -24,7 +24,7 @@ const QA: { q: string; a: React.ReactNode }[] = [
   {
     q: 'How does it work?',
     a: <>
-      It starts with a Founding Session with a Legacy Guide. From there the archive grows through guided questions, real scenarios, voice recordings, photographs, and contributions from the people around them. Every deposit is scored before it can shape the model.
+      It starts with a Founding Session, led in person. From there the archive grows through guided questions, real scenarios, voice recordings, photographs, and contributions from the people around them. Every deposit is scored before it can shape the model.
       {' '}<a href="/method" style={LINK}>Read the method &rarr;</a>
     </>,
   },
@@ -79,7 +79,7 @@ const QA: { q: string; a: React.ReactNode }[] = [
   },
   {
     q: 'How do I begin?',
-    a: 'Apply. We review every application ourselves, and a Legacy Guide will be in touch within 48 hours to schedule your Founding Session.',
+    a: 'Apply. We review every application ourselves and will be in touch within 48 hours to schedule your Founding Session.',
   },
 ]
 
@@ -193,7 +193,7 @@ export default function FAQPage() {
             >
               Still have a question? Ask it in the application.
               <br />
-              Your Legacy Guide will answer it before your Founding Session.
+              We will answer it before your Founding Session.
             </p>
             <a
               href="/apply"

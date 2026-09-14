@@ -56,7 +56,7 @@ const HANDOFF = [
   {
     n:     '01',
     title: 'The Founding.',
-    body:  'An extended guided session with a Senior Legacy Guide. We start with the hardest calls the operator ever made and work outward to the frameworks they use every day.',
+    body:  'An extended session, led in person by the founder of Basalith. We start with the hardest calls the operator ever made and work outward to the frameworks they use every day.',
   },
   {
     n:     '02',
