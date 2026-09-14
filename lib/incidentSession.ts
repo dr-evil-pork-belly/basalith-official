@@ -91,6 +91,17 @@ export interface IncidentState {
   pendingQuestion?: string
   pendingProbeType?: ProbeType | 'SEED' | 'TIMELINE'
   pendingBranchIndex?: number
+  // Founding Sequence marker (lib/foundingSequence.ts). Present only on the
+  // three incidents that make up an archive's Founding Sequence. Rides the
+  // serialized state jsonb, so no schema change; the reducer never reads it
+  // and `clone` preserves it across every advance.
+  founding?: FoundingMarker
+}
+
+export interface FoundingMarker {
+  call: 1 | 2 | 3
+  scope: 'personal' | 'business'
+  startedAt: string
 }
 
 export interface IncidentSession {

@@ -25,6 +25,12 @@ export async function POST(req: NextRequest) {
     const audioFile       = formData.get('audio') as File
     const prompt          = formData.get('prompt') as string || ''
     const durationSeconds = parseInt(formData.get('duration') as string || '0')
+    // transcript_only: upload, record, and transcribe, but write NO deposit and
+    // NO training pairs. The caller (the Founding Sequence on /archive/founding)
+    // posts the transcript to /api/archive/b2b-question/answer, which is the
+    // single writer for interview deposits and links the recording by id.
+    // Default behavior (deposit + pairs) is unchanged for every other caller.
+    const transcriptOnly  = formData.get('mode') === 'transcript_only'
 
     if (!audioFile) {
       return NextResponse.json({ error: 'Missing audio' }, { status: 400 })
@@ -121,9 +127,9 @@ export async function POST(req: NextRequest) {
       })
       .eq('id', recording.id)
 
-    // If transcription succeeded, create a deposit
+    // If transcription succeeded, create a deposit (skipped in transcript_only)
     let depositId = null
-    if (transcript && transcript.length > 20) {
+    if (!transcriptOnly && transcript && transcript.length > 20) {
       const depositPrompt = prompt || 'Voice recording'
 
       const { data: deposit } = await supabaseAdmin
@@ -147,8 +153,8 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Training pairs from voice (fire-and-forget)
-    if (transcript && transcript.length > 50) {
+    // Training pairs from voice (fire-and-forget; skipped in transcript_only)
+    if (!transcriptOnly && transcript && transcript.length > 50) {
       void Promise.resolve(supabaseAdmin.from('archives').select('owner_name, name, preferred_language').eq('id', archiveId).single())
         .then(({ data: arch }) => {
           if (!arch) return
@@ -169,6 +175,7 @@ export async function POST(req: NextRequest) {
       languageDetected,
       transcriptStatus:  transcript ? 'complete' : 'failed',
       depositCreated:    !!depositId,
+      transcriptOnly,
       durationSeconds,
     })
 

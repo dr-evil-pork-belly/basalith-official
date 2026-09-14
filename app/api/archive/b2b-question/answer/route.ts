@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse, after } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { createTrainingPairFromDeposit } from '@/lib/trainingPipeline'
@@ -17,15 +17,28 @@ import {
 import { classifyAnswer, parseTimeline } from '@/lib/incidentClassifier'
 import { checkSaturation } from '@/lib/incidentSaturation'
 import { renderProbe } from '@/lib/renderProbe'
+import { FOUNDING_CALLS, getFoundingStatus } from '@/lib/foundingSequence'
+import {
+  buildFoundingCompleteInternalEmail,
+  buildFoundingCompleteOwnerEmail,
+} from '@/lib/emails/foundingSequenceComplete'
+import { resend } from '@/lib/resend'
 
 export const dynamic = 'force-dynamic'
 
-// Saves a founder's web answer to the current incident probe and advances the
+// Saves an owner's web answer to the current incident probe and advances the
 // interview. archiveId is resolved from the session, never the client. The
 // deposit write + training pair are wrapped inside the incident turn cycle: the
 // reducer decides re-probe vs accept, and we write a deposit only on acceptance.
-// If no incident is open (defensive), we fall back to the prior single-question
-// save behavior unchanged.
+//
+// September 14, 2026: opened to every owner tier for the Founding Sequence
+// (/archive/founding, lib/foundingSequence.ts). The incident turn cycle is
+// tier-agnostic. The no-open-incident fallback below stays succession-only,
+// exactly as it was, so a personal archive can only write through an open
+// interview. Also: the post-response classify and training-pair writes now run
+// under after() instead of void/fire-and-forget, per the serverless rule in
+// CLAUDE.md section 1; and an optional recordingId links a transcript-only
+// voice recording to the deposit it became.
 export async function POST(req: NextRequest) {
   const session = await getSessionUser()
   if (!session?.archiveId) {
@@ -35,11 +48,11 @@ export async function POST(req: NextRequest) {
 
   const { data: archive } = await supabaseAdmin
     .from('archives')
-    .select('id, owner_user_id, tier, name, owner_name, preferred_language')
+    .select('id, owner_user_id, tier, name, owner_name, preferred_language, owner_email')
     .eq('id', archiveId)
     .maybeSingle()
 
-  if (!archive || archive.owner_user_id !== session.userId || archive.tier !== 'succession') {
+  if (!archive || archive.owner_user_id !== session.userId) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
@@ -51,6 +64,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Answer is required' }, { status: 400 })
   }
 
+  // Optional: a voice_recordings.id from /api/archive/transcribe-voice in
+  // transcript_only mode. Linked to the deposit below, scoped to this archive.
+  const recordingId = typeof body.recordingId === 'string' && /^[0-9a-f-]{36}$/i.test(body.recordingId)
+    ? body.recordingId
+    : null
+
   const ownerName = archive.owner_name ?? ''
   const archiveName = archive.name ?? ''
   const lang = archive.preferred_language ?? 'en'
@@ -58,6 +77,11 @@ export async function POST(req: NextRequest) {
   const incident = await loadOpenIncident(archiveId)
 
   // ── Fallback: no open incident → prior single-question save behavior ─────────
+  // Succession only, unchanged. Every other tier must answer through an open
+  // interview (the Founding Sequence opens one via /api/archive/founding/start).
+  if (!incident && archive.tier !== 'succession') {
+    return NextResponse.json({ error: 'No open interview' }, { status: 409 })
+  }
   if (!incident) {
     const b2bQuestionId = typeof body.b2bQuestionId === 'string' ? body.b2bQuestionId : null
     const questionText = typeof body.questionText === 'string' ? body.questionText.trim() : ''
@@ -81,8 +105,10 @@ export async function POST(req: NextRequest) {
         .eq('b2b_question_id', b2bQuestionId)
         .is('answered_deposit_id', null)
     }
-    void classifyDeposit({ depositId: deposit.id, archiveId, text: answer })
-    createTrainingPairFromDeposit(deposit, ownerName, archiveName, lang, 'owner').catch(() => {})
+    after(async () => {
+      try { await classifyDeposit({ depositId: deposit.id, archiveId, text: answer }) } catch {}
+      try { await createTrainingPairFromDeposit(deposit, ownerName, archiveName, lang, 'owner') } catch {}
+    })
     return NextResponse.json({ ok: true, depositId: deposit.id })
   }
 
@@ -161,10 +187,26 @@ export async function POST(req: NextRequest) {
         .is('answered_deposit_id', null)
     }
 
-    void classifyDeposit({ depositId: deposit.id, archiveId, text: answer })
+    // Link the voice recording this answer came from, if any. Scoped to this
+    // archive so a recordingId from another archive is a no-op.
+    if (recordingId) {
+      await supabaseAdmin
+        .from('voice_recordings')
+        .update({ deposit_id: deposit.id })
+        .eq('id', recordingId)
+        .eq('archive_id', archiveId)
+        .is('deposit_id', null)
+    }
+
     // Step 6: probe type rides into training_pairs.metadata.probe_type; the closed
     // coverage dimension (if any) rides alongside it as metadata.dimension.
-    createTrainingPairFromDeposit(deposit, ownerName, archiveName, lang, 'owner', probeType, dimensionTag).catch(() => {})
+    // Both run after the response under after(); void/fire-and-forget dies on
+    // lambda freeze (CLAUDE.md section 1).
+    const acceptedDeposit = deposit
+    after(async () => {
+      try { await classifyDeposit({ depositId: acceptedDeposit.id, archiveId, text: answer }) } catch {}
+      try { await createTrainingPairFromDeposit(acceptedDeposit, ownerName, archiveName, lang, 'owner', probeType, dimensionTag) } catch {}
+    })
 
     // Patch the depositId onto the just-answered ProbeRecord (the last appended).
     const recs = next.state.probeHistory
@@ -177,6 +219,55 @@ export async function POST(req: NextRequest) {
     next.state.pendingProbeType = undefined
     next.state.pendingBranchIndex = undefined
     await completeIncident(next)
+
+    // Founding Sequence: when the third founding call closes, tell the owner
+    // and the founder. Runs after the response. The owner email promises only
+    // the 48-hour reply the site already commits to.
+    if (next.state.founding && next.state.founding.call === FOUNDING_CALLS) {
+      const scope = next.state.founding.scope
+      const ownerEmail = (archive.owner_email as string | null) ?? null
+      after(async () => {
+        try {
+          const status = await getFoundingStatus(archiveId, archive.tier)
+          if (!status.done) return
+          const deposits = status.calls.reduce((n, c) => n + c.deposits, 0)
+          const { count } = await supabaseAdmin
+            .from('voice_recordings')
+            .select('id', { count: 'exact', head: true })
+            .eq('archive_id', archiveId)
+            .not('deposit_id', 'is', null)
+          const input = {
+            archiveName: archiveName || 'Basalith archive',
+            ownerName:   ownerName || null,
+            ownerEmail,
+            deposits,
+            voiceTurns:  count ?? 0,
+            scope,
+          }
+          const internal = buildFoundingCompleteInternalEmail(input)
+          const adminEmail = process.env.ADMIN_EMAIL ?? 'legacy@basalith.xyz'
+          await resend.emails.send({
+            from:    'Basalith <davidha@basalith.xyz>',
+            to:      Array.from(new Set(['mrdavidha@gmail.com', adminEmail])),
+            subject: internal.subject,
+            html:    internal.html,
+            text:    internal.text,
+          })
+          if (ownerEmail) {
+            const owner = buildFoundingCompleteOwnerEmail(input)
+            await resend.emails.send({
+              from:    `${archiveName || 'Basalith'} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
+              to:      ownerEmail,
+              subject: owner.subject,
+              html:    owner.html,
+              text:    owner.text,
+            })
+          }
+        } catch (err) {
+          console.error('[b2b-question/answer] founding complete notice failed:', err instanceof Error ? err.message : err)
+        }
+      })
+    }
   } else {
     const tensionForTradeoff =
       decision.probeType === 'TRADEOFF' ? next.state.tensions[next.state.spineCursor] : undefined
@@ -202,6 +293,8 @@ export async function POST(req: NextRequest) {
     answeredProbeType: probeType,
     reprobed: isReprobe,
     nextProbeType: decision.incidentComplete ? null : decision.probeType,
+    nextQuestion:  decision.incidentComplete ? null : (next.state.pendingQuestion ?? null),
+    founding:      next.state.founding ?? null,
     incidentComplete: decision.incidentComplete,
   })
 }

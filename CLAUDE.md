@@ -150,6 +150,14 @@ section 6 so nobody mistakes the gap for a fresh regression.
 
 ## 4. ARCHITECTURE, THE PARTS THAT MATTER
 
+**The Founding Sequence.** `lib/foundingSequence.ts`, `/archive/founding`. Three
+incident interviews (seeds in code, personal or business by tier) run through the
+incident engine below, replacing the live Founding Session. The marker rides
+`incident_sessions.state.founding`; no schema change. `/api/archive/founding/status`
+reads, `/founding/start` opens, `/api/archive/b2b-question/answer` advances (open to
+every owner tier since September 14, 2026). Runbook:
+`docs/FOUNDING_SEQUENCE_2026-09-14.md`.
+
 **Control B, the grounding verifier.** `lib/verifyGrounding.ts`. A separate auditor call
 that refuses any founder position not directly supported by a deposit. It is the
 central integrity mechanism, live in production on the succession entity chat route.

@@ -22,6 +22,7 @@ type NavItem = { href: string; label: string; hideForSuccession?: boolean }
 
 const PRIMARY_NAV: NavItem[] = [
   { href: '/archive/dashboard',         label: 'Dashboard'        },
+  { href: '/archive/founding',          label: 'Founding Sequence' },
   { href: '/archive/label',             label: 'Upload Photos',   hideForSuccession: true },
   { href: '/archive/gallery',           label: 'Gallery',         hideForSuccession: true },
   { href: '/archive/timeline',          label: 'Life Timeline',   hideForSuccession: true },

@@ -6,6 +6,7 @@ import { calculateArchiveScore } from '@/lib/archiveScore'
 import OnboardingGuide from '@/app/components/OnboardingGuide'
 import TrainingDataCard from './TrainingDataCard'
 import SuccessionDashboard from './SuccessionDashboard'
+import FoundingBanner from '../components/FoundingBanner'
 
 // ── Accuracy types ──────────────────────────────────────────────────────────
 type DimensionResult = {
@@ -1409,6 +1410,9 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
           </>
         )}
       </div>
+
+      {/* ── FOUNDING SEQUENCE (until complete) ── */}
+      {!loading && <FoundingBanner />}
 
       {/* ── PAUSED ARCHIVE BANNER ── */}
       {!loading && archive?.status === 'paused' && (

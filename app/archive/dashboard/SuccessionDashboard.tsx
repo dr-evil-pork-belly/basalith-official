@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { B2B_DOMAINS } from '@/lib/b2bDomains'
+import FoundingBanner from '../components/FoundingBanner'
 
 type ReadinessDomain = { domainId: number; answered: number; total: number }
 type Readiness       = { domains: ReadinessDomain[]; overall: { answered: number; total: number } }
@@ -116,6 +117,9 @@ export default function SuccessionDashboard({
           </p>
         )}
       </div>
+
+      {/* ── FOUNDING SEQUENCE (until complete) ── */}
+      <FoundingBanner />
 
       {/* ── CAPTURE PANEL ── */}
       <div
