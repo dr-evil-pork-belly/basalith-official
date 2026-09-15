@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { B2B_DOMAINS } from '@/lib/b2bDomains'
 import FoundingBanner from '../components/FoundingBanner'
+import CoverageMap from '../components/CoverageMap'
 
 type ReadinessDomain = { domainId: number; answered: number; total: number }
 type Readiness       = { domains: ReadinessDomain[]; overall: { answered: number; total: number } }
@@ -89,9 +89,6 @@ export default function SuccessionDashboard({
     : readiness
       ? `${readiness.overall.answered} of ${readiness.overall.total} answered across 8 domains`
       : ''
-
-  const answeredByDomain = new Map<number, ReadinessDomain>()
-  for (const d of readiness?.domains ?? []) answeredByDomain.set(d.domainId, d)
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -203,56 +200,14 @@ export default function SuccessionDashboard({
         )}
       </div>
 
-      {/* ── READINESS MAP ── */}
-      <div
-        className="rounded-sm mb-10"
-        style={{ background: '#111112', border: '1px solid rgba(255,255,255,0.06)', padding: 'clamp(1.5rem,4vw,2rem)' }}
-      >
-        <div className="flex items-baseline justify-between gap-4" style={{ marginBottom: '1.75rem' }}>
-          <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.52rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#5C6166' }}>
-            Judgment Coverage
-          </p>
-          {readiness && (
-            <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.48rem', letterSpacing: '0.1em', color: 'rgba(196,162,74,0.8)' }}>
-              {readiness.overall.answered} of {readiness.overall.total} answered across 8 domains
-            </p>
-          )}
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2" style={{ rowGap: '1.5rem', columnGap: '2.5rem' }}>
-          {B2B_DOMAINS.map(domain => {
-            const r        = answeredByDomain.get(domain.domainId)
-            const answered = r?.answered ?? 0
-            const total    = r?.total ?? 0
-            const pct      = total > 0 ? Math.min(100, Math.round((answered / total) * 100)) : 0
-            return (
-              <div key={domain.domainId}>
-                <div className="flex items-baseline justify-between gap-3" style={{ marginBottom: '0.5rem' }}>
-                  <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontSize: '1.15rem', fontWeight: 400, color: '#F0EDE6' }}>
-                    {domain.name}
-                  </p>
-                  <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.46rem', letterSpacing: '0.08em', color: answered > 0 ? 'rgba(196,162,74,0.8)' : '#3A3F44', whiteSpace: 'nowrap' }}>
-                    {answered} / {total}
-                  </p>
-                </div>
-                <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontSize: '0.92rem', color: '#706C65', lineHeight: 1.5, marginBottom: '0.6rem' }}>
-                  {domain.description}
-                </p>
-                <div style={{ height: '6px', borderRadius: '3px', background: 'rgba(255,255,255,0.05)', overflow: 'hidden' }}>
-                  <div
-                    className="transition-all duration-500"
-                    style={{
-                      height:     '100%',
-                      width:      `${pct}%`,
-                      background: answered > 0 ? 'rgba(196,162,74,0.55)' : 'transparent',
-                    }}
-                  />
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </div>
+      {/* ── COVERAGE MAP ──
+          Replaces the question-count "Judgment Coverage" grid (September 15,
+          2026). That grid counted questions answered per domain and drew a bar
+          from the ratio, which read as coverage and was not: answering a
+          question is not the entity holding a grounded position on it. The map
+          below is measured by probing the entity and reading the verifier. The
+          answered count survives, as the factual subline under the greeting. */}
+      <CoverageMap />
 
     </div>
   )

@@ -23,6 +23,7 @@ import {
   buildFoundingCompleteOwnerEmail,
 } from '@/lib/emails/foundingSequenceComplete'
 import { resend } from '@/lib/resend'
+import { inngest } from '@/lib/inngest'
 
 export const dynamic = 'force-dynamic'
 
@@ -280,6 +281,23 @@ export async function POST(req: NextRequest) {
           }
         } catch (err) {
           console.error('[b2b-question/answer] founding complete notice failed:', err instanceof Error ? err.message : err)
+        }
+
+        // First coverage reading, succession archives only. The business probe
+        // set is off-label against a personal archive and an off-label run is
+        // never shown to a customer, so a personal archive gets no run here.
+        // The Inngest function is idempotent on archiveId and the monthly
+        // sweep re-reads the map from here on. A failed send is logged and
+        // costs nothing: the sweep picks the archive up on the third.
+        if (archive.tier === 'succession') {
+          try {
+            await inngest.send({
+              name: 'coverage.run.requested',
+              data: { archiveId, triggerSource: 'manual' },
+            })
+          } catch (err) {
+            console.error('[b2b-question/answer] coverage run request failed:', err instanceof Error ? err.message : err)
+          }
         }
       })
     }

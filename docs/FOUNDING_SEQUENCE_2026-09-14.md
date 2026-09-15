@@ -216,3 +216,78 @@ Show me. Expect one gold panel (your call opener, the entity's answer, your
 deposit under it) and one plain panel (a question you never answered, declined
 in the entity's words or the templated gap reply). Paste the response JSON if
 either half is missing.
+
+---
+
+## Addendum, September 15: the coverage map, rendered to the owner
+
+Third of the four follow-ups. The map itself shipped August 17 as an internal
+instrument (`lib/coverage.ts`, `lib/coverageRun.ts`, the Inngest function
+`computeCoverage` and its monthly sweep). This slice puts a read of it in
+front of the owner and computes nothing new.
+
+**What renders.** `app/archive/components/CoverageMap.tsx` on the succession
+dashboard, in place of the "Judgment Coverage" grid. That grid counted
+questions answered per domain and drew a bar from the ratio, which read as
+coverage and was not. The count of questions answered survives as the factual
+subline under the greeting. The new block leads with the count the state doc
+asked for, "4 of 6 questions here got a grounded answer," one line per domain
+in dashboard order, the state word as coarse sorting only, the overreach line
+where it applies, `OVERREACH_EXPLAINER` once under the grid, and the
+temperature caveat verbatim: the map reads the entity's most likely answer, a
+successor gets a live one. No archive-level score, no percentage, no bar. Six
+marks per domain, filled per grounded probe, are the only graphic.
+
+**What serves it.** `GET /api/archive/coverage`, owner only, archiveId from
+the session. `lib/coverageOwner.ts` reads `archive_coverage` and the run row
+it points to, labels everything server side (so the client never imports
+`lib/coverage.ts`, which would pull the 48 probe questions into a customer
+bundle), and returns `available: false` with a reason for anything that must
+not render: a personal archive (`not_succession`), an off-label run
+(`off_label`), or no run yet (`no_reading`). The component renders nothing at
+all for the first two and a "No reading yet" line for the third.
+
+**Denominator.** `archive_coverage.probes_total` is already the usable count;
+`rollUpRun` sets it to the probes whose verdict was not discarded and carries
+`probes_errored` beside it. The owner sees "4 of 5" on a domain that ran six
+and discarded one. The first draft of `coverageOwner.ts` subtracted errored
+twice; the test now pins the right shape.
+
+**Trigger.** When the third founding call closes on a succession archive,
+`/answer` sends `coverage.run.requested` with `triggerSource: 'manual'`
+inside the same `after()` as the completion emails. Personal archives get no
+send: the business probe set is off-label there and an off-label run is never
+shown. The function is idempotent on archiveId, so a duplicate send collapses,
+and the monthly sweep (the third, 06:00 UTC) re-reads from then on. A failed
+send is logged and the sweep covers it.
+
+**Not done, on purpose.** A personal probe set. The owner said his life is one
+mural with no business and personal boundary, which argues for one taxonomy
+rather than a second set. That is a founder decision with its own cycle, and
+until it is made a personal archive shows no map. The `backed` threshold stays
+at 6 of 6 (uncalibrated, see the state doc), so in practice domains read
+"Partly backed" or "Nothing here yet" and the count carries the signal, as
+designed.
+
+Tests: `lib/coverageOwner.test.ts` (4), including the copy-rule scan over
+every owner-visible string. Full local suite 21 green.
+
+Preview check: sign in on the Founder Test Archive, open the dashboard. If a
+run exists you get the grid with counts; if not, "No reading yet." Then paste:
+
+    select domain, state, overreach, probes_deposit, probes_total,
+           probes_errored, damped, probe_set_version, computed_at
+    from archive_coverage
+    where archive_id = '6c0722d3-719a-423f-9024-621ba0072d6f'
+    order by domain;
+
+    select id, trigger_source, off_label, complete, ok, finished_at
+    from coverage_runs
+    where archive_id = '6c0722d3-719a-423f-9024-621ba0072d6f'
+    order by started_at desc limit 3;
+
+The counts on screen must match `probes_deposit` of `probes_total` row for
+row. After a founding completion on a succession archive, the second query
+should show a new row with `trigger_source = 'manual'` within a few minutes;
+if it does not, check the Inngest app page first (CLAUDE.md section 6, the
+sync trap).
