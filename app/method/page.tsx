@@ -150,7 +150,7 @@ export default function MethodPage() {
           {/* CTA */}
           <div style={{ textAlign: 'center', paddingTop: '32px', borderTop: '1px solid var(--color-border)' }}>
             <p style={{ ...BODY, fontStyle: 'italic', textAlign: 'center' }}>
-              Every archive begins with The Founding, a guided session led in person.
+              Every archive begins with The Founding: three of the hardest calls you ever made, in your own words, then a first read with the founder by video.
             </p>
             <a
               href="/founding-session"

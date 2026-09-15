@@ -46,7 +46,7 @@ const STEPS = [
   {
     n:     '01',
     title: 'The Founding.',
-    body:  'A 90-minute session, led in person. Not an interview. A conversation about how they think, and the first deposit in the archive.',
+    body:  'Three of the hardest calls they ever made, in their own words, in their own time. Speak or type, about ten minutes each. Not an interview. The first deposits in the archive, and the way they think, already showing.',
   },
   {
     n:     '02',

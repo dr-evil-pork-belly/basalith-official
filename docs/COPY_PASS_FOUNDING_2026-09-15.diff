@@ -1,0 +1,443 @@
+--- a/app/families/page.tsx
++++ b/app/families/page.tsx
+@@ -46,7 +46,7 @@
+   {
+     n:     '01',
+     title: 'The Founding.',
+-    body:  'A 90-minute session, led in person. Not an interview. A conversation about how they think, and the first deposit in the archive.',
++    body:  'Three of the hardest calls they ever made, in their own words, in their own time. Speak or type, about ten minutes each. Not an interview. The first deposits in the archive, and the way they think, already showing.',
+   },
+   {
+     n:     '02',
+--- a/app/founding-session/page.tsx
++++ b/app/founding-session/page.tsx
+@@ -4,8 +4,8 @@
+ import type { Metadata }  from 'next'
+ 
+ export const metadata: Metadata = {
+-  title:       'The Founding Session · Basalith',
+-  description: 'Every Basalith archive begins with a Founding Session. The founder of Basalith sits with you, not to interview you, but to start listening to how you think.',
++  title:       'The Founding · Basalith',
++  description: 'Every Basalith archive begins with The Founding: three of the hardest calls you ever made, in your own words, in your own time. Then a first read with the founder of Basalith, by video.',
+ }
+ 
+ const SERIF: React.CSSProperties = {
+@@ -50,25 +50,27 @@
+           </h1>
+ 
+           <p style={P}>
+-            The Founding Session is where the archive starts.
++            The Founding is where the archive starts.
+             <br />
+-            For a person, it is 90 minutes.
++            Three of the hardest calls you ever made.
+             <br />
+-            For a business, it runs longer, because the first thing we capture is the hardest calls the operator ever made.
++            For a business, the hardest calls the operator ever made running it.
+           </p>
+ 
+           <p style={P}>
+-            The founder of Basalith sits with you.
++            You take them in your own time, in your own words.
+             <br />
+-            Not to interview you.
++            Speak or type. About ten minutes each.
+             <br />
+-            To start listening to how you think.
++            Stop whenever you like and come back; every answer is saved as you go.
+           </p>
+ 
+           <p style={P}>
+-            What you say matters.
++            Each call starts with one question.
+             <br />
+-            How you say it matters more.
++            The next few follow what you say: what tipped it, where it stops, who was in the room, how sure you were.
++            <br />
++            What you say matters. How you say it matters more.
+           </p>
+ 
+           <div
+@@ -77,19 +79,19 @@
+           />
+ 
+           <p style={P}>
+-            The session lays the foundation
++            When the three calls are in, the founder of Basalith reads every word.
+             <br />
+-            of your entity.
++            Within 48 hours we set up your first read: a short video call to walk through what your archive holds, where it is still thin, and what comes next.
+             <br />
+-            Everything that follows builds on it.
++            For a business, one more session by video, with your successor in the room, working through those calls together.
+           </p>
+ 
+           <p style={{ ...P, marginBottom: '56px' }}>
+-            Come ready to talk. About anything.
+-            <br />
+             Nothing you say has to be important.
+             <br />
+             The ordinary things are usually the ones that show how you think.
++            <br />
++            Everything that follows builds on this.
+           </p>
+ 
+           <a
+@@ -107,7 +109,7 @@
+               borderRadius:  'var(--radius-sm)',
+             }}
+           >
+-            Request a Founding Session
++            Begin your archive
+           </a>
+         </section>
+ 
+@@ -124,7 +126,7 @@
+             style={{ width: '40px', height: '1px', background: 'var(--color-gold)', margin: '0 0 40px' }}
+           />
+           <p style={{ ...P }}>
+-            After the session, the people around you start adding what they remember. It works because we took the friction out.
++            After the three calls, the people around you start adding what they remember. It works because we took the friction out.
+           </p>
+           <p style={{ ...P }}>
+             Your contributors never log in, never remember a password, never learn a new interface.
+--- a/app/succession/page.tsx
++++ b/app/succession/page.tsx
+@@ -56,7 +56,7 @@
+   {
+     n:     '01',
+     title: 'The Founding.',
+-    body:  'An extended session, led in person by the founder of Basalith. We start with the hardest calls the operator ever made and work outward to the frameworks they use every day.',
++    body:  'Three of the hardest calls the operator ever made running the business, in their own words, in their own time. Then one live session by video, with the successor in the room, working through those calls together.',
+   },
+   {
+     n:     '02',
+@@ -99,7 +99,7 @@
+ ]
+ 
+ const FEATURES = [
+-  'Extended 3-hour founding session',
++  'The Founding, with a live successor session by video',
+   'Business decision framework capture',
+   '20+ scenario training library',
+   'Successor access portal',
+@@ -458,7 +458,7 @@
+                 per year
+               </p>
+               <p style={{ ...GEORGIA, fontSize: '0.95rem', fontStyle: 'italic', color: 'var(--color-gold)', marginBottom: '32px' }}>
+-                + $5,000 founding session (one-time)
++                + $5,000 Founding (one-time)
+               </p>
+ 
+               <div style={{ height: '1px', background: 'rgba(196,162,74,0.15)', marginBottom: '28px' }} />
+@@ -472,7 +472,7 @@
+               </div>
+ 
+               <p style={{ ...GEORGIA, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-secondary)', marginBottom: '28px' }}>
+-                Every engagement begins with a founding session. Tell us about the transition and we will tell you whether Basalith fits.
++                Every engagement begins with The Founding. Tell us about the transition and we will tell you whether Basalith fits.
+               </p>
+ 
+               <Link
+--- a/app/pricing/page.tsx
++++ b/app/pricing/page.tsx
+@@ -7,7 +7,7 @@
+ 
+ export const metadata: Metadata = {
+   title: 'Pricing · Basalith',
+-  description: 'Basalith pricing, in full. Succession at $12,000 a year plus a one-time founding session. Acquisition engagements from $50,000. Individual and family archives from $2,500 to begin.',
++  description: 'Basalith pricing, in full. Succession at $12,000 a year plus a one-time Founding fee. Acquisition engagements from $50,000. Individual and family archives from $2,500 to begin.',
+ }
+ 
+ const MONO: React.CSSProperties = {
+@@ -98,12 +98,17 @@
+ }
+ 
+ const FOUNDING_DELIVERABLES = [
+-  { n: '01', title: 'Archive Architecture Build',     desc: 'Your permanent archive structure, configured for transfer and long-term standing.' },
+-  { n: '02', title: 'Document Compatibility Review',   desc: 'Assessment against your existing legal and succession documents. Attorney-ready output.' },
+-  { n: '03', title: 'Contributor Network Setup',       desc: 'Onboarding for up to 15 contributors. Roles assigned. Access levels configured.' },
+-  { n: '04', title: 'Founding Session',                desc: 'Your first guided session, led in person. This is where it becomes real.' },
+-  { n: '05', title: 'Data Migration',                  desc: 'Your records filtered, deduplicated, dated, and sequenced before they reach the labeling interface.' },
+-  { n: '06', title: 'Custodian Designation',           desc: "Your archive's custodian assigned and documented." },
++  // Rewritten September 15, 2026 to list what The Founding actually delivers.
++  // The prior list (document compatibility review, data migration, custodian
++  // designation) described steps with no mechanism behind them and was flagged
++  // as unverified in the September 8 pass. Nothing here is a promise the
++  // product or the founder does not keep today.
++  { n: '01', title: 'Your archive, opened',            desc: 'Your archive and your sign-in, ready the day you begin.' },
++  { n: '02', title: 'The Founding Sequence',           desc: 'Three of the hardest calls you ever made, in your own words, in your own time. Speak or type. This is where it becomes real.' },
++  { n: '03', title: 'The people around you',           desc: 'Contributors invited by email. They never need to log in.' },
++  { n: '04', title: 'What you already have',           desc: 'Documents, photographs, and recordings brought into the archive.' },
++  { n: '05', title: 'The first read',                  desc: 'A short video call with the founder of Basalith: what your archive holds, where it is still thin, and what comes next.' },
++  { n: '06', title: 'For a business, the successor',   desc: 'One live session by video with your successor in the room, working through the calls together.' },
+ ]
+ 
+ const TRUST_BADGES: { icon: IconName; label: string }[] = [
+@@ -121,7 +126,7 @@
+ ]
+ 
+ const SUCCESSION_FEATURES = [
+-  'Extended 3-hour founding session',
++  'The Founding, with a live successor session by video',
+   'Business decision framework capture',
+   '20+ scenario training library',
+   'Successor access portal',
+@@ -187,7 +192,7 @@
+               margin:     '0 auto',
+             }}
+           >
+-            Business engagements first. Individual and family plans below. Every archive begins with a founding session.
++            Business engagements first. Individual and family plans below. Every archive begins with The Founding.
+           </p>
+         </section>
+ 
+@@ -233,7 +238,7 @@
+               <p style={{ ...MONO, fontSize: '0.48rem', color: 'var(--color-gold)', marginBottom: '16px' }}>Succession</p>
+               <p style={{ ...SERIF, fontSize: 'clamp(2.5rem,5vw,3.2rem)', fontWeight: 300, color: 'rgba(250,248,244,0.92)', lineHeight: 1, marginBottom: '4px' }}>$12,000</p>
+               <p style={{ ...MONO, fontSize: '0.44rem', color: 'rgba(250,248,244,0.4)', marginBottom: '8px' }}>per year</p>
+-              <p style={{ ...SERIF, fontSize: '0.95rem', fontStyle: 'italic', color: 'var(--color-gold)', marginBottom: '28px' }}>+ $5,000 founding session (one-time)</p>
++              <p style={{ ...SERIF, fontSize: '0.95rem', fontStyle: 'italic', color: 'var(--color-gold)', marginBottom: '28px' }}>+ $5,000 Founding (one-time)</p>
+               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 20px', marginBottom: '32px' }}>
+                 {SUCCESSION_FEATURES.map(f => (
+                   <p key={f} style={{ ...MONO, fontSize: '0.43rem', color: 'rgba(250,248,244,0.5)', margin: 0 }}>&#10003; {f}</p>
+@@ -309,7 +314,7 @@
+             }}
+           >
+             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
+-              <p style={{ ...MONO, fontSize: '0.52rem', color: 'var(--color-gold)' }}>The Founding Session</p>
++              <p style={{ ...MONO, fontSize: '0.52rem', color: 'var(--color-gold)' }}>The Founding</p>
+               <svg width="32" height="32" viewBox="0 0 34 34" fill="none" aria-hidden="true" style={{ opacity: 0.5 }}>
+                 <polygon points="17,1 33,17 17,33 1,17" fill="none" stroke="#C4A24A" strokeWidth="1.4"/>
+                 <polygon points="17,7 27,17 17,27 7,17" fill="none" stroke="#C4A24A" strokeWidth="1.1"/>
+@@ -321,12 +326,12 @@
+               The Founding
+             </h2>
+             <div style={{ ...SERIF, fontSize: '1.05rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.45)', lineHeight: 1.8, marginBottom: '40px', maxWidth: '600px' }}>
+-              <p style={{ marginBottom: '20px' }}>Every archive begins with a Founding Session.</p>
++              <p style={{ marginBottom: '20px' }}>Every archive begins with The Founding.</p>
+               <p style={{ marginBottom: '20px' }}>
+-                For a business, the operator works through the decision frameworks that
+-                built the company, in an extended session led in person.
+-                For an individual or a family, the session captures voice, values, and the
+-                particular way someone sees the world.
++                Three of the hardest calls you ever made, in your own words, in your own
++                time. For a business, the hardest calls the operator made running it,
++                then one live session by video with the successor in the room. For an
++                individual or a family, the calls that show how someone sees the world.
+               </p>
+               <p style={{ marginBottom: '20px' }}>
+                 It is the foundation. Everything that follows builds on it.
+@@ -357,7 +362,7 @@
+                   <p style={{ ...MONO, fontSize: '0.48rem', color: 'var(--color-gold)', marginBottom: '16px' }}>Business founding, one-time</p>
+                   <p style={{ ...SERIF, fontSize: '0.88rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.3)', lineHeight: 1.7 }}>
+                     Individual and family founding is $2,500. Annual plan selected separately.
+-                    Led in person.
++                    Three calls in your own words, then a first read by video.
+                   </p>
+                 </div>
+               </div>
+@@ -365,7 +370,7 @@
+ 
+             <div style={{ display: 'flex', gap: '24px', marginTop: '40px', flexWrap: 'wrap' }}>
+               <a href="/founding-session" className="pricing-ghost-link" style={{ ...SERIF, fontSize: '0.9rem', fontStyle: 'italic', color: 'rgba(196,162,74,0.6)', textDecoration: 'none', transition: 'color 200ms ease' }}>
+-                What happens in a Founding session →
++                What happens in The Founding →
+               </a>
+             </div>
+           </div>
+--- a/app/components/PricingTiers.tsx
++++ b/app/components/PricingTiers.tsx
+@@ -167,7 +167,7 @@
+ 
+         {/* Founding fee — legible subhead, not a faint mono eyebrow */}
+         <p style={{ ...SERIF, fontSize: '1.05rem', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-primary)', marginBottom: '24px' }}>
+-          Every plan begins with a one-time $2,500 founding session.
++          Every plan begins with The Founding, a one-time $2,500 fee.
+         </p>
+ 
+         {/* Toggle — Annual / Monthly (Active + Resting only) */}
+--- a/app/components/PricingFAQ.tsx
++++ b/app/components/PricingFAQ.tsx
+@@ -11,11 +11,12 @@
+   {
+     q: 'What exactly is The Founding?',
+     a: <>
+-      The Founding is the one-time fee that sets up your archive: the archive structure, a review of your
+-      existing estate or succession documents, and your first guided session, led in person. You pay
+-      it once, at the start. Your annual plan begins after The Founding is complete.
++      The Founding is the one-time fee that opens your archive. It covers the Founding Sequence, three of
++      the hardest calls you ever made, in your own words and your own time, plus your contributors invited,
++      your records brought in, and a first read with the founder of Basalith by video. You pay it once, at
++      the start. Your annual plan begins after The Founding is complete.
+       {' '}<a href="/founding-session" style={{ color: '#C4A24A', textDecoration: 'none' }}>
+-        What happens in a Founding Session →
++        What happens in The Founding →
+       </a>
+     </>,
+   },
+--- a/app/faq/page.tsx
++++ b/app/faq/page.tsx
+@@ -24,7 +24,7 @@
+   {
+     q: 'How does it work?',
+     a: <>
+-      It starts with a Founding Session, led in person. From there the archive grows through guided questions, real scenarios, voice recordings, photographs, and contributions from the people around them. Every deposit is scored before it can shape the model.
++      It starts with The Founding: three of the hardest calls you ever made, in your own words, by voice or typed, in your own time, then a first read with the founder of Basalith by video. From there the archive grows through guided questions, real scenarios, voice recordings, photographs, and contributions from the people around them. Every deposit is scored before it can shape the model.
+       {' '}<a href="/method" style={LINK}>Read the method &rarr;</a>
+     </>,
+   },
+@@ -50,7 +50,7 @@
+   {
+     q: 'What does it cost?',
+     a: <>
+-      For a business succession, $12,000 a year plus a one-time $5,000 founding session. Acquisition engagements start at $50,000, scaled to the transaction. For individuals and families, a one-time $2,500 founding fee, then Active at $3,600 a year, Resting at $600 a year, or Legacy at $1,200 a year.
++      For a business succession, $12,000 a year plus a one-time $5,000 Founding fee. Acquisition engagements start at $50,000, scaled to the transaction. For individuals and families, a one-time $2,500 founding fee, then Active at $3,600 a year, Resting at $600 a year, or Legacy at $1,200 a year.
+       {' '}<a href="/pricing" style={LINK}>See pricing in full &rarr;</a>
+     </>,
+   },
+@@ -79,7 +79,7 @@
+   },
+   {
+     q: 'How do I begin?',
+-    a: 'Apply. We review every application ourselves and will be in touch within 48 hours to schedule your Founding Session.',
++    a: 'Apply. We review every application ourselves and will be in touch within 48 hours. Once your archive is open, The Founding starts whenever you are ready.',
+   },
+ ]
+ 
+@@ -193,7 +193,7 @@
+             >
+               Still have a question? Ask it in the application.
+               <br />
+-              We will answer it before your Founding Session.
++              We will answer it before you begin.
+             </p>
+             <a
+               href="/apply"
+--- a/app/method/page.tsx
++++ b/app/method/page.tsx
+@@ -150,7 +150,7 @@
+           {/* CTA */}
+           <div style={{ textAlign: 'center', paddingTop: '32px', borderTop: '1px solid var(--color-border)' }}>
+             <p style={{ ...BODY, fontStyle: 'italic', textAlign: 'center' }}>
+-              Every archive begins with The Founding, a guided session led in person.
++              Every archive begins with The Founding: three of the hardest calls you ever made, in your own words, then a first read with the founder by video.
+             </p>
+             <a
+               href="/founding-session"
+--- a/app/about/page.tsx
++++ b/app/about/page.tsx
+@@ -232,21 +232,21 @@
+           </div>
+         </section>
+ 
+-        {/* Section 4. Who runs the Founding Session. Rewritten September 14,
+-            2026 when the Legacy Guide recruiting surface was retired. This
+-            states the founder-led delivery that is true today. The day
+-            someone other than the founder runs a Founding Session, this
+-            section changes. */}
++        {/* Section 4. Who reads the archive. Rewritten September 14 and 15,
++            2026: the Guide recruiting surface was retired and the live
++            Founding Session became the Founding Sequence. This states the
++            founder-led read that is true today. The day someone other than
++            the founder reads a founding or runs a first read, this changes. */}
+         <section style={{ background: 'var(--color-void)', padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,80px)' }}>
+           <div style={{ maxWidth: '680px', margin: '0 auto' }}>
+             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '24px' }}>
+               Who runs it
+             </p>
+-            <h2 style={{ ...H2, color: 'rgba(250,248,244,0.9)' }}>Every archive is opened in person.</h2>
++            <h2 style={{ ...H2, color: 'rgba(250,248,244,0.9)' }}>Every archive is read by a person.</h2>
+             <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>
+-              The founder of Basalith runs every Founding Session today. One person
+-              in the room, listening to how the operator decides, and staying with
+-              the archive as it grows.
++              The founder of Basalith reads every Founding Sequence and runs every
++              first read himself today. One person, listening to how you decide,
++              and staying with the archive as it grows.
+             </p>
+             <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>The technology handles the complexity. A person handles the rest.</p>
+             <p style={{ ...BODY, color: 'rgba(250,248,244,0.85)', fontStyle: 'italic' }}>
+--- a/app/components/Footer.tsx
++++ b/app/components/Footer.tsx
+@@ -11,7 +11,7 @@
+       { label: 'Acquisition',              href: '/apply?type=acquisition' },
+       { label: 'Succession',               href: '/succession'             },
+       { label: 'Individuals and Families', href: '/families'               },
+-      { label: 'Founding Session',         href: '/founding-session'       },
++      { label: 'The Founding',             href: '/founding-session'       },
+       { label: 'Pricing',                  href: '/pricing'                },
+     ],
+   },
+--- a/app/terms/page.tsx
++++ b/app/terms/page.tsx
+@@ -45,7 +45,7 @@
+       // sentence is new, because /pricing publishes that floor and the Terms
+       // were silent on it. Monthly billing and its 12-month minimum are stated
+       // because /pricing offers them.
+-      'All Basalith archives require a one-time Founding fee, due at the commencement of your archive: currently $2,500 for an individual or family archive and $5,000 for a business succession archive. The Founding fee covers initial archive architecture, legal framework configuration, and your first Founding Session. It is non-refundable once The Founding process has commenced. Business acquisition engagements are priced per transaction, starting at $50,000, and are invoiced separately under a written engagement rather than under the subscription terms below.',
++      'All Basalith archives require a one-time Founding fee, due at the commencement of your archive: currently $2,500 for an individual or family archive and $5,000 for a business succession archive. The Founding fee covers initial archive architecture, legal framework configuration, and The Founding as described in the service documentation current at the time of your Founding. It is non-refundable once The Founding process has commenced. Business acquisition engagements are priced per transaction, starting at $50,000, and are invoiced separately under a written engagement rather than under the subscription terms below.',
+       'Following The Founding, archives are maintained on a subscription basis at the rate applicable to your chosen plan. Individual and family plans: Active ($3,600 per year, or $360 per month), Resting ($600 per year, or $60 per month), and Legacy ($1,200 per year, billed annually). Business succession: $12,000 per year, with post-transition successor access at $3,600 per year. Monthly plans carry a 12-month minimum commitment. Prices are denominated in US dollars and are exclusive of any taxes, duties, or levies that may apply in your jurisdiction.',
+       'Annual subscriptions are billed on the anniversary of your Founding date. Monthly subscriptions are billed monthly from that date. Payment is processed by Stripe. Your Family Trust, estate entity, or personal account may be designated as the billing party at any time.',
+       'Invoices are issued 14 days before each renewal date. If payment is not received, your archive moves to Resting status. Your content is preserved in full during Resting, and your entity remains intact. Active features are suspended until payment resumes. We do not delete an archive for non-payment. Permanent deletion occurs only through the deliberate process described in the Cancellation section below.',
+--- a/app/apply/ApplyForm.tsx
++++ b/app/apply/ApplyForm.tsx
+@@ -260,7 +260,7 @@
+                   onMouseEnter={e => { if (!submitting) (e.currentTarget as HTMLElement).style.background = 'var(--color-gold-light)' }}
+                   onMouseLeave={e => { if (!submitting) (e.currentTarget as HTMLElement).style.background = 'var(--color-gold)' }}
+                 >
+-                  {submitting ? 'Sending...' : isBusiness ? 'Start the conversation' : 'Request a Founding Session'}
++                  {submitting ? 'Sending...' : isBusiness ? 'Start the conversation' : 'Request The Founding'}
+                 </button>
+ 
+               </form>
+--- a/app/components/Nav.tsx
++++ b/app/components/Nav.tsx
+@@ -15,7 +15,7 @@
+   { href: '/succession',      label: 'For Business'     },
+   { href: '/about',           label: 'About'            },
+   { href: '/method',          label: 'The Method'       },
+-  { href: '/founding-session',label: 'Founding Session' },
++  { href: '/founding-session',label: 'The Founding' },
+   { href: '/apply',           label: 'Apply'            },
+   { href: '/archive-login',   label: 'Client Login'     },
+ ]
+--- a/lib/emails/foundingWelcome.ts
++++ b/lib/emails/foundingWelcome.ts
+@@ -4,7 +4,7 @@
+  * charge succeeds and the archive is provisioned.
+  *
+  * Copy rules (enforced): no em dashes, American English, short declarative
+- * sentences, "Legacy Guide" never "Archivist", no invented numbers, timelines,
++ * sentences, no invented numbers, timelines,
+  * or mechanisms, and no selling with "AI". The email states what the customer
+  * bought and what happens next. It promises nothing that is not real.
+  */
+@@ -23,7 +23,8 @@
+ 
+ export function buildFoundingWelcomeEmail(input: FoundingWelcomeInput): BuiltEmail {
+   const { familyName, firstName, magicLinkUrl, password, loginUrl } = input
+-  const guideName = input.guideName ?? 'Your Legacy Guide'
++  // No Guide network (September 2026). The founder reads and runs every founding.
++  const guideName = input.guideName ?? 'The founder of Basalith'
+ 
+   const subject = `Your Basalith archive is active. The ${familyName} Archive.`
+ 
+@@ -78,7 +79,7 @@
+   ${accessBlockHtml}
+ 
+   <p style="font-size:14px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 24px">
+-    When you are ready, you can enter the archive and start adding your photographs and records. There is no rush. Your Legacy Guide will walk you through the first steps.
++    When you are ready, you can enter the archive and start adding your photographs and records. There is no rush. The Founding starts whenever you are ready: three of the hardest calls you ever made, in your own words.
+   </p>
+   <hr style="border:none;border-top:1px solid rgba(240,237,230,0.06);margin:24px 0">
+   <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830;line-height:1.8;margin:0">
+@@ -111,7 +112,7 @@
+     '',
+     ...accessTextLines,
+     '',
+-    'When you are ready, you can enter the archive and start adding your photographs and records. There is no rush. Your Legacy Guide will walk you through the first steps.',
++    'When you are ready, you can enter the archive and start adding your photographs and records. There is no rush. The Founding starts whenever you are ready: three of the hardest calls you ever made, in your own words.',
+     '',
+     'BASALITH',
+     `The ${familyName} Archive · Generation I`,

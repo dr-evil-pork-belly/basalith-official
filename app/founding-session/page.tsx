@@ -4,8 +4,8 @@ import MilestoneProgress  from '../components/MilestoneProgress'
 import type { Metadata }  from 'next'
 
 export const metadata: Metadata = {
-  title:       'The Founding Session · Basalith',
-  description: 'Every Basalith archive begins with a Founding Session. The founder of Basalith sits with you, not to interview you, but to start listening to how you think.',
+  title:       'The Founding · Basalith',
+  description: 'Every Basalith archive begins with The Founding: three of the hardest calls you ever made, in your own words, in your own time. Then a first read with the founder of Basalith, by video.',
 }
 
 const SERIF: React.CSSProperties = {
@@ -50,25 +50,27 @@ export default function FoundingSessionPage() {
           </h1>
 
           <p style={P}>
-            The Founding Session is where the archive starts.
+            The Founding is where the archive starts.
             <br />
-            For a person, it is 90 minutes.
+            Three of the hardest calls you ever made.
             <br />
-            For a business, it runs longer, because the first thing we capture is the hardest calls the operator ever made.
+            For a business, the hardest calls the operator ever made running it.
           </p>
 
           <p style={P}>
-            The founder of Basalith sits with you.
+            You take them in your own time, in your own words.
             <br />
-            Not to interview you.
+            Speak or type. About ten minutes each.
             <br />
-            To start listening to how you think.
+            Stop whenever you like and come back; every answer is saved as you go.
           </p>
 
           <p style={P}>
-            What you say matters.
+            Each call starts with one question.
             <br />
-            How you say it matters more.
+            The next few follow what you say: what tipped it, where it stops, who was in the room, how sure you were.
+            <br />
+            What you say matters. How you say it matters more.
           </p>
 
           <div
@@ -77,19 +79,19 @@ export default function FoundingSessionPage() {
           />
 
           <p style={P}>
-            The session lays the foundation
+            When the three calls are in, the founder of Basalith reads every word.
             <br />
-            of your entity.
+            Within 48 hours we set up your first read: a short video call to walk through what your archive holds, where it is still thin, and what comes next.
             <br />
-            Everything that follows builds on it.
+            For a business, one more session by video, with your successor in the room, working through those calls together.
           </p>
 
           <p style={{ ...P, marginBottom: '56px' }}>
-            Come ready to talk. About anything.
-            <br />
             Nothing you say has to be important.
             <br />
             The ordinary things are usually the ones that show how you think.
+            <br />
+            Everything that follows builds on this.
           </p>
 
           <a
@@ -107,7 +109,7 @@ export default function FoundingSessionPage() {
               borderRadius:  'var(--radius-sm)',
             }}
           >
-            Request a Founding Session
+            Begin your archive
           </a>
         </section>
 
@@ -124,7 +126,7 @@ export default function FoundingSessionPage() {
             style={{ width: '40px', height: '1px', background: 'var(--color-gold)', margin: '0 0 40px' }}
           />
           <p style={{ ...P }}>
-            After the session, the people around you start adding what they remember. It works because we took the friction out.
+            After the three calls, the people around you start adding what they remember. It works because we took the friction out.
           </p>
           <p style={{ ...P }}>
             Your contributors never log in, never remember a password, never learn a new interface.

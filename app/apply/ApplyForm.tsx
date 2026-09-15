@@ -260,7 +260,7 @@ export default function ApplyForm({ initialType = 'legacy' }: { initialType?: st
                   onMouseEnter={e => { if (!submitting) (e.currentTarget as HTMLElement).style.background = 'var(--color-gold-light)' }}
                   onMouseLeave={e => { if (!submitting) (e.currentTarget as HTMLElement).style.background = 'var(--color-gold)' }}
                 >
-                  {submitting ? 'Sending...' : isBusiness ? 'Start the conversation' : 'Request a Founding Session'}
+                  {submitting ? 'Sending...' : isBusiness ? 'Start the conversation' : 'Request The Founding'}
                 </button>
 
               </form>

@@ -4,7 +4,7 @@
  * charge succeeds and the archive is provisioned.
  *
  * Copy rules (enforced): no em dashes, American English, short declarative
- * sentences, "Legacy Guide" never "Archivist", no invented numbers, timelines,
+ * sentences, no invented numbers, timelines,
  * or mechanisms, and no selling with "AI". The email states what the customer
  * bought and what happens next. It promises nothing that is not real.
  */
@@ -23,7 +23,8 @@ export type BuiltEmail = { subject: string; html: string; text: string }
 
 export function buildFoundingWelcomeEmail(input: FoundingWelcomeInput): BuiltEmail {
   const { familyName, firstName, magicLinkUrl, password, loginUrl } = input
-  const guideName = input.guideName ?? 'Your Legacy Guide'
+  // No Guide network (September 2026). The founder reads and runs every founding.
+  const guideName = input.guideName ?? 'The founder of Basalith'
 
   const subject = `Your Basalith archive is active. The ${familyName} Archive.`
 
@@ -78,7 +79,7 @@ export function buildFoundingWelcomeEmail(input: FoundingWelcomeInput): BuiltEma
   ${accessBlockHtml}
 
   <p style="font-size:14px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 24px">
-    When you are ready, you can enter the archive and start adding your photographs and records. There is no rush. Your Legacy Guide will walk you through the first steps.
+    When you are ready, you can enter the archive and start adding your photographs and records. There is no rush. The Founding starts whenever you are ready: three of the hardest calls you ever made, in your own words.
   </p>
   <hr style="border:none;border-top:1px solid rgba(240,237,230,0.06);margin:24px 0">
   <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830;line-height:1.8;margin:0">
@@ -111,7 +112,7 @@ export function buildFoundingWelcomeEmail(input: FoundingWelcomeInput): BuiltEma
     '',
     ...accessTextLines,
     '',
-    'When you are ready, you can enter the archive and start adding your photographs and records. There is no rush. Your Legacy Guide will walk you through the first steps.',
+    'When you are ready, you can enter the archive and start adding your photographs and records. There is no rush. The Founding starts whenever you are ready: three of the hardest calls you ever made, in your own words.',
     '',
     'BASALITH',
     `The ${familyName} Archive · Generation I`,

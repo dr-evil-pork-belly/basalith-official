@@ -24,7 +24,7 @@ const QA: { q: string; a: React.ReactNode }[] = [
   {
     q: 'How does it work?',
     a: <>
-      It starts with a Founding Session, led in person. From there the archive grows through guided questions, real scenarios, voice recordings, photographs, and contributions from the people around them. Every deposit is scored before it can shape the model.
+      It starts with The Founding: three of the hardest calls you ever made, in your own words, by voice or typed, in your own time, then a first read with the founder of Basalith by video. From there the archive grows through guided questions, real scenarios, voice recordings, photographs, and contributions from the people around them. Every deposit is scored before it can shape the model.
       {' '}<a href="/method" style={LINK}>Read the method &rarr;</a>
     </>,
   },
@@ -50,7 +50,7 @@ const QA: { q: string; a: React.ReactNode }[] = [
   {
     q: 'What does it cost?',
     a: <>
-      For a business succession, $12,000 a year plus a one-time $5,000 founding session. Acquisition engagements start at $50,000, scaled to the transaction. For individuals and families, a one-time $2,500 founding fee, then Active at $3,600 a year, Resting at $600 a year, or Legacy at $1,200 a year.
+      For a business succession, $12,000 a year plus a one-time $5,000 Founding fee. Acquisition engagements start at $50,000, scaled to the transaction. For individuals and families, a one-time $2,500 founding fee, then Active at $3,600 a year, Resting at $600 a year, or Legacy at $1,200 a year.
       {' '}<a href="/pricing" style={LINK}>See pricing in full &rarr;</a>
     </>,
   },
@@ -79,7 +79,7 @@ const QA: { q: string; a: React.ReactNode }[] = [
   },
   {
     q: 'How do I begin?',
-    a: 'Apply. We review every application ourselves and will be in touch within 48 hours to schedule your Founding Session.',
+    a: 'Apply. We review every application ourselves and will be in touch within 48 hours. Once your archive is open, The Founding starts whenever you are ready.',
   },
 ]
 
@@ -193,7 +193,7 @@ export default function FAQPage() {
             >
               Still have a question? Ask it in the application.
               <br />
-              We will answer it before your Founding Session.
+              We will answer it before you begin.
             </p>
             <a
               href="/apply"

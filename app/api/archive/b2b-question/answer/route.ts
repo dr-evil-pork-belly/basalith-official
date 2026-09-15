@@ -17,7 +17,7 @@ import {
 import { classifyAnswer, parseTimeline } from '@/lib/incidentClassifier'
 import { checkSaturation } from '@/lib/incidentSaturation'
 import { renderProbe } from '@/lib/renderProbe'
-import { FOUNDING_CALLS, getFoundingStatus } from '@/lib/foundingSequence'
+import { FOUNDING_CALLS, getFoundingStatus, loadFoundingRows } from '@/lib/foundingSequence'
 import {
   buildFoundingCompleteInternalEmail,
   buildFoundingCompleteOwnerEmail,
@@ -231,11 +231,21 @@ export async function POST(req: NextRequest) {
           const status = await getFoundingStatus(archiveId, archive.tier)
           if (!status.done) return
           const deposits = status.calls.reduce((n, c) => n + c.deposits, 0)
-          const { count } = await supabaseAdmin
+          // Voice turns within the Founding Sequence only: linked recordings
+          // created since the first founding call opened. An unbounded count
+          // would include every recording the archive ever made.
+          const rows = await loadFoundingRows(archiveId)
+          const firstFounding = rows
+            .filter(r => r.state?.founding)
+            .map(r => r.created_at)
+            .sort()[0]
+          let voiceQuery = supabaseAdmin
             .from('voice_recordings')
             .select('id', { count: 'exact', head: true })
             .eq('archive_id', archiveId)
             .not('deposit_id', 'is', null)
+          if (firstFounding) voiceQuery = voiceQuery.gte('created_at', firstFounding)
+          const { count } = await voiceQuery
           const input = {
             archiveName: archiveName || 'Basalith archive',
             ownerName:   ownerName || null,

@@ -7,7 +7,7 @@ import PricingTiers from '../components/PricingTiers'
 
 export const metadata: Metadata = {
   title: 'Pricing · Basalith',
-  description: 'Basalith pricing, in full. Succession at $12,000 a year plus a one-time founding session. Acquisition engagements from $50,000. Individual and family archives from $2,500 to begin.',
+  description: 'Basalith pricing, in full. Succession at $12,000 a year plus a one-time Founding fee. Acquisition engagements from $50,000. Individual and family archives from $2,500 to begin.',
 }
 
 const MONO: React.CSSProperties = {
@@ -98,12 +98,17 @@ function Mark({ name, size = 13 }: { name: IconName; size?: number }) {
 }
 
 const FOUNDING_DELIVERABLES = [
-  { n: '01', title: 'Archive Architecture Build',     desc: 'Your permanent archive structure, configured for transfer and long-term standing.' },
-  { n: '02', title: 'Document Compatibility Review',   desc: 'Assessment against your existing legal and succession documents. Attorney-ready output.' },
-  { n: '03', title: 'Contributor Network Setup',       desc: 'Onboarding for up to 15 contributors. Roles assigned. Access levels configured.' },
-  { n: '04', title: 'Founding Session',                desc: 'Your first guided session, led in person. This is where it becomes real.' },
-  { n: '05', title: 'Data Migration',                  desc: 'Your records filtered, deduplicated, dated, and sequenced before they reach the labeling interface.' },
-  { n: '06', title: 'Custodian Designation',           desc: "Your archive's custodian assigned and documented." },
+  // Rewritten September 15, 2026 to list what The Founding actually delivers.
+  // The prior list (document compatibility review, data migration, custodian
+  // designation) described steps with no mechanism behind them and was flagged
+  // as unverified in the September 8 pass. Nothing here is a promise the
+  // product or the founder does not keep today.
+  { n: '01', title: 'Your archive, opened',            desc: 'Your archive and your sign-in, ready the day you begin.' },
+  { n: '02', title: 'The Founding Sequence',           desc: 'Three of the hardest calls you ever made, in your own words, in your own time. Speak or type. This is where it becomes real.' },
+  { n: '03', title: 'The people around you',           desc: 'Contributors invited by email. They never need to log in.' },
+  { n: '04', title: 'What you already have',           desc: 'Documents, photographs, and recordings brought into the archive.' },
+  { n: '05', title: 'The first read',                  desc: 'A short video call with the founder of Basalith: what your archive holds, where it is still thin, and what comes next.' },
+  { n: '06', title: 'For a business, the successor',   desc: 'One live session by video with your successor in the room, working through the calls together.' },
 ]
 
 const TRUST_BADGES: { icon: IconName; label: string }[] = [
@@ -121,7 +126,7 @@ const SECURITY_BADGES: { icon: IconName; label: string }[] = [
 ]
 
 const SUCCESSION_FEATURES = [
-  'Extended 3-hour founding session',
+  'The Founding, with a live successor session by video',
   'Business decision framework capture',
   '20+ scenario training library',
   'Successor access portal',
@@ -187,7 +192,7 @@ export default function PricingPage() {
               margin:     '0 auto',
             }}
           >
-            Business engagements first. Individual and family plans below. Every archive begins with a founding session.
+            Business engagements first. Individual and family plans below. Every archive begins with The Founding.
           </p>
         </section>
 
@@ -233,7 +238,7 @@ export default function PricingPage() {
               <p style={{ ...MONO, fontSize: '0.48rem', color: 'var(--color-gold)', marginBottom: '16px' }}>Succession</p>
               <p style={{ ...SERIF, fontSize: 'clamp(2.5rem,5vw,3.2rem)', fontWeight: 300, color: 'rgba(250,248,244,0.92)', lineHeight: 1, marginBottom: '4px' }}>$12,000</p>
               <p style={{ ...MONO, fontSize: '0.44rem', color: 'rgba(250,248,244,0.4)', marginBottom: '8px' }}>per year</p>
-              <p style={{ ...SERIF, fontSize: '0.95rem', fontStyle: 'italic', color: 'var(--color-gold)', marginBottom: '28px' }}>+ $5,000 founding session (one-time)</p>
+              <p style={{ ...SERIF, fontSize: '0.95rem', fontStyle: 'italic', color: 'var(--color-gold)', marginBottom: '28px' }}>+ $5,000 Founding (one-time)</p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 20px', marginBottom: '32px' }}>
                 {SUCCESSION_FEATURES.map(f => (
                   <p key={f} style={{ ...MONO, fontSize: '0.43rem', color: 'rgba(250,248,244,0.5)', margin: 0 }}>&#10003; {f}</p>
@@ -309,7 +314,7 @@ export default function PricingPage() {
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
-              <p style={{ ...MONO, fontSize: '0.52rem', color: 'var(--color-gold)' }}>The Founding Session</p>
+              <p style={{ ...MONO, fontSize: '0.52rem', color: 'var(--color-gold)' }}>The Founding</p>
               <svg width="32" height="32" viewBox="0 0 34 34" fill="none" aria-hidden="true" style={{ opacity: 0.5 }}>
                 <polygon points="17,1 33,17 17,33 1,17" fill="none" stroke="#C4A24A" strokeWidth="1.4"/>
                 <polygon points="17,7 27,17 17,27 7,17" fill="none" stroke="#C4A24A" strokeWidth="1.1"/>
@@ -321,12 +326,12 @@ export default function PricingPage() {
               The Founding
             </h2>
             <div style={{ ...SERIF, fontSize: '1.05rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.45)', lineHeight: 1.8, marginBottom: '40px', maxWidth: '600px' }}>
-              <p style={{ marginBottom: '20px' }}>Every archive begins with a Founding Session.</p>
+              <p style={{ marginBottom: '20px' }}>Every archive begins with The Founding.</p>
               <p style={{ marginBottom: '20px' }}>
-                For a business, the operator works through the decision frameworks that
-                built the company, in an extended session led in person.
-                For an individual or a family, the session captures voice, values, and the
-                particular way someone sees the world.
+                Three of the hardest calls you ever made, in your own words, in your own
+                time. For a business, the hardest calls the operator made running it,
+                then one live session by video with the successor in the room. For an
+                individual or a family, the calls that show how someone sees the world.
               </p>
               <p style={{ marginBottom: '20px' }}>
                 It is the foundation. Everything that follows builds on it.
@@ -357,7 +362,7 @@ export default function PricingPage() {
                   <p style={{ ...MONO, fontSize: '0.48rem', color: 'var(--color-gold)', marginBottom: '16px' }}>Business founding, one-time</p>
                   <p style={{ ...SERIF, fontSize: '0.88rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.3)', lineHeight: 1.7 }}>
                     Individual and family founding is $2,500. Annual plan selected separately.
-                    Led in person.
+                    Three calls in your own words, then a first read by video.
                   </p>
                 </div>
               </div>
@@ -365,7 +370,7 @@ export default function PricingPage() {
 
             <div style={{ display: 'flex', gap: '24px', marginTop: '40px', flexWrap: 'wrap' }}>
               <a href="/founding-session" className="pricing-ghost-link" style={{ ...SERIF, fontSize: '0.9rem', fontStyle: 'italic', color: 'rgba(196,162,74,0.6)', textDecoration: 'none', transition: 'color 200ms ease' }}>
-                What happens in a Founding session →
+                What happens in The Founding →
               </a>
             </div>
           </div>

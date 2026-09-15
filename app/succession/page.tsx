@@ -56,7 +56,7 @@ const HANDOFF = [
   {
     n:     '01',
     title: 'The Founding.',
-    body:  'An extended session, led in person by the founder of Basalith. We start with the hardest calls the operator ever made and work outward to the frameworks they use every day.',
+    body:  'Three of the hardest calls the operator ever made running the business, in their own words, in their own time. Then one live session by video, with the successor in the room, working through those calls together.',
   },
   {
     n:     '02',
@@ -99,7 +99,7 @@ const TRUST = [
 ]
 
 const FEATURES = [
-  'Extended 3-hour founding session',
+  'The Founding, with a live successor session by video',
   'Business decision framework capture',
   '20+ scenario training library',
   'Successor access portal',
@@ -458,7 +458,7 @@ export default function SuccessionPage() {
                 per year
               </p>
               <p style={{ ...GEORGIA, fontSize: '0.95rem', fontStyle: 'italic', color: 'var(--color-gold)', marginBottom: '32px' }}>
-                + $5,000 founding session (one-time)
+                + $5,000 Founding (one-time)
               </p>
 
               <div style={{ height: '1px', background: 'rgba(196,162,74,0.15)', marginBottom: '28px' }} />
@@ -472,7 +472,7 @@ export default function SuccessionPage() {
               </div>
 
               <p style={{ ...GEORGIA, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-secondary)', marginBottom: '28px' }}>
-                Every engagement begins with a founding session. Tell us about the transition and we will tell you whether Basalith fits.
+                Every engagement begins with The Founding. Tell us about the transition and we will tell you whether Basalith fits.
               </p>
 
               <Link
