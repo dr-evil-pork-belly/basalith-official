@@ -170,3 +170,47 @@ which serves any open incident's pending probe.
    refusal) on the owner surface.
 3. Coverage map v2 rendered to the owner.
 4. Classifier `scope` parameter for personal archives.
+
+---
+
+## Addendum, September 15: classifier scope and the founding proof
+
+Two of the four follow-ups above, built after the live run.
+
+**Classifier scope.** `lib/incidentClassifier.ts` takes `scope: 'business' |
+'personal'`. Business is the original prompt byte for byte and the default, so
+the succession interview, the Guide demo, and every drive script are
+unchanged. Personal is the same prompt with the speaker reframed ("a person,
+about a decision in their own life"), and the tension rule now reads "in the
+person's own terms; never translate a family or personal tension into business
+vocabulary." `parseTimeline` takes the same scope. `/answer` passes
+`scopeForTier(archive.tier)`. `lib/incidentClassifier.test.ts` pins that the
+business prompt is untouched and that every substitution in the personal one
+actually matched. Cause: a personal archive's tradeoff probe came back as
+"protection or growth" on the live run.
+
+**The founding proof.** `lib/foundingProof.ts`, `POST
+/api/archive/founding/proof`, and a "Show me" card on the completion panel of
+/archive/founding. One question the archive answers from a deposit, with the
+deposit shown verbatim underneath, and one it declines. Runs the real
+pipeline: `selectFrozenLayer`, `buildEntitySystemPrompt`, `claude-sonnet-4-6`,
+`verifyGrounding`. Grounded half asks the owner's own founding call openers
+back (SEED pairs first, then by quality, up to three tries) and shows only a
+`basis === 'deposit'` result under the approved words "checked against your
+archive." Refusal half asks up to three questions from `REFUSAL_CANDIDATES`
+(per scope, deliberately not coverage probes, since the owner sees them) and
+shows the first the verifier does not ground, tagged "no deposit covers this."
+If either half comes up empty the card says so instead of faking it. Owner
+only, requires all three calls complete, rate limited to 4 per IP per hour,
+never stored, never logged to grounding_gaps. The owner completion email now
+points at it. Tests: `lib/foundingProof.test.ts`, including a guard that no
+refusal candidate is a coverage probe.
+
+Not stored is a v1 choice. When a proper table exists for owner-facing
+artifacts, persist the first proof so the owner can return to it.
+
+Preview check for the proof: on your own archive, open /archive/founding, click
+Show me. Expect one gold panel (your call opener, the entity's answer, your
+deposit under it) and one plain panel (a question you never answered, declined
+in the entity's words or the templated gap reply). Paste the response JSON if
+either half is missing.

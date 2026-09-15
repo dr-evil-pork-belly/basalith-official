@@ -6,8 +6,9 @@
  * sentences, no invented numbers or mechanisms, no selling with "AI". The
  * depositor email promises exactly one thing, a reply within 48 hours to set
  * up the first read, which is the same commitment the site already makes on
- * /apply, /faq, and /contact. It does not describe a coverage map, a proof
- * card, or anything else that has not shipped to the owner surface yet.
+ * /apply, /faq, and /contact. It points at the founding proof on
+ * /archive/founding (shipped September 15) and describes nothing else that
+ * has not shipped to the owner surface.
  */
 
 export type FoundingCompleteInput = {
@@ -35,7 +36,9 @@ export function buildFoundingCompleteOwnerEmail(input: FoundingCompleteInput): B
     : 'Three of the hardest calls you ever made are now in your archive, in your own words.'
   const count = `${input.deposits} ${input.deposits === 1 ? 'deposit' : 'deposits'}`
 
-  const subject = `Your Founding Sequence is complete. The ${input.archiveName}.`
+  // archives.name is the full display name ("The Dr Ha Archive"), so it is used
+  // as-is. The first send read "The The Dr Ha Archive" from a prepended "The".
+  const subject = `Your Founding Sequence is complete. ${input.archiveName}.`
 
   const text = [
     greeting,
@@ -44,6 +47,9 @@ export function buildFoundingCompleteOwnerEmail(input: FoundingCompleteInput): B
     `${count} in total. Nothing you said was rewritten.`,
     '',
     'We read every word ourselves. Within 48 hours we will be in touch to set up your first read: a short video call to walk through what your archive holds, where it is still thin, and what comes next.',
+    '',
+    'When you are ready, your archive can show you one thing it can already answer, in your words, and one thing it will not, because you never said.',
+    `${SITE}/archive/founding`,
     '',
     'Your archive keeps growing from here. The dashboard has your next question whenever you are ready.',
     `${SITE}/archive/dashboard`,
@@ -62,6 +68,8 @@ export function buildFoundingCompleteOwnerEmail(input: FoundingCompleteInput): B
     <div style="border-left:2px solid rgba(196,162,74,0.5);padding:4px 0 4px 18px;margin:0 0 24px">
       <p style="font-size:16px;font-weight:300;line-height:1.8;margin:0;color:#F0EDE6">We read every word ourselves. Within 48 hours we will be in touch to set up your first read: a short video call to walk through what your archive holds, where it is still thin, and what comes next.</p>
     </div>
+    <p style="font-size:15px;font-weight:300;line-height:1.8;margin:0 0 8px;color:#B8B4AB">When you are ready, your archive can show you one thing it can already answer, in your words, and one thing it will not, because you never said.</p>
+    <p style="margin:0 0 24px"><a href="${SITE}/archive/founding" style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#C4A24A;text-decoration:none;text-transform:uppercase">Show me</a></p>
     <p style="font-size:15px;font-weight:300;line-height:1.8;margin:0 0 8px;color:#B8B4AB">Your archive keeps growing from here. The dashboard has your next question whenever you are ready.</p>
     <p style="margin:0 0 32px"><a href="${SITE}/archive/dashboard" style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#C4A24A;text-decoration:none;text-transform:uppercase">Open your archive</a></p>
     <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#706C65;margin:0">Basalith · Heritage Nexus Inc.</p>

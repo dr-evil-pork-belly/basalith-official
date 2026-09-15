@@ -33,6 +33,15 @@ type AnswerResult = {
 
 type RecorderState = 'idle' | 'requesting' | 'recording' | 'processing' | 'error'
 
+type Proof =
+  | { ready: false; reason: string }
+  | {
+      ready: true
+      grounded: { question: string; answer: string; deposit: string } | null
+      refusal: { question: string; reply: string } | null
+      note: string | null
+    }
+
 export default function FoundingClient({
   archiveId,
   scope,
@@ -194,6 +203,7 @@ export default function FoundingClient({
             Your archive keeps growing from here. The dashboard has your next question whenever you are ready.
           </p>
           <Link href="/archive/dashboard" style={goldButton()}>Open your archive</Link>
+          <ProofCard />
         </section>
       )}
 
@@ -322,6 +332,104 @@ export default function FoundingClient({
         .founding-btn:focus-visible { outline: 2px solid ${GOLD}; outline-offset: 3px; }
         textarea#founding-answer:focus { border-color: rgba(196,162,74,0.5); }
       `}</style>
+    </div>
+  )
+}
+
+// ── The proof ─────────────────────────────────────────────────────────────────
+// After the three calls: one question the archive answers from a deposit,
+// with the deposit shown under it, and one it declines. Computed on demand by
+// POST /api/archive/founding/proof and never stored. The badge wording is the
+// approved phrase, "checked against your archive," and only appears on the
+// grounded half; the refusal half is tagged "no deposit covers this."
+
+function ProofCard() {
+  const [state, setState] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
+  const [proof, setProof] = useState<Proof | null>(null)
+  const [error, setError] = useState('')
+
+  async function run() {
+    setState('loading')
+    setError('')
+    try {
+      const res = await fetch('/api/archive/founding/proof', { method: 'POST' })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data?.error || 'Could not ask your archive right now.')
+      setProof(data as Proof)
+      setState('done')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not ask your archive right now.')
+      setState('error')
+    }
+  }
+
+  const q = (text: string) => (
+    <p style={{ fontFamily: SERIF, fontSize: '1.15rem', fontStyle: 'italic', fontWeight: 300, color: BONE, lineHeight: 1.55, margin: '0 0 12px' }}>
+      {text}
+    </p>
+  )
+
+  return (
+    <div style={{ marginTop: '32px', paddingTop: '28px', borderTop: '1px solid rgba(196,162,74,0.15)' }}>
+      <p style={eyebrow()}>What it holds</p>
+      <p style={{ fontFamily: SERIF, fontSize: '1.08rem', fontWeight: 300, lineHeight: 1.75, color: BODY, marginBottom: '18px' }}>
+        Your archive can already show you one thing it can answer, in your words, and one thing it will not, because you never said.
+      </p>
+
+      {state === 'idle' && (
+        <button type="button" onClick={run} className="founding-btn" style={quietButton()}>Show me</button>
+      )}
+      {state === 'loading' && (
+        <p aria-live="polite" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '1rem', color: BODY }}>
+          Asking your archive. This takes a moment.
+        </p>
+      )}
+      {state === 'error' && (
+        <div>
+          <p role="alert" style={{ fontFamily: SERIF, fontSize: '1rem', color: '#D98C8C', margin: '0 0 10px', lineHeight: 1.6 }}>{error}</p>
+          <button type="button" onClick={run} className="founding-btn" style={quietButton()}>Try again</button>
+        </div>
+      )}
+
+      {state === 'done' && proof && !proof.ready && (
+        <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '1rem', color: BODY, lineHeight: 1.7 }}>
+          Your deposits are still being scored. Give it a few minutes and come back.
+        </p>
+      )}
+
+      {state === 'done' && proof && proof.ready && (
+        <div style={{ display: 'grid', gap: '2px' }} aria-live="polite">
+          {proof.grounded && (
+            <div style={{ padding: '20px 22px', background: 'rgba(196,162,74,0.05)', border: '1px solid rgba(196,162,74,0.3)' }}>
+              <p style={{ ...eyebrow(), marginBottom: '10px' }}>Checked against your archive</p>
+              {q(proof.grounded.question)}
+              <p style={{ fontFamily: SERIF, fontSize: '1.02rem', fontWeight: 300, color: BONE, lineHeight: 1.7, margin: '0 0 16px', whiteSpace: 'pre-wrap' }}>
+                {proof.grounded.answer}
+              </p>
+              <p style={{ fontFamily: MONO, fontSize: '0.54rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: LABEL, marginBottom: '6px' }}>
+                From your archive, in your words
+              </p>
+              <p style={{ fontFamily: SERIF, fontSize: '0.98rem', fontStyle: 'italic', fontWeight: 300, color: BODY, lineHeight: 1.7, margin: 0, whiteSpace: 'pre-wrap' }}>
+                {proof.grounded.deposit}
+              </p>
+            </div>
+          )}
+          {proof.refusal && (
+            <div style={{ padding: '20px 22px', background: 'rgba(250,248,244,0.03)', border: '1px solid rgba(250,248,244,0.12)' }}>
+              <p style={{ ...eyebrow(), color: LABEL, marginBottom: '10px' }}>No deposit covers this</p>
+              {q(proof.refusal.question)}
+              <p style={{ fontFamily: SERIF, fontSize: '1.02rem', fontWeight: 300, color: BODY, lineHeight: 1.7, margin: 0, whiteSpace: 'pre-wrap' }}>
+                {proof.refusal.reply}
+              </p>
+            </div>
+          )}
+          {proof.note && (
+            <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '1rem', color: BODY, lineHeight: 1.7, margin: '14px 0 0' }}>
+              {proof.note}
+            </p>
+          )}
+        </div>
+      )}
     </div>
   )
 }

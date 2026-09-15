@@ -14,6 +14,15 @@
 import Anthropic from '@anthropic-ai/sdk'
 import type { ClassifierOut, ProbeType } from './incidentSession'
 
+// Who is speaking. 'business' is the original prompt, byte for byte, and the
+// default, so every existing caller (the succession interview, the Guide demo,
+// the drive scripts) is unchanged. 'personal' is the same prompt with the
+// speaker and the decision reframed for a family archive, added September 15,
+// 2026 after a personal archive's tradeoff probe came back as "protection or
+// growth": the extractor had been told it was reading a founder describing a
+// business decision, and it translated a family tension into business words.
+export type ClassifierScope = 'business' | 'personal'
+
 const anthropic = new Anthropic()
 
 const HAIKU = 'claude-haiku-4-5-20251001'
@@ -40,6 +49,25 @@ Field rules:
   Set status "substantive" if the answer genuinely covers that dimension, or "not_a_factor" if the answer explicitly says that dimension did not apply here (for example, no one else was involved, or there was nothing at stake for them). If <probe_type> is STAKE, READ, or CALIBRATION, tag that same dimension. Otherwise, tag calibration when the answer volunteers confidence language (for example "I was certain", "I had no idea", "it was a coin flip"), or tag stake or read only when the answer clearly speaks to them. When unsure, return null. Never invent coverage; a null just means the dimension's own probe still gets to ask.
 
 Return only the JSON object.`
+
+// Personal variant. Derived from CLASSIFY_SYSTEM by substitution so the two
+// prompts cannot drift apart in structure; the test asserts the business
+// prompt is untouched and the personal one carries no business framing.
+const CLASSIFY_SYSTEM_PERSONAL = CLASSIFY_SYSTEM
+  .replace(
+    'You read a single answer a founder gave to one interview probe about a past business decision,',
+    'You read a single answer a person gave to one interview probe about a past decision in their own life,',
+  )
+  .replace("the probe and the founder's answer", "the probe and the person's answer")
+  .replace('true ONLY if the founder has clearly finished', 'true ONLY if the person has clearly finished')
+  .replace(
+    'written as "X vs Y" (for example "speed vs certainty").',
+    'written as "X vs Y" in the person\'s own terms (for example "keeping the peace vs telling the truth"). Never translate a family or personal tension into business vocabulary.',
+  )
+
+export function classifySystemFor(scope: ClassifierScope): string {
+  return scope === 'personal' ? CLASSIFY_SYSTEM_PERSONAL : CLASSIFY_SYSTEM
+}
 
 function buildClassifyUser(input: {
   probeType: ProbeType
@@ -74,7 +102,9 @@ export async function classifyAnswer(input: {
   question: string
   answer: string
   branchSummary: string
+  scope?: ClassifierScope
 }): Promise<ClassifierOut> {
+  const system = classifySystemFor(input.scope ?? 'business')
   // Fail-closed default: accept the answer (containsRule true so a parse failure
   // never forces a wrong re-probe), never invent a detour, never short-circuit a
   // branch. Failures degrade toward the plain spine, never toward lost data.
@@ -94,7 +124,7 @@ export async function classifyAnswer(input: {
       model:       HAIKU,
       max_tokens:  200,
       temperature: 0,
-      system:      CLASSIFY_SYSTEM,
+      system,
       messages: [
         { role: 'user', content: buildClassifyUser(input) },
         { role: 'assistant', content: '{' },
@@ -155,8 +185,17 @@ Return STRICT JSON only, no markdown code fences, no commentary, in exactly this
 
 Return at most ${MAX_BRANCHES} branches, in chronological order. If the narrative contains no clear decision point, return {"branches":[]}.`
 
+const TIMELINE_SYSTEM_PERSONAL = TIMELINE_SYSTEM
+  .replace("You read a founder's narrative", "You read a person's narrative")
+  .replace('where the founder chose among options', 'where the person chose among options')
+
+export function timelineSystemFor(scope: ClassifierScope): string {
+  return scope === 'personal' ? TIMELINE_SYSTEM_PERSONAL : TIMELINE_SYSTEM
+}
+
 export async function parseTimeline(
   narrative: string,
+  scope: ClassifierScope = 'business',
 ): Promise<{ branches: { summary: string; chosen: string }[] }> {
   if (!narrative?.trim()) return { branches: [] }
 
@@ -165,7 +204,7 @@ export async function parseTimeline(
       model:       HAIKU,
       max_tokens:  700,
       temperature: 0,
-      system:      TIMELINE_SYSTEM,
+      system:      timelineSystemFor(scope),
       messages: [
         { role: 'user', content: `<narrative>\n${narrative}\n</narrative>` },
         { role: 'assistant', content: '{' },

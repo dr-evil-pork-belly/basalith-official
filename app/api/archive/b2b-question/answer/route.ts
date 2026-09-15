@@ -17,7 +17,7 @@ import {
 import { classifyAnswer, parseTimeline } from '@/lib/incidentClassifier'
 import { checkSaturation } from '@/lib/incidentSaturation'
 import { renderProbe } from '@/lib/renderProbe'
-import { FOUNDING_CALLS, getFoundingStatus, loadFoundingRows } from '@/lib/foundingSequence'
+import { FOUNDING_CALLS, getFoundingStatus, loadFoundingRows, scopeForTier } from '@/lib/foundingSequence'
 import {
   buildFoundingCompleteInternalEmail,
   buildFoundingCompleteOwnerEmail,
@@ -120,16 +120,21 @@ export async function POST(req: NextRequest) {
   const branchSummary = branchIndex >= 0 ? (st.branches[branchIndex]?.summary ?? '') : ''
 
   // Model layer (all fail closed internally → a model outage yields a plain spine).
+  // Scope by tier: succession archives are read as a founder describing a
+  // business decision (the original prompt); every other tier as a person
+  // describing a decision in their own life. See ClassifierScope.
+  const scope = scopeForTier(archive.tier)
   const classifierOut: ClassifierOut = await classifyAnswer({
     probeType: probeType as ProbeType, // SEED/TIMELINE only feed the prompt label
     question: pendingQuestion,
     answer,
     branchSummary,
+    scope,
   })
 
   // TIMELINE: populate branches before advance (reducer falls closed to one).
   if (probeType === 'TIMELINE') {
-    const parsed = await parseTimeline(answer)
+    const parsed = await parseTimeline(answer, scope)
     st.branches = parsed.branches.map((b, i) => ({ index: i, summary: b.summary, chosen: b.chosen, saturated: false }))
   }
 
