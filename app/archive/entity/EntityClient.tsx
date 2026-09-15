@@ -33,27 +33,12 @@ type ArchiveStats = {
   decadeCount:   number
 }
 
-type MiniDimension = {
-  id:    string
-  label: string
-  score: number
-}
-
-type MiniAccuracy = {
-  overallScore: number
-  depthLabel:   string
-  bottom5:      MiniDimension[]
-  cacheTime:    number
-}
-
 type WisdomNudge = {
   dimension:        string
   title:            string
   estimatedMinutes: number
 } | null
 
-const ACCURACY_CACHE_KEY = 'entity-accuracy-cache'
-const CACHE_TTL_MS = 5 * 60 * 1000 // 5 minutes
 
 // ── Prompts ────────────────────────────────────────────────────────────────
 const SUGGESTED_PROMPTS = [
@@ -111,8 +96,6 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
   const [sessionId,            setSessionId]            = useState<string | null>(null)
   const [conversationHistory,  setConversationHistory]  = useState<{ role: string; content: string }[]>([])
   const [stats,                setStats]                = useState<ArchiveStats | null>(null)
-  const [miniAccuracy,         setMiniAccuracy]         = useState<MiniAccuracy | null>(null)
-  const [accuracyAnimated,     setAccuracyAnimated]     = useState(false)
   const [nudgeDismissed,       setNudgeDismissed]       = useState(false)
   const [wisdomNudge,          setWisdomNudge]          = useState<WisdomNudge>(null)
   const [correctionOpen,       setCorrectionOpen]       = useState<Record<string, boolean>>({})
@@ -146,35 +129,6 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
       })
   }, [archiveId])
 
-  // Load mini accuracy (with 5-minute client cache)
-  useEffect(() => {
-    try {
-      const cached = JSON.parse(sessionStorage.getItem(ACCURACY_CACHE_KEY) || 'null')
-      if (cached && Date.now() - cached.cacheTime < CACHE_TTL_MS) {
-        setMiniAccuracy(cached)
-        setTimeout(() => setAccuracyAnimated(true), 100)
-        return
-      }
-    } catch {}
-
-    fetch(`/api/archive/entity-accuracy?archiveId=${archiveId}`)
-      .then(r => r.ok ? r.json() : null)
-      .then(data => {
-        if (!data) return
-        const sorted = [...data.dimensions].sort((a: any, b: any) => a.score - b.score)
-        const result: MiniAccuracy = {
-          overallScore: data.overallScore,
-          depthLabel:   data.depthLabel,
-          bottom5:      sorted.slice(0, 5).map((d: any) => ({ id: d.id, label: d.label, score: d.score })),
-          cacheTime:    Date.now(),
-        }
-        sessionStorage.setItem(ACCURACY_CACHE_KEY, JSON.stringify(result))
-        setMiniAccuracy(result)
-        setTimeout(() => setAccuracyAnimated(true), 100)
-      })
-      .catch(() => {})
-  }, [archiveId])
-
   // Load wisdom session nudge
   useEffect(() => {
     fetch(`/api/archive/wisdom-session?archiveId=${archiveId}`)
@@ -191,26 +145,6 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
       })
       .catch(() => {})
   }, [archiveId])
-
-  // Refresh accuracy data and re-animate bars
-  async function refreshAccuracy() {
-    try {
-      const res  = await fetch(`/api/archive/entity-accuracy?archiveId=${archiveId}`)
-      const data = await res.json()
-      if (!data) return
-      const sorted = [...data.dimensions].sort((a: any, b: any) => a.score - b.score)
-      const result: MiniAccuracy = {
-        overallScore: data.overallScore,
-        depthLabel:   data.depthLabel,
-        bottom5:      sorted.slice(0, 5).map((d: any) => ({ id: d.id, label: d.label, score: d.score })),
-        cacheTime:    Date.now(),
-      }
-      sessionStorage.setItem(ACCURACY_CACHE_KEY, JSON.stringify(result))
-      setAccuracyAnimated(false)
-      setMiniAccuracy(result)
-      setTimeout(() => setAccuracyAnimated(true), 80)
-    } catch {}
-  }
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -278,10 +212,6 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
         ...nextHistory,
         { role: 'assistant', content: data.response },
       ])
-      // If the server detected a deposit, refresh accuracy bars
-      if (data.wasDeposit) {
-        refreshAccuracy()
-      }
     } catch (err) {
       setMessages(prev => [...prev, {
         id:      crypto.randomUUID(),
@@ -312,7 +242,6 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ archiveId, prompt: 'Direct deposit', response: text }),
       })
-      refreshAccuracy()
     } catch {}
   }
 
@@ -417,91 +346,55 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
         {/* ── LEFT: context + prompts (35%) ── */}
         <div className="entity-left-col" style={{ width: '100%', maxWidth: '320px', flexShrink: 0 }}>
 
-          {/* Mini accuracy panel */}
+          {/* Entity state */}
           <div className="mb-6">
             <p style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.7)', marginBottom: '0.75rem' }}>
               Your Entity
             </p>
 
-            {miniAccuracy ? (
-              <>
-                {/* Overall score */}
-                <div className="flex items-baseline gap-1.5 mb-0.5">
-                  <span className="font-serif" style={{ fontWeight: 700, fontSize: '2.8rem', color: 'rgba(196,162,74,1)', lineHeight: 1, letterSpacing: '-0.02em' }}>
-                    {miniAccuracy.overallScore}
-                  </span>
-                  <span className="font-serif font-light" style={{ fontSize: '1rem', color: '#5C6166' }}>/100</span>
-                </div>
-                <p style={{ fontFamily: 'monospace', fontSize: '0.42rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: stateLabelColor, marginBottom: '1.25rem' }}>
-                  {miniAccuracy.depthLabel}
+            {/* The score out of 100 and the five lowest dimension bars that sat
+                here until September 15, 2026 were a deposit-count reading shown
+                as accuracy. The coverage map on the dashboard replaces them. */}
+            <p style={{ fontFamily: 'monospace', fontSize: '0.42rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: stateLabelColor, marginBottom: '1rem' }}>
+              {stateLabel}
+            </p>
+
+            <a
+              href="/archive/dashboard"
+              style={{ fontFamily: 'monospace', fontSize: '0.38rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.5)', textDecoration: 'none' }}
+              onMouseEnter={e => (e.currentTarget.style.color = 'rgba(196,162,74,0.9)')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'rgba(196,162,74,0.5)')}
+            >
+              See where your archive is thin →
+            </a>
+
+            {/* Wisdom session nudge */}
+            {wisdomNudge && (
+              <div style={{
+                marginTop:    '1.5rem',
+                background:   'rgba(196,162,74,0.04)',
+                border:       '1px solid rgba(196,162,74,0.15)',
+                borderTop:    '2px solid rgba(196,162,74,0.45)',
+                borderRadius: '2px',
+                padding:      '0.85rem 1rem',
+              }}>
+                <p style={{ fontFamily: 'monospace', fontSize: '0.4rem', letterSpacing: '0.25em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.7)', marginBottom: '0.4rem' }}>
+                  This Month&rsquo;s Session
                 </p>
-
-                {/* 5 lowest dimensions */}
-                <div className="flex flex-col gap-3 mb-3">
-                  {miniAccuracy.bottom5.map((dim, i) => (
-                    <div key={dim.id}>
-                      <div className="flex items-center justify-between mb-1">
-                        <p className="font-serif font-light" style={{ fontSize: '0.82rem', color: '#9DA3A8' }}>{dim.label}</p>
-                        <p style={{ fontFamily: 'monospace', fontSize: '0.38rem', color: '#5C6166' }}>{dim.score}%</p>
-                      </div>
-                      <div style={{ height: '4px', borderRadius: '2px', background: 'rgba(240,237,230,0.07)', overflow: 'hidden' }}>
-                        <div style={{
-                          height:     '100%',
-                          borderRadius: '2px',
-                          background: 'linear-gradient(90deg,rgba(196,162,74,0.5),rgba(196,162,74,0.85))',
-                          width:      accuracyAnimated ? `${dim.score}%` : '0%',
-                          transition: `width 0.7s ease-out ${i * 80}ms`,
-                        }} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
+                <p className="font-serif" style={{ fontWeight: 700, fontSize: '0.95rem', color: '#F0EDE6', lineHeight: 1.3, marginBottom: '0.35rem' }}>
+                  {wisdomNudge.title}
+                </p>
+                <p style={{ fontFamily: 'monospace', fontSize: '0.38rem', color: '#5C6166', marginBottom: '0.75rem' }}>
+                  5 questions · ~{wisdomNudge.estimatedMinutes} min
+                </p>
                 <a
-                  href="/archive/dashboard"
-                  style={{ fontFamily: 'monospace', fontSize: '0.38rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.5)', textDecoration: 'none' }}
-                  onMouseEnter={e => (e.currentTarget.style.color = 'rgba(196,162,74,0.9)')}
-                  onMouseLeave={e => (e.currentTarget.style.color = 'rgba(196,162,74,0.5)')}
+                  href="/archive/wisdom"
+                  style={{ fontFamily: 'monospace', fontSize: '0.4rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.9)', textDecoration: 'none' }}
+                  onMouseEnter={e => (e.currentTarget.style.textDecoration = 'underline')}
+                  onMouseLeave={e => (e.currentTarget.style.textDecoration = 'none')}
                 >
-                  See full accuracy →
+                  Begin →
                 </a>
-
-                {/* Wisdom session nudge */}
-                {wisdomNudge && (
-                  <div style={{
-                    marginTop:    '1.5rem',
-                    background:   'rgba(196,162,74,0.04)',
-                    border:       '1px solid rgba(196,162,74,0.15)',
-                    borderTop:    '2px solid rgba(196,162,74,0.45)',
-                    borderRadius: '2px',
-                    padding:      '0.85rem 1rem',
-                  }}>
-                    <p style={{ fontFamily: 'monospace', fontSize: '0.4rem', letterSpacing: '0.25em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.7)', marginBottom: '0.4rem' }}>
-                      This Month&rsquo;s Session
-                    </p>
-                    <p className="font-serif" style={{ fontWeight: 700, fontSize: '0.95rem', color: '#F0EDE6', lineHeight: 1.3, marginBottom: '0.35rem' }}>
-                      {wisdomNudge.title}
-                    </p>
-                    <p style={{ fontFamily: 'monospace', fontSize: '0.38rem', color: '#5C6166', marginBottom: '0.75rem' }}>
-                      5 questions · ~{wisdomNudge.estimatedMinutes} min
-                    </p>
-                    <a
-                      href="/archive/wisdom"
-                      style={{ fontFamily: 'monospace', fontSize: '0.4rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.9)', textDecoration: 'none' }}
-                      onMouseEnter={e => (e.currentTarget.style.textDecoration = 'underline')}
-                      onMouseLeave={e => (e.currentTarget.style.textDecoration = 'none')}
-                    >
-                      Begin →
-                    </a>
-                  </div>
-                )}
-              </>
-            ) : (
-              <div>
-                <div style={{ height: '44px', width: '80px', background: 'rgba(255,255,255,0.04)', borderRadius: '2px', marginBottom: '0.75rem', animation: 'mysteryGlowPulse 1.8s ease-in-out infinite' }} />
-                <p style={{ fontFamily: 'monospace', fontSize: '0.42rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: stateLabelColor }}>
-                  {stateLabel}
-                </p>
               </div>
             )}
           </div>

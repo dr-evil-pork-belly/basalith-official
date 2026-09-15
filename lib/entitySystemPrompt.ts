@@ -296,15 +296,62 @@ export function formatFingerprintSection(pairs: FingerprintPair[]): string {
     : 'No training data available yet.'
 }
 
+/**
+ * Who is asking. 'business' is the succession route: the person now running
+ * the organization. 'personal' is a family archive: someone in the family.
+ *
+ * Added September 15, 2026 for the personal coverage map and the founding
+ * proof on personal archives, both of which had been building the succession
+ * framing ("the person now running their organization") over a family
+ * archive. The business prompt is the original, byte for byte, and is the
+ * default, so the succession route, the coverage fixtures, and every drive
+ * script are unchanged. The personal prompt is the same text with the five
+ * framing phrases swapped (PROMPT_SCOPE_SUBSTITUTIONS), and the swap asserts
+ * that every phrase still matched exactly once, so an edit to the business
+ * text that breaks a substitution fails at the call rather than silently
+ * shipping a half-personal prompt. Same construction as the classifier scope
+ * in lib/incidentClassifier.ts.
+ *
+ * Not used by the family chat route (app/api/archive/entity-chat, which runs
+ * lib/entityContext.ts without a verifier). Moving that route onto this
+ * prompt is its own slice.
+ */
+export type EntityPromptScope = 'business' | 'personal'
+
+export const PROMPT_SCOPE_SUBSTITUTIONS: ReadonlyArray<readonly [string, string]> = [
+  [
+    'The person now running their organization is asking you to apply the founder\'s reasoning to what they face today.',
+    'Someone in their family is asking you to apply their reasoning to what they face today.',
+  ],
+  ['(fixed at the handover. This does not change)', '(fixed in the archive. This does not change)'],
+  ['(what the person now running the business has told you)', '(what the family member has told you)'],
+  ['the current context the successor has provided', 'the current context the family member has provided'],
+  ['A successor acting on a position', 'A family member acting on a position'],
+]
+
+function toPersonalScope(businessPrompt: string): string {
+  let out = businessPrompt
+  for (const [from, to] of PROMPT_SCOPE_SUBSTITUTIONS) {
+    const first = out.indexOf(from)
+    if (first === -1 || out.indexOf(from, first + 1) !== -1) {
+      throw new Error(`[entitySystemPrompt] scope substitution did not match exactly once: ${from}`)
+    }
+    out = out.replace(from, to)
+  }
+  return out
+}
+
 export function buildEntitySystemPrompt(params: {
   ownerName: string
   archiveName: string
   fingerprintSection: string
   contextSection: string
+  /** Defaults to 'business', the original prompt byte for byte. */
+  scope?: EntityPromptScope
 }): string {
   const { ownerName, archiveName, fingerprintSection, contextSection } = params
 
-  return `You are the cognitive reference model of ${ownerName}, built from ${archiveName}, a permanent archive of their lifetime of deposits, decisions, and expressed values. The person now running their organization is asking you to apply the founder's reasoning to what they face today.
+  const business = `You are the cognitive reference model of ${ownerName}, built from ${archiveName}, a permanent archive of their lifetime of deposits, decisions, and expressed values. The person now running their organization is asking you to apply the founder's reasoning to what they face today.
 
 WHAT ${ownerName} SETTLED (fixed at the handover. This does not change):
 
@@ -325,4 +372,6 @@ Never invent a policy, a number, a rule, or a past decision that is not in the r
 Never break character. Never refer to yourself as an AI or a model. Speak in first person as ${ownerName}.
 
 No em dashes. American English. Responses should be 3 to 6 sentences.`
+
+  return params.scope === 'personal' ? toPersonalScope(business) : business
 }

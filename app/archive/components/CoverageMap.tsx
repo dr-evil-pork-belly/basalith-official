@@ -1,12 +1,14 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 
-// The owner's coverage map: a map of absence by decision domain, measured by
+// The owner's coverage map: a map of absence by kind of judgment, measured by
 // probing the entity and reading the verifier, never inferred from deposit
-// counts. Renders what GET /api/archive/coverage returns, labels included, and
-// draws nothing that looks like a score. Every text color here is measured
-// against the portal's dark ground (table in globals.css).
+// counts. Renders what GET /api/archive/coverage returns, labels and copy
+// included, and draws nothing that looks like a score. The API decides the
+// taxonomy and the copy by archive tier; this component knows neither. Every
+// text color here is measured against the portal's dark ground.
 
 type Domain = {
   domain:        string
@@ -21,8 +23,18 @@ type Domain = {
 }
 
 type Coverage =
-  | { available: false; reason: 'not_succession' | 'off_label' | 'no_reading' }
-  | { available: true; domains: Domain[]; computedAt: string; probeSet: string; complete: boolean; explainer: string; caveat: string }
+  | { available: false; reason: string }
+  | {
+      available:  true
+      scope:      'business' | 'personal'
+      domains:    Domain[]
+      computedAt: string
+      probeSet:   string
+      complete:   boolean
+      intro:      string
+      explainer:  string | null
+      caveat:     string
+    }
 
 const SERIF = '"Cormorant Garamond",Georgia,serif'
 const MONO  = '"Space Mono","Courier New",monospace'
@@ -39,7 +51,7 @@ function fmtDate(iso: string): string {
   }
 }
 
-export default function CoverageMap() {
+export default function CoverageMap({ link }: { link?: { href: string; label: string } }) {
   const [coverage, setCoverage] = useState<Coverage | null>(null)
   const [failed,   setFailed]   = useState(false)
 
@@ -52,8 +64,8 @@ export default function CoverageMap() {
     return () => { active = false }
   }, [])
 
-  // A personal archive has no on-label probe set yet: render nothing rather
-  // than a business map that would mislead.
+  // An off-label reading is never shown. Anything else the API declines to
+  // render (a tier with no set) renders nothing rather than a wrong map.
   if (coverage && !coverage.available && coverage.reason !== 'no_reading') return null
 
   return (
@@ -66,15 +78,29 @@ export default function CoverageMap() {
         <p style={{ fontFamily: MONO, fontSize: '0.6rem', letterSpacing: '0.24em', textTransform: 'uppercase', color: GOLD }}>
           Where your archive is thin
         </p>
-        {coverage?.available && (
-          <p style={{ fontFamily: MONO, fontSize: '0.56rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: LABEL }}>
-            Read {fmtDate(coverage.computedAt)} · question set {coverage.probeSet}
-          </p>
-        )}
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: '18px', flexWrap: 'wrap' }}>
+          {coverage?.available && (
+            <p style={{ fontFamily: MONO, fontSize: '0.56rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: LABEL }}>
+              Read {fmtDate(coverage.computedAt)} · question set {coverage.probeSet}
+            </p>
+          )}
+          {link && (
+            <Link
+              href={link.href}
+              className="no-underline"
+              style={{ fontFamily: MONO, fontSize: '0.56rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: GOLD, whiteSpace: 'nowrap' }}
+            >
+              {link.label} →
+            </Link>
+          )}
+        </div>
       </div>
-      <p style={{ fontFamily: SERIF, fontSize: '1.05rem', fontWeight: 300, color: BODY, lineHeight: 1.7, marginBottom: '22px', maxWidth: '640px' }}>
-        Each domain is put to your entity as a fixed set of questions an operator in that domain has had to answer. A question counts only when the answer came from something you deposited, checked against your archive. This is a map of where your archive is still silent.
-      </p>
+
+      {coverage?.available && (
+        <p style={{ fontFamily: SERIF, fontSize: '1.05rem', fontWeight: 300, color: BODY, lineHeight: 1.7, marginBottom: '22px', maxWidth: '640px' }}>
+          {coverage.intro}
+        </p>
+      )}
 
       {failed && (
         <p role="alert" style={{ fontFamily: SERIF, fontSize: '1rem', color: '#D98C8C' }}>Could not load the coverage map right now.</p>
@@ -85,8 +111,8 @@ export default function CoverageMap() {
       )}
 
       {coverage && !coverage.available && coverage.reason === 'no_reading' && (
-        <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '1.05rem', color: BODY, lineHeight: 1.7, margin: 0 }}>
-          No reading yet. The first one runs after the Founding Sequence is complete, and the map is read again each month.
+        <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '1.05rem', color: BODY, lineHeight: 1.7, margin: '8px 0 0' }}>
+          No reading yet. Your archive is read once the Founding Sequence is complete, and again each month. Each reading asks your entity a fixed set of questions and counts only the answers that came from something you deposited.
         </p>
       )}
 
@@ -107,7 +133,7 @@ export default function CoverageMap() {
                   <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '0.95rem', fontWeight: 300, color: LABEL, lineHeight: 1.5, margin: '0 0 10px' }}>
                     {d.description}
                   </p>
-                  {/* Six marks, one per question. Filled = grounded. No bar, no percent. */}
+                  {/* One mark per question. Filled = grounded. No bar, no percent. */}
                   <div aria-hidden="true" style={{ display: 'flex', gap: '5px', marginBottom: '8px' }}>
                     {Array.from({ length: d.total }).map((_, i) => (
                       <span key={i} style={{ width: '14px', height: '6px', borderRadius: '1px', background: i < d.deposit ? GOLD : 'rgba(250,248,244,0.12)' }} />
@@ -126,11 +152,13 @@ export default function CoverageMap() {
             })}
           </div>
 
-          <p style={{ fontFamily: SERIF, fontSize: '0.98rem', fontWeight: 300, color: BODY, lineHeight: 1.7, margin: '18px 0 0', maxWidth: '640px' }}>
-            {coverage.explainer}
-          </p>
-          <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '0.95rem', fontWeight: 300, color: LABEL, lineHeight: 1.7, margin: '10px 0 0', maxWidth: '640px' }}>
-            {coverage.caveat}{!coverage.complete ? ' This reading did not finish every question, so an open domain here is a weaker claim than usual.' : ''}
+          {coverage.explainer && (
+            <p style={{ fontFamily: SERIF, fontSize: '0.98rem', fontWeight: 300, color: BODY, lineHeight: 1.7, margin: '18px 0 0', maxWidth: '640px' }}>
+              {coverage.explainer}
+            </p>
+          )}
+          <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '0.95rem', fontWeight: 300, color: LABEL, lineHeight: 1.7, margin: `${coverage.explainer ? 10 : 18}px 0 0`, maxWidth: '640px' }}>
+            {coverage.caveat}{!coverage.complete ? ' This reading did not finish every question, so an open area here is a weaker claim than usual.' : ''}
           </p>
         </>
       )}

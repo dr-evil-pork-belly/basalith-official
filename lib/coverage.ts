@@ -201,8 +201,15 @@ const RANK: Record<CoverageState, number> = { open: 0, partial: 1, backed: 2 }
 export function rollUpRun(
   results: ProbeResult[],
   previousByDomain: Record<string, CoverageState> = {},
+  /**
+   * The domain list the run is rolled up against. Defaults to the business
+   * taxonomy, which is what every caller before September 15, 2026 got. A
+   * personal run passes the personal taxonomy (lib/personalDomains.ts) through
+   * lib/coverageSet.ts. Same shape, same rule: every listed domain gets a row.
+   */
+  domains: ReadonlyArray<{ name: string }> = B2B_DOMAINS,
 ): DomainRollup[] {
-  return B2B_DOMAINS.map(d => {
+  return domains.map(d => {
     const forDomain = results.filter(r => r.domain === d.name)
     const usable    = forDomain.filter(r => !r.verifierErrored)
     const bases     = usable.map(r => r.basis)

@@ -116,8 +116,9 @@ async function askVerified(params: {
   archiveName: string
   candidates: ProofPair[]
   question: string
+  scope: FoundingScope
 }): Promise<{ reply: string; basis: GroundingBasis; topic: string; pairs: ProofPair[] }> {
-  const { ownerName, archiveName, candidates, question } = params
+  const { ownerName, archiveName, candidates, question, scope } = params
 
   const selection = await selectFrozenLayer({ question, priorQuestions: [], candidates })
   const pairs = selection.pairs as ProofPair[]
@@ -127,6 +128,10 @@ async function askVerified(params: {
     archiveName,
     fingerprintSection: formatFingerprintSection(pairs),
     contextSection:     EMPTY_CONTEXT,
+    // Personal archives were getting the succession framing ("the person now
+    // running their organization") until September 15, 2026. Same pipeline,
+    // right framing. Business is the original prompt byte for byte.
+    scope,
   })
 
   const aiResponse = await anthropic.messages.create({
@@ -170,7 +175,7 @@ export async function buildFoundingProof(archiveId: string, scope: FoundingScope
   for (const candidate of orderGroundedCandidates(pairs).slice(0, MAX_ATTEMPTS)) {
     const question = candidate.prompt.trim()
     if (!question) continue
-    const r = await askVerified({ ownerName, archiveName, candidates: pairs, question })
+    const r = await askVerified({ ownerName, archiveName, candidates: pairs, question, scope })
     if (r.basis === 'deposit') {
       // The deposit shown is the pair whose prompt was asked. If the verifier
       // keyed on a different pair, the owner still sees their own words on
@@ -183,7 +188,7 @@ export async function buildFoundingProof(archiveId: string, scope: FoundingScope
   // Refusal half: questions outside the three calls, until one is declined.
   let refusal: RefusalProof | null = null
   for (const question of REFUSAL_CANDIDATES[scope].slice(0, MAX_ATTEMPTS)) {
-    const r = await askVerified({ ownerName, archiveName, candidates: pairs, question })
+    const r = await askVerified({ ownerName, archiveName, candidates: pairs, question, scope })
     if (r.basis !== 'deposit') {
       refusal = { question, reply: r.reply, basis: r.basis }
       break

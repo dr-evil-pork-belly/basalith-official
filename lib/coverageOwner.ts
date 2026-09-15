@@ -3,9 +3,8 @@
  *
  * Reads what the coverage run already wrote (archive_coverage, coverage_runs)
  * and shapes it for the owner. Computes nothing. The run itself is
- * lib/coverageRun.ts, fired by Inngest on the monthly sweep and, since
- * September 15, 2026, once when a succession archive completes its Founding
- * Sequence.
+ * lib/coverageRun.ts, fired by Inngest on the monthly sweep and once when an
+ * archive completes its Founding Sequence.
  *
  * Rules carried from BASALITH_COVERAGE_MAP_STATE (August 2026):
  *   - Lead with counts. "4 of 6 questions here got a grounded answer" has a
@@ -13,19 +12,34 @@
  *   - No archive-level score, in any version, ever.
  *   - Only basis='deposit' backs coverage language. Nothing here says complete,
  *     verified, or grounded in, and nothing is a percentage.
- *   - An off-label run (the business probe set against a personal archive) is
- *     diagnostic only and must not be shown to a customer. So the map is
- *     available to succession archives only, until a personal probe set exists.
- *   - The map reads the entity's most likely answer; a successor gets a sampled
- *     one. It must never be described as what the successor will experience.
+ *   - An off-label run is diagnostic only and must not be shown to a customer.
+ *   - The map reads the entity's most likely answer, not a conversation. It
+ *     must never be described as what a successor or a family member will
+ *     experience.
+ *
+ * Since September 15, 2026 the map is read per segment (lib/coverageSet.ts):
+ * the business set and its eight domains for a succession archive, the
+ * personal set and its eight for a family archive. Rows are filtered to the
+ * segment's probe set version, so a row left behind by an earlier off-label
+ * run under the other set (same archive, other domain names) is never shown.
+ *
+ * THE OVERREACH LINE IS BUSINESS ONLY. Overreach measures how often the entity
+ * reaches past the archive and is caught by the verifier. On the succession
+ * route the verifier runs, so the explainer's claim that reaching is caught
+ * before a successor sees it is true. The family chat route
+ * (app/api/archive/entity-chat) runs no verifier today, so for a personal
+ * archive that sentence would be false, and the overreach reading describes a
+ * check the family does not get. Until the family entity runs the grounded
+ * pipeline, a personal map shows the coverage count only, and its caveat says
+ * plainly that it is a reading of the archive, not of a conversation.
  *
  * Labels are produced HERE, server side, so the client component never imports
- * lib/coverage.ts (which pulls the 48 probe questions into any bundle that
- * imports it, and probes are never rendered to a customer).
+ * lib/coverage.ts or either probe module (which would pull the probe questions
+ * into a bundle, and probes are never rendered to a customer).
  */
 
 import { supabaseAdmin } from './supabase-admin'
-import { B2B_DOMAINS } from './b2bDomains'
+import { coverageSetForSegment, segmentForTier, type CoverageScope, type CoverageSet } from './coverageSet'
 import {
   coverageStateLabel,
   overreachLabel,
@@ -61,26 +75,41 @@ export type OwnerCoverageDomain = {
   countLine:     string     // "4 of 6 questions here got a grounded answer"
   stateLabel:    string     // coarse sorting word, from coverageStateLabel
   state:         CoverageState
-  overreachLine: string | null
+  overreachLine: string | null   // business only; null on every personal domain
   held:          boolean    // hysteresis held this above the raw reading
   deposit:       number
   total:         number
 }
 
 export type OwnerCoverage =
-  | { available: false; reason: 'not_succession' | 'off_label' | 'no_reading' }
+  | { available: false; reason: 'off_label' | 'no_reading' }
   | {
       available:   true
+      scope:       CoverageScope
       domains:     OwnerCoverageDomain[]
       computedAt:  string
       probeSet:    string
       complete:    boolean
-      explainer:   string
+      intro:       string
+      explainer:   string | null   // business only
       caveat:      string
     }
 
-export const COVERAGE_CAVEAT =
-  'This reads your entity’s most likely answer to each question. A successor gets a live answer, which can vary, so treat a thin domain as thinner than it looks here.'
+// ── Copy, per scope ───────────────────────────────────────────────────────────
+
+export const COVERAGE_INTRO: Record<CoverageScope, string> = {
+  business:
+    'Each domain is put to your entity as a fixed set of questions an operator in that domain has had to answer. A question counts only when the answer came from something you deposited, checked against your archive. This is a map of where your archive is still silent.',
+  personal:
+    'Each area is put to your entity as a fixed set of questions a person has had to answer for themselves, at home or at work. A question counts only when the answer came from something you deposited, checked against your archive. This is a map of where your archive is still silent.',
+}
+
+export const COVERAGE_CAVEAT: Record<CoverageScope, string> = {
+  business:
+    'This reads your entity’s most likely answer to each question. A successor gets a live answer, which can vary, so treat a thin domain as thinner than it looks here.',
+  personal:
+    'This is a reading of your archive, not of a conversation. Each question is asked once against what you have deposited and counts only when the answer came from a deposit. Talking with your entity is a live exchange and can go differently.',
+}
 
 /** "4 of 6 questions here got a grounded answer." Count-led, denominator shown. */
 export function countLine(deposit: number, total: number): string {
@@ -90,14 +119,22 @@ export function countLine(deposit: number, total: number): string {
   return `${deposit} of ${total} questions here got a grounded answer`
 }
 
-/** Pure. Shape rows for the owner in the domain order the dashboard uses. */
-export function ownerCoverageFromRows(rows: OwnerCoverageRow[], run: OwnerCoverageRun | null): OwnerCoverage {
-  if (rows.length === 0) return { available: false, reason: 'no_reading' }
+/**
+ * Pure. Shape rows for the owner in the set's domain order. Rows under another
+ * probe set version are ignored, not shown.
+ */
+export function ownerCoverageFromRows(
+  rows: OwnerCoverageRow[],
+  run: OwnerCoverageRun | null,
+  set: CoverageSet = coverageSetForSegment('succession'),
+): OwnerCoverage {
+  const own = rows.filter(r => r.probe_set_version === set.version)
+  if (own.length === 0) return { available: false, reason: 'no_reading' }
   if (run?.off_label) return { available: false, reason: 'off_label' }
 
-  const byDomain = new Map(rows.map(r => [r.domain, r]))
+  const byDomain = new Map(own.map(r => [r.domain, r]))
   const domains: OwnerCoverageDomain[] = []
-  for (const d of [...B2B_DOMAINS].sort((a, b) => a.order - b.order)) {
+  for (const d of [...set.domains].sort((a, b) => a.order - b.order)) {
     const r = byDomain.get(d.name)
     if (!r) continue
     // probes_total is already the usable count: rollUpRun in lib/coverage.ts
@@ -112,7 +149,7 @@ export function ownerCoverageFromRows(rows: OwnerCoverageRow[], run: OwnerCovera
       countLine:     countLine(r.probes_deposit, countable),
       stateLabel:    coverageStateLabel(r.state),
       state:         r.state,
-      overreachLine: overreachLabel(r.state, r.overreach),
+      overreachLine: set.scope === 'business' ? overreachLabel(r.state, r.overreach) : null,
       held:          r.damped,
       deposit:       r.probes_deposit,
       total:         countable,
@@ -120,24 +157,26 @@ export function ownerCoverageFromRows(rows: OwnerCoverageRow[], run: OwnerCovera
   }
   if (domains.length === 0) return { available: false, reason: 'no_reading' }
 
-  const computedAt = rows.map(r => r.computed_at).sort().at(-1) ?? new Date(0).toISOString()
-  const probeSet   = rows[0].probe_set_version
+  const computedAt = own.map(r => r.computed_at).sort().at(-1) ?? new Date(0).toISOString()
 
   return {
     available: true,
+    scope:     set.scope,
     domains,
     computedAt,
-    probeSet,
+    probeSet:  set.version,
     complete:  run?.complete ?? true,
-    explainer: OVERREACH_EXPLAINER,
-    caveat:    COVERAGE_CAVEAT,
+    intro:     COVERAGE_INTRO[set.scope],
+    explainer: set.scope === 'business' ? OVERREACH_EXPLAINER : null,
+    caveat:    COVERAGE_CAVEAT[set.scope],
   }
 }
 
 /** Every owner-visible string this module produces, for the copy-rule test. */
 export function allCoverageCopy(): string[] {
   return [
-    COVERAGE_CAVEAT,
+    COVERAGE_INTRO.business, COVERAGE_INTRO.personal,
+    COVERAGE_CAVEAT.business, COVERAGE_CAVEAT.personal,
     OVERREACH_EXPLAINER,
     countLine(0, 6), countLine(4, 6), countLine(6, 6), countLine(0, 0),
     ...(['backed', 'partial', 'open'] as CoverageState[]).map(coverageStateLabel),
@@ -148,12 +187,13 @@ export function allCoverageCopy(): string[] {
 // ── Read ──────────────────────────────────────────────────────────────────────
 
 export async function loadOwnerCoverage(archiveId: string, tier: string | null | undefined): Promise<OwnerCoverage> {
-  if (tier !== 'succession') return { available: false, reason: 'not_succession' }
+  const set = coverageSetForSegment(segmentForTier(tier))
 
   const { data: rowsData, error } = await supabaseAdmin
     .from('archive_coverage')
     .select('domain, state, overreach, probes_deposit, probes_total, probes_errored, damped, probe_set_version, last_run_id, computed_at')
     .eq('archive_id', archiveId)
+    .eq('probe_set_version', set.version)
   if (error) throw new Error(`loadOwnerCoverage failed: ${error.message}`)
 
   const rows = (rowsData ?? []) as OwnerCoverageRow[]
@@ -170,5 +210,5 @@ export async function loadOwnerCoverage(archiveId: string, tier: string | null |
     run = (data as OwnerCoverageRun | null) ?? null
   }
 
-  return ownerCoverageFromRows(rows, run)
+  return ownerCoverageFromRows(rows, run, set)
 }

@@ -21,7 +21,14 @@
  * is no second prompt builder, no second retriever, and no demo shortcut
  * verifier here.
  *
- * COST. Two model calls per probe, so 2 * COVERAGE_PROBES.length per run, plus
+ * WHICH PROBES. Decided by archive segment through lib/coverageSet.ts: the
+ * business set (v2) for a succession archive, the personal set (p1) for a
+ * family archive, since September 15, 2026. Before that every non-succession
+ * run was the business set off-label. The prompt framing follows the set's
+ * scope (buildEntitySystemPrompt scope), so a family archive is not read as
+ * "the person now running the organization."
+ *
+ * COST. Two model calls per probe, so 2 * (probes in the set) per run, plus
  * one retrieval call per probe when the archive holds more pairs than the
  * frozen layer cap (lib/frozenLayer.ts). At probe set v2 that is 48 probes and
  * 96 calls, or up to 144 on an archive over the cap. The fixtures sit under the
@@ -33,7 +40,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { supabaseAdmin } from './supabase-admin'
 import { buildEntitySystemPrompt, formatFingerprintSection, EMPTY_CONTEXT } from './entitySystemPrompt'
 import { verifyGrounding } from './verifyGrounding'
-import { COVERAGE_PROBES, PROBE_SET_VERSION } from './coverageProbes'
+import { coverageSetForSegment, isOffLabel, segmentForTier, type CoverageSet } from './coverageSet'
 import { rollUpRun, isRunComplete, type CoverageState, type ProbeResult, type DomainRollup } from './coverage'
 import { selectFrozenLayer, FROZEN_LAYER_LIMIT, FROZEN_LAYER_CANDIDATE_LIMIT } from './frozenLayer'
 
@@ -171,6 +178,13 @@ export type TriggerSource = 'manual' | 'cron' | 'transition'
 export type RunStep = <T>(id: string, fn: () => Promise<T>) => Promise<T>
 
 export const passThroughStep: RunStep = (_id, fn) => fn()
+
+/** The set a run row's probe_set_version names. Throws on an unknown version, which cannot happen for a row this code opened. */
+function setForVersion(version: string): CoverageSet {
+  const match = [coverageSetForSegment('succession'), coverageSetForSegment('b2c')].find(s => s.version === version)
+  if (!match) throw new Error(`[coverage] no probe set for version ${version}`)
+  return match
+}
 
 /** `id` is present on the archive path and absent for injected fixtures. */
 export type FingerprintPairRow = { id?: string; prompt: string; completion: string }
@@ -476,15 +490,24 @@ async function loadArchiveContent(archiveId: string): Promise<CoverageContent | 
     .order('id', { ascending: true })
     .limit(FROZEN_LAYER_CANDIDATE_LIMIT)
 
+  // An archive with nothing included in training has nothing to measure. Every
+  // probe would run against 'No training data available yet.' and every domain
+  // would read open, which a count already says for free. Skipped before a run
+  // row is opened, so nothing is written and the owner sees "No reading yet,"
+  // which is the truthful state. Injected content (fixtures) is not gated: a
+  // fixture with no pairs is a deliberate control and still runs.
+  // Added September 15, 2026 when the sweep widened to every archive.
+  if (!pairs || pairs.length === 0) return { error: 'no included training pairs' }
+
   return {
     ownerName:   (archive.owner_name ?? archive.name) as string,
     archiveName: archive.name as string,
-    // The b2b probe set against a non-succession archive is diagnostic only. It
-    // is allowed, because waiting for a real succession archive means the map
-    // cannot be judged against real data at all, but it is labeled at the row so
-    // nothing downstream can mistake it for a customer-facing result.
-    segment:     archive.tier === 'succession' ? 'succession' : 'b2c',
-    pairs:       (pairs ?? []) as FingerprintPairRow[],
+    // Segment picks the probe set (lib/coverageSet.ts). A segment with a set of
+    // its own is on-label; anything else falls back to the business set and is
+    // labeled off-label at the row so nothing downstream can mistake it for a
+    // customer-facing result.
+    segment:     segmentForTier(archive.tier as string | null),
+    pairs:       pairs as FingerprintPairRow[],
   }
 }
 
@@ -496,6 +519,8 @@ type OpenRunResult =
       archiveName: string
       pairs:       FingerprintPairRow[]
       offLabel:    boolean
+      /** The set's version, so the roll-up writes the same version the run row opened with. */
+      probeSetVersion: string
     }
 
 export type CoverageRunResult =
@@ -551,11 +576,12 @@ export async function runCoverage(params: {
     const content = params.content ?? (await loadArchiveContent(archiveId))
     if ('error' in content) return { error: content.error }
 
-    const offLabel = content.segment !== 'succession'
+    const set      = coverageSetForSegment(content.segment)
+    const offLabel = isOffLabel(set, content.segment)
 
     const outcome = await store.openRun({
       archiveId,
-      probeSetVersion: PROBE_SET_VERSION,
+      probeSetVersion: set.version,
       segment:         content.segment,
       offLabel,
       triggerSource,
@@ -578,12 +604,19 @@ export async function runCoverage(params: {
       // selectFrozenLayer below. See FROZEN_LAYER_LIMIT.
       pairs:       content.pairs,
       offLabel,
+      probeSetVersion: set.version,
     }
   })
 
   if ('error' in opened) return { skipped: opened.error }
 
-  const { runId, ownerName, archiveName, pairs: candidates, offLabel } = opened
+  const { runId, ownerName, archiveName, pairs: candidates, offLabel, probeSetVersion } = opened
+
+  // Re-derived from the version rather than carried through the step boundary,
+  // because a step result is serialized on the Inngest path and a set holds 48
+  // probe strings that have no business in a run payload. The version is the
+  // set's identity, so the lookup cannot disagree with what the run row says.
+  const set: CoverageSet = setForVersion(probeSetVersion)
 
   // ── Probe ──────────────────────────────────────────────────────────────────
   // Each probe writes its own row before returning: a timeout partway through
@@ -600,7 +633,7 @@ export async function runCoverage(params: {
   let retrievalCalls     = 0
   let retrievalFallbacks = 0
 
-  for (const probe of COVERAGE_PROBES) {
+  for (const probe of set.probes) {
     try {
       const out = await runStep(`probe:${probe.key}`, async () => {
         const selection = await selectFrozenLayer({ question: probe.question, candidates })
@@ -611,6 +644,7 @@ export async function runCoverage(params: {
           archiveName,
           fingerprintSection: formatFingerprintSection(pairs),
           contextSection:     NO_CONTEXT,
+          scope:              set.scope,
         })
 
         const draft = await withApiRetry(`voice ${probe.key}`, () => client().messages.create({
@@ -709,12 +743,12 @@ export async function runCoverage(params: {
     // to damp this one.
     const previousByDomain: Record<string, CoverageState> = {}
     for (const row of prior) {
-      if (row.probeSetVersion === PROBE_SET_VERSION) {
+      if (row.probeSetVersion === set.version) {
         previousByDomain[row.domain] = row.state
       }
     }
 
-    const rollups  = rollUpRun(results, previousByDomain)
+    const rollups  = rollUpRun(results, previousByDomain, set.domains)
     const complete = isRunComplete(rollups)
 
     await store.writeCoverage(rollups.map(r => ({
@@ -728,7 +762,7 @@ export async function runCoverage(params: {
       probesDeclined:  r.probesDeclined,
       probesTotal:     r.probesTotal,
       damped:          r.damped,
-      probeSetVersion: PROBE_SET_VERSION,
+      probeSetVersion: set.version,
       lastRunId:       runId,
       computedAt:      now,
     })))

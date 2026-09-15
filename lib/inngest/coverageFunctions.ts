@@ -3,7 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { runCoverage, type RunStep, type TriggerSource } from '@/lib/coverageRun'
 
 // ─────────────────────────────────────────────────────────────────────────────
-// computeCoverage — probe the succession entity across the eight b2b domains and
+// computeCoverage: probe the entity across its eight domains and
 // read the grounding verifier to produce a coverage map.
 //
 // The run itself lives in lib/coverageRun.ts, shared with
@@ -75,15 +75,21 @@ export const computeCoverage = inngest.createFunction(
 )
 
 // ─────────────────────────────────────────────────────────────────────────────
-// coverageMonthlySweep — fire a coverage run for each succession archive.
+// coverageMonthlySweep: fire a coverage run for every archive with a set.
 //
-// Monthly, not weekly. The map moves at the speed a founder deposits, and a run
+// Monthly, not weekly. The map moves at the speed a person deposits, and a run
 // is two model calls per probe. 06:00 UTC on the 3rd sits clear of the daily storage
 // sync at 04:00 and the Sunday verify at 05:00. Nothing enforces that ordering,
 // it just keeps the common case uncontended.
 //
-// Off-label archives are NOT swept. A diagnostic run against a b2c archive is
-// something a person asks for, never something a cron does on its own.
+// Until September 15, 2026 only succession archives were swept, because every
+// other archive was off-label under the one set that existed. The personal set
+// (lib/coverageProbesPersonal.ts) makes family archives on-label, so the sweep
+// now requests every archive. Two things keep that from being a cost surprise:
+// runCoverage skips an archive with no included training pairs before opening
+// a run row, and the compute function runs one archive at a time. An archive
+// whose segment has no set still falls back to the business set and is written
+// off-label, never shown, exactly as before.
 // ─────────────────────────────────────────────────────────────────────────────
 export const coverageMonthlySweep = inngest.createFunction(
   {
@@ -94,11 +100,10 @@ export const coverageMonthlySweep = inngest.createFunction(
     triggers:    [{ cron: '0 6 3 * *' }],
   },
   async ({ step }) => {
-    const archiveIds = await step.run('load-succession-archives', async () => {
+    const archiveIds = await step.run('load-archives', async () => {
       const { data } = await supabaseAdmin
         .from('archives')
         .select('id')
-        .eq('tier', 'succession')
       return (data ?? []).map(a => a.id as string)
     })
 

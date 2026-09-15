@@ -7,215 +7,16 @@ import OnboardingGuide from '@/app/components/OnboardingGuide'
 import TrainingDataCard from './TrainingDataCard'
 import SuccessionDashboard from './SuccessionDashboard'
 import FoundingBanner from '../components/FoundingBanner'
+import CoverageMap from '../components/CoverageMap'
 
-// ── Accuracy types ──────────────────────────────────────────────────────────
-type DimensionResult = {
-  id:          string
-  label:       string
-  description: string
-  score:       number
-}
-type AccuracyData = {
-  overallScore:       number
-  depthLabel:         string
-  dimensions:         DimensionResult[]
-  improvements:       string[]
-  totalDeposits:      number
-  totalConversations: number
-  totalLabels:        number
-}
-
-// ── Accuracy Dashboard component ────────────────────────────────────────────
-function AccuracyDashboard({ archiveId }: { archiveId: string }) {
-  const [data,     setData]     = useState<AccuracyData | null>(null)
-  const [loading,  setLoading]  = useState(true)
-  const [animated, setAnimated] = useState(false)
-
-  async function doFetch() {
-    setAnimated(false)
-    try {
-      const r = await fetch(`/api/archive/entity-accuracy?archiveId=${archiveId}`)
-      if (r.ok) { const d = await r.json(); setData(d) }
-    } catch {}
-    setLoading(false)
-  }
-
-  async function refresh() {
-    setLoading(true)
-    await doFetch()
-  }
-
-  // Initial load
-  useEffect(() => { doFetch() }, [archiveId])
-
-  // Auto-refresh if user visited entity page this session
-  useEffect(() => {
-    const flag = sessionStorage.getItem('visited-entity')
-    if (flag) {
-      sessionStorage.removeItem('visited-entity')
-      refresh()
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!loading && data) {
-      const t = setTimeout(() => setAnimated(true), 100)
-      return () => clearTimeout(t)
-    }
-  }, [loading, data])
-
-  function scoreColor(score: number): string {
-    if (score > 80) return 'rgba(196,162,74,1)'
-    if (score > 60) return '#F0EDE6'
-    if (score > 40) return '#B8B4AB'
-    if (score > 20) return '#9DA3A8'
-    return '#5C6166'
-  }
-
-  return (
-    <div
-      className="rounded-sm mb-8"
-      style={{
-        background:  'rgba(196,162,74,0.04)',
-        border:      '1px solid rgba(196,162,74,0.12)',
-        borderTop:   '3px solid rgba(196,162,74,0.5)',
-        padding:     'clamp(1.25rem,4vw,2rem) clamp(1rem,4vw,2.5rem)',
-      }}
-    >
-      {/* Header row */}
-      <div className="flex items-start justify-between gap-4 mb-5">
-        <div>
-          <p style={{ fontFamily: 'monospace', fontSize: '0.42rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.7)', marginBottom: '0.5rem' }}>
-            Your Entity
-          </p>
-          {loading ? (
-            <div style={{ height: '64px', width: '120px', background: 'rgba(255,255,255,0.04)', borderRadius: '2px', animation: 'mysteryGlowPulse 1.8s ease-in-out infinite' }} />
-          ) : (
-            <>
-              <div className="flex items-baseline gap-2">
-                <span className="font-serif" style={{ fontWeight: 700, fontSize: '4rem', color: '#F0EDE6', letterSpacing: '-0.02em', lineHeight: 1 }}>
-                  {data?.overallScore ?? 0}
-                </span>
-                <span className="font-serif font-light" style={{ fontSize: '1.5rem', color: '#5C6166' }}>/100</span>
-              </div>
-              <p style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.25em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.8)', marginTop: '0.25rem' }}>
-                {data?.depthLabel ?? 'Just beginning'}
-              </p>
-            </>
-          )}
-        </div>
-        <div className="flex items-center gap-4 shrink-0 mt-1">
-          <button
-            onClick={refresh}
-            style={{ fontFamily: 'monospace', fontSize: '0.38rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#5C6166', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-          >
-            ↻ REFRESH
-          </button>
-          <Link
-            href="/archive/entity"
-            className="no-underline group flex items-center gap-1"
-            style={{ fontFamily: 'monospace', fontSize: '0.42rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.8)' }}
-          >
-            Talk to your entity
-            <span className="transition-transform duration-150 group-hover:translate-x-1 inline-block">→</span>
-          </Link>
-        </div>
-      </div>
-
-      {/* Gold rule */}
-      <div style={{ height: '1px', background: 'rgba(196,162,74,0.15)', marginBottom: '1.5rem' }} />
-
-      {/* Ten dimension bars — two column grid */}
-      {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-4 mb-6">
-          {Array.from({ length: 10 }).map((_, i) => (
-            <div key={i} className="flex items-center gap-3">
-              <div style={{ width: '140px', height: '10px', background: 'rgba(255,255,255,0.04)', borderRadius: '2px', animation: 'mysteryGlowPulse 1.8s ease-in-out infinite', animationDelay: `${i * 80}ms` }} />
-              <div style={{ flex: 1, height: '6px', background: 'rgba(255,255,255,0.04)', borderRadius: '3px', animation: 'mysteryGlowPulse 1.8s ease-in-out infinite', animationDelay: `${i * 80}ms` }} />
-            </div>
-          ))}
-        </div>
-      ) : data ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5 mb-6">
-          {data.dimensions.map((dim, i) => (
-            <div key={dim.id} className="flex items-center gap-3">
-              {/* Label */}
-              <div style={{ width: 'clamp(90px,28%,140px)', flexShrink: 0 }}>
-                <p className="font-serif" style={{ fontWeight: 700, fontSize: '0.9rem', color: '#F0EDE6', lineHeight: 1.2 }}>
-                  {dim.label}
-                </p>
-                <p className="font-serif font-light" style={{ fontSize: '0.78rem', color: '#5C6166', lineHeight: 1.3 }}>
-                  {dim.description}
-                </p>
-              </div>
-              {/* Bar */}
-              <div style={{ flex: 1, height: '6px', borderRadius: '3px', background: 'rgba(240,237,230,0.08)', overflow: 'hidden' }}>
-                <div
-                  style={{
-                    height:     '100%',
-                    borderRadius: '3px',
-                    background: 'linear-gradient(90deg,rgba(196,162,74,0.6),rgba(196,162,74,1))',
-                    width:      animated ? `${dim.score}%` : '0%',
-                    transition: `width 0.8s ease-out ${i * 80}ms`,
-                  }}
-                />
-              </div>
-              {/* Score */}
-              <p style={{ fontFamily: 'monospace', fontSize: '0.42rem', letterSpacing: '0.06em', color: scoreColor(dim.score), width: '32px', textAlign: 'right', flexShrink: 0 }}>
-                {dim.score}%
-              </p>
-            </div>
-          ))}
-        </div>
-      ) : null}
-
-      {/* Improvements */}
-      {!loading && data && data.improvements.length > 0 && (
-        <>
-          <div style={{ height: '1px', background: 'rgba(196,162,74,0.1)', marginBottom: '1.25rem' }} />
-          <p style={{ fontFamily: 'monospace', fontSize: '0.42rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: '#5C6166', marginBottom: '0.75rem' }}>
-            What would deepen your entity most
-          </p>
-          <ul className="flex flex-col gap-2 mb-5">
-            {data.improvements.map((text, i) => (
-              <li key={i}>
-                <Link
-                  href="/archive/entity"
-                  className="no-underline flex items-start gap-2 group"
-                >
-                  <span style={{ color: 'rgba(196,162,74,0.5)', flexShrink: 0, fontFamily: 'monospace', fontSize: '0.8rem' }}>→</span>
-                  <p className="font-serif italic" style={{ fontSize: '0.9rem', color: '#9DA3A8', lineHeight: 1.5, transition: 'color 0.15s' }}
-                    onMouseEnter={e => (e.currentTarget.style.color = '#E8E4DC')}
-                    onMouseLeave={e => (e.currentTarget.style.color = '#9DA3A8')}
-                  >
-                    {text}
-                  </p>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
-
-      {/* Footer stats */}
-      {!loading && data && (
-        <>
-          <p style={{ fontFamily: 'monospace', fontSize: '0.4rem', letterSpacing: '0.1em', color: '#5C6166' }}>
-            {data.totalDeposits} deposit{data.totalDeposits !== 1 ? 's' : ''} · {data.totalConversations} conversation{data.totalConversations !== 1 ? 's' : ''} · {data.totalLabels} family memor{data.totalLabels !== 1 ? 'ies' : 'y'}
-          </p>
-          <p style={{ fontFamily: 'Georgia, serif', fontSize: '0.9rem', fontStyle: 'italic', color: '#706C65', marginTop: '0.75rem' }}>
-            Your entity is {data.overallScore}% accurate across 10 dimensions of your life.{' '}
-            {data.overallScore >= 80 ? 'Speaking with authority.' :
-             data.overallScore >= 60 ? 'Speaking with depth.' :
-             data.overallScore >= 40 ? 'Taking shape.' :
-             data.overallScore >= 20 ? 'Still learning.' :
-             'Just beginning.'}
-          </p>
-        </>
-      )}
-    </div>
-  )
-}
+// ── Coverage map ────────────────────────────────────────────────────────────
+// The entity accuracy card that lived here until September 15, 2026 (a score
+// out of 100, ten dimension percentages, "N% accurate across 10 dimensions")
+// was a readiness reading derived from deposit counts, presented as accuracy.
+// Nothing measured accuracy. It is replaced by the coverage map below, which
+// is measured by probing the entity and reading the verifier, leads with
+// counts, and carries no score. /api/archive/entity-accuracy still exists for
+// the iOS app; nothing on the web reads it now.
 
 // ── Upcoming Dates component ─────────────────────────────────────────────────
 type SignificantDate = {
@@ -1486,8 +1287,8 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
         />
       )}
 
-      {/* ── ENTITY ACCURACY DASHBOARD ── */}
-      <AccuracyDashboard archiveId={archiveId} />
+      {/* ── COVERAGE MAP ── */}
+      <CoverageMap link={{ href: '/archive/entity', label: 'Talk to your entity' }} />
 
       {/* ── ENTITY READINESS + ACCESS ── */}
       <EntityReadinessCard archiveId={archiveId} />

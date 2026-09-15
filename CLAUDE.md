@@ -163,6 +163,20 @@ that refuses any founder position not directly supported by a deposit. It is the
 central integrity mechanism, live in production on the succession entity chat route.
 `lib/entitySystemPrompt.ts` holds the shared prompt.
 
+**Coverage map.** `lib/coverageRun.ts` probes the entity and reads the verifier;
+`lib/coverageSet.ts` picks the probe set by segment: business (v2,
+`lib/coverageProbes.ts`, eight b2b domains) for succession, personal (p1,
+`lib/coverageProbesPersonal.ts`, eight kinds of judgment in `lib/personalDomains.ts`)
+for every other tier, since September 15, 2026. Rendered to owners by
+`lib/coverageOwner.ts` and `app/archive/components/CoverageMap.tsx`, count-led, no
+score. The family entity chat route (`app/api/archive/entity-chat`,
+`lib/entityContext.ts`) runs NO verifier, so a personal map shows coverage only and
+never an overreach line until that route is moved onto the grounded pipeline. The
+accuracy score and dimension percentages that used to sit on the personal dashboard
+were deposit-count readings presented as accuracy and are gone from the web;
+`/api/archive/entity-accuracy` remains for iOS only. Runbook:
+`docs/PERSONAL_COVERAGE_MAP_2026-09-15.md`.
+
 `GroundingVerdict` carries `basis`: `'deposit'` (position backed by a pair),
 `'no_position'` (no normative position taken, includes the in character thin archive
 hedge), `'unsupported'` (overreach, triggers the gap reply). `supported` is derived as

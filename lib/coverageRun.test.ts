@@ -138,6 +138,8 @@ vi.mock('@anthropic-ai/sdk', () => ({
 
 import { runCoverage } from './coverageRun'
 import { COVERAGE_PROBES, PROBE_SET_VERSION } from './coverageProbes'
+import { PERSONAL_COVERAGE_PROBES, PERSONAL_PROBE_SET_VERSION } from './coverageProbesPersonal'
+import { PERSONAL_DOMAINS } from './personalDomains'
 import { B2B_DOMAINS } from './b2bDomains'
 import { RETRIEVAL_MODEL, FROZEN_LAYER_CANDIDATE_LIMIT } from './frozenLayer'
 
@@ -329,16 +331,61 @@ describe('runCoverage default path, store neutrality', () => {
     expect(sequence()).toEqual(['select archives'])
   })
 
-  it('derives off_label from segment, not from the caller', async () => {
+  /**
+   * CHANGED 2026-09-15. This test used to pin that a b2c archive ran the
+   * business set off-label, because that was the only set. A family archive
+   * now gets the personal set (p1) on-label: its own probes, its own eight
+   * domain names, the personal prompt framing. off_label still derives from
+   * segment against the set, never from the caller; it is simply false now for
+   * both known segments.
+   */
+  it('runs a family archive through the personal set, on-label, with the personal domains', async () => {
     H.state.archive = { id: ARCHIVE, name: 'A Family', owner_name: 'Someone', tier: 'active' }
 
-    await runCoverage({ archiveId: ARCHIVE })
+    const result = await runCoverage({ archiveId: ARCHIVE })
 
     const open = H.state.calls.find(c => c.op === 'insert' && c.table === 'coverage_runs')!
     console.log('  b2c archive open payload:', JSON.stringify(open.payload))
 
     expect((open.payload as Row).segment).toBe('b2c')
-    expect((open.payload as Row).off_label).toBe(true)
+    expect((open.payload as Row).off_label).toBe(false)
+    expect((open.payload as Row).probe_set_version).toBe(PERSONAL_PROBE_SET_VERSION)
+
+    const probeWrites = H.state.calls.filter(c => c.op === 'upsert' && c.table === 'coverage_probe_results')
+    expect(probeWrites.length).toBe(PERSONAL_COVERAGE_PROBES.length)
+    const keys = new Set(probeWrites.map(c => (c.payload as Row).probe_key as string))
+    for (const p of PERSONAL_COVERAGE_PROBES) expect(keys.has(p.key), p.key).toBe(true)
+
+    const write = H.state.calls.find(c => c.op === 'upsert' && c.table === 'archive_coverage')!
+    const rows  = write.payload as Row[]
+    expect(rows.map(r => r.domain).sort()).toEqual(PERSONAL_DOMAINS.map(d => d.name).sort())
+    for (const r of rows) expect(r.probe_set_version).toBe(PERSONAL_PROBE_SET_VERSION)
+
+    // The voice call carried the personal framing, not the succession one.
+    const voice = M.calls.find(c => c.model !== RETRIEVAL_MODEL && typeof c.system === 'string')!
+    expect(voice.system).toContain('Someone in their family is asking you')
+    expect(voice.system).not.toContain('running their organization')
+
+    expect('skipped' in result).toBe(false)
+    if ('skipped' in result) return
+    expect(result.offLabel).toBe(false)
+  })
+
+  it('keeps the succession framing on a succession archive', async () => {
+    await runCoverage({ archiveId: ARCHIVE })
+    const voice = M.calls.find(c => c.model !== RETRIEVAL_MODEL && typeof c.system === 'string')!
+    expect(voice.system).toContain('The person now running their organization')
+    expect(voice.system).not.toContain('Someone in their family')
+  })
+
+  it('skips an archive with no included training pairs before opening a run row', async () => {
+    H.state.pairs = []
+
+    const result = await runCoverage({ archiveId: ARCHIVE })
+    console.log('  empty archive   :', JSON.stringify(result))
+
+    expect(result).toEqual({ skipped: 'no included training pairs' })
+    expect(sequence()).toEqual(['select archives', 'select training_pairs'])
   })
 })
 

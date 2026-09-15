@@ -16,6 +16,7 @@ import {
   type OverreachLevel,
 } from './coverage'
 import { B2B_DOMAINS } from './b2bDomains'
+import { PERSONAL_DOMAINS } from './personalDomains'
 import { COVERAGE_PROBES, PROBES_PER_DOMAIN, PROBE_SET_VERSION, probesForDomain } from './coverageProbes'
 import type { GroundingBasis } from './verifyGrounding'
 
@@ -357,5 +358,25 @@ describe('isRunComplete', () => {
     const full = Array.from({ length: PROBES_PER_DOMAIN }, () => 'deposit' as GroundingBasis)
     const all  = B2B_DOMAINS.flatMap(d => results(d.name, ...full))
     expect(isRunComplete(rollUpRun(all))).toBe(true)
+  })
+})
+
+describe('rollUpRun with an injected domain list', () => {
+  it('defaults to the business taxonomy and rolls a personal run up against the personal one', () => {
+    const personal = rollUpRun([
+      { probeKey: 'p-money-01', domain: 'Money', basis: 'deposit' },
+      { probeKey: 'p-money-02', domain: 'Money', basis: 'no_position' },
+    ], {}, PERSONAL_DOMAINS)
+    expect(personal.map(r => r.domain)).toEqual(PERSONAL_DOMAINS.map(d => d.name))
+    const money = personal.find(r => r.domain === 'Money')!
+    expect(money.state).toBe('partial')
+    expect(money.probesDeposit).toBe(1)
+    expect(money.probesTotal).toBe(2)
+    // A business-named result is ignored under the personal list, not rolled into a phantom row.
+    const stray = rollUpRun([{ probeKey: 'capital-01', domain: 'Capital', basis: 'deposit' }], {}, PERSONAL_DOMAINS)
+    expect(stray.find(r => r.domain === 'Capital')).toBeUndefined()
+    expect(stray.every(r => r.probesTotal === 0)).toBe(true)
+    // Default is unchanged.
+    expect(rollUpRun([]).map(r => r.domain)).toEqual(B2B_DOMAINS.map(d => d.name))
   })
 })

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { REFUSAL_CANDIDATES, allProofCopy, orderGroundedCandidates, type ProofPair } from './foundingProof'
-import { COVERAGE_PROBES } from './coverageProbes'
+import { ALL_COVERAGE_SETS } from './coverageSet'
 
 describe('founding proof candidates', () => {
   it('has refusal candidates for both scopes, all position-forcing questions', () => {
@@ -11,9 +11,10 @@ describe('founding proof candidates', () => {
     }
   })
 
-  it('never reuses a coverage probe, because the owner sees these', () => {
-    const probes = new Set(COVERAGE_PROBES.map(p => p.question.trim().toLowerCase()))
-    for (const q of allProofCopy()) expect(probes.has(q.trim().toLowerCase())).toBe(false)
+  it('never reuses a coverage probe from any set, because the owner sees these', () => {
+    const probes = new Set(ALL_COVERAGE_SETS.flatMap(s => s.probes.map(p => p.question.trim().toLowerCase())))
+    expect(probes.size).toBeGreaterThan(48)
+    for (const q of allProofCopy()) expect(probes.has(q.trim().toLowerCase()), q).toBe(false)
   })
 
   it('obeys the copy rules', () => {
