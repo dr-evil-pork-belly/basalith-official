@@ -341,7 +341,9 @@ export default function FoundingClient({
 // with the deposit shown under it, and one it declines. Computed on demand by
 // POST /api/archive/founding/proof and never stored. The badge wording is the
 // approved phrase, "checked against your archive," and only appears on the
-// grounded half; the refusal half is tagged "no deposit covers this."
+// grounded half. The refusal half is tagged "where the archive is silent, it
+// says so," because a declined reply can still carry a grounded rule alongside
+// the part it declines, and "no deposit covers this" overstated the silence.
 
 function ProofCard() {
   const [state, setState] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
@@ -416,7 +418,7 @@ function ProofCard() {
           )}
           {proof.refusal && (
             <div style={{ padding: '20px 22px', background: 'rgba(250,248,244,0.03)', border: '1px solid rgba(250,248,244,0.12)' }}>
-              <p style={{ ...eyebrow(), color: LABEL, marginBottom: '10px' }}>No deposit covers this</p>
+              <p style={{ ...eyebrow(), color: LABEL, marginBottom: '10px' }}>Where the archive is silent, it says so</p>
               {q(proof.refusal.question)}
               <p style={{ fontFamily: SERIF, fontSize: '1.02rem', fontWeight: 300, color: BODY, lineHeight: 1.7, margin: 0, whiteSpace: 'pre-wrap' }}>
                 {proof.refusal.reply}

@@ -49,7 +49,9 @@ export const FOUNDING_SEEDS: Record<FoundingScope, FoundingSeed[]> = {
   personal: [
     {
       call: 1, category: 'judgment', title: 'The hardest call',
-      question: 'Tell me about the hardest call you ever made for the people you love. What was going on, and what did you do?',
+      // The mural: an owner's hardest family call and hardest work call are
+      // often the same call. No tier decides where a life is divided.
+      question: 'Tell me about the hardest call you ever made, at home or at work. What was going on, and what did you do?',
     },
     {
       call: 2, category: 'conflict', title: 'Against the room',

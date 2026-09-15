@@ -199,7 +199,9 @@ back (SEED pairs first, then by quality, up to three tries) and shows only a
 `basis === 'deposit'` result under the approved words "checked against your
 archive." Refusal half asks up to three questions from `REFUSAL_CANDIDATES`
 (per scope, deliberately not coverage probes, since the owner sees them) and
-shows the first the verifier does not ground, tagged "no deposit covers this."
+shows the first the verifier does not ground, tagged "where the archive is
+silent, it says so" (a declined reply can still carry a grounded rule beside
+the part it declines, so the earlier tag overstated the silence).
 If either half comes up empty the card says so instead of faking it. Owner
 only, requires all three calls complete, rate limited to 4 per IP per hour,
 never stored, never logged to grounding_gaps. The owner completion email now

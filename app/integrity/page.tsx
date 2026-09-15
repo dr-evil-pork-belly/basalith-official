@@ -204,6 +204,34 @@ export default function IntegrityPage() {
           </div>
         </section>
 
+        {/* Section 5. From the founder. Added September 15, 2026, the night
+            after he ran The Founding on his own archive. His words, lightly
+            set. "Machines" rather than the word the copy rules keep off this
+            site. */}
+        <section style={{ background: 'var(--color-void)', padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,80px)' }}>
+          <div style={{ maxWidth: '680px', margin: '0 auto' }}>
+            <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '24px' }}>
+              From the founder
+            </p>
+            <h2 style={{ ...H2, color: 'rgba(250,248,244,0.9)' }}>The trust of our truth.</h2>
+            <p style={{ ...BODY, color: 'rgba(250,248,244,0.62)' }}>
+              I ran The Founding on my own archive before anyone else did. What hit home
+              was not the answer that read like my own thinking, word for word. It was the
+              question it declined. It gave me a rule I had actually laid down, then said
+              I had left no position on the rest and it would not manufacture one. It does
+              not try to be me and come out as something I can tell is not me.
+            </p>
+            <p style={{ ...BODY, color: 'rgba(250,248,244,0.62)' }}>
+              As machines get better at sounding like anyone, that is the one thing worth
+              counting on. The trust of our truth. What you actually said, and nothing you
+              did not.
+            </p>
+            <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'rgba(250,248,244,0.55)', marginTop: '28px' }}>
+              David Ha, Founder
+            </p>
+          </div>
+        </section>
+
         {/* Closing CTA */}
         <section style={{ background: 'var(--color-void)', padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,80px)', textAlign: 'center' }}>
           <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.5)', marginBottom: '8px', lineHeight: 1.85 }}>
