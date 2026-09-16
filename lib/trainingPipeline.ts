@@ -1,7 +1,7 @@
 /**
  * Training Data Pipeline
  *
- * Scores every pair inline at creation — no Inngest required.
+ * Scores every pair inline at creation. No Inngest required.
  * Each create function: idempotency check → score → insert with scores.
  */
 
@@ -11,6 +11,29 @@ import { supabaseAdmin } from './supabase-admin'
 const anthropic = new Anthropic()
 
 const QUALITY_THRESHOLD = 50
+
+/**
+ * Whether a pair enters the frozen layer.
+ *
+ * Open deposits are gated by the scorer above, which was written for
+ * standalone paragraphs and says so ("under 20 words caps specificity at 3").
+ * An incident-interview turn is a different kind of material: the reducer in
+ * lib/incidentSession.ts re-probes a thin spine answer once and accepts the
+ * rest, and the probes are built to draw short precise answers. Scoring those
+ * with the paragraph rubric rejected 31 of 37 founding turns on the first live
+ * Founding Sequence (September 14 and 15, 2026; average 39, best reject 49
+ * against a bar of 50). So an interview turn, identified by a probe_type in
+ * its metadata, is included on the interview's say-so. Its score is still
+ * recorded, never consulted. Pure, exported for the test.
+ *
+ * The scorer's rubric itself is not changed here. A self-contained incident
+ * pair, whose prompt carries the incident it came from, is the proper next
+ * step (docs/TRAINING_INCLUSION_2026-09-16.md).
+ */
+export function includeInTraining(qualityScore: number, probeType?: string | null): boolean {
+  if (probeType) return true
+  return qualityScore >= QUALITY_THRESHOLD
+}
 
 function buildPersonSystemPrompt(ownerName: string, archiveName: string): string {
   return `You are ${ownerName}. You think, speak, and reason exactly as ${ownerName} does.
@@ -118,7 +141,7 @@ export async function createTrainingPairFromDeposit(
   probeType?: string,
   dimensionTag?: { dimension: string; status: string },
 ): Promise<void> {
-  console.log('[training] createTrainingPairFromDeposit called —',
+  console.log('[training] createTrainingPairFromDeposit called,',
     'depositId:', deposit.id,
     'archiveId:', deposit.archive_id,
     'promptLen:', deposit.prompt?.length ?? 0,
@@ -126,8 +149,26 @@ export async function createTrainingPairFromDeposit(
   )
 
   if (!deposit.prompt || !deposit.response || deposit.response.length < 20) {
-    console.log('[training] skipping — response too short')
+    console.log('[training] skipping: response too short')
     return
+  }
+
+  // A deposit flagged as a test artifact never trains anything. The flag
+  // lives on the row, not on the object callers pass in, so read it when an
+  // id is given. Until September 16, 2026 nothing on this path checked it;
+  // the drive scripts' fictional founder turns did reach training_pairs and
+  // were kept out of the layer only because the scorer happened to reject
+  // them. Not luck to rely on.
+  if (deposit.id) {
+    const { data: row } = await supabaseAdmin
+      .from('owner_deposits')
+      .select('test_artifact')
+      .eq('id', deposit.id)
+      .maybeSingle()
+    if (row?.test_artifact === true) {
+      console.log('[training] skipping: deposit is a test artifact', deposit.id)
+      return
+    }
   }
 
   // Idempotency
@@ -139,7 +180,7 @@ export async function createTrainingPairFromDeposit(
       .eq('source_type', sourceType)
       .maybeSingle()
     if (existing) {
-      console.log('[training] pair already exists for', sourceType, deposit.id, '— skipping')
+      console.log('[training] pair already exists for', sourceType, deposit.id, 'skipping')
       return
     }
   }
@@ -172,7 +213,7 @@ export async function createTrainingPairFromDeposit(
       system_prompt:        buildPersonSystemPrompt(ownerName, archiveName),
       language,
       word_count:           deposit.response.split(/\s+/).filter(Boolean).length,
-      included_in_training: scores.quality_score >= QUALITY_THRESHOLD,
+      included_in_training: includeInTraining(scores.quality_score, probeType),
       ...scores,
       metadata,
     })
@@ -184,7 +225,7 @@ export async function createTrainingPairFromDeposit(
     return
   }
 
-  console.log('[training] pair created — id:', inserted?.id, '— quality:', scores.quality_score, '— included:', scores.quality_score >= QUALITY_THRESHOLD)
+  console.log('[training] pair created, id:', inserted?.id, 'quality:', scores.quality_score, 'included:', includeInTraining(scores.quality_score, probeType))
 }
 
 // ── Create from voice ─────────────────────────────────────────────────────────
