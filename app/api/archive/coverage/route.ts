@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { loadOwnerCoverage } from '@/lib/coverageOwner'
+import { readEntityPipeline } from '@/lib/familyEntity'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,7 +27,10 @@ export async function GET() {
   }
 
   try {
-    const coverage = await loadOwnerCoverage(archive.id, archive.tier)
+    // A personal archive shows its overreach reading only once its family
+    // entity runs the verifier (archives.entity_pipeline = 'grounded').
+    const verified = archive.tier === 'succession' ? true : (await readEntityPipeline(archive.id)) === 'grounded'
+    const coverage = await loadOwnerCoverage(archive.id, archive.tier, verified)
     return NextResponse.json(coverage)
   } catch (err) {
     console.error('[archive/coverage]', err instanceof Error ? err.message : err)

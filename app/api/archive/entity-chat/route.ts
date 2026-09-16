@@ -1,34 +1,44 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { NextResponse } from 'next/server'
+import { NextResponse, after } from 'next/server'
 import { resend } from '@/lib/resend'
 import { createTrainingPairFromDeposit } from '@/lib/trainingPipeline'
 import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { classifyDeposit } from '@/lib/classifyDeposit'
-import { buildEntitySystemPrompt } from '@/lib/entityContext'
+import { buildEntitySystemPrompt as buildContextPrompt } from '@/lib/entityContext'
+import { logGroundingGap } from '@/lib/groundingGapLog'
+import {
+  isDeposit,
+  sanitizeHistory,
+  gapLanguage,
+  readEntityPipeline,
+  generateGroundedFamilyReply,
+} from '@/lib/familyEntity'
 
 const anthropic = new Anthropic()
 
-function isDeposit(message: string): boolean {
-  const trimmed = message.trim()
-  if (trimmed.endsWith('?')) return false
-  const questionStarters = [
-    'what','how','why','when','where','who',
-    'can','could','would','should',
-    'do','does','is','are','will',
-  ]
-  const firstWord = trimmed.split(' ')[0].toLowerCase()
-  if (questionStarters.includes(firstWord)) return false
-  return trimmed.length > 30
-}
-
+// The family entity. Owner (Supabase session, web or iOS) or contributor
+// (bearer access token, gated by archives.contributor_entity_access).
+//
+// September 16, 2026: two pipelines behind one contract, chosen per archive by
+// archives.entity_pipeline. 'context' is the pre-move path, byte for byte:
+// lib/entityContext.ts, Opus, no verifier. 'grounded' is the succession
+// pipeline with the personal prompt scope: frozen layer, Sonnet, Control B,
+// gap reply in the reader's language, gap log. The switch is temporary; see
+// lib/familyEntity.ts. Two changes apply to BOTH paths because they were
+// wrong on their own: a contributor's turn is never saved as the owner's
+// deposit (it used to be, unattributed), and every post-response write runs
+// under after() instead of void, per CLAUDE.md section 1.
+//
+// Request and response shapes are unchanged: { message, sessionId,
+// conversationHistory } in, { response, sessionId, wasDeposit } out. The iOS
+// app depends on that.
 export async function POST(req: Request) {
-  console.log('=== ENTITY CHAT POST ===')
   try {
     const body = await req.json()
-    const { message, sessionId, conversationHistory } = body
+    const { message, sessionId } = body
 
-    if (!message) {
+    if (!message || typeof message !== 'string') {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
@@ -43,6 +53,7 @@ export async function POST(req: Request) {
 
     let authorizedArchiveId: string | null = null
     let callerType: 'owner' | 'contributor' | null = null
+    let contributorLanguage: string | null = null
 
     if (session?.archiveId) {
       // A session carrying an archiveId is not proof of ownership (getSessionUser
@@ -60,7 +71,7 @@ export async function POST(req: Request) {
     } else if (contributorToken) {
       const { data: contributor } = await supabaseAdmin
         .from('contributors')
-        .select('archive_id, status')
+        .select('archive_id, status, preferred_language')
         .eq('access_token', contributorToken)
         .eq('status', 'active')
         .maybeSingle()
@@ -68,16 +79,17 @@ export async function POST(req: Request) {
       if (contributor) {
         authorizedArchiveId = contributor.archive_id
         callerType          = 'contributor'
+        contributorLanguage = (contributor.preferred_language as string | null) ?? null
       }
     }
 
-    if (!authorizedArchiveId) {
+    if (!authorizedArchiveId || !callerType) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const archiveId = authorizedArchiveId
 
-    // ── Step 3: Contributor access check ──────────────────────────────────────
+    // ── Step 2: Contributor access check ──────────────────────────────────────
     if (callerType === 'contributor') {
       const { data: archiveAccess } = await supabaseAdmin
         .from('archives')
@@ -93,41 +105,77 @@ export async function POST(req: Request) {
       }
     }
 
-    console.log('[entity-chat] archiveId:', archiveId, '| caller:', callerType, '| msgLen:', message?.length, '| msgPreview:', message?.substring(0, 60))
+    const history  = sanitizeHistory(body.conversationHistory)
+    const pipeline = await readEntityPipeline(archiveId)
 
-    const { systemPrompt, usedDepositIds } = await buildEntitySystemPrompt(archiveId, message)
+    console.log('[entity-chat] archiveId:', archiveId, '| caller:', callerType, '| pipeline:', pipeline, '| msgLen:', message.length)
 
-    const messages = [
-      ...(conversationHistory || []),
-      { role: 'user' as const, content: message },
-    ]
+    // ── Step 3: Answer ────────────────────────────────────────────────────────
+    let entityResponse = ''
+    let usedDepositIds: string[] = []
 
-    const aiResponse = await anthropic.messages.create({
-      model: 'claude-opus-4-6',
-      max_tokens: 600,
-      system: systemPrompt,
-      messages,
-    })
+    if (pipeline === 'grounded') {
+      const { data: arch } = await supabaseAdmin
+        .from('archives')
+        .select('name, owner_name, preferred_language')
+        .eq('id', archiveId)
+        .single()
+      if (!arch) return NextResponse.json({ error: 'Archive not found' }, { status: 404 })
 
-    const entityResponse =
-      aiResponse.content[0].type === 'text' ? aiResponse.content[0].text : ''
+      const language = gapLanguage(contributorLanguage, arch.preferred_language as string | null)
+      const out = await generateGroundedFamilyReply({
+        archiveId,
+        ownerName:   (arch.owner_name as string | null) ?? (arch.name as string),
+        archiveName: arch.name as string,
+        message,
+        history,
+        language,
+      })
+      console.log(`[entity-chat] ${archiveId} ${out.selection} basis=${out.basis}`)
+
+      entityResponse = out.reply
+      usedDepositIds = out.usedDepositIds
+
+      // Every question the frozen archive could not ground, as on the
+      // succession route. after() is load-bearing: a bare dispatch dies on
+      // lambda freeze and the gap is silently lost.
+      if (out.basis !== 'deposit') {
+        const basis = out.basis
+        after(() => logGroundingGap({ archiveId, question: message, basis }))
+      }
+    } else {
+      // The pre-move path, unchanged: keyword-selected raw deposits and family
+      // material, Opus, no verifier.
+      const built = await buildContextPrompt(archiveId, message)
+      const aiResponse = await anthropic.messages.create({
+        model:      'claude-opus-4-6',
+        max_tokens: 600,
+        system:     built.systemPrompt,
+        messages:   [...history, { role: 'user' as const, content: message }],
+      })
+      entityResponse = aiResponse.content[0].type === 'text' ? aiResponse.content[0].text : ''
+      usedDepositIds = built.usedDepositIds
+    }
 
     const currentSessionId = sessionId || crypto.randomUUID()
 
-    // Save conversation (non-fatal)
-    supabaseAdmin.from('entity_conversations').insert([
-      { archive_id: archiveId, session_id: currentSessionId, role: 'user', content: message },
-      { archive_id: archiveId, session_id: currentSessionId, role: 'entity', content: entityResponse },
-    ]).then(({ error }) => {
+    // ── Step 4: Post-response writes, all under after() ───────────────────────
+    after(async () => {
+      const { error } = await supabaseAdmin.from('entity_conversations').insert([
+        { archive_id: archiveId, session_id: currentSessionId, role: 'user',   content: message },
+        { archive_id: archiveId, session_id: currentSessionId, role: 'entity', content: entityResponse },
+      ])
       if (error) console.warn('entity_conversations insert skipped:', error.message)
     })
 
-    // Auto-save statement responses as deposits + create training pair (non-fatal, fire-and-forget)
-    const wasDeposit = isDeposit(message)
-    console.log('[entity-chat] wasDeposit:', wasDeposit, '| firstWord:', message.trim().split(' ')[0], '| endsWithQ:', message.trim().endsWith('?'))
+    // Auto-save an OWNER's statement as a deposit and a training pair. Owner
+    // only. Until September 16, 2026 this ran for contributors too and wrote
+    // their words into owner_deposits with no attribution, from where they
+    // became first-person training pairs. A contributor's deliberate deposit
+    // path is /api/contribute/answer, which attributes correctly.
+    const wasDeposit = callerType === 'owner' && isDeposit(message)
     if (wasDeposit) {
-      console.log('[entity-chat] entering deposit+training IIFE')
-      void (async () => {
+      after(async () => {
         try {
           const { data: dep, error: depErr } = await supabaseAdmin
             .from('owner_deposits')
@@ -135,26 +183,22 @@ export async function POST(req: Request) {
             .select('id')
             .single()
 
-          if (depErr) {
-            console.warn('[entity-chat] deposit save failed:', depErr.message)
+          if (depErr || !dep?.id) {
+            console.warn('[entity-chat] deposit save failed:', depErr?.message)
             return
           }
 
-          if (dep?.id) void classifyDeposit({ depositId: dep.id, archiveId, text: message })
+          try { await classifyDeposit({ depositId: dep.id, archiveId, text: message }) } catch {}
 
           const { data: arch } = await supabaseAdmin
             .from('archives')
             .select('owner_name, name, preferred_language')
             .eq('id', archiveId)
             .single()
-
-          if (!arch) {
-            console.warn('[entity-chat] archive not found for training pair:', archiveId)
-            return
-          }
+          if (!arch) return
 
           await createTrainingPairFromDeposit(
-            { id: dep?.id, archive_id: archiveId, prompt: 'Entity chat deposit', response: message },
+            { id: dep.id, archive_id: archiveId, prompt: 'Entity chat deposit', response: message },
             arch.owner_name || 'Unknown',
             arch.name,
             arch.preferred_language || 'en',
@@ -162,16 +206,19 @@ export async function POST(req: Request) {
         } catch (e) {
           console.error('[entity-chat] deposit/training error:', e instanceof Error ? e.message : e)
         }
-      })()
+      })
     }
 
-    // Track deposit usage + send memory confirmation on first use (non-blocking)
+    // Track deposit usage and send the memory confirmation on first use. On
+    // the grounded path usedDepositIds are the owner_deposits behind the
+    // selected pairs; contributor deposits are never among them (owner-only
+    // corpus), so the first-use email below does not fire there. Kept intact
+    // for the 'context' path and for the day contributor material returns.
     if (usedDepositIds.length > 0) {
-      Promise.resolve().then(async () => {
+      after(async () => {
         try {
           await supabaseAdmin.rpc('increment_deposit_access', { deposit_ids: usedDepositIds })
 
-          // First-use deposits with a contributor attribution → send notification
           const { data: firstUse } = await supabaseAdmin
             .from('owner_deposits')
             .select('id, contributor_id, contributor_name, prompt, response, archive_id')

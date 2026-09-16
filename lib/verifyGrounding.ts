@@ -1,7 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 
 /**
- * Control B — output-side grounding verifier for the succession entity.
+ * Control B, the output-side grounding verifier for the succession entity.
  *
  * A dedicated auditor (NOT the founder persona) reads the founder's actual
  * deposits, the question, and the draft answer, and decides whether the draft
@@ -79,13 +79,48 @@ function stripFences(s: string): string {
  * Plain first-person founder voice, no em dashes. Declines without extending a
  * principle to pick a side.
  */
-export function groundingGapReply(topic: string): string {
+export function groundingGapReply(topic: string, language: string = 'en'): string {
   const t = topic && topic.trim() ? topic.trim() : 'this'
+  const lang = normalizeGapLanguage(language)
+  if (lang !== 'en') return GAP_REPLY_BY_LANGUAGE[lang]
   return (
     `I haven't left a settled position on ${t} in the archive, so I won't put words in my own mouth now. ` +
     `That's a call you'll have to make with the people in the room. ` +
     `I'll tell you how I think in general, but I won't pretend I decided this one when I didn't.`
   )
+}
+
+/**
+ * The same decline in the languages the product already serves by email
+ * (lib/emailTranslations.ts). Added September 16, 2026 for the family entity,
+ * whose callers write in their own languages. English is unchanged byte for
+ * byte, because scripts/two-layer-probe.ts scores against it.
+ *
+ * These carry no topic. The auditor names the topic in English, and an
+ * English phrase inside a Vietnamese sentence reads as exactly the seam it
+ * is. A decline that names nothing is honest; a decline that half-translates
+ * is not. Each string is a plain first-person refusal to invent a position,
+ * with no template phrase a model could echo back. A native reader should
+ * confirm each one before an archive in that language moves onto the
+ * grounded route (the per-archive switch exists for this).
+ */
+export type GapReplyLanguage = 'en' | 'es' | 'ja' | 'ko' | 'tl' | 'vi' | 'yue' | 'zh'
+
+export const GAP_REPLY_BY_LANGUAGE: Record<Exclude<GapReplyLanguage, 'en'>, string> = {
+  es:  'No dejé una postura definida sobre esto en mi archivo, así que no voy a poner palabras en mi propia boca ahora. Esa es una decisión que tendrán que tomar entre ustedes. Puedo contarles cómo pienso en general, pero no voy a fingir que decidí esto cuando no lo hice.',
+  ja:  'この件について、私はアーカイブにはっきりした考えを残していません。だから今、自分の口で言っていないことを言うつもりはありません。それは、そこにいる人たちと相談して決めることです。私がふだんどう考えるかは話せますが、決めていないことを決めたふりはしません。',
+  ko:  '이 문제에 대해 나는 기록에 분명한 입장을 남기지 않았다. 그래서 지금 내가 하지 않은 말을 내 입에 넣지 않겠다. 그건 그 자리에 있는 사람들과 함께 내려야 할 결정이다. 내가 대체로 어떻게 생각하는지는 말해 줄 수 있지만, 결정하지 않은 일을 결정한 척하지는 않겠다.',
+  tl:  'Wala akong iniwang malinaw na paninindigan tungkol dito sa aking archive, kaya hindi ko ilalagay ngayon sa sarili kong bibig ang hindi ko sinabi. Desisyon iyan na kailangan ninyong pagpasyahan kasama ang mga taong nandiyan. Masasabi ko kung paano ako mag-isip sa pangkalahatan, pero hindi ako magpapanggap na napagpasyahan ko ito gayong hindi naman.',
+  vi:  'Tôi không để lại một lập trường rõ ràng về chuyện này trong hồ sơ của mình, nên bây giờ tôi sẽ không nói điều mà tôi chưa từng nói. Đó là quyết định mà các con phải cùng nhau đưa ra. Tôi có thể kể cách tôi thường suy nghĩ, nhưng tôi sẽ không giả vờ là mình đã quyết định khi tôi chưa hề quyết định.',
+  yue: '呢件事我嘅檔案入面唔存在一個確定嘅立場，所以我家下唔會把我沒講過嘅話放入自己把口。呢個決定要你地同在場嘅人一齊做。我可以講下我平時點諸計，但我唔會裝作自己決定咗一件我沒決定過嘅事。',
+  zh:  '关于这件事，我在档案里没有留下明确的立场，所以现在我不会把我没说过的话安在自己嘴上。这个决定要你们和在场的人一起做。我可以说说我平时怎么想，但我不会假装自己决定过一件我没决定过的事。',
+}
+
+/** 'en' for anything not in the table, including null and unknown codes. */
+export function normalizeGapLanguage(language: string | null | undefined): GapReplyLanguage {
+  const code = (language ?? '').trim().toLowerCase()
+  if (code in GAP_REPLY_BY_LANGUAGE) return code as GapReplyLanguage
+  return 'en'
 }
 
 export async function verifyGrounding({

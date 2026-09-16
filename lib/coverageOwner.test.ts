@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { allCoverageCopy, countLine, ownerCoverageFromRows, COVERAGE_CAVEAT, type OwnerCoverageRow } from './coverageOwner'
+import { allCoverageCopy, countLine, ownerCoverageFromRows, COVERAGE_CAVEAT, COVERAGE_CAVEAT_PERSONAL_VERIFIED, OVERREACH_EXPLAINER_PERSONAL, type OwnerCoverageRow } from './coverageOwner'
 import { BUSINESS_SET, PERSONAL_SET } from './coverageSet'
 
 function row(domain: string, deposit: number, extra: Partial<OwnerCoverageRow> = {}): OwnerCoverageRow {
@@ -106,8 +106,27 @@ describe('owner coverage', () => {
     }
   })
 
-  it('does not claim, on a personal archive, that overreach is caught, because the family route runs no verifier', () => {
+  it('does not claim, on a personal archive still on the context route, that overreach is caught', () => {
     expect(COVERAGE_CAVEAT.personal).not.toMatch(/caught/i)
     expect(COVERAGE_CAVEAT.personal).toMatch(/not of a conversation/)
+  })
+
+  it('turns the overreach line, the family explainer, and the live caveat on once the family entity is verified', () => {
+    const rows = [
+      row('Money', 3, { probe_set_version: 'p1', overreach: 'high' }),
+      row('People', 6, { probe_set_version: 'p1' }),
+    ]
+    const r = ownerCoverageFromRows(rows, RUN, PERSONAL_SET, true)
+    expect(r.available).toBe(true)
+    if (!r.available) return
+    expect(r.domains[0].domain).toBe('People')
+    expect(r.domains[0].overreachLine).toBeNull()          // backed: the question does not arise
+    expect(r.domains[1].overreachLine).toContain('more often than not')
+    expect(r.explainer).toBe(OVERREACH_EXPLAINER_PERSONAL)
+    expect(r.explainer).not.toMatch(/successor/i)
+    expect(r.caveat).toBe(COVERAGE_CAVEAT_PERSONAL_VERIFIED)
+    // Business is unaffected by the flag either way.
+    const b = ownerCoverageFromRows([row('Capital', 2, { overreach: 'some' })], RUN, BUSINESS_SET, false)
+    expect(b.available && b.domains[0].overreachLine).toContain('sometimes')
   })
 })

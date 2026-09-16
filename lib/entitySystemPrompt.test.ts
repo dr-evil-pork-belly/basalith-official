@@ -26,12 +26,13 @@ describe('entity system prompt scope', () => {
       expect(personal, to).toContain(to)
       expect(personal, from).not.toContain(from)
     }
-    // The grounding rules are the same text in both.
+    // The grounding rules are the same text in both. The output-language line
+    // is the one closing rule that differs and is pinned by its own test below.
     for (const rule of [
       'Where the record does not settle the question, do not settle it.',
       'Never invent a policy, a number, a rule, or a past decision that is not in the record above.',
       'Never break character. Never refer to yourself as an AI or a model.',
-      'No em dashes. American English. Responses should be 3 to 6 sentences.',
+      'Responses should be 3 to 6 sentences.',
     ]) {
       expect(business).toContain(rule)
       expect(personal).toContain(rule)
@@ -44,5 +45,14 @@ describe('entity system prompt scope', () => {
     expect(personal).not.toMatch(/\borganization\b/i)
     expect(personal).not.toMatch(/running the business/i)
     expect(personal).not.toMatch(/\bhandover\b/i)
+  })
+
+  it('lets a personal archive answer in the language of the question, business stays American English', () => {
+    const business = buildEntitySystemPrompt(base)
+    const personal = buildEntitySystemPrompt({ ...base, scope: 'personal' })
+    expect(business).toContain('American English.')
+    expect(personal).not.toContain('American English.')
+    expect(personal).toContain('Answer in the language the question was asked in.')
+    expect(personal).toContain('No em dashes.')
   })
 })

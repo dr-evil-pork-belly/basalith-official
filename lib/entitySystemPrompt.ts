@@ -327,6 +327,14 @@ export const PROMPT_SCOPE_SUBSTITUTIONS: ReadonlyArray<readonly [string, string]
   ['(what the person now running the business has told you)', '(what the family member has told you)'],
   ['the current context the successor has provided', 'the current context the family member has provided'],
   ['A successor acting on a position', 'A family member acting on a position'],
+  // Families write in their own languages (see lib/emailTranslations.ts for
+  // the ones the product serves). The grounding rules above are unchanged;
+  // only the output language follows the question. The business prompt keeps
+  // American English because the succession route is English by contract.
+  [
+    'No em dashes. American English. Responses should be 3 to 6 sentences.',
+    'No em dashes. Answer in the language the question was asked in. Responses should be 3 to 6 sentences.',
+  ],
 ]
 
 function toPersonalScope(businessPrompt: string): string {

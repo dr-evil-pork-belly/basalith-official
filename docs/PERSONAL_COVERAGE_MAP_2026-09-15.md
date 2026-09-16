@@ -220,3 +220,72 @@ Tests: `lib/coverageProbesPersonal.test.ts` (8), `lib/entitySystemPrompt.test.ts
 new), `lib/coverage.test.ts` (48, one new), `lib/foundingProof.test.ts` (4,
 guard widened to both sets). Full local suite over the coverage, frozen
 layer, founding, classifier, and proof modules: 116 green.
+
+---
+
+## Verified in production, September 15, 2026
+
+Commit `2f48f57`, pushed to main, Ready with the basalith.ai alias. Inngest
+synced the same commit at 12:38 PM Pacific, 13 functions, "Compute archive
+coverage map" on `coverage.run.requested`.
+
+First personal run, requested by hand from the Inngest dashboard, run
+`3996f520-6b02-464c-8be6-114e14502dc1`:
+
+    probe_set_version p1, segment b2c, off_label false, trigger_source manual,
+    complete true, ok true, probes_total 48, probes_deposit 19,
+    probes_errored 0, model_calls 144, error null
+
+`model_calls` of 144 is 48 times 3, so retrieval fired on every probe: the
+archive's 122 deposits put it over the frozen layer cap, and each question got
+the layer the route would select for it. `error` null means none of those 48
+retrievals fell back to quality order, which is the first exercise of the
+September 10 retrieval work under a probe set it was not built against.
+
+The map, all eight p1 domains, nothing damped, no discarded verdicts:
+
+| domain | state | overreach | deposit of total |
+|---|---|---|---|
+| Decision-Making | partial | some | 2 of 6 |
+| People | partial | none | 4 of 6 |
+| Risk | partial | some | 2 of 6 |
+| Money | open | none | 0 of 6 |
+| Standards | partial | high | 5 of 6 |
+| Direction | partial | some | 3 of 6 |
+| Adversity | partial | some | 2 of 6 |
+| Legacy | partial | some | 1 of 6 |
+
+Deposit spread 5, better than either fixture persona (Margaret 5 of 6, Joey 4
+of 6 were the v2 numbers, and this is a real archive). The set discriminates.
+The dashboard rendered these counts row for row in set order with no overreach
+line on any domain, as designed.
+
+## FINDING: the overreach level has no minimum denominator
+
+Recorded because it produced a false alarm in the session that shipped this,
+and the next reader will hit the same trap.
+
+`rollUpOverreach` in `lib/coverage.ts` computes the level over the ungrounded
+probes ONLY, and applies `reached * 2 > ungrounded.length` with no floor on
+`ungrounded.length`. So the better covered a domain is, the fewer ungrounded
+probes it has, and the more its overreach label swings on a single verdict.
+
+Standards above reads `high` on one ungrounded probe out of six. One of one is
+a majority by arithmetic and carries no evidence. Money reads `none` over six
+ungrounded probes and means something. The label is least stable exactly where
+coverage is strongest, and most stable where it is weakest.
+
+That is backwards from what the dimension is for. Overreach exists to rank
+open domains by how often a successor hears a refusal, so its useful range is
+domains with many ungrounded probes, where it happens to be stable. On a
+nearly backed domain it is close to noise and should probably not render at
+all.
+
+Proposed fix, NOT made: require `ungrounded.length >= 3` before the level can
+rise above `none`. Below that, report `none` and let the count carry the
+domain. This changes what a live succession customer sees on the business map,
+and the state doc records two prior threshold changes made as side effects
+that had to be undone. It gets its own cycle with the threshold as the only
+variable, measured before and after on both fixtures.
+
+No effect on the personal map today, which renders no overreach line.
