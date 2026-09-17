@@ -156,6 +156,11 @@ export default function VoiceClient({ archiveId }: { archiveId: string }) {
         Every recording is transcribed and saved to your archive permanently.
         Your voice is preserved alongside your words.
       </p>
+      <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontWeight: 300, fontSize: '1.05rem', color: '#9DA3A8', lineHeight: 1.8, maxWidth: '560px', margin: '0 0 12px' }}>
+        Or call{' '}
+        <a href="tel:+18886889168" style={{ color: '#C4A24A', textDecoration: 'none', whiteSpace: 'nowrap' }}>1-888-688-9168</a>
+        {' '}and talk.
+      </p>
       <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.44rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(112,108,101,0.4)', marginBottom: '28px' }}>
         Supports Vietnamese · Spanish · Cantonese · Arabic · Tagalog · Korean · English · and 93 more
       </p>

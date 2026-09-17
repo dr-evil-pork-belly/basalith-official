@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { calculateArchiveScore } from '@/lib/archiveScore'
 import OnboardingGuide from '@/app/components/OnboardingGuide'
-import TrainingDataCard from './TrainingDataCard'
 import SuccessionDashboard from './SuccessionDashboard'
 import FoundingBanner from '../components/FoundingBanner'
 import CoverageMap from '../components/CoverageMap'
@@ -248,429 +247,62 @@ function MemoryGameCard({ archiveId }: { archiveId: string }) {
   )
 }
 
-// ── Entity Readiness Card ─────────────────────────────────────────────────────
+// ── Family access ───────────────────────────────────────────────────────────
+// The four-milestone "Entity Progress" ladder that lived here until September
+// 16, 2026 counted photographs, deposits, and voice recordings against fixed
+// targets and gated contributor access behind 500 photographs. It is removed:
+// the coverage map is the reading of the archive now. What survives is the
+// access control itself, shown only while family access is on, so an owner who
+// has already opened it can see that and revoke it.
 
-type ReadinessData = {
-  ready:    boolean
-  score:    number
-  breakdown: {
-    photographs: number
-    deposits: number
-    accuracyAvg: number
-    voiceRecordings: number
-    wisdomSessions: number
-  }
-  missing:  string[]
-  access:   'none' | 'preview' | 'open'
+type FamilyAccessData = {
+  access:                'none' | 'preview' | 'open'
   previewContributorIds: string[]
-  contributors: { id: string; name: string; email: string }[]
 }
 
-type MilestoneRow = {
-  id:       number
-  label:    string
-  complete: boolean
-  criteria: Record<string, number>
-}
-
-function getMilestones(b: ReadinessData['breakdown']): MilestoneRow[] {
-  return [
-    { id: 1, label: 'Foundations',              complete: b.photographs >= 10  && b.deposits >= 5,                                           criteria: { photographs: 10,  deposits: 5 } },
-    { id: 2, label: 'Taking Shape',             complete: b.photographs >= 100 && b.deposits >= 25 && b.voiceRecordings >= 1,                criteria: { photographs: 100, deposits: 25, voiceRecordings: 1  } },
-    { id: 3, label: 'Recognizable',             complete: b.photographs >= 250 && b.deposits >= 50 && b.wisdomSessions >= 5,                 criteria: { photographs: 250, deposits: 50, wisdomSessions: 5   } },
-    { id: 4, label: 'Ready to Meet Your Family', complete: b.photographs >= 500 && b.deposits >= 100 && b.voiceRecordings >= 10 && b.accuracyAvg >= 50, criteria: { photographs: 500, deposits: 100, voiceRecordings: 10, accuracyAvg: 50 } },
-  ]
-}
-
-const CRITERIA_LABELS: Record<string, string> = {
-  photographs:     'photographs processed',
-  deposits:        'deposits completed',
-  voiceRecordings: 'voice recordings',
-  wisdomSessions:  'wisdom sessions completed',
-  accuracyAvg:     '% entity accuracy',
-}
-
-const CRITERIA_LINKS: Record<string, string> = {
-  photographs:     '/archive/upload',
-  deposits:        '/archive/entity',
-  voiceRecordings: '/archive/voice',
-  wisdomSessions:  '/archive/wisdom',
-  accuracyAvg:     '/archive/entity',
-}
-
-function MilestoneItem({
-  milestone, status, breakdown,
-}: {
-  milestone: MilestoneRow
-  status: 'complete' | 'current' | 'locked'
-  breakdown: ReadinessData['breakdown']
-}) {
-  const icon = status === 'complete' ? '✓' : status === 'current' ? '◐' : '○'
-  const iconColor = status === 'complete' ? '#C4A24A' : status === 'current' ? '#9DA3A8' : '#3A3F44'
-  const labelColor = status === 'complete' ? '#C4A24A' : status === 'current' ? '#F0EDE6' : '#3A3F44'
-
-  return (
-    <div style={{ display: 'flex', gap: '0.9rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.04)', marginBottom: '0.75rem' }}>
-      <span style={{ fontFamily: 'monospace', fontSize: '0.9rem', color: iconColor, flexShrink: 0, lineHeight: 1.4 }}>{icon}</span>
-      <div style={{ flex: 1 }}>
-        <p style={{ fontFamily: 'monospace', fontSize: '0.48rem', letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: labelColor, margin: '0 0 0.35rem' }}>
-          Milestone {milestone.id} — {milestone.label}
-        </p>
-        {status === 'complete' && (
-          <p style={{ fontFamily: 'Georgia,serif', fontStyle: 'italic', fontSize: '0.82rem', color: 'rgba(196,162,74,0.6)', margin: 0 }}>Complete</p>
-        )}
-        {status === 'current' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
-            {Object.entries(milestone.criteria).map(([key, target]) => {
-              const current = breakdown[key as keyof typeof breakdown] ?? 0
-              const done    = current >= target
-              const label   = CRITERIA_LABELS[key] ?? key
-              const href    = CRITERIA_LINKS[key]
-              const text    = done
-                ? `✓ ${current} of ${target} ${label}`
-                : `${current} of ${target} ${label}`
-              return (
-                <a
-                  key={key}
-                  href={done ? undefined : href}
-                  style={{
-                    fontFamily:     'Georgia,serif',
-                    fontStyle:      'italic',
-                    fontSize:       '0.82rem',
-                    color:          done ? 'rgba(196,162,74,0.5)' : '#9DA3A8',
-                    textDecoration: 'none',
-                    display:        'block',
-                  }}
-                >
-                  {text}
-                </a>
-              )
-            })}
-          </div>
-        )}
-        {status === 'locked' && (
-          <p style={{ fontFamily: 'Georgia,serif', fontStyle: 'italic', fontSize: '0.82rem', color: '#3A3F44', margin: 0 }}>
-            Unlocks after Milestone {milestone.id - 1}
-          </p>
-        )}
-      </div>
-    </div>
-  )
-}
-
-function EntityReadinessCard({ archiveId }: { archiveId: string }) {
-  const [data,        setData]        = useState<ReadinessData | null>(null)
-  const [loading,     setLoading]     = useState(true)
-  const [showModal,   setShowModal]   = useState(false)
-  const [selectedIds, setSelectedIds] = useState<string[]>([])
-  const [saving,      setSaving]      = useState(false)
-  const [showConfirm, setShowConfirm] = useState(false)
+function FamilyAccessCard() {
+  const [data,   setData]   = useState<FamilyAccessData | null>(null)
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    fetch(`/api/archive/entity-readiness?archiveId=${archiveId}`)
+    fetch('/api/archive/entity-readiness')
       .then(r => r.ok ? r.json() : null)
-      .then(d => { if (d) setData(d) })
+      .then(d => { if (d) setData({ access: d.access ?? 'none', previewContributorIds: d.previewContributorIds ?? [] }) })
       .catch(() => {})
-      .finally(() => setLoading(false))
-  }, [archiveId])
+  }, [])
 
-  async function setAccess(action: 'enable_preview' | 'enable_open' | 'disable', ids?: string[]) {
+  async function revoke() {
     setSaving(true)
     try {
       const res = await fetch('/api/archive/entity-readiness', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, contributorIds: ids }),
+        body: JSON.stringify({ action: 'disable' }),
       })
-      const updated = await res.json()
-      if (res.ok && data) {
-        setData({ ...data, access: updated.access, previewContributorIds: ids ?? [] })
-      }
+      if (res.ok) setData({ access: 'none', previewContributorIds: [] })
     } catch {}
     setSaving(false)
-    setShowModal(false)
-    setShowConfirm(false)
   }
 
-  if (loading || !data) return null
-
-  const { ready, access, contributors } = data
-  const bd = data.breakdown
-  const milestones = getMilestones(bd)
-  const allComplete = milestones.every(m => m.complete)
-  const currentIdx  = milestones.findIndex(m => !m.complete)
-
-  // Contextual guidance based on current milestone
-  function guidanceText(): string | null {
-    if (allComplete && access === 'none') return null // replaced by activation prompt below
-    if (currentIdx === 2) { // working toward M3
-      return 'Upload more photographs from your phone. Every decade of your life makes the entity more accurate.\n\nCall 1‑888‑688‑9168 and share a memory. Voice recordings teach the entity how you speak — not just what you say.'
-    }
-    if (currentIdx === 3) { // working toward M4
-      return 'You are close.\n\nSchedule your next wisdom session. The questions are designed to reveal how you think under pressure. Your entity needs to hear you reason through difficult things.'
-    }
-    return null
-  }
-
-  const guidance = guidanceText()
+  if (!data || data.access === 'none') return null
 
   return (
-    <>
-      <div
-        className="rounded-sm mb-8"
-        style={{
-          background: '#111112',
-          border:     allComplete ? '1px solid rgba(196,162,74,0.3)' : '1px solid rgba(255,255,255,0.06)',
-          borderTop:  allComplete ? '3px solid rgba(196,162,74,0.7)' : '3px solid rgba(255,255,255,0.08)',
-        }}
-      >
-        <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid rgba(255,255,255,0.04)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.2em', textTransform: 'uppercase' as const, color: allComplete ? '#C4A24A' : '#5C6166', margin: 0 }}>
-            Entity Progress
+    <div className="rounded-sm mb-8" style={{ background: '#111112', border: '1px solid rgba(255,255,255,0.06)' }}>
+      <div style={{ padding: '1.25rem 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' as const }}>
+        <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.2em', textTransform: 'uppercase' as const, color: '#5C6166', margin: 0 }}>
+          Family access to your entity
+        </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <p style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.12em', textTransform: 'uppercase' as const, color: '#4CAF50', margin: 0 }}>
+            {data.access === 'open' ? 'Open to all' : `${data.previewContributorIds.length} invited`}
           </p>
-          {access !== 'none' && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <p style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.12em', textTransform: 'uppercase' as const, color: '#4CAF50', margin: 0 }}>
-                {access === 'open' ? 'Open to all' : `${data.previewContributorIds.length} invited`}
-              </p>
-              <button
-                onClick={() => setAccess('disable')}
-                disabled={saving}
-                style={{ fontFamily: 'monospace', fontSize: '0.4rem', letterSpacing: '0.1em', textTransform: 'uppercase' as const, color: '#5C6166', background: 'transparent', border: '1px solid rgba(255,255,255,0.07)', padding: '0.3rem 0.6rem', cursor: 'pointer', borderRadius: '2px' }}
-              >
-                Revoke
-              </button>
-            </div>
-          )}
+          <button
+            onClick={revoke}
+            disabled={saving}
+            style={{ fontFamily: 'monospace', fontSize: '0.4rem', letterSpacing: '0.1em', textTransform: 'uppercase' as const, color: '#5C6166', background: 'transparent', border: '1px solid rgba(255,255,255,0.07)', padding: '0.3rem 0.6rem', cursor: 'pointer', borderRadius: '2px' }}
+          >
+            {saving ? 'Revoking' : 'Revoke'}
+          </button>
         </div>
-
-        <div style={{ padding: '1.25rem 1.5rem' }}>
-          {/* Milestone list */}
-          {milestones.map((m, i) => {
-            const status: 'complete' | 'current' | 'locked' =
-              m.complete               ? 'complete' :
-              i === currentIdx         ? 'current'  :
-              'locked'
-            return (
-              <MilestoneItem
-                key={m.id}
-                milestone={m}
-                status={status}
-                breakdown={bd}
-              />
-            )
-          })}
-
-          {/* Contextual guidance */}
-          {guidance && (
-            <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '2px', padding: '1rem', margin: '0.5rem 0 1rem' }}>
-              {guidance.split('\n\n').map((para, i) => (
-                <p key={i} style={{ fontFamily: 'Georgia,serif', fontStyle: 'italic', fontSize: '0.88rem', color: '#706C65', lineHeight: 1.75, margin: i > 0 ? '0.75rem 0 0' : 0 }}>
-                  {para}
-                </p>
-              ))}
-            </div>
-          )}
-
-          {/* Activation prompt — M4 complete, not yet activated */}
-          {allComplete && access === 'none' && (
-            <>
-              <div style={{ borderTop: '1px solid rgba(196,162,74,0.15)', paddingTop: '1.25rem', marginTop: '0.5rem' }}>
-                <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.2em', textTransform: 'uppercase' as const, color: '#C4A24A', marginBottom: '1rem' }}>
-                  Your Entity Is Ready to Meet Your Family.
-                </p>
-                <p style={{ fontFamily: 'Georgia,serif', fontStyle: 'italic', fontSize: '0.9rem', color: '#9DA3A8', lineHeight: 1.75, marginBottom: '0.5rem' }}>
-                  You have built something worth sharing.
-                </p>
-                <p style={{ fontFamily: 'Georgia,serif', fontStyle: 'italic', fontSize: '0.9rem', color: '#9DA3A8', lineHeight: 1.75, marginBottom: '0.5rem' }}>
-                  When you are ready you can invite your family to talk to your entity.
-                </p>
-                <p style={{ fontFamily: 'Georgia,serif', fontStyle: 'italic', fontSize: '0.9rem', color: '#706C65', lineHeight: 1.75, marginBottom: '1.25rem' }}>
-                  We recommend talking to it yourself first. Make sure it sounds like you.
-                </p>
-                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' as const }}>
-                  <button
-                    onClick={() => { setSelectedIds([]); setShowModal(true) }}
-                    style={{ fontFamily: 'monospace', fontSize: '0.48rem', letterSpacing: '0.14em', textTransform: 'uppercase' as const, color: '#0A0908', background: '#C4A24A', border: 'none', padding: '0.6rem 1.25rem', cursor: 'pointer', borderRadius: '2px' }}
-                  >
-                    Activate Contributor Access
-                  </button>
-                  <a
-                    href="/archive/entity"
-                    style={{ fontFamily: 'monospace', fontSize: '0.48rem', letterSpacing: '0.14em', textTransform: 'uppercase' as const, color: '#C4A24A', background: 'transparent', border: '1px solid rgba(196,162,74,0.3)', padding: '0.6rem 1.25rem', borderRadius: '2px', textDecoration: 'none', display: 'inline-block' }}
-                  >
-                    Talk to It First →
-                  </a>
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Contributor selector modal */}
-      {showModal && (
-        <div
-          onClick={e => { if (e.target === e.currentTarget) setShowModal(false) }}
-          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}
-        >
-          <div style={{ background: '#0F0F10', border: '1px solid rgba(196,162,74,0.2)', borderRadius: '4px', padding: '1.75rem', width: '100%', maxWidth: '480px' }}>
-            <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.2em', textTransform: 'uppercase' as const, color: '#C4A24A', marginBottom: '0.75rem' }}>
-              Activate Contributor Access
-            </p>
-            <p style={{ fontFamily: 'Georgia,serif', fontStyle: 'italic', fontSize: '0.9rem', color: '#9DA3A8', lineHeight: 1.7, marginBottom: '1.25rem' }}>
-              Select which contributors can talk to your entity. They will receive an invitation email. You can also open it to everyone.
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.25rem' }}>
-              {contributors.map(c => (
-                <label
-                  key={c.id}
-                  style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', padding: '0.5rem 0.75rem', border: `1px solid ${selectedIds.includes(c.id) ? 'rgba(196,162,74,0.3)' : 'rgba(255,255,255,0.06)'}`, borderRadius: '2px' }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedIds.includes(c.id)}
-                    onChange={e => setSelectedIds(prev => e.target.checked ? [...prev, c.id] : prev.filter(id => id !== c.id))}
-                    style={{ accentColor: '#C4A24A', width: '14px', height: '14px', flexShrink: 0 }}
-                  />
-                  <div>
-                    <p style={{ fontFamily: 'Georgia,serif', fontSize: '0.9rem', color: '#F0EDE6', margin: 0 }}>{c.name}</p>
-                    <p style={{ fontFamily: 'monospace', fontSize: '0.42rem', letterSpacing: '0.08em', color: '#5C6166', margin: 0 }}>{c.email}</p>
-                  </div>
-                </label>
-              ))}
-              {contributors.length === 0 && (
-                <p style={{ fontFamily: 'Georgia,serif', fontStyle: 'italic', fontSize: '0.9rem', color: '#5C6166' }}>No active contributors found.</p>
-              )}
-            </div>
-            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' as const, justifyContent: 'space-between', alignItems: 'center' }}>
-              <button
-                onClick={() => setShowConfirm(true)}
-                style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.1em', textTransform: 'uppercase' as const, color: '#706C65', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', textDecoration: 'underline' }}
-              >
-                Open to all instead
-              </button>
-              <div style={{ display: 'flex', gap: '0.6rem' }}>
-                <button onClick={() => setShowModal(false)} style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.12em', textTransform: 'uppercase' as const, color: '#5C6166', background: 'transparent', border: '1px solid rgba(255,255,255,0.07)', padding: '0.5rem 1rem', cursor: 'pointer', borderRadius: '2px' }}>
-                  Cancel
-                </button>
-                <button
-                  onClick={() => setAccess('enable_preview', selectedIds)}
-                  disabled={saving || selectedIds.length === 0}
-                  style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.12em', textTransform: 'uppercase' as const, color: '#0A0908', background: saving || selectedIds.length === 0 ? 'rgba(196,162,74,0.4)' : '#C4A24A', border: 'none', padding: '0.5rem 1rem', cursor: saving || selectedIds.length === 0 ? 'not-allowed' : 'pointer', borderRadius: '2px' }}
-                >
-                  {saving ? 'Sending…' : `Invite ${selectedIds.length > 0 ? selectedIds.length : ''} Contributor${selectedIds.length !== 1 ? 's' : ''}`}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Open-to-all confirmation */}
-      {showConfirm && (
-        <div
-          onClick={e => { if (e.target === e.currentTarget) setShowConfirm(false) }}
-          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}
-        >
-          <div style={{ background: '#0F0F10', border: '1px solid rgba(196,162,74,0.2)', borderRadius: '4px', padding: '1.75rem', width: '100%', maxWidth: '420px' }}>
-            <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.2em', textTransform: 'uppercase' as const, color: '#C4A24A', marginBottom: '1rem' }}>Are you sure?</p>
-            <p style={{ fontFamily: 'Georgia,serif', fontStyle: 'italic', fontSize: '0.9rem', color: '#9DA3A8', lineHeight: 1.7, marginBottom: '1.5rem' }}>
-              Your contributors will be able to talk to your entity. You can revoke this at any time.
-            </p>
-            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
-              <button onClick={() => setShowConfirm(false)} style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.12em', textTransform: 'uppercase' as const, color: '#5C6166', background: 'transparent', border: '1px solid rgba(255,255,255,0.07)', padding: '0.5rem 1rem', cursor: 'pointer', borderRadius: '2px' }}>Cancel</button>
-              <button onClick={() => setAccess('enable_open')} disabled={saving} style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.12em', textTransform: 'uppercase' as const, color: '#0A0908', background: saving ? 'rgba(196,162,74,0.4)' : '#C4A24A', border: 'none', padding: '0.5rem 1rem', cursor: saving ? 'not-allowed' : 'pointer', borderRadius: '2px' }}>
-                {saving ? 'Enabling…' : 'Confirm'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  )
-}
-
-// ── WeChat Connect Card ──────────────────────────────────────────────────────
-
-function WeChatConnectCard({ archiveId }: { archiveId: string }) {
-  const [code,    setCode]    = useState<string | null>(null)
-  const [linked,  setLinked]  = useState(false)
-  const [loading, setLoading] = useState(true)
-  const [copied,  setCopied]  = useState(false)
-
-  useEffect(() => {
-    fetch(`/api/archive/wechat-link?archiveId=${archiveId}`)
-      .then(r => r.ok ? r.json() : null)
-      .then(d => { if (d) { setCode(d.code); setLinked(d.linked) } })
-      .catch(() => {})
-      .finally(() => setLoading(false))
-  }, [archiveId])
-
-  function handleCopy() {
-    if (!code) return
-    navigator.clipboard.writeText(code).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    }).catch(() => {})
-  }
-
-  if (loading || !code) return null
-
-  return (
-    <div
-      className="rounded-sm mb-8"
-      style={{
-        background: '#111112',
-        border:     linked ? '1px solid rgba(196,162,74,0.2)' : '1px solid rgba(255,255,255,0.06)',
-      }}
-    >
-      <div
-        className="flex items-center justify-between px-6 py-4 border-b"
-        style={{ borderColor: 'rgba(255,255,255,0.04)' }}
-      >
-        <div className="flex items-center gap-2">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={linked ? 'rgba(196,162,74,0.8)' : 'rgba(255,255,255,0.2)'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-          </svg>
-          <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: linked ? '#C4A24A' : '#5C6166', margin: 0 }}>
-            WeChat
-          </p>
-        </div>
-        {linked && (
-          <span style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#4CAF50' }}>
-            Connected
-          </span>
-        )}
-      </div>
-
-      <div style={{ padding: '1.25rem 1.5rem' }}>
-        {linked ? (
-          <p style={{ fontFamily: 'Georgia,serif', fontStyle: 'italic', fontSize: '0.88rem', color: '#706C65', lineHeight: 1.75, margin: 0 }}>
-            Your WeChat is connected. Send a voice message or text to deposit memories directly from WeChat.
-          </p>
-        ) : (
-          <>
-            <p style={{ fontFamily: 'Georgia,serif', fontStyle: 'italic', fontSize: '0.88rem', color: '#9DA3A8', lineHeight: 1.75, marginBottom: '1rem' }}>
-              Follow the Basalith Official Account on WeChat, then send this code to link your archive.
-            </p>
-            <div className="flex items-center gap-4 flex-wrap">
-              <div style={{ background: 'rgba(196,162,74,0.06)', border: '1px solid rgba(196,162,74,0.2)', borderRadius: '2px', padding: '0.5rem 1.25rem' }}>
-                <span style={{ fontFamily: 'monospace', fontSize: '1.5rem', letterSpacing: '0.3em', color: '#C4A24A', fontWeight: 700 }}>
-                  {code}
-                </span>
-              </div>
-              <button
-                onClick={handleCopy}
-                style={{ fontFamily: 'monospace', fontSize: '0.48rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: copied ? '#4CAF50' : '#5C6166', background: 'transparent', border: `1px solid ${copied ? 'rgba(76,175,80,0.3)' : 'rgba(255,255,255,0.08)'}`, padding: '0.5rem 0.9rem', cursor: 'pointer', borderRadius: '2px', transition: 'all 0.15s' }}
-              >
-                {copied ? '✓ Copied' : 'Copy Code'}
-              </button>
-            </div>
-            <p style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.08em', color: '#3A3F44', marginTop: '0.75rem' }}>
-              Open WeChat, follow Basalith, and send: {code}
-            </p>
-          </>
-        )}
       </div>
     </div>
   )
@@ -689,12 +321,6 @@ type ArchiveRow = {
   status:           string
   paused_at:        string | null
   tier:             string | null
-}
-
-type DecadeRow = {
-  decade:         string
-  photo_count:    number
-  labelled_count: number
 }
 
 type LabelRow = {
@@ -729,8 +355,6 @@ type ScoreBreakdown = {
   covered?: number
 }
 
-const ALL_DECADES = ['1940s','1950s','1960s','1970s','1980s','1990s','2000s','2010s','2020s']
-
 function Skeleton({ className, style }: { className?: string; style?: React.CSSProperties }) {
   return (
     <div
@@ -738,33 +362,6 @@ function Skeleton({ className, style }: { className?: string; style?: React.CSSP
       style={{ background: 'rgba(255,255,255,0.04)', animation: 'mysteryGlowPulse 1.8s ease-in-out infinite', ...style }}
     />
   )
-}
-
-
-function buildDecadeMap(rows: DecadeRow[]): Record<string, number> {
-  const map: Record<string, number> = {}
-  ALL_DECADES.forEach(d => { map[d] = 0 })
-  rows.forEach(r => { if (map[r.decade] !== undefined) map[r.decade] = r.labelled_count })
-  return map
-}
-
-function buildDecadeMapFromLocal(items: LocalItem[]): Record<string, number> {
-  const map: Record<string, number> = {}
-  ALL_DECADES.forEach(d => { map[d] = 0 })
-  items.forEach(i => { if (i.decade && map[i.decade] !== undefined) map[i.decade]++ })
-  return map
-}
-
-function timeAgo(isoStr: string): string {
-  const diff = Date.now() - new Date(isoStr).getTime()
-  const mins  = Math.floor(diff / 60000)
-  const hrs   = Math.floor(diff / 3600000)
-  const days  = Math.floor(diff / 86400000)
-  if (mins < 2)  return 'just now'
-  if (mins < 60) return `${mins}m ago`
-  if (hrs < 24)  return `${hrs}h ago`
-  if (days < 7)  return `${days}d ago`
-  return new Date(isoStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
 // ── Random Thought Capture ────────────────────────────────────────────────────
@@ -1074,8 +671,6 @@ function MirrorCard({ archiveId }: { archiveId: string }) {
 export default function DashboardClient({ archiveId }: { archiveId: string }) {
   const [loading,              setLoading]              = useState(true)
   const [archive,              setArchive]              = useState<ArchiveRow | null>(null)
-  const [byDecade,             setByDecade]             = useState<Record<string, number>>({})
-  const [recent,               setRecent]               = useState<{ id: string; quote: string; contributor: string; year: string; ago: string }[]>([])
   const [stats,                setStats]                = useState({ total: 0, streak: 0, contributors: 0, thisMonth: 0 })
   const [entityConversations,  setEntityConversations]  = useState(0)
   const [significantDates,     setSignificantDates]     = useState(0)
@@ -1092,18 +687,9 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
 
       const a: ArchiveRow = data.archive
       setArchive(a)
-      setByDecade(buildDecadeMap(data.decades ?? []))
 
       const conts = (data.contributors ?? []).length
       setContributorNames((data.contributors ?? []).map((c: { name: string }) => c.name.split(' ')[0]))
-
-      const recentRows = (data.recentLabels ?? []).map((l: LabelRow) => ({
-        id:          l.id,
-        quote:       (l.what_was_happening || l.story_extracted || '').slice(0, 80),
-        contributor: l.labelled_by || 'Unknown',
-        year:        l.year_taken ? String(l.year_taken) : '—',
-        ago:         timeAgo(l.created_at),
-      }))
 
       const now = new Date()
       const thisMonthLabels = (data.recentLabels ?? []).filter((l: LabelRow) => {
@@ -1111,7 +697,6 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
         return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
       }).length
 
-      setRecent(recentRows)
       setStats({ total: a.labelled_photos, streak: a.current_streak, contributors: conts, thisMonth: thisMonthLabels })
       setEntityConversations(data.entityConversations ?? 0)
       setSignificantDates(data.significantDates ?? 0)
@@ -1144,25 +729,10 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
         return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
       }).length
       const contSet = new Set(stored.map(i => i.contributor).filter(Boolean))
-      setByDecade(buildDecadeMapFromLocal(stored))
       setStats({ total: stored.length, streak, contributors: contSet.size, thisMonth })
-      setRecent(
-        [...stored]
-          .sort((a, b) => new Date(b.labeledAt).getTime() - new Date(a.labeledAt).getTime())
-          .slice(0, 8)
-          .map(i => ({
-            id:          i.id,
-            quote:       (i.title || i.story || '').slice(0, 80),
-            contributor: i.contributor || 'You',
-            year:        i.year ? String(i.year) : '—',
-            ago:         timeAgo(i.labeledAt),
-          }))
-      )
     } catch {}
     setLoading(false)
   }
-
-  const maxCount = Math.max(...Object.values(byDecade), 1)
 
   // Succession archives get a distinct judgment-capture dashboard. This branch
   // only adds a path; the consumer return below is untouched.
@@ -1290,11 +860,8 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
       {/* ── COVERAGE MAP ── */}
       <CoverageMap link={{ href: '/archive/entity', label: 'Talk to your entity' }} />
 
-      {/* ── ENTITY READINESS + ACCESS ── */}
-      <EntityReadinessCard archiveId={archiveId} />
-
-      {/* ── TRAINING DATA ── */}
-      <TrainingDataCard />
+      {/* ── FAMILY ACCESS (only while on) ── */}
+      <FamilyAccessCard />
 
       {/* ── UPCOMING DATES ── */}
       <UpcomingDates archiveId={archiveId} />
@@ -1302,148 +869,8 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
       {/* ── MEMORY GAME ── */}
       <MemoryGameCard archiveId={archiveId} />
 
-      {/* ── WECHAT CONNECT ── */}
-      <WeChatConnectCard archiveId={archiveId} />
-
-      {/* ── STAT CARDS ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '12px', marginBottom: '40px' }} className="md:grid-cols-4">
-        {loading ? (
-          Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} style={{ height: '96px', background: 'rgba(255,255,255,0.04)', borderRadius: '2px', animation: 'mysteryGlowPulse 1.8s ease-in-out infinite', animationDelay: `${i * 100}ms` }} />
-          ))
-        ) : (
-          [
-            { label: 'Photos Archived',   value: archive?.total_photos ?? stats.total },
-            { label: 'Contributors',      value: stats.contributors },
-            { label: 'Days Active',       value: Math.max(1, Math.ceil((Date.now() - new Date(archive?.last_label_date ?? Date.now()).getTime()) / 86400000)) },
-            { label: 'Labels This Month', value: stats.thisMonth },
-          ].map(({ label, value }) => (
-            <div
-              key={label}
-              style={{
-                background:  '#141210',
-                border:      '1px solid rgba(196,162,74,0.08)',
-                borderTop:   '2px solid rgba(196,162,74,0.3)',
-                padding:     '20px 24px 18px',
-              }}
-            >
-              <p
-                style={{
-                  fontFamily:    '"Cormorant Garamond",Georgia,serif',
-                  fontSize:      'clamp(2rem,4vw,2.75rem)',
-                  fontWeight:    300,
-                  color:         '#C4A24A',
-                  lineHeight:    1,
-                  marginBottom:  '8px',
-                  letterSpacing: '-0.02em',
-                }}
-              >
-                {value}
-              </p>
-              <p
-                style={{
-                  fontFamily:    '"Space Mono","Courier New",monospace',
-                  fontSize:      '0.44rem',
-                  letterSpacing: '0.18em',
-                  textTransform: 'uppercase' as const,
-                  color:         'rgba(112,108,101,0.6)',
-                }}
-              >
-                {label}
-              </p>
-            </div>
-          ))
-        )}
-      </div>
-
-      {/* ── DECADE CHART ── */}
-      <div className="rounded-sm border p-8 mb-10" style={{ background: '#111112', borderColor: 'rgba(255,255,255,0.06)' }}>
-        <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#5C6166', marginBottom: '2rem' }}>
-          Archive by Decade
-        </p>
-        {loading ? (
-          <div className="flex items-end gap-3 h-36">
-            {ALL_DECADES.map(d => <Skeleton key={d} className="flex-1" style={{ height: '40px' }} />)}
-          </div>
-        ) : (
-          <div className="flex items-end gap-3 h-36">
-            {ALL_DECADES.map(decade => {
-              const count  = byDecade[decade] || 0
-              const height = count === 0 ? 4 : Math.max(12, Math.round((count / maxCount) * 120))
-              return (
-                <div key={decade} className="flex flex-col items-center gap-2 flex-1">
-                  <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', color: count > 0 ? 'rgba(196,162,74,0.8)' : '#3A3F44' }}>
-                    {count > 0 ? count : ''}
-                  </p>
-                  <div
-                    className="w-full rounded-sm transition-all duration-500"
-                    style={{
-                      height:    `${height}px`,
-                      background: count > 0 ? 'rgba(196,162,74,0.25)' : 'rgba(255,255,255,0.04)',
-                      borderTop:  count > 0 ? '1px solid rgba(196,162,74,0.5)' : '1px solid rgba(255,255,255,0.06)',
-                    }}
-                  />
-                  <p style={{ fontFamily: 'monospace', fontSize: '0.48rem', letterSpacing: '0.04em', color: '#3A3F44' }}>{decade}</p>
-                </div>
-              )
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* ── RECENT FAMILY MEMORIES + QUICK LINKS ── */}
-      <div className="grid md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 rounded-sm border" style={{ background: '#111112', borderColor: 'rgba(255,255,255,0.06)' }}>
-          <div className="px-6 py-4 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-            <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#5C6166' }}>
-              Recent Family Memories
-            </p>
-          </div>
-          {loading ? (
-            <div className="flex flex-col gap-0">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="px-6 py-4 border-b" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
-                  <Skeleton className="h-3 w-3/4 mb-2" />
-                  <Skeleton className="h-2 w-1/3" />
-                </div>
-              ))}
-            </div>
-          ) : recent.length === 0 ? (
-            <div className="px-6 py-10 text-center">
-              <p className="font-serif" style={{ color: '#5C6166', fontSize: '1rem', fontWeight: 600, marginBottom: '0.5rem' }}>
-                Your archive is empty.
-              </p>
-              <p className="font-serif italic" style={{ color: '#3A3F44', fontSize: '0.9rem', lineHeight: 1.6, marginBottom: '1.25rem' }}>
-                Upload your family photographs to begin. Your family will receive one photograph by email every evening and can reply with their memories.
-              </p>
-              <Link href="/archive/label" className="no-underline" style={{ fontFamily: 'monospace', fontSize: '0.46rem', letterSpacing: '0.2em', color: '#C4A24A' }}>
-                UPLOAD YOUR FIRST PHOTOS →
-              </Link>
-            </div>
-          ) : (
-            <ul>
-              {recent.map(item => (
-                <li key={item.id} className="px-6 py-4 border-b last:border-0" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
-                  {item.quote && (
-                    <p className="font-serif italic text-[0.85rem] mb-1" style={{ color: '#B8B4AB', lineHeight: 1.6 }}>
-                      &ldquo;{item.quote}{item.quote.length >= 80 ? '…' : ''}&rdquo;
-                    </p>
-                  )}
-                  <div className="flex items-center justify-between gap-4">
-                    <p style={{ fontFamily: 'monospace', fontSize: '0.46rem', letterSpacing: '0.08em', color: '#C4A24A' }}>
-                      {item.contributor}{item.year !== '—' ? ' · ' + item.year : ''}
-                    </p>
-                    <p style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.06em', color: '#3A3F44', whiteSpace: 'nowrap' }}>
-                      {item.ago}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-        <div className="flex flex-col gap-4">
+      {/* ── QUICK LINKS ── */}
+      <div className="grid md:grid-cols-2 gap-4">
           {[
             { href: '/archive/label',        label: 'Upload Photos',    desc: 'Upload photographs from your phone or computer.',  gold: true  },
             { href: '/archive/gallery',       label: 'View Gallery',     desc: 'Browse preserved memories across all decades.',    gold: false },
@@ -1481,7 +908,6 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
               )}
             </div>
           )}
-        </div>
       </div>
 
     </div>

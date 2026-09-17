@@ -28,7 +28,6 @@ const PRIMARY_NAV: NavItem[] = [
   { href: '/archive/timeline',          label: 'Life Timeline',   hideForSuccession: true },
   { href: '/archive/memory-map',        label: 'Memory Map',      hideForSuccession: true },
   { href: '/archive/entity',            label: 'My Entity'        },
-  { href: '/archive/wisdom-exchange',   label: 'Wisdom Exchange'  },
   { href: '/archive/contributors',      label: 'Contributors'     },
 ]
 
@@ -37,13 +36,11 @@ const CONTRIBUTE_NAV: NavItem[] = [
   { href: '/archive/writing',      label: 'Writing'          },
   { href: '/archive/videos',       label: 'Videos',          hideForSuccession: true },
   { href: '/archive/upload',       label: 'Docs & Videos'    },
-  { href: '/archive/wisdom',       label: 'Wisdom Session',  hideForSuccession: true },
 ]
 
 const MANAGE_NAV: NavItem[] = [
   { href: '/archive/dates',        label: 'Important Dates', hideForSuccession: true },
   { href: '/archive/preferences',  label: 'Email Delivery'   },
-  { href: '/archive/scenarios',    label: 'Scenarios'        },
   { href: '/archive/succession',   label: 'Succession'       },
 ]
 
