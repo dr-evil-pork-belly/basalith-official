@@ -23,6 +23,7 @@ import {
   buildFoundingCompleteOwnerEmail,
 } from '@/lib/emails/foundingSequenceComplete'
 import { resend } from '@/lib/resend'
+import { notifyInternal } from '@/lib/internalNotify'
 import { inngest } from '@/lib/inngest'
 
 export const dynamic = 'force-dynamic'
@@ -226,13 +227,38 @@ export async function POST(req: NextRequest) {
     next.state.pendingBranchIndex = undefined
     await completeIncident(next)
 
-    // Founding Sequence: when the third founding call closes, tell the owner
-    // and the founder. Runs after the response. The owner email promises only
-    // the 48-hour reply the site already commits to.
-    if (next.state.founding && next.state.founding.call === FOUNDING_CALLS) {
+    // Founding Sequence: when the first founding call closes, tell the
+    // founder (watch mode, skeleton 1.7); when the third closes, tell the
+    // owner and the founder. Runs after the response. The owner email
+    // promises only the 48-hour reply the site already commits to.
+    if (next.state.founding && (next.state.founding.call === 1 || next.state.founding.call === FOUNDING_CALLS)) {
       const scope = next.state.founding.scope
+      const closedCall = next.state.founding.call
       const ownerEmail = (archive.owner_email as string | null) ?? null
       after(async () => {
+        if (closedCall === 1) {
+          // Call 1 complete. Internal only; the owner sees the proof card.
+          try {
+            const status = await getFoundingStatus(archiveId, archive.tier)
+            const call = status.calls.find(c => c.call === 1)
+            const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
+            await notifyInternal({
+              subject: `Call 1 complete: ${archiveName || 'Basalith archive'}`,
+              text: [
+                `Archive: ${archiveName || 'Basalith archive'} (${archiveId})`,
+                `Owner: ${ownerName || 'Unknown owner'}${ownerEmail ? ` <${ownerEmail}>` : ''}`,
+                `Scope: ${scope}`,
+                `Deposits: ${call?.deposits ?? 0}`,
+                `Turns: ${call?.turns ?? 0}`,
+                `God view: ${siteUrl}/god`,
+              ].join('\n'),
+            })
+          } catch (err) {
+            console.error('[b2b-question/answer] call 1 complete notice failed:', err instanceof Error ? err.message : err)
+          }
+          return
+        }
+
         try {
           const status = await getFoundingStatus(archiveId, archive.tier)
           if (!status.done) return
@@ -260,15 +286,10 @@ export async function POST(req: NextRequest) {
             voiceTurns:  count ?? 0,
             scope,
           }
+          // Same sender and recipients as before, now through the one helper
+          // (lib/internalNotify.ts) every founder-facing send uses.
           const internal = buildFoundingCompleteInternalEmail(input)
-          const adminEmail = process.env.ADMIN_EMAIL ?? 'legacy@basalith.xyz'
-          await resend.emails.send({
-            from:    'Basalith <davidha@basalith.xyz>',
-            to:      Array.from(new Set(['mrdavidha@gmail.com', adminEmail])),
-            subject: internal.subject,
-            html:    internal.html,
-            text:    internal.text,
-          })
+          await notifyInternal({ subject: internal.subject, html: internal.html, text: internal.text })
           if (ownerEmail) {
             const owner = buildFoundingCompleteOwnerEmail(input)
             await resend.emails.send({
