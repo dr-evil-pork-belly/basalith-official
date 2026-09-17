@@ -9,7 +9,7 @@ import FoundingClient from './FoundingClient'
 // the archive comes from the session, and the tier only picks the seed set.
 export default async function FoundingPage({ searchParams }: { searchParams: Promise<{ area?: string }> }) {
   const session = await getSessionUser()
-  if (!session?.archiveId) redirect('/archive-login')
+  if (!session?.archiveId) redirect('/begin?signed_in=1')
 
   const { data: archive } = await supabaseAdmin
     .from('archives')

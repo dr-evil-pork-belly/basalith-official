@@ -9,6 +9,6 @@ export const metadata: Metadata = {
 
 export default async function ArchiveDashboardPage() {
   const session = await getSessionUser()
-  if (!session?.archiveId) redirect('/archive-login')
+  if (!session?.archiveId) redirect('/begin?signed_in=1')
   return <DashboardClient archiveId={session.archiveId} />
 }
