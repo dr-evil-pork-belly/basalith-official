@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import type { FoundingScope, FoundingStatus } from '@/lib/foundingSequence'
+import { canShowProof } from '@/lib/trial'
 
 // The Founding Sequence, owner surface.
 //
@@ -48,12 +49,15 @@ export default function FoundingClient({
   scope,
   area,
   ownerName,
+  trial = false,
 }: {
   archiveId: string
   scope: FoundingScope
   /** An area from the coverage map to deposit into (lib/areaCalls.ts). Opens an area call on load. */
   area?: string | null
   ownerName: string | null
+  /** archives.status === 'trial' (lib/trial.ts isTrial). Adds one line under the proof card. */
+  trial?: boolean
 }) {
   const [status,     setStatus]     = useState<Status | null>(null)
   const [loadError,  setLoadError]  = useState('')
@@ -265,7 +269,7 @@ export default function FoundingClient({
             Your archive keeps growing from here. The dashboard has your next question whenever you are ready.
           </p>
           <Link href="/archive/dashboard" style={goldButton()}>Open your archive</Link>
-          <ProofCard />
+          <ProofCard trial={trial} />
         </section>
       )}
 
@@ -279,6 +283,7 @@ export default function FoundingClient({
           <p style={{ fontFamily: SERIF, fontSize: '1.08rem', fontWeight: 300, lineHeight: 1.75, color: BODY, marginBottom: '24px' }}>
             {justClosed.deposits} {justClosed.deposits === 1 ? 'deposit' : 'deposits'}, in your own words. The next call is ready when you are. Now, or another day; it will be here.
           </p>
+          {status && canShowProof(status) && <ProofCard trial={trial} below />}
           <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
             <button onClick={startNext} disabled={starting} style={goldButton(starting)}>
               {starting ? 'Opening' : `Begin call ${status?.nextCall ?? ''}`}
@@ -298,6 +303,7 @@ export default function FoundingClient({
           <p style={{ fontFamily: SERIF, fontSize: '1.08rem', fontWeight: 300, lineHeight: 1.75, color: BODY, marginBottom: '24px' }}>
             One question to start, then a few more that follow what you say. Nothing you say has to be important. The ordinary details are usually the ones that show how you decide.
           </p>
+          {canShowProof(status) && <ProofCard trial={trial} below />}
           {submitErr && <p role="alert" style={{ fontFamily: SERIF, fontSize: '1rem', color: '#D98C8C', marginBottom: '14px' }}>{submitErr}</p>}
           <button onClick={startNext} disabled={starting} style={goldButton(starting)}>
             {starting ? 'Opening' : `Begin call ${status.nextCall}`}
@@ -431,19 +437,34 @@ export default function FoundingClient({
 // says so," because a declined reply can still carry a grounded rule alongside
 // the part it declines, and "no deposit covers this" overstated the silence.
 
-function ProofCard() {
-  const [state, setState] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
+// After call 1 the last turn's training pair can still be landing under
+// after() when the owner clicks (recon C3), so a first no_pairs answer waits
+// five seconds and asks once more before saying so.
+const PROOF_RETRY_MS = 5000
+
+function ProofCard({ trial = false, below = false }: { trial?: boolean; below?: boolean }) {
+  const [state, setState] = useState<'idle' | 'loading' | 'waiting' | 'done' | 'error'>('idle')
   const [proof, setProof] = useState<Proof | null>(null)
   const [error, setError] = useState('')
+
+  async function ask(): Promise<Proof> {
+    const res = await fetch('/api/archive/founding/proof', { method: 'POST' })
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok) throw new Error(data?.error || 'Could not ask your archive right now.')
+    return data as Proof
+  }
 
   async function run() {
     setState('loading')
     setError('')
     try {
-      const res = await fetch('/api/archive/founding/proof', { method: 'POST' })
-      const data = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(data?.error || 'Could not ask your archive right now.')
-      setProof(data as Proof)
+      let result = await ask()
+      if (!result.ready && result.reason === 'no_pairs') {
+        setState('waiting')
+        await new Promise(resolve => setTimeout(resolve, PROOF_RETRY_MS))
+        result = await ask()
+      }
+      setProof(result)
       setState('done')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not ask your archive right now.')
@@ -458,7 +479,7 @@ function ProofCard() {
   )
 
   return (
-    <div style={{ marginTop: '32px', paddingTop: '28px', borderTop: '1px solid rgba(196,162,74,0.15)' }}>
+    <div style={{ marginTop: below ? '8px' : '32px', marginBottom: below ? '28px' : 0, paddingTop: '28px', borderTop: '1px solid rgba(196,162,74,0.15)' }}>
       <p style={eyebrow()}>What it holds</p>
       <p style={{ fontFamily: SERIF, fontSize: '1.08rem', fontWeight: 300, lineHeight: 1.75, color: BODY, marginBottom: '18px' }}>
         Your archive can already show you one thing it can answer, in your words, and one thing it will not, because you never said.
@@ -470,6 +491,11 @@ function ProofCard() {
       {state === 'loading' && (
         <p aria-live="polite" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '1rem', color: BODY }}>
           Asking your archive. This takes a moment.
+        </p>
+      )}
+      {state === 'waiting' && (
+        <p aria-live="polite" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '1rem', color: BODY }}>
+          One moment.
         </p>
       )}
       {state === 'error' && (
@@ -517,6 +543,14 @@ function ProofCard() {
             </p>
           )}
         </div>
+      )}
+
+      {/* Trial only (skeleton section 6). The button to Checkout arrives in
+          slice C; until then this is the sentence alone. */}
+      {trial && (
+        <p style={{ fontFamily: SERIF, fontSize: '1.08rem', fontWeight: 300, lineHeight: 1.75, color: BODY, margin: '22px 0 0' }}>
+          Found your archive to keep going.
+        </p>
       )}
     </div>
   )

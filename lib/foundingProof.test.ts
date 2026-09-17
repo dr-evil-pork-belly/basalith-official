@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+import { canShowProof } from './foundingSequence'
 import { REFUSAL_CANDIDATES, allProofCopy, orderGroundedCandidates, type ProofPair } from './foundingProof'
 import { ALL_COVERAGE_SETS } from './coverageSet'
 
@@ -34,5 +35,18 @@ describe('founding proof candidates', () => {
       { id: 'd', prompt: 'p4', completion: 'c4', quality_score: 95, metadata: { probe_type: 'SEED' } },
     ]
     expect(orderGroundedCandidates(pairs).map(p => p.id)).toEqual(['d', 'b', 'a', 'c'])
+  })
+})
+
+describe('the route gate, canShowProof', () => {
+  // The proof route used to require status.done (all three calls). Since
+  // September 17, 2026 it requires one completed call, because the proof
+  // needs one included pair and call 1 produces ten to fifteen (recon C2).
+  it('opens after call 1 and stays open through call 3', () => {
+    const status = (completed: number) => ({ completed, done: completed >= 3 })
+    expect(canShowProof(status(0))).toBe(false)
+    expect(canShowProof(status(1))).toBe(true)
+    expect(canShowProof(status(2))).toBe(true)
+    expect(canShowProof(status(3))).toBe(true)
   })
 })
