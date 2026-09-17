@@ -29,7 +29,7 @@ export async function proxy(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   const { pathname } = request.nextUrl
-  const match = PROTECTED.find(p => pathname.startsWith(p.prefix))
+  const match = PROTECTED.find(p => pathname === p.prefix || pathname.startsWith(p.prefix + '/'))
   if (match && !user) {
     return NextResponse.redirect(new URL(match.loginPath, request.url))
   }
