@@ -29,6 +29,7 @@ type AnswerResult = {
   nextQuestion?: string | null
   nextProbeType?: string | null
   founding?: { call: 1 | 2 | 3 } | null
+  areaCall?: { area: string } | null
 }
 
 type RecorderState = 'idle' | 'requesting' | 'recording' | 'processing' | 'error'
@@ -45,10 +46,13 @@ type Proof =
 export default function FoundingClient({
   archiveId,
   scope,
+  area,
   ownerName,
 }: {
   archiveId: string
   scope: FoundingScope
+  /** An area from the coverage map to deposit into (lib/areaCalls.ts). Opens an area call on load. */
+  area?: string | null
   ownerName: string | null
 }) {
   const [status,     setStatus]     = useState<Status | null>(null)
@@ -59,6 +63,8 @@ export default function FoundingClient({
   const [submitErr,  setSubmitErr]  = useState('')
   const [note,       setNote]       = useState<'' | 'reprobe' | 'saved'>('')
   const [justClosed, setJustClosed] = useState<{ call: 1 | 2 | 3; deposits: number } | null>(null)
+  const [areaClosed, setAreaClosed] = useState<{ area: string; deposits: number } | null>(null)
+  const areaOpenedRef = useRef(false)
   const [recordingId, setRecordingId] = useState<string | null>(null)
 
   const loadStatus = useCallback(async (): Promise<Status | null> => {
@@ -76,6 +82,32 @@ export default function FoundingClient({
   }, [])
 
   useEffect(() => { void loadStatus() }, [loadStatus])
+
+  // Arrived from the coverage map with an area: open a call aimed at it, once.
+  // If an interview is already open the route returns it and the page simply
+  // continues that one, which the copy below explains.
+  useEffect(() => {
+    if (!area || areaOpenedRef.current) return
+    areaOpenedRef.current = true
+    ;(async () => {
+      setStarting(true)
+      setSubmitErr('')
+      try {
+        const res = await fetch('/api/archive/area-call/start', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ area }),
+        })
+        const data = await res.json().catch(() => ({}))
+        if (!res.ok) throw new Error(data?.error || 'Could not open the call')
+        await loadStatus()
+      } catch (err) {
+        setSubmitErr(err instanceof Error ? err.message : 'Could not open the call')
+      } finally {
+        setStarting(false)
+      }
+    })()
+  }, [area, loadStatus])
 
   async function startNext() {
     if (starting) return
@@ -114,12 +146,17 @@ export default function FoundingClient({
 
       if (data.incidentComplete) {
         const call = data.founding?.call ?? status?.current?.call ?? null
+        const closedArea = data.areaCall?.area ?? status?.current?.area ?? null
         const prevDeposits = status?.current?.deposits ?? 0
         const fresh = await loadStatus()
         if (call) {
           // Deposit count for the call that just closed, from the refreshed status.
           const done = fresh?.calls.find(c => c.call === call)
           setJustClosed({ call, deposits: done?.deposits ?? prevDeposits })
+        } else if (closedArea) {
+          // An area call. The count is the last one the open incident reported
+          // before it closed, plus the answer that closed it.
+          setAreaClosed({ area: closedArea, deposits: prevDeposits + 1 })
         }
       } else {
         setNote(data.reprobed ? 'reprobe' : 'saved')
@@ -133,6 +170,9 @@ export default function FoundingClient({
   }
 
   const current = status?.current ?? null
+  // The area this page is about: the open area call if there is one, else the
+  // area just closed, else the one the link asked for while it opens.
+  const activeArea = current?.area ?? areaClosed?.area ?? (area && !status?.current && !areaClosed ? area : null)
   const isBusiness = scope === 'business'
   const firstName = ownerName?.split(' ')[0] ?? null
 
@@ -140,24 +180,46 @@ export default function FoundingClient({
     <div className="max-w-3xl mx-auto" style={{ paddingBottom: '64px' }}>
 
       {/* Header */}
-      <p style={{ fontFamily: MONO, fontSize: '0.62rem', letterSpacing: '0.28em', textTransform: 'uppercase', color: GOLD, marginBottom: '14px' }}>
-        The Founding Sequence
-      </p>
-      <h1 style={{ fontFamily: SERIF, fontSize: 'clamp(1.8rem,3.5vw,2.6rem)', fontWeight: 300, lineHeight: 1.12, letterSpacing: '-0.02em', color: BONE, marginBottom: '14px' }}>
-        {isBusiness
-          ? 'Three of the hardest calls you made running this business.'
-          : 'Three of the hardest calls you ever made.'}
-      </h1>
-      <p style={{ fontFamily: SERIF, fontSize: '1.08rem', fontWeight: 300, lineHeight: 1.75, color: BODY, marginBottom: '36px', maxWidth: '560px' }}>
-        About ten minutes each. Speak or type. Stop whenever you like and come back; every answer is saved as you go.
-      </p>
+      {activeArea ? (
+        <>
+          <p style={{ fontFamily: MONO, fontSize: '0.62rem', letterSpacing: '0.28em', textTransform: 'uppercase', color: GOLD, marginBottom: '14px' }}>
+            A call on {activeArea}
+          </p>
+          <h1 style={{ fontFamily: SERIF, fontSize: 'clamp(1.8rem,3.5vw,2.6rem)', fontWeight: 300, lineHeight: 1.12, letterSpacing: '-0.02em', color: BONE, marginBottom: '14px' }}>
+            Where your archive is thin, in your own words.
+          </h1>
+          <p style={{ fontFamily: SERIF, fontSize: '1.08rem', fontWeight: 300, lineHeight: 1.75, color: BODY, marginBottom: '36px', maxWidth: '560px' }}>
+            One question to start, then a few that follow what you say. About ten minutes. Speak or type. When it closes, your map is read again.
+          </p>
+        </>
+      ) : (
+        <>
+          <p style={{ fontFamily: MONO, fontSize: '0.62rem', letterSpacing: '0.28em', textTransform: 'uppercase', color: GOLD, marginBottom: '14px' }}>
+            The Founding Sequence
+          </p>
+          <h1 style={{ fontFamily: SERIF, fontSize: 'clamp(1.8rem,3.5vw,2.6rem)', fontWeight: 300, lineHeight: 1.12, letterSpacing: '-0.02em', color: BONE, marginBottom: '14px' }}>
+            {isBusiness
+              ? 'Three of the hardest calls you made running this business.'
+              : 'Three of the hardest calls you ever made.'}
+          </h1>
+          <p style={{ fontFamily: SERIF, fontSize: '1.08rem', fontWeight: 300, lineHeight: 1.75, color: BODY, marginBottom: '36px', maxWidth: '560px' }}>
+            About ten minutes each. Speak or type. Stop whenever you like and come back; every answer is saved as you go.
+          </p>
+        </>
+      )}
 
       {loadError && (
         <p role="alert" style={{ fontFamily: SERIF, fontSize: '1rem', color: '#D98C8C', marginBottom: '24px' }}>{loadError}</p>
       )}
+      {area && !current && !areaClosed && submitErr && (
+        <p role="alert" style={{ fontFamily: SERIF, fontSize: '1rem', color: '#D98C8C', marginBottom: '24px' }}>{submitErr}</p>
+      )}
+      {area && !current && !areaClosed && !submitErr && starting && (
+        <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '1.05rem', color: BODY, marginBottom: '24px' }}>Opening your call on {area}.</p>
+      )}
 
       {/* Call cards */}
-      {status && (
+      {status && !activeArea && (
         <div className="founding-cards" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2px', marginBottom: '36px' }}>
           {status.calls.map(c => {
             const lit = c.state !== 'upcoming'
@@ -190,7 +252,7 @@ export default function FoundingClient({
       )}
 
       {/* Sequence complete */}
-      {status?.done && !current && (
+      {status?.done && !current && !areaClosed && !area && (
         <section aria-live="polite" style={panel()}>
           <p style={eyebrow()}>Complete</p>
           <h2 style={{ fontFamily: SERIF, fontSize: '1.6rem', fontWeight: 300, color: BONE, lineHeight: 1.25, marginBottom: '14px' }}>
@@ -227,7 +289,7 @@ export default function FoundingClient({
       )}
 
       {/* Nothing open yet: begin the next call */}
-      {status && !current && !status.done && !justClosed && (
+      {status && !current && !status.done && !justClosed && !areaClosed && !area && (
         <section style={panel()}>
           <p style={eyebrow()}>{status.completed === 0 ? 'Begin' : 'Continue'}</p>
           <h2 style={{ fontFamily: SERIF, fontSize: '1.6rem', fontWeight: 300, color: BONE, lineHeight: 1.25, marginBottom: '14px' }}>
@@ -243,16 +305,40 @@ export default function FoundingClient({
         </section>
       )}
 
+      {/* An area call just closed */}
+      {areaClosed && !current && (
+        <section aria-live="polite" style={panel()}>
+          <p style={eyebrow()}>Saved</p>
+          <h2 style={{ fontFamily: SERIF, fontSize: '1.6rem', fontWeight: 300, color: BONE, lineHeight: 1.25, marginBottom: '14px' }}>
+            Your call on {areaClosed.area} is in your archive.
+          </h2>
+          <p style={{ fontFamily: SERIF, fontSize: '1.08rem', fontWeight: 300, lineHeight: 1.75, color: BODY, marginBottom: '24px' }}>
+            {areaClosed.deposits} {areaClosed.deposits === 1 ? 'deposit' : 'deposits'}, in your own words. Your map is being read again now; it takes about twenty minutes, and the dashboard shows the new reading when it is done.
+          </p>
+          <Link href="/archive/dashboard" style={goldButton()}>Back to your archive</Link>
+        </section>
+      )}
+
       {/* The interview */}
       {current && (
         <section style={panel()}>
-          {!current.isFounding && (
+          {!current.isFounding && !current.area && (
             <p style={{ fontFamily: SERIF, fontSize: '1rem', fontStyle: 'italic', color: BODY, marginBottom: '18px', lineHeight: 1.7 }}>
               You have an interview open from your dashboard. Finish it here; the Founding Sequence picks up right after.
             </p>
           )}
+          {current.area && area && current.area !== area && (
+            <p style={{ fontFamily: SERIF, fontSize: '1rem', fontStyle: 'italic', color: BODY, marginBottom: '18px', lineHeight: 1.7 }}>
+              You already have a call open on {current.area}. Finish it first; one call at a time.
+            </p>
+          )}
+          {current.isFounding && area && (
+            <p style={{ fontFamily: SERIF, fontSize: '1rem', fontStyle: 'italic', color: BODY, marginBottom: '18px', lineHeight: 1.7 }}>
+              A founding call is still open. Finish it first; the call on {area} is a click away on your map afterward.
+            </p>
+          )}
           <p style={eyebrow()}>
-            {current.isFounding && current.call ? `Call ${current.call} · ` : ''}{current.label}
+            {current.isFounding && current.call ? `Call ${current.call} · ` : ''}{current.area ? `${current.area} · ` : ''}{current.label}
           </p>
 
           <div aria-live="polite" style={{ borderLeft: '3px solid rgba(196,162,74,0.5)', padding: '14px 22px', margin: '0 0 22px', background: 'rgba(196,162,74,0.04)' }}>

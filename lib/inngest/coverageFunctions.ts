@@ -28,10 +28,17 @@ export const computeCoverage = inngest.createFunction(
     // per probe; two concurrent runs double that against the same rate limit for
     // no gain, since nothing is waiting on the result interactively.
     concurrency: { limit: 1 },
-    // Duplicate deliveries for one archive collapse before a second run can
-    // open. The in-flight check inside runCoverage and the partial unique index
-    // coverage_runs_one_in_flight are the two backstops behind this.
-    idempotency: 'event.data.archiveId',
+    // No idempotency key since September 17, 2026. It was
+    // `event.data.archiveId`, which Inngest holds for 24 hours, and that meant
+    // a map could not be read again the same day an owner deposited into it:
+    // a second manual send for the same archive was accepted and started
+    // nothing (VERIFIED September 16, 37 minutes short of the window). An area
+    // call closing is exactly the moment the map should move. Duplicate
+    // deliveries are still collapsed, by the in-flight check inside runCoverage
+    // and the partial unique index coverage_runs_one_in_flight, which refuse a
+    // second run while one is open. A duplicate that arrives after a run has
+    // finished costs one more reading; Inngest deduplicates by event id at
+    // ingestion, so that is rare.
     triggers:    [{ event: 'coverage.run.requested' }],
   },
   async ({ event, step }) => {

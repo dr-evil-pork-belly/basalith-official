@@ -146,6 +146,8 @@ export interface FoundingStatus {
     incidentId:  string
     isFounding:  boolean
     call:        FoundingCall | null
+    /** The area this open incident is depositing into, when it is an area call (lib/areaCalls.ts). */
+    area:        string | null
     probeType:   ProbeType | 'SEED' | 'TIMELINE' | null
     question:    string | null
     label:       string
@@ -204,6 +206,7 @@ export function foundingStatusFromRows(rows: FoundingRow[], scope: FoundingScope
           incidentId: open.id,
           isFounding: !!openMarker,
           call:       openMarker?.call ?? null,
+          area:       open.state?.areaCall?.area ?? null,
           probeType:  open.state.pendingProbeType ?? null,
           question:   open.state.pendingQuestion ?? null,
           label:      phaseLabel(open.state.pendingProbeType),

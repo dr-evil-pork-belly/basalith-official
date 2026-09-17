@@ -158,6 +158,13 @@ reads, `/founding/start` opens, `/api/archive/b2b-question/answer` advances (ope
 every owner tier since September 14, 2026). Runbook:
 `docs/FOUNDING_SEQUENCE_2026-09-14.md`.
 
+**Area calls.** `lib/areaCalls.ts`, September 17, 2026. One incident interview aimed at
+one thin area of the coverage map, opened from the "Deposit here" link on a map card
+(`/archive/founding?area=Money`), seeded per area per scope, marked in
+`incident_sessions.state.areaCall`, advanced by `/answer` like a founding call. When it
+closes, `/answer` sends `coverage.run.requested` so the map is read again. One open
+incident per archive still holds; the page explains when another must finish first.
+
 **Control B, the grounding verifier.** `lib/verifyGrounding.ts`. A separate auditor call
 that refuses any founder position not directly supported by a deposit. It is the
 central integrity mechanism, live in production on the succession entity chat route.
@@ -169,9 +176,13 @@ central integrity mechanism, live in production on the succession entity chat ro
 `lib/coverageProbesPersonal.ts`, eight kinds of judgment in `lib/personalDomains.ts`)
 for every other tier, since September 15, 2026. Rendered to owners by
 `lib/coverageOwner.ts` and `app/archive/components/CoverageMap.tsx`, count-led, no
-score. The family entity chat route (`app/api/archive/entity-chat`,
-`lib/entityContext.ts`) runs NO verifier, so a personal map shows coverage only and
-never an overreach line until that route is moved onto the grounded pipeline. The
+score. The family entity chat route (`app/api/archive/entity-chat`) has two pipelines
+behind one contract, chosen per archive by `archives.entity_pipeline` (September 16,
+2026): `context` is `lib/entityContext.ts`, Opus, no verifier; `grounded` is
+`lib/familyEntity.ts`, the succession pipeline with the personal prompt scope. A personal
+map shows an overreach line only for an archive on `grounded`. The switch is temporary;
+delete `entityContext.ts` when the last archive flips. Runbooks:
+`docs/FAMILY_ENTITY_RECON_2026-09-16.md`, `docs/FAMILY_ENTITY_MOVE_2026-09-16.md`. The
 accuracy score and dimension percentages that used to sit on the personal dashboard
 were deposit-count readings presented as accuracy and are gone from the web;
 `/api/archive/entity-accuracy` remains for iOS only. Runbook:
@@ -396,11 +407,42 @@ Vercel deploy and a 200 from `/api/inngest` both hide it. The per-function diagn
 that function's event, then read `GET /v1/events/{id}/runs` with the signing key. An empty
 `data` array means no function is registered for that trigger.
 
+**A `vercel` preview deploy repoints the production Inngest app.** VERIFIED September 16,
+2026. The preview sync landed in the Production environment and replaced the serve URL
+with the preview deployment's URL (behind deployment protection) until the next production
+deploy synced and put `https://basalith.ai/api/inngest` back, ten minutes later. Any event
+sent in that window goes to the preview. Rule: after a preview deploy, send no events until
+production has deployed and the app page URL reads basalith.ai again.
+
+**Coverage sends used to be deduplicated for 24 hours.** Until September 17, 2026
+`computeCoverage` was keyed `idempotency: 'event.data.archiveId'`, so a second
+`coverage.run.requested` for the same archive inside a day was accepted as an event and
+started nothing (Events page: "No functions triggered." VERIFIED September 16, 37 minutes
+short of the window). The key is gone: an area call closing is exactly when the map should
+be read again. The in-flight check in `runCoverage` and the partial unique index still
+refuse a second run while one is open. Also: the Send event form's placeholder name "Your
+Event Name" is easy to leave in place; the JSON's `name` field is what matters.
+
 **Other open conflicts.** FROM DOCS, each needs its own session. Inclusion threshold is
 50 in `trainingPipeline.ts` and 60 in the god scoring route. Dimension taxonomy is 10 vs
 9 vs 12 across subsystems. The Calder Archive was provisioned four times as empty
-duplicate rows, which is a provisioning idempotency bug. Dr Ha has deposits flagged
-`test_artifact = true` that may be real founder content from a CDM incident run.
+duplicate rows, which is a provisioning idempotency bug.
+
+**`test_artifact` on Dr Ha, resolved September 16, 2026.** The 18 July `web_capture` rows
+are fiction from the CDM drive script (Marcus at Vantage, Priya, a CFO) and stay flagged.
+The 38 founding-call rows from September 14 and 15 were real and were also flagged; the
+founder unflagged them. Nothing sets the flag: no trigger, rule, function, default, or
+scheduled job, and nothing in the code writes it. The founding rows were flagged by a
+hand-run update after September 13, origin unknown. Do not search for a mechanism again.
+`lib/entityContext.ts` filters the flag, so the family entity never read the founding calls
+until the fix; `lib/trainingPipeline.ts` now refuses to create a pair from a flagged deposit.
+
+**The scorer rejects incident-interview turns.** `scoreTrainingPair` is a paragraph rubric
+(under 20 words caps specificity at 3). It excluded 31 of 37 founding pairs on the first live
+Founding Sequence. Since September 16, 2026 a pair whose metadata carries `probe_type` is
+included on the interview's say-so, score recorded and not consulted (`includeInTraining`).
+The proper fix, pairs whose prompt carries the incident they came from, is its own slice.
+Runbook: `docs/TRAINING_INCLUSION_2026-09-16.md`.
 
 **Migration files diverge from live schema.** `20260611_elicitation_engine.sql` marks
 `question_history.source` as PENDING. It is live. Assume nothing from a migration file's

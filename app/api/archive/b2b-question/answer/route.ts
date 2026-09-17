@@ -299,6 +299,23 @@ export async function POST(req: NextRequest) {
         }
       })
     }
+
+    // Area call (lib/areaCalls.ts): the owner deposited into one thin area of
+    // the map, so read the map again. The compute function refuses a run while
+    // another is in flight; a send that lands during one is logged and the
+    // monthly sweep covers it.
+    if (next.state.areaCall) {
+      after(async () => {
+        try {
+          await inngest.send({
+            name: 'coverage.run.requested',
+            data: { archiveId, triggerSource: 'manual' },
+          })
+        } catch (err) {
+          console.error('[b2b-question/answer] coverage run request after area call failed:', err instanceof Error ? err.message : err)
+        }
+      })
+    }
   } else {
     const tensionForTradeoff =
       decision.probeType === 'TRADEOFF' ? next.state.tensions[next.state.spineCursor] : undefined
@@ -326,6 +343,7 @@ export async function POST(req: NextRequest) {
     nextProbeType: decision.incidentComplete ? null : decision.probeType,
     nextQuestion:  decision.incidentComplete ? null : (next.state.pendingQuestion ?? null),
     founding:      next.state.founding ?? null,
+    areaCall:      next.state.areaCall ?? null,
     incidentComplete: decision.incidentComplete,
   })
 }

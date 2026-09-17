@@ -96,10 +96,20 @@ export interface IncidentState {
   // serialized state jsonb, so no schema change; the reducer never reads it
   // and `clone` preserves it across every advance.
   founding?: FoundingMarker
+  // Area call marker (lib/areaCalls.ts). Present only on an incident opened
+  // from the coverage map to deposit into one thin area. Same contract as
+  // `founding`: rides the jsonb, reducer never reads it, clone preserves it.
+  areaCall?: AreaCallMarker
 }
 
 export interface FoundingMarker {
   call: 1 | 2 | 3
+  scope: 'personal' | 'business'
+  startedAt: string
+}
+
+export interface AreaCallMarker {
+  area: string
   scope: 'personal' | 'business'
   startedAt: string
 }

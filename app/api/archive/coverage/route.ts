@@ -3,6 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { loadOwnerCoverage } from '@/lib/coverageOwner'
 import { readEntityPipeline } from '@/lib/familyEntity'
+import { openAreaCall } from '@/lib/areaCalls'
 
 export const dynamic = 'force-dynamic'
 
@@ -30,8 +31,13 @@ export async function GET() {
     // A personal archive shows its overreach reading only once its family
     // entity runs the verifier (archives.entity_pipeline = 'grounded').
     const verified = archive.tier === 'succession' ? true : (await readEntityPipeline(archive.id)) === 'grounded'
-    const coverage = await loadOwnerCoverage(archive.id, archive.tier, verified)
-    return NextResponse.json(coverage)
+    const [coverage, open] = await Promise.all([
+      loadOwnerCoverage(archive.id, archive.tier, verified),
+      openAreaCall(archive.id),
+    ])
+    // The area of an open area call, so the map can say "continue" on that
+    // card instead of offering to open a second one.
+    return NextResponse.json({ ...coverage, openArea: open?.area ?? null })
   } catch (err) {
     console.error('[archive/coverage]', err instanceof Error ? err.message : err)
     return NextResponse.json({ error: 'Could not load the coverage map' }, { status: 500 })

@@ -23,9 +23,11 @@ type Domain = {
 }
 
 type Coverage =
-  | { available: false; reason: string }
+  | { available: false; reason: string; openArea?: string | null }
   | {
       available:  true
+      /** The area of an open area call on this archive, if any. */
+      openArea?:  string | null
       scope:      'business' | 'personal'
       domains:    Domain[]
       computedAt: string
@@ -146,6 +148,19 @@ export default function CoverageMap({ link }: { link?: { href: string; label: st
                     <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '0.95rem', fontWeight: 300, color: BODY, lineHeight: 1.6, margin: '6px 0 0' }}>
                       {d.overreachLine}
                     </p>
+                  )}
+                  {/* The way in. One incident interview aimed at this area, on
+                      /archive/founding. A card whose call is already open says
+                      so; any other card opens a new one, and the page explains
+                      if another interview has to finish first. */}
+                  {d.state !== 'backed' && (
+                    <Link
+                      href={`/archive/founding?area=${encodeURIComponent(d.domain)}`}
+                      className="no-underline"
+                      style={{ display: 'inline-block', marginTop: '12px', fontFamily: MONO, fontSize: '0.56rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: GOLD }}
+                    >
+                      {coverage.openArea === d.domain ? 'Continue your call' : 'Deposit here'} →
+                    </Link>
                   )}
                 </div>
               )
