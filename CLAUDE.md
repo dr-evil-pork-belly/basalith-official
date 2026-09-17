@@ -165,6 +165,26 @@ one thin area of the coverage map, opened from the "Deposit here" link on a map 
 closes, `/answer` sends `coverage.run.requested` so the map is read again. One open
 incident per archive still holds; the page explains when another must finish first.
 
+**Self-serve trial.** `/begin` (`app/begin`), `POST /api/trial/start`, `lib/trial.ts`,
+September 17, 2026. A person types a name and an email; the route creates the auth
+user with `app_metadata.role = 'owner'` forced (`getOrCreateAuthUser` `forceRole`),
+inserts the archive, and the page requests the same OTP link `/archive-login` sends.
+The trial convention is `archives.status = 'trial'` with `trial_started_at` and
+`trial_expires_at` (thirty days). There is NO CHECK on `status`; `'trial'` sits beside
+`active` and `drill` by convention. What keeps a trial out of every scheduled email is
+that every cron selects `status = 'active'`, and `lib/cronGates.test.ts` fails the suite
+if a cron that reads `archives` stops doing so (two are skipped by name because they
+select paused and resting on purpose). `coverageMonthlySweep` carries the same filter.
+Trial media never enters B2: both backup functions read trial ids into
+`excludedArchiveIds` and `applyArchiveScope` drops them exactly as terminated ids,
+because an object written to B2 sits under a 90 day lock and a trial is deleted at
+thirty. Trials cannot invite contributors or upload photos; the three surfaces that
+refuse a non-active archive are left as they are and the dashboard's Contributors card
+becomes one line. The founding proof opens after call 1 (`canShowProof`). A signed-in
+user with no archive lands on `/begin`, not on a redirect loop. Deletion at thirty days
+and trial-to-paid are slices B and C of `docs/SELF_SERVE_SKELETON_2026-09-17.md`; until
+slice B has run in production, no copy says "deleted after 30 days."
+
 **Control B, the grounding verifier.** `lib/verifyGrounding.ts`. A separate auditor call
 that refuses any founder position not directly supported by a deposit. It is the
 central integrity mechanism, live in production on the succession entity chat route.
@@ -397,9 +417,11 @@ audit. Unresolved.
 What proves a sync landed, because this is the trap that hid it. Inngest compares function
 signatures, not bodies, so most deploys legitimately report "No change" and that is not
 evidence of failure. The commit metadata on the app page is what tells you a sync happened.
-A signature change is what makes a real change visible: adding the daily cron to
-`storage-backup-sync` on August 13, 2026 altered its trigger list, so a landed sync had to
-show it.
+A signature change is what makes a real change visible: the daily cron on
+`storage-backup-sync` was written August 13, 2026 on a branch that was never merged, and
+reached main on September 17, 2026 (`docs/BACKUP_CRON_RESTORE_2026-09-17.md`; between
+those dates the weekly verify failed four times with `A1_MISSING_IN_DEST` because no sync
+ran). Its trigger list changed on that deploy, so a landed sync had to show it.
 
 **Standing check: after a production deploy, confirm the Inngest app page shows the deployed
 commit.** This failed silently for months and nothing else would have surfaced it. A green
