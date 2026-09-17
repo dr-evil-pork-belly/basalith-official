@@ -485,26 +485,31 @@ on a different scheduler.
 
 | Unit | Where | Schedule | Job |
 |---|---|---|---|
-| `storage-backup-sync` | Inngest | **event only, no cron yet** | list, diff, copy what is new or changed |
+| `storage-backup-sync` | Inngest cron | daily `0 4 * * *` UTC, on since August 13, 2026 | list, diff, copy what is new or changed |
 | `storage-backup-verify` | Inngest cron | weekly `0 5 * * 0` UTC | structural diff plus full re-hash of the destination |
 | `storage-backup-heartbeat` | Vercel cron route | daily `0 6 * * *` UTC | read the run log, alarm on silence |
 
 Plus one quarterly unit, `storage-backup-drill`, Inngest cron `0 7 1 1,4,7,10 *`, covered in
 section 5. Not built, see section 7 on A7.
 
-**The sync intentionally has no cron until build order 9d.** It was specified as daily
-`0 4 * * *` and shipped without it. Registering a cron-triggered sync means the first
-production deploy seeds the whole property overnight, unattended, into a 90 day COMPLIANCE
-lock that nobody can shorten. The per-run byte ceiling does not stop it, because 1073 MB
-against a 3.5 GB ceiling passes. Build order 9a through 9d puts the dissolution dry walk,
-`dissolution-purge.ts`, and the tenet 04 redraft ahead of the first write to B2, and an
-unattended seed inverts all three. So the seed is sent by hand at 9d and the daily cron goes
-on afterwards, as its own commit. `lib/storageBackup.test.ts` fails if a cron reappears here
-before then.
+**The sync intentionally had no cron until build order 9d. The cron went on August 13,
+2026.** It was specified as daily `0 4 * * *` and shipped without it. Registering a
+cron-triggered sync would have meant the first production deploy seeding the whole property
+overnight, unattended, into a 90 day COMPLIANCE lock that nobody can shorten. The per-run
+byte ceiling does not stop it, because 1073 MB against a 3.5 GB ceiling passes. Build order
+9a through 9d put the dissolution dry walk, `dissolution-purge.ts`, and the tenet 04 redraft
+ahead of the first write to B2, and an unattended seed inverts all three. So the seed was
+sent by hand at 9d and the daily cron went on afterwards, as its own commit. That is what
+happened: the seed ran green on August 13, 2026, 376 objects and 1,125,215,480 bytes across
+two runs, and the cron was added the same day.
 
-When it is added, 04:00 UTC puts the sync after the 03:00 export reaper and clear of the
-08:00 and 09:00 cron cluster. 05:00 Sunday is clear of `weekly-replay` at 09:00 and
-`weekly-mirror` at 17:00.
+`lib/storageBackup.test.ts` used to fail if a cron reappeared here before then. That guard
+was deleted along with the condition it guarded, and replaced by its inverse. The suite now
+fails if the sync loses the daily cron, if it loses either event trigger, or if verify's
+weekly cron changes.
+
+04:00 UTC puts the sync after the 03:00 export reaper and clear of the 08:00 and 09:00 cron
+cluster. 05:00 Sunday is clear of `weekly-replay` at 09:00 and `weekly-mirror` at 17:00.
 
 Verify and the heartbeat keep their crons from day one. Neither writes to B2. Verify reads
 the destination and re-hashes, and with an empty manifest it has nothing to do, so it is safe
@@ -1040,8 +1045,17 @@ it, and the redraft will be checkable because there will be something to check. 
 copy now would be writing the promise before the thing it promises.
 
 Until then the existing tenet 04 copy stays as it is, and **the first sync does not run.**
-This is still the gate. It has moved from "approve a sentence" to "specify and staff a
+This is the gate. It has moved from "approve a sentence" to "specify and staff a
 process," which is more work and is the correct amount of work.
+
+**GATE PASSED. The runbook was walked at 9b, tenet 04 was redrafted at 9c, and the first
+sync ran at 9d on August 13, 2026.** The redrafted copy is live in
+`app/data-ownership/page.tsx`, tenet `04`, and it now says the archive is copied to a second
+location, that a dissolution request takes it out of that copy scope, and that the offsite
+copy is deleted as part of the deletion on the same written process. Each of those three is
+checkable against `applyArchiveScope`, `buildSnapshotEntries`, and
+`docs/DISSOLUTION_RUNBOOK.md` section 4. The daily cron went on the same day. This paragraph
+is kept as the record of what the gate was, not as a description of a gate still closed.
 
 ### 9.2 Not blocking: subprocessor disclosure
 
@@ -1305,16 +1319,24 @@ Nothing moves a byte until steps 1 through 4 are done.
      back 377, the section 2.2 placeholder filter has regressed and a zero byte non-file
      just went under a 90 day lock.
 
-     **The seed is sent by hand. `storage-backup-sync` carries no cron.** It is event
-     triggered only, so nothing seeds on its own, and this step is where the first write to
-     B2 happens on purpose rather than overnight. Send `storage/backup.sync.requested` with
-     `{ "kind": "seed" }`. Run it once with `{ "dryRun": true }` first: a dry run writes
-     nothing at all, not even a run row, so it cannot let the heartbeat read the backup as
-     healthy while nothing has been copied.
+     **The seed is sent by hand. `storage-backup-sync` carries no cron when this step
+     runs.** It is event triggered only at that point, so nothing seeds on its own, and this
+     step is where the first write to B2 happens on purpose rather than overnight. Send
+     `storage/backup.sync.requested` with `{ "kind": "seed" }`. Run it once with
+     `{ "dryRun": true }` first: a dry run writes nothing at all, not even a run row, so it
+     cannot let the heartbeat read the backup as healthy while nothing has been copied.
 
      Adding the daily `0 4 * * *` cron is a separate commit, after this run is green and the
      runbook is signed. A test in `lib/storageBackup.test.ts` fails if a cron reappears on
      the sync before then.
+
+     **DONE August 13, 2026.** The seed ran green: 376 objects, 1,125,215,480 bytes, across
+     two runs. The first copied `MAX_COPIES_PER_RUN` = 300 and raised `A8_CAPPED` as
+     designed, and the continuation it emitted took the remaining 76. The snapshot at
+     `_manifest/2026-08-13.json` carries 376 entries and zero drill paths, so the dissolution
+     filter is proven against the live property. The count came back 376 and not 377, so the
+     section 2.2 placeholder filter held. The daily cron went on the same day as its own
+     commit, and the no-cron guard was deleted with it. See section 3.
 
    The cost is one extra seed run and a throwaway archive. Against 1073 MB and a $0.0075
    monthly storage line, that is nothing. The thing it buys is that the first execution of
