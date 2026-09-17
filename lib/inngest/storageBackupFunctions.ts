@@ -398,7 +398,21 @@ export const storageBackupSync = inngest.createFunction(
         return (rows ?? []).map((r) => (r as { id: string }).id)
       })
 
-      const scope = applyArchiveScope(source.objects, { onlyArchiveId, terminatedArchiveIds })
+      // Trial archives (status 'trial', lib/trial.ts) are excluded the same
+      // way, for the same reason in the other direction: a trial is deleted at
+      // thirty days unless it converts, and nothing written to B2 comes out for
+      // ninety. Same throw-never-default rule: an empty list on a failed read
+      // would copy a trial into a lock. Skeleton 1.6.
+      const excludedArchiveIds = await step.run('load-trial-archives', async () => {
+        const { data: rows, error } = await supabaseAdmin
+          .from('archives')
+          .select('id')
+          .eq('status', 'trial')
+        if (error) throw new Error(`load-trial-archives: ${error.message}`)
+        return (rows ?? []).map((r) => (r as { id: string }).id)
+      })
+
+      const scope = applyArchiveScope(source.objects, { onlyArchiveId, terminatedArchiveIds, excludedArchiveIds })
       const inScope = scope.kept
 
       // ── 2. A dry run stops here and writes nothing at all. ───────────────────
@@ -422,6 +436,7 @@ export const storageBackupSync = inngest.createFunction(
           sourceInScope: inScope.length,
           droppedOutOfScope: scope.droppedOutOfScope,
           droppedTerminated: scope.droppedTerminated,
+          droppedExcluded: scope.droppedExcluded,
           terminatedArchiveIds,
           sourceBytes: inScope.reduce((n, o) => n + o.size, 0),
           manifestRows: manifest.length,
@@ -601,7 +616,7 @@ export const storageBackupSync = inngest.createFunction(
           // offsite again under a fresh lock. Pure and unit tested in
           // lib/storageBackup.ts. Same parser, same lowercasing, same rule that
           // a path with no uuid prefix is kept.
-          const entries = buildSnapshotEntries(rows, terminatedArchiveIds)
+          const entries = buildSnapshotEntries(rows, terminatedArchiveIds, excludedArchiveIds)
 
           const isoDate = new Date().toISOString().slice(0, 10)
           const key = manifestSnapshotKey(isoDate)
@@ -675,6 +690,7 @@ export const storageBackupSync = inngest.createFunction(
           sourceInScope: inScope.length,
           droppedOutOfScope: scope.droppedOutOfScope,
           droppedTerminated: scope.droppedTerminated,
+          droppedExcluded: scope.droppedExcluded,
           copied,
           deferred: diff.deferred,
           unchanged: diff.unchanged,
@@ -785,8 +801,20 @@ export const storageBackupVerify = inngest.createFunction(
           if (error) throw new Error(`load-terminated-archives: ${error.message}`)
           return (rows ?? []).map((r) => (r as { id: string }).id)
         })
+        // Trials too, or every trial with one voice turn raises A1 (hard) every
+        // Sunday: their objects are in Supabase and, by design, never in B2.
+        // Same source-side-only treatment as terminated.
+        const verifyExcluded = await step.run('load-trial-archives', async () => {
+          const { data: rows, error } = await supabaseAdmin
+            .from('archives')
+            .select('id')
+            .eq('status', 'trial')
+          if (error) throw new Error(`load-trial-archives: ${error.message}`)
+          return (rows ?? []).map((r) => (r as { id: string }).id)
+        })
         const verifyScope = applyArchiveScope(source.objects, {
           terminatedArchiveIds: verifyTerminated,
+          excludedArchiveIds:   verifyExcluded,
         })
 
         // Three way structural diff, in plain code, no step.

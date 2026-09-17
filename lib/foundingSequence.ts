@@ -28,6 +28,10 @@ import {
 } from './incidentSession'
 import { renderProbe } from './renderProbe'
 
+// The proof gate lives with the trial rules so it is testable without the
+// route. Re-exported here because the founding surface is where it is read.
+export { canShowProof } from './trial'
+
 export const FOUNDING_CALLS = 3 as const
 export type FoundingScope = FoundingMarker['scope']
 export type FoundingCall  = FoundingMarker['call']

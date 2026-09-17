@@ -6,6 +6,10 @@ import Link from 'next/link'
 // Points a new owner at the Founding Sequence until it is complete, then
 // disappears. Read-only: one GET, renders nothing while loading, nothing on
 // error, nothing once done. Dropped into both dashboards above the fold.
+//
+// On a trial archive with no call completed the headline leads with the
+// first call, because for a trialist the banner is the dashboard (skeleton
+// 1.3). Everything else is unchanged.
 
 type Status = {
   done: boolean
@@ -17,7 +21,7 @@ type Status = {
 const SERIF = '"Cormorant Garamond",Georgia,serif'
 const MONO  = '"Space Mono","Courier New",monospace'
 
-export default function FoundingBanner() {
+export default function FoundingBanner({ trial = false }: { trial?: boolean } = {}) {
   const [status, setStatus] = useState<Status | null>(null)
 
   useEffect(() => {
@@ -33,7 +37,7 @@ export default function FoundingBanner() {
 
   const inProgress = status.current?.isFounding && status.current.call
   const headline = status.completed === 0 && !inProgress
-    ? 'Start with the Founding Sequence.'
+    ? (trial ? 'Your first call is ready.' : 'Start with the Founding Sequence.')
     : inProgress
       ? `Call ${status.current!.call} is in progress.`
       : `Call ${status.nextCall} is ready when you are.`

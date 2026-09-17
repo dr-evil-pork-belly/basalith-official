@@ -593,7 +593,7 @@ describe('the sync wiring applies the scope where it actually matters', () => {
     // arguments, because buildSnapshotEntries(rows) with the list forgotten
     // compiles, passes every unit test of the function itself, and writes the
     // terminated archive offsite exactly as before.
-    expect(code).toMatch(/const entries = buildSnapshotEntries\(rows, terminatedArchiveIds\)/)
+    expect(code).toMatch(/const entries = buildSnapshotEntries\(rows, terminatedArchiveIds, excludedArchiveIds\)/)
     expect(code).toMatch(/snapshotExcludedTerminated: snapshot\.rows - snapshot\.entries/)
   })
 
@@ -1052,6 +1052,36 @@ describe('the snapshot read honours the dissolution filter too', () => {
 
   it('throws on a malformed terminated id rather than writing the archive offsite again', () => {
     expect(() => buildSnapshotEntries(ROWS, ['nonsense'])).toThrow(/not a uuid/)
+  })
+
+  it('a trial archive is dropped from the kept set and the snapshot; a converted one is kept', () => {
+    // Skeleton 1.6. HA plays the trial, FOUNDER the archive that converted
+    // (status left trial, so it is in neither list). Same predicate as the
+    // dissolution filter, applied through excludedArchiveIds on both halves.
+    const trial = [HA]
+    const scoped = applyArchiveScope(
+      [
+        { bucket: 'photographs', path: `${HA}/one.jpeg`,        size: 1, etag: 'e', createdAt: null },
+        { bucket: 'photographs', path: `${FOUNDER}/three.jpeg`, size: 1, etag: 'e', createdAt: null },
+        { bucket: 'photographs', path: 'legacy-import/five.jpeg', size: 1, etag: 'e', createdAt: null },
+      ],
+      { terminatedArchiveIds: [], excludedArchiveIds: trial },
+    )
+    expect(scoped.kept.map((o) => o.path)).toEqual([`${FOUNDER}/three.jpeg`, 'legacy-import/five.jpeg'])
+    expect(scoped.droppedExcluded).toBe(1)
+    expect(scoped.droppedTerminated).toBe(0)
+
+    const entries = buildSnapshotEntries(ROWS, [], trial)
+    expect(paths(entries)).not.toContain(`${HA}/one.jpeg`)
+    expect(paths(entries)).not.toContain(`${HA}/two.jpeg`)
+    expect(paths(entries)).toContain(`${FOUNDER}/three.jpeg`)
+    expect(paths(entries)).toContain('legacy-import/four.jpeg')
+
+    // Both lists at once: the union drops both archives.
+    expect(paths(buildSnapshotEntries(ROWS, [FOUNDER], trial))).toEqual(['legacy-import/four.jpeg'])
+    // A malformed excluded id throws, same as a terminated one.
+    expect(() => buildSnapshotEntries(ROWS, [], ['nonsense'])).toThrow(/not a uuid/)
+    expect(() => applyArchiveScope([], { excludedArchiveIds: ['nonsense'] })).toThrow(/not a uuid/)
   })
 
   it('still carries five fields and never source_row', () => {

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { checkRateLimit, getClientIP, sanitizedError } from '@/lib/apiSecurity'
-import { getFoundingStatus } from '@/lib/foundingSequence'
+import { canShowProof, getFoundingStatus } from '@/lib/foundingSequence'
 import { buildFoundingProof } from '@/lib/foundingProof'
 
 export const dynamic = 'force-dynamic'
@@ -11,8 +11,9 @@ export const maxDuration = 60
 const ONE_HOUR_MS = 60 * 60 * 1000
 
 // The founding proof: one question the owner's archive answers from a deposit
-// (deposit shown), one it declines. Owner-only, available once the three
-// founding calls are complete, computed on demand and never stored. Up to
+// (deposit shown), one it declines. Owner-only, available once the first
+// founding call is complete (canShowProof, lib/trial.ts; until September 17,
+// 2026 it required all three), computed on demand and never stored. Up to
 // eight model calls per run, so it is rate limited per IP. Writes nothing and
 // logs nothing to grounding_gaps; see lib/foundingProof.ts.
 export async function POST(req: NextRequest) {
@@ -39,8 +40,8 @@ export async function POST(req: NextRequest) {
 
   try {
     const status = await getFoundingStatus(archive.id, archive.tier)
-    if (!status.done) {
-      return NextResponse.json({ error: 'Finish the three calls first.' }, { status: 409 })
+    if (!canShowProof(status)) {
+      return NextResponse.json({ error: 'Finish the first call first.' }, { status: 409 })
     }
     const proof = await buildFoundingProof(archive.id, status.scope)
     return NextResponse.json(proof)

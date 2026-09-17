@@ -293,15 +293,21 @@ export type SnapshotSourceRow = Parameters<typeof toSnapshotEntry>[0]
 export function buildSnapshotEntries(
   rows: readonly SnapshotSourceRow[],
   terminatedArchiveIds: readonly string[] = [],
+  excludedArchiveIds: readonly string[] = [],
 ): SnapshotEntry[] {
-  const terminated = new Set(
-    terminatedArchiveIds.map((id) => requireUuid(id, 'terminatedArchiveIds entry')),
-  )
+  // The union. A trial's manifest rows exist only if it converted and was
+  // then copied, at which point it is no longer excluded; the same rule
+  // applies to both lists so the snapshot can never list an object the
+  // source filter would refuse to copy.
+  const dropped = new Set([
+    ...terminatedArchiveIds.map((id) => requireUuid(id, 'terminatedArchiveIds entry')),
+    ...excludedArchiveIds.map((id) => requireUuid(id, 'excludedArchiveIds entry')),
+  ])
 
   const entries: SnapshotEntry[] = []
   for (const row of rows) {
     const archiveId = archiveIdFromPath(row.path)
-    if (archiveId !== null && terminated.has(archiveId)) continue
+    if (archiveId !== null && dropped.has(archiveId)) continue
     entries.push(toSnapshotEntry(row))
   }
   return entries
@@ -424,6 +430,19 @@ export interface ArchiveScope {
    * objects leave the source set.
    */
   terminatedArchiveIds?: readonly string[]
+  /**
+   * Archive ids excluded from the backup for a reason other than dissolution.
+   * September 17, 2026: trial archives (archives.status = 'trial',
+   * lib/trial.ts). A trial is deleted at thirty days unless it converts, and
+   * an object written to B2 sits under a 90 day COMPLIANCE lock nobody can
+   * lift, so trial media must never enter B2. Same predicate and same
+   * treatment as terminated: dropped by path prefix, a path with no uuid
+   * prefix is kept. On conversion the id leaves this list and the next run
+   * copies the objects as new. Production call sites always pass it; the
+   * default exists so the pure function keeps its zero-argument shape for
+   * the tests.
+   */
+  excludedArchiveIds?: readonly string[]
 }
 
 export interface ArchiveScopeResult {
@@ -432,6 +451,8 @@ export interface ArchiveScopeResult {
   droppedOutOfScope: number
   /** Dropped by the dissolution filter. */
   droppedTerminated: number
+  /** Dropped by excludedArchiveIds (trial archives). */
+  droppedExcluded: number
 }
 
 function requireUuid(value: string, field: string): string {
@@ -492,16 +513,24 @@ export function applyArchiveScope(
   const terminated = new Set(
     (scope.terminatedArchiveIds ?? []).map((id) => requireUuid(id, 'terminatedArchiveIds entry')),
   )
+  const excluded = new Set(
+    (scope.excludedArchiveIds ?? []).map((id) => requireUuid(id, 'excludedArchiveIds entry')),
+  )
 
   const kept: SourceObject[] = []
   let droppedOutOfScope = 0
   let droppedTerminated = 0
+  let droppedExcluded = 0
 
   for (const object of objects) {
     const archiveId = archiveIdFromPath(object.path)
 
     if (archiveId !== null && terminated.has(archiveId)) {
       droppedTerminated += 1
+      continue
+    }
+    if (archiveId !== null && excluded.has(archiveId)) {
+      droppedExcluded += 1
       continue
     }
     if (only !== null && archiveId !== only) {
@@ -511,7 +540,7 @@ export function applyArchiveScope(
     kept.push(object)
   }
 
-  return { kept, droppedOutOfScope, droppedTerminated }
+  return { kept, droppedOutOfScope, droppedTerminated, droppedExcluded }
 }
 
 // ── Diff ─────────────────────────────────────────────────────────────────────

@@ -783,7 +783,7 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
       </div>
 
       {/* ── FOUNDING SEQUENCE (until complete) ── */}
-      {!loading && <FoundingBanner />}
+      {!loading && <FoundingBanner trial={archive?.status === 'trial'} />}
 
       {/* ── PAUSED ARCHIVE BANNER ── */}
       {!loading && archive?.status === 'paused' && (
@@ -874,7 +874,11 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
           {[
             { href: '/archive/label',        label: 'Upload Photos',    desc: 'Upload photographs from your phone or computer.',  gold: true  },
             { href: '/archive/gallery',       label: 'View Gallery',     desc: 'Browse preserved memories across all decades.',    gold: false },
-            { href: '/archive/contributors',  label: 'Contributors',     desc: 'Invite family to contribute their memories.',      gold: false },
+            // Trials cannot invite contributors (skeleton 1.5, decision 5.2).
+            // The card that opens the invite form is replaced by one line.
+            ...(archive?.status === 'trial'
+              ? []
+              : [{ href: '/archive/contributors',  label: 'Contributors',     desc: 'Invite family to contribute their memories.',      gold: false }]),
           ].map(({ href, label, desc, gold }) => (
             <Link
               key={href}
@@ -887,6 +891,17 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
               <p className="font-sans text-[0.72rem] leading-relaxed" style={{ color: '#5C6166' }}>{desc}</p>
             </Link>
           ))}
+
+          {archive?.status === 'trial' && (
+            <div
+              className="rounded-sm border px-6 py-6 flex flex-col gap-3"
+              style={{ background: '#111112', borderColor: 'rgba(255,255,255,0.06)' }}
+            >
+              <div className="w-8 h-px" style={{ background: 'rgba(255,255,255,0.1)' }} />
+              <p className="font-serif font-semibold" style={{ color: '#F0F0EE', fontSize: '1.05rem' }}>Contributors</p>
+              <p className="font-sans text-[0.72rem] leading-relaxed" style={{ color: '#5C6166' }}>Invite family once your archive is founded.</p>
+            </div>
+          )}
 
           {/* Next email time */}
           {!loading && (
