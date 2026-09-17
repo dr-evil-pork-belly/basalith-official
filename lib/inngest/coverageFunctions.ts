@@ -107,10 +107,16 @@ export const coverageMonthlySweep = inngest.createFunction(
     triggers:    [{ cron: '0 6 3 * *' }],
   },
   async ({ step }) => {
+    // Active archives only. A trial (status 'trial', lib/trial.ts) has ten to
+    // fifteen included pairs after call 1 and would otherwise cost a full
+    // 96 to 144 call run every month (recon E3); a paused or drill archive
+    // has no reader. Same filter every Vercel cron already applies, pinned
+    // by lib/cronGates.test.ts.
     const archiveIds = await step.run('load-archives', async () => {
       const { data } = await supabaseAdmin
         .from('archives')
         .select('id')
+        .eq('status', 'active')
       return (data ?? []).map(a => a.id as string)
     })
 
