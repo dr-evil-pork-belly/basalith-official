@@ -5,7 +5,18 @@ import type { SessionRole } from '@/lib/auth/getSessionUser'
 // and app_metadata.role set, or returns the id of the existing user if one
 // is already registered with that email. No password is set; the user signs
 // in by magic link.
-export async function getOrCreateAuthUser(email: string, role: Exclude<SessionRole, null>): Promise<string> {
+//
+// forceRole (September 17, 2026, the self-serve trial): when the user already
+// exists, set app_metadata.role to the requested role even if another role is
+// present. Without it an existing role is kept, which is right for every
+// caller that predates the trial and wrong for a contributor who starts their
+// own archive: they kept role 'contributor' and app/auth/callback bounced them
+// (recon B4). Callers that pass no options are unchanged.
+export async function getOrCreateAuthUser(
+  email: string,
+  role: Exclude<SessionRole, null>,
+  options: { forceRole?: boolean } = {},
+): Promise<string> {
   const normalized = email.trim().toLowerCase()
 
   const { data, error } = await supabaseAdmin.auth.admin.createUser({
@@ -24,7 +35,7 @@ export async function getOrCreateAuthUser(email: string, role: Exclude<SessionRo
 
     const match = list.users.find(u => u.email?.toLowerCase() === normalized)
     if (match) {
-      if (!match.app_metadata?.role) {
+      if (options.forceRole || !match.app_metadata?.role) {
         await supabaseAdmin.auth.admin.updateUserById(match.id, {
           app_metadata: { ...match.app_metadata, role },
         })
