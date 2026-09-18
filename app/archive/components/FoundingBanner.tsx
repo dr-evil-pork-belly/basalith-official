@@ -55,9 +55,10 @@ export default function FoundingBanner({ trial = false }: { trial?: boolean } = 
       className="rounded-sm mb-8"
       style={{
         display:    'block',
-        background: 'var(--portal-tint)',
-        border:     '1px solid var(--portal-gold-line)',
-        borderLeft: '3px solid var(--portal-gold-ink)',
+        background: 'var(--portal-card)',
+        border:     '1px solid var(--portal-card-line)',
+        borderLeft: '4px solid var(--portal-btn)',
+        boxShadow:  'var(--portal-lift)',
         padding:    'clamp(1.1rem,3vw,1.5rem) clamp(1.1rem,3vw,1.75rem)',
         textDecoration: 'none',
       }}
@@ -65,14 +66,14 @@ export default function FoundingBanner({ trial = false }: { trial?: boolean } = 
       <p style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.24em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '10px' }}>
         The Founding Sequence
       </p>
-      <p style={{ fontFamily: SERIF, fontSize: '22px', fontWeight: 400, color: 'var(--portal-ink)', lineHeight: 1.25, marginBottom: '6px' }}>
+      <p style={{ fontFamily: SERIF, fontSize: '26px', fontWeight: 500, color: 'var(--portal-ink)', lineHeight: 1.2, marginBottom: '8px', letterSpacing: '-0.01em' }}>
         {headline}
       </p>
       <p style={{ fontFamily: SERIF, fontSize: '17px', fontWeight: 400, color: 'var(--portal-body)', lineHeight: 1.6, marginBottom: '12px', maxWidth: '58ch' }}>
         {body}
       </p>
-      <span style={{ fontFamily: MONO, fontSize: '11.5px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)' }}>
-        {inProgress ? 'Continue' : 'Begin'} <span aria-hidden="true">→</span>
+      <span style={{ display: 'inline-flex', alignItems: 'center', minHeight: '44px', padding: '0 22px', fontFamily: MONO, fontSize: '12px', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--portal-btn-label)', background: 'var(--portal-btn)', borderRadius: '2px', marginTop: '4px' }}>
+        {inProgress ? 'Continue' : 'Begin'}
       </span>
     </Link>
   )

@@ -81,7 +81,7 @@ function UpcomingDates({ archiveId }: { archiveId: string }) {
   if (upcoming.length === 0) return null
 
   return (
-    <div className="rounded-sm mb-8" style={{ background: CARD, border: `1px solid ${LINE}` }}>
+    <div className="rounded-sm mb-8 portal-card" style={{ background: CARD, border: `1px solid ${LINE}` }}>
       <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: RULE }}>
         <p style={{ fontFamily: MONO, fontSize: '11.5px', letterSpacing: '0.2em', textTransform: 'uppercase', color: GOLD, margin: 0 }}>
           Upcoming dates
@@ -181,12 +181,8 @@ function MemoryGameCard({ archiveId }: { archiveId: string }) {
 
   if (!session) {
     return (
-      <div className="rounded-sm mb-8" style={{ background: CARD, border: `1px solid ${LINE}`, padding: '1.1rem 1.5rem' }}>
+      <div className="mb-8" style={{ padding: '0.9rem 0', borderTop: `1px solid ${RULE}`, borderBottom: `1px solid ${RULE}` }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={LABEL} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }} aria-hidden="true">
-            <rect x="3" y="3" width="18" height="18" rx="2"/>
-            <path d="M3 9h18M9 21V9"/>
-          </svg>
           <p style={{ fontFamily: SERIF, fontSize: '15.5px', color: SECOND, margin: 0 }}>
             Memory game. The next one opens Wednesday.
           </p>
@@ -198,7 +194,7 @@ function MemoryGameCard({ archiveId }: { archiveId: string }) {
   const maxCount = leaderboard[0]?.count ?? 1
 
   return (
-    <div className="rounded-sm mb-8" style={{ background: CARD, border: `1px solid ${LINE}`, borderTop: '3px solid var(--portal-btn)' }}>
+    <div className="rounded-sm mb-8 portal-card" style={{ background: CARD, border: `1px solid ${LINE}`, borderTop: '3px solid var(--portal-btn)' }}>
       <div style={{ padding: '1.25rem 1.5rem', borderBottom: `1px solid ${RULE}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={GOLD} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }} aria-hidden="true">
@@ -302,7 +298,7 @@ function FamilyAccessCard() {
   if (!data || data.access === 'none') return null
 
   return (
-    <div className="rounded-sm mb-8" style={{ background: CARD, border: `1px solid ${LINE}` }}>
+    <div className="rounded-sm mb-8 portal-card" style={{ background: CARD, border: `1px solid ${LINE}` }}>
       <div style={{ padding: '1.1rem 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' as const }}>
         <p style={{ fontFamily: SERIF, fontSize: '16px', color: INK, margin: 0 }}>
           Family access to your entity
@@ -774,7 +770,7 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
               style={{
                 fontFamily:    SERIF,
                 fontSize:      'clamp(34px,4.2vw,50px)',
-                fontWeight:    300,
+                fontWeight:    400,
                 lineHeight:    1.08,
                 letterSpacing: '-0.015em',
                 color:         INK,
@@ -905,7 +901,7 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
             <Link
               key={href}
               href={href}
-              className="rounded-sm border px-6 py-6 no-underline flex flex-col gap-3 transition-colors duration-200"
+              className="rounded-sm border px-6 py-6 no-underline flex flex-col gap-3 transition-colors duration-200 portal-card"
               style={{ background: CARD, borderColor: LINE }}
             >
               <div className="w-8 h-px" style={{ background: gold ? 'var(--portal-gold-ink)' : LINE }} />
@@ -927,7 +923,7 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
 
           {/* Next email time */}
           {!loading && (
-            <div className="rounded-sm border px-5 py-4" style={{ background: CARD, borderColor: LINE }}>
+            <div className="rounded-sm border px-5 py-4 portal-card" style={{ background: CARD, borderColor: LINE }}>
               <p style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: LABEL, marginBottom: '6px' }}>
                 Next photograph email
               </p>

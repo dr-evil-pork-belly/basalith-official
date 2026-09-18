@@ -89,7 +89,7 @@ export default function ArchiveSwitcher() {
         style={{
           fontFamily:      SERIF,
           fontSize:        '15px',
-          color:           open ? 'var(--portal-ink)' : 'var(--portal-secondary)',
+          color:           open ? 'var(--spine-fg)' : 'var(--spine-body)',
           background:      'none',
           border:          'none',
           cursor:          switching ? 'wait' : 'pointer',
@@ -100,13 +100,13 @@ export default function ArchiveSwitcher() {
           width:           '100%',
           transition:      'color 150ms ease',
         }}
-        onMouseEnter={e => { if (!open) (e.currentTarget as HTMLElement).style.color = 'var(--portal-ink)' }}
-        onMouseLeave={e => { if (!open) (e.currentTarget as HTMLElement).style.color = 'var(--portal-secondary)' }}
+        onMouseEnter={e => { if (!open) (e.currentTarget as HTMLElement).style.color = 'var(--spine-fg)' }}
+        onMouseLeave={e => { if (!open) (e.currentTarget as HTMLElement).style.color = 'var(--spine-body)' }}
       >
         <span style={{ flex: 1, textAlign: 'left', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {current?.name ?? 'Select Archive'}
         </span>
-        <span aria-hidden="true" style={{ color: 'var(--portal-label)', fontSize: '12px' }}>▾</span>
+        <span aria-hidden="true" style={{ color: 'var(--spine-dim)', fontSize: '12px' }}>▾</span>
       </button>
 
       {open && (
@@ -117,7 +117,7 @@ export default function ArchiveSwitcher() {
           width:     '260px',
           background: 'var(--portal-card)',
           border:    '1px solid var(--portal-card-line)',
-          boxShadow: '0 12px 40px rgba(20,18,15,0.12)',
+          boxShadow: 'var(--portal-lift)',
           zIndex:    200,
         }}>
           {archives.map((archive, idx) => {

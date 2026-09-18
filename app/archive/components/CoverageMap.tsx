@@ -75,7 +75,7 @@ export default function CoverageMap({ link }: { link?: { href: string; label: st
   return (
     <section
       aria-label="Coverage map"
-      className="rounded-sm mb-10"
+      className="rounded-sm mb-10 portal-card"
       style={{ background: 'var(--portal-card)', border: '1px solid var(--portal-card-line)', padding: 'clamp(1.5rem,4vw,2rem)' }}
     >
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap', marginBottom: '6px' }}>

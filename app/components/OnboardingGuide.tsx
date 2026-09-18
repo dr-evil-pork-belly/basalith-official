@@ -16,7 +16,7 @@ const STEPS: Step[] = [
   {
     number:        1,
     title:         'Upload your photos',
-    description:   'Upload everything from your phone. Our AI analyzes each photo and removes screenshots automatically.',
+    description:   'Upload everything from your phone. Screenshots are set aside for you automatically.',
     buttonLabel:   'UPLOAD PHOTOS →',
     buttonHref:    '/archive/label',
     completedWhen: 'photos',
@@ -119,14 +119,14 @@ export default function OnboardingGuide({
       >
         <div className="flex items-center gap-3">
           <span style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.25em', color: 'var(--portal-gold-ink)' }}>
-            GETTING STARTED
+            Getting started
           </span>
           <span style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.1em', color: 'var(--portal-secondary)' }}>
             {completedCount} of 4 steps complete
           </span>
         </div>
         <span style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.15em', color: 'var(--portal-gold-ink)' }}>
-          CONTINUE →
+          Continue
         </span>
       </div>
     )
@@ -136,9 +136,9 @@ export default function OnboardingGuide({
     <div
       className="mb-8 rounded-sm"
       style={{
-        background:  'var(--portal-gold-wash)',
-        border:      '1px solid var(--portal-gold-line)',
-        borderTop:   '3px solid var(--portal-gold-ink)',
+        background:  'var(--portal-card)',
+        border:      '1px solid var(--portal-card-line)',
+        boxShadow:   'var(--portal-lift)',
         padding:     '1.5rem 2rem',
       }}
     >
@@ -146,7 +146,7 @@ export default function OnboardingGuide({
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-4">
           <span style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.3em', color: 'var(--portal-gold-ink)' }}>
-            GETTING STARTED
+            Getting started
           </span>
           {/* Progress pills */}
           <div className="flex items-center gap-1.5">

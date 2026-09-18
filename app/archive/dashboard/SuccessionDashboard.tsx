@@ -102,7 +102,7 @@ export default function SuccessionDashboard({
           style={{
             fontFamily:    SERIF,
             fontSize:      'clamp(34px,4.2vw,50px)',
-            fontWeight:    300,
+            fontWeight:    400,
             lineHeight:    1.08,
             letterSpacing: '-0.015em',
             color:         'var(--portal-ink)',
@@ -123,7 +123,7 @@ export default function SuccessionDashboard({
 
       {/* ── CAPTURE PANEL ── */}
       <div
-        className="rounded-sm mb-10"
+        className="rounded-sm mb-10 portal-card"
         style={{
           background: 'var(--portal-card)',
           border:     '1px solid var(--portal-card-line)',

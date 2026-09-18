@@ -194,7 +194,7 @@ export default function FoundingClient({
           <p className="founding-eyebrow" style={{ fontFamily: MONO, fontSize: '11.5px', letterSpacing: '0.24em', textTransform: 'uppercase', color: GOLD, marginBottom: '18px' }}>
             A call on {activeArea}
           </p>
-          <h1 style={{ fontFamily: SERIF, fontSize: 'clamp(34px,4.2vw,50px)', fontWeight: 300, lineHeight: 1.08, letterSpacing: '-0.015em', color: INK, marginBottom: '16px' }}>
+          <h1 style={{ fontFamily: SERIF, fontSize: 'clamp(34px,4.2vw,50px)', fontWeight: 400, lineHeight: 1.08, letterSpacing: '-0.015em', color: INK, marginBottom: '16px' }}>
             Where your archive is thin, in your own words.
           </h1>
           <p style={{ fontFamily: SERIF, fontSize: '19px', fontWeight: 400, lineHeight: 1.6, color: BODY, marginBottom: '34px', maxWidth: '560px' }}>
@@ -206,7 +206,7 @@ export default function FoundingClient({
           <p className="founding-eyebrow" style={{ fontFamily: MONO, fontSize: '11.5px', letterSpacing: '0.24em', textTransform: 'uppercase', color: GOLD, marginBottom: '18px' }}>
             The Founding Sequence
           </p>
-          <h1 style={{ fontFamily: SERIF, fontSize: 'clamp(34px,4.2vw,50px)', fontWeight: 300, lineHeight: 1.08, letterSpacing: '-0.015em', color: INK, marginBottom: '16px' }}>
+          <h1 style={{ fontFamily: SERIF, fontSize: 'clamp(34px,4.2vw,50px)', fontWeight: 400, lineHeight: 1.08, letterSpacing: '-0.015em', color: INK, marginBottom: '16px' }}>
             {isBusiness
               ? 'Three of the hardest calls you made running this business.'
               : 'Three of the hardest calls you ever made.'}
@@ -732,6 +732,7 @@ function panel(): React.CSSProperties {
     background:   'var(--portal-card)',
     border:       '1px solid var(--portal-card-line)',
     borderTop:    '3px solid var(--portal-btn)',
+    boxShadow:    'var(--portal-lift)',
     padding:      'clamp(1.6rem,4vw,2.25rem) clamp(1.35rem,4vw,2.25rem)',
     borderRadius: '2px',
     marginBottom: '24px',

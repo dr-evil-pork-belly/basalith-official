@@ -214,19 +214,25 @@ ON GOLD BUTTON (#B8963E):
   NEVER USE:      #FAFAF8  FAIL  2.69:1
   NEVER USE:      #FFFFFF  FAIL  2.81:1
 
-ON STONE (PORTAL, .portal-stone; worst case of #F2F0EC, #F4F2EE, #F7F2E6, #FFFFFF):
-  Ink:            #14120F  PASS  16.43:1  (--portal-ink)
-  Body:           #3A352E  PASS  10.67:1  (--portal-body)
-  Secondary:      #5C574F  PASS   6.29:1  (--portal-secondary)
-  Label:          #6E685F  PASS   4.84:1  (--portal-label, the floor for readable text)
-  Gold text:      #7A6129  PASS   5.17:1  (--portal-gold-ink; 4.72:1 on #EAE6DC)
-  Error:          #8E2F2F  PASS   7.10:1  (--portal-error)
-  Confirmation:   #2F6B3A  PASS   5.62:1  (--portal-ok)
-  NEVER USE:      #8A6E30  FAIL   4.24:1  (var(--color-gold-on-light) on #F2F0EC; passes
-                  only on pure white, so it is not a portal text color)
-  NEVER USE:      #8A847B  FAIL   3.26:1  (the homepage --stone-label; too light for the
-                  portal's 11px mono labels)
-  NEVER USE:      #C4A24A  FAIL   2.14:1  (gold is a button fill on stone, never text)
+ON STONE (PORTAL, .portal-stone; worst case is the ground #ECE8E1; also #F3F0EB, #F7F2E6, #FFFFFF):
+  Ink:            #14120F  PASS  15.31:1  (--portal-ink)
+  Body:           #3A352E  PASS   9.95:1  (--portal-body)
+  Secondary:      #5C574F  PASS   5.87:1  (--portal-secondary)
+  Label:          #665F56  PASS   5.15:1  (--portal-label, the floor for readable text)
+  Gold text:      #6B5522  PASS   5.83:1  (--portal-gold-ink)
+  Error:          #8E2F2F  PASS   6.62:1  (--portal-error)
+  Confirmation:   #2F6B3A  PASS   5.23:1  (--portal-ok)
+  NEVER USE:      #6E685F  FAIL   4.52:1  (the September 18 label; marginal on the deeper ground)
+  NEVER USE:      #7A6129  MIXED  4.82:1  (the September 18 gold ink; passes, but --portal-gold-ink is darker now)
+  NEVER USE:      #8A6E30  FAIL   3.9:1   (var(--color-gold-on-light); marketing token, not a portal text color)
+  NEVER USE:      #8A847B  FAIL   3.0:1   (the homepage --stone-label)
+  NEVER USE:      #C4A24A  FAIL   2.0:1   (gold is a button fill on stone, never text)
+
+ON THE SPINE (#14120F, sidebar and mobile bar):
+  Primary text:   #F7F5F1  PASS  17.17:1  (--spine-fg)
+  Nav items:      #C7C1B8  PASS  10.46:1  (--spine-body)
+  Group labels:   rgba(247,245,241,0.62)  PASS  7.08:1  (--spine-dim)
+  Active item:    #C4A24A  PASS   7.67:1  (--spine-gold)
 
 ON THE INVERTED BLOCK (#14120F, the only dark surface in the portal):
   Primary text:   #F7F5F1  PASS  17.17:1  (--invert-fg)
@@ -689,21 +695,37 @@ input[type='range'].range-amber::-webkit-slider-thumb {
    drawn inside it hardcodes --invert-* values and never inherits the stone
    text colors. */
 .portal-stone {
-  --portal-bg:        #F2F0EC;
-  --portal-inset:     #F4F2EE;
+  /* Revised September 19, 2026: the first production read was washed out.
+     Every surface sat in one narrow band of near-white, the rules measured
+     1.2:1 against the ground, and the only dark thing on a page was the h1.
+     The ground is now one step deeper so white cards lift off it, the rules
+     are a step darker so edges exist, and the sidebar is the same ink as the
+     inverted block (--portal-spine), so every page has a spine. */
+  --portal-bg:        #ECE8E1;
+  --portal-inset:     #F3F0EB;
   --portal-card:      #FFFFFF;
   --portal-tint:      #F7F2E6;
 
-  --portal-ink:       #14120F;   /* 16.43:1 on bg */
-  --portal-body:      #3A352E;   /* 10.67:1 */
-  --portal-secondary: #5C574F;   /*  6.29:1 */
-  --portal-label:     #6E685F;   /*  4.84:1, the floor for readable text */
-  --portal-gold-ink:  #7A6129;   /*  5.17:1 on bg, 4.72:1 on #EAE6DC */
-  --portal-error:     #8E2F2F;   /*  7.10:1 */
-  --portal-ok:        #2F6B3A;   /*  5.62:1, confirmations only */
+  --portal-ink:       #14120F;   /* 15.31:1 on bg */
+  --portal-body:      #3A352E;   /*  9.95:1 */
+  --portal-secondary: #5C574F;   /*  5.87:1 */
+  --portal-label:     #665F56;   /*  5.15:1, the floor for readable text */
+  --portal-gold-ink:  #6B5522;   /*  5.83:1 on bg, 7.12:1 on card */
+  --portal-error:     #8E2F2F;   /*  6.62:1 */
+  --portal-ok:        #2F6B3A;   /*  5.23:1, confirmations only */
 
-  --portal-rule:      #DDD9D2;
-  --portal-card-line: #D6D1C9;
+  --portal-rule:      #D2CBC0;
+  --portal-card-line: #C8C0B4;
+  --portal-lift:      0 1px 0 rgba(20,18,15,0.05), 0 10px 28px rgba(20,18,15,0.07);
+
+  /* The spine: sidebar and mobile bar. Same ink as the inverted block. */
+  --portal-spine:     #14120F;
+  --spine-fg:         #F7F5F1;   /* 17.17:1 */
+  --spine-body:       #C7C1B8;   /* 10.46:1 */
+  --spine-dim:        rgba(247,245,241,0.62);   /* 7.08:1 */
+  --spine-rule:       rgba(247,245,241,0.12);
+  --spine-gold:       #C4A24A;   /*  7.67:1 */
+  --spine-gold-wash:  rgba(196,162,74,0.10);
   --portal-gold-line: rgba(138,110,48,0.30);
   --portal-gold-wash: rgba(138,110,48,0.07);
 
@@ -727,6 +749,17 @@ input[type='range'].range-amber::-webkit-slider-thumb {
   background: var(--portal-bg);
   color:      var(--portal-body);
 }
+
+/* Cards. Every block that paints itself with the card white lifts off the
+   ground. Portal components carry their colors as inline styles, so the
+   attribute selector matches the rendered style text; it is limited to
+   block containers so inputs, buttons and options stay flat. The
+   .portal-card class does the same for anything that opts in explicitly. */
+.portal-stone .portal-card,
+.portal-stone div[style*="background: var(--portal-card)"],
+.portal-stone section[style*="background: var(--portal-card)"],
+.portal-stone a[style*="background: var(--portal-card)"] { box-shadow: var(--portal-lift); }
+.portal-stone div[style*="background: var(--portal-card)"] div[style*="background: var(--portal-card)"] { box-shadow: none; }
 
 /* Form controls inside the portal. Inputs and textareas are the one place a
    stylesheet rule wins cleanly, because the components leave them unstyled or

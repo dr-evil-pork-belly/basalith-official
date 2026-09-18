@@ -78,7 +78,7 @@ export default function TrainingDataCard() {
 
   return (
     <div
-      className="rounded-sm mb-8"
+      className="rounded-sm mb-8 portal-card"
       style={{
         background: 'var(--portal-card)',
         border:     '1px solid var(--portal-card-line)',

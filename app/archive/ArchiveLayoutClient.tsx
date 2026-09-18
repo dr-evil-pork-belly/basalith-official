@@ -5,8 +5,11 @@ import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import ArchiveSwitcher from './components/ArchiveSwitcher'
 
-// Stone register. Every color is a var(--portal-*) read; the tokens live in
-// the .portal-stone block in globals.css. No hex literal belongs in this file.
+// Stone register. Every color is a var(--portal-*) or var(--spine-*) read; the
+// tokens live in the .portal-stone block in globals.css. No hex literal belongs
+// in this file. The sidebar and mobile bar are the spine: the same ink as the
+// inverted block, so every page has a dark anchor and the stone content reads
+// as the founder's desk against it (revised September 19, 2026).
 // Decision and measurements: docs/BASALITH_PORTAL_PALETTE_DECISION_2026-09-18.md.
 
 const SERIF = 'var(--portal-serif)'
@@ -50,7 +53,7 @@ const MANAGE_NAV: NavItem[] = [
 function NavGroup({ label, items, pathname }: { label: string; items: NavItem[]; pathname: string }) {
   return (
     <div style={{ padding: '10px 0 4px' }}>
-      <p style={{ ...LABEL, color: 'var(--portal-label)', padding: '6px 26px 6px' }}>
+      <p style={{ ...LABEL, color: 'var(--spine-dim)', padding: '6px 26px 6px' }}>
         {label}
       </p>
       {items.map(({ href, label: itemLabel }) => {
@@ -67,14 +70,14 @@ function NavGroup({ label, items, pathname }: { label: string; items: NavItem[];
               fontWeight:      active ? 500 : 400,
               display:         'block',
               padding:         '9px 26px 9px 24px',
-              color:           active ? 'var(--portal-ink)' : 'var(--portal-body)',
+              color:           active ? 'var(--spine-gold)' : 'var(--spine-body)',
               textDecoration:  'none',
-              background:      active ? 'var(--portal-gold-wash)' : 'transparent',
-              borderLeft:      active ? '2px solid var(--portal-gold-ink)' : '2px solid transparent',
+              background:      active ? 'var(--spine-gold-wash)' : 'transparent',
+              borderLeft:      active ? '2px solid var(--spine-gold)' : '2px solid transparent',
               transition:      'color 150ms ease, background 150ms ease',
             }}
-            onMouseEnter={e => { if (!active) (e.currentTarget as HTMLElement).style.color = 'var(--portal-ink)' }}
-            onMouseLeave={e => { if (!active) (e.currentTarget as HTMLElement).style.color = 'var(--portal-body)' }}
+            onMouseEnter={e => { if (!active) (e.currentTarget as HTMLElement).style.color = 'var(--spine-fg)' }}
+            onMouseLeave={e => { if (!active) (e.currentTarget as HTMLElement).style.color = 'var(--spine-body)' }}
           >
             {itemLabel}
           </Link>
@@ -103,7 +106,7 @@ export default function ArchiveLayoutClient({ children, tier }: { children: Reac
   const signOutLink: React.CSSProperties = {
     ...LABEL,
     letterSpacing:  '0.14em',
-    color:          'var(--portal-label)',
+    color:          'var(--spine-dim)',
     background:     'none',
     border:         'none',
     cursor:         'pointer',
@@ -122,18 +125,18 @@ export default function ArchiveLayoutClient({ children, tier }: { children: Reac
           flexDirection:  'column',
           width:          '256px',
           flexShrink:     0,
-          background:     'var(--portal-inset)',
-          borderRight:    '1px solid var(--portal-rule)',
+          background:     'var(--portal-spine)',
+          color:          'var(--spine-fg)',
         }}
       >
         {/* Archive name */}
-        <div style={{ padding: '30px 26px 22px', borderBottom: '1px solid var(--portal-rule)' }}>
+        <div style={{ padding: '30px 26px 22px', borderBottom: '1px solid var(--spine-rule)' }}>
           <Link href="/" style={{ textDecoration: 'none' }}>
-            <p style={{ fontFamily: SERIF, fontSize: '19px', fontWeight: 500, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--portal-ink)', lineHeight: 1.2 }}>
+            <p style={{ fontFamily: SERIF, fontSize: '19px', fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--spine-fg)', lineHeight: 1.2 }}>
               Basalith
             </p>
           </Link>
-          <p style={{ ...LABEL, color: 'var(--portal-label)', marginTop: '6px' }}>
+          <p style={{ ...LABEL, color: 'var(--spine-dim)', marginTop: '6px' }}>
             Archive
           </p>
           <ArchiveSwitcher />
@@ -153,12 +156,12 @@ export default function ArchiveLayoutClient({ children, tier }: { children: Reac
         </nav>
 
         {/* Sign out */}
-        <div style={{ padding: '18px 26px', borderTop: '1px solid var(--portal-rule)' }}>
+        <div style={{ padding: '18px 26px', borderTop: '1px solid var(--spine-rule)' }}>
           {confirmSignOut ? (
             <div>
-              <p style={{ fontFamily: SERIF, fontSize: '14.5px', color: 'var(--portal-secondary)', marginBottom: '8px' }}>Sign out of your archive?</p>
+              <p style={{ fontFamily: SERIF, fontSize: '14.5px', color: 'var(--spine-body)', marginBottom: '8px' }}>Sign out of your archive?</p>
               <div style={{ display: 'flex', gap: '18px' }}>
-                <a href="/api/auth/logout" style={{ ...signOutLink, color: 'var(--portal-gold-ink)' }}>Yes, sign out</a>
+                <a href="/api/auth/logout" style={{ ...signOutLink, color: 'var(--spine-gold)' }}>Yes, sign out</a>
                 <button onClick={() => setConfirmSignOut(false)} style={signOutLink}>Cancel</button>
               </div>
             </div>
@@ -166,8 +169,8 @@ export default function ArchiveLayoutClient({ children, tier }: { children: Reac
             <button
               onClick={() => setConfirmSignOut(true)}
               style={signOutLink}
-              onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = 'var(--portal-ink)'}
-              onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = 'var(--portal-label)'}
+              onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = 'var(--spine-fg)'}
+              onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = 'var(--spine-dim)'}
             >
               Sign out
             </button>
@@ -176,9 +179,9 @@ export default function ArchiveLayoutClient({ children, tier }: { children: Reac
       </aside>
 
       {/* Mobile top bar */}
-      <div className="md:hidden" style={{ position: 'fixed', inset: '0 0 auto 0', zIndex: 50, background: 'var(--portal-inset)', borderBottom: '1px solid var(--portal-rule)', paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+      <div className="md:hidden" style={{ position: 'fixed', inset: '0 0 auto 0', zIndex: 50, background: 'var(--portal-spine)', color: 'var(--spine-fg)', paddingTop: 'env(safe-area-inset-top, 0px)' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', height: '56px' }}>
-          <Link href="/" style={{ fontFamily: SERIF, fontSize: '17px', fontWeight: 500, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--portal-ink)', textDecoration: 'none', minHeight: '44px', display: 'flex', alignItems: 'center' }}>Basalith</Link>
+          <Link href="/" style={{ fontFamily: SERIF, fontSize: '17px', fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--spine-fg)', textDecoration: 'none', minHeight: '44px', display: 'flex', alignItems: 'center' }}>Basalith</Link>
           {/* Hamburger, 44px touch target */}
           <button
             onClick={() => setMobileOpen(o => !o)}
@@ -186,9 +189,9 @@ export default function ArchiveLayoutClient({ children, tier }: { children: Reac
             aria-expanded={mobileOpen}
             style={{ width: '44px', height: '44px', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '5px', flexShrink: 0 }}
           >
-            <span style={{ display: 'block', height: '1.5px', width: '22px', background: 'var(--portal-ink)', transition: 'all 250ms ease', transform: mobileOpen ? 'rotate(45deg) translate(4px, 4px)' : 'none' }} />
-            <span style={{ display: 'block', height: '1.5px', width: '22px', background: 'var(--portal-ink)', transition: 'all 250ms ease', opacity: mobileOpen ? 0 : 1 }} />
-            <span style={{ display: 'block', height: '1.5px', width: '22px', background: 'var(--portal-ink)', transition: 'all 250ms ease', transform: mobileOpen ? 'rotate(-45deg) translate(4px, -4px)' : 'none' }} />
+            <span style={{ display: 'block', height: '1.5px', width: '22px', background: 'var(--spine-fg)', transition: 'all 250ms ease', transform: mobileOpen ? 'rotate(45deg) translate(4px, 4px)' : 'none' }} />
+            <span style={{ display: 'block', height: '1.5px', width: '22px', background: 'var(--spine-fg)', transition: 'all 250ms ease', opacity: mobileOpen ? 0 : 1 }} />
+            <span style={{ display: 'block', height: '1.5px', width: '22px', background: 'var(--spine-fg)', transition: 'all 250ms ease', transform: mobileOpen ? 'rotate(-45deg) translate(4px, -4px)' : 'none' }} />
           </button>
         </div>
       </div>
@@ -197,7 +200,7 @@ export default function ArchiveLayoutClient({ children, tier }: { children: Reac
       {mobileOpen && (
         <div
           className="md:hidden"
-          style={{ position: 'fixed', inset: 0, zIndex: 49, background: 'var(--portal-bg)', display: 'flex', flexDirection: 'column', paddingTop: 'calc(56px + env(safe-area-inset-top, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)', overflow: 'auto' }}
+          style={{ position: 'fixed', inset: 0, zIndex: 49, background: 'var(--portal-spine)', color: 'var(--spine-fg)', display: 'flex', flexDirection: 'column', paddingTop: 'calc(56px + env(safe-area-inset-top, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)', overflow: 'auto' }}
           onClick={e => { if (e.target === e.currentTarget) setMobileOpen(false) }}
         >
           <nav style={{ display: 'flex', flexDirection: 'column', padding: '16px 0' }} aria-label="Archive mobile navigation">
@@ -214,24 +217,24 @@ export default function ArchiveLayoutClient({ children, tier }: { children: Reac
                     fontFamily:      SERIF,
                     fontSize:        isPrimary ? '19px' : '17px',
                     fontWeight:      active ? 500 : 400,
-                    color:           active ? 'var(--portal-ink)' : isPrimary ? 'var(--portal-ink)' : 'var(--portal-secondary)',
+                    color:           active ? 'var(--spine-gold)' : isPrimary ? 'var(--spine-fg)' : 'var(--spine-body)',
                     textDecoration:  'none',
                     padding:         '0 24px',
                     minHeight:       '56px',
                     display:         'flex',
                     alignItems:      'center',
-                    borderLeft:      active ? '2px solid var(--portal-gold-ink)' : '2px solid transparent',
-                    background:      active ? 'var(--portal-gold-wash)' : 'transparent',
+                    borderLeft:      active ? '2px solid var(--spine-gold)' : '2px solid transparent',
+                    background:      active ? 'var(--spine-gold-wash)' : 'transparent',
                   }}
                 >
                   {lbl}
                 </Link>
               )
             })}
-            <div style={{ height: '1px', background: 'var(--portal-rule)', margin: '16px 24px' }} />
+            <div style={{ height: '1px', background: 'var(--spine-rule)', margin: '16px 24px' }} />
             {confirmSignOut ? (
               <div style={{ padding: '0 24px', display: 'flex', gap: '24px', alignItems: 'center', minHeight: '56px' }}>
-                <a href="/api/auth/logout" style={{ ...signOutLink, fontSize: '12px', color: 'var(--portal-gold-ink)' }}>Yes, sign out</a>
+                <a href="/api/auth/logout" style={{ ...signOutLink, fontSize: '12px', color: 'var(--spine-gold)' }}>Yes, sign out</a>
                 <button onClick={() => setConfirmSignOut(false)} style={{ ...signOutLink, fontSize: '12px' }}>Cancel</button>
               </div>
             ) : (
