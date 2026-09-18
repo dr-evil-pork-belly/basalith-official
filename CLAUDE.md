@@ -181,9 +181,33 @@ because an object written to B2 sits under a 90 day lock and a trial is deleted 
 thirty. Trials cannot invite contributors or upload photos; the three surfaces that
 refuse a non-active archive are left as they are and the dashboard's Contributors card
 becomes one line. The founding proof opens after call 1 (`canShowProof`). A signed-in
-user with no archive lands on `/begin`, not on a redirect loop. Deletion at thirty days
-and trial-to-paid are slices B and C of `docs/SELF_SERVE_SKELETON_2026-09-17.md`; until
-slice B has run in production, no copy says "deleted after 30 days."
+user with no archive lands on `/begin`, not on a redirect loop. Trial-to-paid is slice C
+of `docs/SELF_SERVE_SKELETON_2026-09-17.md`.
+
+**Trial expiry.** `lib/inngest/trialFunctions.ts`, two Inngest crons, September 17, 2026.
+`trial-warn` (`0 15 * * *`, 08:00 Pacific) sends the day 23 email
+(`lib/emails/trialWarning.ts`) to a trial expiring in six to eight days, then sets
+`archives.trial_warned_at` where still null; send before mark, so a failed send never
+marks. `trial-expire` (`0 16 * * *`, 09:00 Pacific) deletes every `status = 'trial'` row
+with `trial_expires_at` in the past and `scheduled_deletion_at` null (an owner-terminated
+archive takes the 365 day dissolution path; a converted one is `active` and never
+selects). Both read `status = 'trial'`, never `'active'`; `lib/inngest/trialFunctions.test.ts`
+pins it, and `lib/cronGates.test.ts` does not apply to them. The delete is one body,
+`lib/trialExpiryRunner.ts`, run by the function (one `step.run` per step, named
+`step:archiveId`) and by `scripts/trial-expiry-probe.ts`, in `DELETE_ORDER`:
+`mark_terminated`, `purge_storage` (`lib/storagePurge.ts`, the runbook script's body, five
+buckets under `{archiveId}/`, refuses without `termination_requested_at`), `assert_no_b2`
+(a `storage_backup_objects` row for the id stops that archive and mails the founder; the
+slice A exclusion promised zero and a violation is a bug to read), `delete_email_replies`
+(the one no-action FK), `delete_application` (by email and `status = 'trial'`, no FK),
+`delete_archive` (one delete, the cascade takes the other 49 tables, three counts
+confirmed zero), `maybe_delete_user` (`profiles` then the auth user, only when the user
+owns no other archive and is in none of `contributors` by email, `successors`, or
+`archivists`), `notify` (domain only). The warning email's keep line is "reply to this
+email" with `replyTo` on `ADMIN_EMAIL` until slice C puts the Checkout button there. The
+export line points at `/archive/preferences`. English only. Until the job has deleted a
+real expired trial in production and the counts were pasted, no copy says "deleted after
+30 days."
 
 **Control B, the grounding verifier.** `lib/verifyGrounding.ts`. A separate auditor call
 that refuses any founder position not directly supported by a deposit. It is the
