@@ -4,6 +4,8 @@ import {
   WARN_DAYS_BEFORE,
   canDeleteAuthUser,
   emailDomain,
+  firstExpiryRunAfter,
+  formatPacificDate,
   selectTrialsToExpire,
   selectTrialsToWarn,
   warnWindow,
@@ -128,5 +130,17 @@ describe('emailDomain', () => {
     expect(emailDomain('person@example.com')).toBe('example.com')
     expect(emailDomain(null)).toBe('(no email)')
     expect(emailDomain('nonsense')).toBe('(malformed)')
+  })
+})
+
+describe('firstExpiryRunAfter', () => {
+  it('is the 16:00 UTC run on the same day when the expiry is before it, else the next day', () => {
+    expect(firstExpiryRunAfter(new Date('2026-10-18T03:31:00Z')).toISOString()).toBe('2026-10-18T16:00:00.000Z')
+    expect(firstExpiryRunAfter(new Date('2026-10-18T16:00:00Z')).toISOString()).toBe('2026-10-18T16:00:00.000Z')
+    expect(firstExpiryRunAfter(new Date('2026-10-18T16:00:01Z')).toISOString()).toBe('2026-10-19T16:00:00.000Z')
+  })
+
+  it('formats in Pacific, long form', () => {
+    expect(formatPacificDate(new Date('2026-10-18T16:00:00Z'))).toBe('Sunday, October 18, 2026')
   })
 })

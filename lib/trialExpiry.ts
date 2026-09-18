@@ -140,3 +140,26 @@ export function emailDomain(email: string | null | undefined): string {
   const at = email.lastIndexOf('@')
   return at >= 0 ? email.slice(at + 1) : '(malformed)'
 }
+
+/** The hour, UTC, at which trialExpire runs. Cron 0 16 * * * (09:00 Pacific). */
+export const EXPIRE_RUN_UTC_HOUR = 16
+
+/**
+ * When the job will actually delete a trial that expires at `expiresAt`: the
+ * first daily run at or after that instant. The warning email states this
+ * date, not the raw expiry timestamp, so what it says matches what happens.
+ */
+export function firstExpiryRunAfter(expiresAt: Date): Date {
+  const run = new Date(Date.UTC(
+    expiresAt.getUTCFullYear(), expiresAt.getUTCMonth(), expiresAt.getUTCDate(), EXPIRE_RUN_UTC_HOUR, 0, 0, 0,
+  ))
+  if (run.getTime() < expiresAt.getTime()) run.setUTCDate(run.getUTCDate() + 1)
+  return run
+}
+
+/** "Sunday, October 18, 2026" in Pacific time. */
+export function formatPacificDate(d: Date): string {
+  return new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Los_Angeles', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+  }).format(d)
+}
