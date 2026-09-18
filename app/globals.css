@@ -1,6 +1,7 @@
 /* ─────────────────────────────────────────────────────────────────────────
    BASALITH — GLOBAL CSS
-   Light luxury design system (marketing). Portal pages override inline.
+   Light luxury design system (marketing). Portal runs on the stone register
+   via .portal-stone (bottom of file); portal components read var(--portal-*).
    Design references: Rolex, Patek Philippe — restrained, generous, serious.
 ───────────────────────────────────────────────────────────────────────── */
 
@@ -29,7 +30,11 @@
   --color-border:        rgba(26,24,20,0.08);
   --color-border-medium: rgba(26,24,20,0.15);
 
-  /* Portal — dark theme (referenced by portal pages inline) */
+  /* Portal dark theme. RETIRED September 18, 2026: no component ever read
+     these (portal pages carried hex literals inline). The portal now runs on
+     stone via .portal-stone at the bottom of this file, which redefines
+     --portal-bg inside its scope. Kept here, unused, until the last slice of
+     the portal migration lands; then delete this block. */
   --portal-bg:      #0C0B09;
   --portal-surface: #141210;
   --portal-alt:     #1C1A17;
@@ -208,6 +213,29 @@ ON GOLD BUTTON (#B8963E):
   ONLY USE:       #0A0908  PASS  7.08:1
   NEVER USE:      #FAFAF8  FAIL  2.69:1
   NEVER USE:      #FFFFFF  FAIL  2.81:1
+
+ON STONE (PORTAL, .portal-stone; worst case of #F2F0EC, #F4F2EE, #F7F2E6, #FFFFFF):
+  Ink:            #14120F  PASS  16.43:1  (--portal-ink)
+  Body:           #3A352E  PASS  10.67:1  (--portal-body)
+  Secondary:      #5C574F  PASS   6.29:1  (--portal-secondary)
+  Label:          #6E685F  PASS   4.84:1  (--portal-label, the floor for readable text)
+  Gold text:      #7A6129  PASS   5.17:1  (--portal-gold-ink; 4.72:1 on #EAE6DC)
+  Error:          #8E2F2F  PASS   7.10:1  (--portal-error)
+  Confirmation:   #2F6B3A  PASS   5.62:1  (--portal-ok)
+  NEVER USE:      #8A6E30  FAIL   4.24:1  (var(--color-gold-on-light) on #F2F0EC; passes
+                  only on pure white, so it is not a portal text color)
+  NEVER USE:      #8A847B  FAIL   3.26:1  (the homepage --stone-label; too light for the
+                  portal's 11px mono labels)
+  NEVER USE:      #C4A24A  FAIL   2.14:1  (gold is a button fill on stone, never text)
+
+ON THE INVERTED BLOCK (#14120F, the only dark surface in the portal):
+  Primary text:   #F7F5F1  PASS  17.17:1  (--invert-fg)
+  Body:           #C7C1B8  PASS  10.46:1  (--invert-body)
+  Gold:           #C4A24A  PASS   7.67:1  (--invert-gold)
+  Dim label:      rgba(247,245,241,0.62)  PASS  7.08:1  (composited: #A19F9B)
+
+ON PORTAL BUTTON (#C4A24A, hover #B08F3E):
+  ONLY USE:       #0A0908  PASS  8.16:1 (6.48:1 on hover)
 */
 
 /* ── Contrast-safe section utilities ── */
@@ -641,3 +669,82 @@ input[type='range'].range-amber::-webkit-slider-thumb {
     --stone-fs-mono-sm:   10.5px;
   }
 }
+
+/* ── Stone register, portal ───────────────────────────────────────────────────
+   Every signed-in surface (/archive/*, /succession/portal/*, /archivist/*,
+   /begin, the login pages) runs on the same stone the homepage runs on.
+   Decision and measurements: docs/BASALITH_PORTAL_PALETTE_DECISION_2026-09-18.md.
+
+   Portal components carry their colors as React inline styles, which outrank
+   any stylesheet rule, so this block does not restyle anything by itself. It
+   defines the tokens; each component reads them with var(--portal-*). That
+   keeps one place to change a value and one grep to prove no literal is left.
+
+   The gold used for TEXT here is #7A6129, not --color-gold-on-light (#8A6E30),
+   which measures 4.24:1 on #F2F0EC and fails. Filled buttons keep #C4A24A with
+   the #0A0908 label from the design system.
+
+   The --invert-* tokens are the one dark surface in the portal: the block where
+   the archive speaks (the founding proof card, the entity's answers). Anything
+   drawn inside it hardcodes --invert-* values and never inherits the stone
+   text colors. */
+.portal-stone {
+  --portal-bg:        #F2F0EC;
+  --portal-inset:     #F4F2EE;
+  --portal-card:      #FFFFFF;
+  --portal-tint:      #F7F2E6;
+
+  --portal-ink:       #14120F;   /* 16.43:1 on bg */
+  --portal-body:      #3A352E;   /* 10.67:1 */
+  --portal-secondary: #5C574F;   /*  6.29:1 */
+  --portal-label:     #6E685F;   /*  4.84:1, the floor for readable text */
+  --portal-gold-ink:  #7A6129;   /*  5.17:1 on bg, 4.72:1 on #EAE6DC */
+  --portal-error:     #8E2F2F;   /*  7.10:1 */
+  --portal-ok:        #2F6B3A;   /*  5.62:1, confirmations only */
+
+  --portal-rule:      #DDD9D2;
+  --portal-card-line: #D6D1C9;
+  --portal-gold-line: rgba(138,110,48,0.30);
+  --portal-gold-wash: rgba(138,110,48,0.07);
+
+  --portal-btn:       #C4A24A;   /* label #0A0908, 8.16:1 */
+  --portal-btn-hover: #B08F3E;   /* label #0A0908, 6.48:1 */
+  --portal-btn-label: #0A0908;
+
+  --invert-bg:        #14120F;
+  --invert-fg:        #F7F5F1;   /* 17.17:1 */
+  --invert-body:      #C7C1B8;   /* 10.46:1 */
+  --invert-gold:      #C4A24A;   /*  7.67:1 */
+  --invert-dim:       rgba(247,245,241,0.62);   /* 7.08:1 */
+  --invert-rule:      rgba(247,245,241,0.14);
+  --invert-field:     rgba(247,245,241,0.07);   /* text field ground on the inverted block */
+  --invert-gold-line: rgba(196,162,74,0.45);
+
+  --portal-serif:     var(--font-newsreader), Georgia, serif;
+  --portal-mono:      var(--font-space-mono), 'Courier New', monospace;
+
+  background: var(--portal-bg);
+  color:      var(--portal-body);
+}
+
+/* Form controls inside the portal. Inputs and textareas are the one place a
+   stylesheet rule wins cleanly, because the components leave them unstyled or
+   style only the frame. */
+.portal-stone input[type='text'],
+.portal-stone input[type='email'],
+.portal-stone textarea,
+.portal-stone select {
+  color: var(--portal-ink);
+  background: var(--portal-card);
+  border: 1px solid var(--portal-card-line);
+}
+.portal-stone input:focus-visible,
+.portal-stone textarea:focus-visible,
+.portal-stone select:focus-visible,
+.portal-stone button:focus-visible,
+.portal-stone a:focus-visible {
+  outline: 2px solid var(--portal-gold-ink);
+  outline-offset: 2px;
+}
+.portal-stone ::placeholder { color: var(--portal-label); }
+.portal-stone ::selection   { background: rgba(196,162,74,0.35); }

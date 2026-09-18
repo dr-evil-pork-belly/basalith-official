@@ -8,7 +8,10 @@ type ReadinessDomain = { domainId: number; answered: number; total: number }
 type Readiness       = { domains: ReadinessDomain[]; overall: { answered: number; total: number } }
 type NextQuestion    = { b2bQuestionId: string | null; questionText: string | null; domainId: number | null; allAnswered?: boolean }
 
-const GOLD = '#C4A24A'
+// Stone register: every color is a var(--portal-*) read (globals.css,
+// .portal-stone). No hex literal belongs in this file.
+const SERIF = 'var(--portal-serif)'
+const MONO  = 'var(--portal-mono)'
 
 export default function SuccessionDashboard({
   archiveId,
@@ -97,19 +100,19 @@ export default function SuccessionDashboard({
       <div className="mb-10">
         <h1
           style={{
-            fontFamily:    '"Cormorant Garamond",Georgia,serif',
-            fontSize:      'clamp(1.8rem,3.5vw,2.75rem)',
+            fontFamily:    SERIF,
+            fontSize:      'clamp(34px,4.2vw,50px)',
             fontWeight:    300,
-            lineHeight:    1.1,
-            letterSpacing: '-0.025em',
-            color:         '#F0EDE6',
-            marginBottom:  '10px',
+            lineHeight:    1.08,
+            letterSpacing: '-0.015em',
+            color:         'var(--portal-ink)',
+            marginBottom:  '12px',
           }}
         >
           {firstName ? `${greeting}, ${firstName}.` : `${greeting}.`}
         </h1>
         {!loading && (
-          <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.48rem', letterSpacing: '0.12em', color: 'rgba(112,108,101,0.6)' }}>
+          <p style={{ fontFamily: SERIF, fontSize: '17px', color: 'var(--portal-secondary)', lineHeight: 1.5 }}>
             {subline}
           </p>
         )}
@@ -122,25 +125,25 @@ export default function SuccessionDashboard({
       <div
         className="rounded-sm mb-10"
         style={{
-          background: 'rgba(196,162,74,0.04)',
-          border:     '1px solid rgba(196,162,74,0.14)',
-          borderTop:  '3px solid rgba(196,162,74,0.5)',
-          padding:    'clamp(1.5rem,4vw,2.25rem) clamp(1.25rem,4vw,2.5rem)',
+          background: 'var(--portal-card)',
+          border:     '1px solid var(--portal-card-line)',
+          borderTop:  '3px solid var(--portal-btn)',
+          padding:    'clamp(1.6rem,4vw,2.25rem) clamp(1.35rem,4vw,2.25rem)',
         }}
       >
-        <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.46rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.7)', marginBottom: '0.85rem' }}>
+        <p style={{ fontFamily: MONO, fontSize: '11.5px', letterSpacing: '0.24em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '14px' }}>
           Answer your first judgment question
         </p>
-        <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontSize: '1.05rem', fontWeight: 300, color: '#B8B4AB', lineHeight: 1.7, marginBottom: '1.5rem' }}>
+        <p style={{ fontFamily: SERIF, fontSize: '17.5px', fontWeight: 400, color: 'var(--portal-body)', lineHeight: 1.65, marginBottom: '22px', maxWidth: '58ch' }}>
           Respond to one question about how you decide. Each answer trains the entity your successor will consult.
         </p>
 
         {loading ? (
-          <div style={{ height: '120px', background: 'rgba(255,255,255,0.04)', borderRadius: '2px', animation: 'mysteryGlowPulse 1.8s ease-in-out infinite' }} />
+          <div style={{ height: '120px', background: 'var(--portal-inset)', borderRadius: '2px', animation: 'mysteryGlowPulse 1.8s ease-in-out infinite' }} />
         ) : question?.questionText ? (
           <>
-            <div style={{ borderLeft: `3px solid rgba(196,162,74,0.5)`, padding: '16px 22px', margin: '0 0 1.5rem', background: 'rgba(196,162,74,0.04)' }}>
-              <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontSize: '1.4rem', fontStyle: 'italic', fontWeight: 300, color: '#F0EDE6', lineHeight: 1.6, margin: 0 }}>
+            <div style={{ borderLeft: '3px solid var(--portal-gold-ink)', padding: '16px 22px', margin: '0 0 22px', background: 'var(--portal-tint)' }}>
+              <p style={{ fontFamily: SERIF, fontSize: 'clamp(20px,2.4vw,24px)', fontStyle: 'italic', fontWeight: 400, color: 'var(--portal-ink)', lineHeight: 1.5, margin: 0 }}>
                 {question.questionText}
               </p>
             </div>
@@ -152,13 +155,13 @@ export default function SuccessionDashboard({
               rows={6}
               style={{
                 width:        '100%',
-                background:   'rgba(10,9,8,0.5)',
-                border:       '1px solid rgba(196,162,74,0.18)',
+                background:   'var(--portal-card)',
+                border:       '1px solid var(--portal-card-line)',
                 borderRadius: '2px',
                 padding:      '14px 18px',
-                fontFamily:   '"Cormorant Garamond",Georgia,serif',
-                fontSize:     '1.05rem',
-                color:        '#F0EDE6',
+                fontFamily:   SERIF,
+                fontSize:     '18px',
+                color:        'var(--portal-ink)',
                 lineHeight:   1.7,
                 resize:       'vertical',
                 outline:      'none',
@@ -171,30 +174,31 @@ export default function SuccessionDashboard({
                 onClick={submitAnswer}
                 disabled={submitting || answer.trim().length < 2}
                 style={{
-                  fontFamily:    '"Space Mono","Courier New",monospace',
-                  fontSize:      '0.46rem',
-                  letterSpacing: '0.25em',
+                  fontFamily:    MONO,
+                  fontSize:      '12px',
+                  letterSpacing: '0.16em',
                   textTransform: 'uppercase',
-                  color:         '#0A0908',
-                  background:    GOLD,
+                  color:         'var(--portal-btn-label)',
+                  background:    'var(--portal-btn)',
                   border:        'none',
                   borderRadius:  '2px',
-                  padding:       '0.7rem 1.5rem',
+                  padding:       '0 26px',
+                  minHeight:     '48px',
                   cursor:        submitting || answer.trim().length < 2 ? 'not-allowed' : 'pointer',
                   opacity:       answer.trim().length < 2 ? 0.5 : 1,
                 }}
               >
-                {submitting ? 'Saving…' : 'Answer a question'}
+                {submitting ? 'Saving' : 'Save your answer'}
               </button>
               {savedNote && (
-                <span style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontSize: '0.95rem', color: 'rgba(196,162,74,0.85)' }}>
+                <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '16px', color: 'var(--portal-gold-ink)' }}>
                   Saved to your archive.
                 </span>
               )}
             </div>
           </>
         ) : (
-          <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontSize: '1.05rem', color: '#B8B4AB', lineHeight: 1.7, margin: 0 }}>
+          <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '17px', color: 'var(--portal-body)', lineHeight: 1.65, margin: 0 }}>
             You have answered every question available right now. New questions will arrive as your archive grows.
           </p>
         )}

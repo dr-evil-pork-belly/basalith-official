@@ -8,6 +8,22 @@ import SuccessionDashboard from './SuccessionDashboard'
 import FoundingBanner from '../components/FoundingBanner'
 import CoverageMap from '../components/CoverageMap'
 
+// Stone register. Every color is a var(--portal-*) read from the .portal-stone
+// block in globals.css, where each pair is measured. No hex literal belongs in
+// this file. The Mirror card is the one dark surface here (the --invert-*
+// tokens): it is the entity speaking, and nothing inside it inherits the
+// stone text colors.
+const SERIF  = 'var(--portal-serif)'
+const MONO   = 'var(--portal-mono)'
+const INK    = 'var(--portal-ink)'
+const BODY   = 'var(--portal-body)'
+const SECOND = 'var(--portal-secondary)'
+const LABEL  = 'var(--portal-label)'
+const GOLD   = 'var(--portal-gold-ink)'
+const CARD   = 'var(--portal-card)'
+const LINE   = 'var(--portal-card-line)'
+const RULE   = 'var(--portal-rule)'
+
 // ── Coverage map ────────────────────────────────────────────────────────────
 // The entity accuracy card that lived here until September 15, 2026 (a score
 // out of 100, ten dimension percentages, "N% accurate across 10 dimensions")
@@ -65,12 +81,12 @@ function UpcomingDates({ archiveId }: { archiveId: string }) {
   if (upcoming.length === 0) return null
 
   return (
-    <div className="rounded-sm mb-8" style={{ background: '#111112', border: '1px solid rgba(255,255,255,0.06)' }}>
-      <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-        <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#5C6166', margin: 0 }}>
-          Upcoming Dates
+    <div className="rounded-sm mb-8" style={{ background: CARD, border: `1px solid ${LINE}` }}>
+      <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: RULE }}>
+        <p style={{ fontFamily: MONO, fontSize: '11.5px', letterSpacing: '0.2em', textTransform: 'uppercase', color: GOLD, margin: 0 }}>
+          Upcoming dates
         </p>
-        <Link href="/archive/dates" style={{ fontFamily: 'monospace', fontSize: '0.46rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#5C6166', textDecoration: 'none' }}>
+        <Link href="/archive/dates" style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: GOLD, textDecoration: 'none' }}>
           Manage →
         </Link>
       </div>
@@ -80,34 +96,34 @@ function UpcomingDates({ archiveId }: { archiveId: string }) {
             key={d.id}
             className="flex items-center gap-4 px-6 py-3"
             style={{
-              borderBottom: i < upcoming.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
-              background:   d.today ? 'rgba(196,162,74,0.05)' : 'transparent',
+              borderBottom: i < upcoming.length - 1 ? `1px solid ${RULE}` : 'none',
+              background:   d.today ? 'var(--portal-tint)' : 'transparent',
             }}
           >
             <div style={{ minWidth: '42px', textAlign: 'center', flexShrink: 0 }}>
-              <p style={{ fontFamily: 'monospace', fontSize: '0.48rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#5C6166', margin: '0 0 1px' }}>
+              <p style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: LABEL, margin: '0 0 2px' }}>
                 {MONTH_ABBR[d.month]}
               </p>
-              <p className="font-serif" style={{ fontWeight: 700, fontSize: '1.4rem', color: d.today ? '#C4A24A' : '#F0EDE6', lineHeight: 1, margin: 0 }}>
+              <p style={{ fontFamily: SERIF, fontWeight: 500, fontSize: '24px', color: d.today ? GOLD : INK, lineHeight: 1, margin: 0, fontVariantNumeric: 'tabular-nums' }}>
                 {d.day}
               </p>
             </div>
             <div style={{ flex: 1 }}>
-              <p className="font-serif" style={{ fontWeight: 600, fontSize: '0.9rem', color: '#F0EDE6', margin: '0 0 2px' }}>
+              <p style={{ fontFamily: SERIF, fontWeight: 500, fontSize: '17px', color: INK, margin: '0 0 2px' }}>
                 {d.person_name}
               </p>
-              <p style={{ fontFamily: 'monospace', fontSize: '0.46rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#5C6166', margin: 0 }}>
+              <p style={{ fontFamily: SERIF, fontSize: '14.5px', color: SECOND, margin: 0, textTransform: 'capitalize' }}>
                 {d.date_type.replace(/_/g, ' ')}
                 {d.year && d.date_type === 'birthday' ? ` · Would be ${new Date().getFullYear() - d.year}` : ''}
               </p>
             </div>
             {d.today ? (
-              <span style={{ fontFamily: 'monospace', fontSize: '0.46rem', letterSpacing: '0.18em', textTransform: 'uppercase', background: 'rgba(196,162,74,0.15)', color: '#C4A24A', padding: '3px 8px', borderRadius: '2px', flexShrink: 0 }}>
-                TODAY
+              <span style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', border: '1px solid var(--portal-gold-line)', color: GOLD, padding: '3px 8px', borderRadius: '2px', flexShrink: 0 }}>
+                Today
               </span>
             ) : (
-              <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.08em', color: '#5C6166', margin: 0, flexShrink: 0 }}>
-                {d.days}d
+              <p style={{ fontFamily: SERIF, fontSize: '14.5px', color: SECOND, margin: 0, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+                in {d.days} {d.days === 1 ? 'day' : 'days'}
               </p>
             )}
           </div>
@@ -165,14 +181,14 @@ function MemoryGameCard({ archiveId }: { archiveId: string }) {
 
   if (!session) {
     return (
-      <div className="rounded-sm mb-8" style={{ background: '#111112', border: '1px solid rgba(255,255,255,0.06)', padding: '1.25rem 1.5rem' }}>
+      <div className="rounded-sm mb-8" style={{ background: CARD, border: `1px solid ${LINE}`, padding: '1.1rem 1.5rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.18)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={LABEL} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }} aria-hidden="true">
             <rect x="3" y="3" width="18" height="18" rx="2"/>
             <path d="M3 9h18M9 21V9"/>
           </svg>
-          <p style={{ fontFamily: 'monospace', fontSize: '0.48rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#3A3F44', margin: 0 }}>
-            Memory Game · Next game: Wednesday
+          <p style={{ fontFamily: SERIF, fontSize: '15.5px', color: SECOND, margin: 0 }}>
+            Memory game. The next one opens Wednesday.
           </p>
         </div>
       </div>
@@ -182,25 +198,25 @@ function MemoryGameCard({ archiveId }: { archiveId: string }) {
   const maxCount = leaderboard[0]?.count ?? 1
 
   return (
-    <div className="rounded-sm mb-8" style={{ background: '#111112', border: '1px solid rgba(196,162,74,0.15)', borderTop: '2px solid rgba(196,162,74,0.4)' }}>
-      <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid rgba(255,255,255,0.04)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+    <div className="rounded-sm mb-8" style={{ background: CARD, border: `1px solid ${LINE}`, borderTop: '3px solid var(--portal-btn)' }}>
+      <div style={{ padding: '1.25rem 1.5rem', borderBottom: `1px solid ${RULE}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(196,162,74,0.8)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={GOLD} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }} aria-hidden="true">
             <circle cx="12" cy="12" r="10"/>
             <line x1="12" y1="8" x2="12" y2="12"/>
             <line x1="12" y1="16" x2="12.01" y2="16"/>
           </svg>
-          <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#C4A24A', margin: 0 }}>
-            Memory Game · Live
+          <p style={{ fontFamily: MONO, fontSize: '11.5px', letterSpacing: '0.2em', textTransform: 'uppercase', color: GOLD, margin: 0 }}>
+            Memory game · Live
           </p>
         </div>
-        <p style={{ fontFamily: 'monospace', fontSize: '0.48rem', letterSpacing: '0.1em', color: 'rgba(196,162,74,0.5)', margin: 0 }}>
+        <p style={{ fontFamily: SERIF, fontSize: '14.5px', color: SECOND, margin: 0 }}>
           Closes in {hoursLeft(session.closesAt)}
         </p>
       </div>
 
       <div style={{ padding: '1rem 1.5rem' }}>
-        <p style={{ fontFamily: 'monospace', fontSize: '0.48rem', letterSpacing: '0.1em', color: '#5C6166', margin: '0 0 0.75rem' }}>
+        <p style={{ fontFamily: SERIF, fontSize: '15.5px', color: BODY, margin: '0 0 0.75rem' }}>
           {session.totalMemories} {session.totalMemories === 1 ? 'memory' : 'memories'} contributed so far
         </p>
 
@@ -210,12 +226,12 @@ function MemoryGameCard({ archiveId }: { archiveId: string }) {
               const barWidth = Math.round((row.count / maxCount) * 100)
               return (
                 <div key={row.name} style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.4rem' }}>
-                  <span style={{ fontFamily: 'monospace', fontSize: '0.46rem', color: '#3A3F44', width: '14px', flexShrink: 0 }}>#{i + 1}</span>
-                  <span style={{ fontFamily: 'monospace', fontSize: '0.52rem', color: i === 0 ? '#C4A24A' : '#9DA3A8', minWidth: '80px', flexShrink: 0 }}>{row.name}</span>
-                  <div style={{ flex: 1, height: '4px', background: 'rgba(255,255,255,0.04)', borderRadius: '2px', overflow: 'hidden' }}>
-                    <div style={{ height: '100%', width: `${barWidth}%`, background: i === 0 ? 'rgba(196,162,74,0.5)' : 'rgba(240,237,230,0.12)', borderRadius: '2px' }} />
+                  <span style={{ fontFamily: MONO, fontSize: '11px', color: LABEL, width: '18px', flexShrink: 0 }}>{i + 1}</span>
+                  <span style={{ fontFamily: SERIF, fontSize: '15.5px', color: i === 0 ? INK : BODY, minWidth: '80px', flexShrink: 0 }}>{row.name}</span>
+                  <div style={{ flex: 1, height: '4px', background: RULE, borderRadius: '2px', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${barWidth}%`, background: i === 0 ? 'var(--portal-btn)' : LINE, borderRadius: '2px' }} />
                   </div>
-                  <span style={{ fontFamily: 'monospace', fontSize: '0.48rem', color: '#5C6166', flexShrink: 0 }}>{row.count}</span>
+                  <span style={{ fontFamily: MONO, fontSize: '11px', color: LABEL, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>{row.count}</span>
                 </div>
               )
             })}
@@ -223,7 +239,7 @@ function MemoryGameCard({ archiveId }: { archiveId: string }) {
         )}
 
         {leaderboard.length === 0 && (
-          <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: '0.85rem', color: '#3A3F44', marginBottom: '1rem' }}>
+          <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '15.5px', color: SECOND, marginBottom: '1rem' }}>
             No memories yet. Share the link to start.
           </p>
         )}
@@ -231,15 +247,15 @@ function MemoryGameCard({ archiveId }: { archiveId: string }) {
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
           <button
             onClick={handleCopyLink}
-            style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: copied ? '#4CAF50' : '#C4A24A', background: 'transparent', border: `1px solid ${copied ? 'rgba(76,175,80,0.3)' : 'rgba(196,162,74,0.3)'}`, padding: '0.5rem 1rem', cursor: 'pointer', borderRadius: '2px', transition: 'all 0.15s' }}
+            style={{ fontFamily: MONO, fontSize: '11.5px', letterSpacing: '0.16em', textTransform: 'uppercase', color: copied ? 'var(--portal-ok)' : GOLD, background: CARD, border: `1px solid ${copied ? 'var(--portal-ok)' : 'var(--portal-gold-line)'}`, padding: '0 16px', minHeight: '44px', cursor: 'pointer', borderRadius: '2px', transition: 'all 0.15s' }}
           >
-            {copied ? '✓ Copied' : 'Share Game Link →'}
+            {copied ? 'Link copied' : 'Share the game link'}
           </button>
           <a
             href={`/game/${session.id}/leaderboard`}
-            style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#5C6166', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.06)', padding: '0.5rem 1rem', borderRadius: '2px' }}
+            style={{ fontFamily: MONO, fontSize: '11.5px', letterSpacing: '0.16em', textTransform: 'uppercase', color: SECOND, textDecoration: 'none', border: `1px solid ${LINE}`, padding: '0 16px', minHeight: '44px', display: 'inline-flex', alignItems: 'center', borderRadius: '2px' }}
           >
-            View Leaderboard →
+            View the leaderboard
           </a>
         </div>
       </div>
@@ -286,19 +302,19 @@ function FamilyAccessCard() {
   if (!data || data.access === 'none') return null
 
   return (
-    <div className="rounded-sm mb-8" style={{ background: '#111112', border: '1px solid rgba(255,255,255,0.06)' }}>
-      <div style={{ padding: '1.25rem 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' as const }}>
-        <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.2em', textTransform: 'uppercase' as const, color: '#5C6166', margin: 0 }}>
+    <div className="rounded-sm mb-8" style={{ background: CARD, border: `1px solid ${LINE}` }}>
+      <div style={{ padding: '1.1rem 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' as const }}>
+        <p style={{ fontFamily: SERIF, fontSize: '16px', color: INK, margin: 0 }}>
           Family access to your entity
         </p>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <p style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.12em', textTransform: 'uppercase' as const, color: '#4CAF50', margin: 0 }}>
+          <p style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase' as const, color: 'var(--portal-ok)', margin: 0 }}>
             {data.access === 'open' ? 'Open to all' : `${data.previewContributorIds.length} invited`}
           </p>
           <button
             onClick={revoke}
             disabled={saving}
-            style={{ fontFamily: 'monospace', fontSize: '0.4rem', letterSpacing: '0.1em', textTransform: 'uppercase' as const, color: '#5C6166', background: 'transparent', border: '1px solid rgba(255,255,255,0.07)', padding: '0.3rem 0.6rem', cursor: 'pointer', borderRadius: '2px' }}
+            style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase' as const, color: SECOND, background: 'transparent', border: `1px solid ${LINE}`, padding: '0 12px', minHeight: '36px', cursor: 'pointer', borderRadius: '2px' }}
           >
             {saving ? 'Revoking' : 'Revoke'}
           </button>
@@ -359,7 +375,7 @@ function Skeleton({ className, style }: { className?: string; style?: React.CSSP
   return (
     <div
       className={`rounded-sm ${className ?? ''}`}
-      style={{ background: 'rgba(255,255,255,0.04)', animation: 'mysteryGlowPulse 1.8s ease-in-out infinite', ...style }}
+      style={{ background: 'var(--portal-inset)', animation: 'mysteryGlowPulse 1.8s ease-in-out infinite', ...style }}
     />
   )
 }
@@ -394,16 +410,15 @@ function RandomThoughtCapture({ archiveId }: { archiveId: string }) {
         onClick={() => setOpen(true)}
         style={{
           width:           '100%',
-          background:      'rgba(196,162,74,0.05)',
-          border:          '1px dashed rgba(196,162,74,0.25)',
+          background:      'transparent',
+          border:          `1px dashed ${LINE}`,
           borderRadius:    '4px',
           padding:         '14px 20px',
+          minHeight:       '48px',
           cursor:          'pointer',
-          fontFamily:      '"Space Mono","Courier New",monospace',
-          fontSize:        '0.42rem',
-          letterSpacing:   '0.28em',
-          textTransform:   'uppercase' as const,
-          color:           'rgba(196,162,74,0.55)',
+          fontFamily:      SERIF,
+          fontSize:        '16.5px',
+          color:           SECOND,
           textAlign:       'left' as const,
           marginBottom:    '24px',
           display:         'flex',
@@ -411,19 +426,19 @@ function RandomThoughtCapture({ archiveId }: { archiveId: string }) {
           gap:             '10px',
           transition:      'border-color 200ms, color 200ms',
         }}
-        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(196,162,74,0.5)'; (e.currentTarget as HTMLButtonElement).style.color = '#C4A24A' }}
-        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(196,162,74,0.25)'; (e.currentTarget as HTMLButtonElement).style.color = 'rgba(196,162,74,0.55)' }}
+        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--portal-gold-ink)'; (e.currentTarget as HTMLButtonElement).style.color = INK }}
+        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--portal-card-line)'; (e.currentTarget as HTMLButtonElement).style.color = SECOND }}
       >
-        <span style={{ fontSize: '1rem', opacity: 0.7 }}>💭</span>
+        <span aria-hidden="true" style={{ fontFamily: MONO, fontSize: '14px', color: GOLD }}>+</span>
         Something just came to mind? Capture it.
       </button>
     )
   }
 
   return (
-    <div style={{ background: 'rgba(196,162,74,0.05)', border: '1px solid rgba(196,162,74,0.25)', borderRadius: '4px', padding: '20px 24px', marginBottom: '24px' }}>
-      <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.42rem', letterSpacing: '0.28em', textTransform: 'uppercase' as const, color: '#C4A24A', marginBottom: '12px' }}>
-        Capture This Thought
+    <div style={{ background: CARD, border: `1px solid ${LINE}`, borderRadius: '4px', padding: '20px 24px', marginBottom: '24px' }}>
+      <p style={{ fontFamily: MONO, fontSize: '11.5px', letterSpacing: '0.24em', textTransform: 'uppercase' as const, color: GOLD, marginBottom: '12px' }}>
+        Capture this thought
       </p>
       <textarea
         value={text}
@@ -433,13 +448,13 @@ function RandomThoughtCapture({ archiveId }: { archiveId: string }) {
         rows={4}
         style={{
           width:       '100%',
-          background:  'rgba(196,162,74,0.04)',
-          border:      '1px solid rgba(196,162,74,0.18)',
+          background:  CARD,
+          border:      `1px solid ${LINE}`,
           borderRadius:'2px',
           padding:     '12px 16px',
-          fontFamily:  '"Cormorant Garamond",Georgia,serif',
-          fontSize:    '1rem',
-          color:       '#F0EDE6',
+          fontFamily:  SERIF,
+          fontSize:    '17px',
+          color:       INK,
           lineHeight:  1.7,
           resize:      'vertical' as const,
           outline:     'none',
@@ -451,33 +466,35 @@ function RandomThoughtCapture({ archiveId }: { archiveId: string }) {
           onClick={handleSave}
           disabled={saving || text.length < 5}
           style={{
-            background:    saved ? '#4A8A4A' : '#C4A24A',
-            color:         '#0A0908',
+            background:    saved ? 'var(--portal-ok)' : 'var(--portal-btn)',
+            color:         saved ? 'var(--portal-card)' : 'var(--portal-btn-label)',
             border:        'none',
             borderRadius:  '2px',
-            padding:       '10px 20px',
-            fontFamily:    '"Space Mono","Courier New",monospace',
-            fontSize:      '0.42rem',
-            letterSpacing: '0.25em',
+            padding:       '0 20px',
+            minHeight:     '44px',
+            fontFamily:    MONO,
+            fontSize:      '12px',
+            letterSpacing: '0.16em',
             textTransform: 'uppercase' as const,
             cursor:        saving ? 'not-allowed' : 'pointer',
             opacity:       text.length < 5 ? 0.5 : 1,
             transition:    'background 200ms',
           }}
         >
-          {saved ? '✓ Saved' : saving ? 'Saving...' : 'Save This Thought'}
+          {saved ? 'Saved' : saving ? 'Saving' : 'Save this thought'}
         </button>
         <button
           onClick={() => { setOpen(false); setText('') }}
           style={{
             background:    'transparent',
-            color:         '#706C65',
-            border:        '1px solid rgba(240,237,230,0.1)',
+            color:         SECOND,
+            border:        `1px solid ${LINE}`,
             borderRadius:  '2px',
-            padding:       '10px 20px',
-            fontFamily:    '"Space Mono","Courier New",monospace',
-            fontSize:      '0.42rem',
-            letterSpacing: '0.2em',
+            padding:       '0 20px',
+            minHeight:     '44px',
+            fontFamily:    MONO,
+            fontSize:      '12px',
+            letterSpacing: '0.16em',
             textTransform: 'uppercase' as const,
             cursor:        'pointer',
           }}
@@ -551,16 +568,18 @@ function MirrorCard({ archiveId }: { archiveId: string }) {
     setSaving(false)
   }
 
+  // Inside the inverted block every color is an --invert-* token.
   const reactionBtnStyle = (active: boolean): React.CSSProperties => ({
-    fontFamily:    '"Space Mono","Courier New",monospace',
-    fontSize:      '0.42rem',
+    fontFamily:    MONO,
+    fontSize:      '11.5px',
     letterSpacing: '0.16em',
     textTransform: 'uppercase' as const,
-    color:         active ? '#C4A24A' : '#5C6166',
-    background:    active ? 'rgba(196,162,74,0.1)' : 'transparent',
-    border:        `1px solid ${active ? 'rgba(196,162,74,0.4)' : 'rgba(255,255,255,0.08)'}`,
+    color:         active ? 'var(--invert-gold)' : 'var(--invert-dim)',
+    background:    active ? 'var(--invert-field)' : 'transparent',
+    border:        `1px solid ${active ? 'var(--invert-gold-line)' : 'var(--invert-rule)'}`,
     borderRadius:  '2px',
-    padding:       '0.45rem 0.9rem',
+    padding:       '0 14px',
+    minHeight:     '40px',
     cursor:        'pointer',
     transition:    'all 0.15s',
   })
@@ -569,33 +588,33 @@ function MirrorCard({ archiveId }: { archiveId: string }) {
     <div
       className="rounded-sm mb-8"
       style={{
-        background: 'rgba(196,162,74,0.04)',
-        border:     '1px solid rgba(196,162,74,0.12)',
-        borderTop:  '3px solid rgba(196,162,74,0.5)',
-        padding:    'clamp(1.5rem,4vw,2.25rem) clamp(1.25rem,4vw,2.5rem)',
+        background: 'var(--invert-bg)',
+        color:      'var(--invert-fg)',
+        borderTop:  '3px solid var(--invert-gold)',
+        padding:    'clamp(1.6rem,4vw,2.25rem) clamp(1.35rem,4vw,2.25rem)',
       }}
     >
       {/* Eyebrow */}
-      <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.44rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.8)', marginBottom: '1.5rem' }}>
-        What Your Entity Is Learning
+      <p style={{ fontFamily: MONO, fontSize: '11.5px', letterSpacing: '0.24em', textTransform: 'uppercase', color: 'var(--invert-gold)', marginBottom: '1.4rem' }}>
+        What your entity is learning
       </p>
 
-      {/* Reflection — the hero */}
-      <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontWeight: 300, fontSize: 'clamp(1.3rem,2.8vw,1.7rem)', color: '#F0EDE6', lineHeight: 1.9, whiteSpace: 'pre-wrap', margin: 0 }}>
+      {/* Reflection, the hero. The entity speaking, so the block is dark. */}
+      <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 300, fontSize: 'clamp(20px,2.6vw,26px)', color: 'var(--invert-fg)', lineHeight: 1.7, whiteSpace: 'pre-wrap', margin: 0, maxWidth: '60ch' }}>
         {mirror.reflection}
       </p>
 
       {/* Divider */}
-      <div style={{ height: '1px', background: 'rgba(196,162,74,0.18)', margin: '1.85rem 0 1.5rem' }} />
+      <div style={{ height: '1px', background: 'var(--invert-rule)', margin: '1.85rem 0 1.5rem' }} />
 
       {/* Thread question */}
-      <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontWeight: 300, fontSize: '1.1rem', color: '#B8B4AB', lineHeight: 1.65, marginBottom: '1.1rem' }}>
+      <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400, fontSize: '18px', color: 'var(--invert-body)', lineHeight: 1.6, marginBottom: '1.1rem', maxWidth: '60ch' }}>
         {mirror.thread_question}
       </p>
 
       {/* Respond */}
       {saved ? (
-        <p style={{ fontFamily: 'Georgia,serif', fontStyle: 'italic', fontSize: '0.92rem', color: 'rgba(196,162,74,0.85)', margin: 0 }}>
+        <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '16px', color: 'var(--invert-gold)', margin: 0 }}>
           Saved to your archive.
         </p>
       ) : respondOpen ? (
@@ -608,13 +627,13 @@ function MirrorCard({ archiveId }: { archiveId: string }) {
             rows={4}
             style={{
               width:        '100%',
-              background:   'rgba(196,162,74,0.04)',
-              border:       '1px solid rgba(196,162,74,0.18)',
+              background:   'var(--invert-field)',
+              border:       '1px solid var(--invert-rule)',
               borderRadius: '2px',
               padding:      '12px 16px',
-              fontFamily:   '"Cormorant Garamond",Georgia,serif',
-              fontSize:     '1rem',
-              color:        '#F0EDE6',
+              fontFamily:   SERIF,
+              fontSize:     '17px',
+              color:        'var(--invert-fg)',
               lineHeight:   1.7,
               resize:       'vertical' as const,
               outline:      'none',
@@ -625,13 +644,13 @@ function MirrorCard({ archiveId }: { archiveId: string }) {
             <button
               onClick={saveResponse}
               disabled={saving || responseText.trim().length < 5}
-              style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.44rem', letterSpacing: '0.25em', textTransform: 'uppercase' as const, color: '#0A0908', background: '#C4A24A', border: 'none', borderRadius: '2px', padding: '0.6rem 1.25rem', cursor: saving ? 'not-allowed' : 'pointer', opacity: responseText.trim().length < 5 ? 0.5 : 1 }}
+              style={{ fontFamily: MONO, fontSize: '12px', letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: 'var(--portal-btn-label)', background: 'var(--invert-gold)', border: 'none', borderRadius: '2px', padding: '0 20px', minHeight: '44px', cursor: saving ? 'not-allowed' : 'pointer', opacity: responseText.trim().length < 5 ? 0.5 : 1 }}
             >
-              {saving ? 'Saving…' : 'Save'}
+              {saving ? 'Saving' : 'Save'}
             </button>
             <button
               onClick={() => { setRespondOpen(false); setResponseText('') }}
-              style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.44rem', letterSpacing: '0.2em', textTransform: 'uppercase' as const, color: '#706C65', background: 'transparent', border: '1px solid rgba(240,237,230,0.1)', borderRadius: '2px', padding: '0.6rem 1.25rem', cursor: 'pointer' }}
+              style={{ fontFamily: MONO, fontSize: '12px', letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: 'var(--invert-dim)', background: 'transparent', border: '1px solid var(--invert-rule)', borderRadius: '2px', padding: '0 20px', minHeight: '44px', cursor: 'pointer' }}
             >
               Cancel
             </button>
@@ -640,14 +659,14 @@ function MirrorCard({ archiveId }: { archiveId: string }) {
       ) : (
         <button
           onClick={() => setRespondOpen(true)}
-          style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.46rem', letterSpacing: '0.25em', textTransform: 'uppercase' as const, color: '#0A0908', background: '#C4A24A', border: 'none', borderRadius: '2px', padding: '0.65rem 1.4rem', cursor: 'pointer' }}
+          style={{ fontFamily: MONO, fontSize: '12px', letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: 'var(--portal-btn-label)', background: 'var(--invert-gold)', border: 'none', borderRadius: '2px', padding: '0 22px', minHeight: '44px', cursor: 'pointer' }}
         >
-          Respond →
+          Respond
         </button>
       )}
 
       {/* Reactions */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginTop: '1.75rem', paddingTop: '1.25rem', borderTop: '1px solid rgba(196,162,74,0.1)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginTop: '1.75rem', paddingTop: '1.25rem', borderTop: '1px solid var(--invert-rule)', flexWrap: 'wrap' }}>
         <button onClick={() => react('this_is_me')} style={reactionBtnStyle(reaction === 'this_is_me')}>
           This is me
         </button>
@@ -659,7 +678,7 @@ function MirrorCard({ archiveId }: { archiveId: string }) {
           aria-label="Love this"
           style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '0.3rem', display: 'flex', alignItems: 'center', marginLeft: '0.1rem' }}
         >
-          <svg width="17" height="17" viewBox="0 0 24 24" fill={reaction === 'heart' ? '#C4A24A' : 'none'} stroke={reaction === 'heart' ? '#C4A24A' : '#5C6166'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill={reaction === 'heart' ? 'var(--invert-gold)' : 'none'} stroke={reaction === 'heart' ? 'var(--invert-gold)' : 'var(--invert-dim)'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
           </svg>
         </button>
@@ -753,13 +772,13 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
           <>
             <h1
               style={{
-                fontFamily:    '"Cormorant Garamond",Georgia,serif',
-                fontSize:      'clamp(1.8rem,3.5vw,2.75rem)',
+                fontFamily:    SERIF,
+                fontSize:      'clamp(34px,4.2vw,50px)',
                 fontWeight:    300,
-                lineHeight:    1.1,
-                letterSpacing: '-0.025em',
-                color:         '#F0EDE6',
-                marginBottom:  '10px',
+                lineHeight:    1.08,
+                letterSpacing: '-0.015em',
+                color:         INK,
+                marginBottom:  '12px',
               }}
             >
               {(() => {
@@ -769,7 +788,7 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
                 return firstName ? `${greeting}, ${firstName}.` : `${greeting}.`
               })()}
             </h1>
-            <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.48rem', letterSpacing: '0.12em', color: 'rgba(112,108,101,0.6)' }}>
+            <p style={{ fontFamily: SERIF, fontSize: '17px', color: SECOND, lineHeight: 1.5 }}>
               {(() => {
                 const n = archive?.total_photos ?? 0
                 if (n === 0)       return 'Your archive is ready for its first photographs.'
@@ -788,30 +807,31 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
       {/* ── PAUSED ARCHIVE BANNER ── */}
       {!loading && archive?.status === 'paused' && (
         <div style={{
-          background:   'rgba(196,162,74,0.06)',
-          border:       '1px solid rgba(196,162,74,0.3)',
-          borderLeft:   '3px solid #C4A24A',
+          background:   'var(--portal-tint)',
+          border:       '1px solid var(--portal-gold-line)',
+          borderLeft:   `3px solid ${GOLD}`,
           borderRadius: '2px',
           padding:      '20px 24px',
           marginBottom: '32px',
         }}>
           <p style={{
-            fontFamily:    '"Cormorant Garamond", Georgia, serif',
-            fontSize:      '1.1rem',
+            fontFamily:    SERIF,
+            fontSize:      '20px',
             fontWeight:    500,
-            color:         '#F0EDE6',
+            color:         INK,
             marginBottom:  '8px',
           }}>
             Your archive is paused.
           </p>
           <p style={{
-            fontFamily:   '"Cormorant Garamond", Georgia, serif',
-            fontSize:      '0.95rem',
-            fontWeight:    300,
+            fontFamily:    SERIF,
+            fontSize:      '16.5px',
+            fontWeight:    400,
             fontStyle:     'italic',
-            lineHeight:    1.7,
-            color:         'rgba(250,250,248,0.55)',
+            lineHeight:    1.65,
+            color:         BODY,
             marginBottom:  '16px',
+            maxWidth:      '58ch',
           }}>
             Your data is safe. Everything you have built is exactly as you left it.
             Resume your archive to continue adding memories and receiving photographs.
@@ -819,19 +839,21 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
           <a
             href="/resume"
             style={{
-              display:        'inline-block',
-              fontFamily:     '"Space Mono","Courier New",monospace',
-              fontSize:       '0.44rem',
-              letterSpacing:  '0.2em',
+              display:        'inline-flex',
+              alignItems:     'center',
+              fontFamily:     MONO,
+              fontSize:       '12px',
+              letterSpacing:  '0.16em',
               textTransform:  'uppercase',
-              color:          '#0A0908',
-              background:     '#C4A24A',
+              color:          'var(--portal-btn-label)',
+              background:     'var(--portal-btn)',
               textDecoration: 'none',
-              padding:        '10px 20px',
+              padding:        '0 22px',
+              minHeight:      '44px',
               borderRadius:   '2px',
             }}
           >
-            Resume Now →
+            Resume your archive
           </a>
         </div>
       )}
@@ -872,8 +894,8 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
       {/* ── QUICK LINKS ── */}
       <div className="grid md:grid-cols-2 gap-4">
           {[
-            { href: '/archive/label',        label: 'Upload Photos',    desc: 'Upload photographs from your phone or computer.',  gold: true  },
-            { href: '/archive/gallery',       label: 'View Gallery',     desc: 'Browse preserved memories across all decades.',    gold: false },
+            { href: '/archive/label',        label: 'Upload photos',    desc: 'Upload photographs from your phone or computer.',  gold: true  },
+            { href: '/archive/gallery',       label: 'View the gallery', desc: 'Browse preserved memories across all decades.',    gold: false },
             // Trials cannot invite contributors (skeleton 1.5, decision 5.2).
             // The card that opens the invite form is replaced by one line.
             ...(archive?.status === 'trial'
@@ -884,32 +906,32 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
               key={href}
               href={href}
               className="rounded-sm border px-6 py-6 no-underline flex flex-col gap-3 transition-colors duration-200"
-              style={{ background: '#111112', borderColor: 'rgba(255,255,255,0.06)' }}
+              style={{ background: CARD, borderColor: LINE }}
             >
-              <div className="w-8 h-px" style={{ background: gold ? 'rgba(196,162,74,0.5)' : 'rgba(255,255,255,0.1)' }} />
-              <p className="font-serif font-semibold" style={{ color: '#F0F0EE', fontSize: '1.05rem' }}>{label}</p>
-              <p className="font-sans text-[0.72rem] leading-relaxed" style={{ color: '#5C6166' }}>{desc}</p>
+              <div className="w-8 h-px" style={{ background: gold ? 'var(--portal-gold-ink)' : LINE }} />
+              <p style={{ fontFamily: SERIF, fontWeight: 500, color: INK, fontSize: '19px', lineHeight: 1.25 }}>{label}</p>
+              <p style={{ fontFamily: SERIF, color: SECOND, fontSize: '15.5px', lineHeight: 1.55 }}>{desc}</p>
             </Link>
           ))}
 
           {archive?.status === 'trial' && (
             <div
               className="rounded-sm border px-6 py-6 flex flex-col gap-3"
-              style={{ background: '#111112', borderColor: 'rgba(255,255,255,0.06)' }}
+              style={{ background: 'var(--portal-inset)', borderColor: RULE }}
             >
-              <div className="w-8 h-px" style={{ background: 'rgba(255,255,255,0.1)' }} />
-              <p className="font-serif font-semibold" style={{ color: '#F0F0EE', fontSize: '1.05rem' }}>Contributors</p>
-              <p className="font-sans text-[0.72rem] leading-relaxed" style={{ color: '#5C6166' }}>Invite family once your archive is founded.</p>
+              <div className="w-8 h-px" style={{ background: LINE }} />
+              <p style={{ fontFamily: SERIF, fontWeight: 500, color: INK, fontSize: '19px', lineHeight: 1.25 }}>Contributors</p>
+              <p style={{ fontFamily: SERIF, color: SECOND, fontSize: '15.5px', lineHeight: 1.55 }}>Invite family once your archive is founded.</p>
             </div>
           )}
 
           {/* Next email time */}
           {!loading && (
-            <div className="rounded-sm border px-5 py-4" style={{ background: '#111112', borderColor: 'rgba(255,255,255,0.04)' }}>
-              <p style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.1em', color: '#3A3F44', marginBottom: '0.25rem' }}>
-                NEXT PHOTOGRAPH EMAIL
+            <div className="rounded-sm border px-5 py-4" style={{ background: CARD, borderColor: LINE }}>
+              <p style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: LABEL, marginBottom: '6px' }}>
+                Next photograph email
               </p>
-              <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.1em', color: '#5C6166' }}>
+              <p style={{ fontFamily: SERIF, fontSize: '17px', color: INK }}>
                 {(() => {
                   const now  = new Date()
                   const utcH = now.getUTCHours()
@@ -917,7 +939,7 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
                 })()}
               </p>
               {stats.contributors > 0 && (
-                <p style={{ fontFamily: 'monospace', fontSize: '0.42rem', letterSpacing: '0.08em', color: '#3A3F44', marginTop: '0.35rem' }}>
+                <p style={{ fontFamily: SERIF, fontSize: '14.5px', color: SECOND, marginTop: '6px' }}>
                   {stats.contributors} family member{stats.contributors !== 1 ? 's' : ''} receiving photos
                 </p>
               )}

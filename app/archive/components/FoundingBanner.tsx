@@ -18,8 +18,10 @@ type Status = {
   current: { isFounding: boolean; call: 1 | 2 | 3 | null; turns: number } | null
 }
 
-const SERIF = '"Cormorant Garamond",Georgia,serif'
-const MONO  = '"Space Mono","Courier New",monospace'
+// Stone register: every color is a var(--portal-*) read (globals.css,
+// .portal-stone). No hex literal belongs in this file.
+const SERIF = 'var(--portal-serif)'
+const MONO  = 'var(--portal-mono)'
 
 export default function FoundingBanner({ trial = false }: { trial?: boolean } = {}) {
   const [status, setStatus] = useState<Status | null>(null)
@@ -53,23 +55,23 @@ export default function FoundingBanner({ trial = false }: { trial?: boolean } = 
       className="rounded-sm mb-8"
       style={{
         display:    'block',
-        background: 'rgba(196,162,74,0.06)',
-        border:     '1px solid rgba(196,162,74,0.25)',
-        borderLeft: '3px solid rgba(196,162,74,0.7)',
+        background: 'var(--portal-tint)',
+        border:     '1px solid var(--portal-gold-line)',
+        borderLeft: '3px solid var(--portal-gold-ink)',
         padding:    'clamp(1.1rem,3vw,1.5rem) clamp(1.1rem,3vw,1.75rem)',
         textDecoration: 'none',
       }}
     >
-      <p style={{ fontFamily: MONO, fontSize: '0.58rem', letterSpacing: '0.28em', textTransform: 'uppercase', color: '#C4A24A', marginBottom: '8px' }}>
+      <p style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.24em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '10px' }}>
         The Founding Sequence
       </p>
-      <p style={{ fontFamily: SERIF, fontSize: '1.35rem', fontWeight: 300, color: 'rgba(250,248,244,0.9)', lineHeight: 1.3, marginBottom: '6px' }}>
+      <p style={{ fontFamily: SERIF, fontSize: '22px', fontWeight: 400, color: 'var(--portal-ink)', lineHeight: 1.25, marginBottom: '6px' }}>
         {headline}
       </p>
-      <p style={{ fontFamily: SERIF, fontSize: '1.02rem', fontWeight: 300, color: 'rgba(250,248,244,0.62)', lineHeight: 1.65, marginBottom: '10px' }}>
+      <p style={{ fontFamily: SERIF, fontSize: '17px', fontWeight: 400, color: 'var(--portal-body)', lineHeight: 1.6, marginBottom: '12px', maxWidth: '58ch' }}>
         {body}
       </p>
-      <span style={{ fontFamily: MONO, fontSize: '0.58rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#C4A24A' }}>
+      <span style={{ fontFamily: MONO, fontSize: '11.5px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)' }}>
         {inProgress ? 'Continue' : 'Begin'} <span aria-hidden="true">→</span>
       </span>
     </Link>

@@ -10,15 +10,20 @@ import { canShowProof } from '@/lib/trial'
 // Three incident interviews run through the existing engine. Each turn: one
 // probe, one answer (typed, or spoken and transcribed), saved on the spot. The
 // page never advances an interview on its own; only a submitted answer does.
-// Reloading re-serves the same probe. Colors are the portal's dark register,
-// every text color measured against #0A0908 (see the table in globals.css).
+// Reloading re-serves the same probe. Colors are the portal's stone register:
+// every value is a var(--portal-*) read from the .portal-stone block in
+// globals.css, where each pair is measured. No hex literal belongs here. The
+// proof card's result blocks are the one dark surface (the --invert-* tokens),
+// and nothing inside them inherits the stone text colors.
 
-const SERIF = '"Cormorant Garamond",Georgia,serif'
-const MONO  = '"Space Mono","Courier New",monospace'
-const GOLD  = '#C4A24A'
-const BONE  = 'rgba(250,248,244,0.9)'   // 15:1
-const BODY  = 'rgba(250,248,244,0.62)'  // 7.4:1
-const LABEL = 'rgba(250,248,244,0.55)'  // 5.9:1
+const SERIF  = 'var(--portal-serif)'
+const MONO   = 'var(--portal-mono)'
+const GOLD   = 'var(--portal-gold-ink)'
+const INK    = 'var(--portal-ink)'
+const BODY   = 'var(--portal-body)'
+const SECOND = 'var(--portal-secondary)'
+const LABEL  = 'var(--portal-label)'
+const ERR    = 'var(--portal-error)'
 
 type Status = FoundingStatus & { ownerName?: string | null }
 
@@ -186,68 +191,76 @@ export default function FoundingClient({
       {/* Header */}
       {activeArea ? (
         <>
-          <p style={{ fontFamily: MONO, fontSize: '0.62rem', letterSpacing: '0.28em', textTransform: 'uppercase', color: GOLD, marginBottom: '14px' }}>
+          <p className="founding-eyebrow" style={{ fontFamily: MONO, fontSize: '11.5px', letterSpacing: '0.24em', textTransform: 'uppercase', color: GOLD, marginBottom: '18px' }}>
             A call on {activeArea}
           </p>
-          <h1 style={{ fontFamily: SERIF, fontSize: 'clamp(1.8rem,3.5vw,2.6rem)', fontWeight: 300, lineHeight: 1.12, letterSpacing: '-0.02em', color: BONE, marginBottom: '14px' }}>
+          <h1 style={{ fontFamily: SERIF, fontSize: 'clamp(34px,4.2vw,50px)', fontWeight: 300, lineHeight: 1.08, letterSpacing: '-0.015em', color: INK, marginBottom: '16px' }}>
             Where your archive is thin, in your own words.
           </h1>
-          <p style={{ fontFamily: SERIF, fontSize: '1.08rem', fontWeight: 300, lineHeight: 1.75, color: BODY, marginBottom: '36px', maxWidth: '560px' }}>
+          <p style={{ fontFamily: SERIF, fontSize: '19px', fontWeight: 400, lineHeight: 1.6, color: BODY, marginBottom: '34px', maxWidth: '560px' }}>
             One question to start, then a few that follow what you say. About ten minutes. Speak or type. When it closes, your map is read again.
           </p>
         </>
       ) : (
         <>
-          <p style={{ fontFamily: MONO, fontSize: '0.62rem', letterSpacing: '0.28em', textTransform: 'uppercase', color: GOLD, marginBottom: '14px' }}>
+          <p className="founding-eyebrow" style={{ fontFamily: MONO, fontSize: '11.5px', letterSpacing: '0.24em', textTransform: 'uppercase', color: GOLD, marginBottom: '18px' }}>
             The Founding Sequence
           </p>
-          <h1 style={{ fontFamily: SERIF, fontSize: 'clamp(1.8rem,3.5vw,2.6rem)', fontWeight: 300, lineHeight: 1.12, letterSpacing: '-0.02em', color: BONE, marginBottom: '14px' }}>
+          <h1 style={{ fontFamily: SERIF, fontSize: 'clamp(34px,4.2vw,50px)', fontWeight: 300, lineHeight: 1.08, letterSpacing: '-0.015em', color: INK, marginBottom: '16px' }}>
             {isBusiness
               ? 'Three of the hardest calls you made running this business.'
               : 'Three of the hardest calls you ever made.'}
           </h1>
-          <p style={{ fontFamily: SERIF, fontSize: '1.08rem', fontWeight: 300, lineHeight: 1.75, color: BODY, marginBottom: '36px', maxWidth: '560px' }}>
+          <p style={{ fontFamily: SERIF, fontSize: '19px', fontWeight: 400, lineHeight: 1.6, color: BODY, marginBottom: '34px', maxWidth: '560px' }}>
             About ten minutes each. Speak or type. Stop whenever you like and come back; every answer is saved as you go.
           </p>
         </>
       )}
 
       {loadError && (
-        <p role="alert" style={{ fontFamily: SERIF, fontSize: '1rem', color: '#D98C8C', marginBottom: '24px' }}>{loadError}</p>
+        <p role="alert" style={{ fontFamily: SERIF, fontSize: '1rem', color: ERR, marginBottom: '24px' }}>{loadError}</p>
       )}
       {area && !current && !areaClosed && submitErr && (
-        <p role="alert" style={{ fontFamily: SERIF, fontSize: '1rem', color: '#D98C8C', marginBottom: '24px' }}>{submitErr}</p>
+        <p role="alert" style={{ fontFamily: SERIF, fontSize: '1rem', color: ERR, marginBottom: '24px' }}>{submitErr}</p>
       )}
       {area && !current && !areaClosed && !submitErr && starting && (
         <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '1.05rem', color: BODY, marginBottom: '24px' }}>Opening your call on {area}.</p>
       )}
 
-      {/* Call cards */}
+      {/* Call cards: one hairline row, three cells */}
       {status && !activeArea && (
-        <div className="founding-cards" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2px', marginBottom: '36px' }}>
-          {status.calls.map(c => {
-            const lit = c.state !== 'upcoming'
+        <div className="founding-cards" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', borderTop: '1px solid var(--portal-rule)', borderBottom: '1px solid var(--portal-rule)', marginBottom: '36px' }}>
+          {status.calls.map((c, i) => {
+            const dot: React.CSSProperties = {
+              width: '8px', height: '8px', borderRadius: '50%', display: 'inline-block', flexShrink: 0,
+              background: c.state === 'done' ? 'var(--portal-btn)' : c.state === 'current' ? 'var(--portal-card)' : 'transparent',
+              border:     `1px solid ${c.state === 'done' ? 'var(--portal-btn)' : c.state === 'current' ? GOLD : 'var(--portal-card-line)'}`,
+            }
             return (
               <div
                 key={c.call}
+                className="founding-card"
                 style={{
-                  padding:    '18px 18px',
-                  background: c.state === 'done' ? 'rgba(196,162,74,0.07)' : c.state === 'current' ? 'rgba(196,162,74,0.04)' : 'rgba(250,248,244,0.03)',
-                  border:     `1px solid ${c.state === 'done' ? 'rgba(196,162,74,0.4)' : c.state === 'current' ? 'rgba(196,162,74,0.2)' : 'rgba(250,248,244,0.12)'}`,
+                  padding:     '20px 20px 20px 0',
+                  marginRight: i < status.calls.length - 1 ? '20px' : 0,
+                  borderRight: i < status.calls.length - 1 ? '1px solid var(--portal-rule)' : 'none',
                 }}
               >
-                <p style={{ fontFamily: MONO, fontSize: '0.56rem', letterSpacing: '0.25em', textTransform: 'uppercase', color: GOLD, marginBottom: '8px' }}>
+                <p style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: GOLD, marginBottom: '10px' }}>
                   Call {c.call}
                 </p>
-                <p style={{ fontFamily: SERIF, fontSize: '1.15rem', fontWeight: 400, color: lit ? BONE : 'rgba(250,248,244,0.7)', marginBottom: '6px', lineHeight: 1.3 }}>
+                <p style={{ fontFamily: SERIF, fontSize: '19px', fontWeight: 400, color: INK, marginBottom: '8px', lineHeight: 1.25 }}>
                   {c.title}
                 </p>
-                <p style={{ fontFamily: MONO, fontSize: '0.56rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: LABEL, lineHeight: 1.6 }}>
+                <p style={{ fontFamily: SERIF, fontSize: '14.5px', color: SECOND, lineHeight: 1.5, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span aria-hidden="true" style={dot} />
                   {c.state === 'done'
                     ? `In your archive · ${c.deposits} ${c.deposits === 1 ? 'deposit' : 'deposits'}`
                     : c.state === 'current'
                       ? `In progress · ${c.turns} answered`
-                      : 'Not yet started'}
+                      : status.nextCall === c.call
+                        ? 'Ready to begin'
+                        : 'Not yet started'}
                 </p>
               </div>
             )
@@ -258,14 +271,14 @@ export default function FoundingClient({
       {/* Sequence complete */}
       {status?.done && !current && !areaClosed && !area && (
         <section aria-live="polite" style={panel()}>
-          <p style={eyebrow()}>Complete</p>
-          <h2 style={{ fontFamily: SERIF, fontSize: '1.6rem', fontWeight: 300, color: BONE, lineHeight: 1.25, marginBottom: '14px' }}>
+          <p className="founding-eyebrow" style={eyebrow()}>Complete</p>
+          <h2 style={{ fontFamily: SERIF, fontSize: '30px', fontWeight: 300, color: INK, lineHeight: 1.2, marginBottom: '14px' }}>
             {firstName ? `${firstName}, the Founding Sequence is complete.` : 'The Founding Sequence is complete.'}
           </h2>
-          <p style={{ fontFamily: SERIF, fontSize: '1.08rem', fontWeight: 300, lineHeight: 1.75, color: BODY, marginBottom: '14px' }}>
+          <p style={{ fontFamily: SERIF, fontSize: '17.5px', fontWeight: 400, lineHeight: 1.65, color: BODY, marginBottom: '14px', maxWidth: '58ch' }}>
             We read every word ourselves. Within 48 hours we will be in touch to set up your first read: a short video call about what your archive holds, where it is still thin, and what comes next.
           </p>
-          <p style={{ fontFamily: SERIF, fontSize: '1.08rem', fontWeight: 300, lineHeight: 1.75, color: BODY, marginBottom: '24px' }}>
+          <p style={{ fontFamily: SERIF, fontSize: '17.5px', fontWeight: 400, lineHeight: 1.65, color: BODY, marginBottom: '26px', maxWidth: '58ch' }}>
             Your archive keeps growing from here. The dashboard has your next question whenever you are ready.
           </p>
           <Link href="/archive/dashboard" style={goldButton()}>Open your archive</Link>
@@ -276,11 +289,11 @@ export default function FoundingClient({
       {/* A call just closed and the next one is available */}
       {justClosed && !current && !status?.done && (
         <section aria-live="polite" style={panel()}>
-          <p style={eyebrow()}>Saved</p>
-          <h2 style={{ fontFamily: SERIF, fontSize: '1.6rem', fontWeight: 300, color: BONE, lineHeight: 1.25, marginBottom: '14px' }}>
+          <p className="founding-eyebrow" style={eyebrow()}>Saved</p>
+          <h2 style={{ fontFamily: SERIF, fontSize: '30px', fontWeight: 300, color: INK, lineHeight: 1.2, marginBottom: '14px' }}>
             Call {justClosed.call} is in your archive.
           </h2>
-          <p style={{ fontFamily: SERIF, fontSize: '1.08rem', fontWeight: 300, lineHeight: 1.75, color: BODY, marginBottom: '24px' }}>
+          <p style={{ fontFamily: SERIF, fontSize: '17.5px', fontWeight: 400, lineHeight: 1.65, color: BODY, marginBottom: '26px', maxWidth: '58ch' }}>
             {justClosed.deposits} {justClosed.deposits === 1 ? 'deposit' : 'deposits'}, in your own words. The next call is ready when you are. Now, or another day; it will be here.
           </p>
           {status && canShowProof(status) && <ProofCard trial={trial} below />}
@@ -296,15 +309,15 @@ export default function FoundingClient({
       {/* Nothing open yet: begin the next call */}
       {status && !current && !status.done && !justClosed && !areaClosed && !area && (
         <section style={panel()}>
-          <p style={eyebrow()}>{status.completed === 0 ? 'Begin' : 'Continue'}</p>
-          <h2 style={{ fontFamily: SERIF, fontSize: '1.6rem', fontWeight: 300, color: BONE, lineHeight: 1.25, marginBottom: '14px' }}>
+          <p className="founding-eyebrow" style={eyebrow()}>{status.completed === 0 ? 'Begin' : 'Continue'}</p>
+          <h2 style={{ fontFamily: SERIF, fontSize: '30px', fontWeight: 300, color: INK, lineHeight: 1.2, marginBottom: '14px' }}>
             Call {status.nextCall}. {status.calls.find(c => c.call === status.nextCall)?.title}.
           </h2>
-          <p style={{ fontFamily: SERIF, fontSize: '1.08rem', fontWeight: 300, lineHeight: 1.75, color: BODY, marginBottom: '24px' }}>
+          <p style={{ fontFamily: SERIF, fontSize: '17.5px', fontWeight: 400, lineHeight: 1.65, color: BODY, marginBottom: '26px', maxWidth: '58ch' }}>
             One question to start, then a few more that follow what you say. Nothing you say has to be important. The ordinary details are usually the ones that show how you decide.
           </p>
           {canShowProof(status) && <ProofCard trial={trial} below />}
-          {submitErr && <p role="alert" style={{ fontFamily: SERIF, fontSize: '1rem', color: '#D98C8C', marginBottom: '14px' }}>{submitErr}</p>}
+          {submitErr && <p role="alert" style={{ fontFamily: SERIF, fontSize: '1rem', color: ERR, marginBottom: '14px' }}>{submitErr}</p>}
           <button onClick={startNext} disabled={starting} style={goldButton(starting)}>
             {starting ? 'Opening' : `Begin call ${status.nextCall}`}
           </button>
@@ -314,11 +327,11 @@ export default function FoundingClient({
       {/* An area call just closed */}
       {areaClosed && !current && (
         <section aria-live="polite" style={panel()}>
-          <p style={eyebrow()}>Saved</p>
-          <h2 style={{ fontFamily: SERIF, fontSize: '1.6rem', fontWeight: 300, color: BONE, lineHeight: 1.25, marginBottom: '14px' }}>
+          <p className="founding-eyebrow" style={eyebrow()}>Saved</p>
+          <h2 style={{ fontFamily: SERIF, fontSize: '30px', fontWeight: 300, color: INK, lineHeight: 1.2, marginBottom: '14px' }}>
             Your call on {areaClosed.area} is in your archive.
           </h2>
-          <p style={{ fontFamily: SERIF, fontSize: '1.08rem', fontWeight: 300, lineHeight: 1.75, color: BODY, marginBottom: '24px' }}>
+          <p style={{ fontFamily: SERIF, fontSize: '17.5px', fontWeight: 400, lineHeight: 1.65, color: BODY, marginBottom: '26px', maxWidth: '58ch' }}>
             {areaClosed.deposits} {areaClosed.deposits === 1 ? 'deposit' : 'deposits'}, in your own words. Your map is being read again now; it takes about twenty minutes, and the dashboard shows the new reading when it is done.
           </p>
           <Link href="/archive/dashboard" style={goldButton()}>Back to your archive</Link>
@@ -343,12 +356,12 @@ export default function FoundingClient({
               A founding call is still open. Finish it first; the call on {area} is a click away on your map afterward.
             </p>
           )}
-          <p style={eyebrow()}>
+          <p className="founding-eyebrow" style={eyebrow()}>
             {current.isFounding && current.call ? `Call ${current.call} · ` : ''}{current.area ? `${current.area} · ` : ''}{current.label}
           </p>
 
-          <div aria-live="polite" style={{ borderLeft: '3px solid rgba(196,162,74,0.5)', padding: '14px 22px', margin: '0 0 22px', background: 'rgba(196,162,74,0.04)' }}>
-            <p style={{ fontFamily: SERIF, fontSize: 'clamp(1.25rem,2.4vw,1.5rem)', fontStyle: 'italic', fontWeight: 300, color: BONE, lineHeight: 1.55, margin: 0 }}>
+          <div aria-live="polite" style={{ borderLeft: `3px solid ${GOLD}`, padding: '16px 22px', margin: '0 0 22px', background: 'var(--portal-tint)' }}>
+            <p style={{ fontFamily: SERIF, fontSize: 'clamp(20px,2.4vw,24px)', fontStyle: 'italic', fontWeight: 400, color: INK, lineHeight: 1.5, margin: 0 }}>
               {current.question ?? 'Loading the next question.'}
             </p>
           </div>
@@ -359,12 +372,12 @@ export default function FoundingClient({
             </p>
           )}
           {note === 'saved' && (
-            <p style={{ fontFamily: SERIF, fontSize: '1rem', fontStyle: 'italic', color: 'rgba(196,162,74,0.85)', marginBottom: '14px', lineHeight: 1.7 }}>
+            <p style={{ fontFamily: SERIF, fontSize: '1rem', fontStyle: 'italic', color: GOLD, marginBottom: '14px', lineHeight: 1.7 }}>
               Saved to your archive.
             </p>
           )}
 
-          <label htmlFor="founding-answer" style={{ display: 'block', fontFamily: MONO, fontSize: '0.56rem', letterSpacing: '0.25em', textTransform: 'uppercase', color: LABEL, marginBottom: '8px' }}>
+          <label htmlFor="founding-answer" style={{ display: 'block', fontFamily: MONO, fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: LABEL, marginBottom: '8px' }}>
             Your answer
           </label>
           <textarea
@@ -376,13 +389,13 @@ export default function FoundingClient({
             disabled={submitting}
             style={{
               width:        '100%',
-              background:   'rgba(10,9,8,0.5)',
-              border:       '1px solid rgba(196,162,74,0.18)',
+              background:   'var(--portal-card)',
+              border:       '1px solid var(--portal-card-line)',
               borderRadius: '2px',
               padding:      '14px 18px',
               fontFamily:   SERIF,
-              fontSize:     '1.12rem',
-              color:        '#F0EDE6',
+              fontSize:     '18px',
+              color:        INK,
               lineHeight:   1.7,
               resize:       'vertical',
               outline:      'none',
@@ -400,7 +413,7 @@ export default function FoundingClient({
             }}
           />
 
-          {submitErr && <p role="alert" style={{ fontFamily: SERIF, fontSize: '1rem', color: '#D98C8C', margin: '12px 0 0' }}>{submitErr}</p>}
+          {submitErr && <p role="alert" style={{ fontFamily: SERIF, fontSize: '1rem', color: ERR, margin: '12px 0 0' }}>{submitErr}</p>}
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '18px', flexWrap: 'wrap' }}>
             <button
@@ -410,7 +423,7 @@ export default function FoundingClient({
             >
               {submitting ? 'Saving' : 'Save and continue'}
             </button>
-            <span style={{ fontFamily: MONO, fontSize: '0.56rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: LABEL }}>
+            <span style={{ fontFamily: SERIF, fontSize: '14.5px', color: SECOND }}>
               {current.turns} answered so far
             </span>
           </div>
@@ -421,8 +434,15 @@ export default function FoundingClient({
         @media (max-width: 720px) {
           .founding-cards { grid-template-columns: 1fr !important; }
         }
+        @media (max-width: 720px) {
+          .founding-card { margin-right: 0 !important; border-right: none !important; border-bottom: 1px solid var(--portal-rule); padding-left: 0; }
+          .founding-card:last-child { border-bottom: none; }
+        }
+        .founding-eyebrow { display: flex; align-items: center; gap: 12px; }
+        .founding-eyebrow::before { content: ''; display: block; width: 22px; height: 1px; background: var(--portal-gold-line); flex-shrink: 0; }
+        .founding-eyebrow-dim::before { background: var(--invert-rule); }
         .founding-btn:focus-visible { outline: 2px solid ${GOLD}; outline-offset: 3px; }
-        textarea#founding-answer:focus { border-color: rgba(196,162,74,0.5); }
+        textarea#founding-answer:focus { border-color: ${GOLD}; outline: none; }
       `}</style>
     </div>
   )
@@ -473,15 +493,15 @@ function ProofCard({ trial = false, below = false }: { trial?: boolean; below?: 
   }
 
   const q = (text: string) => (
-    <p style={{ fontFamily: SERIF, fontSize: '1.15rem', fontStyle: 'italic', fontWeight: 300, color: BONE, lineHeight: 1.55, margin: '0 0 12px' }}>
+    <p style={{ fontFamily: SERIF, fontSize: '19px', fontStyle: 'italic', fontWeight: 300, color: 'var(--invert-fg)', lineHeight: 1.5, margin: '0 0 12px' }}>
       {text}
     </p>
   )
 
   return (
-    <div style={{ marginTop: below ? '8px' : '32px', marginBottom: below ? '28px' : 0, paddingTop: '28px', borderTop: '1px solid rgba(196,162,74,0.15)' }}>
-      <p style={eyebrow()}>What it holds</p>
-      <p style={{ fontFamily: SERIF, fontSize: '1.08rem', fontWeight: 300, lineHeight: 1.75, color: BODY, marginBottom: '18px' }}>
+    <div style={{ marginTop: below ? '8px' : '32px', marginBottom: below ? '28px' : 0, paddingTop: '26px', borderTop: '1px solid var(--portal-rule)' }}>
+      <p className="founding-eyebrow" style={eyebrow()}>What it holds</p>
+      <p style={{ fontFamily: SERIF, fontSize: '17.5px', fontWeight: 400, lineHeight: 1.65, color: BODY, marginBottom: '20px', maxWidth: '58ch' }}>
         Your archive can already show you one thing it can answer, in your words, and one thing it will not, because you never said.
       </p>
 
@@ -500,7 +520,7 @@ function ProofCard({ trial = false, below = false }: { trial?: boolean; below?: 
       )}
       {state === 'error' && (
         <div>
-          <p role="alert" style={{ fontFamily: SERIF, fontSize: '1rem', color: '#D98C8C', margin: '0 0 10px', lineHeight: 1.6 }}>{error}</p>
+          <p role="alert" style={{ fontFamily: SERIF, fontSize: '1rem', color: ERR, margin: '0 0 10px', lineHeight: 1.6 }}>{error}</p>
           <button type="button" onClick={run} className="founding-btn" style={quietButton()}>Try again</button>
         </div>
       )}
@@ -511,28 +531,29 @@ function ProofCard({ trial = false, below = false }: { trial?: boolean; below?: 
         </p>
       )}
 
+      {/* The inverted block: the archive speaks. Every color inside is an --invert-* value. */}
       {state === 'done' && proof && proof.ready && (
-        <div style={{ display: 'grid', gap: '2px' }} aria-live="polite">
+        <div style={{ display: 'grid', background: 'var(--invert-bg)', color: 'var(--invert-fg)' }} aria-live="polite">
           {proof.grounded && (
-            <div style={{ padding: '20px 22px', background: 'rgba(196,162,74,0.05)', border: '1px solid rgba(196,162,74,0.3)' }}>
-              <p style={{ ...eyebrow(), marginBottom: '10px' }}>Checked against your archive</p>
+            <div style={{ padding: '26px 28px 28px' }}>
+              <p className="founding-eyebrow" style={{ ...eyebrow(), color: 'var(--invert-gold)', marginBottom: '14px' }}>Checked against your archive</p>
               {q(proof.grounded.question)}
-              <p style={{ fontFamily: SERIF, fontSize: '1.02rem', fontWeight: 300, color: BONE, lineHeight: 1.7, margin: '0 0 16px', whiteSpace: 'pre-wrap' }}>
+              <p style={{ fontFamily: SERIF, fontSize: '17px', fontWeight: 400, color: 'var(--invert-fg)', lineHeight: 1.65, margin: '0 0 18px', whiteSpace: 'pre-wrap', maxWidth: '60ch' }}>
                 {proof.grounded.answer}
               </p>
-              <p style={{ fontFamily: MONO, fontSize: '0.54rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: LABEL, marginBottom: '6px' }}>
+              <p style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--invert-dim)', marginBottom: '8px' }}>
                 From your archive, in your words
               </p>
-              <p style={{ fontFamily: SERIF, fontSize: '0.98rem', fontStyle: 'italic', fontWeight: 300, color: BODY, lineHeight: 1.7, margin: 0, whiteSpace: 'pre-wrap' }}>
+              <p style={{ fontFamily: SERIF, fontSize: '16.5px', fontStyle: 'italic', fontWeight: 400, color: 'var(--invert-body)', lineHeight: 1.65, margin: 0, whiteSpace: 'pre-wrap', maxWidth: '60ch' }}>
                 {proof.grounded.deposit}
               </p>
             </div>
           )}
           {proof.refusal && (
-            <div style={{ padding: '20px 22px', background: 'rgba(250,248,244,0.03)', border: '1px solid rgba(250,248,244,0.12)' }}>
-              <p style={{ ...eyebrow(), color: LABEL, marginBottom: '10px' }}>Where the archive is silent, it says so</p>
+            <div style={{ padding: '24px 28px 28px', borderTop: proof.grounded ? '1px solid var(--invert-rule)' : 'none' }}>
+              <p className="founding-eyebrow founding-eyebrow-dim" style={{ ...eyebrow(), color: 'var(--invert-dim)', marginBottom: '14px' }}>Where the archive is silent, it says so</p>
               {q(proof.refusal.question)}
-              <p style={{ fontFamily: SERIF, fontSize: '1.02rem', fontWeight: 300, color: BODY, lineHeight: 1.7, margin: 0, whiteSpace: 'pre-wrap' }}>
+              <p style={{ fontFamily: SERIF, fontSize: '17px', fontWeight: 400, color: 'var(--invert-body)', lineHeight: 1.65, margin: 0, whiteSpace: 'pre-wrap', maxWidth: '60ch' }}>
                 {proof.refusal.reply}
               </p>
             </div>
@@ -548,7 +569,7 @@ function ProofCard({ trial = false, below = false }: { trial?: boolean; below?: 
       {/* Trial only (skeleton section 6). The button to Checkout arrives in
           slice C; until then this is the sentence alone. */}
       {trial && (
-        <p style={{ fontFamily: SERIF, fontSize: '1.08rem', fontWeight: 300, lineHeight: 1.75, color: BODY, margin: '22px 0 0' }}>
+        <p style={{ fontFamily: SERIF, fontSize: '17.5px', fontWeight: 400, lineHeight: 1.65, color: BODY, margin: '22px 0 0' }}>
           Found your archive to keep going.
         </p>
       )}
@@ -674,8 +695,8 @@ function VoiceCapture({
       )}
       {state === 'recording' && (
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap', marginTop: '4px' }}>
-          <span aria-hidden="true" style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#C43E3E', display: 'inline-block' }} />
-          <span style={{ fontFamily: MONO, fontSize: '0.9rem', color: BONE, letterSpacing: '0.05em' }}>{mm}:{ss}</span>
+          <span aria-hidden="true" style={{ width: '12px', height: '12px', borderRadius: '50%', background: ERR, display: 'inline-block' }} />
+          <span style={{ fontFamily: MONO, fontSize: '14px', color: INK, letterSpacing: '0.05em', fontVariantNumeric: 'tabular-nums' }}>{mm}:{ss}</span>
           <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '1rem', color: BODY }}>Recording. Speak naturally. Up to five minutes.</span>
           <button type="button" onClick={stop} className="founding-btn" style={goldButton()}>Stop</button>
         </div>
@@ -685,7 +706,7 @@ function VoiceCapture({
       )}
       {state === 'error' && (
         <div style={{ marginTop: '8px' }}>
-          <p role="alert" style={{ fontFamily: SERIF, fontSize: '1rem', color: '#D98C8C', margin: '0 0 10px', lineHeight: 1.6 }}>{error}</p>
+          <p role="alert" style={{ fontFamily: SERIF, fontSize: '1rem', color: ERR, margin: '0 0 10px', lineHeight: 1.6 }}>{error}</p>
           <button type="button" onClick={() => { setState('idle'); setError('') }} className="founding-btn" style={quietButton()}>Try again</button>
         </div>
       )}
@@ -708,10 +729,10 @@ function MicIcon() {
 
 function panel(): React.CSSProperties {
   return {
-    background: 'rgba(196,162,74,0.04)',
-    border:     '1px solid rgba(196,162,74,0.14)',
-    borderTop:  '3px solid rgba(196,162,74,0.5)',
-    padding:    'clamp(1.5rem,4vw,2.25rem) clamp(1.25rem,4vw,2.5rem)',
+    background:   'var(--portal-card)',
+    border:       '1px solid var(--portal-card-line)',
+    borderTop:    '3px solid var(--portal-btn)',
+    padding:      'clamp(1.6rem,4vw,2.25rem) clamp(1.35rem,4vw,2.25rem)',
     borderRadius: '2px',
     marginBottom: '24px',
   }
@@ -720,26 +741,26 @@ function panel(): React.CSSProperties {
 function eyebrow(): React.CSSProperties {
   return {
     fontFamily:    MONO,
-    fontSize:      '0.6rem',
-    letterSpacing: '0.28em',
+    fontSize:      '11.5px',
+    letterSpacing: '0.24em',
     textTransform: 'uppercase',
     color:         GOLD,
-    marginBottom:  '14px',
+    marginBottom:  '18px',
   }
 }
 
 function goldButton(disabled = false): React.CSSProperties {
   return {
     fontFamily:    MONO,
-    fontSize:      '0.62rem',
-    letterSpacing: '0.22em',
+    fontSize:      '12px',
+    letterSpacing: '0.16em',
     textTransform: 'uppercase',
-    color:         '#0A0908',
-    background:    GOLD,
+    color:         'var(--portal-btn-label)',
+    background:    'var(--portal-btn)',
     border:        'none',
     borderRadius:  '2px',
-    padding:       '0.85rem 1.5rem',
-    minHeight:     '44px',
+    padding:       '0 26px',
+    minHeight:     '48px',
     cursor:        disabled ? 'not-allowed' : 'pointer',
     opacity:       disabled ? 0.55 : 1,
     textDecoration:'none',
@@ -751,14 +772,14 @@ function goldButton(disabled = false): React.CSSProperties {
 function quietButton(): React.CSSProperties {
   return {
     fontFamily:    MONO,
-    fontSize:      '0.6rem',
-    letterSpacing: '0.2em',
+    fontSize:      '11.5px',
+    letterSpacing: '0.16em',
     textTransform: 'uppercase',
     color:         GOLD,
-    background:    'transparent',
-    border:        '1px solid rgba(196,162,74,0.35)',
+    background:    'var(--portal-card)',
+    border:        '1px solid var(--portal-gold-line)',
     borderRadius:  '2px',
-    padding:       '0.7rem 1.1rem',
+    padding:       '0 18px',
     minHeight:     '44px',
     cursor:        'pointer',
     display:       'inline-flex',
@@ -768,14 +789,14 @@ function quietButton(): React.CSSProperties {
 
 function quietLink(): React.CSSProperties {
   return {
-    fontFamily:    MONO,
-    fontSize:      '0.6rem',
-    letterSpacing: '0.2em',
-    textTransform: 'uppercase',
-    color:         LABEL,
-    textDecoration:'none',
-    minHeight:     '44px',
-    display:       'inline-flex',
-    alignItems:    'center',
+    fontFamily:          SERIF,
+    fontSize:            '16.5px',
+    color:               SECOND,
+    textDecoration:      'underline',
+    textDecorationColor: 'var(--portal-card-line)',
+    textUnderlineOffset: '4px',
+    minHeight:           '44px',
+    display:             'inline-flex',
+    alignItems:          'center',
   }
 }

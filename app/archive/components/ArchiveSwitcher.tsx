@@ -12,12 +12,14 @@ type ArchiveItem = {
   contributorId?:    string
 }
 
-const G = '#C4A24A'
-const M = '#706C65'
+// Stone register: every color is a var(--portal-*) read (globals.css,
+// .portal-stone). No hex literal belongs in this file.
+const SERIF = 'var(--portal-serif)'
 
 const MONO: React.CSSProperties = {
-  fontFamily:    '"Space Mono", "Courier New", monospace',
-  letterSpacing: '0.2em',
+  fontFamily:    'var(--portal-mono)',
+  fontSize:      '11px',
+  letterSpacing: '0.16em',
   textTransform: 'uppercase' as const,
 }
 
@@ -82,10 +84,12 @@ export default function ArchiveSwitcher() {
       <button
         onClick={() => setOpen(o => !o)}
         disabled={switching}
+        aria-haspopup="listbox"
+        aria-expanded={open}
         style={{
-          ...MONO,
-          fontSize:        '0.44rem',
-          color:           open ? G : 'rgba(240,237,230,0.55)',
+          fontFamily:      SERIF,
+          fontSize:        '15px',
+          color:           open ? 'var(--portal-ink)' : 'var(--portal-secondary)',
           background:      'none',
           border:          'none',
           cursor:          switching ? 'wait' : 'pointer',
@@ -96,13 +100,13 @@ export default function ArchiveSwitcher() {
           width:           '100%',
           transition:      'color 150ms ease',
         }}
-        onMouseEnter={e => { if (!open) (e.currentTarget as HTMLElement).style.color = 'rgba(240,237,230,0.85)' }}
-        onMouseLeave={e => { if (!open) (e.currentTarget as HTMLElement).style.color = 'rgba(240,237,230,0.55)' }}
+        onMouseEnter={e => { if (!open) (e.currentTarget as HTMLElement).style.color = 'var(--portal-ink)' }}
+        onMouseLeave={e => { if (!open) (e.currentTarget as HTMLElement).style.color = 'var(--portal-secondary)' }}
       >
         <span style={{ flex: 1, textAlign: 'left', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {current?.name ?? 'Select Archive'}
         </span>
-        <span style={{ opacity: 0.6, fontSize: '0.6rem' }}>▾</span>
+        <span aria-hidden="true" style={{ color: 'var(--portal-label)', fontSize: '12px' }}>▾</span>
       </button>
 
       {open && (
@@ -111,9 +115,9 @@ export default function ArchiveSwitcher() {
           top:       'calc(100% + 6px)',
           left:      '-24px',
           width:     '260px',
-          background: '#0C0B09',
-          border:    '1px solid rgba(196,162,74,0.14)',
-          boxShadow: '0 12px 40px rgba(0,0,0,0.7)',
+          background: 'var(--portal-card)',
+          border:    '1px solid var(--portal-card-line)',
+          boxShadow: '0 12px 40px rgba(20,18,15,0.12)',
           zIndex:    200,
         }}>
           {archives.map((archive, idx) => {
@@ -124,22 +128,22 @@ export default function ArchiveSwitcher() {
                 onClick={() => void switchArchive(archive.id, archive.role)}
                 disabled={isActive || switching}
                 style={{
-                  ...MONO,
+                  fontFamily:    SERIF,
                   display:       'flex',
                   alignItems:    'center',
                   gap:           '8px',
                   width:         '100%',
                   padding:       '11px 16px',
-                  background:    isActive ? 'rgba(196,162,74,0.07)' : 'transparent',
+                  background:    isActive ? 'var(--portal-gold-wash)' : 'transparent',
                   border:        'none',
-                  borderBottom:  idx < archives.length - 1 ? '1px solid rgba(196,162,74,0.06)' : 'none',
+                  borderBottom:  idx < archives.length - 1 ? '1px solid var(--portal-rule)' : 'none',
                   cursor:        isActive ? 'default' : 'pointer',
                   textAlign:     'left',
-                  fontSize:      '0.44rem',
-                  color:         isActive ? G : 'rgba(240,237,230,0.55)',
+                  fontSize:      '15px',
+                  color:         isActive ? 'var(--portal-ink)' : 'var(--portal-body)',
                   transition:    'background 150ms ease',
                 }}
-                onMouseEnter={e => { if (!isActive) (e.currentTarget as HTMLElement).style.background = 'rgba(196,162,74,0.04)' }}
+                onMouseEnter={e => { if (!isActive) (e.currentTarget as HTMLElement).style.background = 'var(--portal-inset)' }}
                 onMouseLeave={e => { if (!isActive) (e.currentTarget as HTMLElement).style.background = 'transparent' }}
               >
                 <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -148,21 +152,20 @@ export default function ArchiveSwitcher() {
 
                 <span style={{
                   ...MONO,
-                  fontSize:  '0.36rem',
-                  padding:   '2px 5px',
-                  border:    `1px solid ${archive.role === 'owner' ? 'rgba(196,162,74,0.28)' : 'rgba(112,108,101,0.28)'}`,
-                  color:     archive.role === 'owner' ? G : M,
+                  padding:   '2px 6px',
+                  border:    `1px solid ${archive.role === 'owner' ? 'var(--portal-gold-line)' : 'var(--portal-card-line)'}`,
+                  color:     archive.role === 'owner' ? 'var(--portal-gold-ink)' : 'var(--portal-label)',
                   flexShrink: 0,
                 }}>
-                  {archive.role === 'owner' ? 'Owner' : 'Contrib'}
+                  {archive.role === 'owner' ? 'Owner' : 'Contributor'}
                 </span>
 
                 {archive.streak > 0 && (
-                  <span style={{ fontSize: '0.65rem', flexShrink: 0 }} aria-label={`${archive.streak} day streak`}>🔥</span>
+                  <span style={{ ...MONO, color: 'var(--portal-label)', flexShrink: 0 }} aria-label={`${archive.streak} day streak`}>{archive.streak}d</span>
                 )}
 
                 {isActive && (
-                  <span style={{ color: G, fontSize: '0.7rem', flexShrink: 0 }}>✓</span>
+                  <span aria-hidden="true" style={{ color: 'var(--portal-gold-ink)', fontSize: '13px', flexShrink: 0 }}>✓</span>
                 )}
               </button>
             )

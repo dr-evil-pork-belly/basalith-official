@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from 'react'
 
+// Stone register: every color is a var(--portal-*) read (globals.css,
+// .portal-stone). No hex literal belongs in this file.
+
 interface TrainingStats {
   total:              number
   included:           number
@@ -11,34 +14,33 @@ interface TrainingStats {
   estimatedAccuracy:  string
 }
 
+const SERIF = 'var(--portal-serif)'
+const MONO  = 'var(--portal-mono)'
+
 const STAGES = [
   {
     name:      'The Echo Layer',
     threshold: 10,
     consumer:  'Your entity echoes you back.',
-    unlocks:   'Accurate answers about your life — names, dates, relationships.',
-    color:     'rgba(196,162,74,0.25)',
+    unlocks:   'Accurate answers about your life: names, dates, relationships.',
   },
   {
     name:      'The Wisdom Compass',
     threshold: 50,
     consumer:  'Your entity reflects how you reason.',
     unlocks:   'Guidance that reflects your specific values, not generic advice.',
-    color:     'rgba(196,162,74,0.55)',
   },
   {
     name:      'The Full Portrait',
     threshold: 200,
     consumer:  'Your entity captures what shapes your judgment.',
     unlocks:   'The entity stops sounding like an advisor and starts sounding like a person.',
-    color:     'rgba(196,162,74,0.80)',
   },
   {
     name:      'The Cognitive Fingerprint',
     threshold: 500,
     consumer:  'Your entity sounds like you.',
     unlocks:   'Your linguistic cadence, characteristic framing, and relationship to uncertainty.',
-    color:     '#C4A24A',
   },
 ]
 
@@ -78,24 +80,24 @@ export default function TrainingDataCard() {
     <div
       className="rounded-sm mb-8"
       style={{
-        background: 'rgba(196,162,74,0.03)',
-        border:     '1px solid rgba(196,162,74,0.1)',
-        padding:    'clamp(1rem,3vw,1.5rem)',
+        background: 'var(--portal-card)',
+        border:     '1px solid var(--portal-card-line)',
+        padding:    'clamp(1.1rem,3vw,1.5rem)',
       }}
     >
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
         <div>
-          <p style={{ fontFamily: 'monospace', fontSize: '0.4rem', letterSpacing: '0.35em', textTransform: 'uppercase', color: '#C4A24A', marginBottom: '6px' }}>
+          <p style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.24em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '6px' }}>
             {current ? current.name : 'Building your archive'}
           </p>
-          <p style={{ fontFamily: 'Georgia,serif', fontSize: '0.95rem', fontStyle: 'italic', fontWeight: 300, color: '#F0EDE6', margin: 0, lineHeight: 1.5 }}>
+          <p style={{ fontFamily: SERIF, fontSize: '17px', fontStyle: 'italic', fontWeight: 400, color: 'var(--portal-ink)', margin: 0, lineHeight: 1.5 }}>
             {current ? current.consumer : 'Keep adding memories.'}
           </p>
         </div>
-        <p style={{ fontFamily: 'monospace', fontSize: '1.3rem', color: current ? '#C4A24A' : '#3A3830', letterSpacing: '-0.02em', margin: 0 }}>
+        <p style={{ fontFamily: SERIF, fontSize: '28px', fontWeight: 300, color: 'var(--portal-ink)', letterSpacing: '-0.01em', margin: 0, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
           {count}
-          <span style={{ fontSize: '0.45rem', letterSpacing: '0.1em', color: '#3A3830', marginLeft: '5px' }}>
+          <span style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--portal-label)', marginLeft: '8px' }}>
             deposits
           </span>
         </p>
@@ -103,25 +105,25 @@ export default function TrainingDataCard() {
 
       {/* Progress toward next stage */}
       {next && (
-        <div style={{ marginBottom: '14px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-            <span style={{ fontFamily: 'monospace', fontSize: '0.38rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#5C6166' }}>
+        <div style={{ marginBottom: '4px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', marginBottom: '6px' }}>
+            <span style={{ fontFamily: SERIF, fontSize: '14.5px', color: 'var(--portal-secondary)' }}>
               {next.threshold - count} more to {next.name}
             </span>
-            <span style={{ fontFamily: 'monospace', fontSize: '0.38rem', letterSpacing: '0.1em', color: '#5C6166' }}>
+            <span style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.1em', color: 'var(--portal-label)', fontVariantNumeric: 'tabular-nums' }}>
               {capped}%
             </span>
           </div>
-          <div style={{ height: '4px', background: 'rgba(196,162,74,0.08)', borderRadius: '2px', overflow: 'hidden' }}>
+          <div style={{ height: '4px', background: 'var(--portal-rule)', borderRadius: '2px', overflow: 'hidden' }}>
             <div style={{
               height:       '100%',
               width:        `${capped}%`,
-              background:   next.color,
+              background:   'var(--portal-btn)',
               borderRadius: '2px',
               transition:   'width 800ms ease',
             }} />
           </div>
-          <p style={{ fontFamily: 'Georgia,serif', fontSize: '0.78rem', fontStyle: 'italic', color: '#5C6166', margin: '8px 0 0', lineHeight: 1.6 }}>
+          <p style={{ fontFamily: SERIF, fontSize: '14.5px', fontStyle: 'italic', color: 'var(--portal-secondary)', margin: '8px 0 0', lineHeight: 1.6 }}>
             Next: {next.consumer}
           </p>
         </div>
@@ -129,10 +131,10 @@ export default function TrainingDataCard() {
 
       {/* Completed all stages */}
       {!next && current && (
-        <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid rgba(196,162,74,0.1)' }}>
-          <p style={{ fontFamily: 'Georgia,serif', fontSize: '0.88rem', fontStyle: 'italic', color: '#C4A24A', margin: 0, lineHeight: 1.7 }}>
+        <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid var(--portal-rule)' }}>
+          <p style={{ fontFamily: SERIF, fontSize: '15.5px', fontStyle: 'italic', color: 'var(--portal-gold-ink)', margin: 0, lineHeight: 1.7 }}>
             Your entity has reached The Cognitive Fingerprint.
-            Contact your Legacy Guide to discuss voice fine-tuning.
+            Ask us about voice fine-tuning.
           </p>
         </div>
       )}

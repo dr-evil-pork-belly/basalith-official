@@ -5,49 +5,52 @@ import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import ArchiveSwitcher from './components/ArchiveSwitcher'
 
-const P = '#0C0B09'   // portal bg
-const S = '#141210'   // sidebar
-const G = '#C4A24A'   // gold
-const T = '#F0EDE6'   // text
-const M = '#706C65'   // muted
+// Stone register. Every color is a var(--portal-*) read; the tokens live in
+// the .portal-stone block in globals.css. No hex literal belongs in this file.
+// Decision and measurements: docs/BASALITH_PORTAL_PALETTE_DECISION_2026-09-18.md.
 
-const MONO: React.CSSProperties = {
-  fontFamily:    '"Space Mono", "Courier New", monospace',
-  fontSize:      '0.52rem',
-  letterSpacing: '0.2em',
+const SERIF = 'var(--portal-serif)'
+const MONO  = 'var(--portal-mono)'
+
+// Mono is for eyebrows and group labels only, never below 11px. Depositors
+// are often older and often on tablets.
+const LABEL: React.CSSProperties = {
+  fontFamily:    MONO,
+  fontSize:      '11px',
+  letterSpacing: '0.18em',
   textTransform: 'uppercase' as const,
 }
 
 type NavItem = { href: string; label: string; hideForSuccession?: boolean }
 
 const PRIMARY_NAV: NavItem[] = [
-  { href: '/archive/dashboard',         label: 'Dashboard'        },
+  { href: '/archive/dashboard',         label: 'Dashboard'         },
   { href: '/archive/founding',          label: 'Founding Sequence' },
-  { href: '/archive/label',             label: 'Upload Photos',   hideForSuccession: true },
-  { href: '/archive/gallery',           label: 'Gallery',         hideForSuccession: true },
-  { href: '/archive/timeline',          label: 'Life Timeline',   hideForSuccession: true },
-  { href: '/archive/memory-map',        label: 'Memory Map',      hideForSuccession: true },
-  { href: '/archive/entity',            label: 'My Entity'        },
-  { href: '/archive/contributors',      label: 'Contributors'     },
+  { href: '/archive/label',             label: 'Upload photos',    hideForSuccession: true },
+  { href: '/archive/gallery',           label: 'Gallery',          hideForSuccession: true },
+  { href: '/archive/timeline',          label: 'Life timeline',    hideForSuccession: true },
+  { href: '/archive/memory-map',        label: 'Memory map',       hideForSuccession: true },
+  { href: '/archive/entity',            label: 'My entity'         },
+  { href: '/archive/contributors',      label: 'Contributors'      },
 ]
 
 const CONTRIBUTE_NAV: NavItem[] = [
-  { href: '/archive/voice',        label: 'Voice'            },
-  { href: '/archive/writing',      label: 'Writing'          },
-  { href: '/archive/videos',       label: 'Videos',          hideForSuccession: true },
-  { href: '/archive/upload',       label: 'Docs & Videos'    },
+  { href: '/archive/voice',        label: 'Voice'           },
+  { href: '/archive/writing',      label: 'Writing'         },
+  { href: '/archive/videos',       label: 'Videos',         hideForSuccession: true },
+  { href: '/archive/upload',       label: 'Docs and videos' },
 ]
 
 const MANAGE_NAV: NavItem[] = [
-  { href: '/archive/dates',        label: 'Important Dates', hideForSuccession: true },
-  { href: '/archive/preferences',  label: 'Email Delivery'   },
-  { href: '/archive/succession',   label: 'Succession'       },
+  { href: '/archive/dates',        label: 'Important dates', hideForSuccession: true },
+  { href: '/archive/preferences',  label: 'Email delivery'  },
+  { href: '/archive/succession',   label: 'Succession'      },
 ]
 
 function NavGroup({ label, items, pathname }: { label: string; items: NavItem[]; pathname: string }) {
   return (
-    <div style={{ marginBottom: '8px' }}>
-      <p style={{ ...MONO, fontSize: '0.42rem', color: 'rgba(196,162,74,0.3)', padding: '8px 24px 6px', letterSpacing: '0.25em' }}>
+    <div style={{ padding: '10px 0 4px' }}>
+      <p style={{ ...LABEL, color: 'var(--portal-label)', padding: '6px 26px 6px' }}>
         {label}
       </p>
       {items.map(({ href, label: itemLabel }) => {
@@ -56,19 +59,22 @@ function NavGroup({ label, items, pathname }: { label: string; items: NavItem[];
           <Link
             key={href}
             href={href}
+            aria-current={active ? 'page' : undefined}
             style={{
-              ...MONO,
+              fontFamily:      SERIF,
+              fontSize:        '16.5px',
+              lineHeight:      1.2,
+              fontWeight:      active ? 500 : 400,
               display:         'block',
-              padding:         '10px 24px',
-              color:           active ? G : 'rgba(240,237,230,0.45)',
+              padding:         '9px 26px 9px 24px',
+              color:           active ? 'var(--portal-ink)' : 'var(--portal-body)',
               textDecoration:  'none',
-              background:      active ? 'rgba(196,162,74,0.06)' : 'transparent',
-              borderLeft:      active ? `2px solid ${G}` : '2px solid transparent',
-              transition:      'all 200ms ease',
-              position:        'relative',
+              background:      active ? 'var(--portal-gold-wash)' : 'transparent',
+              borderLeft:      active ? '2px solid var(--portal-gold-ink)' : '2px solid transparent',
+              transition:      'color 150ms ease, background 150ms ease',
             }}
-            onMouseEnter={e => { if (!active) (e.currentTarget as HTMLElement).style.color = 'rgba(240,237,230,0.85)' }}
-            onMouseLeave={e => { if (!active) (e.currentTarget as HTMLElement).style.color = 'rgba(240,237,230,0.45)' }}
+            onMouseEnter={e => { if (!active) (e.currentTarget as HTMLElement).style.color = 'var(--portal-ink)' }}
+            onMouseLeave={e => { if (!active) (e.currentTarget as HTMLElement).style.color = 'var(--portal-body)' }}
           >
             {itemLabel}
           </Link>
@@ -94,91 +100,95 @@ export default function ArchiveLayoutClient({ children, tier }: { children: Reac
   const manageNav     = visible(MANAGE_NAV)
   const allNav        = [...primaryNav, ...contributeNav, ...manageNav]
 
-  const divider = <div style={{ height: '1px', background: 'rgba(196,162,74,0.04)', margin: '8px 24px' }} />
+  const signOutLink: React.CSSProperties = {
+    ...LABEL,
+    letterSpacing:  '0.14em',
+    color:          'var(--portal-label)',
+    background:     'none',
+    border:         'none',
+    cursor:         'pointer',
+    padding:        0,
+    textDecoration: 'none',
+    transition:     'color 150ms ease',
+  }
 
   return (
-    <div style={{ minHeight: '100svh', display: 'flex', background: P }}>
+    <div className="portal-stone" style={{ minHeight: '100svh', display: 'flex', background: 'var(--portal-bg)' }}>
 
       {/* Desktop sidebar */}
       <aside
         className="hidden md:flex"
         style={{
           flexDirection:  'column',
-          width:          '260px',
+          width:          '256px',
           flexShrink:     0,
-          background:     S,
-          borderRight:    '1px solid rgba(196,162,74,0.08)',
+          background:     'var(--portal-inset)',
+          borderRight:    '1px solid var(--portal-rule)',
         }}
       >
         {/* Archive name */}
-        <div style={{ padding: '32px 24px 24px', borderBottom: '1px solid rgba(196,162,74,0.06)' }}>
+        <div style={{ padding: '30px 26px 22px', borderBottom: '1px solid var(--portal-rule)' }}>
           <Link href="/" style={{ textDecoration: 'none' }}>
-            <p style={{ ...MONO, fontSize: '0.48rem', color: G, marginBottom: '4px' }}>
+            <p style={{ fontFamily: SERIF, fontSize: '19px', fontWeight: 500, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--portal-ink)', lineHeight: 1.2 }}>
               Basalith
             </p>
           </Link>
-          <p style={{ ...MONO, fontSize: '0.42rem', color: 'rgba(112,108,101,0.7)', letterSpacing: '0.18em' }}>
-            Archive Portal
+          <p style={{ ...LABEL, color: 'var(--portal-label)', marginTop: '6px' }}>
+            Archive
           </p>
           <ArchiveSwitcher />
         </div>
 
         {/* Navigation */}
-        <nav style={{ flex: 1, paddingTop: '16px', paddingBottom: '16px' }} aria-label="Archive navigation">
+        <nav style={{ flex: 1, paddingTop: '8px', paddingBottom: '16px' }} aria-label="Archive navigation">
           {primaryNav.length > 0 && (
-            <NavGroup label="Primary" items={primaryNav} pathname={pathname} />
+            <NavGroup label="Archive" items={primaryNav} pathname={pathname} />
           )}
           {contributeNav.length > 0 && (
-            <>
-              {primaryNav.length > 0 && divider}
-              <NavGroup label="Contribute" items={contributeNav} pathname={pathname} />
-            </>
+            <NavGroup label="Contribute" items={contributeNav} pathname={pathname} />
           )}
           {manageNav.length > 0 && (
-            <>
-              {(primaryNav.length > 0 || contributeNav.length > 0) && divider}
-              <NavGroup label="Manage" items={manageNav} pathname={pathname} />
-            </>
+            <NavGroup label="Manage" items={manageNav} pathname={pathname} />
           )}
         </nav>
 
         {/* Sign out */}
-        <div style={{ padding: '20px 24px', borderTop: '1px solid rgba(196,162,74,0.06)' }}>
+        <div style={{ padding: '18px 26px', borderTop: '1px solid var(--portal-rule)' }}>
           {confirmSignOut ? (
             <div>
-              <p style={{ ...MONO, fontSize: '0.44rem', color: M, marginBottom: '8px' }}>Confirm sign out?</p>
-              <div style={{ display: 'flex', gap: '16px' }}>
-                <a href="/api/auth/logout" style={{ ...MONO, fontSize: '0.44rem', color: G, textDecoration: 'none' }}>Yes</a>
-                <button onClick={() => setConfirmSignOut(false)} style={{ ...MONO, fontSize: '0.44rem', color: M, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>Cancel</button>
+              <p style={{ fontFamily: SERIF, fontSize: '14.5px', color: 'var(--portal-secondary)', marginBottom: '8px' }}>Sign out of your archive?</p>
+              <div style={{ display: 'flex', gap: '18px' }}>
+                <a href="/api/auth/logout" style={{ ...signOutLink, color: 'var(--portal-gold-ink)' }}>Yes, sign out</a>
+                <button onClick={() => setConfirmSignOut(false)} style={signOutLink}>Cancel</button>
               </div>
             </div>
           ) : (
             <button
               onClick={() => setConfirmSignOut(true)}
-              style={{ ...MONO, fontSize: '0.44rem', color: 'rgba(112,108,101,0.4)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, transition: 'color 200ms ease' }}
-              onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = M}
-              onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = 'rgba(112,108,101,0.4)'}
+              style={signOutLink}
+              onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = 'var(--portal-ink)'}
+              onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = 'var(--portal-label)'}
             >
-              Sign Out
+              Sign out
             </button>
           )}
         </div>
       </aside>
 
       {/* Mobile top bar */}
-      <div className="md:hidden" style={{ position: 'fixed', inset: '0 0 auto 0', zIndex: 50, background: S, borderBottom: '1px solid rgba(196,162,74,0.08)', paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+      <div className="md:hidden" style={{ position: 'fixed', inset: '0 0 auto 0', zIndex: 50, background: 'var(--portal-inset)', borderBottom: '1px solid var(--portal-rule)', paddingTop: 'env(safe-area-inset-top, 0px)' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', height: '56px' }}>
-          <Link href="/" style={{ ...MONO, fontSize: '0.52rem', color: T, textDecoration: 'none', minHeight: '44px', display: 'flex', alignItems: 'center' }}>Basalith</Link>
-          {/* Hamburger — 44px touch target */}
+          <Link href="/" style={{ fontFamily: SERIF, fontSize: '17px', fontWeight: 500, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--portal-ink)', textDecoration: 'none', minHeight: '44px', display: 'flex', alignItems: 'center' }}>Basalith</Link>
+          {/* Hamburger, 44px touch target */}
           <button
             onClick={() => setMobileOpen(o => !o)}
             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={mobileOpen}
             style={{ width: '44px', height: '44px', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '5px', flexShrink: 0 }}
           >
-            <span style={{ display: 'block', height: '1px', width: '22px', background: T, transition: 'all 250ms ease', transform: mobileOpen ? 'rotate(45deg) translate(4px, 4px)' : 'none' }} />
-            <span style={{ display: 'block', height: '1px', width: '22px', background: T, transition: 'all 250ms ease', opacity: mobileOpen ? 0 : 1 }} />
-            <span style={{ display: 'block', height: '1px', width: '22px', background: T, transition: 'all 250ms ease', transform: mobileOpen ? 'rotate(-45deg) translate(4px, -4px)' : 'none' }} />
+            <span style={{ display: 'block', height: '1.5px', width: '22px', background: 'var(--portal-ink)', transition: 'all 250ms ease', transform: mobileOpen ? 'rotate(45deg) translate(4px, 4px)' : 'none' }} />
+            <span style={{ display: 'block', height: '1.5px', width: '22px', background: 'var(--portal-ink)', transition: 'all 250ms ease', opacity: mobileOpen ? 0 : 1 }} />
+            <span style={{ display: 'block', height: '1.5px', width: '22px', background: 'var(--portal-ink)', transition: 'all 250ms ease', transform: mobileOpen ? 'rotate(-45deg) translate(4px, -4px)' : 'none' }} />
           </button>
         </div>
       </div>
@@ -187,7 +197,7 @@ export default function ArchiveLayoutClient({ children, tier }: { children: Reac
       {mobileOpen && (
         <div
           className="md:hidden"
-          style={{ position: 'fixed', inset: 0, zIndex: 49, background: '#0C0B09', display: 'flex', flexDirection: 'column', paddingTop: 'calc(56px + env(safe-area-inset-top, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)', overflow: 'auto' }}
+          style={{ position: 'fixed', inset: 0, zIndex: 49, background: 'var(--portal-bg)', display: 'flex', flexDirection: 'column', paddingTop: 'calc(56px + env(safe-area-inset-top, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)', overflow: 'auto' }}
           onClick={e => { if (e.target === e.currentTarget) setMobileOpen(false) }}
         >
           <nav style={{ display: 'flex', flexDirection: 'column', padding: '16px 0' }} aria-label="Archive mobile navigation">
@@ -199,32 +209,34 @@ export default function ArchiveLayoutClient({ children, tier }: { children: Reac
                   key={href}
                   href={href}
                   onClick={() => setMobileOpen(false)}
+                  aria-current={active ? 'page' : undefined}
                   style={{
-                    ...MONO,
-                    fontSize:        isPrimary ? '0.62rem' : '0.54rem',
-                    color:           active ? G : isPrimary ? T : 'rgba(196,162,74,0.5)',
+                    fontFamily:      SERIF,
+                    fontSize:        isPrimary ? '19px' : '17px',
+                    fontWeight:      active ? 500 : 400,
+                    color:           active ? 'var(--portal-ink)' : isPrimary ? 'var(--portal-ink)' : 'var(--portal-secondary)',
                     textDecoration:  'none',
                     padding:         '0 24px',
                     minHeight:       '56px',
                     display:         'flex',
                     alignItems:      'center',
-                    borderLeft:      active ? `2px solid ${G}` : '2px solid transparent',
-                    background:      active ? 'rgba(196,162,74,0.06)' : 'transparent',
+                    borderLeft:      active ? '2px solid var(--portal-gold-ink)' : '2px solid transparent',
+                    background:      active ? 'var(--portal-gold-wash)' : 'transparent',
                   }}
                 >
                   {lbl}
                 </Link>
               )
             })}
-            <div style={{ height: '1px', background: 'rgba(196,162,74,0.06)', margin: '16px 24px' }} />
+            <div style={{ height: '1px', background: 'var(--portal-rule)', margin: '16px 24px' }} />
             {confirmSignOut ? (
               <div style={{ padding: '0 24px', display: 'flex', gap: '24px', alignItems: 'center', minHeight: '56px' }}>
-                <a href="/api/auth/logout" style={{ ...MONO, fontSize: '0.54rem', color: G, textDecoration: 'none' }}>Yes, sign out</a>
-                <button onClick={() => setConfirmSignOut(false)} style={{ ...MONO, fontSize: '0.54rem', color: M, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>Cancel</button>
+                <a href="/api/auth/logout" style={{ ...signOutLink, fontSize: '12px', color: 'var(--portal-gold-ink)' }}>Yes, sign out</a>
+                <button onClick={() => setConfirmSignOut(false)} style={{ ...signOutLink, fontSize: '12px' }}>Cancel</button>
               </div>
             ) : (
-              <button onClick={() => setConfirmSignOut(true)} style={{ ...MONO, fontSize: '0.54rem', color: M, background: 'none', border: 'none', cursor: 'pointer', padding: '0 24px', minHeight: '56px', textAlign: 'left' }}>
-                Sign Out
+              <button onClick={() => setConfirmSignOut(true)} style={{ ...signOutLink, fontSize: '12px', padding: '0 24px', minHeight: '56px', textAlign: 'left' }}>
+                Sign out
               </button>
             )}
           </nav>
@@ -232,7 +244,7 @@ export default function ArchiveLayoutClient({ children, tier }: { children: Reac
       )}
 
       {/* Page content */}
-      <main className="flex-1 md:px-10 px-5 pb-16 md:mt-0 mt-[56px]" style={{ paddingTop: '40px' }}>
+      <main className="portal-main flex-1 md:px-10 px-5 pb-16 md:mt-0 mt-[56px]" style={{ paddingTop: '40px', minWidth: 0 }}>
         {children}
       </main>
 
