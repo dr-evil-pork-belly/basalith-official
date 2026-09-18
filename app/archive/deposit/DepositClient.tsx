@@ -65,12 +65,12 @@ export default function DepositClient({ archiveId }: { archiveId: string }) {
     return (
       <div className="max-w-2xl mx-auto pt-16 text-center">
         <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '1rem' }}>
-          SAVED TO ARCHIVE
+          ON THE RECORD
         </p>
         <p className="font-serif italic" style={{ fontSize: '1.3rem', color: 'var(--portal-ink)', lineHeight: 1.6 }}>
           Your memory has been preserved.
         </p>
-        <p className="font-sans text-[15px] mt-3" style={{ color: 'var(--portal-secondary)' }}>Returning to your archive…</p>
+        <p className="font-sans text-[15px] mt-3" style={{ color: 'var(--portal-secondary)' }}>Returning to your Basalith…</p>
       </div>
     )
   }
@@ -93,7 +93,7 @@ export default function DepositClient({ archiveId }: { archiveId: string }) {
       ) : photoUrl ? (
         <div className="mb-8 rounded-sm overflow-hidden border" style={{ borderColor: 'var(--portal-rule)' }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={photoUrl} alt="Archive photograph" className="w-full h-auto block" style={{ maxHeight: '420px', objectFit: 'cover' }} />
+          <img src={photoUrl} alt="Photograph" className="w-full h-auto block" style={{ maxHeight: '420px', objectFit: 'cover' }} />
         </div>
       ) : null}
 
@@ -144,7 +144,7 @@ export default function DepositClient({ archiveId }: { archiveId: string }) {
         disabled={submitting || !response.trim()}
         className="btn-monolith-amber disabled:opacity-40"
       >
-        {submitting ? 'Saving…' : 'ADD TO ARCHIVE'}
+        {submitting ? 'Saving…' : 'SAVE THIS MEMORY'}
       </button>
 
     </div>

@@ -87,11 +87,11 @@ export function reasonedExplainer(m: PersonaMetadata): string {
 
 /** Collapsed intro block, two-layer explanation. */
 export const COLLAPSED_INTRO =
-  'Every founder archive has two layers. The frozen layer is the founder\'s judgment, captured while they ran the company, and it never changes after transition. The mutable layer is where a successor adds current business reality. This demo runs the frozen layer. Ask anything. Every answer is checked against the archive before you see it. Questions with no covering deposit get a refusal, on purpose.'
+  'Every founder\'s Basalith has two layers. The frozen layer is the founder\'s judgment, captured while they ran the company, and it never changes after transition. The mutable layer is where a successor adds current business reality. This demo runs the frozen layer. Ask anything. Every answer is checked against the record before you see it. Questions with no covering deposit get a refusal, on purpose.'
 
 /** Shown once the session question cap is reached. */
 export const SESSION_CAP_CARD =
-  'That is the demo session. In a real engagement, the archive holds the founder\'s actual judgment, and the successor asks these questions for years. Your Legacy Guide can walk you through what a real archive holds.'
+  'That is the demo session. In a real engagement, the record holds the founder\'s actual judgment, and the successor asks these questions for years. Your Legacy Guide can walk you through what a real Basalith holds.'
 
 /** Server-enforced and client-enforced ceiling on user questions per session. */
 export const MAX_USER_MESSAGES = 12

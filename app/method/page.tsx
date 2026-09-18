@@ -61,13 +61,13 @@ const STEPS = [
     title: 'Together, they make a model of how the person thinks',
     body:  [
       'The inside view plus the outside view gives you something neither could produce alone.',
-      'The archive becomes training data. The entity learns not just what they said but how they reason. Not their opinions. Their patterns.',
+      'The record becomes training data. The entity learns not just what they said but how they reason. Not their opinions. Their patterns.',
       'That is the difference between memory and cognition. Memory stores facts. The entity holds how a specific mind works.',
     ],
   },
   {
     n:     '04',
-    title: 'How the archive grows',
+    title: 'How your Basalith grows',
     body:  [
       'This is not a single interview. The operator works through 20 real business scenarios and 29 decision questions across the 8 domains that built the company.',
       'Every answer adds depth. The longer the active period runs before a transition, the more the model has to work with. Start before the handoff is on the calendar, not after.',
@@ -150,7 +150,7 @@ export default function MethodPage() {
           {/* CTA */}
           <div style={{ textAlign: 'center', paddingTop: '32px', borderTop: '1px solid var(--color-border)' }}>
             <p style={{ ...BODY, fontStyle: 'italic', textAlign: 'center' }}>
-              Every archive begins with The Founding: three of the hardest calls you ever made, in your own words, then a first read with the founder by video.
+              Every Basalith begins with The Founding: three of the hardest calls you ever made, in your own words, then a first read with the founder by video.
             </p>
             <a
               href="/founding-session"
@@ -214,7 +214,7 @@ export default function MethodPage() {
             </div>
 
             <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)', maxWidth: '580px', marginTop: '40px' }}>
-              Your archive is not scored by the cheapest available model.
+              Your record is not scored by the cheapest available model.
               It is scored by the right model for each decision.
             </p>
           </div>
@@ -261,13 +261,13 @@ export default function MethodPage() {
               The method is the same. The operator becomes a parent. The colleagues become the family. The scenario library becomes the stories told at the table.
             </p>
             <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)', marginBottom: '36px' }}>
-              For family archives, photographs are filtered and ranked before anyone is asked to label them, so the family only sees what is worth their time.
+              For a family Basalith, photographs are filtered and ranked before anyone is asked to label them, so the family only sees what is worth their time.
             </p>
             <a
               href="/apply"
               style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px', border: '1px solid rgba(184,150,62,0.4)', padding: '12px 24px' }}
             >
-              Begin a family archive <span aria-hidden="true">→</span>
+              Begin a family Basalith <span aria-hidden="true">→</span>
             </a>
           </div>
         </section>

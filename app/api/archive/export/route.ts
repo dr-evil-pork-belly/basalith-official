@@ -47,7 +47,7 @@ export async function POST() {
   // An owner with no email on file would get a zip nobody could tell them about.
   if (!ownerRow.owner_email) {
     return NextResponse.json(
-      { error: 'No email address is on file for this archive. Contact hello@basalith.xyz and we will send your export directly.' },
+      { error: 'No email address is on file for your Basalith. Contact hello@basalith.xyz and we will send your export directly.' },
       { status: 409 },
     )
   }
@@ -66,7 +66,7 @@ export async function POST() {
     return NextResponse.json({
       queued:  false,
       already: true,
-      message: 'An export for this archive was prepared in the last few minutes. Check your email. If it has not arrived, wait a moment and try again.',
+      message: 'An export of your Basalith was prepared in the last few minutes. Check your email. If it has not arrived, wait a moment and try again.',
     })
   }
 

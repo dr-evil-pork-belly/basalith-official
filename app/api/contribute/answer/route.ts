@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     const now = new Date().toISOString()
     const trimmedAnswer = answerText.trim()
 
-    // Atomically claim this question — only one request can win the
+    // Atomically claim this question, only one request can win the
     // pending -> answered transition. Losers (lost race / duplicate
     // submit) get a benign no-op so the client appends nothing further.
     const { data: claimedRows, error: claimError } = await supabaseAdmin
@@ -45,14 +45,14 @@ export async function POST(req: NextRequest) {
 
     const question = claimedRows?.[0]
     if (!question) {
-      console.log('[contribute-answer] no rows claimed — lost race or duplicate submit:', questionId)
+      console.log('[contribute-answer] no rows claimed, lost race or duplicate submit:', questionId)
       return NextResponse.json({ success: true, nextQuestion: null })
     }
 
     console.log('[contribute-answer] claimed:', { questionId, answerLength: trimmedAnswer.length, contributorId: contributor.id })
 
     // Save as owner_deposit so entity learns from it. This is our
-    // permanent record of the contribution — must never be silently
+    // permanent record of the contribution, must never be silently
     // dropped once the question has been claimed.
     // Deliberately not classified via classifyDeposit: contributor-sourced
     // deposits must not feed the owner's coverage map.
@@ -197,7 +197,7 @@ export async function POST(req: NextRequest) {
     </div>
     <div style="border-top:1px solid rgba(240,237,230,0.06);padding-top:20px;margin-top:28px">
       <p style="font-family:Georgia,serif;font-size:13px;font-style:italic;color:#3A3830;margin:0 0 12px">
-        This answer is now in your archive permanently.
+        This answer is now on the record, permanently.
       </p>
       <a href="${siteUrl}/archive/entity" style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#C4A24A;text-decoration:none">
         VIEW YOUR ENTITY →

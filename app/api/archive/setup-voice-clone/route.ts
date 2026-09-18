@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
     .eq('id', archiveId)
     .single()
 
-  if (!archive) return NextResponse.json({ error: 'Archive not found' }, { status: 404 })
+  if (!archive) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
   // Prefer longer recordings (60s+) for better clone quality; fall back to 30s+
   const { data: rawRecordings } = await supabaseAdmin
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
   const recordings      = (longRecordings.length >= 3 ? longRecordings : deduped).slice(0, 5)
 
   const qualityNote = longRecordings.length >= 3
-    ? `${longRecordings.length} recordings ≥60s available — using highest quality`
+    ? `${longRecordings.length} recordings ≥60s available, using highest quality`
     : `Only ${longRecordings.length} recordings ≥60s; falling back to 30s+ threshold`
 
   console.log('[voice-clone]', qualityNote)
@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
     }, { status: 400 })
   }
 
-  // Download audio — deduplicate by content size
+  // Download audio, deduplicate by content size
   const audioBuffers: Buffer[] = []
   const seenSizes = new Set<number>()
 
@@ -122,7 +122,7 @@ export async function POST(req: NextRequest) {
   try {
     const client = new ElevenLabsClient({ apiKey })
 
-    // Delete existing clone before recreating — allows quality improvement as more recordings accumulate
+    // Delete existing clone before recreating, allows quality improvement as more recordings accumulate
     if (existingVoiceId) {
       try {
         await client.voices.delete(existingVoiceId)
@@ -155,7 +155,7 @@ export async function POST(req: NextRequest) {
       qualityNote,
       replaced:    !!existingVoiceId,
       warning: isChinese
-        ? 'For best Cantonese pronunciation quality ask the archive owner to record directly in the portal (not via phone call). Portal recordings are higher quality than phone recordings. More direct portal recordings will improve pronunciation accuracy.'
+        ? 'For best Cantonese pronunciation quality ask the owner to record directly in the portal (not via phone call). Portal recordings are higher quality than phone recordings. More direct portal recordings will improve pronunciation accuracy.'
         : null,
     })
   } catch (err: any) {

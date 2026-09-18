@@ -63,7 +63,7 @@ const AUDITOR_SYSTEM =
   '"deposit" when the draft commits a normative founder position and a deposit ' +
   'directly takes that position on that question; ' +
   '"no_position" when the draft commits no normative founder position, or ' +
-  'already declines, or says the archive does not settle this, or only reasons ' +
+  'already declines, or says the record does not settle this, or only reasons ' +
   'from general principles without landing on a stance; ' +
   '"unsupported" when the draft commits a normative founder position that no ' +
   'deposit directly takes. ' +
@@ -84,7 +84,7 @@ export function groundingGapReply(topic: string, language: string = 'en'): strin
   const lang = normalizeGapLanguage(language)
   if (lang !== 'en') return GAP_REPLY_BY_LANGUAGE[lang]
   return (
-    `I haven't left a settled position on ${t} in the archive, so I won't put words in my own mouth now. ` +
+    `I haven't left a settled position on ${t} in the record, so I won't put words in my own mouth now. ` +
     `That's a call you'll have to make with the people in the room. ` +
     `I'll tell you how I think in general, but I won't pretend I decided this one when I didn't.`
   )

@@ -57,22 +57,22 @@ function buildWelcomeEmail(
 <html>
 <body style="background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:600px;margin:0 auto;padding:32px">
   <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;text-transform:uppercase;margin:0 0 16px">
-    THE ${familyName.toUpperCase()} ARCHIVE
+    THE ${familyName.toUpperCase()} BASALITH
   </p>
   <h1 style="font-family:Georgia,serif;font-size:28px;font-weight:700;color:#F0EDE6;margin:0 0 16px">
     Welcome to Basalith, ${firstName}.
   </h1>
   <p style="font-size:16px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 24px">
-    Your archive has been initialized. ${archivistName} will be in touch shortly to schedule your Founding Session.
+    Your Basalith is ready. ${archivistName} will be in touch shortly to schedule your Founding Session.
   </p>
 
   ${magicLinkUrl ? `
   <div style="background:rgba(196,162,74,0.08);border:1px solid rgba(196,162,74,0.3);border-top:3px solid rgba(196,162,74,0.8);padding:24px;margin:0 0 24px">
     <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;margin:0 0 12px;text-transform:uppercase">
-      Your Personal Archive Link
+      Your Basalith sign-in link
     </p>
     <p style="font-size:15px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 16px">
-      Click the link below to access your archive. No password required.
+      Click the link below to enter your Basalith. No password required.
     </p>
     <a href="${magicLinkUrl}" style="display:inline-block;font-family:'Courier New',monospace;font-size:12px;color:#C4A24A;word-break:break-all;margin:0 0 12px">
       ${magicLinkUrl}
@@ -100,7 +100,7 @@ function buildWelcomeEmail(
   </p>
   <hr style="border:none;border-top:1px solid rgba(240,237,230,0.06);margin:24px 0">
   <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830;line-height:1.8;margin:0">
-    BASALITH · XYZ<br>The ${familyName} Archive · Generation I<br>Heritage Nexus Inc.
+    BASALITH · XYZ<br>The ${familyName} Basalith · Generation I<br>Heritage Nexus Inc.
   </p>
 </body>
 </html>`
@@ -185,7 +185,7 @@ export async function POST(req: NextRequest) {
       await resend.emails.send({
         from:    `The ${familyName} Archive <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
         to:      clientEmail,
-        subject: `Welcome to Basalith. The ${familyName} Archive is ready.`,
+        subject: `Welcome to Basalith. The ${familyName} Basalith is ready.`,
         html:    buildWelcomeEmail(familyName, firstName, tierName, archivist.name, magicLinkUrl),
         headers: {
           'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',

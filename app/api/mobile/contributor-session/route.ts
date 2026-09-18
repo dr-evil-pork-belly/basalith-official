@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
     if (!contributor) {
       // Deliberately the same shape whether the archive does not exist or the
       // caller is simply not a contributor to it.
-      return NextResponse.json({ error: 'Not a contributor to this archive' }, { status: 403 })
+      return NextResponse.json({ error: 'Not a contributor to this Basalith' }, { status: 403 })
     }
 
     const { data: archive } = await supabaseAdmin
@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
       .maybeSingle()
 
     if (!archive || (archive.status && archive.status !== 'active')) {
-      return NextResponse.json({ error: 'Archive is not active' }, { status: 403 })
+      return NextResponse.json({ error: 'This Basalith is not active' }, { status: 403 })
     }
 
     // contributor_entity_access is read on its own so a schema without the

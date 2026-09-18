@@ -7,7 +7,7 @@ import PricingTiers from '../components/PricingTiers'
 
 export const metadata: Metadata = {
   title: 'Pricing · Basalith',
-  description: 'Basalith pricing, in full. Succession at $12,000 a year plus a one-time Founding fee. Acquisition engagements from $50,000. Individual and family archives from $2,500 to begin.',
+  description: 'Basalith pricing, in full. Succession at $12,000 a year plus a one-time Founding fee. Acquisition engagements from $50,000. A Basalith for one person or a family from $2,500 to begin.',
 }
 
 const MONO: React.CSSProperties = {
@@ -103,11 +103,11 @@ const FOUNDING_DELIVERABLES = [
   // designation) described steps with no mechanism behind them and was flagged
   // as unverified in the September 8 pass. Nothing here is a promise the
   // product or the founder does not keep today.
-  { n: '01', title: 'Your archive, opened',            desc: 'Your archive and your sign-in, ready the day you begin.' },
+  { n: '01', title: 'Your Basalith, opened',           desc: 'Your Basalith and your sign-in, ready the day you begin.' },
   { n: '02', title: 'The Founding Sequence',           desc: 'Three of the hardest calls you ever made, in your own words, in your own time. Speak or type. This is where it becomes real.' },
   { n: '03', title: 'The people around you',           desc: 'Contributors invited by email. They never need to log in.' },
-  { n: '04', title: 'What you already have',           desc: 'Documents, photographs, and recordings brought into the archive.' },
-  { n: '05', title: 'The first read',                  desc: 'A short video call with the founder of Basalith: what your archive holds, where it is still thin, and what comes next.' },
+  { n: '04', title: 'What you already have',           desc: 'Documents, photographs, and recordings brought onto the record.' },
+  { n: '05', title: 'The first read',                  desc: 'A short video call with the founder of Basalith: what your Basalith holds, where it is still thin, and what comes next.' },
   { n: '06', title: 'For a business, the successor',   desc: 'One live session by video with your successor in the room, working through the calls together.' },
 ]
 
@@ -192,7 +192,7 @@ export default function PricingPage() {
               margin:     '0 auto',
             }}
           >
-            Business engagements first. Individual and family plans below. Every archive begins with The Founding.
+            Business engagements first. Individual and family plans below. Every Basalith begins with The Founding.
           </p>
         </section>
 
@@ -326,7 +326,7 @@ export default function PricingPage() {
               The Founding
             </h2>
             <div style={{ ...SERIF, fontSize: '1.05rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.45)', lineHeight: 1.8, marginBottom: '40px', maxWidth: '600px' }}>
-              <p style={{ marginBottom: '20px' }}>Every archive begins with The Founding.</p>
+              <p style={{ marginBottom: '20px' }}>Every Basalith begins with The Founding.</p>
               <p style={{ marginBottom: '20px' }}>
                 Three of the hardest calls you ever made, in your own words, in your own
                 time. For a business, the hardest calls the operator made running it,
@@ -337,7 +337,7 @@ export default function PricingPage() {
                 It is the foundation. Everything that follows builds on it.
               </p>
               <p style={{ ...SERIF, fontSize: '0.88rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.28)', lineHeight: 1.85, margin: 0 }}>
-                Your archive runs on two permanent layers: one that holds every fact and memory you have deposited, and one that learns how you express, reason, and decide. Neither replaces the other.
+                Your Basalith runs on two permanent layers: one that holds every fact and memory you have deposited, and one that learns how you express, reason, and decide. Neither replaces the other.
               </p>
             </div>
 
@@ -450,7 +450,7 @@ export default function PricingPage() {
         {/* CTA */}
         <section style={{ background: 'var(--color-void)', padding: 'clamp(80px,12vw,120px) clamp(24px,6vw,80px)', textAlign: 'center' }}>
           <p style={{ ...SERIF, fontSize: 'clamp(1.6rem,3vw,2.4rem)', fontWeight: 300, fontStyle: 'italic', lineHeight: 1.4, color: 'rgba(250,248,244,0.85)', maxWidth: '620px', margin: '0 auto 40px' }}>
-            Every archive starts with a conversation. Tell us what is changing and we will tell you, plainly, whether Basalith fits.
+            Every Basalith starts with a conversation. Tell us what is changing and we will tell you, plainly, whether Basalith fits.
           </p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
             <a href="/contact" className="pricing-cta" style={{ ...MONO, fontSize: 'var(--text-caption)', display: 'inline-block', textDecoration: 'none', background: 'var(--color-gold)', color: '#0A0908', padding: '16px 32px', borderRadius: 'var(--radius-sm)', transition: 'background 250ms ease' }}>

@@ -101,7 +101,7 @@ export async function GET(req: NextRequest) {
         from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
         to:      archive.owner_email,
         replyTo: ownerReplyTo,
-        subject: lang === 'zh' ? `本周问题 · ${archive.name}` : `This week's question — ${archive.name}`,
+        subject: lang === 'zh' ? `本周问题 · ${archive.name}` : `This week's question · ${archive.name}`,
         html:    buildWeeklyPromptEmail({
           archiveName:      archive.name,
           ownerFirstName,
@@ -335,7 +335,7 @@ function buildWeeklyPromptEmail({
     <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:20px 0 0">
       BASALITH · XYZ<br>
       ${archiveName}<br>
-      <a href="${siteUrl}/archive/dashboard" style="color:#5C6166">View your archive</a>
+      <a href="${siteUrl}/archive/dashboard" style="color:#5C6166">View your Basalith</a>
     </p>
   </div>
 

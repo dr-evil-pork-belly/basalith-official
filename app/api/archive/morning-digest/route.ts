@@ -79,7 +79,7 @@ export async function POST(req: Request) {
 
     const topDecade = decades?.sort((a, b) => b.photo_count - a.photo_count)[0]
 
-    // Permanent proxy URL for email — never expires
+    // Permanent proxy URL for email, never expires
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const firstPhoto = (recentLabels[0] as any)?.photographs
     const photoUrl: string | null = firstPhoto?.id ? getEmailPhotoUrl(firstPhoto.id) : null
@@ -102,7 +102,7 @@ export async function POST(req: Request) {
 
     const lang           = archive.preferred_language ?? 'en'
     const ownerFirstName = archive.owner_name?.split(' ')[0] || 'there'
-    const archiveName    = archive.name || 'Your Archive'
+    const archiveName    = archive.name || 'Your Basalith'
     const dateLocale     = lang === 'zh' ? 'zh-CN' : 'en-US'
     const dateStr        = new Date().toLocaleDateString(dateLocale, { weekday: 'long', month: 'long', day: 'numeric' })
 
@@ -153,7 +153,7 @@ export async function POST(req: Request) {
     </div>`).join('')}
   </div>` : ''
 
-    // Monthly wisdom session section — shown only on the 1st of each month
+    // Monthly wisdom session section, shown only on the 1st of each month
     const isFirstOfMonth = new Date().getDate() === 1
     let wisdomSessionHtml = ''
 
@@ -209,7 +209,7 @@ export async function POST(req: Request) {
       }
     }
 
-    // Voice nudge — shown max once per month when archive has fewer than 3 voice recordings
+    // Voice nudge, shown max once per month when archive has fewer than 3 voice recordings
     let voiceNudgeHtml = ''
     if (isFirstOfMonth) {
       const { count: voiceCount } = await supabaseAdmin
@@ -222,10 +222,10 @@ export async function POST(req: Request) {
         voiceNudgeHtml = `
   <div style="margin:32px 0;padding:24px 32px;border-left:3px solid rgba(196,162,74,0.3);background:rgba(196,162,74,0.03)">
     <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#706C65;text-transform:uppercase;margin:0 0 12px">
-      ${lang === 'zh' ? '您的声音尚未保存到档案' : 'YOUR VOICE IS NOT YET IN YOUR ARCHIVE'}
+      ${lang === 'zh' ? '您的声音尚未保存到档案' : 'YOUR VOICE IS NOT ON THE RECORD YET'}
     </p>
     <p style="font-family:Georgia,serif;font-size:16px;font-style:italic;color:#F0EDE6;line-height:1.7;margin:0 0 8px">
-      Your archive has photographs and family memories. But your voice is not yet preserved.
+      Your Basalith has photographs and family memories. Your voice is not on the record yet.
     </p>
     <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#9DA3A8;line-height:1.7;margin:0 0 20px">
       Two minutes. Say anything. Any language.
@@ -259,7 +259,7 @@ export async function POST(req: Request) {
 
   ${photoUrl ? `
   <div style="margin:24px 0 0">
-    <img src="${photoUrl}" style="width:100%;max-width:600px;display:block;height:auto" alt="Archive photograph">
+    <img src="${photoUrl}" style="width:100%;max-width:600px;display:block;height:auto" alt="Photograph">
   </div>
   ` : ''}
 
@@ -283,7 +283,7 @@ export async function POST(req: Request) {
 
     <div style="border-top:1px solid rgba(240,237,230,0.06);padding-top:24px">
       <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#706C65;margin:0 0 4px">
-        ARCHIVE DEPTH
+        DEPTH
       </p>
       <p style="font-size:28px;font-family:Georgia,serif;font-weight:700;color:#F0EDE6;margin:0 0 4px">
         ${archiveData?.labelled_photos || 0}
@@ -302,7 +302,7 @@ export async function POST(req: Request) {
     <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:24px 0 0">
       BASALITH &middot; XYZ<br>
       ${archiveName} &middot; Generation I<br>
-      ${lang === 'zh' ? '您的档案每天都在成长。' : 'Your archive grows every day.'}
+      ${lang === 'zh' ? '您的档案每天都在成长。' : 'Your Basalith grows every day.'}
     </p>
   </div>
 

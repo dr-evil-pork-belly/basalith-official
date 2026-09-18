@@ -136,16 +136,13 @@ export default function ArchiveLayoutClient({ children, tier }: { children: Reac
               Basalith
             </p>
           </Link>
-          <p style={{ ...LABEL, color: 'var(--spine-dim)', marginTop: '6px' }}>
-            Archive
-          </p>
           <ArchiveSwitcher />
         </div>
 
         {/* Navigation */}
-        <nav style={{ flex: 1, paddingTop: '8px', paddingBottom: '16px' }} aria-label="Archive navigation">
+        <nav style={{ flex: 1, paddingTop: '8px', paddingBottom: '16px' }} aria-label="Main navigation">
           {primaryNav.length > 0 && (
-            <NavGroup label="Archive" items={primaryNav} pathname={pathname} />
+            <NavGroup label="Your Basalith" items={primaryNav} pathname={pathname} />
           )}
           {contributeNav.length > 0 && (
             <NavGroup label="Contribute" items={contributeNav} pathname={pathname} />
@@ -159,7 +156,7 @@ export default function ArchiveLayoutClient({ children, tier }: { children: Reac
         <div style={{ padding: '18px 26px', borderTop: '1px solid var(--spine-rule)' }}>
           {confirmSignOut ? (
             <div>
-              <p style={{ fontFamily: SERIF, fontSize: '14.5px', color: 'var(--spine-body)', marginBottom: '8px' }}>Sign out of your archive?</p>
+              <p style={{ fontFamily: SERIF, fontSize: '14.5px', color: 'var(--spine-body)', marginBottom: '8px' }}>Sign out?</p>
               <div style={{ display: 'flex', gap: '18px' }}>
                 <a href="/api/auth/logout" style={{ ...signOutLink, color: 'var(--spine-gold)' }}>Yes, sign out</a>
                 <button onClick={() => setConfirmSignOut(false)} style={signOutLink}>Cancel</button>
@@ -203,7 +200,7 @@ export default function ArchiveLayoutClient({ children, tier }: { children: Reac
           style={{ position: 'fixed', inset: 0, zIndex: 49, background: 'var(--portal-spine)', color: 'var(--spine-fg)', display: 'flex', flexDirection: 'column', paddingTop: 'calc(56px + env(safe-area-inset-top, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)', overflow: 'auto' }}
           onClick={e => { if (e.target === e.currentTarget) setMobileOpen(false) }}
         >
-          <nav style={{ display: 'flex', flexDirection: 'column', padding: '16px 0' }} aria-label="Archive mobile navigation">
+          <nav style={{ display: 'flex', flexDirection: 'column', padding: '16px 0' }} aria-label="Mobile navigation">
             {allNav.map(({ href, label: lbl }) => {
               const active = pathname === href || pathname.startsWith(href + '/')
               const isPrimary = PRIMARY_NAV.some(n => n.href === href)

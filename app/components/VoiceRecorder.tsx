@@ -284,7 +284,7 @@ export default function VoiceRecorder({
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
             <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.25em', color: 'var(--portal-gold-ink)', margin: 0 }}>
-              ✓ SAVED TO YOUR ARCHIVE
+              ✓ ON THE RECORD
             </p>
             {languageDetected && (
               <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.12em', color: 'var(--portal-label)', margin: 0 }}>
@@ -302,7 +302,7 @@ export default function VoiceRecorder({
           </div>
           <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '0.85rem', fontStyle: 'italic', color: 'var(--portal-label)', lineHeight: 1.7, marginBottom: '1.5rem' }}>
             Your words have been transcribed and saved as a deposit.
-            Your voice recording is preserved permanently in your archive.
+            Your voice recording is preserved permanently on the record.
           </p>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <button

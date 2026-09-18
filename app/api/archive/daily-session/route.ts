@@ -17,11 +17,11 @@ const JOURNAL_PROMPTS: Record<number, string> = {
   6: 'What did you do today that was just for you?',
 }
 
-// ── GET — today's session data ─────────────────────────────────────────────────
+// ── GET: today's session data ─────────────────────────────────────────────────
 
 export async function GET() {
   // Auth: Supabase owner session only. Ownership is verified against the
-  // archives table — a session carrying an archiveId is not proof of ownership
+  // archives table, a session carrying an archiveId is not proof of ownership
   // (getSessionUser fills archiveId for successors too). This GET inserts a
   // daily_sessions row and returns a signed URL to a family photograph, so it
   // is a write and a media read, not a metadata read.
@@ -48,7 +48,7 @@ export async function GET() {
     .eq('id', archiveId)
     .single()
 
-  if (!archive) return NextResponse.json({ error: 'Archive not found' }, { status: 404 })
+  if (!archive) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
   // Ensure session row exists (silent if duplicate)
   await supabaseAdmin
@@ -140,7 +140,7 @@ export async function GET() {
     prompt: 'What is on your mind today? Anything at all.',
   })
 
-  // Step 4: contributor ping — most recent answered question in last 7 days
+  // Step 4: contributor ping, most recent answered question in last 7 days
   const { data: recentAnswer } = await supabaseAdmin
     .from('contributor_questions')
     .select('id, question_text, answer_text, contributors(name)')
@@ -180,12 +180,12 @@ export async function GET() {
   })
 }
 
-// ── POST — save a step OR complete the session ────────────────────────────────
+// ── POST: save a step OR complete the session ────────────────────────────────
 
 export async function POST(req: NextRequest) {
   try {
     // Auth: Supabase owner session only. Ownership is verified against the
-    // archives table — a session carrying an archiveId is not proof of ownership
+    // archives table, a session carrying an archiveId is not proof of ownership
     // (getSessionUser fills archiveId for successors too).
     const authSession = await getSessionUser()
     if (!authSession?.archiveId) {
@@ -253,7 +253,7 @@ export async function POST(req: NextRequest) {
           .eq('id', archiveId),
       ])
 
-      console.log('[daily-session] complete — streak:', newStreak, 'archive:', archiveId.substring(0, 8))
+      console.log('[daily-session] complete, streak:', newStreak, 'archive:', archiveId.substring(0, 8))
       return NextResponse.json({ ok: true, streak: newStreak })
     }
 
@@ -292,7 +292,7 @@ export async function POST(req: NextRequest) {
         archive_id:          archiveId,
         photograph_id:       photoId,
         what_was_happening:  text,
-        labelled_by:         'Archive Owner',
+        labelled_by:         'Owner',
         is_primary_label:    true,
         essence_feed_status: 'pending',
       }).then(({ error }) => { if (error) console.warn('[daily-session] label:', error.message) })
@@ -360,7 +360,7 @@ export async function POST(req: NextRequest) {
       .eq('id', sessionId)
       .eq('archive_id', archiveId)
 
-    console.log('[daily-session] step saved — type:', stepType, 'archive:', archiveId.substring(0, 8))
+    console.log('[daily-session] step saved, type:', stepType, 'archive:', archiveId.substring(0, 8))
     return NextResponse.json({ ok: true })
 
   } catch (err: unknown) {

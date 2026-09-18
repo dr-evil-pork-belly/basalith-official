@@ -113,10 +113,10 @@ export async function GET(req: NextRequest) {
           }
           console.log('[story-prompt-friday] sending to:', contributor.email, 'replyTo:', replyTo)
           await resend.emails.send({
-            from:    `The ${archive.family_name} Archive <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
+            from:    `The ${archive.family_name} Basalith <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
             to:      contributor.email,
             replyTo,
-            subject: `Friday reveal — here is what the family knows · ${archive.name}`,
+            subject: `Friday reveal: here is what the family knows · ${archive.name}`,
             html:    buildFridayEmail(archive.family_name, photoUrl, photo.ai_era_estimate, responses, dateStr),
             headers: {
               'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
@@ -135,7 +135,7 @@ export async function GET(req: NextRequest) {
         .update({ reveal_sent: true })
         .eq('id', session.id)
 
-      console.log(`[story-prompt-friday] Revealed session ${session.id} — ${responses.length} responses`)
+      console.log(`[story-prompt-friday] Revealed session ${session.id}: ${responses.length} responses`)
       sent++
     } catch (err: unknown) {
       console.error(`[story-prompt-friday] Failed for session ${session.id}:`, err instanceof Error ? err.message : err)
@@ -160,7 +160,7 @@ function buildFridayEmail(
 
   <div style="padding:32px 32px 0">
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">
-      THE ${familyName.toUpperCase()} ARCHIVE
+      THE ${familyName.toUpperCase()} BASALITH
     </p>
     <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0">
       FRIDAY REVEAL · ${dateStr}
@@ -196,16 +196,16 @@ function buildFridayEmail(
         &ldquo;${r.text.length > 300 ? r.text.substring(0, 300) + '&hellip;' : r.text}&rdquo;
       </p>
       <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#C4A24A;margin:0">
-        — ${r.name}
+        ${r.name}
       </p>
     </div>`).join('')}
 
     <div style="border-top:1px solid rgba(240,237,230,0.06);padding-top:20px;margin-top:24px">
       <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#706C65;margin:0 0 8px">
-        ${eraEstimate ? `Our AI estimates this photograph is from ${eraEstimate}.` : 'This photograph has been added to your archive.'}
+        ${eraEstimate ? `Our AI estimates this photograph is from ${eraEstimate}.` : 'This photograph has been added to your Basalith.'}
       </p>
       <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#5C6166;margin:0">
-        These memories are now permanently preserved in The ${familyName} Archive.
+        These memories are now on the record, permanently.
       </p>
     </div>
     ` : `
@@ -221,7 +221,7 @@ function buildFridayEmail(
   <div style="padding:0 32px 32px;border-top:1px solid rgba(240,237,230,0.06)">
     <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:20px 0 0">
       BASALITH · XYZ<br>
-      The ${familyName} Archive<br>
+      The ${familyName} Basalith<br>
       New mystery every Monday.
     </p>
   </div>

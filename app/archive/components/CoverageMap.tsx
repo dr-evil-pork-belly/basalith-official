@@ -80,7 +80,7 @@ export default function CoverageMap({ link }: { link?: { href: string; label: st
     >
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap', marginBottom: '6px' }}>
         <p style={{ fontFamily: MONO, fontSize: '11.5px', letterSpacing: '0.24em', textTransform: 'uppercase', color: GOLD }}>
-          Where your archive is thin
+          Where your record is thin
         </p>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: '18px', flexWrap: 'wrap' }}>
           {coverage?.available && (
@@ -116,7 +116,7 @@ export default function CoverageMap({ link }: { link?: { href: string; label: st
 
       {coverage && !coverage.available && coverage.reason === 'no_reading' && (
         <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '17px', color: BODY, lineHeight: 1.65, margin: '8px 0 0', maxWidth: '640px' }}>
-          No reading yet. Your archive is read once the Founding Sequence is complete, and again each month. Each reading asks your entity a fixed set of questions and counts only the answers that came from something you deposited.
+          No reading yet. Your record is read once the Founding Sequence is complete, and again each month. Each reading asks your entity a fixed set of questions and counts only the answers that came from something you deposited.
         </p>
       )}
 

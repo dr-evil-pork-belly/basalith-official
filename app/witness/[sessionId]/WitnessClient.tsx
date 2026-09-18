@@ -227,17 +227,17 @@ export default function WitnessClient({ sessionId }: { sessionId: string }) {
       </p>
 
       <h1 className="font-serif" style={{ fontWeight: 700, fontSize: 'clamp(1.8rem,4vw,2.5rem)', color: '#F0EDE6', lineHeight: 1.2, letterSpacing: '-0.02em' }}>
-        Your memories of {subjectName} matter to this archive.
+        Your memories of {subjectName} belong on the record.
       </h1>
 
       <p className="font-serif italic font-light" style={{ fontSize: '1rem', color: '#9DA3A8', lineHeight: 1.9, maxWidth: '520px' }}>
-        {subjectName} is building a permanent archive of their life, one that their
+        {subjectName} is building a permanent record of their life, one that their
         grandchildren and great-grandchildren will be able to access for generations.
         <br /><br />
         You have been invited because your perspective is irreplaceable. The things
         you have observed about {subjectName} are things only you can contribute.
         <br /><br />
-        This session has 5 questions. Your answers go directly into the archive and
+        This session has 5 questions. Your answers go straight into the record and
         help train {subjectName}&rsquo;s AI entity.
         <br /><br />
         There are no right or wrong answers. Just what you remember and what you observed.
@@ -267,7 +267,7 @@ export default function WitnessClient({ sessionId }: { sessionId: string }) {
       </button>
 
       <p className="font-serif italic" style={{ fontSize: '0.8rem', color: '#5C6166', lineHeight: 1.7 }}>
-        Your responses will be seen by {subjectName} and their designated archive custodian.
+        Your responses will be seen by {subjectName} and their Custodian.
       </p>
     </div>
   )
@@ -343,7 +343,7 @@ export default function WitnessClient({ sessionId }: { sessionId: string }) {
 
             {savedMsg && (
               <p style={{ fontFamily: 'monospace', fontSize: '0.42rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.9)', marginBottom: '1rem' }}>
-                Saved to the archive ✓
+                On the record
               </p>
             )}
 

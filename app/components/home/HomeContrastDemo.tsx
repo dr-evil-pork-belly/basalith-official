@@ -44,7 +44,7 @@ const ILLUSTRATION: Record<Audience, [string, string]> = {
 
 const LEFT_NOTE =
   "A fact, not a pattern. It can return what you said. It can't yet answer what you never said."
-const ILLUSTRATION_CAPTION = 'Illustration. An example archive, not a real person.'
+const ILLUSTRATION_CAPTION = 'Illustration. An example Basalith, not a real person.'
 const CLOSING_LINE = 'That distance is the product.'
 const CLOSING_SUB =
   'Not a record of what they said. A model of how they reasoned, shaped to answer what no one thought to ask.'

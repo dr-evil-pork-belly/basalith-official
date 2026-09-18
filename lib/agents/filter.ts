@@ -49,7 +49,7 @@ export const filterAgent = inngest.createFunction(
     // ── 4. Claude Vision analysis ─────────────────────────────────────────────
     const analysis = await step.run('analyze-with-claude', async () => {
       const subjectName =
-        archiveInfo?.owner_name || archiveInfo?.name || 'the archive subject'
+        archiveInfo?.owner_name || archiveInfo?.name || 'the subject'
 
       const response = await anthropic.messages.create({
         model:      'claude-sonnet-4-6',
@@ -67,13 +67,13 @@ export const filterAgent = inngest.createFunction(
             },
             {
               type: 'text',
-              text: `You are analyzing a photograph for a family archive dedicated to preserving the life of ${subjectName}.
+              text: `You are analyzing a photograph for a family's Basalith dedicated to preserving the life of ${subjectName}.
 
 Family members are uploading from their phones. Many uploads will be completely unrelated to ${subjectName} or their family history.
 
 Classify this photograph:
 
-KEEP — belongs in this family archive:
+KEEP (belongs in this family's Basalith):
   Photos of people (any generation)
   Family gatherings and events
   Meaningful places (home, hometown, travel)
@@ -82,12 +82,12 @@ KEEP — belongs in this family archive:
   Old photographs (pre-digital era)
   Photos that appear to be family memories
 
-REVIEW — unclear, needs human review:
-  Groups where archive subject may or may not be present
+REVIEW (unclear, needs human review):
+  Groups where the subject may or may not be present
   Places that might be meaningful but unclear
   Confidence below 80%
 
-DISCARD — does not belong:
+DISCARD (does not belong):
   Screenshots of texts, apps, websites
   Receipts, invoices, parking tickets
   Food photos with no people present

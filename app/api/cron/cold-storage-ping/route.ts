@@ -24,13 +24,13 @@ function buildColdStorageEmail(
 
   <div style="padding:32px 32px 0">
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">${archiveName.toUpperCase()}</p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0">SOMETHING FROM YOUR ARCHIVE</p>
+    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0">SOMETHING FROM YOUR BASALITH</p>
   </div>
 
   <div style="padding:32px">
     <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#B8B4AB;margin:0 0 24px">${firstName},</p>
     <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#B8B4AB;line-height:1.7;margin:0 0 32px">
-      Your archive has been resting for ${monthsPaused} month${monthsPaused !== 1 ? 's' : ''}.
+      Your Basalith has been resting for ${monthsPaused} month${monthsPaused !== 1 ? 's' : ''}.
       We found something.
     </p>
 
@@ -46,7 +46,7 @@ function buildColdStorageEmail(
     </p>
 
     <a href="${resumeUrl}" style="display:inline-block;background:#C4A24A;color:#0A0908;font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;text-decoration:none;padding:14px 28px;border-radius:2px">
-      RETURN TO YOUR ARCHIVE →
+      RETURN TO YOUR BASALITH →
     </a>
   </div>
 
@@ -94,7 +94,7 @@ export async function GET(req: NextRequest) {
         daysPaused >= m && daysPaused < m + 3
       )
 
-      if (!atMilestone) { skipped.push(`${archive.name} (${daysPaused}d — not at milestone)`); continue }
+      if (!atMilestone) { skipped.push(`${archive.name} (${daysPaused}d, not at milestone)`); continue }
 
       const monthsPaused = Math.round(daysPaused / 30)
 
@@ -127,7 +127,7 @@ export async function GET(req: NextRequest) {
         ((randomDeposit.response?.length ?? 0) > 200 ? '…' : '')
 
       const firstName = archive.owner_name?.split(' ')[0] ?? 'there'
-      const subject   = `Something from your archive · ${archive.name}`
+      const subject   = `Something from your Basalith · ${archive.name}`
 
       await resend.emails.send({
         from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,

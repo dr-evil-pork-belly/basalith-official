@@ -115,7 +115,7 @@ export default function SuccessorEntityClient({ session, archiveName, ownerName,
 
       <div style={{ maxWidth: '800px', margin: '0 auto', padding: '40px 40px' }}>
 
-        {/* Active context layer — collapsible */}
+        {/* Active context layer, collapsible */}
         <div style={{ marginBottom: '32px', border: '1px solid rgba(196,162,74,0.18)', background: 'rgba(196,162,74,0.03)' }}>
           <button
             onClick={() => setContextOpen(v => !v)}
@@ -228,7 +228,7 @@ export default function SuccessorEntityClient({ session, archiveName, ownerName,
                 </p>
                 <div style={{ borderLeft: '2px solid rgba(196,162,74,0.35)', paddingLeft: '18px', paddingTop: '12px', paddingBottom: '12px' }}>
                   <p style={{ ...SERIF, fontSize: '0.95rem', fontStyle: 'italic', color: '#9DA3A8', margin: 0 }}>
-                    Drawing from the archive
+                    Drawing on the record
                     <span style={{ animation: 'pulse 1.5s ease-in-out infinite' }}>…</span>
                   </p>
                 </div>
@@ -247,8 +247,8 @@ export default function SuccessorEntityClient({ session, archiveName, ownerName,
             onChange={e => setInput(e.target.value)}
             onKeyDown={handleKey}
             placeholder={activeContexts.length > 0
-              ? 'Ask your question — the entity has your context…'
-              : 'Ask your question — or add context first to inform the response…'}
+              ? 'Ask your question. The entity has your context.'
+              : 'Ask your question, or add context first to inform the response.'}
             style={{
               ...SERIF,
               width:        '100%',

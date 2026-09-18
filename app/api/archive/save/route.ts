@@ -9,7 +9,7 @@ const MILESTONE_NUMBERS = [1, 5, 10, 25, 50, 100, 250, 500]
 export async function POST(req: NextRequest) {
   try {
     // Auth: Supabase owner session only. Ownership is verified against the
-    // archives table — a session carrying an archiveId is not proof of ownership
+    // archives table, a session carrying an archiveId is not proof of ownership
     // (getSessionUser fills archiveId for successors too).
     const session = await getSessionUser()
     if (!session?.archiveId) {
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
         })
 
       if (!uploadError) storagePath = path
-      // If upload fails, continue without photo — label is still saved
+      // If upload fails, continue without photo, label is still saved
     }
 
     // ── 2. Create photograph record ──────────────────────────────────────────
@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
           storagePath,
           uploadedBy: labelledBy || 'owner',
         },
-      }).catch(() => {}) // non-fatal — agent pipeline is background
+      }).catch(() => {}) // non-fatal, agent pipeline is background
     }
 
     // ── 4. Create label record ────────────────────────────────────────────────
@@ -179,7 +179,7 @@ export async function POST(req: NextRequest) {
       .eq('id', archiveId)
       .single()
 
-    if (!archive) throw new Error('Archive not found')
+    if (!archive) throw new Error('Not found')
 
     const today            = new Date().toISOString().split('T')[0]
     const yesterday        = new Date(Date.now() - 86_400_000).toISOString().split('T')[0]

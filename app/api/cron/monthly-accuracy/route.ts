@@ -54,7 +54,7 @@ async function generateOwnerQuestion(
       max_tokens: 120,
       messages: [{
         role:    'user',
-        content: `Generate one personal reflection question for someone building a legacy archive.
+        content: `Generate one personal reflection question for someone building their Basalith.
 
 The question targets this dimension: ${dimensionLabel}
 The person's first name: ${firstName}

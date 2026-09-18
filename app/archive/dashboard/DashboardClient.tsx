@@ -611,7 +611,7 @@ function MirrorCard({ archiveId }: { archiveId: string }) {
       {/* Respond */}
       {saved ? (
         <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '16px', color: 'var(--invert-gold)', margin: 0 }}>
-          Saved to your archive.
+          Saved to the record.
         </p>
       ) : respondOpen ? (
         <div>
@@ -787,10 +787,10 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
             <p style={{ fontFamily: SERIF, fontSize: '17px', color: SECOND, lineHeight: 1.5 }}>
               {(() => {
                 const n = archive?.total_photos ?? 0
-                if (n === 0)       return 'Your archive is ready for its first photographs.'
-                if (n <= 10)       return `Your archive is growing. ${n} photograph${n !== 1 ? 's' : ''} preserved so far.`
-                if (n <= 50)       return `Your archive is taking shape. ${n} photographs preserved.`
-                return `A meaningful archive. ${n} photographs and counting.`
+                if (n === 0)       return 'Your Basalith is ready for its first photographs.'
+                if (n <= 10)       return `Your Basalith is growing. ${n} photograph${n !== 1 ? 's' : ''} preserved so far.`
+                if (n <= 50)       return `Your Basalith is taking shape. ${n} photographs preserved.`
+                return `A meaningful record. ${n} photographs and counting.`
               })()}
             </p>
           </>
@@ -817,7 +817,7 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
             color:         INK,
             marginBottom:  '8px',
           }}>
-            Your archive is paused.
+            Your Basalith is paused.
           </p>
           <p style={{
             fontFamily:    SERIF,
@@ -830,7 +830,7 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
             maxWidth:      '58ch',
           }}>
             Your data is safe. Everything you have built is exactly as you left it.
-            Resume your archive to continue adding memories and receiving photographs.
+            Resume your Basalith to continue adding memories and receiving photographs.
           </p>
           <a
             href="/resume"
@@ -849,7 +849,7 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
               borderRadius:   '2px',
             }}
           >
-            Resume your archive
+            Resume your Basalith
           </a>
         </div>
       )}
@@ -887,61 +887,33 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
       {/* ── MEMORY GAME ── */}
       <MemoryGameCard archiveId={archiveId} />
 
-      {/* ── QUICK LINKS ── */}
-      <div className="grid md:grid-cols-2 gap-4">
-          {[
-            { href: '/archive/label',        label: 'Upload photos',    desc: 'Upload photographs from your phone or computer.',  gold: true  },
-            { href: '/archive/gallery',       label: 'View the gallery', desc: 'Browse preserved memories across all decades.',    gold: false },
-            // Trials cannot invite contributors (skeleton 1.5, decision 5.2).
-            // The card that opens the invite form is replaced by one line.
-            ...(archive?.status === 'trial'
-              ? []
-              : [{ href: '/archive/contributors',  label: 'Contributors',     desc: 'Invite family to contribute their memories.',      gold: false }]),
-          ].map(({ href, label, desc, gold }) => (
-            <Link
-              key={href}
-              href={href}
-              className="rounded-sm border px-6 py-6 no-underline flex flex-col gap-3 transition-colors duration-200 portal-card"
-              style={{ background: CARD, borderColor: LINE }}
-            >
-              <div className="w-8 h-px" style={{ background: gold ? 'var(--portal-gold-ink)' : LINE }} />
-              <p style={{ fontFamily: SERIF, fontWeight: 500, color: INK, fontSize: '19px', lineHeight: 1.25 }}>{label}</p>
-              <p style={{ fontFamily: SERIF, color: SECOND, fontSize: '15.5px', lineHeight: 1.55 }}>{desc}</p>
-            </Link>
-          ))}
-
+      {/* ── NOTES ──
+          The quick-link grid that lived here repeated the sidebar (Upload
+          photos, Gallery, Contributors) and, on a fresh archive, the
+          getting-started guide's own Upload photos button: three of the same
+          link on one screen. Cut September 19, 2026. What survives is the
+          information the grid carried: the next photograph email, and the
+          contributor note for trial archives. */}
+      {!loading && (
+        <div style={{ borderTop: `1px solid ${RULE}` }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap', padding: '0.9rem 0', borderBottom: `1px solid ${RULE}` }}>
+            <p style={{ fontFamily: SERIF, fontSize: '15.5px', color: SECOND, margin: 0 }}>Next photograph email</p>
+            <p style={{ fontFamily: SERIF, fontSize: '15.5px', color: INK, margin: 0 }}>
+              {(() => {
+                const now  = new Date()
+                const utcH = now.getUTCHours()
+                return utcH < 21 ? 'Tonight at 9pm' : 'Tomorrow at 9pm'
+              })()}
+              {stats.contributors > 0 ? ` · ${stats.contributors} family member${stats.contributors !== 1 ? 's' : ''} receiving` : ''}
+            </p>
+          </div>
           {archive?.status === 'trial' && (
-            <div
-              className="rounded-sm border px-6 py-6 flex flex-col gap-3"
-              style={{ background: 'var(--portal-inset)', borderColor: RULE }}
-            >
-              <div className="w-8 h-px" style={{ background: LINE }} />
-              <p style={{ fontFamily: SERIF, fontWeight: 500, color: INK, fontSize: '19px', lineHeight: 1.25 }}>Contributors</p>
-              <p style={{ fontFamily: SERIF, color: SECOND, fontSize: '15.5px', lineHeight: 1.55 }}>Invite family once your archive is founded.</p>
+            <div style={{ padding: '0.9rem 0', borderBottom: `1px solid ${RULE}` }}>
+              <p style={{ fontFamily: SERIF, fontSize: '15.5px', color: SECOND, margin: 0 }}>Contributors can be invited once your Basalith is founded.</p>
             </div>
           )}
-
-          {/* Next email time */}
-          {!loading && (
-            <div className="rounded-sm border px-5 py-4 portal-card" style={{ background: CARD, borderColor: LINE }}>
-              <p style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: LABEL, marginBottom: '6px' }}>
-                Next photograph email
-              </p>
-              <p style={{ fontFamily: SERIF, fontSize: '17px', color: INK }}>
-                {(() => {
-                  const now  = new Date()
-                  const utcH = now.getUTCHours()
-                  return utcH < 21 ? 'Tonight at 9pm' : 'Tomorrow at 9pm'
-                })()}
-              </p>
-              {stats.contributors > 0 && (
-                <p style={{ fontFamily: SERIF, fontSize: '14.5px', color: SECOND, marginTop: '6px' }}>
-                  {stats.contributors} family member{stats.contributors !== 1 ? 's' : ''} receiving photos
-                </p>
-              )}
-            </div>
-          )}
-      </div>
+        </div>
+      )}
 
     </div>
   )

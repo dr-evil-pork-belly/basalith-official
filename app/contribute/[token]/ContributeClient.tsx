@@ -31,7 +31,7 @@ const PORTAL_UI = {
     footerNote:       'Everything you share here is preserved permanently.',
     contributions_n:  (n: number) => `${n} CONTRIBUTION${n !== 1 ? 'S' : ''}`,
     honesty:          'Be honest. The most valuable thing you can contribute is the truth. Difficult memories and complicated feelings are as important as positive ones.',
-    savedConfirm:     'Saved to your archive',
+    savedConfirm:     'On the record',
     caughtUpTitle:    'You are caught up',
     caughtUpBody:     'There are no new questions right now. Check back soon for more.',
   },
@@ -202,9 +202,9 @@ function StoryGameSection({
   const revealDate  = typeof game === 'object' ? new Date(game.revealAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric' }) : ''
 
   const ui = {
-    en:  { title: 'Remember When', badge: 'Monthly Game', prompt: 'Your answer', submitted: 'Submitted — answers revealed on', responded: (n: number) => `${n} answer${n !== 1 ? 's' : ''} submitted so far`, revealTitle: 'Answers', cta: 'SUBMIT YOUR ANSWER', noAnswer: 'Write your answer…' },
-    yue: { title: '你還記得嗎', badge: '每月遊戲', prompt: '你嘅回答', submitted: '已提交 — 答案將於以下日期公開：', responded: (n: number) => `已有 ${n} 個答案`, revealTitle: '所有答案', cta: '提交你嘅回答', noAnswer: '寫下你嘅回答…' },
-    zh:  { title: '你还记得吗', badge: '每月游戏', prompt: '您的回答', submitted: '已提交 — 答案将于以下日期公开：', responded: (n: number) => `已有 ${n} 个答案`, revealTitle: '所有答案', cta: '提交您的回答', noAnswer: '写下您的回答…' },
+    en:  { title: 'Remember When', badge: 'Monthly Game', prompt: 'Your answer', submitted: 'Submitted. Answers revealed on', responded: (n: number) => `${n} answer${n !== 1 ? 's' : ''} submitted so far`, revealTitle: 'Answers', cta: 'SUBMIT YOUR ANSWER', noAnswer: 'Write your answer…' },
+    yue: { title: '你還記得嗎', badge: '每月遊戲', prompt: '你嘅回答', submitted: '已提交。答案將於以下日期公開：', responded: (n: number) => `已有 ${n} 個答案`, revealTitle: '所有答案', cta: '提交你嘅回答', noAnswer: '寫下你嘅回答…' },
+    zh:  { title: '你还记得吗', badge: '每月游戏', prompt: '您的回答', submitted: '已提交。答案将于以下日期公开：', responded: (n: number) => `已有 ${n} 个答案`, revealTitle: '所有答案', cta: '提交您的回答', noAnswer: '写下您的回答…' },
   }
   const t = (ui as Record<string, typeof ui.en>)[lang] ?? ui.en
 
@@ -236,7 +236,7 @@ function StoryGameSection({
             </p>
           )}
 
-          {/* Active — answer input or submitted state */}
+          {/* Active: answer input or submitted state */}
           {game.status === 'active' && !game.alreadyAnswered && !submitted && (
             <>
               <textarea
@@ -263,7 +263,7 @@ function StoryGameSection({
             </div>
           )}
 
-          {/* Revealed — show all answers */}
+          {/* Revealed: show all answers */}
           {game.status === 'revealed' && game.revealedAnswers && (
             <>
               <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.44rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#B8963E', marginBottom: '16px' }}>
@@ -408,7 +408,7 @@ function QuestionsSection({
     const text = answers[q.id]?.trim()
     if (!text) return
 
-    // Synchronous guard — blocks a second click before React re-renders.
+    // Synchronous guard: blocks a second click before React re-renders.
     if (inFlightRef.current.has(q.id)) return
     inFlightRef.current.add(q.id)
 
@@ -426,7 +426,7 @@ function QuestionsSection({
       if (!res.ok) throw new Error(data.error ?? `HTTP ${res.status}`)
 
       setSaved(prev => ({ ...prev, [q.id]: true }))
-      // Replace answered question with next one — never let the same
+      // Replace answered question with next one. Never let the same
       // question id appear twice in the list.
       setQuestions(prev => {
         const remaining = prev.filter(x => x.id !== q.id)
@@ -438,7 +438,7 @@ function QuestionsSection({
       })
       setAnswers(prev => { const next = { ...prev }; delete next[q.id]; return next })
 
-      // Brief save confirmation — only on a real, successful save.
+      // Brief save confirmation, only on a real, successful save.
       if (savedTimerRef.current) clearTimeout(savedTimerRef.current)
       setShowSaved(true)
       savedTimerRef.current = setTimeout(() => setShowSaved(false), 3000)
@@ -485,14 +485,14 @@ function QuestionsSection({
     )
   }
 
-  const subjectName = ownerName ? ownerName.split(' ')[0] : 'the archive subject'
+  const subjectName = ownerName ? ownerName.split(' ')[0] : 'the owner'
 
   return (
     <SectionCard
       title={PORTAL_UI[lang === 'zh' ? 'zh' : 'en'].questionsForYou}
       subtitle={lang === 'zh'
         ? `档案中有 ${questions.length} 个只有您能回答的问题。`
-        : `The archive has ${questions.length} question${questions.length !== 1 ? 's' : ''} only you can answer.`}
+        : `${questions.length} question${questions.length !== 1 ? 's' : ''} only you can answer.`}
       prominent
     >
       {showSaved && <SavedConfirmation lang={lang} />}
@@ -523,7 +523,7 @@ function QuestionsSection({
           <br /><br />
           Difficult memories and complicated feelings are as important as positive ones.
           <br /><br />
-          An honest archive is one the family will recognize and trust.
+          An honest record is one the family will recognize and trust.
         </p>
       </div>
 
@@ -534,7 +534,7 @@ function QuestionsSection({
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={q.photoUrl}
-                alt={q.ai_era_estimate ? `Photograph from ${q.ai_era_estimate}` : 'Archive photograph'}
+                alt={q.ai_era_estimate ? `Photograph from ${q.ai_era_estimate}` : 'Photograph'}
                 style={{ width: '100%', maxWidth: '280px', height: 'auto', borderRadius: '2px', marginBottom: '0.75rem', display: 'block' }}
               />
             )}
@@ -627,7 +627,7 @@ function PhotoUploadSection({
 
   async function uploadOne(file: File): Promise<boolean> {
     try {
-      // Step 1 — get signed URL
+      // Step 1: get signed URL
       const urlRes  = await fetch('/api/contribute/upload-url', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -639,7 +639,7 @@ function PhotoUploadSection({
       }
       const { uploadUrl, path, archiveId } = await urlRes.json()
 
-      // Step 2 — PUT directly to Supabase (bypasses Vercel size limit)
+      // Step 2: PUT directly to Supabase (bypasses Vercel size limit)
       console.log('[uploadOne] Starting upload:', {
         fileName: file.name,
         fileType: file.type,
@@ -664,7 +664,7 @@ function PhotoUploadSection({
         throw new Error(`Storage upload failed: ${storageRes.status} ${errorDetail}`)
       }
 
-      // Step 3 — register in DB
+      // Step 3: register in DB
       const regRes = await fetch('/api/contribute/register-photo', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -698,7 +698,7 @@ function PhotoUploadSection({
 
     setFiles([])
     setStatus('success')
-    setMessage(`${succeeded} photo${succeeded !== 1 ? 's' : ''} added to the archive.`)
+    setMessage(`${succeeded} photo${succeeded !== 1 ? 's' : ''} added to the record.`)
     onUploaded(succeeded)
   }
 
@@ -835,7 +835,7 @@ function MediaUploadSection({
     setStatus('uploading')
     setMessage('')
     try {
-      // Step 1 — get presigned URL (picks correct bucket by file type)
+      // Step 1: get presigned URL (picks correct bucket by file type)
       const urlRes = await fetch('/api/contribute/upload-url', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -847,7 +847,7 @@ function MediaUploadSection({
       }
       const { uploadUrl, path, archiveId, isVideo } = await urlRes.json()
 
-      // Step 2 — PUT directly to Supabase (bypasses Vercel size limit)
+      // Step 2: PUT directly to Supabase (bypasses Vercel size limit)
       console.log('[media-upload] Starting upload:', {
         fileName: file.name,
         fileType: file.type,
@@ -872,7 +872,7 @@ function MediaUploadSection({
         throw new Error(`Storage upload failed: ${storageRes.status} ${errorDetail}`)
       }
 
-      // Step 3 — register in DB
+      // Step 3: register in DB
       const regRes = await fetch('/api/contribute/register-media', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -893,7 +893,7 @@ function MediaUploadSection({
 
       setFile(null)
       setStatus('success')
-      setMessage(`${file.name} added to the archive.`)
+      setMessage(`${file.name} added to the record.`)
       onUploaded()
     } catch (err: unknown) {
       setStatus('error')
@@ -904,7 +904,7 @@ function MediaUploadSection({
   return (
     <SectionCard
       title={PORTAL_UI[lang === 'zh' ? 'zh' : 'en'].videosAndDocs}
-      subtitle={lang === 'zh' ? '家庭录像、信件、文件——您收藏中的任何内容。' : 'Home videos, letters, documents, anything from your collection.'}
+      subtitle={lang === 'zh' ? '家庭录像、信件、文件，您收藏中的任何内容。' : 'Home videos, letters, documents, anything from your collection.'}
     >
       <p style={{
         fontFamily:    '"Space Mono","Courier New",monospace',
@@ -1417,7 +1417,7 @@ function MemoryMapTeaser({ token }: { token: string }) {
   return (
     <div style={{ background: 'rgba(196,162,74,0.04)', border: '1px solid rgba(196,162,74,0.15)', borderRadius: '2px', padding: '1.25rem', marginBottom: '24px' }}>
       <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.44rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.7)', marginBottom: '1rem' }}>
-        Where the Archive Needs You
+        Where the record is thin
       </p>
 
       {weakestDecade && (
@@ -1497,7 +1497,7 @@ export default function ContributeClient({
   const ui   = PORTAL_UI[lang]
   const firstName     = contributor.name ? contributor.name.split(' ')[0] : 'there'
   const relLabel      = RELATIONSHIP_LABELS[contributor.relationship] ?? 'Contributor'
-  const subjectName   = archive.owner_name ? archive.owner_name.split(' ')[0] : 'the archive subject'
+  const subjectName   = archive.owner_name ? archive.owner_name.split(' ')[0] : 'the owner'
   const totalContribs = photosUploaded + videosUploaded + voiceRecordings + contributor.questions_answered + contributor.photos_labelled
 
   return (
@@ -1514,7 +1514,7 @@ export default function ContributeClient({
           {ui.welcome(firstName)}
         </p>
         <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, color: '#8A8680', margin: '0 0 6px' }}>
-          You have been invited to contribute to this archive.
+          You have been invited to contribute to this Basalith.
         </p>
         <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.44rem', letterSpacing: '0.15em', color: 'rgba(138,134,128,0.6)', margin: 0 }}>
           {relLabel}{totalContribs > 0 ? ` · ${ui.contributions_n(totalContribs)}` : ''}

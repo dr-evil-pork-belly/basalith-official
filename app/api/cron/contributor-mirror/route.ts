@@ -47,20 +47,20 @@ function buildMirrorEmail(
 
   <div style="padding:32px">
     <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#B8B4AB;margin:0 0 24px">${firstName},</p>
-    <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#F0EDE6;line-height:1.7;margin:0 0 8px">This month your contributors added memories to your archive.</p>
+    <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#F0EDE6;line-height:1.7;margin:0 0 8px">This month your contributors added memories to your Basalith.</p>
     <p style="font-family:Georgia,serif;font-size:16px;font-weight:300;font-style:italic;color:#706C65;line-height:1.7;margin:0 0 32px">Here is what they said.</p>
 
     ${answersHtml}
 
     <div style="margin:0 0 32px;padding:20px 24px;border-left:3px solid rgba(196,162,74,0.3);background:rgba(196,162,74,0.04)">
       <p style="font-family:Georgia,serif;font-size:15px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0">
-        Is there anything here you want to add to — or correct?
+        Is there anything here you want to add to, or correct?
         The entity learns from both what your contributors observe and what you add in response.
       </p>
     </div>
 
     <a href="${portalUrl}" style="display:inline-block;background:#C4A24A;color:#0A0908;font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;text-decoration:none;padding:14px 28px;border-radius:2px">
-      RESPOND TO YOUR ARCHIVE →
+      RESPOND IN YOUR BASALITH →
     </a>
   </div>
 

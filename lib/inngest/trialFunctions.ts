@@ -73,7 +73,7 @@ export const trialWarn = inngest.createFunction(
           .is('contributor_id', null)
 
         const email = buildTrialWarningEmail({
-          archiveName: trial.name ?? 'your archive',
+          archiveName: trial.name ?? 'your Basalith',
           ownerName:   trial.owner_name,
           deposits:    count ?? 0,
           expiresAt:   new Date(trial.trial_expires_at),

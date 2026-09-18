@@ -74,10 +74,10 @@ export default function MilestoneProgress({ currentDeposits = 0 }: { currentDepo
   }
 
   return (
-    <section aria-label="Your archive journey" style={{ padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,80px)' }}>
+    <section aria-label="Your progress" style={{ padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,80px)' }}>
       <div style={{ maxWidth: '900px', margin: '0 auto' }}>
         <p style={{ ...MONO, fontSize: '0.6rem', color: ON_DARK.gold, marginBottom: '12px' }}>
-          Your Archive Journey
+          Your progress
         </p>
         <h2 style={{
           ...SERIF,

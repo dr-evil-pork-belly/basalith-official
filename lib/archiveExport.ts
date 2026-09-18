@@ -272,7 +272,7 @@ const MEDIA: MediaSource[] = [
 
 /** Tables that exist on the archive and are deliberately not in the zip. */
 const NOT_INCLUDED = [
-  { name: 'vault_files',           reason: 'Legacy Guide vault storage. Keyed to a Guide, not to this archive.' },
+  { name: 'vault_files',           reason: 'Legacy Guide vault storage. Keyed to a Guide, not to this Basalith.' },
   { name: 'mirror_reflections',    reason: 'Internal reflection drafts. Not part of the exported record in this version.' },
   { name: 'incident_sessions',     reason: 'Internal session state for the interview engine.' },
   { name: 'deposit_domain_scores', reason: 'Internal scoring derived from deposits already included in full.' },
@@ -356,7 +356,7 @@ export async function buildArchiveExport(
   // each use, so a column that stops being a string fails in one place.
   const info = {
     id:        str(archive.id) ?? archiveId,
-    name:      str(archive.name) ?? 'Your archive',
+    name:      str(archive.name) ?? 'Your Basalith',
     ownerName: str(archive.owner_name),
     ownerEmail: str(archive.owner_email),
     familyName: str(archive.family_name),
@@ -567,11 +567,11 @@ export function buildReadme(manifest: ExportManifest, archiveName: string, now: 
     ? [...mediaByFolder.entries()]
         .map(([f, v]) => `  ${(f + '/').padEnd(34)}${v.n} ${v.n === 1 ? 'file' : 'files'}, ${mb(v.bytes)} MB`)
         .join('\n')
-    : '  (no photographs, recordings, or video are stored for this archive)'
+    : '  (no photographs, recordings, or video are stored for this Basalith)'
 
   const exclusionLines = manifest.excluded.length
     ? manifest.excluded.map(e => `  ${e.value ?? '(no path)'}\n      from ${e.sourceTable}. ${e.reason}`).join('\n')
-    : '  Nothing. Every file recorded for this archive is in this export.'
+    : '  Nothing. Every file recorded for this Basalith is in this export.'
 
   const totalFiles = manifest.totals.mediaFiles
 
@@ -579,19 +579,19 @@ export function buildReadme(manifest: ExportManifest, archiveName: string, now: 
     .map(n => `  ${n.name.padEnd(24)}${n.reason}`)
     .join('\n')
 
-  return `BASALITH ARCHIVE EXPORT
+  return `BASALITH EXPORT
 ${archiveName}
 Generated ${date}
 
 WHAT THIS IS
 
-This is everything recorded in your archive. The actual files, not links to
+This is everything recorded in your Basalith. The actual files, not links to
 them. Everything listed below is inside this zip and stays readable with no
 connection to Basalith and no account. You can copy it, store it, and open it
 in twenty years.
 
 Recorded means every photograph, recording, video, document, and written
-record that Basalith holds a record of for this archive. The counts below are
+record that Basalith holds for you. The counts below are
 that record, item for item. MANIFEST.json lists every file in this zip and
 names anything excluded and the reason.
 
@@ -603,7 +603,7 @@ YOUR RECORDS
 
 ${tableLines}
 
-An entry showing 0 records means that table holds nothing for your archive. It
+An entry showing 0 records means that table holds nothing for your Basalith. It
 does not mean something failed. If any part of this export could not be read,
 no zip is produced at all and we contact you instead.
 
@@ -613,7 +613,7 @@ ${mediaLines}
 
   Total ${totalFiles} ${totalFiles === 1 ? 'file' : 'files'}, ${mb(manifest.totals.mediaBytes)} MB
 
-That total is every file recorded for this archive, less anything named under
+That total is every file recorded for this Basalith, less anything named under
 NOT INCLUDED below.
 
 File names are numbered so that nothing overwrites anything else. MANIFEST.json
@@ -624,7 +624,7 @@ NOT INCLUDED, AND WHY
 
 ${exclusionLines}
 
-The following are held by Basalith but are not part of an archive export:
+The following are held by Basalith but are not part of an export:
 
 ${notIncludedLines}
 
@@ -639,13 +639,13 @@ is the real one.
 WHAT YOU CAN DO WITH THIS
 
 Keep it. Copy it to another drive. Give it to your family or your attorney.
-You own your archive. Heritage Nexus Inc. is the custodian, not the owner.
+You own your Basalith. Heritage Nexus Inc. is the custodian, not the owner.
 Nothing in this zip stops working if Basalith does.
 
 You can request another export at any time. There is no limit and no reason
 required.
 
-Questions about your archive: hello@basalith.xyz
+Questions about your Basalith: hello@basalith.xyz
 Security concerns: security@basalith.ai
 
 Heritage Nexus Inc.

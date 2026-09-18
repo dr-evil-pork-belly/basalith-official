@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
   const contexts   = contextsResult.data ?? []
 
   if (!archive) {
-    return NextResponse.json({ error: 'Archive not found' }, { status: 404 })
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
   const ownerName   = archive.owner_name ?? archive.name

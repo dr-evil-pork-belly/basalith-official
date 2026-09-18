@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
         p_contributor_id: contributor.id,
       })
     } catch {
-      // RPC may not exist — fallback to read-then-write
+      // RPC may not exist, fallback to read-then-write
       const { data: current } = await supabaseAdmin
         .from('contributors')
         .select('photos_uploaded')
@@ -91,7 +91,7 @@ export async function POST(req: NextRequest) {
       resend.emails.send({
         from:    `${archive.name} <${fromEmail}>`,
         to:      archive.owner_email,
-        subject: `${contributorName} uploaded a photograph to your archive`,
+        subject: `${contributorName} uploaded a photograph to your Basalith`,
         html: `<!DOCTYPE html>
 <html>
 <body style="background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:520px;margin:0 auto;padding:0">
@@ -102,7 +102,7 @@ export async function POST(req: NextRequest) {
   </div>
   <div style="padding:32px 40px 40px">
     <p style="font-family:Georgia,serif;font-size:18px;font-weight:700;color:#F0EDE6;margin:0 0 16px">
-      ${contributorName} added a photograph to your archive.
+      ${contributorName} added a photograph to your Basalith.
     </p>
     <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#9DA3A8;line-height:1.7;margin:0 0 24px">
       It is being analyzed by AI. Once processed it will appear in your gallery.

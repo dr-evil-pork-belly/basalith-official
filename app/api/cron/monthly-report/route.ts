@@ -98,7 +98,7 @@ export async function GET(req: NextRequest) {
         to:      archive.owner_email,
         subject: lang === 'zh'
           ? `${archive.name} · ${monthName}档案报告`
-          : `Your archive in ${monthName}: ${archive.name}`,
+          : `Your Basalith in ${monthName}: ${archive.name}`,
         html:    buildMonthlyReportEmail({
           archiveName:             archive.name,
           ownerFirstName,
@@ -205,7 +205,7 @@ function buildMonthlyReportEmail({
   <div style="padding:32px">
 
     <p style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#F0EDE6;margin:0 0 8px">
-      ${hasActivity ? t('monthlyReportTitle', lang) : (lang === 'zh' ? '您的档案在等待您。' : 'Your archive is waiting for you.')}
+      ${hasActivity ? t('monthlyReportTitle', lang) : (lang === 'zh' ? '您的档案在等待您。' : 'Your Basalith is waiting for you.')}
     </p>
     <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#706C65;margin:0 0 32px">
       ${monthName} · ${archiveName}
@@ -225,10 +225,10 @@ function buildMonthlyReportEmail({
     ` : `
     <div style="border-left:3px solid rgba(196,162,74,0.3);padding:16px 20px;margin-bottom:32px">
       <p style="font-family:Georgia,serif;font-size:16px;font-style:italic;color:#B8B4AB;margin:0 0 8px">
-        Your archive had no new activity this month.
+        Your Basalith had no new activity this month.
       </p>
       <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#706C65;margin:0">
-        The most meaningful archives are built a little at a time. This week's Monday prompt is waiting for you.
+        The best ones are built a little at a time. This week's Monday prompt is waiting for you.
       </p>
     </div>
     `}
@@ -279,7 +279,7 @@ function buildMonthlyReportEmail({
 
     <div style="border-top:1px solid rgba(240,237,230,0.06);padding-top:20px;margin-bottom:24px">
       <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#706C65;margin:0 0 12px">
-        YOUR ARCHIVE IN NUMBERS
+        YOUR BASALITH IN NUMBERS
       </p>
       <p style="font-family:'Courier New',monospace;font-size:11px;color:#5C6166;line-height:2.2;margin:0">
         ${totalPhotos} PHOTOGRAPHS<br>
@@ -310,13 +310,13 @@ function buildMonthlyReportEmail({
 
 function getDepthLabel(score: number, lang = 'en'): string {
   if (lang === 'zh') {
-    if (score >= 80) return '权威发言——我们最丰富的档案之一'
-    if (score >= 60) return '深度呈现——已达到卓越的准确度'
-    if (score >= 40) return '逐渐成形——您的实体正在变得清晰'
-    if (score >= 20) return '仍在学习——真正的深度正在涌现'
-    return '刚刚开始——基础正在奠定'
+    if (score >= 80) return '权威发言：我们最丰富的档案之一'
+    if (score >= 60) return '深度呈现：已达到卓越的准确度'
+    if (score >= 40) return '逐渐成形：您的实体正在变得清晰'
+    if (score >= 20) return '仍在学习：真正的深度正在涌现'
+    return '刚刚开始：基础正在奠定'
   }
-  if (score >= 80) return 'Speaking with authority: one of our richest archives'
+  if (score >= 80) return 'Speaking with authority: one of our richest records'
   if (score >= 60) return 'Speaking with depth: remarkable accuracy achieved'
   if (score >= 40) return 'Taking shape: your entity is becoming recognizable'
   if (score >= 20) return 'Still learning: real depth is emerging'

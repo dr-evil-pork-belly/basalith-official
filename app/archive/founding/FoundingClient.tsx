@@ -194,8 +194,8 @@ export default function FoundingClient({
           <p className="founding-eyebrow" style={{ fontFamily: MONO, fontSize: '11.5px', letterSpacing: '0.24em', textTransform: 'uppercase', color: GOLD, marginBottom: '18px' }}>
             A call on {activeArea}
           </p>
-          <h1 style={{ fontFamily: SERIF, fontSize: 'clamp(34px,4.2vw,50px)', fontWeight: 400, lineHeight: 1.08, letterSpacing: '-0.015em', color: INK, marginBottom: '16px' }}>
-            Where your archive is thin, in your own words.
+          <h1 className="founding-h1" style={{ fontFamily: SERIF, fontSize: 'clamp(34px,4.2vw,50px)', fontWeight: 400, lineHeight: 1.08, letterSpacing: '-0.015em', color: INK, marginBottom: '16px' }}>
+            Where your record is thin, in your own words.
           </h1>
           <p style={{ fontFamily: SERIF, fontSize: '19px', fontWeight: 400, lineHeight: 1.6, color: BODY, marginBottom: '34px', maxWidth: '560px' }}>
             One question to start, then a few that follow what you say. About ten minutes. Speak or type. When it closes, your map is read again.
@@ -206,7 +206,7 @@ export default function FoundingClient({
           <p className="founding-eyebrow" style={{ fontFamily: MONO, fontSize: '11.5px', letterSpacing: '0.24em', textTransform: 'uppercase', color: GOLD, marginBottom: '18px' }}>
             The Founding Sequence
           </p>
-          <h1 style={{ fontFamily: SERIF, fontSize: 'clamp(34px,4.2vw,50px)', fontWeight: 400, lineHeight: 1.08, letterSpacing: '-0.015em', color: INK, marginBottom: '16px' }}>
+          <h1 className="founding-h1" style={{ fontFamily: SERIF, fontSize: 'clamp(34px,4.2vw,50px)', fontWeight: 400, lineHeight: 1.08, letterSpacing: '-0.015em', color: INK, marginBottom: '16px' }}>
             {isBusiness
               ? 'Three of the hardest calls you made running this business.'
               : 'Three of the hardest calls you ever made.'}
@@ -255,7 +255,7 @@ export default function FoundingClient({
                 <p style={{ fontFamily: SERIF, fontSize: '14.5px', color: SECOND, lineHeight: 1.5, display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span aria-hidden="true" style={dot} />
                   {c.state === 'done'
-                    ? `In your archive · ${c.deposits} ${c.deposits === 1 ? 'deposit' : 'deposits'}`
+                    ? `On the record · ${c.deposits} ${c.deposits === 1 ? 'deposit' : 'deposits'}`
                     : c.state === 'current'
                       ? `In progress · ${c.turns} answered`
                       : status.nextCall === c.call
@@ -276,12 +276,12 @@ export default function FoundingClient({
             {firstName ? `${firstName}, the Founding Sequence is complete.` : 'The Founding Sequence is complete.'}
           </h2>
           <p style={{ fontFamily: SERIF, fontSize: '17.5px', fontWeight: 400, lineHeight: 1.65, color: BODY, marginBottom: '14px', maxWidth: '58ch' }}>
-            We read every word ourselves. Within 48 hours we will be in touch to set up your first read: a short video call about what your archive holds, where it is still thin, and what comes next.
+            We read every word ourselves. Within 48 hours we will be in touch to set up your first read: a short video call about what your record holds, where it is still thin, and what comes next.
           </p>
           <p style={{ fontFamily: SERIF, fontSize: '17.5px', fontWeight: 400, lineHeight: 1.65, color: BODY, marginBottom: '26px', maxWidth: '58ch' }}>
-            Your archive keeps growing from here. The dashboard has your next question whenever you are ready.
+            Your Basalith keeps growing from here. The dashboard has your next question whenever you are ready.
           </p>
-          <Link href="/archive/dashboard" style={goldButton()}>Open your archive</Link>
+          <Link href="/archive/dashboard" style={goldButton()}>Open your Basalith</Link>
           <ProofCard trial={trial} />
         </section>
       )}
@@ -291,7 +291,7 @@ export default function FoundingClient({
         <section aria-live="polite" style={panel()}>
           <p className="founding-eyebrow" style={eyebrow()}>Saved</p>
           <h2 style={{ fontFamily: SERIF, fontSize: '30px', fontWeight: 300, color: INK, lineHeight: 1.2, marginBottom: '14px' }}>
-            Call {justClosed.call} is in your archive.
+            Call {justClosed.call} is on the record.
           </h2>
           <p style={{ fontFamily: SERIF, fontSize: '17.5px', fontWeight: 400, lineHeight: 1.65, color: BODY, marginBottom: '26px', maxWidth: '58ch' }}>
             {justClosed.deposits} {justClosed.deposits === 1 ? 'deposit' : 'deposits'}, in your own words. The next call is ready when you are. Now, or another day; it will be here.
@@ -329,12 +329,12 @@ export default function FoundingClient({
         <section aria-live="polite" style={panel()}>
           <p className="founding-eyebrow" style={eyebrow()}>Saved</p>
           <h2 style={{ fontFamily: SERIF, fontSize: '30px', fontWeight: 300, color: INK, lineHeight: 1.2, marginBottom: '14px' }}>
-            Your call on {areaClosed.area} is in your archive.
+            Your call on {areaClosed.area} is on the record.
           </h2>
           <p style={{ fontFamily: SERIF, fontSize: '17.5px', fontWeight: 400, lineHeight: 1.65, color: BODY, marginBottom: '26px', maxWidth: '58ch' }}>
             {areaClosed.deposits} {areaClosed.deposits === 1 ? 'deposit' : 'deposits'}, in your own words. Your map is being read again now; it takes about twenty minutes, and the dashboard shows the new reading when it is done.
           </p>
-          <Link href="/archive/dashboard" style={goldButton()}>Back to your archive</Link>
+          <Link href="/archive/dashboard" style={goldButton()}>Back to your Basalith</Link>
         </section>
       )}
 
@@ -373,7 +373,7 @@ export default function FoundingClient({
           )}
           {note === 'saved' && (
             <p style={{ fontFamily: SERIF, fontSize: '1rem', fontStyle: 'italic', color: GOLD, marginBottom: '14px', lineHeight: 1.7 }}>
-              Saved to your archive.
+              Saved to the record.
             </p>
           )}
 
@@ -438,6 +438,7 @@ export default function FoundingClient({
           .founding-card { margin-right: 0 !important; border-right: none !important; border-bottom: 1px solid var(--portal-rule); padding-left: 0; }
           .founding-card:last-child { border-bottom: none; }
         }
+        .founding-h1 { text-wrap: balance; max-width: 14ch; }
         .founding-eyebrow { display: flex; align-items: center; gap: 12px; }
         .founding-eyebrow::before { content: ''; display: block; width: 22px; height: 1px; background: var(--portal-gold-line); flex-shrink: 0; }
         .founding-eyebrow-dim::before { background: var(--invert-rule); }
@@ -470,7 +471,7 @@ function ProofCard({ trial = false, below = false }: { trial?: boolean; below?: 
   async function ask(): Promise<Proof> {
     const res = await fetch('/api/archive/founding/proof', { method: 'POST' })
     const data = await res.json().catch(() => ({}))
-    if (!res.ok) throw new Error(data?.error || 'Could not ask your archive right now.')
+    if (!res.ok) throw new Error(data?.error || 'Could not ask your Basalith right now.')
     return data as Proof
   }
 
@@ -487,7 +488,7 @@ function ProofCard({ trial = false, below = false }: { trial?: boolean; below?: 
       setProof(result)
       setState('done')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not ask your archive right now.')
+      setError(err instanceof Error ? err.message : 'Could not ask your Basalith right now.')
       setState('error')
     }
   }
@@ -502,7 +503,7 @@ function ProofCard({ trial = false, below = false }: { trial?: boolean; below?: 
     <div style={{ marginTop: below ? '8px' : '32px', marginBottom: below ? '28px' : 0, paddingTop: '26px', borderTop: '1px solid var(--portal-rule)' }}>
       <p className="founding-eyebrow" style={eyebrow()}>What it holds</p>
       <p style={{ fontFamily: SERIF, fontSize: '17.5px', fontWeight: 400, lineHeight: 1.65, color: BODY, marginBottom: '20px', maxWidth: '58ch' }}>
-        Your archive can already show you one thing it can answer, in your words, and one thing it will not, because you never said.
+        Your Basalith can already show you one thing it can answer, in your words, and one thing it will not, because you never said.
       </p>
 
       {state === 'idle' && (
@@ -510,7 +511,7 @@ function ProofCard({ trial = false, below = false }: { trial?: boolean; below?: 
       )}
       {state === 'loading' && (
         <p aria-live="polite" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '1rem', color: BODY }}>
-          Asking your archive. This takes a moment.
+          Asking your Basalith. This takes a moment.
         </p>
       )}
       {state === 'waiting' && (
@@ -536,13 +537,13 @@ function ProofCard({ trial = false, below = false }: { trial?: boolean; below?: 
         <div style={{ display: 'grid', background: 'var(--invert-bg)', color: 'var(--invert-fg)' }} aria-live="polite">
           {proof.grounded && (
             <div style={{ padding: '26px 28px 28px' }}>
-              <p className="founding-eyebrow" style={{ ...eyebrow(), color: 'var(--invert-gold)', marginBottom: '14px' }}>Checked against your archive</p>
+              <p className="founding-eyebrow" style={{ ...eyebrow(), color: 'var(--invert-gold)', marginBottom: '14px' }}>Checked against your record</p>
               {q(proof.grounded.question)}
               <p style={{ fontFamily: SERIF, fontSize: '17px', fontWeight: 400, color: 'var(--invert-fg)', lineHeight: 1.65, margin: '0 0 18px', whiteSpace: 'pre-wrap', maxWidth: '60ch' }}>
                 {proof.grounded.answer}
               </p>
               <p style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--invert-dim)', marginBottom: '8px' }}>
-                From your archive, in your words
+                From your record, in your words
               </p>
               <p style={{ fontFamily: SERIF, fontSize: '16.5px', fontStyle: 'italic', fontWeight: 400, color: 'var(--invert-body)', lineHeight: 1.65, margin: 0, whiteSpace: 'pre-wrap', maxWidth: '60ch' }}>
                 {proof.grounded.deposit}
@@ -551,7 +552,7 @@ function ProofCard({ trial = false, below = false }: { trial?: boolean; below?: 
           )}
           {proof.refusal && (
             <div style={{ padding: '24px 28px 28px', borderTop: proof.grounded ? '1px solid var(--invert-rule)' : 'none' }}>
-              <p className="founding-eyebrow founding-eyebrow-dim" style={{ ...eyebrow(), color: 'var(--invert-dim)', marginBottom: '14px' }}>Where the archive is silent, it says so</p>
+              <p className="founding-eyebrow founding-eyebrow-dim" style={{ ...eyebrow(), color: 'var(--invert-dim)', marginBottom: '14px' }}>Where the record is silent, it says so</p>
               {q(proof.refusal.question)}
               <p style={{ fontFamily: SERIF, fontSize: '17px', fontWeight: 400, color: 'var(--invert-body)', lineHeight: 1.65, margin: 0, whiteSpace: 'pre-wrap', maxWidth: '60ch' }}>
                 {proof.refusal.reply}
@@ -570,7 +571,7 @@ function ProofCard({ trial = false, below = false }: { trial?: boolean; below?: 
           slice C; until then this is the sentence alone. */}
       {trial && (
         <p style={{ fontFamily: SERIF, fontSize: '17.5px', fontWeight: 400, lineHeight: 1.65, color: BODY, margin: '22px 0 0' }}>
-          Found your archive to keep going.
+          Found your Basalith to keep going.
         </p>
       )}
     </div>

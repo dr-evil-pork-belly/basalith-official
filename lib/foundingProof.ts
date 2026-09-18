@@ -105,8 +105,8 @@ export function allProofCopy(): string[] {
 }
 
 const NOTES = [
-  'Every question we tried came back grounded. Your archive already covers more than three calls usually do.',
-  'The archive declined every question we tried on the grounded side. That happens when the scorer has not finished with your deposits. Try again in a few minutes.',
+  'Every question we tried came back grounded. Your record already covers more than three calls usually do.',
+  'Your Basalith declined every question we tried on the grounded side. That happens when the scorer has not finished with your deposits. Try again in a few minutes.',
 ]
 
 // ── One ask, verified ─────────────────────────────────────────────────────────

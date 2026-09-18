@@ -70,7 +70,7 @@ export async function GET(req: NextRequest) {
 
           if (!useTextPrompt) {
             // ── Photo-based story prompt (existing path) ─────────────────────
-            // Skip here — let per-archive photo logic handle it below
+            // Skip here, let per-archive photo logic handle it below
             continue
           }
 
@@ -89,7 +89,7 @@ export async function GET(req: NextRequest) {
             continue
           }
 
-          // Record before sending (idempotent — unique index prevents double-insert)
+          // Record before sending (idempotent: unique index prevents double-insert)
           const { error: insertError } = await supabaseAdmin
             .from('contributor_story_prompts')
             .insert({
@@ -206,10 +206,10 @@ export async function GET(req: NextRequest) {
 
               console.log('[story-prompt-monday] sending photo to:', contributor.email, 'replyTo:', photoReplyTo)
               await resend.emails.send({
-                from:    `The ${archive.family_name} Archive <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
+                from:    `The ${archive.family_name} Basalith <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
                 to:      contributor.email,
                 replyTo: photoReplyTo,
-                subject: `Monday mystery — what was happening here? · ${archive.name}`,
+                subject: `Monday mystery: what was happening here? · ${archive.name}`,
                 html:    buildMondayPhotoEmail(archive.family_name, photoUrl, selectedPhoto.ai_era_estimate, dateStr),
                 headers: {
                   'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
@@ -274,7 +274,7 @@ function buildStoryPromptEmail(
 <body style="background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:600px;margin:0 auto;padding:0">
   <div style="padding:32px 32px 0">
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">${archiveName.toUpperCase()}</p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0">A MEMORY FOR THE ARCHIVE</p>
+    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0">A MEMORY FOR THE RECORD</p>
   </div>
   <div style="padding:32px">
     <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#B8B4AB;margin:0 0 24px">${ui.greeting}</p>
@@ -303,7 +303,7 @@ function buildMondayPhotoEmail(
 <html>
 <body style="background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:600px;margin:0 auto;padding:0">
   <div style="padding:32px 32px 0">
-    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">THE ${familyName.toUpperCase()} ARCHIVE</p>
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">THE ${familyName.toUpperCase()} BASALITH</p>
     <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0">MONDAY MYSTERY · ${dateStr}</p>
   </div>
   <div style="padding:24px 32px 0">
@@ -315,11 +315,11 @@ function buildMondayPhotoEmail(
     <div style="border-left:3px solid rgba(196,162,74,0.4);padding:16px 20px;margin-bottom:24px">
       <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#F0EDE6;line-height:1.7;margin:0;font-style:italic">What do you think was happening here? Who do you recognize? Where do you think this was taken?</p>
     </div>
-    <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#B8B4AB;line-height:1.7;margin:0 0 24px">Reply to this email with whatever you remember — or your best guess. On Friday we will share everything the family contributed about this photograph.</p>
+    <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#B8B4AB;line-height:1.7;margin:0 0 24px">Reply to this email with whatever you remember, or your best guess. On Friday we will share everything the family contributed about this photograph.</p>
     <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#A08A52;margin:0">REVEAL ARRIVES FRIDAY · REPLY WITH WHAT YOU KNOW</p>
   </div>
   <div style="padding:0 32px 32px;border-top:1px solid rgba(240,237,230,0.06)">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:20px 0 0">BASALITH · XYZ<br>The ${familyName} Archive</p>
+    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:20px 0 0">BASALITH · XYZ<br>The ${familyName} Basalith</p>
   </div>
 </body>
 </html>`

@@ -22,7 +22,7 @@ export default async function SuccessorScenariosPage() {
 
   return (
     <SuccessorScenariosClient
-      archiveName={archiveResult.data?.name ?? 'Archive'}
+      archiveName={archiveResult.data?.name ?? 'Basalith'}
       ownerName={archiveResult.data?.owner_name ?? ''}
       responses={responsesResult.data ?? []}
     />

@@ -20,8 +20,8 @@ import { mono, serif, StoneBlock } from './StonePrimitives'
 // to roughly 1.3:1 on stone.
 
 const VARIANT: Record<'default' | Audience, { eyebrow: string; href: string; cta: string }> = {
-  default: { eyebrow: 'For the forward-thinking',     href: '/apply',                  cta: 'Begin your archive'       },
-  family:  { eyebrow: 'For individuals and families', href: '/apply',                  cta: 'Begin a family archive'   },
+  default: { eyebrow: 'For the forward-thinking',     href: '/apply',                  cta: 'Begin your Basalith'      },
+  family:  { eyebrow: 'For individuals and families', href: '/apply',                  cta: 'Begin a family Basalith'  },
   founder: { eyebrow: 'For founders and successors',  href: '/apply?type=succession',  cta: 'Tell us about the handoff' },
 }
 
@@ -34,7 +34,7 @@ function HomeClosingView({ audience }: { audience: Audience | null }) {
   const variant = VARIANT[audience ?? 'default']
 
   return (
-    <section aria-label="Begin your archive">
+    <section aria-label="Begin your Basalith">
       <StoneBlock
         gap="20px"
         style={{ borderTop: '1px solid var(--stone-rule)', paddingBottom: '40px' }}

@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
       const action    = buildActionUrl(recordingBase, { archiveId: archive.id, isOwner: 'true' })
       const lang      = archive.preferred_language ?? 'en'
 
-      console.log('[twilio/voice] lang:', lang, '— building TwiML')
+      console.log('[twilio/voice] lang:', lang, 'building TwiML')
 
       // Voice + greeting per language.
       // Cantonese (yue) uses Google TTS; vi/tl use English neural with native text.
@@ -142,7 +142,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ── 2. Check contributors table ───────────────────────────────────────────────
-    console.log('[twilio/voice] not an owner — checking contributors for phone:', from)
+    console.log('[twilio/voice] not an owner, checking contributors for phone:', from)
     const { data: contributor } = await supabaseAdmin
       .from('contributors')
       .select('id, name, archive_id, archives(name, family_name)')
@@ -162,7 +162,7 @@ export async function POST(req: NextRequest) {
         .limit(1)
 
       const question     = questions?.[0] ?? null
-      const archiveName  = xmlSafe((contributor as any).archives?.name ?? 'your archive')
+      const archiveName  = xmlSafe((contributor as any).archives?.name ?? "your family's Basalith")
       const firstName    = xmlSafe((contributor.name ?? 'there').split(' ')[0])
       const questionText = xmlSafe(
         question?.question_text
@@ -207,7 +207,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ── 3. Unknown caller ─────────────────────────────────────────────────────────
-    console.log('[twilio/voice] unknown caller — returning generic greeting')
+    console.log('[twilio/voice] unknown caller, returning generic greeting')
     const twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Say voice="alice">Hello, and thank you for calling Basalith.</Say>

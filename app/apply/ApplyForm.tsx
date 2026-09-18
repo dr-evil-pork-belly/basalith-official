@@ -108,7 +108,7 @@ export default function ApplyForm({ initialType = 'legacy' }: { initialType?: st
               <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--color-text-secondary)', lineHeight: 1.9, maxWidth: '420px', margin: '0 auto 32px' }}>
                 {isBusiness
                   ? 'We will contact you within 48 hours to talk through the transition and tell you plainly whether Basalith fits.'
-                  : <>We read every application ourselves. If your archive is a good fit, you will hear from us within 48 hours with next steps.<br /><br />If it is not a fit, we will not chase you.</>}
+                  : <>We read every application ourselves. If your Basalith is a good fit, you will hear from us within 48 hours with next steps.<br /><br />If it is not a fit, we will not chase you.</>}
               </p>
               <p style={{ ...MONO, fontSize: '0.48rem', color: 'var(--color-gold)' }}>Basalith · Heritage Nexus Inc.</p>
             </div>
@@ -120,7 +120,7 @@ export default function ApplyForm({ initialType = 'legacy' }: { initialType?: st
 
               {/* Type selector */}
               <div style={{ marginBottom: '40px' }}>
-                <p style={{ ...LABEL, marginBottom: '12px' }}>This archive is for</p>
+                <p style={{ ...LABEL, marginBottom: '12px' }}>This Basalith is for</p>
                 <div style={{ display: 'flex', gap: '10px' }}>
                   {(['legacy', 'succession', 'acquisition'] as ApplyType[]).map(type => (
                     <button key={type} type="button" className="type-btn"
@@ -206,7 +206,7 @@ export default function ApplyForm({ initialType = 'legacy' }: { initialType?: st
 
                 {!isBusiness && (
                   <div>
-                    <label style={LABEL} htmlFor="apply-subject">Who is the primary archive subject</label>
+                    <label style={LABEL} htmlFor="apply-subject">Who this Basalith is built around</label>
                     <select id="apply-subject" required value={form.subject} onChange={set('subject')}
                       className="apply-input" style={{ ...INPUT, cursor: 'pointer', appearance: 'none' as const }}>
                       <option value="" disabled>Select one</option>

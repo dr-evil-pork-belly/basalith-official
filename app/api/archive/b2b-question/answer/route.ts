@@ -279,7 +279,7 @@ export async function POST(req: NextRequest) {
           if (firstFounding) voiceQuery = voiceQuery.gte('created_at', firstFounding)
           const { count } = await voiceQuery
           const input = {
-            archiveName: archiveName || 'Basalith archive',
+            archiveName: archiveName || 'Your Basalith',
             ownerName:   ownerName || null,
             ownerEmail,
             deposits,

@@ -12,7 +12,7 @@ export default function ConfirmedPage() {
               <path d="M5 12l5 5L20 7" stroke="#FFB347" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
-          <h1 className="font-serif text-[2.5rem] font-semibold text-text-primary leading-tight tracking-[-0.02em] mb-4">Your Archive Has Been Reserved.</h1>
+          <h1 className="font-serif text-[2.5rem] font-semibold text-text-primary leading-tight tracking-[-0.02em] mb-4">Your Basalith is reserved.</h1>
           <p className="font-sans text-[0.95rem] text-text-secondary leading-relaxed mb-4">We have received your application and will be in touch within 48 hours to begin The Founding process.</p>
           <p className="font-sans text-[0.85rem] text-text-muted mb-12">Questions? Email us at <a href="mailto:legacy@basalith.xyz" className="text-amber hover:text-amber/80 transition-colors">legacy@basalith.xyz</a></p>
           <a href="/" className="btn-monolith-amber">Return Home</a>

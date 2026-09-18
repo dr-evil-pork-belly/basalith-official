@@ -82,7 +82,7 @@ export async function GET(req: NextRequest) {
   const sessionCompleted = sessionRow?.completed === true
 
   if (!archive) {
-    return NextResponse.json({ error: 'Archive not found' }, { status: 404 })
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
   // ── Spark ────────────────────────────────────────────────────────────────────
@@ -121,7 +121,7 @@ export async function GET(req: NextRequest) {
 
   let { data: photo } = await fetchNextPhoto(seenIds)
 
-  // All photos seen — reset and start over
+  // All photos seen, reset and start over
   if (!photo && seenIds.length > 0) {
     console.log('[dashboard-mobile] all photos seen, resetting owner_photo_sends')
     await supabaseAdmin.from('owner_photo_sends').delete().eq('archive_id', archiveId)

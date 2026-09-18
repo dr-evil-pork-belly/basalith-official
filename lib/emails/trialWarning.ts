@@ -51,9 +51,9 @@ export function trialWarningLines(input: TrialWarningInput): { greeting: string;
   const date = formatPacificDate(firstExpiryRunAfter(input.expiresAt))
   return {
     greeting:  first ? `${first},` : 'Hello,',
-    body:      `Your archive at ${input.archiveName} holds ${count} from your first call. It is deleted on ${date} unless you keep it.`,
+    body:      `Your Basalith holds ${count} from your first call. It is deleted on ${date} unless you keep it.`,
     keep:      'Reply to this email and we will keep it open while you decide.',
-    export:    'You can download everything in it from your archive settings.',
+    export:    'You can download everything in it from your Basalith settings.',
     exportUrl: `${site}/archive/preferences`,
   }
 }
@@ -85,7 +85,7 @@ export function buildTrialWarningEmail(input: TrialWarningInput): BuiltEmail {
       <p style="font-size:16px;font-weight:300;line-height:1.8;margin:0;color:#F0EDE6">${esc(l.keep)}</p>
     </div>
     <p style="font-size:15px;font-weight:300;line-height:1.8;margin:0 0 8px;color:#B8B4AB">${esc(l.export)}</p>
-    <p style="margin:0 0 32px"><a href="${l.exportUrl}" style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#C4A24A;text-decoration:none;text-transform:uppercase">Your archive settings</a></p>
+    <p style="margin:0 0 32px"><a href="${l.exportUrl}" style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#C4A24A;text-decoration:none;text-transform:uppercase">Your Basalith settings</a></p>
     <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#706C65;margin:0">Basalith · Heritage Nexus Inc.</p>
   </div>
 </div>`.trim()
@@ -96,5 +96,5 @@ export function buildTrialWarningEmail(input: TrialWarningInput): BuiltEmail {
 /** Every string the owner might see, for the copy-rule test. */
 export function allTrialWarningCopy(): string[] {
   const l = trialWarningLines({ archiveName: 'Test Archive', ownerName: 'Test Person', deposits: 2, expiresAt: new Date('2026-10-18T03:31:00Z') })
-  return [TRIAL_WARNING_SUBJECT, l.greeting, l.body, l.keep, l.export, 'Your archive settings']
+  return [TRIAL_WARNING_SUBJECT, l.greeting, l.body, l.keep, l.export, 'Your Basalith settings']
 }

@@ -51,7 +51,7 @@ async function computeB2BReadiness(archiveId: string) {
 
 export async function GET() {
   // Auth: Supabase owner session only. Ownership is verified against the
-  // archives table — a session carrying an archiveId is not proof of ownership
+  // archives table, a session carrying an archiveId is not proof of ownership
   // (getSessionUser fills archiveId for successors too).
   const session = await getSessionUser()
   if (!session?.archiveId) {
@@ -117,7 +117,7 @@ export async function GET() {
   ])
 
   if (archive.error) {
-    return NextResponse.json({ error: 'Archive not found' }, { status: 404 })
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
   const photos   = photographs.data ?? []

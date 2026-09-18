@@ -51,7 +51,7 @@ export async function POST() {
       max_tokens: 80,
       messages: [{
         role:    'user',
-        content: `Generate one unexpected memory prompt for someone building a personal legacy archive. Make it specific, surprising, and personal — not generic. Avoid topics similar to these recent entries: ${avoidContext}. Under 20 words. No em dashes. No quotation marks. Just the prompt.`,
+        content: `Generate one unexpected memory prompt for someone building their Basalith. Make it specific, surprising, and personal, not generic. Avoid topics similar to these recent entries: ${avoidContext}. Under 20 words. No em dashes. No quotation marks. Just the prompt.`,
       }],
     })
 

@@ -51,7 +51,7 @@ export default function MemoryMapClient() {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '400px' }}>
         <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.3em', color: 'var(--portal-gold-ink)', textTransform: 'uppercase' }}>
-          Mapping your archive…
+          Mapping your record…
         </p>
       </div>
     )
@@ -74,7 +74,7 @@ export default function MemoryMapClient() {
           Memory Map
         </p>
         <h1 style={{ fontFamily: 'var(--portal-serif)', fontSize: 'clamp(1.5rem,3vw,2.5rem)', fontWeight: 300, color: 'var(--portal-ink)', margin: '0 0 12px' }}>
-          Where your archive is strong.
+          Where your record is strong.
           Where it needs you.
         </h1>
         <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '1rem', fontStyle: 'italic', color: 'var(--portal-secondary)', lineHeight: 1.7, maxWidth: '560px', margin: 0 }}>

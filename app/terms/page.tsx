@@ -14,8 +14,8 @@ const SECTIONS = [
       // from every other surface months ago, and the business product was not
       // covered at all. Wording aligned to the live product; no change to the
       // legal substance of the section.
-      'Basalith is a service that captures how a person reasons and decides, for individuals and families and for businesses changing hands. It is operated by Heritage Nexus Inc. ("we", "us", "the Company"). By creating an archive or submitting an application, you ("the Subscriber") agree to be bound by these Terms of Service in their entirety.',
-      'Basalith provides a governed digital archive, including secure storage, contributor tools, guided capture sessions, and access to the cognitive reference model (the "entity") built from your archive, as described in the pricing and service documentation current at the time of your Founding.',
+      'Basalith is a service that captures how a person reasons and decides, for individuals and families and for businesses changing hands. It is operated by Heritage Nexus Inc. ("we", "us", "the Company"). A "Basalith" is the record and the entity built for one person or one business under this agreement. By creating a Basalith or submitting an application, you ("the Subscriber") agree to be bound by these Terms of Service in their entirety.',
+      'The Company provides your Basalith as a governed digital service, including secure storage, contributor tools, guided capture sessions, and access to the cognitive reference model (the "entity") built from your record, as described in the pricing and service documentation current at the time of your Founding.',
       // REMOVED 2026-08-12: two sentences that referred the Subscriber to a
       // "separate Basalith agreement, executed at the time of your Founding" for
       // ownership, governance, and continuity, and gave that document precedence
@@ -29,7 +29,7 @@ const SECTIONS = [
       // spoke to the archive as an asset, so leaving the narrow wording said
       // these Terms cover the commercial relationship and left nothing covering
       // the archive. Ownership itself is stated in sections 03, 05, and 06.
-      'These Terms govern your use of the Basalith service in full, including your archive.',
+      'These Terms govern your use of the Basalith service in full, including your Basalith.',
       'We reserve the right to update these Terms. Material changes will be communicated by email no fewer than 30 days before taking effect. Continued use of the service after that date constitutes acceptance.',
     ],
   },
@@ -45,10 +45,10 @@ const SECTIONS = [
       // sentence is new, because /pricing publishes that floor and the Terms
       // were silent on it. Monthly billing and its 12-month minimum are stated
       // because /pricing offers them.
-      'All Basalith archives require a one-time Founding fee, due at the commencement of your archive: currently $2,500 for an individual or family archive and $5,000 for a business succession archive. The Founding fee covers initial archive architecture, legal framework configuration, and The Founding as described in the service documentation current at the time of your Founding. It is non-refundable once The Founding process has commenced. Business acquisition engagements are priced per transaction, starting at $50,000, and are invoiced separately under a written engagement rather than under the subscription terms below.',
-      'Following The Founding, archives are maintained on a subscription basis at the rate applicable to your chosen plan. Individual and family plans: Active ($3,600 per year, or $360 per month), Resting ($600 per year, or $60 per month), and Legacy ($1,200 per year, billed annually). Business succession: $12,000 per year, with post-transition successor access at $3,600 per year. Monthly plans carry a 12-month minimum commitment. Prices are denominated in US dollars and are exclusive of any taxes, duties, or levies that may apply in your jurisdiction.',
+      'Every Basalith requires a one-time Founding fee, due at the commencement of your Basalith: currently $2,500 for an individual or family Basalith and $5,000 for a business succession Basalith. The Founding fee covers the initial architecture of your Basalith, legal framework configuration, and The Founding as described in the service documentation current at the time of your Founding. It is non-refundable once The Founding process has commenced. Business acquisition engagements are priced per transaction, starting at $50,000, and are invoiced separately under a written engagement rather than under the subscription terms below.',
+      'Following The Founding, your Basalith is maintained on a subscription basis at the rate applicable to your chosen plan. Individual and family plans: Active ($3,600 per year, or $360 per month), Resting ($600 per year, or $60 per month), and Legacy ($1,200 per year, billed annually). Business succession: $12,000 per year, with post-transition successor access at $3,600 per year. Monthly plans carry a 12-month minimum commitment. Prices are denominated in US dollars and are exclusive of any taxes, duties, or levies that may apply in your jurisdiction.',
       'Annual subscriptions are billed on the anniversary of your Founding date. Monthly subscriptions are billed monthly from that date. Payment is processed by Stripe. Your Family Trust, estate entity, or personal account may be designated as the billing party at any time.',
-      'Invoices are issued 14 days before each renewal date. If payment is not received, your archive moves to Resting status. Your content is preserved in full during Resting, and your entity remains intact. Active features are suspended until payment resumes. We do not delete an archive for non-payment. Permanent deletion occurs only through the deliberate process described in the Cancellation section below.',
+      'Invoices are issued 14 days before each renewal date. If payment is not received, your Basalith moves to Resting status. Your content is preserved in full during Resting, and your entity remains intact. Active features are suspended until payment resumes. We do not delete a Basalith for non-payment. Permanent deletion occurs only through the deliberate process described in the Cancellation section below.',
     ],
   },
   {
@@ -56,9 +56,9 @@ const SECTIONS = [
     title: 'Cancellation',
     body: [
       'You may cancel your annual subscription at any time by providing written notice to legacy@basalith.xyz. Cancellation takes effect at the end of the current billing period. No partial refunds are issued for unused subscription time.',
-      'Upon cancellation, you retain full rights to a complete export of your archive in open, portable formats. This export right is unconditional and does not require a reason. Export requests are fulfilled within 30 business days.',
-      'Cancellation of a subscription is distinct from dissolution of your archive. Dissolution is the permanent deletion of your archive, and it is a separate, deliberate act. It requires a verified written request from the designated Custodian, or from an executor with documented authority. After the request is verified, Heritage Nexus Inc. holds the archive for 12 months, then deletes it and confirms in writing. Deletion covers the archive held with our storage provider and the offsite backup copy.',
-      'You retain full ownership of your archive at all times. Heritage Nexus Inc. is the custodian, not the owner. If Basalith ceases operations for any reason, you may request a complete export of your archive in open and portable formats, fulfilled within 30 business days. Because the archive is always yours to hold, no closure can strand your data.',
+      'Upon cancellation, you retain full rights to a complete export of your Basalith in open, portable formats. This export right is unconditional and does not require a reason. Export requests are fulfilled within 30 business days.',
+      'Cancellation of a subscription is distinct from dissolution of your Basalith. Dissolution is the permanent deletion of your Basalith, and it is a separate, deliberate act. It requires a verified written request from the designated Custodian, or from an executor with documented authority. After the request is verified, Heritage Nexus Inc. holds your Basalith for 12 months, then deletes it and confirms in writing. Deletion covers your Basalith as held with our storage provider and the offsite backup copy.',
+      'You retain full ownership of your Basalith at all times. Heritage Nexus Inc. is the custodian, not the owner. If Basalith ceases operations for any reason, you may request a complete export of your Basalith in open and portable formats, fulfilled within 30 business days. Because your Basalith is always yours to hold, no closure can strand your data.',
     ],
   },
   {
@@ -68,15 +68,15 @@ const SECTIONS = [
       'To the maximum extent permitted by applicable law, Heritage Nexus Inc. shall not be liable for any indirect, incidental, consequential, punitive, or special damages arising from or related to your use of the Basalith service, including but not limited to loss of data, loss of business, or loss of anticipated savings, even if we have been advised of the possibility of such damages.',
       'Our total aggregate liability to you for any claim arising out of or in connection with these Terms or the service shall not exceed the total fees paid by you to Heritage Nexus Inc. in the twelve months preceding the event giving rise to the claim.',
       'Nothing in these Terms excludes or limits our liability for death or personal injury caused by our negligence, fraud, or any other liability that cannot be excluded or limited by law.',
-      'Basalith is a data preservation and archival service. We make no representation that the entity, or any output of the cognitive reference model built from your archive, constitutes a legally recognized representation of any person for the purposes of any legal proceeding, estate administration, or contractual obligation.',
+      'Basalith is a data preservation service. We make no representation that the entity, or any output of the cognitive reference model built from your record, constitutes a legally recognized representation of any person for the purposes of any legal proceeding, estate administration, or contractual obligation.',
     ],
   },
   {
     num:   '05',
     title: 'Intellectual Property',
     body: [
-      'Your archive content, including all deposits, voice recordings, photographs, and the cognitive reference model derived from them, remains your intellectual property at all times. Heritage Nexus Inc. claims no intellectual property rights over your archive content.',
-      'You grant Heritage Nexus Inc. a limited license to process your archive content solely for the purpose of operating and improving your specific archive. This license does not extend to using your content to train general models, sharing with other users, or commercializing in any form.',
+      'The content of your Basalith, including all deposits, voice recordings, photographs, and the cognitive reference model derived from them, remains your intellectual property at all times. Heritage Nexus Inc. claims no intellectual property rights over the content of your Basalith.',
+      'You grant Heritage Nexus Inc. a limited license to process the content of your Basalith solely for the purpose of operating and improving your specific Basalith. This license does not extend to using your content to train general models, sharing with other users, or commercializing in any form.',
       'Your deposits, entity conversations, and voice data are your property. You may request an export of them in open formats, fulfilled within 30 business days. You may use them with any compatible platform.',
     ],
   },
@@ -84,16 +84,16 @@ const SECTIONS = [
     num:   '06',
     title: 'Death and Succession',
     body: [
-      'Upon your death your archive transfers to your designated heirs or estate. Your archive is treated as a private digital asset for the purposes of estate administration.',
-      'Heritage Nexus Inc. will work with your estate to facilitate archive transfer, continued access under the Legacy tier, or data export and dissolution as directed by your estate.',
-      'Heritage Nexus Inc. does not acquire any rights to your archive data upon your death. We are the custodian. Your heirs are the beneficiaries.',
+      'Upon your death your Basalith transfers to your designated heirs or estate. Your Basalith is treated as a private digital asset for the purposes of estate administration.',
+      'Heritage Nexus Inc. will work with your estate to facilitate transfer of your Basalith, continued access under the Legacy tier, or data export and dissolution as directed by your estate.',
+      'Heritage Nexus Inc. does not acquire any rights to the data in your Basalith upon your death. We are the custodian. Your heirs are the beneficiaries.',
     ],
   },
   {
     num:   '07',
     title: 'Company Dissolution',
     body: [
-      'In the event Heritage Nexus Inc. ceases operations: (a) Users will receive advance notice where circumstances permit. (b) Complete data export will be made available to all users, fulfilled within 30 business days of request. (c) Archive data will not be sold to third parties as part of any dissolution, acquisition, or bankruptcy proceeding. This prohibition is absolute. It is not subject to user consent, waiver, or any other exception. (d) Any acquiring entity must agree to honor these same commitments as a condition of acquiring Heritage Nexus Inc. assets.',
+      'In the event Heritage Nexus Inc. ceases operations: (a) Users will receive advance notice where circumstances permit. (b) Complete data export will be made available to all users, fulfilled within 30 business days of request. (c) The data in every Basalith will not be sold to third parties as part of any dissolution, acquisition, or bankruptcy proceeding. This prohibition is absolute. It is not subject to user consent, waiver, or any other exception. (d) Any acquiring entity must agree to honor these same commitments as a condition of acquiring Heritage Nexus Inc. assets.',
     ],
   },
   {
@@ -169,7 +169,7 @@ export default function TermsPage() {
               </em>
             </h1>
             <p className="font-sans font-light text-body-base text-text-secondary leading-[1.82] max-w-xl mx-auto">
-              These terms govern your use of the Basalith service in full, including your archive.
+              These terms govern your use of the Basalith service in full, including your Basalith.
             </p>
             <p className="font-sans text-[0.75rem] text-text-muted mt-6">
               Last updated: September 2026 &nbsp;·&nbsp; Governing law: {GOVERNING_STATE}
@@ -258,7 +258,7 @@ export default function TermsPage() {
               <a href="mailto:legacy@basalith.xyz" className="text-amber-dim hover:text-amber transition-colors duration-200">
                 legacy@basalith.xyz
               </a>
-              . Please include your archive number.
+              . Please include your Basalith number.
             </p>
             <div className="flex items-center justify-center gap-5 flex-wrap">
               <a href="/privacy" className="btn-monolith-ghost">Privacy Policy</a>

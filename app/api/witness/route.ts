@@ -77,7 +77,7 @@ export async function GET(req: Request) {
   return NextResponse.json({
     sessionId:        session.id,
     archiveId:        session.archive_id,
-    archiveName:      archive?.name ?? 'The Family Archive',
+    archiveName:      archive?.name ?? "the family's Basalith",
     ownerName:        archive?.owner_name ?? subjectName,
     contributorName:  session.contributor_name,
     contributorEmail: session.contributor_email,

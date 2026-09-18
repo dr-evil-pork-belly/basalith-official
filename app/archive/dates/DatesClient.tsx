@@ -207,7 +207,7 @@ export default function DatesClient({ archiveId }: { archiveId: string }) {
           Moments That Return
         </h1>
         <p style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', fontWeight: 300, fontSize: '1rem', color: 'var(--portal-secondary)', lineHeight: 1.75, margin: 0 }}>
-          On these dates the archive automatically sends a curated photograph and memory to you and all contributors.
+          On these dates Basalith automatically sends a photograph and memory to you and all contributors.
         </p>
       </div>
 
@@ -339,7 +339,7 @@ export default function DatesClient({ archiveId }: { archiveId: string }) {
             No important dates added yet.
           </p>
           <p style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', color: 'var(--portal-secondary)', fontSize: '0.9rem', lineHeight: 1.7, maxWidth: '360px', margin: '0 auto' }}>
-            Add birthdays and anniversaries. Your archive will remember them automatically every year.
+            Add birthdays and anniversaries. Your Basalith will remember them automatically every year.
           </p>
         </div>
       ) : (

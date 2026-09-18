@@ -106,7 +106,7 @@ function buildConfirmationEmail(archiveName: string, firstName: string): string 
     Thank you${firstName ? ', ' + firstName : ''}.
   </p>
   <p style="font-family:Georgia,serif;font-size:15px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 24px">
-    Your memory has been added to the archive.
+    Your memory is now on the record.
   </p>
   <hr style="border:none;border-top:1px solid rgba(240,237,230,0.06);margin:0 0 20px">
   <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:0">
@@ -176,7 +176,7 @@ export async function POST(req: NextRequest) {
       : null
 
     if (eventType !== null && eventType !== 'email.received') {
-      console.log('[inbound] skipping, not an inbound reply — type:', eventType)
+      console.log('[inbound] skipping, not an inbound reply, type:', eventType)
       return NextResponse.json({ ok: true, skipped: 'event type not handled' })
     }
 
@@ -214,7 +214,7 @@ export async function POST(req: NextRequest) {
       // still strictly better than a 200 that guarantees silent loss. Do not
       // widen the tolerance to compensate. See lib/resendSignature.ts.
       if (!fetched.ok) {
-        console.error('[inbound] receiving API fetch failed, returning 500 — email_id:',
+        console.error('[inbound] receiving API fetch failed, returning 500, email_id:',
           email.email_id, 'reason:', fetched.reason)
         return NextResponse.json({ error: 'Internal error' }, { status: 500 })
       }
@@ -225,14 +225,14 @@ export async function POST(req: NextRequest) {
       // Lengths only. The previous line here logged up to 500 characters of the
       // raw response, which for a successful fetch is the family's own words
       // sitting in the Vercel log.
-      console.log('[inbound] receiving API ok — text_len:', emailText.length,
+      console.log('[inbound] receiving API ok, text_len:', emailText.length,
         'html_len:', emailHtml.length)
     }
 
     const rawText = emailText
 
     // Log raw shape so Vercel shows exactly what Resend is sending
-    console.log('[inbound] received — to:', to, 'from:', from,
+    console.log('[inbound] received, to:', to, 'from:', from,
       'to_type:', Array.isArray(email.to) ? `array[${email.to.length}] of ${typeof email.to[0]}` : typeof email.to,
       'text_len:', rawText.length, 'html_len:', emailHtml.length,
       'via_data_wrapper:', body.data != null)
@@ -244,7 +244,7 @@ export async function POST(req: NextRequest) {
     console.log('[inbound] extracted:', replyText.substring(0, 150), 'len:', replyText.length)
 
     if (!replyText || replyText.length < 2) {
-      console.log('[inbound] empty reply — skipping')
+      console.log('[inbound] empty reply, skipping')
       return NextResponse.json({ ok: true, skipped: 'empty reply' })
     }
 
@@ -302,14 +302,14 @@ export async function POST(req: NextRequest) {
       const contributor   = session.contributors ?? null
 
       if (contributorId) {
-        console.log('[inbound] contributor reply — contributor:', contributorId, 'archive:', archiveId)
+        console.log('[inbound] contributor reply, contributor:', contributorId, 'archive:', archiveId)
       }
 
       // Log owner replies explicitly. 'mirror' replies (the weekly "keep going"
       // thread) need no special casing: they fall through to the generic
       // owner_deposits save + training pair below, exactly like owner_daily.
       if (session.email_type === 'owner_daily' || session.email_type === 'owner_weekly' || session.email_type === 'conversational' || session.email_type === 'mirror') {
-        console.log('[inbound] owner reply received — type:', session.email_type, 'archive:', archiveId.substring(0, 8))
+        console.log('[inbound] owner reply received, type:', session.email_type, 'archive:', archiveId.substring(0, 8))
       }
 
       // Pre-Echo conversational prompts are tagged distinctly so the onboarding
@@ -358,7 +358,7 @@ export async function POST(req: NextRequest) {
           depositError?.message ?? 'insert returned no row')
         return NextResponse.json({ error: 'Internal error' }, { status: 500 })
       }
-      console.log('[inbound] owner_deposits saved — id:', deposit.id.substring(0, 8))
+      console.log('[inbound] owner_deposits saved, id:', deposit.id.substring(0, 8))
 
       // ── Type-specific writes ──────────────────────────────────────────────
       //
@@ -375,7 +375,7 @@ export async function POST(req: NextRequest) {
             .eq('id', session.prompt_id)
             .eq('status', 'pending')
           if (cqError) console.error('[inbound] contributor_question update failed:', cqError.message)
-          else console.log('[inbound] contributor_question answered — id:', session.prompt_id)
+          else console.log('[inbound] contributor_question answered, id:', session.prompt_id)
         }
       } else if (session.email_type === 'spark') {
         const { error: sparkError } = await supabaseAdmin.from('daily_spark_responses').insert({
@@ -390,7 +390,7 @@ export async function POST(req: NextRequest) {
         if (sparkError) console.error('[inbound] spark save failed:', sparkError.message)
       } else if (session.email_type === 'story_prompt') {
         if (!contributorId || !session.prompt_id) {
-          console.error('[inbound] missing contributorId or prompt_id — cannot update story prompt', {
+          console.error('[inbound] missing contributorId or prompt_id, cannot update story prompt', {
             contributorId,
             promptId: session.prompt_id,
           })
@@ -447,7 +447,7 @@ export async function POST(req: NextRequest) {
 
         if (targetHistoryId === null) {
           console.warn(
-            '[inbound] no question_history_id on session — falling back to the 14-day heuristic. token:',
+            '[inbound] no question_history_id on session, falling back to the 14-day heuristic. token:',
             token,
           )
           const historyCutoff = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString()
@@ -470,12 +470,12 @@ export async function POST(req: NextRequest) {
             .update({ answered_deposit_id: deposit.id, answered_at: new Date().toISOString() })
             .eq('id', targetHistoryId)
           if (historyError) console.error('[inbound] question_history update failed:', historyError.message)
-          else console.log('[inbound] question_history answered — id:', targetHistoryId,
+          else console.log('[inbound] question_history answered, id:', targetHistoryId,
             'via:', servedHistoryId !== null ? 'session_id' : 'heuristic')
         }
       }
 
-      // Domain classification — owner deposits only, fire-and-forget
+      // Domain classification, owner deposits only, fire-and-forget
       if (!contributorId) {
         void classifyDeposit({ depositId: deposit.id, archiveId, text: replyText })
       }
@@ -491,7 +491,7 @@ export async function POST(req: NextRequest) {
         ).catch(() => {})
       }
 
-      // Memory chain — only for contributor replies (owner has no contributor row)
+      // Memory chain, only for contributor replies (owner has no contributor row)
       if (replyText.length > 50 && archiveId && contributorId && archive) {
         const promptText = session.email_type === 'spark'
           ? (session.spark_id ?? 'a spark question')
@@ -524,7 +524,7 @@ export async function POST(req: NextRequest) {
         }).catch(() => {})
       }
 
-      console.log('[inbound] saved spark/prompt reply — type:', session.email_type, 'token:', token)
+      console.log('[inbound] saved spark/prompt reply, type:', session.email_type, 'token:', token)
       return NextResponse.json({ ok: true, saved: session.email_type })
     }
 
@@ -541,7 +541,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (photo.status === 'expired') {
-      console.log('[inbound] photo reply past its window — address:', to,
+      console.log('[inbound] photo reply past its window, address:', to,
         'closed:', photo.windowClosedAt)
 
       const senderEmail = parseEmailAddress(from)
@@ -559,7 +559,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (photo.status === 'saved') {
-      console.log('[inbound] photo reply saved — reply:', photo.replyId, 'count:', photo.replyCount)
+      console.log('[inbound] photo reply saved, reply:', photo.replyId, 'count:', photo.replyCount)
       return NextResponse.json({ ok: true, saved: 'photo_reply' })
     }
 

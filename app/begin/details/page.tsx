@@ -55,7 +55,7 @@ export default function DetailsPage() {
           <BeginProgress step={2} />
           <p className="eyebrow mb-2">Step 2 of 3</p>
           <h1 className="font-serif text-[2.5rem] font-semibold text-text-primary leading-tight tracking-[-0.02em] mb-2">Your Details</h1>
-          <p className="font-sans text-[0.95rem] text-text-secondary leading-relaxed mb-12">We will use these to set up your archive and reach out with next steps.</p>
+          <p className="font-sans text-[0.95rem] text-text-secondary leading-relaxed mb-12">We will use these to set up your Basalith and reach out with next steps.</p>
 
           <div className="flex flex-col gap-5 mb-8">
             <div>

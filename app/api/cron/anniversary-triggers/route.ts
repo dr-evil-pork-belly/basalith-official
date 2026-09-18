@@ -39,16 +39,16 @@ async function generateAnniversaryQuestion(
       max_tokens: 130,
       messages: [{
         role:    'user',
-        content: `Generate one personal question for a legacy archive owner about a significant date.
+        content: `Generate one personal question for an owner about a significant date.
 
 Person/event: ${personName}
 Type: ${dateType}
 Years ago: ${yearsAgo ?? 'unknown'}
-Archive owner's first name: ${firstName}
+Owner's first name: ${firstName}
 
 The question should:
 - Reference the specific date/event
-- Ask about something personal the archive entity would not know from just the date
+- Ask about something personal the entity would not know from just the date
 - Be warm and specific, 1-2 sentences
 - ${langInstr}
 

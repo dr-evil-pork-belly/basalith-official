@@ -116,11 +116,11 @@ function buildMagicLinkEmail({
   const heading   = isZh ? `${firstName}，` : `${firstName},`
   const intro     = isZh
     ? `以下是您访问${familyName}档案的专属链接。无需密码。`
-    : `Here is your personal link to The ${familyName} Archive. No password needed.`
-  const linkLabel = isZh ? '您的档案访问链接' : 'YOUR ARCHIVE LINK'
+    : `Here is your personal link to the ${familyName} Basalith. No password needed.`
+  const linkLabel = isZh ? '您的档案访问链接' : 'YOUR SIGN-IN LINK'
   const bookmark  = isZh
     ? '请收藏此链接。这是您访问档案的专属入口，永久有效。'
-    : 'Bookmark this link. It is your personal entry to the archive and never expires.'
+    : 'Bookmark this link. It is your personal entry to your Basalith and never expires.'
 
   return `<!DOCTYPE html>
 <html>
@@ -128,7 +128,7 @@ function buildMagicLinkEmail({
 
   <div style="padding:40px 40px 0">
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0">
-      THE ${familyName.toUpperCase()} ARCHIVE
+      THE ${familyName.toUpperCase()} BASALITH
     </p>
   </div>
 

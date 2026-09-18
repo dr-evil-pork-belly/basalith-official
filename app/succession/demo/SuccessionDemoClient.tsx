@@ -260,7 +260,7 @@ export default function SuccessionDemoClient() {
         {/* ══ ZONE 2 — contrast cards ══ */}
         <SectionHeader
           label={`What ${persona.metadata.successorLabel} expects`}
-          title="Assumption Against Archive"
+          title="Assumption Against the Record"
         />
         <div className="succ-grid" style={{ marginBottom: 'clamp(40px,5vw,60px)' }}>
           {persona.contrastCards.map(card => {
@@ -296,7 +296,7 @@ export default function SuccessionDemoClient() {
                     {st.reveal >= 2 && deposit && (
                       <div className="succ-fade" style={{ border: '1px solid rgba(196,162,74,0.16)', background: 'rgba(196,162,74,0.03)', padding: '14px 16px' }}>
                         <p style={{ ...MONO, fontSize: '0.5rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: C.gold, marginBottom: '9px' }}>
-                          From the archive
+                          From the record
                         </p>
                         <p style={{ ...SERIF, fontSize: '0.82rem', fontStyle: 'italic', color: C.dim, lineHeight: 1.6, margin: '0 0 8px' }}>
                           {deposit.prompt}
@@ -324,7 +324,7 @@ export default function SuccessionDemoClient() {
                         onClick={() => advanceCard(card)}
                         style={{ ...MONO, fontSize: '0.56rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: C.gold, background: 'transparent', border: `1px solid rgba(196,162,74,0.4)`, padding: '9px 15px', cursor: 'pointer', borderRadius: '2px', alignSelf: 'flex-start' }}
                       >
-                        {st.reveal === 1 ? 'Show the archive' : `Ask ${firstName}`}
+                        {st.reveal === 1 ? 'Show the deposit' : `Ask ${firstName}`}
                       </button>
                     )}
                   </div>
@@ -340,7 +340,7 @@ export default function SuccessionDemoClient() {
 
           {turns.length === 0 && (
             <p style={{ ...SERIF, fontSize: '0.9rem', fontStyle: 'italic', fontWeight: 300, color: C.dim, lineHeight: 1.75, marginTop: 0, marginBottom: '20px' }}>
-              The archive holds fifteen deposits. Ask something it covers, and something it does not.
+              The record holds fifteen deposits. Ask something it covers, and something it does not.
             </p>
           )}
 
@@ -466,7 +466,7 @@ export default function SuccessionDemoClient() {
             rel="noopener noreferrer"
             style={{ ...MONO, display: 'inline-block', fontSize: '0.66rem', letterSpacing: '0.26em', textTransform: 'uppercase', color: C.bg, background: C.gold, padding: '1.05rem 2.5rem', textDecoration: 'none', fontWeight: 700, borderRadius: '2px' }}
           >
-            Build Your Succession Archive &rarr;
+            Found a Basalith for the business &rarr;
           </a>
         </div>
       </div>
@@ -490,7 +490,7 @@ function SectionHeader({ label, title }: { label: string; title: string }) {
 function Thinking() {
   return (
     <p style={{ ...MONO, fontSize: '0.56rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: C.dim, margin: 0 }}>
-      Checking the archive
+      Checking the record
       <span style={{ animation: 'succBlink 1s step-end infinite', color: C.gold, marginLeft: '4px' }}>&#9613;</span>
     </p>
   )
@@ -565,7 +565,7 @@ function Answer({ text, grounded, basis, failed, metadata }: {
           Checked
         </span>
         <span style={{ ...SERIF, fontSize: '0.85rem', fontStyle: 'italic', color: C.dim }}>
-          Checked against {firstName}&rsquo;s archive.
+          Checked against {firstName}&rsquo;s record.
         </span>
       </div>
     </div>

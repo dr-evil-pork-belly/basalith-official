@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Basalith · Knowledge transfer when a business changes hands',
-  description: 'What built the company is not in the data room. Basalith captures how an operator reasons, so it transfers through an acquisition or a succession. Individual and family archives also available.',
+  description: 'What built the company is not in the data room. Basalith captures how an operator reasons, so it transfers through an acquisition or a succession. Also available for one person or a family.',
 }
 
 import Nav               from './components/Nav'

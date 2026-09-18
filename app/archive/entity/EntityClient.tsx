@@ -146,7 +146,7 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
   const subtitleText =
     archiveState === 'thin'
       ? 'Your entity is still learning. Talk to it. Correct it. Every exchange makes it more accurate.'
-      : 'Your entity speaks from your archive. Rate each response. Corrections become deposits.'
+      : 'Your entity speaks from the record. Rate each response. Corrections become deposits.'
 
   // Send message
   async function send() {
@@ -275,7 +275,7 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
       {/* ── Page header ── */}
       <div className="mb-8">
         <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '0.5rem' }}>
-          Archive Portal
+          Basalith
         </p>
         <h1 className="font-serif font-semibold tracking-[-0.025em]" style={{ fontSize: 'clamp(1.8rem,3vw,2.6rem)', color: 'var(--portal-ink)' }}>
           Talk to Your Entity
@@ -341,7 +341,7 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
               onMouseEnter={e => (e.currentTarget.style.color = 'var(--portal-gold-ink)')}
               onMouseLeave={e => (e.currentTarget.style.color = 'var(--portal-gold-ink)')}
             >
-              See where your archive is thin →
+              See where your record is thin →
             </a>
 
           </div>
@@ -405,7 +405,7 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
               {subtitleText}
             </p>
             <p className="font-serif italic" style={{ fontSize: '14.5px', color: 'var(--portal-secondary)', lineHeight: 1.85 }}>
-              Your archive runs on two permanent layers: one that holds every fact and memory you have deposited, and one that learns how you express, reason, and decide. Neither replaces the other.
+              Your Basalith runs on two permanent layers: one that holds every fact and memory you have deposited, and one that learns how you express, reason, and decide. Neither replaces the other.
             </p>
           </div>
 
@@ -453,7 +453,7 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
                   Ask your entity anything.
                 </p>
                 <p className="font-serif italic" style={{ fontSize: '0.85rem', color: 'var(--portal-secondary)' }}>
-                  It will answer from your archive.
+                  It will answer from the record.
                 </p>
               </div>
             )}
@@ -472,7 +472,7 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
                         borderRadius: '0 2px 2px 0',
                       }}>
                         <p className="font-serif italic" style={{ fontSize: '0.9rem', color: 'var(--portal-gold-ink)', marginBottom: '0.3rem' }}>
-                          Deposited to your archive.
+                          On the record.
                         </p>
                         <p className="font-serif font-light" style={{ fontSize: '0.85rem', color: 'var(--portal-body)', lineHeight: 1.5 }}>
                           {msg.content.length > 60 ? msg.content.slice(0, 60) + '…' : msg.content}
@@ -602,7 +602,7 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
                       {/* Saved confirmation */}
                       {correctionSaved[msg.id] && (
                         <p style={{ paddingLeft: '1rem', marginTop: '0.25rem', fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.1em', color: 'var(--portal-gold-ink)', textTransform: 'uppercase' }}>
-                          Saved to your archive
+                          Saved to the record
                         </p>
                       )}
                     </div>
@@ -616,7 +616,7 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
               {/* Gentle nudge after 3 entity responses */}
               {entityResponseCount === 3 && !isLoading && (
                 <p className="font-serif italic text-center" style={{ fontSize: '14.5px', color: 'var(--portal-secondary)' }}>
-                  Each correction you make becomes a deposit in your archive.
+                  Each correction you make becomes a deposit on the record.
                 </p>
               )}
             </div>
@@ -630,7 +630,7 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
             {showVoicePanel && (
               <div style={{ marginBottom: '1rem' }}>
                 <p style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', fontSize: '14.5px', color: 'var(--portal-secondary)', marginBottom: '0.75rem', lineHeight: 1.6 }}>
-                  Your recording will be saved to your archive. The transcript will appear in the chat input.
+                  Your recording will be saved to the record. The transcript will appear in the chat input.
                 </p>
                 <VoiceRecorder
                   archiveId={archiveId}
@@ -770,7 +770,7 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
       <div className="mt-20 text-center">
         <div style={{ width: '80px', height: '1px', background: 'var(--portal-tint)', margin: '0 auto 2rem' }} />
         <p className="font-serif italic" style={{ fontSize: '0.9rem', color: 'var(--portal-secondary)', maxWidth: '500px', margin: '0 auto', lineHeight: 1.85 }}>
-          Every conversation is saved to your archive.<br />
+          Every conversation is saved to the record.<br />
           Every correction becomes a deposit.<br />
           Every session makes your entity more accurately you.<br />
           <br />

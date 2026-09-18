@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title:       'FAQ · Basalith',
-  description: 'Plain answers to the questions people ask before they begin a Basalith archive. What it is, what it costs, who owns the data, and what it will not do.',
+  description: 'Plain answers to the questions people ask before they begin a Basalith. What it is, what it costs, who owns the data, and what it will not do.',
 }
 
 const LINK: React.CSSProperties = { color: 'var(--color-gold)', textDecoration: 'none' }
@@ -19,22 +19,22 @@ const QA: { q: string; a: React.ReactNode }[] = [
   },
   {
     q: 'Is this a chatbot trained on someone’s old emails?',
-    a: 'No. Nothing is reconstructed after the fact. The archive is built while the person is here and taking part. Every model is trained only on that one person’s deposits. No general AI speaks for the archive. And when the person never took a position on something, the entity is built to say so instead of guessing.',
+    a: 'No. Nothing is reconstructed after the fact. A Basalith is built while the person is here and taking part. Every model is trained only on that one person’s deposits. No general AI speaks for the record. And when the person never took a position on something, the entity is built to say so instead of guessing.',
   },
   {
     q: 'How does it work?',
     a: <>
-      It starts with The Founding: three of the hardest calls you ever made, in your own words, by voice or typed, in your own time, then a first read with the founder of Basalith by video. From there the archive grows through guided questions, real scenarios, voice recordings, photographs, and contributions from the people around them. Every deposit is scored before it can shape the model.
+      It starts with The Founding: three of the hardest calls you ever made, in your own words, by voice or typed, in your own time, then a first read with the founder of Basalith by video. From there your Basalith grows through guided questions, real scenarios, voice recordings, photographs, and contributions from the people around them. Every deposit is scored before it can shape the model.
       {' '}<a href="/method" style={LINK}>Read the method &rarr;</a>
     </>,
   },
   {
-    q: 'What is the difference between the archive and the entity?',
-    a: 'The archive is everything deposited: the answers, the recordings, the labeled photographs, the observations from others. The entity is the model trained on it. The archive is the permanent asset. The entity is the instrument. If the technology changes, the archive is what carries forward.',
+    q: 'What is the difference between the record and the entity?',
+    a: 'The record is everything deposited: the answers, the recordings, the labeled photographs, the observations from others. The entity is the model trained on it. The record is the permanent asset. The entity is the instrument. If the technology changes, the record is what carries forward.',
   },
   {
     q: 'How long does it take?',
-    a: 'The archive starts with the first deposit and there is no finish line. Milestones mark depth: 10 deposits, then 50, then 200, then 500. The longer someone deposits, the more the model has to work with. That is why the best time to start is before a transition is on the calendar.',
+    a: 'Your Basalith starts with the first deposit and there is no finish line. Milestones mark depth: 10 deposits, then 50, then 200, then 500. The longer someone deposits, the more the model has to work with. That is why the best time to start is before a transition is on the calendar.',
   },
   {
     q: 'What happens when a business changes hands?',
@@ -65,7 +65,7 @@ const QA: { q: string; a: React.ReactNode }[] = [
   {
     q: 'Who owns the data, and is it secure?',
     a: <>
-      You own it. Basalith is the custodian, not the owner. The archive is encrypted at rest and in transit, kept in private storage, and never shared, sold, or used to train another company’s model. You can export all of it in open formats any time you ask, so nothing is stranded if we ever close.
+      You own it. We are the custodian, not the owner. Your Basalith is encrypted at rest and in transit, kept in private storage, and never shared, sold, or used to train another company’s model. You can export all of it in open formats any time you ask, so nothing is stranded if we ever close.
       {' '}<a href="/data-ownership" style={LINK}>Data ownership &rarr;</a>
       {' '}<a href="/security" style={LINK}>Security &rarr;</a>
     </>,
@@ -79,7 +79,7 @@ const QA: { q: string; a: React.ReactNode }[] = [
   },
   {
     q: 'How do I begin?',
-    a: 'Apply. We review every application ourselves and will be in touch within 48 hours. Once your archive is open, The Founding starts whenever you are ready.',
+    a: 'Apply. We review every application ourselves and will be in touch within 48 hours. Once your Basalith is open, The Founding starts whenever you are ready.',
   },
 ]
 

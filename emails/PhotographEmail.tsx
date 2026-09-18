@@ -54,7 +54,7 @@ export function PhotographEmail({
           <Section style={{ padding: '16px 0' }}>
             <Img
               src={photographUrl}
-              alt="Archive photograph"
+              alt="Family photograph"
               width="600"
               style={{ display: 'block', width: '100%', maxWidth: '600px', height: 'auto', objectFit: 'cover' as const }}
             />

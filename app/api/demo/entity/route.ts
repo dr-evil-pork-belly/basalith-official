@@ -36,7 +36,7 @@ Rules:
 - Length: under 180 words. This is spoken in a room. Keep it tight.
 
 End with a single grounded line that points forward without overpromising. You
-may acknowledge this came from only a few minutes and that a fuller archive would
+may acknowledge this came from only a few minutes and that a fuller record would
 deepen it. Do not invent numbers, timelines, or guarantees.`
 
 // Calm, on-brand line shown if the model call fails or times out. Never a
@@ -44,7 +44,7 @@ deepen it. Do not invent numbers, timelines, or guarantees.`
 const FALLBACK_REPLY =
   "This is taking a moment longer than it should. What can already be said is " +
   "this: showing up and answering honestly is itself the start of a pattern. " +
-  "A fuller archive, built over time, would bring the rest of it into focus."
+  "A fuller record, built over time, would bring the rest of it into focus."
 
 // Public, unauthenticated. Demo archives are ephemeral: nothing is persisted.
 // The only inputs in context are the answers the prospect just gave.
@@ -117,7 +117,7 @@ export async function POST(req: NextRequest) {
 
     // Brand rule: no em dashes anywhere. The model occasionally uses one
     // despite instructions, so strip it as a final safeguard.
-    reply = reply.replace(/\s*[—–]\s*/g, ', ')
+    reply = reply.replace(/\s*[\u2014\u2013]\s*/g, ', ')
 
     return NextResponse.json({ reply: reply || FALLBACK_REPLY })
   } catch (err) {

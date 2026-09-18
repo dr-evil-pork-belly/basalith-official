@@ -94,7 +94,7 @@ export default function LeaderboardPage() {
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
           <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.7rem', letterSpacing: '0.28em', color: '#C4A24A', margin: '0 0 0.5rem' }}>
-            THE {familyName.toUpperCase()} ARCHIVE
+            THE {familyName.toUpperCase()} BASALITH
           </p>
           <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.62rem', letterSpacing: '0.18em', color: '#5C6166', margin: 0 }}>
             MEMORY GAME · WEEK OF {session ? formatDate(session.closesAt).toUpperCase() : ''}
@@ -157,7 +157,7 @@ export default function LeaderboardPage() {
           {/* Current user row if not on leaderboard */}
           {myName && !leaderboard.find(r => r.name === myName.trim()) && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '0.5rem', paddingTop: '0.5rem', borderTop: '1px solid rgba(255,255,255,0.04)' }}>
-              <span style={{ fontFamily: 'Georgia, serif', fontSize: '1rem', color: '#3A3F44', width: '20px' }}>—</span>
+              <span style={{ fontFamily: 'Georgia, serif', fontSize: '1rem', color: '#3A3F44', width: '20px' }}>·</span>
               <span style={{ fontFamily: '"Courier New", monospace', fontSize: '0.7rem', color: 'rgba(196,162,74,0.6)', minWidth: '120px' }}>
                 You
               </span>

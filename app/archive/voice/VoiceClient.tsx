@@ -146,14 +146,14 @@ export default function VoiceClient({ archiveId }: { archiveId: string }) {
       {/* ── Header ── */}
       <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.3em', color: 'var(--portal-gold-ink)', textTransform: 'uppercase', margin: '0 0 14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
         <span style={{ display: 'block', width: '20px', height: '1px', background: 'var(--portal-btn)', flexShrink: 0 }} aria-hidden="true" />
-        Voice Archive
+        Voice
       </p>
       <h1 style={{ fontFamily: 'var(--portal-serif)', fontWeight: 300, fontSize: 'clamp(1.8rem,3vw,2.4rem)', color: 'var(--portal-ink)', margin: '0 0 16px', lineHeight: 1.15, letterSpacing: '-0.02em' }}>
         Your voice. Preserved.
       </h1>
       <p style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', fontWeight: 300, fontSize: '1.05rem', color: 'var(--portal-body)', lineHeight: 1.8, maxWidth: '560px', margin: '0 0 12px' }}>
         Speak your memories, wisdom, and stories in any language.
-        Every recording is transcribed and saved to your archive permanently.
+        Every recording is transcribed and saved to the record permanently.
         Your voice is preserved alongside your words.
       </p>
       <p style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', fontWeight: 300, fontSize: '1.05rem', color: 'var(--portal-body)', lineHeight: 1.8, maxWidth: '560px', margin: '0 0 12px' }}>
@@ -314,7 +314,7 @@ export default function VoiceClient({ archiveId }: { archiveId: string }) {
         ) : recordings.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '2.5rem 0' }}>
             <p style={{ fontFamily: 'var(--portal-serif)', fontWeight: 600, fontSize: '1rem', color: 'var(--portal-body)', marginBottom: '0.5rem' }}>
-              Your voice is not in your archive.
+              Your voice is not on the record yet.
             </p>
             <p style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', fontSize: '0.9rem', color: 'var(--portal-secondary)', lineHeight: 1.7, marginBottom: '1.25rem' }}>
               Record a memory in any language. Your words are transcribed and preserved permanently.

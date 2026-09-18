@@ -16,13 +16,13 @@ export const margaretChen: DemoPersona = {
     trigger:        'Succession',
     successorLabel: 'the incoming managing partner',
     bioLine:        'Margaret Chen built Meridian Capital over twenty six years. She is handing the firm to the next managing partner.',
-    fictionalLabel: 'Margaret Chen is a fictional founder. Every answer is grounded in her fictional archive by the same verifier that runs on real archives. When no deposit covers a question, the entity says so instead of inventing.',
+    fictionalLabel: 'Margaret Chen is a fictional founder. Every answer is grounded in her fictional record by the same verifier that runs on a real Basalith. When no deposit covers a question, the entity says so instead of inventing.',
 
     pronounSubject:    'she',
     pronounSubjectCap: 'She',
   },
 
-  archiveName: 'the Margaret Chen Archive',
+  archiveName: 'the Margaret Chen record',
 
   pairs: [
     {

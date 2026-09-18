@@ -11,7 +11,7 @@ const anthropic = new Anthropic()
 export async function POST(req: NextRequest) {
   try {
     // Auth: Supabase owner session only. Ownership is verified against the
-    // archives table — a session carrying an archiveId is not proof of ownership
+    // archives table, a session carrying an archiveId is not proof of ownership
     // (getSessionUser fills archiveId for successors too). Checked before the
     // body is read, so an unauthenticated caller never reaches the upload or
     // the model calls.
@@ -99,11 +99,11 @@ export async function POST(req: NextRequest) {
             },
             {
               type: 'text',
-              text: `This is a scanned handwritten document from a family archive. Transcribe every word exactly as written, preserving the original text faithfully.
+              text: `This is a scanned handwritten document from a family record. Transcribe every word exactly as written, preserving the original text faithfully.
 
 Include paragraph breaks where they appear in the original. If any words are illegible write [illegible] in their place.
 
-Return only the transcribed text — no commentary, no explanation.`,
+Return only the transcribed text, no commentary, no explanation.`,
             },
           ],
         }],
@@ -132,7 +132,7 @@ Return only the transcribed text — no commentary, no explanation.`,
           max_tokens: 500,
           messages: [{
             role:    'user',
-            content: `Analyze this text from a family archive document.
+            content: `Analyze this text from a family record document.
 
 TEXT:
 ${transcript.substring(0, 3000)}

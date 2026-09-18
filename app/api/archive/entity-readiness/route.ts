@@ -169,7 +169,7 @@ export async function POST(req: NextRequest) {
             headers: { 'X-Entity-Ref-ID': `basalith-entity-invite-${archiveId}-${c.id}` },
             html:    buildInvitationEmail(
               archiveRow?.owner_name ?? 'Your family member',
-              archiveRow?.name       ?? 'The Archive',
+              archiveRow?.name       ?? 'your Basalith',
               c.name,
               portalUrl,
             ),

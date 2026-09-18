@@ -177,7 +177,7 @@ export default function GameClient({ sessionId }: { sessionId: string }) {
     return (
       <div style={{ minHeight: '100vh', background: '#0A0908', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem', textAlign: 'center' }}>
         <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.72rem', letterSpacing: '0.28em', color: '#C4A24A', marginBottom: '1.5rem' }}>
-          THE {familyName.toUpperCase()} ARCHIVE
+          THE {familyName.toUpperCase()} BASALITH
         </p>
         <h1 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1.8rem', color: '#F0EDE6', margin: '0 0 1rem' }}>
           This game has closed.
@@ -196,7 +196,7 @@ export default function GameClient({ sessionId }: { sessionId: string }) {
       <div style={{ minHeight: '100vh', background: '#0A0908', padding: '3rem 1.5rem' }}>
         <div style={{ maxWidth: '540px', margin: '0 auto' }}>
           <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.7rem', letterSpacing: '0.28em', color: '#C4A24A', textAlign: 'center', marginBottom: '2rem' }}>
-            THE {familyName.toUpperCase()} ARCHIVE
+            THE {familyName.toUpperCase()} BASALITH
           </p>
 
           <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
@@ -204,7 +204,7 @@ export default function GameClient({ sessionId }: { sessionId: string }) {
               You contributed {memoriesCount} {memoriesCount === 1 ? 'memory' : 'memories'}.
             </h1>
             <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: '1rem', color: '#9DA3A8', lineHeight: 1.75, maxWidth: '400px', margin: '0 auto 0.5rem' }}>
-              Every memory you shared is now permanently preserved in The {familyName} Archive.
+              Every memory you shared is now permanently preserved in the {familyName} Basalith.
             </p>
             <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: '0.9rem', color: '#5C6166' }}>
               The family leaderboard updates in real time.
@@ -260,7 +260,7 @@ export default function GameClient({ sessionId }: { sessionId: string }) {
       <div style={{ minHeight: '100vh', background: '#0A0908', padding: '3rem 1.5rem' }}>
         <div style={{ maxWidth: '480px', margin: '0 auto' }}>
           <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.7rem', letterSpacing: '0.28em', color: '#C4A24A', marginBottom: '0.5rem' }}>
-            THE {familyName.toUpperCase()} ARCHIVE
+            THE {familyName.toUpperCase()} BASALITH
           </p>
           <h1 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1.8rem', color: '#F0EDE6', margin: '0 0 0.5rem' }}>
             This week&rsquo;s memory game.
@@ -327,7 +327,7 @@ export default function GameClient({ sessionId }: { sessionId: string }) {
         <div style={{ maxWidth: '680px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
           <div>
             <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.68rem', letterSpacing: '0.25em', color: '#C4A24A', margin: '0 0 2px' }}>
-              THE {familyName.toUpperCase()} ARCHIVE
+              THE {familyName.toUpperCase()} BASALITH
             </p>
             <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.6rem', letterSpacing: '0.14em', color: '#5C6166', margin: 0 }}>
               MEMORY GAME

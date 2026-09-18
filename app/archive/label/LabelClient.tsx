@@ -23,11 +23,11 @@ const SEASONS   = ['Spring', 'Summer', 'Autumn', 'Winter', 'Unknown']
 const MILESTONE_THRESHOLDS = [1, 5, 10, 25, 50, 100]
 
 const MILESTONE_TEXTS: Record<number, { main: string; sub: string }> = {
-  1:   { main: 'The archive has begun.',                           sub: 'ONE PHOTOGRAPH · ONE MEMORY · PERMANENT'   },
+  1:   { main: 'Your Basalith has begun.',                         sub: 'ONE PHOTOGRAPH · ONE MEMORY · PERMANENT'   },
   5:   { main: 'Five moments preserved.',                          sub: 'THE RECORD IS GROWING'                     },
   10:  { main: 'Ten photographs.\nA decade comes alive.',          sub: 'KEEP GOING'                                },
-  25:  { main: 'Twenty-five.\nThis family is being remembered.',   sub: 'THE ARCHIVE IS TAKING SHAPE'               },
-  50:  { main: 'Fifty photographs.\nThis is a serious archive.',   sub: 'HALF A CENTURY OF MOMENTS · PRESERVED'     },
+  25:  { main: 'Twenty-five.\nThis family is being remembered.',   sub: 'YOUR BASALITH IS TAKING SHAPE'             },
+  50:  { main: 'Fifty photographs.\nThis is a serious record.',    sub: 'HALF A CENTURY OF MOMENTS · PRESERVED'     },
   100: { main: 'One hundred.\nThis is a legacy.',                  sub: 'ONE HUNDRED MEMORIES · PRESERVED FOREVER'  },
 }
 
@@ -50,7 +50,7 @@ function MilestoneOverlay({ count, onDone }: { count: number; onDone: () => void
   const [showSub,   setShowSub]   = useState(false)
   const [exiting,   setExiting]   = useState(false)
 
-  const texts = MILESTONE_TEXTS[count] ?? { main: `${count} memories preserved.`, sub: 'THE ARCHIVE GROWS' }
+  const texts = MILESTONE_TEXTS[count] ?? { main: `${count} memories preserved.`, sub: 'THE RECORD GROWS' }
 
   useEffect(() => {
     const t1 = setTimeout(() => setShowGhost(true), 400)
@@ -302,7 +302,7 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
     return (
       <div style={{ padding: '2rem 0' }}>
         <p className="font-serif" style={{ fontSize: '1.1rem', fontStyle: 'italic', color: 'var(--portal-ink)', marginBottom: '0.5rem' }}>
-          Uploading your archive…
+          Uploading your photographs…
         </p>
         <div className="w-full" style={{ height: '4px', background: 'var(--portal-inset)', borderRadius: '2px', margin: '1rem 0', overflow: 'hidden' }}>
           <div style={{ height: '100%', background: 'var(--portal-btn)', borderRadius: '2px', width: `${pct}%`, transition: 'width 0.4s ease' }} />
@@ -403,7 +403,7 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
       </div>
 
       <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--portal-label)', textAlign: 'center' }}>
-        Photos upload directly to the archive · AI reviews each one automatically
+        Photos upload directly to your Basalith · AI reviews each one automatically
       </p>
 
       {/* Single-photo diagnostic test */}
@@ -580,7 +580,7 @@ export default function LabelClient({ archiveId }: { archiveId: string }) {
         )}
         <div className="max-w-lg mx-auto pt-12">
           <div className="rounded-sm border px-10 py-10 text-center" style={{ background: 'var(--portal-card)', borderColor: 'var(--portal-gold-line)' }}>
-            <p className="font-serif font-semibold" style={{ fontSize: '1.55rem', color: 'var(--portal-ink)', lineHeight: 1.25 }}>Saved to your archive.</p>
+            <p className="font-serif font-semibold" style={{ fontSize: '1.55rem', color: 'var(--portal-ink)', lineHeight: 1.25 }}>Saved to the record.</p>
             <p className="font-serif" style={{ fontSize: '0.95rem', color: 'var(--portal-body)', lineHeight: 1.5, marginTop: '0.4rem', marginBottom: '2.25rem' }}>Your entity has this now.</p>
             <div className="flex items-center justify-center gap-6 mb-8">
               <div className="text-center">
@@ -746,7 +746,7 @@ export default function LabelClient({ archiveId }: { archiveId: string }) {
           </div>
 
           <button type="submit" disabled={saving} className="btn-monolith-amber w-full text-center disabled:opacity-50 disabled:cursor-not-allowed">
-            {saving ? 'Saving…' : 'Save to Archive'}
+            {saving ? 'Saving…' : 'Save this memory'}
           </button>
 
         </form>

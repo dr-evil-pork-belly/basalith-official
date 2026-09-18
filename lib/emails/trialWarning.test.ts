@@ -9,7 +9,7 @@ describe('the trial warning email', () => {
     expect(TRIAL_WARNING_SUBJECT).toBe('Seven days left on your first call.')
     // Expires 03:31 UTC October 18; the 16:00 UTC run that day deletes it,
     // which is Sunday, October 18 in Pacific time.
-    expect(l.body).toBe('Your archive at Ha Archive holds 12 deposits from your first call. It is deleted on Sunday, October 18, 2026 unless you keep it.')
+    expect(l.body).toBe('Your Basalith holds 12 deposits from your first call. It is deleted on Sunday, October 18, 2026 unless you keep it.')
     expect(l.keep).toBe('Reply to this email and we will keep it open while you decide.')
     expect(l.exportUrl).toBe('https://basalith.ai/archive/preferences')
   })

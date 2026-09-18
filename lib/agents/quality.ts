@@ -63,9 +63,9 @@ export const qualityAgent = inngest.createFunction(
             },
             {
               type: 'text',
-              text: `Score this family archive photograph for archive value and estimate when it was taken.
+              text: `Score this family photograph for its value to the family's record and estimate when it was taken.
 
-ARCHIVE VALUE (0-100):
+VALUE TO THE FAMILY (0-100):
 High (70-100): Faces clearly visible, candid emotional moments, rare or historical settings, group gatherings, milestone events, elderly people, children with family, pre-digital era photos
 Medium (40-69): Faces present but small, posed formal photos, everyday moments, places with personal meaning
 Lower (10-39): No faces, landscapes, buildings, objects with context

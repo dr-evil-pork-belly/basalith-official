@@ -48,19 +48,19 @@ export async function POST(req: NextRequest) {
 
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
 
-    // 2a. Honeypot — bots fill every field, including the decoy.
+    // 2a. Honeypot: bots fill every field, including the decoy.
     if (typeof company_website === 'string' && company_website.length > 0) {
       console.warn('[spam-drop] honeypot', { ip })
       return NextResponse.json({ success: true })
     }
 
-    // 2b. Gibberish heuristics — conservative, ASCII-only.
+    // 2b. Gibberish heuristics, conservative, ASCII-only.
     if (looksLikeBotToken(name) || looksLikeBotToken(reason)) {
       console.warn('[spam-drop] heuristic', { ip })
       return NextResponse.json({ success: true })
     }
 
-    // 2c. Rate limit by IP — soft, in-memory.
+    // 2c. Rate limit by IP, soft, in-memory.
     if (rateLimited(ip)) {
       console.warn('[spam-drop] rate-limit', { ip })
       return NextResponse.json({ success: true })
@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
 
     if (dbError) {
       console.error('[apply] DB insert error:', dbError.message)
-      // Non-fatal — still send the notification
+      // Non-fatal, still send the notification
     }
 
     // Notify the team. Business leads also copy David's personal inbox.
@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
     const emailSubject =
       applyType === 'succession'   ? `New Succession Lead: ${name}`
       : applyType === 'acquisition' ? `New Acquisition Lead: ${name}`
-      : `New Archive Application: ${name}`
+      : `New application: ${name}`
 
     const tdLabel = 'font-family: monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: #888; padding: 12px 16px 12px 0; vertical-align: top; white-space: nowrap;'
     const tdValue = 'font-size: 15px; padding: 12px 0; border-bottom: 1px solid #f0f0f0;'
@@ -109,7 +109,7 @@ export async function POST(req: NextRequest) {
 
     const detailRows = [
       row('Lead Type', leadTypeLabel),
-      !isBusiness && subject     ? row('Archive Subject', subject) : '',
+      !isBusiness && subject     ? row('Subject', subject) : '',
       isBusiness && companyName  ? row('Company', companyName) : '',
       isBusiness && industry     ? row('Industry', industry) : '',
       isBusiness && employees    ? row('Employees', employees) : '',
@@ -132,7 +132,7 @@ export async function POST(req: NextRequest) {
       html: `
         <div style="font-family: Georgia, serif; max-width: 600px; color: #1a1a1a; padding: 32px;">
           <p style="font-family: monospace; font-size: 11px; letter-spacing: 0.2em; color: #888; text-transform: uppercase; margin: 0 0 24px;">
-            New Archive Application · Basalith
+            New application · Basalith
           </p>
 
           <h1 style="font-size: 24px; font-weight: 700; margin: 0 0 8px;">${name}</h1>

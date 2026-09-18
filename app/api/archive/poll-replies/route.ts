@@ -8,7 +8,7 @@ const resend    = new Resend(process.env.RESEND_API_KEY)
 const anthropic = new Anthropic()
 
 // ── Resend REST helpers ────────────────────────────────────────────────────────
-// The SDK does not support inbound/receiving endpoints yet — use REST directly.
+// The SDK does not support inbound/receiving endpoints yet, use REST directly.
 
 async function fetchReceivedEmails() {
   const url = 'https://api.resend.com/emails/receiving?limit=50'
@@ -308,7 +308,7 @@ export async function POST(req: Request) {
               }),
             })
           } catch {
-            // Non-fatal — label already saved
+            // Non-fatal, label already saved
           }
         }
 
@@ -341,7 +341,7 @@ export async function POST(req: Request) {
 
         // Send confirmation
         if (fromEmail) {
-          const archiveName = (matchedSession.archives as { name?: string } | null)?.name ?? 'The Archive'
+          const archiveName = (matchedSession.archives as { name?: string } | null)?.name ?? 'your Basalith'
           const firstName   = fromName.split(' ')[0]
 
           await resend.emails.send({
@@ -379,7 +379,7 @@ export async function POST(req: Request) {
       sessionsChecked: sessions.length,
       errors:          errors.length ? errors : undefined,
       message:         processed > 0
-        ? `Saved ${processed} new ${processed === 1 ? 'reply' : 'replies'} to the archive`
+        ? `Saved ${processed} new ${processed === 1 ? 'reply' : 'replies'} to the record`
         : 'No new replies found',
     })
 

@@ -4,7 +4,7 @@ import { getSessionUser } from '@/lib/auth/getSessionUser'
 import DashboardClient from './DashboardClient'
 
 export const metadata: Metadata = {
-  title: 'Your Archive',
+  title: 'Your Basalith',
 }
 
 export default async function ArchiveDashboardPage() {

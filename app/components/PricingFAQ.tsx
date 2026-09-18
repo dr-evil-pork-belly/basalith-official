@@ -11,7 +11,7 @@ const ITEMS: Item[] = [
   {
     q: 'What exactly is The Founding?',
     a: <>
-      The Founding is the one-time fee that opens your archive. It covers the Founding Sequence, three of
+      The Founding is the one-time fee that opens your Basalith. It covers the Founding Sequence, three of
       the hardest calls you ever made, in your own words and your own time, plus your contributors invited,
       your records brought in, and a first read with the founder of Basalith by video. You pay it once, at
       the start. Your annual plan begins after The Founding is complete.
@@ -21,36 +21,36 @@ const ITEMS: Item[] = [
     </>,
   },
   {
-    q: 'What happens to my archive if Basalith ceases to exist?',
+    q: 'What happens to my Basalith if the company ceases to exist?',
     a: <>
-      You keep everything. You own the archive and Basalith is the custodian, not the owner. You can
-      export the complete archive in open formats any time you ask, so a closure cannot strand your data.
+      You keep everything. You own your Basalith. We are the custodian, not the owner. You can
+      export all of it in open formats any time you ask, so a closure cannot strand your data.
       {' '}<a href="/data-ownership" style={{ color: '#C4A24A', textDecoration: 'none' }}>
         Read our data ownership commitments →
       </a>
     </>,
   },
   {
-    q: 'Who owns my archive content?',
+    q: 'Who owns the content of my Basalith?',
     a: `You do. Basalith holds a limited license to store and process your content so we can provide the
       service to you, and nothing more. We make no claim on your photographs, stories, or memories. You
-      can export the complete archive at any time.`,
+      can export all of it at any time.`,
   },
   {
-    q: 'Can my family access the archive after I am gone?',
-    a: `Yes. That is much of the point. The Custodian you name carries out your directions for the archive.
+    q: 'Can my family access my Basalith after I am gone?',
+    a: `Yes. That is much of the point. The Custodian you name carries out your directions for your Basalith.
       Their legal authority comes from your own will or trust, so name them there as well. Contributors
-      keep their access. The archive continues. Under the Legacy plan, your entity stays available to your
+      keep their access. Your Basalith continues. Under the Legacy plan, your entity stays available to your
       family and your cognitive fingerprint is frozen, so nobody can change what you said.`,
   },
   {
     q: 'What is the entity and how does it work?',
-    a: `Your entity is a cognitive reference model trained only on your archive: your labeled photographs,
+    a: `Your entity is a cognitive reference model trained only on your record: your labeled photographs,
       voice recordings, written deposits, and the stories your family has contributed over time. It
       answers in the patterns of your expression, carries the opinions and values you recorded, and
       points back to your specific memories. It is not a simulation of you and it is not a general
       chatbot. It is a record of how you reason, built from what you chose to deposit. The richer the
-      archive, the richer the entity.`,
+      record, the richer the entity.`,
   },
 ]
 

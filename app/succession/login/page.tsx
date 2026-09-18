@@ -119,7 +119,7 @@ export default function SuccessorLoginPage() {
             lineHeight: 1.6,
           }}
         >
-          {sent ? 'A sign-in link is on its way to you.' : 'Enter your email to access the archive.'}
+          {sent ? 'A sign-in link is on its way to you.' : 'Enter your email to sign in to the founder\'s Basalith.'}
         </p>
 
         {sent ? (
@@ -128,7 +128,7 @@ export default function SuccessorLoginPage() {
               Check your email
             </p>
             <p style={{ ...MONO, fontSize: '0.65rem', letterSpacing: '0.06em', color: '#5C6166', lineHeight: 1.7 }}>
-              We sent a sign-in link to {email}. Open it on this device to access the archive.
+              We sent a sign-in link to {email}. Open it on this device to enter the founder&rsquo;s Basalith.
             </p>
           </div>
         ) : (

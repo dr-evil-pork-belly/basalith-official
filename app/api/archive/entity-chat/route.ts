@@ -120,7 +120,7 @@ export async function POST(req: Request) {
         .select('name, owner_name, preferred_language')
         .eq('id', archiveId)
         .single()
-      if (!arch) return NextResponse.json({ error: 'Archive not found' }, { status: 404 })
+      if (!arch) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
       const language = gapLanguage(contributorLanguage, arch.preferred_language as string | null)
       const out = await generateGroundedFamilyReply({
@@ -251,7 +251,7 @@ export async function POST(req: Request) {
 <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">${archive.name.toUpperCase()}</p>
 <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0 0 24px">YOUR MEMORY WAS USED</p>
 <p style="font-size:17px;font-weight:300;color:#B8B4AB;margin:0 0 8px">${firstName},</p>
-<p style="font-size:17px;font-weight:300;color:#F0EDE6;margin:0 0 8px;line-height:1.7">Something you contributed to ${ownerFirst}'s archive was just used by the entity.</p>
+<p style="font-size:17px;font-weight:300;color:#F0EDE6;margin:0 0 8px;line-height:1.7">Something you contributed to ${ownerFirst}'s Basalith was just used by the entity.</p>
 <p style="font-size:15px;font-style:italic;color:#706C65;margin:0 0 32px;line-height:1.7">Someone asked ${ownerFirst}'s entity about "${depositPrompt}." The entity answered using your words.</p>
 <div style="border-left:3px solid rgba(196,162,74,0.4);padding:20px 24px;margin:0 0 32px;background:rgba(196,162,74,0.04)">
   <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#C4A24A;margin:0 0 12px">YOUR CONTRIBUTION</p>

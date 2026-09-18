@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title:       'About · Basalith',
-  description: 'Heritage Nexus Inc. built Basalith to capture how an operator reasons before a business changes hands, so the judgment transfers through an acquisition or a succession. Individual and family archives also available.',
+  description: 'Heritage Nexus Inc. built Basalith to capture how an operator reasons before a business changes hands, so the judgment transfers through an acquisition or a succession. Also available for one person or a family.',
 }
 
 const SERIF: React.CSSProperties = {
@@ -36,7 +36,7 @@ const H2: React.CSSProperties = {
 const ECOSYSTEM = [
   {
     name: 'Basalith.ai',
-    body: 'The product. Where archives are built, entities are trained, and the work of preservation happens.',
+    body: 'The product. Where each Basalith is built, entities are trained, and the work of preservation happens.',
   },
   {
     name: 'Basalith.life',
@@ -242,15 +242,15 @@ export default function AboutPage() {
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '24px' }}>
               Who runs it
             </p>
-            <h2 style={{ ...H2, color: 'rgba(250,248,244,0.9)' }}>Every archive is read by a person.</h2>
+            <h2 style={{ ...H2, color: 'rgba(250,248,244,0.9)' }}>Every Basalith is read by a person.</h2>
             <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>
               The founder of Basalith reads every Founding Sequence and runs every
               first read himself today. One person, listening to how you decide,
-              and staying with the archive as it grows.
+              and staying with your Basalith as it grows.
             </p>
             <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>The technology handles the complexity. A person handles the rest.</p>
             <p style={{ ...BODY, color: 'rgba(250,248,244,0.85)', fontStyle: 'italic' }}>
-              Every archive is a relationship, not a subscription.
+              Every Basalith is a relationship, not a subscription.
             </p>
           </div>
         </section>
@@ -315,8 +315,8 @@ export default function AboutPage() {
               We are early.
             </p>
             <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.5)', lineHeight: 1.85, marginBottom: '8px' }}>
-              The archives being built today will be the most valuable ones
-              in twenty years, because they will have had the most time.
+              The Basalith you begin today will be worth the most
+              in twenty years, because it will have had the most time.
             </p>
             <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.5)', lineHeight: 1.85, marginBottom: '8px' }}>
               Every year you begin is a year the entity has more to work with.
@@ -339,7 +339,7 @@ export default function AboutPage() {
                 borderRadius:   'var(--radius-sm)',
               }}
             >
-              Begin Your Archive
+              Begin your Basalith
             </a>
           </div>
         </section>

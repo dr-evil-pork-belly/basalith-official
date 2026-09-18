@@ -5,7 +5,7 @@ import type { Metadata }  from 'next'
 
 export const metadata: Metadata = {
   title:       'The Founding · Basalith',
-  description: 'Every Basalith archive begins with The Founding: three of the hardest calls you ever made, in your own words, in your own time. Then a first read with the founder of Basalith, by video.',
+  description: 'Every Basalith begins with The Founding: three of the hardest calls you ever made, in your own words, in your own time. Then a first read with the founder of Basalith, by video.',
 }
 
 const SERIF: React.CSSProperties = {
@@ -50,7 +50,7 @@ export default function FoundingSessionPage() {
           </h1>
 
           <p style={P}>
-            The Founding is where the archive starts.
+            The Founding is where your Basalith starts.
             <br />
             Three of the hardest calls you ever made.
             <br />
@@ -81,7 +81,7 @@ export default function FoundingSessionPage() {
           <p style={P}>
             When the three calls are in, the founder of Basalith reads every word.
             <br />
-            Within 48 hours we set up your first read: a short video call to walk through what your archive holds, where it is still thin, and what comes next.
+            Within 48 hours we set up your first read: a short video call to walk through what your Basalith holds, where it is still thin, and what comes next.
             <br />
             For a business, one more session by video, with your successor in the room, working through those calls together.
           </p>
@@ -109,7 +109,7 @@ export default function FoundingSessionPage() {
               borderRadius:  'var(--radius-sm)',
             }}
           >
-            Begin your archive
+            Begin your Basalith
           </a>
         </section>
 
@@ -135,7 +135,7 @@ export default function FoundingSessionPage() {
             That is all we ask of them.
           </p>
           <p style={{ ...P, marginBottom: 0 }}>
-            The archive grows because contributing feels like a conversation, not a task.
+            Your Basalith grows because contributing feels like a conversation, not a task.
           </p>
         </section>
 

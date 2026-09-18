@@ -47,7 +47,7 @@ export default function FoundingBanner({ trial = false }: { trial?: boolean } = 
     ? 'Three of the hardest calls you ever made, in your own words. About ten minutes each. Speak or type.'
     : inProgress
       ? `${status.current!.turns} answered so far. Pick it up where you left off.`
-      : `${status.completed} of 3 in your archive.`
+      : `${status.completed} of 3 on the record.`
 
   return (
     <Link

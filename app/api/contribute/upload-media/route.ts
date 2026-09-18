@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
       resend.emails.send({
         from:    `${archive.name} <${fromEmail}>`,
         to:      archive.owner_email,
-        subject: `${contributorName} uploaded ${mediaLabel} to your archive`,
+        subject: `${contributorName} uploaded ${mediaLabel} to your Basalith`,
         html: `<!DOCTYPE html>
 <html>
 <body style="background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:520px;margin:0 auto;padding:0">
@@ -92,13 +92,13 @@ export async function POST(req: NextRequest) {
       ${archive.name.toUpperCase()}
     </p>
     <p style="font-family:Georgia,serif;font-size:18px;font-weight:700;color:#F0EDE6;margin:0 0 12px">
-      ${contributorName} uploaded ${mediaLabel} to your archive.
+      ${contributorName} uploaded ${mediaLabel} to your Basalith.
     </p>
     <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#9DA3A8;margin:0 0 20px">
       ${file.name}
     </p>
     <a href="${siteUrl}/archive/dashboard" style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;text-decoration:none">
-      VIEW YOUR ARCHIVE →
+      VIEW YOUR BASALITH →
     </a>
   </div>
 </body>

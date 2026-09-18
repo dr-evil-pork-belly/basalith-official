@@ -65,7 +65,7 @@ export async function POST(req: Request) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const eraEstimate = (label as any).photographs?.ai_era_estimate
     const story       = (label.what_was_happening || label.story_extracted || '').slice(0, 150)
-    const archiveName = archive.name || 'Your Archive'
+    const archiveName = archive.name || 'Your Basalith'
 
     await resend.emails.send({
       from:    `${archiveName} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
@@ -89,7 +89,7 @@ export async function POST(req: Request) {
 
   <a href="${process.env.NEXT_PUBLIC_APP_URL ?? 'https://basalith.ai'}/archive/gallery"
     style="display:inline-block;font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#C4A24A;text-decoration:none;border:1px solid rgba(196,162,74,0.3);padding:10px 20px">
-    VIEW IN ARCHIVE &rarr;
+    VIEW IN YOUR BASALITH &rarr;
   </a>
 
   <hr style="border:none;border-top:1px solid rgba(240,237,230,0.06);margin:32px 0">

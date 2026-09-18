@@ -35,7 +35,7 @@ async function downloadRecording(
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     if (attempt > 1) {
       const waitMs = attempt * 3000   // 3s, 6s, 9s
-      console.log(`[twilio/recording] attempt ${attempt}/${maxRetries} — waiting ${waitMs}ms`)
+      console.log(`[twilio/recording] attempt ${attempt}/${maxRetries}, waiting ${waitMs}ms`)
       await new Promise(resolve => setTimeout(resolve, waitMs))
     }
 
@@ -50,12 +50,12 @@ async function downloadRecording(
     }
 
     if (response.status === 404) {
-      console.log('[twilio/recording] 404 — recording not ready yet, retrying')
+      console.log('[twilio/recording] 404, recording not ready yet, retrying')
       continue
     }
 
     if (response.status === 401) {
-      console.error('[twilio/recording] 401 — auth failed, check TWILIO_AUTH_TOKEN in Vercel env vars')
+      console.error('[twilio/recording] 401, auth failed, check TWILIO_AUTH_TOKEN in Vercel env vars')
       continue   // might be a timing issue; retry anyway
     }
 
@@ -110,7 +110,7 @@ async function buildContinueTwiml(
 <Response>
   <Say voice="alice">Thank you.</Say>
   <Pause length="1"/>
-  <Say voice="alice">Your memory has been saved to the archive.</Say>
+  <Say voice="alice">Your memory is now on the record.</Say>
   <Pause length="1"/>
   <Say voice="alice">${continuePromptEn}</Say>
   <Gather numDigits="1" action="${continueUrl}" method="POST" timeout="10">
@@ -134,7 +134,7 @@ export async function POST(req: NextRequest) {
   const accountSid = process.env.TWILIO_ACCOUNT_SID ?? ''
   const authToken  = process.env.TWILIO_AUTH_TOKEN  ?? ''
   console.log(
-    '[twilio/recording] credentials check —',
+    '[twilio/recording] credentials check:',
     'SID length:', accountSid.length,
     'SID prefix:', accountSid.substring(0, 4),
     'token length:', authToken.length,
@@ -196,7 +196,7 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // ── Download + process (non-fatal — always return TwiML) ─────────────────────
+  // ── Download + process (non-fatal, always return TwiML) ─────────────────────
   let storagePath = ''
   let transcript  = ''
   let downloadOk  = false
@@ -212,7 +212,7 @@ export async function POST(req: NextRequest) {
       : recordingUrl ?? null
 
     if (!baseUrl) {
-      throw new Error('No RecordingSid or RecordingUrl — cannot download')
+      throw new Error('No RecordingSid or RecordingUrl, cannot download')
     }
 
     const audioBuffer = await downloadRecording(baseUrl, accountSid, authToken)
@@ -261,14 +261,14 @@ export async function POST(req: NextRequest) {
     console.error('[twilio/recording] Download/upload failed:', err instanceof Error ? err.message : err)
   }
 
-  // ── Save voice_recordings row (always — with whatever we have) ───────────────
+  // ── Save voice_recordings row (always, with whatever we have) ───────────────
   // The id is held so the training-pair step can name this exact recording
   // instead of re-reading "the archive's newest row", which is a race when two
   // deliveries land close together.
   let voiceRecordingId: string | null = null
 
   try {
-    console.log('[twilio/recording] saving voice_recordings row — archiveId:', archiveId, 'downloadOk:', downloadOk, 'transcriptLen:', transcript.length)
+    console.log('[twilio/recording] saving voice_recordings row, archiveId:', archiveId, 'downloadOk:', downloadOk, 'transcriptLen:', transcript.length)
     const { data: vrRow, error: vrError } = await supabaseAdmin
       .from('voice_recordings')
       .insert({
@@ -290,19 +290,19 @@ export async function POST(req: NextRequest) {
     console.error('[twilio/recording] voice_recordings insert failed:', err instanceof Error ? err.message : err)
   }
 
-  // ── Save deposit / labels (always — transcript or placeholder) ────────────────
+  // ── Save deposit / labels (always, transcript or placeholder) ────────────────
   try {
     const depositText = transcript && transcript.length > 20
       ? transcript
       : downloadOk
-        ? null   // downloaded but Whisper gave nothing — skip
-        : `[Voice recording — ${recordingDuration ?? '?'} seconds — transcription pending. RecordingSid: ${recordingSid ?? 'unknown'}]`
+        ? null   // downloaded but Whisper gave nothing, skip
+        : `[Voice recording, ${recordingDuration ?? '?'} seconds, transcription pending. RecordingSid: ${recordingSid ?? 'unknown'}]`
 
-    console.log('[twilio/recording] deposit — archiveId:', archiveId, 'isOwner:', isOwner, 'transcriptLen:', transcript.length, 'depositText?', !!depositText)
+    console.log('[twilio/recording] deposit, archiveId:', archiveId, 'isOwner:', isOwner, 'transcriptLen:', transcript.length, 'depositText?', !!depositText)
 
     if (depositText) {
       if (isOwner) {
-        console.log('[twilio/recording] saving owner deposit — archiveId:', archiveId)
+        console.log('[twilio/recording] saving owner deposit, archiveId:', archiveId)
         // source_type was 'phone_call', which owner_deposits rejects. Twenty-six
         // phone calls produced zero deposits while every caller heard a
         // confirmation, because the insert error was logged and swallowed. The
@@ -333,7 +333,7 @@ export async function POST(req: NextRequest) {
           )
         }
       } else {
-        console.log('[twilio/recording] saving contributor deposit — archiveId:', archiveId)
+        console.log('[twilio/recording] saving contributor deposit, archiveId:', archiveId)
         // 'contributor' is the value the live contributor path writes
         // (app/api/contribute/answer). contributor_id is set here too, so this
         // row is attributable and stays out of the owner's coverage map, which
@@ -389,7 +389,7 @@ export async function POST(req: NextRequest) {
         }
       }
     } else {
-      console.log('[twilio/recording] no depositText — skipping deposit insert')
+      console.log('[twilio/recording] no depositText, skipping deposit insert')
     }
   } catch (err: unknown) {
     console.error('[twilio/recording] deposit insert failed:', err instanceof Error ? err.message : err)
@@ -442,7 +442,7 @@ export async function POST(req: NextRequest) {
     console.error('[twilio/recording] notification insert failed:', err instanceof Error ? err.message : err)
   }
 
-  // ── Return TwiML (always — Twilio is waiting) ─────────────────────────────────
+  // ── Return TwiML (always, Twilio is waiting) ─────────────────────────────────
   const twiml = await buildContinueTwiml(archiveId, isOwner, contributorId)
 
   console.log('[twilio/recording] TwiML response:')

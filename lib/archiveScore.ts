@@ -76,7 +76,7 @@ export function calculateArchiveScore(
 
   const milestoneLabel =
     finalScore >= 90 ? 'A living legacy'    :
-    finalScore >= 75 ? 'A serious archive'  :
+    finalScore >= 75 ? 'A serious record'   :
     finalScore >= 60 ? 'Taking shape'       :
     finalScore >= 40 ? 'Growing'            :
     finalScore >= 20 ? 'Just beginning'     :

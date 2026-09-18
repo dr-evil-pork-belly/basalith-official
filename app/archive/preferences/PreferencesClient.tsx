@@ -340,17 +340,17 @@ export default function PreferencesClient({ archiveId }: { archiveId: string }) 
       <div className="mt-10 mb-4">
         <p className="font-sans text-[11.5px] font-bold tracking-[0.2em] uppercase mb-1" style={{ color: 'var(--portal-gold-ink)' }}>Your Data</p>
         <h2 className="font-serif font-semibold text-[var(--portal-ink)]" style={{ fontSize: 'clamp(1.4rem,2.5vw,1.9rem)' }}>
-          Download Your Archive
+          Download your Basalith
         </h2>
         <p className="font-sans text-[15px] mt-2" style={{ color: 'var(--portal-secondary)' }}>
-          You own your archive completely. Download everything at any time.
+          You own your Basalith completely. Download everything at any time.
         </p>
       </div>
 
       <div className="rounded-sm border border-[var(--portal-label)] px-6 py-6" style={{ background: 'var(--portal-card)' }}>
-        <p className="font-sans text-[11px] font-bold tracking-[0.18em] uppercase text-[var(--portal-secondary)] mb-2">Complete Archive Export</p>
+        <p className="font-sans text-[11px] font-bold tracking-[0.18em] uppercase text-[var(--portal-secondary)] mb-2">Complete export</p>
         <p className="font-sans text-[15px] mb-5" style={{ color: 'var(--portal-body)' }}>
-          Your export is one zip file holding the actual contents of your archive.
+          Your export is one zip file holding the actual contents of your Basalith.
           Your photographs, recordings, and video as real files, plus every record
           in plain JSON. It opens with no account and no connection to Basalith.
         </p>
@@ -366,7 +366,7 @@ export default function PreferencesClient({ archiveId }: { archiveId: string }) 
             className="btn-monolith-ghost disabled:opacity-50"
             style={{ borderColor: 'var(--portal-gold-line)', color: 'var(--portal-gold-ink)' }}
           >
-            {exporting ? 'Requesting…' : 'Request Archive Export →'}
+            {exporting ? 'Requesting…' : 'Request your export →'}
           </button>
           {exportMsg && (
             <p className="font-sans text-[15px]" style={{ color: 'var(--portal-body)' }}>{exportMsg}</p>

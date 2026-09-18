@@ -30,7 +30,7 @@ function wrap(archiveName: string, bodyHtml: string): string {
 
 export function buildPaymentFailedSubject(archiveName: string, lang = 'en'): string {
   if (lang === 'zh' || lang === 'yue') return `关于您档案的说明 · ${archiveName}`
-  return `A note about your archive · ${archiveName}`
+  return `A note about your Basalith · ${archiveName}`
 }
 
 export function buildPaymentFailedEmail(
@@ -62,11 +62,11 @@ export function buildPaymentFailedEmail(
       We were unable to process your most recent payment.
     </p>
     <p style="font-family:Georgia,serif;font-size:18px;font-weight:300;color:#F0EDE6;line-height:1.8;margin:0 0 8px">
-      Your archive is safe.
+      Your Basalith is safe.
     </p>
     <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 32px">
       Everything you have built is intact. Please update your payment information
-      to continue your archive without interruption.
+      to continue your Basalith without interruption.
     </p>
     ${invoiceUrl ? `<a href="${invoiceUrl}" style="${BASE_STYLES.goldBtn}">Update Payment Method →</a>` : ''}
     <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#706C65;line-height:1.8;margin:32px 0 0">
@@ -107,7 +107,7 @@ export function buildArchivePausedEmail(
   ` : `
     <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#B8B4AB;margin:0 0 24px">${firstName},</p>
     <p style="font-family:Georgia,serif;font-size:18px;font-weight:300;color:#F0EDE6;line-height:1.8;margin:0 0 20px">
-      Your archive has been paused.
+      Your Basalith has been paused.
     </p>
     <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 8px">
       This is not a deletion.
@@ -119,9 +119,9 @@ export function buildArchivePausedEmail(
       Your photographs. Your voice. Your deposits. Your contributors.
       All of it is exactly as you left it.
     </p>
-    <a href="${resumeUrl}" style="${BASE_STYLES.goldBtn}">Resume Your Archive →</a>
+    <a href="${resumeUrl}" style="${BASE_STYLES.goldBtn}">Resume your Basalith →</a>
     <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#706C65;line-height:1.8;margin:32px 0 0">
-      There is no deadline. Your archive will be preserved until you return.
+      There is no deadline. Your Basalith will be preserved until you return.
     </p>
   `
 
@@ -160,7 +160,7 @@ export function buildPausedReminderEmail(
       A brief note.
     </p>
     <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 24px">
-      Your archive has been preserved for ${monthsPaused} month${monthsPaused !== 1 ? 's' : ''}.
+      Your Basalith has been preserved for ${monthsPaused} month${monthsPaused !== 1 ? 's' : ''}.
     </p>
     <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 8px">
       Everything is exactly as you left it.
@@ -169,10 +169,10 @@ export function buildPausedReminderEmail(
       Your photographs. Your voice. Your deposits.
     </p>
     <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 32px">
-      When you are ready to return reply to this email or visit your archive link below.
+      When you are ready to return reply to this email or use your sign-in link below.
       We will be here.
     </p>
-    <a href="${resumeUrl}" style="${BASE_STYLES.goldBtn}">Return to Your Archive →</a>
+    <a href="${resumeUrl}" style="${BASE_STYLES.goldBtn}">Return to your Basalith →</a>
   `
 
   return wrap(archiveName, body)
@@ -202,7 +202,7 @@ export function buildWelcomeBackEmail(
   ` : `
     <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#B8B4AB;margin:0 0 24px">${firstName},</p>
     <p style="font-family:Georgia,serif;font-size:18px;font-weight:300;color:#F0EDE6;line-height:1.8;margin:0 0 20px">
-      Your archive is active again.
+      Your Basalith is active again.
     </p>
     <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 8px">
       Everything you built is still here.
@@ -214,7 +214,7 @@ export function buildWelcomeBackEmail(
     <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 32px">
       Welcome back.
     </p>
-    <a href="${archiveUrl}" style="${BASE_STYLES.goldBtn}">Enter Your Archive →</a>
+    <a href="${archiveUrl}" style="${BASE_STYLES.goldBtn}">Enter your Basalith →</a>
   `
 
   return wrap(archiveName, body)
@@ -231,14 +231,14 @@ export function buildTerminationEmail(
   const body = `
     <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#B8B4AB;margin:0 0 24px">${firstName},</p>
     <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 24px">
-      We have received your request to permanently close your archive.
+      We have received your request to permanently close your Basalith.
     </p>
     <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#F0EDE6;line-height:1.8;margin:0 0 8px">
-      Your archive will be permanently deleted on ${deletionDate}.
+      Your Basalith will be permanently deleted on ${deletionDate}.
     </p>
     <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 32px">
       If you change your mind before then, reply to this email and we will cancel the deletion.
-      Your archive will remain intact until that date.
+      Your Basalith will remain intact until that date.
     </p>
     <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#706C65;line-height:1.8;margin:0">
       Reply to this email at any time to cancel.

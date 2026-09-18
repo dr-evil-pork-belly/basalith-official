@@ -89,7 +89,7 @@ export default function TrainingDataCard() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
         <div>
           <p style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.24em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '6px' }}>
-            {current ? current.name : 'Building your archive'}
+            {current ? current.name : 'Building your Basalith'}
           </p>
           <p style={{ fontFamily: SERIF, fontSize: '17px', fontStyle: 'italic', fontWeight: 400, color: 'var(--portal-ink)', margin: 0, lineHeight: 1.5 }}>
             {current ? current.consumer : 'Keep adding memories.'}

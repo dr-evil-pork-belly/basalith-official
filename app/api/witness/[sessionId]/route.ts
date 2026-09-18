@@ -3,7 +3,7 @@ import { resend } from '@/lib/resend'
 import { NextResponse } from 'next/server'
 import { WITNESS_SESSIONS } from '@/lib/witnessSessions'
 
-// ── PATCH — save answer and advance ────────────────────────────────────────
+// ── PATCH: save answer and advance ────────────────────────────────────────
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ sessionId: string }> }
@@ -96,7 +96,7 @@ export async function PATCH(
       })
     }
 
-    // On completion — notify the archive owner
+    // On completion, notify the archive owner
     if (isComplete) {
       notifyOwnerOnCompletion(session, updatedAnswers, sessionDef.title).catch(
         err => console.warn('witness completion notification failed:', err.message)
@@ -132,10 +132,10 @@ async function notifyOwnerOnCompletion(
   if (!archive?.owner_email) return
 
   const contributorName = session.contributor_name || session.contributor_email
-  const archiveName     = archive.name || 'Your Archive'
+  const archiveName     = archive.name || 'Your Basalith'
   const ownerFirstName  = archive.owner_name?.split(' ')[0] || 'there'
 
-  // Pull most meaningful answer — longest non-empty one
+  // Pull most meaningful answer, longest non-empty one
   const meaningfulAnswer = answers
     .filter(a => a.answer && a.answer.length > 0)
     .sort((a, b) => b.answer.length - a.answer.length)[0]
@@ -177,7 +177,7 @@ async function notifyOwnerOnCompletion(
       ${contributorName} answered 5 questions about you as ${relationshipTitle.toLowerCase()}.
     </p>
     <p style="font-family:Georgia,serif;font-size:15px;color:#9DA3A8;line-height:1.7;margin:0 0 8px">
-      Their answers are now in your archive and your entity has been updated.
+      Their answers are now on the record and your entity has been updated.
     </p>
     <p style="font-family:Georgia,serif;font-size:15px;color:#9DA3A8;line-height:1.7;margin:0 0 24px">
       Here is one thing they said:
@@ -204,7 +204,7 @@ async function notifyOwnerOnCompletion(
   supabaseAdmin.from('owner_notifications').insert({
     archive_id: session.archive_id,
     type:       'witness_complete',
-    subject:    `Witness session complete — ${contributorName}`,
+    subject:    `Witness session complete: ${contributorName}`,
     sent_to:    archive.owner_email,
     sent_at:    new Date().toISOString(),
     metadata:   { contributorName, relationship: session.relationship },

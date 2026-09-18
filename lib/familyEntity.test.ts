@@ -66,12 +66,12 @@ describe('family entity helpers', () => {
 describe('gap reply by language', () => {
   it('keeps the English reply byte for byte, topic included', () => {
     expect(groundingGapReply('pricing')).toBe(
-      'I haven\'t left a settled position on pricing in the archive, so I won\'t put words in my own mouth now. ' +
+      'I haven\'t left a settled position on pricing in the record, so I won\'t put words in my own mouth now. ' +
       'That\'s a call you\'ll have to make with the people in the room. ' +
       'I\'ll tell you how I think in general, but I won\'t pretend I decided this one when I didn\'t.',
     )
     expect(groundingGapReply('pricing', 'en')).toBe(groundingGapReply('pricing'))
-    expect(groundingGapReply('')).toContain('on this in the archive')
+    expect(groundingGapReply('')).toContain('on this in the record')
   })
 
   it('serves every email language the product has, topic-free, and never the template phrase', () => {

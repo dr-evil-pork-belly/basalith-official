@@ -56,7 +56,7 @@ export async function createArchiveWithCredentials(input: {
   const { data: archive, error: archiveError } = await supabaseAdmin
     .from('archives')
     .insert({
-      name:        `The ${familyName} Archive`,
+      name:        `The ${familyName} Basalith`,
       family_name: familyName,
       owner_email: ownerEmail,
       owner_name:  ownerName || null,

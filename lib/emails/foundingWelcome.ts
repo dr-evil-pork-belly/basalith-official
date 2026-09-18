@@ -26,23 +26,23 @@ export function buildFoundingWelcomeEmail(input: FoundingWelcomeInput): BuiltEma
   // No Guide network (September 2026). The founder reads and runs every founding.
   const guideName = input.guideName ?? 'The founder of Basalith'
 
-  const subject = `Your Basalith archive is active. The ${familyName} Archive.`
+  const subject = `The ${familyName} Basalith is active.`
 
   const accessBlockHtml = magicLinkUrl
     ? `
   <div style="background:rgba(196,162,74,0.08);border:1px solid rgba(196,162,74,0.3);border-top:3px solid rgba(196,162,74,0.8);padding:24px;margin:0 0 24px">
     <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;margin:0 0 12px;text-transform:uppercase">
-      Your Personal Archive Link
+      Your Basalith sign-in link
     </p>
     <p style="font-size:14px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 12px">
-      Use the link below to enter your archive. No password is required.
+      Use the link below to enter your Basalith. No password is required.
     </p>
     <a href="${magicLinkUrl}"
       style="display:inline-block;font-family:'Courier New',monospace;font-size:11px;color:#C4A24A;word-break:break-all;margin:0 0 10px">
       ${magicLinkUrl}
     </a>
     <p style="font-size:12px;font-style:italic;color:#706C65;margin:0;line-height:1.7">
-      Save this link. It is your entry to the archive.
+      Save this link. It is your entry to your Basalith.
     </p>
   </div>
   <div style="background:rgba(196,162,74,0.04);border:1px solid rgba(196,162,74,0.12);padding:20px;margin:0 0 24px">
@@ -64,33 +64,33 @@ export function buildFoundingWelcomeEmail(input: FoundingWelcomeInput): BuiltEma
 <html>
 <body style="background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:600px;margin:0 auto;padding:32px">
   <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;text-transform:uppercase;margin:0 0 16px">
-    THE ${familyName.toUpperCase()} ARCHIVE
+    THE ${familyName.toUpperCase()} BASALITH
   </p>
   <h1 style="font-size:26px;font-weight:300;color:#F0EDE6;margin:0 0 16px">
     Welcome to Basalith, ${firstName}.
   </h1>
   <p style="font-size:15px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 20px">
-    Your founding is complete. The ${familyName} Archive is now active.
+    Your founding is complete. The ${familyName} Basalith is now active.
   </p>
   <p style="font-size:15px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 24px">
-    ${guideName} will contact you to begin. Your archive is private and held in your name.
+    ${guideName} will contact you to begin. Your Basalith is private and held in your name.
   </p>
 
   ${accessBlockHtml}
 
   <p style="font-size:14px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 24px">
-    When you are ready, you can enter the archive and start adding your photographs and records. There is no rush. The Founding starts whenever you are ready: three of the hardest calls you ever made, in your own words.
+    When you are ready, you can enter your Basalith and start adding your photographs and records. There is no rush. The Founding starts whenever you are ready: three of the hardest calls you ever made, in your own words.
   </p>
   <hr style="border:none;border-top:1px solid rgba(240,237,230,0.06);margin:24px 0">
   <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830;line-height:1.8;margin:0">
-    BASALITH<br>The ${familyName} Archive · Generation I<br>Heritage Nexus Inc.
+    BASALITH<br>The ${familyName} Basalith · Generation I<br>Heritage Nexus Inc.
   </p>
 </body>
 </html>`
 
   const accessTextLines = magicLinkUrl
     ? [
-        'Your personal archive link (no password required):',
+        'Your Basalith sign-in link (no password required):',
         magicLinkUrl,
         '',
         `Password login: ${loginUrl}`,
@@ -102,20 +102,20 @@ export function buildFoundingWelcomeEmail(input: FoundingWelcomeInput): BuiltEma
       ]
 
   const text = [
-    `THE ${familyName.toUpperCase()} ARCHIVE`,
+    `THE ${familyName.toUpperCase()} BASALITH`,
     '',
     `Welcome to Basalith, ${firstName}.`,
     '',
-    `Your founding is complete. The ${familyName} Archive is now active.`,
+    `Your founding is complete. The ${familyName} Basalith is now active.`,
     '',
-    `${guideName} will contact you to begin. Your archive is private and held in your name.`,
+    `${guideName} will contact you to begin. Your Basalith is private and held in your name.`,
     '',
     ...accessTextLines,
     '',
-    'When you are ready, you can enter the archive and start adding your photographs and records. There is no rush. The Founding starts whenever you are ready: three of the hardest calls you ever made, in your own words.',
+    'When you are ready, you can enter your Basalith and start adding your photographs and records. There is no rush. The Founding starts whenever you are ready: three of the hardest calls you ever made, in your own words.',
     '',
     'BASALITH',
-    `The ${familyName} Archive · Generation I`,
+    `The ${familyName} Basalith · Generation I`,
     'Heritage Nexus Inc.',
   ].join('\n')
 

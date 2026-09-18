@@ -38,7 +38,7 @@ function buildFamilyReactionsEmail(
 
   <div style="padding:32px">
     <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#B8B4AB;margin:0 0 24px">${firstName},</p>
-    <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#F0EDE6;line-height:1.7;margin:0 0 8px">The people who know you best added to your archive this week.</p>
+    <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#F0EDE6;line-height:1.7;margin:0 0 8px">The people who know you best added to your Basalith this week.</p>
     <p style="font-family:Georgia,serif;font-size:16px;font-weight:300;font-style:italic;color:#706C65;margin:0 0 32px">Here is what they said.</p>
 
     ${answersHtml}
@@ -50,7 +50,7 @@ function buildFamilyReactionsEmail(
     </div>
 
     <a href="${portalUrl}" style="display:inline-block;background:#C4A24A;color:#0A0908;font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;text-decoration:none;padding:14px 28px;border-radius:2px">
-      VISIT YOUR ARCHIVE →
+      VISIT YOUR BASALITH →
     </a>
   </div>
 
@@ -70,7 +70,7 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const isTest = searchParams.get('test') === 'true'
 
-  // Weekly on Mondays — or in test mode
+  // Weekly on Mondays, or in test mode
   if (!isTest) {
     const dow = new Date().getUTCDay()
     if (dow !== 1) return Response.json({ skipped: true, reason: 'Not Monday' })

@@ -265,7 +265,7 @@ export default function GalleryClient({ archiveId }: { archiveId: string }) {
           Memory Gallery
         </p>
         <h1 style={{ fontFamily: 'var(--portal-serif)', fontSize: 'clamp(1.8rem,3vw,2.4rem)', fontWeight: 300, letterSpacing: '-0.025em', color: 'var(--portal-ink)' }}>
-          {loading ? '' : `${total} ${total === 1 ? 'Memory' : 'Memories'} Archived`}
+          {loading ? '' : `${total} ${total === 1 ? 'Memory' : 'Memories'} Preserved`}
         </h1>
       </div>
 
@@ -351,7 +351,7 @@ export default function GalleryClient({ archiveId }: { archiveId: string }) {
             <>
               <div style={{ width: '40px', height: '1px', background: 'var(--portal-btn)', margin: '0 auto 32px' }} aria-hidden="true" />
               <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '1.25rem', fontWeight: 500, color: 'var(--portal-ink)', marginBottom: '12px' }}>
-                Your archive is empty.
+                Nothing here yet.
               </p>
               <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--portal-secondary)', lineHeight: 1.8, maxWidth: '380px', margin: '0 auto 32px' }}>
                 Upload your family photographs to begin. Every evening one photograph goes to every family member. They reply with what they remember.
@@ -392,7 +392,7 @@ export default function GalleryClient({ archiveId }: { archiveId: string }) {
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={item.imageUrl}
-                      alt={item.title || 'Archive photograph'}
+                      alt={item.title || 'Photograph'}
                       style={{ display: 'block', width: '100%', objectFit: 'cover', minHeight: '160px' }}
                     />
                     {/* Hover overlay */}
@@ -506,7 +506,7 @@ export default function GalleryClient({ archiveId }: { archiveId: string }) {
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '16px', borderTop: '1px solid var(--portal-gold-line)' }}>
                 <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.1em', color: 'var(--portal-label)' }}>{selected.date}</p>
                 <button onClick={() => deleteItem(selected.id, selected.source)} style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--portal-label)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
-                  Remove from Archive
+                  Remove
                 </button>
               </div>
             </div>

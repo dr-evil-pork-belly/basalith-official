@@ -104,7 +104,7 @@ export default function ArchiveSwitcher() {
         onMouseLeave={e => { if (!open) (e.currentTarget as HTMLElement).style.color = 'var(--spine-body)' }}
       >
         <span style={{ flex: 1, textAlign: 'left', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {current?.name ?? 'Select Archive'}
+          {current?.name ?? 'Select a Basalith'}
         </span>
         <span aria-hidden="true" style={{ color: 'var(--spine-dim)', fontSize: '12px' }}>▾</span>
       </button>

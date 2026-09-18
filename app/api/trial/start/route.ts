@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
     const { data: archive, error: archiveErr } = await supabaseAdmin
       .from('archives')
       .insert({
-        name:             `${familyName} Archive`,
+        name:             `${familyName} Basalith`,
         family_name:      familyName,
         owner_email:      email,
         owner_name:       name,
@@ -151,6 +151,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true })
   } catch (err) {
     console.error('[trial/start]', err instanceof Error ? err.message : err)
-    return NextResponse.json({ error: 'Could not start your archive right now. Please try again in a moment.' }, { status: 500 })
+    return NextResponse.json({ error: 'Could not start your Basalith right now. Please try again in a moment.' }, { status: 500 })
   }
 }

@@ -266,9 +266,9 @@ export default function UploadClient({ archiveId }: Props) {
 
         {/* Header */}
         <div className="mb-10">
-          <p className="font-compute text-xs tracking-widest text-[var(--portal-gold-ink)] uppercase mb-2">Archive</p>
+          <p className="font-compute text-xs tracking-widest text-[var(--portal-gold-ink)] uppercase mb-2">Your Basalith</p>
           <h1 className="font-legacy text-4xl text-[var(--portal-ink)] mb-2">Upload</h1>
-          <p className="font-compute text-xs text-[var(--portal-secondary)]">Add to your archive: photographs, documents, videos, or voice recordings.</p>
+          <p className="font-compute text-xs text-[var(--portal-secondary)]">Add to your Basalith: photographs, documents, videos, or voice recordings.</p>
         </div>
 
         {/* Section tabs */}
@@ -562,7 +562,7 @@ export default function UploadClient({ archiveId }: Props) {
               <path d="M5 10a7 7 0 0014 0M12 19v3M8 22h8"/>
             </svg>
             <p className="font-legacy text-2xl text-[var(--portal-secondary)] mb-3">Voice Recording</p>
-            <p className="font-compute text-xs text-[var(--portal-label)] mb-6">Record your voice directly in the archive.</p>
+            <p className="font-compute text-xs text-[var(--portal-label)] mb-6">Record your voice directly in your Basalith.</p>
             <a
               href="/archive/voice"
               className="inline-block px-8 py-3 font-compute text-xs tracking-widest border border-[var(--portal-gold-line)] text-[var(--portal-gold-ink)] rounded hover:bg-[var(--portal-tint)] transition-colors"

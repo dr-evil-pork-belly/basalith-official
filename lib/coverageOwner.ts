@@ -100,16 +100,16 @@ export type OwnerCoverage =
 
 export const COVERAGE_INTRO: Record<CoverageScope, string> = {
   business:
-    'Each domain is put to your entity as a fixed set of questions an operator in that domain has had to answer. A question counts only when the answer came from something you deposited, checked against your archive. This is a map of where your archive is still silent.',
+    'Each domain is put to your entity as a fixed set of questions an operator in that domain has had to answer. A question counts only when the answer came from something you deposited, checked against your record. This is a map of where your record is still silent.',
   personal:
-    'Each area is put to your entity as a fixed set of questions a person has had to answer for themselves, at home or at work. A question counts only when the answer came from something you deposited, checked against your archive. This is a map of where your archive is still silent.',
+    'Each area is put to your entity as a fixed set of questions a person has had to answer for themselves, at home or at work. A question counts only when the answer came from something you deposited, checked against your record. This is a map of where your record is still silent.',
 }
 
 export const COVERAGE_CAVEAT: Record<CoverageScope, string> = {
   business:
     'This reads your entity’s most likely answer to each question. A successor gets a live answer, which can vary, so treat a thin domain as thinner than it looks here.',
   personal:
-    'This is a reading of your archive, not of a conversation. Each question is asked once against what you have deposited and counts only when the answer came from a deposit. Talking with your entity is a live exchange and can go differently.',
+    'This is a reading of your record, not of a conversation. Each question is asked once against what you have deposited and counts only when the answer came from a deposit. Talking with your entity is a live exchange and can go differently.',
 }
 
 /** The personal caveat once the family entity is on the grounded route. Same shape as the business one. */
@@ -118,7 +118,7 @@ export const COVERAGE_CAVEAT_PERSONAL_VERIFIED =
 
 /** The explainer for a personal archive on the grounded route. "Successor" becomes "someone in your family." */
 export const OVERREACH_EXPLAINER_PERSONAL =
-  'Reaching past the archive is caught before anyone in your family sees it. What they get instead is your entity saying it did not settle the question. An area where this happens often is where your family hears that most, and where one deposit changes the most.'
+  'Reaching past the record is caught before anyone in your family sees it. What they get instead is your entity saying it did not settle the question. An area where this happens often is where your family hears that most, and where one deposit changes the most.'
 
 /** "4 of 6 questions here got a grounded answer." Count-led, denominator shown. */
 export function countLine(deposit: number, total: number): string {

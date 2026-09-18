@@ -88,7 +88,7 @@ export default function SuccessionDashboard({
   })()
 
   const subline = depositCount === 0
-    ? 'Your archive is empty. Start by showing how you decide.'
+    ? 'Nothing on the record yet. Start by showing how you decide.'
     : readiness
       ? `${readiness.overall.answered} of ${readiness.overall.total} answered across 8 domains`
       : ''
@@ -192,14 +192,14 @@ export default function SuccessionDashboard({
               </button>
               {savedNote && (
                 <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '16px', color: 'var(--portal-gold-ink)' }}>
-                  Saved to your archive.
+                  Saved to the record.
                 </span>
               )}
             </div>
           </>
         ) : (
           <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '17px', color: 'var(--portal-body)', lineHeight: 1.65, margin: 0 }}>
-            You have answered every question available right now. New questions will arrive as your archive grows.
+            You have answered every question available right now. New questions will arrive as your record grows.
           </p>
         )}
       </div>

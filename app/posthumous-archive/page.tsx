@@ -3,8 +3,8 @@ import Footer from '../components/Footer'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title:       'The Witness Archive',
-  description: 'For someone who has already passed. The Witness Archive builds a Basalith archive from everything that remains and everything the people who loved them remember.',
+  title:       'The Witness Basalith',
+  description: 'For someone who has already passed. The Witness Basalith is built from everything that remains and everything the people who loved them remember.',
 }
 
 // ── shared tokens ────────────────────────────────────────────────────────────
@@ -60,14 +60,14 @@ function Opening() {
   return (
     <section aria-label="Opening" style={{ background: 'var(--color-bg)', padding: 'clamp(7rem,12vw,10rem) 2rem 6rem' }}>
       <div style={{ maxWidth: '680px', margin: '0 auto' }}>
-        <span style={EYEBROW}>The Witness Archive</span>
+        <span style={EYEBROW}>The Witness Basalith</span>
 
         <h1 style={H1}>
           The people who loved them remember things<br />
           they never knew about themselves.
         </h1>
 
-        <p style={BODY}>Every Basalith archive is built from two directions simultaneously.</p>
+        <p style={BODY}>Every Basalith is built from two directions simultaneously.</p>
 
         <p style={BODY}>
           The subject deposits their own memories, wisdom, and beliefs,
@@ -126,8 +126,8 @@ function WitnessesCarry() {
         </p>
 
         <p style={BODY}>
-          These observations are not secondary to the archive. In many ways they
-          are the archive&rsquo;s most valuable data, because they capture dimensions
+          These observations are not secondary to the record. In many ways they
+          are the record&rsquo;s most valuable data, because they capture dimensions
           of a person that the person themselves would never think to deposit.
         </p>
 
@@ -161,16 +161,16 @@ function WhatWeCanBuild() {
           and what the people who loved them remember.
         </h2>
 
-        <p style={BODY}>The entity we build will reflect the archive we are given.</p>
+        <p style={BODY}>The entity we build will reflect the record we are given.</p>
 
         <p style={BODY}>
-          A witness archive built from thousands of labeled photographs, transcribed
+          A Witness Basalith built from thousands of labeled photographs, transcribed
           letters, guided family sessions, voicemails, and structured witness
           observations, can carry real depth. Recognizable patterns of expression.
           Known opinions, specific memories, a particular way of looking at the world.
         </p>
 
-        <p style={BODY}>A sparse witness archive produces a sparser entity.</p>
+        <p style={BODY}>A sparse record produces a sparser entity.</p>
 
         <p style={BODY}>We will never claim to give you back the person you lost.</p>
 
@@ -193,7 +193,7 @@ function MissingPiece() {
         <span style={EYEBROW}>The Missing Piece</span>
 
         <h2 style={H2}>
-          Every witness archive has gaps.<br />
+          Every Witness Basalith has gaps.<br />
           Here is how we close them.
         </h2>
 
@@ -220,7 +220,7 @@ function MissingPiece() {
         </p>
 
         <p style={{ ...BODY, color: 'var(--color-text-primary)', fontStyle: 'italic', marginBottom: 0 }}>
-          That is the witness archive. Not a lesser product. A different kind of truth.
+          That is the Witness Basalith. Not a lesser product. A different kind of truth.
         </p>
       </div>
     </section>
@@ -253,12 +253,12 @@ const STEPS = [
   {
     n:    '05',
     name: 'Audio and Video Processing',
-    body: 'Voicemails, home videos, recordings, processed and integrated into the archive as primary source material.',
+    body: 'Voicemails, home videos, recordings, processed and integrated into the record as primary source material.',
   },
   {
     n:    '06',
     name: 'Entity Initialization',
-    body: 'The entity is built from everything collected. Initialized. Tested with the family. Delivered with full archive access and custodian designation.',
+    body: 'The entity is built from everything collected. Initialized. Tested with the family. Delivered with full access and custodian designation.',
   },
 ]
 
@@ -346,7 +346,7 @@ function Pricing() {
         {/* Part 2 — Ongoing Care */}
         <div style={{ border: '1px solid rgba(255,255,255,0.06)', borderRadius: '2px', padding: '2.5rem', marginBottom: '2.5rem' }}>
           <p style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.44rem', letterSpacing: '0.28em', textTransform: 'uppercase', color: '#C4A24A', marginBottom: '1rem' }}>
-            Witness Archive
+            Witness Basalith
           </p>
           <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 700, fontSize: '2.5rem', color: '#F0EDE6', lineHeight: 1, marginBottom: '0.4rem' }}>
             $3,600 <span style={{ fontSize: '1.2rem', fontWeight: 300 }}>/ year</span>
@@ -355,16 +355,16 @@ function Pricing() {
             Billed annually
           </p>
           <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'italic', fontSize: '0.85rem', color: '#9DA3A8', lineHeight: 1.65, marginBottom: '1.5rem' }}>
-            The same infrastructure as any Active Basalith archive.
+            The same infrastructure as any Active Basalith.
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginBottom: '1.5rem' }}>
             {[
-              'Permanent secure archive storage',
+              'Permanent secure storage',
               'Entity active and accessible',
               'Up to 10 family contributors',
               'Nightly photograph emails continue',
               'Custodian designation maintained',
-              'Full archive export in open formats anytime',
+              'Full export in open formats anytime',
               'Legal estate documentation preserved',
             ].map(f => (
               <div key={f} style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
@@ -377,9 +377,9 @@ function Pricing() {
             ))}
           </div>
           <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'italic', fontSize: '0.85rem', color: '#5C6166', lineHeight: 1.75, margin: 0 }}>
-            Archive begins after The Witness Founding is complete. Renews annually.
-            Cancel at any time. Cancelling ends the subscription. It does not delete the
-            archive. Your content is preserved, and permanent deletion happens only
+            Your Basalith begins after The Witness Founding is complete. Renews annually.
+            Cancel at any time. Cancelling ends the subscription. It does not delete your
+            Basalith. Your content is preserved, and permanent deletion happens only
             through a verified written request.
           </p>
         </div>
@@ -442,7 +442,7 @@ function ClosingQuote() {
           <br /><br />
           Nothing does.
           <br /><br />
-          But a carefully built archive, honest about what it is and what it
+          But a carefully built Basalith, honest about what it is and what it
           is not, can let a family keep talking to someone they thought
           they had lost.&rdquo;
         </p>
@@ -454,7 +454,7 @@ function ClosingQuote() {
           textTransform: 'uppercase',
           color:         '#C4A24A',
         }}>
-          The Witness Archive &middot; Basalith
+          The Witness Basalith
         </p>
       </div>
     </section>

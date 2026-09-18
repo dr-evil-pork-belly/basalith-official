@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title:       'The Asset',
-  description: 'The most valuable thing you own is not on your balance sheet. It is the way you think. A Basalith archive is built to be owned, inherited, and named in your estate plan.',
+  description: 'The most valuable thing you own is not on your balance sheet. It is the way you think. A Basalith is built to be owned, inherited, and named in your estate plan.',
 }
 
 const eyebrow: React.CSSProperties = {
@@ -80,7 +80,7 @@ export default function AssetPage() {
 
           <div style={divider} />
 
-          <h2 style={h2}>The archive.</h2>
+          <h2 style={h2}>The deposits.</h2>
           <p style={body}>
             Every photograph labeled by the people who were present when it was taken. Every story
             kept in the voice of the person who lived it. Every decade of a life recorded
@@ -93,7 +93,7 @@ export default function AssetPage() {
 
           <h2 style={h2}>The entity.</h2>
           <p style={body}>
-            A cognitive reference model trained only on your archive. It answers in the patterns
+            A cognitive reference model trained only on your record. It answers in the patterns
             of the person it was built from, carries the opinions and memories they recorded, and
             holds their particular way of looking at the world.
           </p>
@@ -123,12 +123,12 @@ export default function AssetPage() {
 
           <h2 style={h2}>Built to be named in your estate plan.</h2>
           <p style={body}>
-            The Basalith archive is not a cloud storage account. It is something you own, and it
+            A Basalith is not a cloud storage account. It is something you own, and it
             can be named in your estate plan like any other asset you leave behind.
           </p>
           <p style={body}>
-            The archive can be named in a will. It can be inherited. The Custodian you name can
-            grant and revoke access, manage plans, and keep the archive running for the people
+            Your Basalith can be named in a will. It can be inherited. The Custodian you name can
+            grant and revoke access, manage plans, and keep your Basalith running for the people
             who come after you. Their legal authority comes from your estate documents, so name
             them there too.
           </p>
@@ -138,7 +138,7 @@ export default function AssetPage() {
 
           <div style={{ textAlign: 'center', padding: '3rem 0' }}>
             <p style={{ ...body, fontStyle: 'italic', textAlign: 'center', marginBottom: '2rem' }}>
-              See how an archive is built, and what it will not do.
+              See how a Basalith is built, and what it will not do.
             </p>
             <a
               href="/method"
@@ -170,7 +170,7 @@ export default function AssetPage() {
                 borderRadius:   '2px',
               }}
             >
-              Begin Your Archive →
+              Begin your Basalith →
             </a>
           </div>
 

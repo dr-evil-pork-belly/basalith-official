@@ -61,8 +61,8 @@ function humanizeError(raw: string | undefined): string {
 
 const inputCls   = 'w-full bg-transparent font-sans text-[15.5px] placeholder:text-[var(--portal-label)] focus:outline-none pb-2 transition-colors duration-200'
 const inputStyle = { color: 'var(--portal-ink)', borderBottom: '1px solid var(--portal-card-line)' }
-const labelCls   = 'font-sans text-[11px] font-bold tracking-[0.14em] uppercase block mb-2'
-const labelStyle = { color: 'var(--portal-secondary)' }
+const labelCls   = 'font-compute text-[11px] tracking-[0.16em] uppercase block mb-2'
+const labelStyle = { color: 'var(--portal-label)' }
 
 // ── Status badge ──────────────────────────────────────────────────────────────
 function StatusBadge({ status }: { status: string }) {
@@ -296,23 +296,22 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
       {/* ── CONTRIBUTORS SECTION ── */}
       <div className="flex items-end justify-between mb-8 gap-4">
         <div>
-          <p className="eyebrow mb-3">Contributors</p>
-          <h1 className="font-serif font-semibold leading-[0.95] tracking-[-0.03em]"
-              style={{ fontSize: 'clamp(1.8rem,3vw,2.4rem)', color: 'var(--portal-ink)' }}>
-            Archive Access
+          <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11.5px', letterSpacing: '0.24em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '14px' }}>Contributors</p>
+          <h1 className="font-serif" style={{ fontSize: 'clamp(34px,4.2vw,50px)', fontWeight: 400, lineHeight: 1.08, letterSpacing: '-0.015em', color: 'var(--portal-ink)' }}>
+            The people who remember with you.
           </h1>
         </div>
         <button onClick={() => setShowForm(!showForm)} className="btn-monolith-amber shrink-0 !py-2.5 !px-5 !text-[0.7rem]" style={{ minHeight: '44px' }}>
-          {showForm ? 'Cancel' : 'Add Contributor'}
+          {showForm ? 'Cancel' : 'Add a contributor'}
         </button>
       </div>
 
       {showForm && (
         <form onSubmit={handleAdd} className="rounded-sm border px-7 py-7 mb-8" style={{ background: 'var(--portal-card)', borderColor: 'var(--portal-gold-line)' }}>
-          <p className="font-sans text-[11.5px] tracking-[0.14em] uppercase mb-6" style={{ color: 'var(--portal-gold-ink)' }}>New Contributor</p>
+          <p className="font-compute text-[11.5px] tracking-[0.24em] uppercase mb-6" style={{ color: 'var(--portal-gold-ink)' }}>New contributor</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
             <div>
-              <label className={labelCls} style={labelStyle}>Full Name</label>
+              <label className={labelCls} style={labelStyle}>Full name</label>
               <input type="text" required placeholder="Jane Whitmore" value={form.name} onChange={setContrib('name')} className={inputCls} style={inputStyle} />
             </div>
             <div>
@@ -327,7 +326,7 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
               </select>
             </div>
             <div>
-              <label className={labelCls} style={labelStyle}>Relationship to Subject</label>
+              <label className={labelCls} style={labelStyle}>Relationship to you</label>
               <select value={form.relationship} onChange={setContrib('relationship')} className={inputCls} style={{ ...inputStyle, cursor: 'pointer' }}>
                 <option value="" style={{ background: 'var(--portal-card)' }}>Select (optional)</option>
                 {Object.entries(RELATIONSHIP_LABELS).map(([value, label]) => (
@@ -349,7 +348,7 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
               style={inputStyle}
             />
             <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.08em', color: 'var(--portal-label)', marginTop: '0.4rem' }}>
-              Include country code. They can call {process.env.NEXT_PUBLIC_TWILIO_PHONE_NUMBER || 'your archive number'} to record stories by phone.
+              Include country code. They can call {process.env.NEXT_PUBLIC_TWILIO_PHONE_NUMBER || 'your Basalith phone number'} to record stories by phone.
             </p>
           </div>
           <div className="mb-5">
@@ -366,18 +365,18 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
             <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', color: 'var(--portal-error)', marginBottom: '1rem' }}>{addError}</p>
           )}
           <button type="submit" disabled={adding} className="btn-monolith-amber disabled:opacity-50">
-            {adding ? 'Adding…' : 'Add to Archive'}
+            {adding ? 'Adding…' : 'Add contributor'}
           </button>
         </form>
       )}
 
       {contributors.length === 0 && (
-        <div className="text-center py-12">
-          <p className="font-serif font-semibold" style={{ color: 'var(--portal-body)', fontSize: '1rem', marginBottom: '0.5rem' }}>
+        <div style={{ padding: '1.5rem 0 0.5rem', borderTop: '1px solid var(--portal-rule)' }}>
+          <p className="font-serif" style={{ color: 'var(--portal-ink)', fontSize: '19px', marginBottom: '0.5rem' }}>
             No contributors yet.
           </p>
-          <p className="font-serif italic" style={{ color: 'var(--portal-secondary)', fontSize: '0.9rem', lineHeight: 1.7, maxWidth: '380px', margin: '0 auto' }}>
-            Invite family members to contribute their memories. Each person receives photographs by email and can reply with what they remember.
+          <p className="font-serif" style={{ color: 'var(--portal-body)', fontSize: '17px', lineHeight: 1.65, maxWidth: '58ch' }}>
+            Invite family to contribute their memories. Each person receives photographs by email and can reply with what they remember.
           </p>
         </div>
       )}
@@ -514,15 +513,14 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
       <div style={{ marginTop: '3rem', paddingTop: '3rem', borderTop: '1px solid var(--portal-rule)' }}>
 
         <div className="mb-6">
-          <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '0.5rem' }}>
-            Witness Sessions
+          <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11.5px', letterSpacing: '0.24em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '14px' }}>
+            Witness sessions
           </p>
-          <h2 className="font-serif font-semibold" style={{ fontSize: 'clamp(1.5rem,2.5vw,2rem)', color: 'var(--portal-ink)', letterSpacing: '-0.02em', marginBottom: '0.75rem' }}>
-            Invite a Witness
+          <h2 className="font-serif" style={{ fontSize: '30px', fontWeight: 400, color: 'var(--portal-ink)', lineHeight: 1.2, marginBottom: '12px' }}>
+            Invite someone who was there.
           </h2>
-          <p className="font-serif italic font-light" style={{ fontSize: '0.95rem', color: 'var(--portal-body)', lineHeight: 1.8, maxWidth: '540px' }}>
-            Invite people who know you to contribute their memories and observations.
-            Their perspective trains your entity with things only they can provide.
+          <p className="font-serif" style={{ fontSize: '17.5px', color: 'var(--portal-body)', lineHeight: 1.65, maxWidth: '58ch' }}>
+            People who know you can add what they saw. Their side of a story goes on the record alongside yours, marked as theirs.
           </p>
         </div>
 
@@ -552,12 +550,12 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
           <form onSubmit={handleInvite} className="rounded-sm border px-7 py-7 mb-8" style={{ background: 'var(--portal-card)', borderColor: 'var(--portal-gold-line)' }}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
               <div>
-                <label className={labelCls} style={labelStyle}>Contributor Name</label>
+                <label className={labelCls} style={labelStyle}>Their name</label>
                 <input type="text" required placeholder="Jane Whitmore" value={inviteForm.contributorName}
                   onChange={setInvite('contributorName')} className={inputCls} style={inputStyle} />
               </div>
               <div>
-                <label className={labelCls} style={labelStyle}>Contributor Email</label>
+                <label className={labelCls} style={labelStyle}>Their email</label>
                 <input type="email" required placeholder="jane@example.com" value={inviteForm.contributorEmail}
                   onChange={setInvite('contributorEmail')} className={inputCls} style={inputStyle} />
               </div>
@@ -582,7 +580,7 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
               </div>
             </div>
             <div className="mb-5">
-              <label className={labelCls} style={labelStyle}>Personal Note (optional)</label>
+              <label className={labelCls} style={labelStyle}>Personal note (optional)</label>
               <textarea
                 placeholder="Add a personal note to the invitation…"
                 value={inviteForm.personalNote}
@@ -611,7 +609,7 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
                 cursor:        inviting ? 'not-allowed' : 'pointer',
               }}
             >
-              {inviting ? 'Sending…' : 'Send Witness Invitation'}
+              {inviting ? 'Sending' : 'Send the invitation'}
             </button>
           </form>
         )}

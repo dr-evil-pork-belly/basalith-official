@@ -7,7 +7,7 @@ import { getSessionUser } from '@/lib/auth/getSessionUser'
 
 const anthropic = new Anthropic()
 
-// ── POST — trigger a life event send ──────────────────────────────────────
+// ── POST: trigger a life event send ──────────────────────────────────────
 export async function POST(req: Request) {
   try {
     // Auth. Two legitimate callers, two paths, the shape poll-replies uses.
@@ -73,7 +73,7 @@ export async function POST(req: Request) {
 
     const triggerYear = new Date().getFullYear().toString()
 
-    // Idempotency — don't send twice for the same date in the same year
+    // Idempotency: don't send twice for the same date in the same year
     if (!force) {
       const { data: existing } = await supabaseAdmin
         .from('owner_notifications')
@@ -101,7 +101,7 @@ export async function POST(req: Request) {
       supabaseAdmin.from('significant_dates').select('*').eq('id', dateId).eq('archive_id', archiveId).maybeSingle(),
     ])
 
-    if (!archive) return NextResponse.json({ error: 'Archive not found' }, { status: 404 })
+    if (!archive) return NextResponse.json({ error: 'Not found' }, { status: 404 })
     if (!dateRow) return NextResponse.json({ error: 'Date not found' }, { status: 404 })
 
     // Fetch contributors + owner
@@ -116,7 +116,7 @@ export async function POST(req: Request) {
       ...(contributors ?? []),
     ]
 
-    // Pick a curated photograph — prefer one from the era if year is set
+    // Pick a photograph, prefer one from the era if year is set
     let photoQuery = supabaseAdmin
       .from('photographs')
       .select('id, storage_path, ai_era_estimate, ai_category, primary_label')
@@ -142,7 +142,7 @@ export async function POST(req: Request) {
       if (eraMatch) chosenPhoto = eraMatch
     }
 
-    // Permanent proxy URL — never expires, works for the life of the email
+    // Permanent proxy URL, never expires, works for the life of the email
     const photoUrl: string | null = chosenPhoto?.id ? getEmailPhotoUrl(chosenPhoto.id) : null
 
     // Build context for AI reflection
@@ -168,19 +168,19 @@ export async function POST(req: Request) {
       const aiRes = await anthropic.messages.create({
         model:      'claude-sonnet-4-6',
         max_tokens: 180,
-        system: `You are helping write a short, human reflection for a family archive email.
-The archive is "${archive.name}" and belongs to ${archive.owner_name || 'the family'}.
+        system: `You are helping write a short, human reflection for a family Basalith email.
+The Basalith is "${archive.name}" and belongs to ${archive.owner_name || 'the family'}.
 Write 2-3 sentences. Be warm, specific where possible, never generic or AI-sounding.
 Do not use the phrase "cherish" or "treasure". Speak directly to the reader.
-Context from the archive owner's own words: ${depositContext || 'No context available.'}`,
+Context from the owner's own words: ${depositContext || 'No context available.'}`,
         messages: [{
           role: 'user',
-          content: `Today is ${dateRow.person_name}${yearsAgoStr}. Event type: ${dateRow.date_type}. Write a short reflection for the family archive email.${dateRow.notes ? ` Note: ${dateRow.notes}` : ''}`,
+          content: `Today is ${dateRow.person_name}${yearsAgoStr}. Event type: ${dateRow.date_type}. Write a short reflection for the family Basalith email.${dateRow.notes ? ` Note: ${dateRow.notes}` : ''}`,
         }],
       })
       reflection = aiRes.content[0].type === 'text' ? aiRes.content[0].text.trim() : ''
     } catch {
-      // Non-fatal — send without reflection
+      // Non-fatal, send without reflection
     }
 
     // Subject line
@@ -193,7 +193,7 @@ Context from the archive owner's own words: ${depositContext || 'No context avai
     const subject = subjectMap[dateRow.date_type] ?? `${dateRow.person_name} · ${archive.name}`
 
     const baseUrl  = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
-    const archiveName = archive.name || 'The Family Archive'
+    const archiveName = archive.name || "the family's Basalith"
 
     const yearsBlock = yearsAgo ? `
   <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#C4A24A;margin:0 0 20px;text-transform:uppercase">
@@ -235,7 +235,7 @@ Context from the archive owner's own words: ${depositContext || 'No context avai
     ${photoBlock}
     <div style="margin-top:28px">
       <a href="${baseUrl}/archive/gallery" style="display:inline-block;background:rgba(196,162,74,1);color:#0A0A0B;font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;text-decoration:none;padding:10px 20px;border-radius:2px">
-        OPEN THE ARCHIVE →
+        OPEN YOUR BASALITH →
       </a>
     </div>
   </div>
@@ -270,7 +270,7 @@ Context from the archive owner's own words: ${depositContext || 'No context avai
       }
     }
 
-    // Log — idempotency record
+    // Log: idempotency record
     supabaseAdmin.from('owner_notifications').insert({
       archive_id: archiveId,
       type:       'life_event',

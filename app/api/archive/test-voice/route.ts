@@ -49,8 +49,8 @@ export async function POST(req: NextRequest) {
     .eq('id', archiveId)
     .single()
 
-  if (!archive)                    return NextResponse.json({ error: 'Archive not found' }, { status: 404 })
-  if (!archive.elevenlabs_voice_id) return NextResponse.json({ error: 'No voice clone set up for this archive' }, { status: 400 })
+  if (!archive)                    return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  if (!archive.elevenlabs_voice_id) return NextResponse.json({ error: 'No voice clone set up for this Basalith' }, { status: 400 })
 
   const lang = archive.preferred_language ?? 'en'
 

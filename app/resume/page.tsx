@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'Resume Your Archive · Basalith',
-  description: 'Your archive has been waiting. Resume where you left off.',
+  title: 'Resume your Basalith · Basalith',
+  description: 'Your Basalith has been waiting. Resume where you left off.',
 }
 
 const MONO: React.CSSProperties = {
@@ -53,7 +53,7 @@ export default function ResumePage() {
           color:        'rgba(250,250,248,0.5)',
           marginBottom: '16px',
         }}>
-          Your archive has been waiting.
+          Your Basalith has been waiting.
         </p>
 
         <p style={{
@@ -90,7 +90,7 @@ export default function ResumePage() {
             marginBottom:   '32px',
           }}
         >
-          Resume Your Archive →
+          Resume your Basalith →
         </Link>
 
         <p style={{

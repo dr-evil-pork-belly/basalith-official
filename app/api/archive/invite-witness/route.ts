@@ -7,7 +7,7 @@ import { getSessionUser } from '@/lib/auth/getSessionUser'
 export async function POST(req: Request) {
   try {
     // Auth: Supabase owner session only. Ownership is verified against the
-    // archives table — a session carrying an archiveId is not proof of ownership
+    // archives table, a session carrying an archiveId is not proof of ownership
     // (getSessionUser fills archiveId for successors too). Checked before the
     // body is read, so an unauthenticated caller can never reach the send.
     const session = await getSessionUser()
@@ -70,7 +70,7 @@ export async function POST(req: Request) {
       .select('name')
       .eq('id', archiveId)
       .single()
-    const archiveName = archive?.name ?? 'The Family Archive'
+    const archiveName = archive?.name ?? "the family's Basalith"
 
     const recipientName  = contributorName || 'there'
     const personalNoteHtml = personalNote?.trim() ? `
@@ -101,14 +101,14 @@ export async function POST(req: Request) {
 
   <div style="padding:32px">
     <p style="font-size:20px;font-style:italic;color:#F0EDE6;line-height:1.6;margin:0 0 20px">
-      ${ownerName} is building a permanent archive of their life.
+      ${ownerName} is building a permanent record of their life.
     </p>
     <p style="font-size:16px;color:#9DA3A8;line-height:1.75;margin:0 0 8px">
       They have invited you to contribute because your memories and observations are a part of this story that only you can tell.
     </p>
     ${personalNoteHtml}
     <p style="font-size:16px;color:#9DA3A8;line-height:1.75;margin:20px 0 8px">
-      Your contribution is a guided session of 5 questions. Your answers go directly into the archive and help train the AI entity that will carry ${subjectName}&rsquo;s wisdom forward for generations.
+      Your contribution is a guided session of 5 questions. Your answers go directly into the record and help train the entity that will carry ${subjectName}&rsquo;s wisdom forward for generations.
     </p>
     <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0 0 28px">
       It takes about ${sessionDef.estimatedMinutes} minutes.
@@ -121,7 +121,7 @@ export async function POST(req: Request) {
     </div>
 
     <p style="font-family:Georgia,serif;font-size:13px;font-style:italic;color:#5C6166;line-height:1.7;text-align:center;margin:24px 0 0">
-      Your responses will be seen by ${ownerName} and their archive custodian.<br>
+      Your responses will be seen by ${ownerName} and their Custodian.<br>
       They are stored permanently as part of ${archiveName}.
     </p>
   </div>

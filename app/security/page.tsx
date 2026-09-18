@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title:       'Security · Basalith',
-  description: 'How Basalith protects your archive. Encryption, access control, and infrastructure transparency.',
+  description: 'How we protect your Basalith. Encryption, access control, and infrastructure transparency.',
 }
 
 const EYEBROW: React.CSSProperties = {
@@ -86,7 +86,7 @@ export default function SecurityPage() {
               letterSpacing: '-0.025em',
               marginBottom:  '16px',
             }}>
-              How We Protect Your Archive
+              How We Protect Your Basalith
             </h1>
 
             <p style={{
@@ -110,13 +110,13 @@ export default function SecurityPage() {
 
             {/* 2 — Access Control */}
             <h2 style={H2}>2. Access Control</h2>
-            <p style={BODY}>Only designated people can access your archive.</p>
+            <p style={BODY}>Only designated people can access your Basalith.</p>
             <ul style={{ paddingLeft: 0, margin: '0 0 12px' }}>
               {[
-                'Archive owners: Authenticated via bcrypt-hashed passwords with 12 salt rounds.',
+                'Owners: Authenticated via bcrypt-hashed passwords with 12 salt rounds.',
                 'Contributors: Authenticated via 64-character cryptographically random tokens generated using crypto.getRandomValues, not guessable by brute force.',
-                'Database isolation: Row Level Security is enforced on every table at the database level, not just the application level. Even a misconfigured application cannot access data across archive boundaries.',
-                'No shared access: Your archive data is never visible to other archive owners, contributors of other archives, or Basalith employees in the normal course of operations.',
+                'Database isolation: Row Level Security is enforced on every table at the database level, not just the application level. Even a misconfigured application cannot access data across the boundary of one Basalith.',
+                'No shared access: Your data is never visible to other owners, to contributors of another Basalith, or to Basalith employees in the normal course of operations.',
               ].map(item => (
                 <li key={item} style={LI}>
                   <span style={{ color: 'rgba(196,162,74,0.5)', marginRight: '0.5rem' }}>·</span>{item}
@@ -138,16 +138,16 @@ export default function SecurityPage() {
             </div>
             <p style={BODY}>Each platform has its own security certifications (SOC 2, ISO 27001).</p>
             <p style={BODY}>Anthropic does not train on API data by default. Your deposits and entity conversations do not improve Anthropic&rsquo;s general models.</p>
-            <p style={BODY}>Voice and video recordings are sent to OpenAI for transcription. This covers voice recorded in the portal and the iOS app, deposits left on the phone line, and video you upload. Video is sent as a complete file and transcribed from its audio. The spoken language is detected automatically. Transcription is the only use. No other archive content is sent to OpenAI.</p>
+            <p style={BODY}>Voice and video recordings are sent to OpenAI for transcription. This covers voice recorded in the portal and the iOS app, deposits left on the phone line, and video you upload. Video is sent as a complete file and transcribed from its audio. The spoken language is detected automatically. Transcription is the only use. Nothing else on your record is sent to OpenAI.</p>
             <p style={BODY}>For enterprise clients with specific data residency requirements contact <a href="mailto:enterprise@basalith.ai" style={{ color: '#C4A24A', textDecoration: 'none' }}>enterprise@basalith.ai</a></p>
 
             {/* 4 — MFA */}
             <h2 style={H2}>4. Multi-Factor Authentication</h2>
             <p style={{ ...BODY, color: 'var(--color-gold)', fontStyle: 'italic' }}>Not yet available.</p>
-            <p style={BODY}>Multi-factor authentication for archive login is on our roadmap. We will update this page when it ships. Until then:</p>
+            <p style={BODY}>Multi-factor authentication for sign-in is on our roadmap. We will update this page when it ships. Until then:</p>
             <ul style={{ paddingLeft: 0, margin: '0 0 12px' }}>
               {[
-                'Use a unique, strong password for your Basalith archive.',
+                'Use a unique, strong password for your Basalith.',
                 'Do not share your password with anyone except designated Legacy Guide contacts.',
                 'Contact us immediately if you suspect unauthorized access.',
               ].map(item => (

@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
   const ip = getClientIP(req)
   const { allowed } = checkRateLimit(`founding-proof:${ip}`, 4, ONE_HOUR_MS)
   if (!allowed) {
-    return NextResponse.json({ error: 'Your archive is resting. Try again in a little while.' }, { status: 429 })
+    return NextResponse.json({ error: 'Your Basalith is resting. Try again in a little while.' }, { status: 429 })
   }
 
   const { data: archive } = await supabaseAdmin

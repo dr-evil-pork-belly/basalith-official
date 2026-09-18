@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title:       'Continuity',
-  description: 'The archive is the permanent asset. The model is only the instrument. Why a Basalith archive is built to outlast the tools that built it, and what happens if we ever close.',
+  description: 'The record is the permanent asset. The model is only the instrument. Why a Basalith is built to outlast the tools that built it, and what happens if we ever close.',
 }
 
 const body: React.CSSProperties = {
@@ -78,7 +78,7 @@ export default function ContinuityPage() {
             maxWidth:    '480px',
             lineHeight:  1.7,
           }}>
-            The archive is the permanent asset.<br />The model is only the instrument.
+            The record is the permanent asset.<br />The model is only the instrument.
           </p>
         </section>
 
@@ -86,7 +86,7 @@ export default function ContinuityPage() {
         <section style={{ maxWidth: '720px', margin: '0 auto', padding: 'clamp(40px,6vw,64px) clamp(24px,6vw,48px)' }}>
 
           {/* Section 1 */}
-          <h2 style={h2style}>The archive outlasts the model.</h2>
+          <h2 style={h2style}>The record outlasts the model.</h2>
 
           <p style={body}>
             Every deposit you make is kept in full, in open formats, whatever model happens
@@ -95,15 +95,15 @@ export default function ContinuityPage() {
           <p style={body}>
             That matters because the tools will change. The model that trains your entity
             today will not be the best one in ten years. When a better instrument exists,
-            the archive is ready for it. Nothing has to be collected again, which is the
+            the record is ready for it. Nothing has to be collected again, which is the
             point, because the people who gave it may no longer be here to give it twice.
           </p>
           <p style={body}>
             We will not promise what the tools of the future will be able to do.
-            We can promise the archive will be there, whole, to use them.
+            We can promise the record will be there, whole, to use them.
           </p>
           <p style={body}>
-            The archive compounds.<br />
+            The record compounds.<br />
             Time works in its favor.
           </p>
 
@@ -133,7 +133,7 @@ export default function ContinuityPage() {
             to understand.
           </p>
           <p style={body}>
-            The entity answers from your archive, from what you actually said about how you think and decide.
+            The entity answers from your record, from what you actually said about how you think and decide.
             And where you never took a position, it is built to say so instead of guessing.
           </p>
           <p style={body}>
@@ -143,14 +143,14 @@ export default function ContinuityPage() {
           <div style={rule} />
 
           {/* Section 3 */}
-          <h2 style={h2style}>What happens to the archive if Basalith ceases to exist?</h2>
+          <h2 style={h2style}>What happens to your Basalith if the company ceases to exist?</h2>
 
           <p style={body}>
-            You own your archive. Basalith is the custodian, not the owner.
-            You can export the complete archive, in open formats, at any time you ask.
+            You own your Basalith. Basalith is the custodian, not the owner.
+            You can export all of it, in open formats, at any time you ask.
           </p>
           <p style={body}>
-            Because the full archive is always yours to hold, it does not depend on
+            Because your Basalith is always yours to hold, in full, it does not depend on
             Basalith&rsquo;s continued existence. If we ever close, you keep everything.
           </p>
 
@@ -219,7 +219,7 @@ export default function ContinuityPage() {
                 borderRadius:  '2px',
               }}
             >
-              Begin your archive
+              Begin your Basalith
             </a>
           </div>
 

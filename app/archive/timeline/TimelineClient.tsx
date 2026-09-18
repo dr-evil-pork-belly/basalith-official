@@ -101,7 +101,7 @@ export default function TimelineClient() {
           A life, decade by decade.
         </h1>
         <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '1rem', fontStyle: 'italic', color: 'var(--portal-secondary)', lineHeight: 1.7, maxWidth: '520px', margin: 0 }}>
-          Each decade tells a different story. The brighter the bar, the richer the archive. Dark decades need your help.
+          Each decade tells a different story. The brighter the bar, the richer the record. Dark decades need your help.
         </p>
       </div>
 

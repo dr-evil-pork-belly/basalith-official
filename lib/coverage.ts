@@ -102,7 +102,7 @@ export type DomainRollup = {
  */
 export function coverageStateLabel(state: CoverageState): string {
   switch (state) {
-    case 'backed':  return 'Backed by your archive'
+    case 'backed':  return 'Backed by your record'
     case 'partial': return 'Partly backed'
     case 'open':    return 'Nothing here yet'
   }
@@ -121,13 +121,13 @@ export function overreachLabel(state: CoverageState, level: OverreachLevel): str
   if (state === 'backed') return null
   switch (level) {
     case 'none': return 'Your entity stops here rather than guessing'
-    case 'some': return 'Your entity sometimes reaches past the archive here'
-    case 'high': return 'Your entity reaches past the archive here more often than not'
+    case 'some': return 'Your entity sometimes reaches past the record here'
+    case 'high': return 'Your entity reaches past the record here more often than not'
   }
 }
 
 export const OVERREACH_EXPLAINER =
-  'Reaching past the archive is caught before a successor sees it. What they get instead is your entity saying it did not settle the question. A domain where this happens often is where a successor hears that most, and where one deposit changes the most.'
+  'Reaching past the record is caught before a successor sees it. What they get instead is your entity saying it did not settle the question. A domain where this happens often is where a successor hears that most, and where one deposit changes the most.'
 
 /**
  * Raw coverage state from one run's bases, before hysteresis.

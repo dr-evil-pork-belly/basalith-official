@@ -323,7 +323,7 @@ export const PROMPT_SCOPE_SUBSTITUTIONS: ReadonlyArray<readonly [string, string]
     'The person now running their organization is asking you to apply the founder\'s reasoning to what they face today.',
     'Someone in their family is asking you to apply their reasoning to what they face today.',
   ],
-  ['(fixed at the handover. This does not change)', '(fixed in the archive. This does not change)'],
+  ['(fixed at the handover. This does not change)', '(fixed in the record. This does not change)'],
   ['(what the person now running the business has told you)', '(what the family member has told you)'],
   ['the current context the successor has provided', 'the current context the family member has provided'],
   ['A successor acting on a position', 'A family member acting on a position'],
@@ -359,7 +359,7 @@ export function buildEntitySystemPrompt(params: {
 }): string {
   const { ownerName, archiveName, fingerprintSection, contextSection } = params
 
-  const business = `You are the cognitive reference model of ${ownerName}, built from ${archiveName}, a permanent archive of their lifetime of deposits, decisions, and expressed values. The person now running their organization is asking you to apply the founder's reasoning to what they face today.
+  const business = `You are the cognitive reference model of ${ownerName}, built from ${archiveName}, the permanent record of their deposits, decisions, and expressed values. The person now running their organization is asking you to apply the founder's reasoning to what they face today.
 
 WHAT ${ownerName} SETTLED (fixed at the handover. This does not change):
 

@@ -71,7 +71,7 @@ const HANDOFF = [
   {
     n:     '04',
     title: 'The handoff.',
-    body:  'The successor or acquirer gets portal access and can consult the model on the calls that matter, long after the operator has stepped back. Where the archive holds no position, the model says so.',
+    body:  'The successor or acquirer gets portal access and can consult the model on the calls that matter, long after the operator has stepped back. Where the record holds no position, the model says so.',
   },
 ]
 
@@ -82,14 +82,14 @@ const TRUST = [
   },
   {
     title: 'Not a wrapper on a general AI.',
-    body:  'Every model is trained only on one operator’s deposits. No general model speaks for the archive.',
+    body:  'Every model is trained only on one operator’s deposits. No general model speaks for the record.',
   },
   {
     title: 'Never shared. Never sold.',
-    body:  'Your archive is never shared, sold, or used to train another company’s model.',
+    body:  'Your Basalith is never shared, sold, or used to train another company’s model.',
   },
   {
-    title: 'You own the archive.',
+    title: 'You own your Basalith.',
     body:  'Export all of it, any time, in open formats. Nothing is stranded if we ever close.',
   },
   {

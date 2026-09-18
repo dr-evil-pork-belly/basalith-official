@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic'
 
 export async function GET() {
   // Auth: Supabase owner session only. Ownership is verified against the
-  // archives table — a session carrying an archiveId is not proof of ownership
+  // archives table, a session carrying an archiveId is not proof of ownership
   // (getSessionUser fills archiveId for successors too). archiveId comes from
   // the session, not the query string: the rows below include access_token,
   // which is the credential behind /contribute/{token}, so leaking this list
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
     const { name, email, role, relationship, phone, preferred_language } = await req.json()
 
     // Auth: Supabase owner session only. Ownership is verified against the
-    // archives table — a session carrying an archiveId is not proof of ownership
+    // archives table, a session carrying an archiveId is not proof of ownership
     // (getSessionUser fills archiveId for successors too). archiveId comes from
     // the session, not the body: this creates a contributor row and mails out a
     // /contribute/{token} portal link, so a caller-supplied archive id would let
@@ -127,10 +127,10 @@ export async function POST(req: NextRequest) {
         const contribLang = data.preferred_language ?? 'en'
         const inviteSubject = contribLang === 'zh'
           ? `您已被邀请加入${archive.family_name}家族档案`
-          : `You have been invited to The ${archive.family_name} Archive`
+          : `You have been invited to the ${archive.family_name} Basalith`
 
         await resend.emails.send({
-          from:    `The ${archive.family_name} Archive <${fromEmail}>`,
+          from:    `The ${archive.family_name} Basalith <${fromEmail}>`,
           to:      data.email,
           subject: inviteSubject,
           headers: {
@@ -166,7 +166,7 @@ export async function PATCH(req: NextRequest) {
     const { action, contributorId } = await req.json()
 
     // Auth: Supabase owner session only. Ownership is verified against the
-    // archives table — a session carrying an archiveId is not proof of ownership
+    // archives table, a session carrying an archiveId is not proof of ownership
     // (getSessionUser fills archiveId for successors too). archiveId comes from
     // the session, not the body: this re-mails the /contribute/{token} portal
     // link, so a caller-supplied archive id would let anyone trigger delivery of
@@ -206,7 +206,7 @@ export async function PATCH(req: NextRequest) {
       .single()
 
     if (!archive || !contributor.email) {
-      return NextResponse.json({ error: 'Archive not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Not found' }, { status: 404 })
     }
 
     const siteUrl   = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
@@ -215,9 +215,9 @@ export async function PATCH(req: NextRequest) {
     const portalUrl = contributor.access_token ? `${siteUrl}/contribute/${contributor.access_token}` : null
 
     await resend.emails.send({
-      from:    `The ${archive.family_name} Archive <${fromEmail}>`,
+      from:    `The ${archive.family_name} Basalith <${fromEmail}>`,
       to:      contributor.email,
-      subject: `Your contributor portal link for The ${archive.family_name} Archive`,
+      subject: `Your contributor portal link for the ${archive.family_name} Basalith`,
       headers: {
         'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
         'X-Entity-Ref-ID':  `basalith-${archiveId}-${Date.now()}`,
@@ -247,7 +247,7 @@ export async function DELETE(req: NextRequest) {
     const contributorId = searchParams.get('id')
 
     // Auth: Supabase owner session only. Ownership is verified against the
-    // archives table — a session carrying an archiveId is not proof of ownership
+    // archives table, a session carrying an archiveId is not proof of ownership
     // (getSessionUser fills archiveId for successors too). archiveId comes from
     // the session, not the query string. The old `?archiveId=` parameter was
     // optional: omitting it dropped the archive filter entirely, so a contributor
@@ -321,23 +321,23 @@ function buildContributorInviteEmail({
   const isZh = lang === 'zh'
 
   const inviteBody = isZh
-    ? `您已被邀请为${archiveName}${ownerName ? `——${ownerName}的档案` : ''}做贡献。`
-    : `You have been invited to contribute to ${archiveName}${ownerName ? `, ${ownerName}'s archive` : ''}.`
+    ? `您已被邀请为${archiveName}${ownerName ? `，${ownerName}的档案` : ''}做贡献。`
+    : `You have been invited to contribute to ${archiveName}${ownerName ? `, ${ownerName}'s Basalith` : ''}.`
 
   const archiveDesc = isZh
     ? `这份档案是${familyName}家族的永久记录。作为贡献者，您将通过电子邮件收到档案中的照片，并可以通过您的个人页面分享您自己的照片、视频和回忆。`
-    : `This archive is a permanent record of the ${familyName} family. As a contributor, you will receive photographs from the archive by email, and you can share your own photographs, videos, and memories through your personal portal.`
+    : `This is the permanent record of the ${familyName} family. As a contributor, you will receive photographs from the record by email, and you can share your own photographs, videos, and memories through your personal portal.`
 
   const tonightMsg = isZh
-    ? '今晚您将收到第一张照片。直接回复邮件分享您记得的任何内容——您的回忆将直接进入档案。'
-    : 'Tonight you will receive your first photograph by email. Simply reply with whatever you remember. Your memories go directly into the archive.'
+    ? '今晚您将收到第一张照片。直接回复邮件分享您记得的任何内容，您的回忆将直接进入档案。'
+    : 'Tonight you will receive your first photograph by email. Simply reply with whatever you remember. Your memories go directly into the record.'
 
   const portalLabel   = isZh ? '您的贡献者页面'           : 'YOUR CONTRIBUTOR PORTAL'
-  const bookmarkNote  = isZh ? '请收藏此链接。这是您访问档案的专属入口，无需密码。' : 'Bookmark this link. It is your personal access to the archive. No password needed.'
+  const bookmarkNote  = isZh ? '请收藏此链接。这是您访问档案的专属入口，无需密码。' : 'Bookmark this link. It is your personal way in. No password needed.'
   const portalCanLabel = isZh ? '通过您的页面您可以：'      : 'THROUGH YOUR PORTAL YOU CAN:'
   const portalCaps    = isZh
     ? `上传您自己收藏的照片<br>上传视频和文件<br>录制语音回忆<br>回答关于${ownerName || '档案主题'}的问题`
-    : `Upload photographs from your own collection<br>Upload videos and documents<br>Record voice memories<br>Answer questions about ${ownerName || 'the archive subject'}`
+    : `Upload photographs from your own collection<br>Upload videos and documents<br>Record voice memories<br>Answer questions about ${ownerName || 'the person it belongs to'}`
 
   const phoneLabel = isZh ? '更喜欢用电话录音？' : 'PREFER TO RECORD BY PHONE?'
   const phoneNote  = isZh
@@ -350,7 +350,7 @@ function buildContributorInviteEmail({
 
   <div style="padding:40px 40px 0">
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0">
-      THE ${familyName.toUpperCase()} ARCHIVE
+      THE ${familyName.toUpperCase()} BASALITH
     </p>
   </div>
 

@@ -43,7 +43,7 @@ function escapeHtml(s: string): string {
 }
 
 export function buildExportReadySubject(archiveName: string): string {
-  return `Your archive export is ready · ${archiveName}`
+  return `Your export is ready · ${archiveName}`
 }
 
 export interface ExportReadyParams {
@@ -60,17 +60,17 @@ export function buildExportReadyEmail(p: ExportReadyParams): string {
   return wrap(p.archiveName, `
     <p style="${S.p}">${escapeHtml(p.firstName)},</p>
 
-    <p style="${S.pBright}">Your archive export is ready.</p>
+    <p style="${S.pBright}">Your export is ready.</p>
 
     <p style="${S.p}">
-      This is a single zip file holding everything recorded in your archive. The
+      This is a single zip file holding everything recorded in your Basalith. The
       actual photographs, recordings, and records, not links to them. It opens
       without an account and without any connection to Basalith. The manifest
       inside names anything excluded and the reason.
     </p>
 
     <div style="text-align:center;margin:32px 0">
-      <a href="${escapeHtml(p.downloadUrl)}" style="${S.goldBtn}">Download your archive</a>
+      <a href="${escapeHtml(p.downloadUrl)}" style="${S.goldBtn}">Download your Basalith</a>
     </div>
 
     <hr style="${S.rule}">
@@ -85,12 +85,12 @@ export function buildExportReadyEmail(p: ExportReadyParams): string {
 
     <p style="${S.p}">
       On ${escapeHtml(p.expiryDate)} this link stops working and the file is deleted
-      from our servers. That is deliberate. A full copy of your recorded archive
+      from our servers. That is deliberate. A full copy of your Basalith
       should not sit on a download server indefinitely.
     </p>
 
     <p style="${S.p}">
-      Your archive itself is not affected by that date. You can request another
+      Your Basalith itself is not affected by that date. You can request another
       export at any time, as often as you like, with no reason required.
     </p>
 
@@ -109,10 +109,10 @@ export function buildExportFailedEmail(firstName: string, archiveName: string): 
   return wrap(archiveName, `
     <p style="${S.p}">${escapeHtml(firstName)},</p>
 
-    <p style="${S.pBright}">Your archive export did not complete.</p>
+    <p style="${S.pBright}">Your export did not complete.</p>
 
     <p style="${S.p}">
-      Nothing is wrong with your archive and nothing has been lost. The problem is
+      Nothing is wrong with your Basalith and nothing has been lost. The problem is
       on our side, in the process that assembles the file. We stopped rather than
       send you a partial export, because an export that quietly leaves something
       out is worse than no export.

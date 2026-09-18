@@ -51,13 +51,13 @@ export async function generateRelationshipQuestion(
     : language === 'tl'  ? 'Write the question in Filipino (Tagalog).'
     : 'Write the question in English.'
 
-  const prompt = `You are generating a personalized question for a contributor to a family legacy archive.
+  const prompt = `You are generating a personalized question for a contributor to a family's Basalith.
 
 CONTRIBUTOR: ${contributorName.split(' ')[0]}
 RELATIONSHIP TO SUBJECT: ${relationship}
-ARCHIVE SUBJECT: ${primaryFirstName}
+SUBJECT: ${primaryFirstName}
 
-ARCHIVE NEEDS (weakest dimensions): ${weakDimensionNames || 'wisdom_and_lessons'}
+RECORD NEEDS (weakest dimensions): ${weakDimensionNames || 'wisdom_and_lessons'}
 
 QUESTIONS THIS CONTRIBUTOR ALREADY ANSWERED:
 ${recentTopics || 'None yet'}
@@ -110,7 +110,7 @@ export function buildQuestionEmail(
 ): string {
   type Labels = { greeting: string; intro: string; cta: string; footer: string }
   const labels: Record<string, Labels> = {
-    en:  { greeting: `${firstName},`,    intro: 'The archive has a question that only you can answer.', cta: 'ANSWER THIS QUESTION →', footer: 'Reply to this email or visit your contributor portal.' },
+    en:  { greeting: `${firstName},`,    intro: 'There is a question that only you can answer.', cta: 'ANSWER THIS QUESTION →', footer: 'Reply to this email or visit your contributor portal.' },
     zh:  { greeting: `${firstName}，`,   intro: '档案有一个只有您能回答的问题。', cta: '回答这个问题 →', footer: '请回复此邮件或访问您的贡献者页面。' },
     yue: { greeting: `${firstName}，`,   intro: '檔案有一個只有你能答嘅問題。', cta: '回答呢個問題 →', footer: '請回覆此電郵或訪問你嘅貢獻者頁面。' },
     ja:  { greeting: `${firstName}様、`, intro: 'アーカイブには、あなただけが答えられる質問があります。', cta: 'この質問に答える →', footer: 'このメールに返信するか、コントリビューターポータルをご覧ください。' },

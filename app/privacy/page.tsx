@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title:       'Privacy Policy · Basalith',
-  description: 'How Basalith collects, stores, and protects your personal information and archive content.',
+  description: 'How Basalith collects, stores, and protects your personal information and the content of your Basalith.',
   alternates:  { canonical: '/privacy' },
 }
 
@@ -90,7 +90,7 @@ export default function PrivacyPage() {
 
             {/* 1 */}
             <h2 style={H2}>1. Who We Are</h2>
-            <p style={BODY}>Basalith is a family archive and digital legacy platform operated by Heritage Nexus Inc. We build permanent archives of human memory for families and individuals.</p>
+            <p style={BODY}>Basalith is a digital legacy platform operated by Heritage Nexus Inc. We build a permanent record of human memory for families and individuals. Each one is a Basalith: the record and the entity built for one person or one business.</p>
             <p style={BODY}>Contact: <a href="mailto:privacy@basalith.xyz" style={{ color: '#C4A24A', textDecoration: 'none' }}>privacy@basalith.xyz</a></p>
 
             {/* 2 */}
@@ -98,14 +98,14 @@ export default function PrivacyPage() {
             <p style={BODY}>We collect information you provide directly, including:</p>
             <ul style={{ paddingLeft: 0, margin: '0 0 0.75rem' }}>
               {[
-                'Photographs and visual media you upload to your archive',
+                'Photographs and visual media you upload to your Basalith',
                 'Written stories, labels, and memories you submit',
                 'Voice recordings and video you deposit',
-                'Personal information including names, relationships, dates, and locations associated with archive content',
+                'Personal information including names, relationships, dates, and locations associated with the content of your Basalith',
                 'Contact information for contributors you invite',
                 'Payment information processed through our payment provider',
                 'Communications between you and Basalith',
-                'Archive application details submitted through our onboarding flow, including your name, email address, phone number where you provide one, and your selected tier',
+                'Application details submitted through our onboarding flow, including your name, email address, phone number where you provide one, and your selected tier',
                 'Contact form messages, including your name, email address, the nature of your enquiry, and any message content you choose to provide',
               ].map((item) => (
                 <li key={item} style={LI}>
@@ -120,11 +120,11 @@ export default function PrivacyPage() {
             <p style={BODY}>We use the information we collect to:</p>
             <ul style={{ paddingLeft: 0, margin: '0 0 0.75rem' }}>
               {[
-                'Build and maintain your family archive',
-                'Train your entity on your authorized archive content only',
+                'Build and maintain your Basalith',
+                'Train your entity on the authorized content of your Basalith only',
                 'Send photograph emails and digest notifications to contributors you have designated',
                 'Process payments for your plan',
-                'Communicate with you about your archive',
+                'Communicate with you about your Basalith',
                 'Improve our services',
               ].map((item) => (
                 <li key={item} style={LI}>
@@ -133,17 +133,17 @@ export default function PrivacyPage() {
                 </li>
               ))}
             </ul>
-            <p style={{ ...BODY, color: '#E8E4DC', fontStyle: 'italic' }}>We do not sell your personal information or archive content to any third party. Ever.</p>
-            <p style={{ ...BODY, fontStyle: 'italic' }}>We do not use your archive content to train general-purpose models. Your data trains only your entity.</p>
+            <p style={{ ...BODY, color: '#E8E4DC', fontStyle: 'italic' }}>We do not sell your personal information or the content of your Basalith to any third party. Ever.</p>
+            <p style={{ ...BODY, fontStyle: 'italic' }}>We do not use the content of your Basalith to train general-purpose models. Your data trains only your entity.</p>
 
             {/* 4 */}
             <h2 style={H2}>4. How We Store and Protect Your Data</h2>
-            <p style={BODY}>Your photographs and archive content are stored in encrypted private storage. Photographs are never publicly accessible. Access requires authenticated credentials specific to your archive.</p>
+            <p style={BODY}>Your photographs and the content of your Basalith are stored in encrypted private storage. Photographs are never publicly accessible. Access requires authenticated credentials specific to your Basalith.</p>
             <p style={BODY}>We use industry-standard encryption for data in transit and at rest.</p>
 
             {/* 5 */}
             <h2 style={H2}>5. Service Providers and Data Location</h2>
-            <p style={BODY}>Basalith runs on a small number of named service providers. Each one receives only what it needs to perform its function. None of them may use your archive content for their own purposes, and we do not sell or license your data to any of them.</p>
+            <p style={BODY}>Basalith runs on a small number of named service providers. Each one receives only what it needs to perform its function. None of them may use the content of your Basalith for their own purposes, and we do not sell or license your data to any of them.</p>
             <div style={{ marginBottom: '16px' }}>
               {[
                 { name: 'Supabase',  role: 'Database and file storage. Servers located in the United States.' },
@@ -161,25 +161,25 @@ export default function PrivacyPage() {
                 </div>
               ))}
             </div>
-            <p style={BODY}>Your archive content, meaning your photographs, voice recordings, video, and written deposits, is held in the United States.</p>
+            <p style={BODY}>The content of your Basalith, meaning your photographs, voice recordings, video, and written deposits, is held in the United States.</p>
             <p style={BODY}>The Anthropic API, which powers entity responses, does not train on API submissions by default. Their data usage policy is available at <a href="https://anthropic.com/legal/privacy" style={{ color: '#C4A24A', textDecoration: 'none' }} target="_blank" rel="noopener noreferrer">anthropic.com/legal/privacy</a>.</p>
-            <p style={BODY}>Voice and video deposits are sent to OpenAI for transcription. This covers voice recorded in the portal and the iOS app, deposits left on the phone line, and video you upload. Video is sent as a complete file and transcribed from its audio. The spoken language is detected automatically, in every language. Transcription is the only use. No other archive content is sent to OpenAI.</p>
+            <p style={BODY}>Voice and video deposits are sent to OpenAI for transcription. This covers voice recorded in the portal and the iOS app, deposits left on the phone line, and video you upload. Video is sent as a complete file and transcribed from its audio. The spoken language is detected automatically, in every language. Transcription is the only use. No other content of your Basalith is sent to OpenAI.</p>
 
             {/* 6 */}
             <h2 style={H2}>6. Who Can Access Your Data</h2>
-            <p style={BODY}>Access is limited to Heritage Nexus Inc. staff and authorized contractors operating under confidentiality obligations, and only where access is necessary to operate or support your archive.</p>
-            <p style={BODY}>We do not sell, license, rent, or otherwise transfer your personal data or archive content to third parties for any commercial purpose. We do not share it with data brokers, advertising networks, or research organizations.</p>
+            <p style={BODY}>Access is limited to Heritage Nexus Inc. staff and authorized contractors operating under confidentiality obligations, and only where access is necessary to operate or support your Basalith.</p>
+            <p style={BODY}>We do not sell, license, rent, or otherwise transfer your personal data or the content of your Basalith to third parties for any commercial purpose. We do not share it with data brokers, advertising networks, or research organizations.</p>
             <p style={BODY}>Law enforcement requests are handled in accordance with applicable law. We will notify affected individuals of such requests where we are legally permitted to do so.</p>
 
             {/* 7 */}
             <h2 style={H2}>7. Face Recognition</h2>
-            <p style={BODY}>With your consent, we use face recognition technology to identify individuals across your archive. This technology:</p>
+            <p style={BODY}>With your consent, we use face recognition technology to identify individuals across your Basalith. This technology:</p>
             <ul style={{ paddingLeft: 0, margin: '0 0 0.75rem' }}>
               {[
-                'Operates only within your archive',
+                'Operates only within your Basalith',
                 'Is never used to identify individuals outside your family\'s photographs',
-                'Can be disabled at any time in your archive preferences',
-                'Face data is stored only within your archive and never shared',
+                'Can be disabled at any time in your preferences',
+                'Face data is stored only within your Basalith and never shared',
               ].map((item) => (
                 <li key={item} style={LI}>
                   <span style={{ color: 'rgba(196,162,74,0.5)', marginRight: '0.5rem' }}>·</span>
@@ -190,26 +190,26 @@ export default function PrivacyPage() {
 
             {/* 8 */}
             <h2 style={H2}>8. Data Retention</h2>
-            <p style={BODY}>Archive content and enquiry data are governed separately. The two commitments below are not interchangeable, and neither one extends to the other.</p>
+            <p style={BODY}>The content of your Basalith and enquiry data are governed separately. The two commitments below are not interchangeable, and neither one extends to the other.</p>
 
-            <h3 style={{ ...H2, fontSize: '1.1rem', marginTop: '24px' }}>Your archive</h3>
-            <p style={BODY}>You own your archive, and you may request a complete export of it in open, portable formats. Export requests are fulfilled within 30 business days. If a payment is missed, your archive moves to Resting status. Your content is preserved and is never deleted for non-payment. Permanent deletion occurs only when you, or an executor with documented authority, make a verified written request. After that request is verified, we hold the archive for 12 months, then permanently delete it and confirm in writing.</p>
-            <p style={BODY}>Because you keep ownership and can export, your archive does not depend on the continued existence of Basalith as a company. Basalith is the custodian, not the owner. <a href="/data-ownership" style={{ color: '#C4A24A', textDecoration: 'none' }}>Read our data ownership commitments →</a></p>
+            <h3 style={{ ...H2, fontSize: '1.1rem', marginTop: '24px' }}>Your Basalith</h3>
+            <p style={BODY}>You own your Basalith, and you may request a complete export of it in open, portable formats. Export requests are fulfilled within 30 business days. If a payment is missed, your Basalith moves to Resting status. Your content is preserved and is never deleted for non-payment. Permanent deletion occurs only when you, or an executor with documented authority, make a verified written request. After that request is verified, we hold your Basalith for 12 months, then permanently delete it and confirm in writing.</p>
+            <p style={BODY}>Because you keep ownership and can export, your Basalith does not depend on the continued existence of Basalith as a company. Basalith is the custodian, not the owner. <a href="/data-ownership" style={{ color: '#C4A24A', textDecoration: 'none' }}>Read our data ownership commitments →</a></p>
 
             <h3 style={{ ...H2, fontSize: '1.1rem', marginTop: '24px' }}>Enquiry data</h3>
-            <p style={BODY}>Archive applications and contact form submissions are enquiry data. They are not archive content, and the archive commitments above do not apply to them.</p>
-            <p style={BODY}>We retain enquiry data for as long as is necessary to manage your enquiry and keep a record of our correspondence. If an enquiry does not result in an active archive, we delete the submission within 24 months of your last interaction with us, or sooner on a verified deletion request. Send deletion requests to <a href="mailto:privacy@basalith.xyz" style={{ color: '#C4A24A', textDecoration: 'none' }}>privacy@basalith.xyz</a> from the address associated with your submission. We confirm receipt within 5 business days and complete the deletion within 30 days, unless we are legally required to retain the data for longer.</p>
-            <p style={BODY}>Deleting enquiry data does not affect an active archive. The commitments above apply to archive content and are unchanged by it.</p>
+            <p style={BODY}>Applications and contact form submissions are enquiry data. They are not the content of your Basalith, and the commitments above for your Basalith do not apply to them.</p>
+            <p style={BODY}>We retain enquiry data for as long as is necessary to manage your enquiry and keep a record of our correspondence. If an enquiry does not result in an active Basalith, we delete the submission within 24 months of your last interaction with us, or sooner on a verified deletion request. Send deletion requests to <a href="mailto:privacy@basalith.xyz" style={{ color: '#C4A24A', textDecoration: 'none' }}>privacy@basalith.xyz</a> from the address associated with your submission. We confirm receipt within 5 business days and complete the deletion within 30 days, unless we are legally required to retain the data for longer.</p>
+            <p style={BODY}>Deleting enquiry data does not affect an active Basalith. The commitments above apply to the content of your Basalith and are unchanged by it.</p>
 
             {/* 9 */}
             <h2 style={H2}>9. Your Rights</h2>
             <p style={BODY}>You have the right to:</p>
             <ul style={{ paddingLeft: 0, margin: '0 0 0.75rem' }}>
               {[
-                'Access all data in your archive',
-                'Request a complete export of your archive in open formats, fulfilled within 30 business days',
-                'Delete specific content from your archive',
-                'Designate or change your archive Custodian',
+                'Access all data in your Basalith',
+                'Request a complete export of your Basalith in open formats, fulfilled within 30 business days',
+                'Delete specific content from your Basalith',
+                'Designate or change your Custodian',
                 'Opt out of face recognition',
                 'Close your account and request an export of your data',
               ].map((item) => (
@@ -228,7 +228,7 @@ export default function PrivacyPage() {
 
             {/* 11 */}
             <h2 style={H2}>11. Children</h2>
-            <p style={BODY}>Basalith archives are managed by adults. We do not knowingly collect personal information from children under 13 as primary account holders. Family members of any age may appear in archive photographs as subjects.</p>
+            <p style={BODY}>Every Basalith is managed by an adult. We do not knowingly collect personal information from children under 13 as primary account holders. Family members of any age may appear as subjects in the photographs in a Basalith.</p>
 
             {/* 12 */}
             <h2 style={H2}>12. Changes to This Policy</h2>
@@ -241,12 +241,12 @@ export default function PrivacyPage() {
             {/* Ownership section */}
             <div aria-hidden="true" style={{ height: '1px', background: 'var(--color-border)', margin: '48px 0' }} />
 
-            <h2 style={{ ...H2, marginTop: 0 }}>Your Data. Your Archive. Your Heirs.</h2>
+            <h2 style={{ ...H2, marginTop: 0 }}>Your Data. Your Basalith. Your Heirs.</h2>
 
             <h3 style={{ ...H2, fontSize: '1.1rem', marginTop: '32px', color: 'var(--color-text-primary)' }}>Ownership After Death</h3>
-            <p style={BODY}>Your archive is your property. It does not become ours when you die.</p>
-            <p style={BODY}>Upon your death your archive transfers to your designated heirs or estate exactly as you would transfer any other private asset.</p>
-            <p style={BODY}>Heritage Nexus Inc. does not acquire any rights to your archive data upon your death. Your cognitive reference model, meaning your deposits, voice recordings, and photographs, is a private digital asset that belongs to your estate.</p>
+            <p style={BODY}>Your Basalith is your property. It does not become ours when you die.</p>
+            <p style={BODY}>Upon your death your Basalith transfers to your designated heirs or estate exactly as you would transfer any other private asset.</p>
+            <p style={BODY}>Heritage Nexus Inc. does not acquire any rights to the data in your Basalith upon your death. Your cognitive reference model, meaning your deposits, voice recordings, and photographs, is a private digital asset that belongs to your estate.</p>
             <p style={{ ...BODY, fontStyle: 'italic' }}>We are the custodian. You are the owner. Your heirs are the beneficiaries. We are never the inheritor.</p>
 
             <h3 style={{ ...H2, fontSize: '1.1rem', marginTop: '32px', color: 'var(--color-text-primary)' }}>Company Dissolution</h3>
@@ -254,8 +254,8 @@ export default function PrivacyPage() {
             <ul style={{ paddingLeft: 0, margin: '0 0 12px' }}>
               {[
                 'You will receive advance notice where circumstances permit.',
-                'You can request a complete export of your archive, meaning all deposits, voice recordings, and photographs in standard open formats (JSON, MP3, JPEG), fulfilled within 30 business days.',
-                'Your archive data will never be sold to a third party as part of any asset sale, acquisition, or bankruptcy proceeding.',
+                'You can request a complete export of your Basalith, meaning all deposits, voice recordings, and photographs in standard open formats (JSON, MP3, JPEG), fulfilled within 30 business days.',
+                'The data in your Basalith will never be sold to a third party as part of any asset sale, acquisition, or bankruptcy proceeding.',
                 'If we are acquired, the acquiring entity must honor these same commitments as a condition of the acquisition.',
               ].map(item => (
                 <li key={item} style={LI}>
@@ -265,8 +265,8 @@ export default function PrivacyPage() {
             </ul>
 
             <h3 style={{ ...H2, fontSize: '1.1rem', marginTop: '32px', color: 'var(--color-text-primary)' }}>Data Use for Training</h3>
-            <p style={BODY}>Your archive data is never used to train models for other users. Not now. Not ever.</p>
-            <p style={BODY}>Each archive is a closed system. What you deposit trains your entity. It does not train anyone else&rsquo;s entity. It does not train Basalith&rsquo;s general models. It does not leave your archive except to the service providers named in section 5, and only for the purposes stated there.</p>
+            <p style={BODY}>The data in your Basalith is never used to train models for other users. Not now. Not ever.</p>
+            <p style={BODY}>Each Basalith is a closed system. What you deposit trains your entity. It does not train anyone else&rsquo;s entity. It does not train Basalith&rsquo;s general models. It does not leave your Basalith except to the service providers named in section 5, and only for the purposes stated there.</p>
 
             <p style={{ ...BODY, marginTop: '32px' }}>For security questions: <a href="mailto:security@basalith.ai" style={{ color: '#C4A24A', textDecoration: 'none' }}>security@basalith.ai</a></p>
 

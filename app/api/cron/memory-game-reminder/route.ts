@@ -98,7 +98,7 @@ export async function GET(req: NextRequest) {
       for (const contributor of nonPlayers) {
         try {
           await resend.emails.send({
-            from:    `The ${archive.family_name} Archive <archive@basalith.xyz>`,
+            from:    `The ${archive.family_name} Basalith <archive@basalith.xyz>`,
             to:      contributor.email,
             subject: `The game closes ${hoursLeft <= 3 ? 'soon' : 'today'}: ${session.total_memories} memories so far · ${archive.name}`,
             html: `<!DOCTYPE html>
@@ -107,7 +107,7 @@ export async function GET(req: NextRequest) {
 
   <div style="padding:32px 32px 24px">
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">
-      THE ${(archive.family_name ?? archive.name).toUpperCase()} ARCHIVE
+      THE ${(archive.family_name ?? archive.name).toUpperCase()} BASALITH
     </p>
     <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0 0 24px">
       MEMORY GAME · CLOSING ${hoursLeft <= 3 ? 'SOON' : 'TODAY'}
@@ -147,7 +147,7 @@ export async function GET(req: NextRequest) {
   <div style="padding:0 32px 32px;border-top:1px solid rgba(240,237,230,0.06)">
     <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:20px 0 0">
       BASALITH · XYZ<br>
-      The ${archive.family_name ?? archive.name} Archive
+      The ${archive.family_name ?? archive.name} Basalith
     </p>
   </div>
 

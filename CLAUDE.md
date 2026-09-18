@@ -518,7 +518,19 @@ regressions here are not theoretical.
 - American English. Short declarative sentences.
 - Banned words: curated, seamless, innovative, stewardship. Also avoid unlock,
   supercharge, game-changer.
-- No "Golden Dataset." Say "your archive."
+- "Archive" is a code word, not a reader's word (September 18, 2026). It stays in
+  identifiers, routes, tables, buckets, and comments, and leaves every rendered
+  surface, email, spoken prompt, and model-facing prompt. Three words replace it, one
+  per layer. "A Basalith" is the thing the customer owns, always with a determiner
+  ("your Basalith," "a family Basalith," "the Chen Basalith"); bare "Basalith" is the
+  company. "The record" is the evidence and the word for every mechanism sentence
+  ("checked against the record," "where the record is silent, it says so," "confined
+  to the record"); never a button, nav label, or standalone heading, because capture
+  pages already say "recording." "The entity" is unchanged. No "Golden Dataset."
+  Retired with it: "Archive Portal," "archive owner" (say owner), "archive custodian"
+  (say Custodian), "archive link" (say sign-in link). New rows in `archives` are
+  named "The <family> Basalith" (`lib/billing/createArchive.ts`) or "<family>
+  Basalith" (`app/api/trial/start`). Record: `docs/ARCHIVE_WORD_2026-09-18.md`.
 - "Legacy Guide," never "Archivist," in anything user-facing. The route may still be
   `/archivist-login`, but the copy says Legacy Guide. As of September 14, 2026 the
   public site does not name the role at all; delivery copy says "led in person" or

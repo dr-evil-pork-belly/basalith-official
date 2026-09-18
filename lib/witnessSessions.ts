@@ -18,7 +18,7 @@ export const WITNESS_SESSIONS: Record<string, WitnessSessionDef> = {
   child: {
     title:            'As Their Child',
     relationship:     'child',
-    intro:            'You have known [Name] longer than almost anyone in their adult life. You have seen them in moments they do not remember and versions of themselves they have forgotten. Your observations matter enormously to this archive.',
+    intro:            'You have known [Name] longer than almost anyone in their adult life. You have seen them in moments they do not remember and versions of themselves they have forgotten. Your observations matter enormously to this Basalith.',
     estimatedMinutes: 20,
     questions: [
       {
@@ -57,7 +57,7 @@ export const WITNESS_SESSIONS: Record<string, WitnessSessionDef> = {
   spouse: {
     title:            'As Their Partner',
     relationship:     'spouse',
-    intro:            'You know [Name] in ways no one else does. The private self. The person at the end of the day when there is no performance left. What you know is irreplaceable to this archive.',
+    intro:            'You know [Name] in ways no one else does. The private self. The person at the end of the day when there is no performance left. What you know is irreplaceable to this Basalith.',
     estimatedMinutes: 20,
     questions: [
       {

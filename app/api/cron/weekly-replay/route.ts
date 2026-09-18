@@ -87,7 +87,7 @@ export async function GET(req: NextRequest) {
         from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
         to:      archive.owner_email,
         replyTo,
-        subject: `Your week in the archive · ${archive.name}`,
+        subject: `Your week on the record · ${archive.name}`,
         html:    buildWeeklyReplayEmail({
           archiveName:      archive.name,
           firstName,
@@ -146,7 +146,7 @@ function buildWeeklyReplayEmail({
   if (journalCount > 0) summaryLines.push(`${journalCount} journal ${journalCount === 1 ? 'entry' : 'entries'}`)
   if (labelsCount  > 0) summaryLines.push(`${labelsCount} ${labelsCount === 1 ? 'photograph' : 'photographs'} labeled`)
   if (contribCount > 0) summaryLines.push(`${contribCount} family ${contribCount === 1 ? 'answer' : 'answers'} received`)
-  if (summaryLines.length === 0) summaryLines.push('Your archive is waiting for you')
+  if (summaryLines.length === 0) summaryLines.push('Your Basalith is waiting for you')
 
   return `<!DOCTYPE html>
 <html>
@@ -166,7 +166,7 @@ function buildWeeklyReplayEmail({
       ${firstName},
     </p>
     <p style="font-family:Georgia,serif;font-size:16px;font-weight:300;color:#B8B4AB;line-height:1.7;margin:0 0 24px">
-      Here is what your archive captured this week.
+      Here is what went on the record this week.
     </p>
 
     <div style="border-left:3px solid rgba(196,162,74,0.4);padding:20px 24px;margin:0 0 28px;background:rgba(196,162,74,0.03)">
@@ -209,13 +209,13 @@ function buildWeeklyReplayEmail({
     </p>
     ` : `
     <p style="font-family:Georgia,serif;font-size:15px;font-weight:300;color:#B8B4AB;line-height:1.7;margin:0 0 24px">
-      Your archive is waiting. Even one minute counts.
+      Your Basalith is waiting. Even one minute counts.
     </p>
     `}
 
     <a href="${siteUrl}/archive/dashboard"
       style="display:block;background:#C4A24A;color:#0A0908;font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;text-decoration:none;padding:16px 24px;text-align:center;margin-bottom:8px">
-      CONTINUE YOUR ARCHIVE
+      CONTINUE YOUR BASALITH
     </a>
   </div>
 

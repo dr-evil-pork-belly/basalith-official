@@ -32,8 +32,8 @@ export function buildFoundingCompleteOwnerEmail(input: FoundingCompleteInput): B
   const first = input.ownerName?.split(' ')[0] ?? null
   const greeting = first ? `${esc(first)},` : 'Hello,'
   const what = input.scope === 'business'
-    ? 'Three of the hardest calls you made running the business are now in your archive, in your own words.'
-    : 'Three of the hardest calls you ever made are now in your archive, in your own words.'
+    ? 'Three of the hardest calls you made running the business are now on the record, in your own words.'
+    : 'Three of the hardest calls you ever made are now on the record, in your own words.'
   const count = `${input.deposits} ${input.deposits === 1 ? 'deposit' : 'deposits'}`
 
   // archives.name is the full display name ("The Dr Ha Archive"), so it is used
@@ -46,12 +46,12 @@ export function buildFoundingCompleteOwnerEmail(input: FoundingCompleteInput): B
     what,
     `${count} in total. Nothing you said was rewritten.`,
     '',
-    'We read every word ourselves. Within 48 hours we will be in touch to set up your first read: a short video call to walk through what your archive holds, where it is still thin, and what comes next.',
+    'We read every word ourselves. Within 48 hours we will be in touch to set up your first read: a short video call to walk through what your record holds, where it is still thin, and what comes next.',
     '',
-    'When you are ready, your archive can show you one thing it can already answer, in your words, and one thing it will not, because you never said.',
+    'When you are ready, your Basalith can show you one thing it can already answer, in your words, and one thing it will not, because you never said.',
     `${SITE}/archive/founding`,
     '',
-    'Your archive keeps growing from here. The dashboard has your next question whenever you are ready.',
+    'Your record keeps growing from here. The dashboard has your next question whenever you are ready.',
     `${SITE}/archive/dashboard`,
     '',
     'Basalith',
@@ -66,12 +66,12 @@ export function buildFoundingCompleteOwnerEmail(input: FoundingCompleteInput): B
     <p style="font-size:16px;font-weight:300;line-height:1.8;margin:0 0 16px;color:#B8B4AB">${what}</p>
     <p style="font-size:16px;font-weight:300;line-height:1.8;margin:0 0 24px;color:#B8B4AB">${count} in total. Nothing you said was rewritten.</p>
     <div style="border-left:2px solid rgba(196,162,74,0.5);padding:4px 0 4px 18px;margin:0 0 24px">
-      <p style="font-size:16px;font-weight:300;line-height:1.8;margin:0;color:#F0EDE6">We read every word ourselves. Within 48 hours we will be in touch to set up your first read: a short video call to walk through what your archive holds, where it is still thin, and what comes next.</p>
+      <p style="font-size:16px;font-weight:300;line-height:1.8;margin:0;color:#F0EDE6">We read every word ourselves. Within 48 hours we will be in touch to set up your first read: a short video call to walk through what your record holds, where it is still thin, and what comes next.</p>
     </div>
-    <p style="font-size:15px;font-weight:300;line-height:1.8;margin:0 0 8px;color:#B8B4AB">When you are ready, your archive can show you one thing it can already answer, in your words, and one thing it will not, because you never said.</p>
+    <p style="font-size:15px;font-weight:300;line-height:1.8;margin:0 0 8px;color:#B8B4AB">When you are ready, your Basalith can show you one thing it can already answer, in your words, and one thing it will not, because you never said.</p>
     <p style="margin:0 0 24px"><a href="${SITE}/archive/founding" style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#C4A24A;text-decoration:none;text-transform:uppercase">Show me</a></p>
-    <p style="font-size:15px;font-weight:300;line-height:1.8;margin:0 0 8px;color:#B8B4AB">Your archive keeps growing from here. The dashboard has your next question whenever you are ready.</p>
-    <p style="margin:0 0 32px"><a href="${SITE}/archive/dashboard" style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#C4A24A;text-decoration:none;text-transform:uppercase">Open your archive</a></p>
+    <p style="font-size:15px;font-weight:300;line-height:1.8;margin:0 0 8px;color:#B8B4AB">Your record keeps growing from here. The dashboard has your next question whenever you are ready.</p>
+    <p style="margin:0 0 32px"><a href="${SITE}/archive/dashboard" style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#C4A24A;text-decoration:none;text-transform:uppercase">Open your Basalith</a></p>
     <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#706C65;margin:0">Basalith · Heritage Nexus Inc.</p>
   </div>
 </div>`.trim()

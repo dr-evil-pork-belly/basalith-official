@@ -32,7 +32,7 @@ const STEPS: Step[] = [
   {
     number:        3,
     title:         'Meet your entity',
-    description:   'Your entity learns from your archive. Talk to it, correct it, and watch it become more accurate over time.',
+    description:   'Your entity learns from the record. Talk to it, correct it, and watch it become more accurate over time.',
     buttonLabel:   'TALK TO YOUR ENTITY →',
     buttonHref:    '/archive/entity',
     completedWhen: 'entity',
@@ -40,7 +40,7 @@ const STEPS: Step[] = [
   {
     number:        4,
     title:         'Add important dates',
-    description:   'Add birthdays and anniversaries. Your archive will remember them automatically every year.',
+    description:   'Add birthdays and anniversaries. Your Basalith will remember them automatically every year.',
     buttonLabel:   'ADD A DATE →',
     buttonHref:    '/archive/dates',
     completedWhen: 'dates',
@@ -182,7 +182,7 @@ export default function OnboardingGuide({
       {showComplete ? (
         <div>
           <p className="font-serif font-semibold" style={{ fontSize: '1.2rem', color: 'var(--portal-ink)', marginBottom: '0.4rem' }}>
-            Your archive is ready.
+            Your Basalith is ready.
           </p>
           <p className="font-serif italic" style={{ fontSize: '0.9rem', color: 'var(--portal-body)', lineHeight: 1.6 }}>
             The journey begins tonight at 9pm.
@@ -207,11 +207,16 @@ export default function OnboardingGuide({
               className="no-underline inline-block"
               style={{
                 fontFamily: 'var(--portal-mono)',
-                fontSize: '11px',
-                letterSpacing: '0.25em',
-                color:         'var(--portal-btn-label)',
-                background:    'var(--portal-btn)',
-                padding:       '0.55rem 1.25rem',
+                fontSize: '11.5px',
+                letterSpacing: '0.16em',
+                textTransform: 'uppercase',
+                color:         'var(--portal-gold-ink)',
+                background:    'var(--portal-card)',
+                border:        '1px solid var(--portal-gold-line)',
+                padding:       '0 18px',
+                minHeight:     '44px',
+                display:       'inline-flex',
+                alignItems:    'center',
                 borderRadius:  '2px',
               }}
             >

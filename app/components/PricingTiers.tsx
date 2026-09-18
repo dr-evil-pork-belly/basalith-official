@@ -37,7 +37,7 @@ const TIERS: Tier[] = [
     annualPrice: '$3,600',
     annualSub:   '',
     monthlyPrice:'$360',
-    description: 'The full archive.\nYour entity learns from you every week.\nYour family adds what they remember.\nThe record of how you think keeps growing.',
+    description: 'Your Basalith, in full.\nYour entity learns from you every week.\nYour family adds what they remember.\nThe record of how you think keeps growing.',
     featured:    true,
     features: [
       'Weekly story prompts',
@@ -50,7 +50,7 @@ const TIERS: Tier[] = [
       'All supported languages',
     ],
     contributorNote: 'Your contributors never need to log in, remember a password, or learn a new interface. They receive an email. They hit reply. Their memory is added. Or they hold a button in the app and speak for two minutes.',
-    cta:     'Begin Your Archive',
+    cta:     'Begin your Basalith',
     ctaHref: '/apply',
     note:    'One-time founding fee of $2,500',
   },
@@ -61,7 +61,7 @@ const TIERS: Tier[] = [
     annualPrice: '$600',
     annualSub:   '',
     monthlyPrice:'$60',
-    description: 'Your archive, kept and waiting.\nNo emails. No prompts.\nEverything you built, safe and intact,\nuntil you are ready to come back.',
+    description: 'Your Basalith, kept and waiting.\nNo emails. No prompts.\nEverything you built, safe and intact,\nuntil you are ready to come back.',
     featured:    false,
     features: [
       'All data preserved permanently',
@@ -76,20 +76,20 @@ const TIERS: Tier[] = [
   },
   {
     id:          'legacy',
-    eyebrow:     'The Archive Continues',
+    eyebrow:     'Your Basalith Continues',
     name:        'Legacy',
     annualPrice: '$1,200',
     annualSub:   'billed to estate or family',
     monthlyPrice:'$1,200',
     annualOnly:  true,
-    description: 'The entity continues.\n\nYour family can keep asking. Every contributor who adds a memory makes the archive more complete. What you said while you were here stays exactly as you said it.',
+    description: 'The entity continues.\n\nYour family can keep asking. Every contributor who adds a memory makes the record more complete. What you said while you were here stays exactly as you said it.',
     featured:    false,
     features: [
-      'Archive and entity continue for your heirs',
+      'Your Basalith and entity continue for your heirs',
       'Full family contributor access',
       'Cognitive fingerprint frozen. Nobody can change what you said',
       'Annual entity report to family',
-      'Archive storage and security',
+      'Storage and security',
       'Full export in open formats, any time',
     ],
     cta:     'Ask About Legacy',
@@ -134,7 +134,7 @@ export default function PricingTiers() {
           }}
         >
           <span style={{ width: '24px', height: '1px', background: 'var(--color-gold)', display: 'block', flexShrink: 0 }} aria-hidden="true" />
-          Three Moments. One Archive.
+          Three Moments. One Basalith.
           <span style={{ width: '24px', height: '1px', background: 'var(--color-gold)', display: 'block', flexShrink: 0 }} aria-hidden="true" />
         </p>
 

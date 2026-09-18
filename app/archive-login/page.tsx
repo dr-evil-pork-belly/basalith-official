@@ -58,7 +58,7 @@ export default function ArchiveLoginPage() {
         </div>
 
         {/* Eyebrow */}
-        <p className="eyebrow text-center mb-12" style={{ letterSpacing: '0.2em' }}>Archive Portal</p>
+        <p className="eyebrow text-center mb-12" style={{ letterSpacing: '0.2em' }}>Your Basalith</p>
 
         {sent ? (
           <div className="flex flex-col items-center gap-4 text-center">
@@ -66,7 +66,7 @@ export default function ArchiveLoginPage() {
               Check your email
             </p>
             <p className="font-sans text-[0.78rem] leading-relaxed" style={{ color: '#5C6166' }}>
-              We sent a sign-in link to {email}. Open it on this device to access your archive.
+              We sent a sign-in link to {email}. Open it on this device to enter your Basalith.
             </p>
           </div>
         ) : (
@@ -108,7 +108,7 @@ export default function ArchiveLoginPage() {
         )}
 
         <p className="font-sans text-[0.62rem] tracking-[0.1em] uppercase text-center mt-10" style={{ color: '#3A3F44' }}>
-          Authorized archive owners only
+          Authorized owners only
         </p>
       </div>
     </main>

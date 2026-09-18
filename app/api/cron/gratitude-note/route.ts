@@ -69,7 +69,7 @@ export async function GET(req: NextRequest) {
 
       const [contributorName, data] = sorted[0]
 
-      // Look up their email — match on first name prefix to handle display name variants
+      // Look up their email, match on first name prefix to handle display name variants
       const firstName = contributorName.split(' ')[0]
       const { data: contributor } = await supabaseAdmin
         .from('contributors')
@@ -89,16 +89,16 @@ export async function GET(req: NextRequest) {
       let noteText: string
       try {
         const langInstruction = lang === 'zh'
-          ? '\n- Write entirely in Simplified Chinese (简体中文). End with "— ${archive.family_name}档案"'
-          : `\n- End with "— The ${archive.family_name} Archive"`
+          ? '\n- Write entirely in Simplified Chinese (简体中文). End with "${archive.family_name}档案" on its own line'
+          : `\n- End with "The ${archive.family_name} Basalith" on its own line`
         const aiResponse = await anthropic.messages.create({
           model:      'claude-sonnet-4-6',
           max_tokens: 200,
           messages: [{
             role:    'user',
-            content: `Write a short, personal, deeply sincere thank-you note from a family archive to a contributor named ${contributorName}.
+            content: `Write a short, personal, deeply sincere thank-you note from a family Basalith to a contributor named ${contributorName}.
 
-They contributed ${data.count} memories this month to The ${archive.family_name} Archive.
+They contributed ${data.count} memories this month to the ${archive.family_name} Basalith.
 
 Some of what they shared: "${memorySample}"
 
@@ -122,11 +122,11 @@ Return only the note text. Nothing else.`,
       }
 
       await resend.emails.send({
-        from:    `The ${archive.family_name} Archive <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
+        from:    `The ${archive.family_name} Basalith <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
         to:      contributor.email,
         subject: lang === 'zh'
           ? `来自${archive.family_name}档案的感谢`
-          : `A note from The ${archive.family_name} Archive`,
+          : `A note from the ${archive.family_name} Basalith`,
         html:    buildGratitudeEmail(archive.family_name, firstName, data.count, noteText, lang),
         headers: {
           'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
@@ -147,9 +147,9 @@ Return only the note text. Nothing else.`,
 
 function fallbackNote(firstName: string, count: number, familyName: string, lang = 'en'): string {
   if (lang === 'zh') {
-    return `${firstName}——您本月为${familyName}档案贡献了${count}条回忆。正因为您，档案中存在着那些在其他任何地方都找不到的珍贵记录。这比您想象的更有意义。\n— ${familyName}档案`
+    return `${firstName}，您本月为${familyName}档案贡献了${count}条回忆。正因为您，档案中存在着那些在其他任何地方都找不到的珍贵记录。这比您想象的更有意义。\n${familyName}档案`
   }
-  return `${firstName}, you contributed ${count} memories to The ${familyName} Archive this month. Because of you, things exist in this archive that would not exist anywhere else. That matters more than you know.\nThe ${familyName} Archive`
+  return `${firstName}, you contributed ${count} memories to the ${familyName} Basalith this month. Because of you, things exist on the record that would not exist anywhere else. That matters more than you know.\nThe ${familyName} Basalith`
 }
 
 function buildGratitudeEmail(
@@ -167,7 +167,7 @@ function buildGratitudeEmail(
 
   <div style="padding:40px 40px 0">
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0">
-      THE ${familyName.toUpperCase()} ARCHIVE
+      THE ${familyName.toUpperCase()} BASALITH
     </p>
   </div>
 
@@ -185,7 +185,7 @@ function buildGratitudeEmail(
 
     <div style="border-top:1px solid rgba(240,237,230,0.06);padding-top:24px">
       <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#5C6166;margin:0 0 16px">
-        ${lang === 'zh' ? '您的回忆已永久保存在档案中。' : 'Your memories are preserved in this archive permanently.'}
+        ${lang === 'zh' ? '您的回忆已永久保存在档案中。' : 'Your memories are on the record permanently.'}
       </p>
       <a href="${siteUrl}" style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;text-decoration:none">
         BASALITH · XYZ

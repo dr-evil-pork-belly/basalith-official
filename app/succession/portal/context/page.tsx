@@ -33,7 +33,7 @@ export default async function SuccessorContextPage() {
         name:        successorResult.data?.name ?? '',
         organization: successorResult.data?.organization ?? null,
       }}
-      archiveName={archiveResult.data?.name ?? 'Archive'}
+      archiveName={archiveResult.data?.name ?? 'Basalith'}
       existingContexts={contextsResult.data ?? []}
     />
   )

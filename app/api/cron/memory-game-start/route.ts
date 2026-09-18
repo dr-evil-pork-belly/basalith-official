@@ -58,7 +58,7 @@ function buildGameStartEmail(
 
   <div style="padding:32px 32px 0">
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">
-      THE ${familyName.toUpperCase()} ARCHIVE
+      THE ${familyName.toUpperCase()} BASALITH
     </p>
     <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0">
       WEEKLY MEMORY GAME · ${dateStr}
@@ -79,7 +79,7 @@ function buildGameStartEmail(
 
   <div style="padding:32px">
     <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#B8B4AB;line-height:1.7;margin:0 0 20px">
-      Every memory you add goes directly into the archive permanently.
+      Every memory you add goes on the record permanently.
       Click ADD YOUR MEMORY on any photograph to contribute.
     </p>
     <a href="${siteUrl}/game/${sessionId}"
@@ -94,7 +94,7 @@ function buildGameStartEmail(
   <div style="padding:0 32px 32px;border-top:1px solid rgba(240,237,230,0.06)">
     <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:20px 0 0">
       BASALITH · XYZ<br>
-      The ${familyName} Archive<br>
+      The ${familyName} Basalith<br>
       Memory game every Wednesday.
     </p>
   </div>
@@ -162,7 +162,7 @@ export async function GET(req: NextRequest) {
 
       const selectedPhotos = photos.slice(0, 5)
 
-      // Permanent proxy URLs — never expire, work for the life of the email
+      // Permanent proxy URLs: never expire, work for the life of the email
       const photoUrls: Record<string, string> = {}
       for (const photo of selectedPhotos) {
         photoUrls[photo.id] = getEmailPhotoUrl(photo.id)
@@ -195,7 +195,7 @@ export async function GET(req: NextRequest) {
       for (const contributor of contributors) {
         try {
           await resend.emails.send({
-            from:    `The ${archive.family_name} Archive <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
+            from:    `The ${archive.family_name} Basalith <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
             to:      contributor.email,
             subject: `This week's memory game is live · ${archive.name}`,
             html:    buildGameStartEmail(

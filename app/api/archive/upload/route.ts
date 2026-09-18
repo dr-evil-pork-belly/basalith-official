@@ -5,9 +5,9 @@ import { getSessionUser } from '@/lib/auth/getSessionUser'
 
 export const dynamic = 'force-dynamic'
 
-// Photo upload — accepts multipart/form-data with a 'file' field.
+// Photo upload: accepts multipart/form-data with a 'file' field.
 // Auth: Supabase owner session only. Ownership is verified against the archives
-// table — a session carrying an archiveId is not proof of ownership
+// table, a session carrying an archiveId is not proof of ownership
 // (getSessionUser fills archiveId for successors too).
 
 export async function POST(req: NextRequest) {
@@ -35,10 +35,10 @@ export async function POST(req: NextRequest) {
       .maybeSingle()
 
     if (!archive) {
-      return NextResponse.json({ error: 'Archive not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Not found' }, { status: 404 })
     }
     if (archive.status && archive.status !== 'active') {
-      return NextResponse.json({ error: 'Archive is not active' }, { status: 403 })
+      return NextResponse.json({ error: 'Your Basalith is not active' }, { status: 403 })
     }
 
     const formData = await req.formData()
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
     }
 
-    // 50 MB limit — accommodates iPhone HEIC and large JPEGs
+    // 50 MB limit, accommodates iPhone HEIC and large JPEGs
     const sizeMB = (file.size / (1024 * 1024)).toFixed(1)
     console.log('[upload] file:', file.name, '| type:', file.type, '| size:', sizeMB + 'MB')
     if (file.size > 50 * 1024 * 1024) {
@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Database error' }, { status: 500 })
     }
 
-    // Fire processing pipeline (background — non-fatal)
+    // Fire processing pipeline (background, non-fatal)
     inngest.send({
       name: 'photo/uploaded',
       data: {

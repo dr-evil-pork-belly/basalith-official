@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
   // Auth: Supabase owner session only. Ownership is verified against the
-  // archives table — a session carrying an archiveId is not proof of ownership
+  // archives table, a session carrying an archiveId is not proof of ownership
   // (getSessionUser fills archiveId for successors too). Without this, a
   // successor could schedule the owner's archive for deletion.
   const session = await getSessionUser()
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
     .eq('id', archiveId)
     .maybeSingle()
 
-  if (!archive) return NextResponse.json({ error: 'Archive not found' }, { status: 404 })
+  if (!archive) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
   if (archive.termination_requested_at) {
     return NextResponse.json({ error: 'Termination already requested' }, { status: 409 })

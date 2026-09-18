@@ -84,7 +84,7 @@ export default function WritingClient({ archiveId }: Props) {
 
         {/* Header */}
         <div className="mb-8">
-          <p className="font-compute text-xs tracking-widest text-[var(--portal-gold-ink)] uppercase mb-2">Archive</p>
+          <p className="font-compute text-xs tracking-widest text-[var(--portal-gold-ink)] uppercase mb-2">Your Basalith</p>
           <h1 className="font-legacy text-4xl text-[var(--portal-ink)] mb-2">Writing</h1>
           <p className="font-compute text-xs text-[var(--portal-secondary)]">Letters, journals, emails, and other written documents.</p>
         </div>

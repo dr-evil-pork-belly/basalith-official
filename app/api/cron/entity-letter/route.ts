@@ -84,13 +84,13 @@ function buildEntityLetterEmail(
     <div style="padding:20px 24px;border-left:3px solid rgba(196,162,74,0.2);margin:0 0 32px">
       <p style="font-family:Georgia,serif;font-size:15px;font-weight:300;color:#706C65;line-height:1.8;margin:0">
         This letter was written by your entity based on what it has learned from you.
-        If it says something that does not feel right — correct it.
-        If it asks something you want to answer — reply to this email or visit your archive.
+        If it says something that does not feel right, correct it.
+        If it asks something you want to answer, reply to this email or visit your Basalith.
       </p>
     </div>
 
     <a href="${portalUrl}" style="display:inline-block;background:#C4A24A;color:#0A0908;font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;text-decoration:none;padding:14px 28px;border-radius:2px">
-      VISIT YOUR ARCHIVE →
+      VISIT YOUR BASALITH →
     </a>
   </div>
 

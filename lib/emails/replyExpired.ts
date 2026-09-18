@@ -43,7 +43,7 @@ export function buildReplyExpiredEmail(input: {
   const text = [
     greeting,
     '',
-    'Your reply reached us, but the link it came from had expired, so it was not added to the archive.',
+    'Your reply reached us, but the link it came from had expired, so it was not added to the record.',
     '',
     'Reply links stay active for 30 days. This one was older than that.',
     '',
@@ -51,9 +51,9 @@ export function buildReplyExpiredEmail(input: {
     '',
     replyText,
     '',
-    `You can add it to the archive here: ${portalUrl}`,
+    `You can add it to the record here: ${portalUrl}`,
     '',
-    'Copy the text above into the archive and it will be saved as though it arrived on time.',
+    'Copy the text above into your Basalith and it will be saved as though it arrived on time.',
     '',
     `BASALITH`,
     archiveName,
@@ -73,7 +73,7 @@ export function buildReplyExpiredEmail(input: {
     <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#B8B4AB;margin:0 0 24px">${escapeHtml(greeting)}</p>
 
     <p style="font-family:Georgia,serif;font-size:15px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 20px">
-      Your reply reached us, but the link it came from had expired, so it was not added to the archive.
+      Your reply reached us, but the link it came from had expired, so it was not added to the record.
       Reply links stay active for 30 days. This one was older than that.
     </p>
 
@@ -86,11 +86,11 @@ export function buildReplyExpiredEmail(input: {
     </div>
 
     <p style="font-family:Georgia,serif;font-size:15px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 24px">
-      Copy the text above into the archive and it will be saved as though it arrived on time.
+      Copy the text above into your Basalith and it will be saved as though it arrived on time.
     </p>
 
     <a href="${portalUrl}" style="display:inline-block;background:#C4A24A;color:#0A0908;font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;text-decoration:none;padding:14px 28px;border-radius:2px">
-      OPEN THE ARCHIVE
+      OPEN YOUR BASALITH
     </a>
   </div>
 

@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
     const { photographId, prompt, response, source_type } = body
 
     // Auth: Supabase owner session only. Ownership is verified against the
-    // archives table — a session carrying an archiveId is not proof of ownership
+    // archives table, a session carrying an archiveId is not proof of ownership
     // (getSessionUser fills archiveId for successors too).
     const session = await getSessionUser()
     if (!session?.archiveId) {
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
       await supabaseAdmin.from('labels').insert({
         photograph_id:       photographId,
         archive_id:          archiveId,
-        labelled_by:         'Archive Owner',
+        labelled_by:         'Owner',
         what_was_happening:  response.trim(),
         is_primary_label:    true,
         essence_feed_status: 'pending',
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
       return supabaseAdmin.from('archives').update({ archive_score: score }).eq('id', archiveId)
     }).catch(e => console.warn('[owner-deposit] score update skipped:', e instanceof Error ? e.message : e))
 
-    // Training pair — fire-and-forget
+    // Training pair, fire-and-forget
     if (response.trim().length > 20) {
       void (async () => {
         try {
@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
             .from('archives').select('owner_name, name, preferred_language').eq('id', archiveId).single()
           if (!arch) return
           await createTrainingPairFromDeposit(
-            { id: deposit.id, archive_id: archiveId, prompt: prompt ?? 'Archive deposit', response: response.trim() },
+            { id: deposit.id, archive_id: archiveId, prompt: prompt ?? 'Deposit', response: response.trim() },
             arch.owner_name || 'Unknown',
             arch.name,
             arch.preferred_language || 'en',
@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
       })()
     }
 
-    // Domain classification — fire-and-forget
+    // Domain classification, fire-and-forget
     void classifyDeposit({ depositId: deposit.id, archiveId, text: response.trim() })
 
     return NextResponse.json({ success: true, depositId: deposit.id })

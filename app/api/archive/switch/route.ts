@@ -26,7 +26,7 @@ export async function POST(req: Request) {
         .eq('owner_user_id', session.userId)
         .single()
       if (!data) {
-        return NextResponse.json({ error: 'Archive not found' }, { status: 403 })
+        return NextResponse.json({ error: 'Not found' }, { status: 403 })
       }
     } else {
       // Contributor access is matched by email, not by session scope.
@@ -37,7 +37,7 @@ export async function POST(req: Request) {
         .eq('email', session.email)
         .single()
       if (!data) {
-        return NextResponse.json({ error: 'Archive not found' }, { status: 403 })
+        return NextResponse.json({ error: 'Not found' }, { status: 403 })
       }
     }
 

@@ -84,7 +84,7 @@ export async function activateArchiveById(archiveId: string): Promise<Activation
       loginUrl:     `${siteUrl}/archive-login`,
     })
     await resend.emails.send({
-      from:    `The ${familyName} Archive <${RESEND_FROM}>`,
+      from:    `The ${familyName} Basalith <${RESEND_FROM}>`,
       to:      archive.owner_email,
       subject: email.subject,
       html:    email.html,

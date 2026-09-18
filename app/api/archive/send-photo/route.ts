@@ -42,13 +42,13 @@ function buildAllPhotosSentEmail(
       ${contributorName} has seen all your photographs.
     </h2>
     <p style="font-family:Georgia,serif;font-size:16px;font-weight:300;font-style:italic;color:#B8B4AB;line-height:1.8;margin:0 0 24px">
-      Every photograph in your archive has been sent to ${contributorName}.
-      To continue the daily photograph series, upload more photographs to your archive.
+      Every photograph in your Basalith has been sent to ${contributorName}.
+      To continue the daily photograph series, upload more photographs to your Basalith.
     </p>
     <p style="font-family:Georgia,serif;font-size:15px;font-weight:300;font-style:italic;color:#706C65;line-height:1.8;margin:0 0 32px">
       Each new photograph is an opportunity for ${contributorName} to share
       a memory you may not have heard. Old family albums, photographs from
-      other relatives, and digitised prints all make excellent archive additions.
+      other relatives, and digitized prints all make excellent additions.
     </p>
     <a href="${siteUrl}/archive/label"
       style="display:inline-block;background:#C4A24A;color:#0A0908;font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;text-decoration:none;padding:14px 28px">
@@ -70,14 +70,14 @@ function buildSparkOnlyEmail(
 ): string {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
   const subjectLabels: Record<string, string> = {
-    en:  'A question from the archive',
+    en:  'A question for you',
     zh:  '来自档案的问题',
     yue: '檔案嘅問題',
     ja:  'アーカイブからの質問',
-    es:  'Una pregunta del archivo',
+    es:  'Una pregunta para ti',
     ko:  '아카이브의 질문',
     vi:  'Câu hỏi từ kho lưu trữ',
-    tl:  'Tanong mula sa archive',
+    tl:  'Isang tanong para sa iyo',
   }
   const label = subjectLabels[lang] ?? subjectLabels.en
   return `<!DOCTYPE html>
@@ -172,10 +172,10 @@ export async function POST(req: NextRequest) {
       supabaseAdmin.from('email_preferences').select('*').eq('archive_id', archiveId).single(),
     ])
 
-    if (!archive) return NextResponse.json({ error: 'Archive not found' }, { status: 404 })
+    if (!archive) return NextResponse.json({ error: 'Not found' }, { status: 404 })
     if (!prefs?.active) return NextResponse.json({ skipped: true, reason: 'No active preferences' })
 
-    // 2. Get active contributors — include id for per-contributor tracking
+    // 2. Get active contributors, include id for per-contributor tracking
     const { data: contributors } = await supabaseAdmin
       .from('contributors')
       .select('id, email, name, access_token, preferred_language')
@@ -235,8 +235,8 @@ export async function POST(req: NextRequest) {
         photo = anyPhotoData?.[0] ?? null
 
         if (!photo) {
-          // All photos have been sent to this contributor — send spark-only email instead
-          console.log('[send-photos] all photos sent to:', contributor.name, '— sending spark')
+          // All photos have been sent to this contributor, send spark-only email instead
+          console.log('[send-photos] all photos sent to:', contributor.name, 'sending spark')
           exhausted.push(contributor.name ?? contributor.email)
 
           const contribLang2 = (contributor as { preferred_language?: string }).preferred_language ?? 'en'
@@ -253,9 +253,9 @@ export async function POST(req: NextRequest) {
                 sparkId:       spark.id,
               })
               const subjectLabels: Record<string, string> = {
-                en: 'A question from the archive', zh: '来自档案的问题',
+                en: 'A question for you', zh: '来自档案的问题',
                 yue: '檔案嘅問題', ja: 'アーカイブからの質問',
-                es: 'Una pregunta del archivo', ko: '아카이브의 질문',
+                es: 'Una pregunta para ti', ko: '아카이브의 질문',
               }
               await resend.emails.send({
                 from:    `${archive.name} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
@@ -288,7 +288,7 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // ── 3D. Photo URL — permanent proxy, never expires ─────────────────────
+      // ── 3D. Photo URL: permanent proxy, never expires ─────────────────────
       const photoUrl = getEmailPhotoUrl(photo.id)
 
       // ── 3E. Build unique reply address per contributor ──────────────────────
@@ -355,7 +355,7 @@ export async function POST(req: NextRequest) {
         continue
       }
 
-      // ── 3H. Record the send — idempotent via unique index ───────────────────
+      // ── 3H. Record the send, idempotent via unique index ───────────────────
       try {
         await supabaseAdmin
           .from('contributor_photo_sends')
@@ -366,7 +366,7 @@ export async function POST(req: NextRequest) {
             sent_at:        new Date().toISOString(),
           })
       } catch {
-        // Unique constraint violation = already recorded — safe to ignore
+        // Unique constraint violation = already recorded, safe to ignore
       }
 
       sentCount++
@@ -386,7 +386,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 5. Owner daily photo — select their next unsent photo and record it
+    // 5. Owner daily photo: select their next unsent photo and record it
     if (archive.owner_email && firstSentPhoto) {
       try {
         const { data: ownerSentRows } = await supabaseAdmin
@@ -417,7 +417,7 @@ export async function POST(req: NextRequest) {
             .insert({ archive_id: archiveId, photograph_id: ownerPhoto.id, sent_at: new Date().toISOString() })
         }
       } catch (e) {
-        // Non-fatal — owner tracking is supplementary
+        // Non-fatal, owner tracking is supplementary
         console.warn('[send-photos] owner_photo_sends failed:', e instanceof Error ? e.message : e)
       }
     }

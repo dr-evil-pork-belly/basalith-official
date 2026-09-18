@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
     const atOneYear   = pausedMs >= YEAR_MS        && pausedMs < YEAR_MS + WINDOW_MS
 
     if (!atSixMonths && !atOneYear) {
-      skipped.push(`${archive.name} (${monthsPaused}mo — not at milestone)`)
+      skipped.push(`${archive.name} (${monthsPaused}mo, not at milestone)`)
       continue
     }
 
@@ -70,7 +70,7 @@ export async function GET(req: NextRequest) {
     const lang      = archive.preferred_language ?? 'en'
     const subject   = lang === 'zh' || lang === 'yue'
       ? `您的档案还在这里 · ${archive.name}`
-      : `Your archive is still here · ${archive.name}`
+      : `Your Basalith is still here · ${archive.name}`
 
     try {
       await resend.emails.send({

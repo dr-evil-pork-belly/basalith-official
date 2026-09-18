@@ -225,7 +225,7 @@ export const provisionOnFoundingFee = inngest.createFunction(
       })
       try {
         await resend.emails.send({
-          from:    `The ${familyName} Archive <${RESEND_FROM}>`,
+          from:    `The ${familyName} Basalith <${RESEND_FROM}>`,
           to:      ownerEmail,
           subject: email.subject,
           html:    email.html,
@@ -367,7 +367,7 @@ export const logSubscriptionCanceled = inngest.createFunction(
         await resend.emails.send({
           from:    `${archive.name} <${RESEND_FROM}>`,
           to:      archive.owner_email,
-          subject: `Your archive is preserved · ${archive.name}`,
+          subject: `Your Basalith is preserved · ${archive.name}`,
           html:    buildArchivePausedEmail(firstName, archive.name, lang),
           headers: {
             'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',

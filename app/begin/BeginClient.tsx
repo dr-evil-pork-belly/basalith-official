@@ -86,7 +86,7 @@ export default function BeginClient({ signedInEmail }: { signedInEmail: string |
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) {
-        setError(data?.error || 'Could not start your archive right now. Please try again in a moment.')
+        setError(data?.error || 'Could not start your Basalith right now. Please try again in a moment.')
         setLoading(false)
         return
       }
@@ -109,7 +109,7 @@ export default function BeginClient({ signedInEmail }: { signedInEmail: string |
       setScreen('sent')
       setLoading(false)
     } catch {
-      setError('Could not start your archive right now. Please try again in a moment.')
+      setError('Could not start your Basalith right now. Please try again in a moment.')
       setLoading(false)
     }
   }
@@ -177,7 +177,7 @@ export default function BeginClient({ signedInEmail }: { signedInEmail: string |
           <form onSubmit={handleSubmit} className="flex flex-col gap-7">
             {signedIn ? (
               <p className="font-serif text-[1.25rem] font-light leading-snug" style={{ color: '#F0F0EE' }}>
-                You are signed in as {signedInEmail}. Begin your archive.
+                You are signed in as {signedInEmail}. Begin your Basalith.
               </p>
             ) : (
               <>
@@ -185,7 +185,7 @@ export default function BeginClient({ signedInEmail }: { signedInEmail: string |
                   Tell us about the hardest call you ever made.
                 </h1>
                 <p className="font-sans text-[0.82rem] leading-relaxed" style={{ color: '#5C6166' }}>
-                  Fifteen to thirty minutes, by voice or typed, on your own time. Nothing you say has to be important. When you are done, your archive answers one question in your own words and declines one it has no grounds for. That is how you know it is you.
+                  Fifteen to thirty minutes, by voice or typed, on your own time. Nothing you say has to be important. When you are done, your Basalith answers one question in your own words and declines one it has no grounds for. That is how you know it is you.
                 </p>
               </>
             )}
@@ -224,7 +224,7 @@ export default function BeginClient({ signedInEmail }: { signedInEmail: string |
             )}
 
             <fieldset className="border-0 p-0 m-0">
-              <legend className={labelClass} style={{ color: '#5C6166' }}>This archive is for</legend>
+              <legend className={labelClass} style={{ color: '#5C6166' }}>This Basalith is for</legend>
               <div className="flex gap-6">
                 {([['me', 'me'], ['someone', 'someone I am helping']] as [ForWhom, string][]).map(([value, text]) => (
                   <label key={value} className="flex items-center gap-2 font-serif text-[1rem] font-light cursor-pointer" style={{ color: forWhom === value ? '#F0F0EE' : '#5C6166' }}>
@@ -270,7 +270,7 @@ export default function BeginClient({ signedInEmail }: { signedInEmail: string |
             </button>
 
             <p className="font-sans text-[0.72rem] leading-relaxed text-center" style={{ color: '#5C6166' }}>
-              Your first call is yours. Found the archive to keep it.
+              Your first call is yours. Found your Basalith to keep it.
             </p>
           </form>
         )}
@@ -279,7 +279,7 @@ export default function BeginClient({ signedInEmail }: { signedInEmail: string |
           {signedIn ? (
             <a href="/api/auth/logout" className="no-underline" style={{ color: '#3A3F44' }}>Not you? Sign out</a>
           ) : (
-            <Link href="/archive-login" className="no-underline" style={{ color: '#3A3F44' }}>Already have an archive? Sign in</Link>
+            <Link href="/archive-login" className="no-underline" style={{ color: '#3A3F44' }}>Already have a Basalith? Sign in</Link>
           )}
         </p>
       </div>

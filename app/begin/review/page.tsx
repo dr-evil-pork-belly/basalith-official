@@ -65,7 +65,7 @@ export default function ReviewPage() {
           <BeginProgress step={3} />
           <p className="eyebrow mb-2">Step 3 of 3</p>
           <h1 className="font-serif text-[2.5rem] font-semibold text-text-primary leading-tight tracking-[-0.02em] mb-2">Review & Confirm</h1>
-          <p className="font-sans text-[0.95rem] text-text-secondary leading-relaxed mb-12">Please confirm your details before we reserve your archive.</p>
+          <p className="font-sans text-[0.95rem] text-text-secondary leading-relaxed mb-12">Please confirm your details before we reserve your Basalith.</p>
 
           <div className="border border-border-subtle rounded-sm p-8 mb-8 flex flex-col gap-6" style={{ background: 'linear-gradient(160deg,#1D1D20,#17171A)' }}>
             <div>
@@ -77,7 +77,7 @@ export default function ReviewPage() {
             <div>
               <p className="eyebrow !text-[0.62rem] mb-1">One-Time Founding Fee</p>
               <p className="font-serif text-[1.25rem] font-semibold text-text-primary">$2,500</p>
-              <p className="font-sans text-[0.8rem] text-text-muted">Due at archive setup</p>
+              <p className="font-sans text-[0.8rem] text-text-muted">Due when your Basalith is set up</p>
             </div>
             <div className="h-px bg-border-subtle" />
             <div>
@@ -118,7 +118,7 @@ export default function ReviewPage() {
                   Submitting…
                 </>
               ) : (
-                'Reserve Your Archive →'
+                'Reserve your Basalith →'
               )}
             </button>
           </div>

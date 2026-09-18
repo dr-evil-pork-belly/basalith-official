@@ -114,8 +114,8 @@ export const buildArchiveExportJob = inngest.createFunction(
           await resend.emails.send({
             from:    RESEND_FROM,
             to:      a.owner_email,
-            subject: buildExportFailedSubject(a.name ?? 'Your archive'),
-            html:    buildExportFailedEmail(a.owner_name?.split(' ')[0] ?? 'there', a.name ?? 'Your archive'),
+            subject: buildExportFailedSubject(a.name ?? 'Your Basalith'),
+            html:    buildExportFailedEmail(a.owner_name?.split(' ')[0] ?? 'there', a.name ?? 'Your Basalith'),
           })
         } catch (e) {
           console.error(`[export ${exportId}] owner failure notice did not send:`, e)

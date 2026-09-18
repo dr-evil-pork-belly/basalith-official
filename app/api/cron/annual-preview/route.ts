@@ -40,7 +40,7 @@ async function generateConversation(
         role:    'user',
         content: `Generate a simulated conversation between a future grandchild and this person's entity.
 
-The grandchild is asking something meaningful — not factual, but personal.
+The grandchild is asking something meaningful: not factual, but personal.
 
 Recent deposits for context (to make the answer feel specific to this person):
 ${recentPrompts.slice(0, 6).join('\n')}
@@ -49,7 +49,7 @@ Format exactly as:
 Grandchild: "[a personal, specific question]"
 Entity: "[answer in first person, drawing from the context above]"
 
-Keep it under 150 words total. Make it feel real and moving. The answer should feel genuinely like this specific person — not generic wisdom.`,
+Keep it under 150 words total. Make it feel real and moving. The answer should feel genuinely like this specific person, not generic wisdom.`,
       }],
     })
     return res.content[0].type === 'text' ? res.content[0].text.trim() : ''
@@ -80,7 +80,7 @@ function buildAnnualPreviewEmail(
   <div style="padding:32px">
     <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#B8B4AB;margin:0 0 24px">${firstName},</p>
     <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#B8B4AB;line-height:1.7;margin:0 0 8px">
-      Your archive is ${archiveYears} year${archiveYears !== 1 ? 's' : ''} old.
+      Your Basalith is ${archiveYears} year${archiveYears !== 1 ? 's' : ''} old.
     </p>
     <p style="font-family:Georgia,serif;font-size:16px;font-weight:300;font-style:italic;color:#706C65;line-height:1.7;margin:0 0 32px">
       Here is a conversation your grandchildren might have with your entity someday.
@@ -93,18 +93,18 @@ function buildAnnualPreviewEmail(
     <div style="height:1px;background:rgba(196,162,74,0.15);margin:0 0 28px"></div>
 
     <p style="font-family:Georgia,serif;font-size:15px;font-weight:300;color:#706C65;line-height:1.8;margin:0 0 8px">
-      This is based on what the archive knows today.
+      This is based on what is on the record today.
     </p>
     <p style="font-family:Georgia,serif;font-size:15px;font-weight:300;color:#706C65;line-height:1.8;margin:0 0 32px">
       The more you add the more accurately it speaks.
     </p>
 
     <p style="font-family:Georgia,serif;font-size:16px;font-weight:300;font-style:italic;color:#B8B4AB;line-height:1.8;margin:0 0 32px">
-      What would you want them to know that is not yet in your archive?
+      What would you want them to know that is not yet on the record?
     </p>
 
     <a href="${portalUrl}" style="display:inline-block;background:#C4A24A;color:#0A0908;font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;text-decoration:none;padding:14px 28px;border-radius:2px">
-      ADD TO YOUR ARCHIVE →
+      ADD TO YOUR BASALITH →
     </a>
   </div>
 

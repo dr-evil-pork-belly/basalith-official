@@ -83,7 +83,7 @@ function buildConfirmationEmail(
     "${replyText.substring(0, 200)}${replyText.length > 200 ? '…' : ''}"
   </blockquote>
   <p style="font-size:14px;font-style:italic;color:#706C65;line-height:1.6">
-    This photograph now has ${replyCount} ${replyCount === 1 ? 'memory' : 'memories'}. The archive is growing.
+    This photograph now has ${replyCount} ${replyCount === 1 ? 'memory' : 'memories'}. The record is growing.
   </p>
   <hr style="border:none;border-top:1px solid rgba(240,237,230,0.06);margin:24px 0">
   <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8">
@@ -142,7 +142,7 @@ export async function ingestPhotoReply(input: {
     const aiResponse = await anthropic.messages.create({
       model:      'claude-sonnet-4-6',
       max_tokens: 500,
-      system:     `You parse family archive replies about photographs. Extract structured information from conversational text. Return ONLY valid JSON. No other text.`,
+      system:     `You parse replies from family members about photographs. Extract structured information from conversational text. Return ONLY valid JSON. No other text.`,
       messages: [{
         role:    'user',
         content: `Parse this reply about a family photograph:\n\n"${replyText}"\n\nReturn JSON:\n{\n  "people_mentioned": ["name1"],\n  "year_estimate": "1962" or null,\n  "location_mentioned": "place" or null,\n  "story_extracted": "the core memory in their words",\n  "legacy_note": "what they want remembered" or null\n}`,
@@ -214,7 +214,7 @@ export async function ingestPhotoReply(input: {
     .maybeSingle()
   if (archiveErr) return { status: 'error', message: `archives read failed: ${archiveErr.message}` }
 
-  const archiveName = archive?.name ?? 'The Archive'
+  const archiveName = archive?.name ?? 'Basalith'
 
   // The reply is already saved. A confirmation that fails to send is worth
   // logging, but it must not turn a successful save into a reported failure.

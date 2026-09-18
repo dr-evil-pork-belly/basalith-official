@@ -46,7 +46,7 @@ const STEPS = [
   {
     n:     '01',
     title: 'The Founding.',
-    body:  'Three of the hardest calls they ever made, in their own words, in their own time. Speak or type, about ten minutes each. Not an interview. The first deposits in the archive, and the way they think, already showing.',
+    body:  'Three of the hardest calls they ever made, in their own words, in their own time. Speak or type, about ten minutes each. Not an interview. The first deposits on the record, and the way they think, already showing.',
   },
   {
     n:     '02',
@@ -56,17 +56,17 @@ const STEPS = [
   {
     n:     '03',
     title: 'The check.',
-    body:  'Every response is scored before it can shape the model. Lower-confidence responses get a closer pass. The archive reflects how the person actually reasoned.',
+    body:  'Every response is scored before it can shape the model. Lower-confidence responses get a closer pass. Their Basalith reflects how the person actually reasoned.',
   },
   {
     n:     '04',
     title: 'Presence.',
-    body:  'The people who rely on them can ask the archive for that judgment, long after the person has stepped back. Where they never took a position, it is built to say so rather than guess.',
+    body:  'The people who rely on them can ask their Basalith for that judgment, long after the person has stepped back. Where they never took a position, it is built to say so rather than guess.',
   },
 ]
 
 const SUBJECTS = [
-  { who: 'Yourself',              body: 'While your thinking is at its sharpest and you can shape the archive yourself.' },
+  { who: 'Yourself',              body: 'While your thinking is at its sharpest and you can shape your Basalith yourself.' },
   { who: 'A parent',             body: 'So the way they reason stays within reach of the people who rely on it.' },
   { who: 'A grandparent',        body: 'Whose memory is the family&rsquo;s first history.' },
   { who: 'A spouse or partner',  body: 'So their counsel stays part of how the family decides.' },
@@ -75,19 +75,19 @@ const SUBJECTS = [
 const TRUST = [
   {
     title: 'Built while they are here.',
-    body:  'The archive is captured while the person is present and fully participating. This is why the method matters, and why now matters.',
+    body:  'A Basalith is built while the person is present and fully participating. This is why the method matters, and why now matters.',
   },
   {
     title: 'Only ever them.',
-    body:  'Every model is trained only on one person&rsquo;s deposits. No general AI speaks for the archive.',
+    body:  'Every model is trained only on one person&rsquo;s deposits. No general AI speaks for the record.',
   },
   {
     title: 'Never shared. Never sold.',
-    body:  'The archive is never shared, sold, or used to train another company&rsquo;s model.',
+    body:  'Your Basalith is never shared, sold, or used to train another company&rsquo;s model.',
   },
   {
     title: 'The family owns it.',
-    body:  'You own the archive and can export all of it at any time. Nothing is stranded if we ever close.',
+    body:  'You own your Basalith and can export all of it at any time. Nothing is stranded if we ever close.',
   },
 ]
 
@@ -135,7 +135,7 @@ export default function FamiliesPage() {
                 transition:     'background 250ms ease',
               }}
             >
-              Begin a family archive
+              Begin a family Basalith
             </Link>
             <Link href="/pricing" style={{ ...MONO, fontSize: '0.46rem', color: 'var(--color-gold)', textDecoration: 'none' }}>
               See pricing <span aria-hidden="true">&rarr;</span>
@@ -199,7 +199,7 @@ export default function FamiliesPage() {
                 Built from them, not about them
               </p>
               <p style={{ ...GEORGIA, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: ON_DARK_2, margin: 0 }}>
-                An archive built from the person is not the same as an archive built about them. The difference can only come from the person, while they are here to give it and to correct it.
+                A Basalith built from the person is not the same as one built about them. The difference can only come from the person, while they are here to give it and to correct it.
               </p>
             </div>
           </div>
@@ -209,7 +209,7 @@ export default function FamiliesPage() {
         <section style={{ padding: `clamp(72px,9vw,110px) ${PAD}`, borderTop: RULE }}>
           <div style={{ maxWidth: '760px', margin: '0 auto' }}>
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '48px' }}>
-              How the archive is built
+              How a Basalith is built
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
               {STEPS.map(({ n, title, body }) => (
@@ -238,7 +238,7 @@ export default function FamiliesPage() {
               marginBottom:  '48px',
               maxWidth:      '720px',
             }}>
-              An archive can be built for anyone whose way of thinking is worth keeping.
+              A Basalith can be built for anyone whose way of thinking is worth keeping.
             </h2>
             <div className="families-subjects" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px 24px' }}>
               {SUBJECTS.map(({ who, body }) => (
@@ -296,10 +296,10 @@ export default function FamiliesPage() {
                 transition:     'background 250ms ease',
               }}
             >
-              Begin a family archive
+              Begin a family Basalith
             </Link>
             <p style={{ ...GEORGIA, fontSize: '0.95rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: ON_DARK_3, margin: '28px 0 0' }}>
-              Personal archives are accepted by application. We review every one ourselves.
+              A personal Basalith is accepted by application. We review every one ourselves.
               {' '}
               <Link href="/pricing" style={{ color: 'var(--color-gold)', textDecoration: 'none' }}>
                 See pricing <span aria-hidden="true">&rarr;</span>

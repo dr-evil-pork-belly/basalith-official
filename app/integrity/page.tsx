@@ -5,7 +5,7 @@ import Footer from '../components/Footer'
 
 export const metadata: Metadata = {
   title:       'The Integrity Promise · Basalith',
-  description: 'Your archive is yours. Forever. Without exception. What happens to it while you are alive, after you pass, and if we ever close our doors.',
+  description: 'Your Basalith is yours. Forever. Without exception. What happens to it while you are alive, after you pass, and if we ever close our doors.',
 }
 
 const SERIF: React.CSSProperties = {
@@ -36,16 +36,16 @@ const H2: React.CSSProperties = {
 
 const DATA_CARDS = [
   {
-    headline: 'We never use your archive to train other people\'s entities.',
-    body:     'What you deposit trains your entity. It does not make anyone else\'s entity smarter. Your memories stay in your archive.',
+    headline: 'We never use your record to train other people\'s entities.',
+    body:     'What you deposit trains your entity. It does not make anyone else\'s entity smarter. Your memories stay in your Basalith.',
   },
   {
     headline: 'You can take everything with you.',
-    body:     'At any time, for any reason, you can download your complete archive. Every deposit, every voice recording, and every photograph, in formats you can open on any device.',
+    body:     'At any time, for any reason, you can download your Basalith in full. Every deposit, every voice recording, and every photograph, in formats you can open on any device.',
   },
   {
-    headline: 'We will never sell your archive.',
-    body:     'Not to advertisers. Not to a data broker. Not as part of a bankruptcy or acquisition. Your archive is not an asset we own. It is yours, and we are its custodian.',
+    headline: 'We will never sell your Basalith.',
+    body:     'Not to advertisers. Not to a data broker. Not as part of a bankruptcy or acquisition. Your Basalith is not an asset we own. It is yours, and we are its custodian.',
   },
 ]
 
@@ -69,12 +69,12 @@ export default function IntegrityPage() {
             color:         'var(--color-text-primary)',
             marginBottom:  '32px',
           }}>
-            Your archive is yours.
+            Your Basalith is yours.
             <br />
             <em style={{ fontStyle: 'italic', color: 'var(--color-gold)' }}>Forever. Without exception.</em>
           </h1>
           <p style={{ ...BODY, fontSize: '1.2rem', maxWidth: '560px' }}>
-            Here is exactly what happens to your archive while you are alive, after you pass,
+            Here is exactly what happens to your Basalith while you are alive, after you pass,
             and if we ever close our doors. No legal language. Nothing we cannot point to.
           </p>
         </section>
@@ -93,7 +93,7 @@ export default function IntegrityPage() {
               When you pass your Cognitive Fingerprint Layer is permanently frozen at the database level.
             </p>
             <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>
-              Not locked behind a paywall. Not archived in a format no one can access.
+              Not locked behind a paywall. Not stored away in a format no one can access.
             </p>
             <p style={{ ...BODY, color: 'rgba(250,248,244,0.9)', fontStyle: 'italic' }}>
               Frozen.
@@ -158,9 +158,9 @@ export default function IntegrityPage() {
               If Heritage Nexus Inc. ever faces dissolution we commit to three things:
             </p>
             {[
-              'You own your archive. Heritage Nexus is the custodian, not the owner. Closing the company does not change who it belongs to.',
-              'Full export at any time. You can download the complete archive in open formats whenever you ask, so a closure never strands your data.',
-              'No sale of archive data. Your memories are not a corporate asset we can liquidate. They are yours.',
+              'You own your Basalith. Heritage Nexus is the custodian, not the owner. Closing the company does not change who it belongs to.',
+              'Full export at any time. You can download your Basalith in full, in open formats, whenever you ask, so a closure never strands your data.',
+              'No sale of your data. Your memories are not a corporate asset we can liquidate. They are yours.',
             ].map((item, i) => (
               <div key={i} style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
                 <span style={{ ...MONO, fontSize: '0.52rem', color: 'var(--color-gold)', paddingTop: '5px', flexShrink: 0 }}>0{i + 1}</span>
@@ -168,7 +168,7 @@ export default function IntegrityPage() {
               </div>
             ))}
             <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)', marginTop: '24px' }}>
-              We cannot promise we will exist forever. We can promise the archive is always
+              We cannot promise we will exist forever. We can promise your Basalith is always
               yours to hold, in full, in formats you can take anywhere.
             </p>
           </div>
@@ -194,10 +194,10 @@ export default function IntegrityPage() {
               <div style={{ border: '1px solid rgba(196,162,74,0.3)', padding: 'clamp(24px,3vw,36px)', background: 'rgba(196,162,74,0.03)' }}>
                 <p style={{ ...MONO, fontSize: '0.48rem', color: 'var(--color-gold-on-light)', marginBottom: '16px' }}>The Voice Layer</p>
                 <p style={{ ...BODY, margin: 0 }}>
-                  As your archive grows a second system learns how you say things: your phrasing,
+                  As your record grows a second system learns how you say things: your phrasing,
                   your characteristic way of expressing uncertainty, the specific words you reach for.
                   <br /><br />
-                  This is why, as the archive deepens, the entity starts to sound like you and not just report on you.
+                  This is why, as the record deepens, the entity starts to sound like you and not just report on you.
                 </p>
               </div>
             </div>
@@ -215,7 +215,7 @@ export default function IntegrityPage() {
             </p>
             <h2 style={{ ...H2, color: 'rgba(250,248,244,0.9)' }}>The trust of our truth.</h2>
             <p style={{ ...BODY, color: 'rgba(250,248,244,0.62)' }}>
-              I ran The Founding on my own archive before anyone else did. What hit home
+              I ran The Founding on my own Basalith before anyone else did. What hit home
               was not the answer that read like my own thinking, word for word. It was the
               question it declined. It gave me a rule I had actually laid down, then said
               I had left no position on the rest and it would not manufacture one. It does
