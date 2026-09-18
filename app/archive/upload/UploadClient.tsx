@@ -261,26 +261,26 @@ export default function UploadClient({ archiveId }: Props) {
   ]
 
   return (
-    <div className="min-h-screen bg-obsidian text-white-ghost">
+    <div className="min-h-full text-[var(--portal-ink)]">
       <div className="max-w-3xl mx-auto px-6 py-12">
 
         {/* Header */}
         <div className="mb-10">
-          <p className="font-compute text-xs tracking-widest text-gold/60 uppercase mb-2">Archive</p>
-          <h1 className="font-legacy text-4xl text-white-ghost mb-2">Upload</h1>
-          <p className="font-compute text-xs text-white-ghost/40">Add to your archive: photographs, documents, videos, or voice recordings.</p>
+          <p className="font-compute text-xs tracking-widest text-[var(--portal-gold-ink)] uppercase mb-2">Archive</p>
+          <h1 className="font-legacy text-4xl text-[var(--portal-ink)] mb-2">Upload</h1>
+          <p className="font-compute text-xs text-[var(--portal-secondary)]">Add to your archive: photographs, documents, videos, or voice recordings.</p>
         </div>
 
         {/* Section tabs */}
-        <div className="flex gap-1 mb-8 border border-white/5 rounded p-1 bg-monolith">
+        <div className="flex gap-1 mb-8 border border-[var(--portal-rule)] rounded p-1 bg-[var(--portal-card)]">
           {sections.map(s => (
             <button
               key={s.key}
               onClick={() => setActiveSection(s.key)}
               className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded font-compute text-xs tracking-wider transition-all ${
                 activeSection === s.key
-                  ? 'bg-gold/10 text-gold border border-gold/20'
-                  : 'text-white-ghost/40 hover:text-white-ghost/70'
+                  ? 'bg-[var(--portal-tint)] text-[var(--portal-gold-ink)] border border-[var(--portal-gold-line)]'
+                  : 'text-[var(--portal-secondary)] hover:text-[var(--portal-body)]'
               }`}
             >
               {s.icon}
@@ -294,18 +294,18 @@ export default function UploadClient({ archiveId }: Props) {
           <div className="space-y-6">
 
             {/* Photo redirect notice */}
-            <div style={{ background: 'rgba(196,162,74,0.06)', border: '1px solid rgba(196,162,74,0.2)', padding: '1rem 1.5rem' }}>
-              <p className="font-legacy text-base italic mb-1" style={{ color: '#F0EDE6' }}>
+            <div style={{ background: 'var(--portal-gold-wash)', border: '1px solid var(--portal-gold-line)', padding: '1rem 1.5rem' }}>
+              <p className="font-legacy text-base italic mb-1" style={{ color: 'var(--portal-ink)' }}>
                 Uploading photos?
               </p>
-              <p className="font-legacy text-base italic mb-4" style={{ color: 'rgba(240,237,230,0.55)' }}>
+              <p className="font-legacy text-base italic mb-4" style={{ color: 'var(--portal-ink)' }}>
                 Photos are uploaded through the Label section in your sidebar.
                 This page is for videos, letters, and documents only.
               </p>
               <a
                 href="/archive/label"
                 className="inline-block font-compute text-xs tracking-widest no-underline"
-                style={{ background: '#C4A24A', color: '#0A0908', padding: '0.5rem 1.25rem' }}
+                style={{ background: 'var(--portal-btn)', color: 'var(--portal-btn-label)', padding: '0.5rem 1.25rem' }}
               >
                 GO TO PHOTO UPLOAD →
               </a>
@@ -313,7 +313,7 @@ export default function UploadClient({ archiveId }: Props) {
 
             <div
               className={`border-2 border-dashed rounded-lg p-12 text-center cursor-pointer transition-colors ${
-                dragging ? 'border-gold/60 bg-gold/5' : 'border-white/10 hover:border-white/20'
+                dragging ? 'border-[var(--portal-gold-ink)] bg-[var(--portal-tint)]' : 'border-[var(--portal-card-line)] hover:border-[var(--portal-card-line)]'
               }`}
               onDragOver={e => { e.preventDefault(); setDragging(true) }}
               onDragLeave={() => setDragging(false)}
@@ -332,12 +332,12 @@ export default function UploadClient({ archiveId }: Props) {
                   e.target.value = ''
                 }}
               />
-              <svg className="mx-auto mb-3 text-white/20" width="40" height="40" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+              <svg className="mx-auto mb-3 text-[var(--portal-label)]" width="40" height="40" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                 <rect x="3" y="5" width="18" height="14" rx="2"/>
                 <circle cx="12" cy="12" r="3"/>
                 <path d="M9 5l1.5-2h3L15 5"/>
               </svg>
-              <p className="font-compute text-xs text-white-ghost/40 tracking-wider">
+              <p className="font-compute text-xs text-[var(--portal-secondary)] tracking-wider">
                 {photoFiles.length ? `${photoFiles.length} file(s) selected` : 'DROP PHOTOS OR CLICK TO SELECT'}
               </p>
             </div>
@@ -345,11 +345,11 @@ export default function UploadClient({ archiveId }: Props) {
             {photoFiles.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {photoFiles.map((f, i) => (
-                  <div key={i} className="flex items-center gap-2 bg-monolith border border-white/5 rounded px-3 py-1.5">
-                    <span className="font-compute text-xs text-white-ghost/60 max-w-32 truncate">{f.name}</span>
+                  <div key={i} className="flex items-center gap-2 bg-[var(--portal-card)] border border-[var(--portal-rule)] rounded px-3 py-1.5">
+                    <span className="font-compute text-xs text-[var(--portal-secondary)] max-w-32 truncate">{f.name}</span>
                     <button
                       onClick={() => setPhotoFiles(prev => prev.filter((_, j) => j !== i))}
-                      className="text-white/30 hover:text-white/60"
+                      className="text-[var(--portal-label)] hover:text-[var(--portal-secondary)]"
                     >×</button>
                   </div>
                 ))}
@@ -363,7 +363,7 @@ export default function UploadClient({ archiveId }: Props) {
             <button
               onClick={uploadPhotographs}
               disabled={!photoFiles.length || photoUpload.status === 'uploading'}
-              className="w-full py-3 font-compute text-xs tracking-widest border border-gold/30 text-gold rounded hover:bg-gold/5 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              className="w-full py-3 font-compute text-xs tracking-widest border border-[var(--portal-gold-line)] text-[var(--portal-gold-ink)] rounded hover:bg-[var(--portal-tint)] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
             >
               UPLOAD {photoFiles.length > 0 ? `${photoFiles.length} PHOTO${photoFiles.length > 1 ? 'S' : ''}` : 'PHOTOGRAPHS'}
             </button>
@@ -375,7 +375,7 @@ export default function UploadClient({ archiveId }: Props) {
           <div className="space-y-5">
             <div
               className={`border-2 border-dashed rounded-lg p-10 text-center cursor-pointer transition-colors ${
-                dragging ? 'border-gold/60 bg-gold/5' : 'border-white/10 hover:border-white/20'
+                dragging ? 'border-[var(--portal-gold-ink)] bg-[var(--portal-tint)]' : 'border-[var(--portal-card-line)] hover:border-[var(--portal-card-line)]'
               }`}
               onDragOver={e => { e.preventDefault(); setDragging(true) }}
               onDragLeave={() => setDragging(false)}
@@ -389,32 +389,32 @@ export default function UploadClient({ archiveId }: Props) {
                 className="hidden"
                 onChange={e => { const f = e.target.files?.[0]; if (f) setDocFile(f); e.target.value = '' }}
               />
-              <svg className="mx-auto mb-3 text-white/20" width="40" height="40" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+              <svg className="mx-auto mb-3 text-[var(--portal-label)]" width="40" height="40" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                 <path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
               </svg>
-              <p className="font-compute text-xs text-white-ghost/40 tracking-wider">
+              <p className="font-compute text-xs text-[var(--portal-secondary)] tracking-wider">
                 {docFile ? docFile.name : 'DROP FILE OR CLICK TO SELECT'}
               </p>
-              <p className="font-compute text-xs text-white-ghost/25 mt-1">PDF · TXT · DOC · DOCX · Image</p>
+              <p className="font-compute text-xs text-[var(--portal-label)] mt-1">PDF · TXT · DOC · DOCX · Image</p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="font-compute text-xs text-white-ghost/40 tracking-wider block mb-1.5">DOCUMENT TYPE</label>
+                <label className="font-compute text-xs text-[var(--portal-secondary)] tracking-wider block mb-1.5">DOCUMENT TYPE</label>
                 <select
                   value={docType}
                   onChange={e => setDocType(e.target.value)}
-                  className="w-full bg-monolith border border-white/10 rounded px-3 py-2 font-compute text-xs text-white-ghost focus:outline-none focus:border-gold/30"
+                  className="w-full bg-[var(--portal-card)] border border-[var(--portal-card-line)] rounded px-3 py-2 font-compute text-xs text-[var(--portal-ink)] focus:outline-none focus:border-[var(--portal-gold-ink)]"
                 >
                   {DOCUMENT_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
                 </select>
               </div>
               <div>
-                <label className="font-compute text-xs text-white-ghost/40 tracking-wider block mb-1.5">APPROXIMATE DECADE</label>
+                <label className="font-compute text-xs text-[var(--portal-secondary)] tracking-wider block mb-1.5">APPROXIMATE DECADE</label>
                 <select
                   value={docDecade}
                   onChange={e => setDocDecade(e.target.value)}
-                  className="w-full bg-monolith border border-white/10 rounded px-3 py-2 font-compute text-xs text-white-ghost focus:outline-none focus:border-gold/30"
+                  className="w-full bg-[var(--portal-card)] border border-[var(--portal-card-line)] rounded px-3 py-2 font-compute text-xs text-[var(--portal-ink)] focus:outline-none focus:border-[var(--portal-gold-ink)]"
                 >
                   <option value="">Unknown</option>
                   {DECADES.map(d => <option key={d} value={d}>{d}</option>)}
@@ -423,24 +423,24 @@ export default function UploadClient({ archiveId }: Props) {
             </div>
 
             <div>
-              <label className="font-compute text-xs text-white-ghost/40 tracking-wider block mb-1.5">TITLE (optional, AI will generate if blank)</label>
+              <label className="font-compute text-xs text-[var(--portal-secondary)] tracking-wider block mb-1.5">TITLE (optional, AI will generate if blank)</label>
               <input
                 type="text"
                 value={docTitle}
                 onChange={e => setDocTitle(e.target.value)}
                 placeholder="e.g. Letter to grandmother, 1962"
-                className="w-full bg-monolith border border-white/10 rounded px-3 py-2 font-compute text-xs text-white-ghost placeholder-white/20 focus:outline-none focus:border-gold/30"
+                className="w-full bg-[var(--portal-card)] border border-[var(--portal-card-line)] rounded px-3 py-2 font-compute text-xs text-[var(--portal-ink)] placeholder-[var(--portal-label)] focus:outline-none focus:border-[var(--portal-gold-ink)]"
               />
             </div>
 
             <div>
-              <label className="font-compute text-xs text-white-ghost/40 tracking-wider block mb-1.5">WRITTEN BY (optional)</label>
+              <label className="font-compute text-xs text-[var(--portal-secondary)] tracking-wider block mb-1.5">WRITTEN BY (optional)</label>
               <input
                 type="text"
                 value={docCreatedBy}
                 onChange={e => setDocCreatedBy(e.target.value)}
                 placeholder="e.g. Harold Whitmore"
-                className="w-full bg-monolith border border-white/10 rounded px-3 py-2 font-compute text-xs text-white-ghost placeholder-white/20 focus:outline-none focus:border-gold/30"
+                className="w-full bg-[var(--portal-card)] border border-[var(--portal-card-line)] rounded px-3 py-2 font-compute text-xs text-[var(--portal-ink)] placeholder-[var(--portal-label)] focus:outline-none focus:border-[var(--portal-gold-ink)]"
               />
             </div>
 
@@ -451,12 +451,12 @@ export default function UploadClient({ archiveId }: Props) {
             <button
               onClick={uploadDocument}
               disabled={!docFile || docUpload.status === 'uploading'}
-              className="w-full py-3 font-compute text-xs tracking-widest border border-gold/30 text-gold rounded hover:bg-gold/5 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              className="w-full py-3 font-compute text-xs tracking-widest border border-[var(--portal-gold-line)] text-[var(--portal-gold-ink)] rounded hover:bg-[var(--portal-tint)] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
             >
               {docUpload.status === 'uploading' ? 'PROCESSING…' : 'PROCESS DOCUMENT'}
             </button>
 
-            <p className="font-compute text-xs text-white-ghost/25 text-center">
+            <p className="font-compute text-xs text-[var(--portal-label)] text-center">
               Handwritten images are transcribed via AI vision. PDFs and text files are read directly.
             </p>
           </div>
@@ -467,7 +467,7 @@ export default function UploadClient({ archiveId }: Props) {
           <div className="space-y-5">
             <div
               className={`border-2 border-dashed rounded-lg p-10 text-center cursor-pointer transition-colors ${
-                dragging ? 'border-gold/60 bg-gold/5' : 'border-white/10 hover:border-white/20'
+                dragging ? 'border-[var(--portal-gold-ink)] bg-[var(--portal-tint)]' : 'border-[var(--portal-card-line)] hover:border-[var(--portal-card-line)]'
               }`}
               onDragOver={e => { e.preventDefault(); setDragging(true) }}
               onDragLeave={() => setDragging(false)}
@@ -481,32 +481,32 @@ export default function UploadClient({ archiveId }: Props) {
                 className="hidden"
                 onChange={e => { const f = e.target.files?.[0]; if (f) setVideoFile(f); e.target.value = '' }}
               />
-              <svg className="mx-auto mb-3 text-white/20" width="40" height="40" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+              <svg className="mx-auto mb-3 text-[var(--portal-label)]" width="40" height="40" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                 <polygon points="5 3 19 12 5 21 5 3"/>
               </svg>
-              <p className="font-compute text-xs text-white-ghost/40 tracking-wider">
+              <p className="font-compute text-xs text-[var(--portal-secondary)] tracking-wider">
                 {videoFile ? `${videoFile.name} (${(videoFile.size / 1024 / 1024).toFixed(0)} MB)` : 'DROP VIDEO OR CLICK TO SELECT'}
               </p>
-              <p className="font-compute text-xs text-white-ghost/25 mt-1">MP4 · MOV · AVI · MKV · WEBM · max 500MB</p>
+              <p className="font-compute text-xs text-[var(--portal-label)] mt-1">MP4 · MOV · AVI · MKV · WEBM · max 500MB</p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="font-compute text-xs text-white-ghost/40 tracking-wider block mb-1.5">VIDEO TYPE</label>
+                <label className="font-compute text-xs text-[var(--portal-secondary)] tracking-wider block mb-1.5">VIDEO TYPE</label>
                 <select
                   value={videoType}
                   onChange={e => setVideoType(e.target.value)}
-                  className="w-full bg-monolith border border-white/10 rounded px-3 py-2 font-compute text-xs text-white-ghost focus:outline-none focus:border-gold/30"
+                  className="w-full bg-[var(--portal-card)] border border-[var(--portal-card-line)] rounded px-3 py-2 font-compute text-xs text-[var(--portal-ink)] focus:outline-none focus:border-[var(--portal-gold-ink)]"
                 >
                   {VIDEO_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
                 </select>
               </div>
               <div>
-                <label className="font-compute text-xs text-white-ghost/40 tracking-wider block mb-1.5">APPROXIMATE DECADE</label>
+                <label className="font-compute text-xs text-[var(--portal-secondary)] tracking-wider block mb-1.5">APPROXIMATE DECADE</label>
                 <select
                   value={videoDecade}
                   onChange={e => setVideoDecade(e.target.value)}
-                  className="w-full bg-monolith border border-white/10 rounded px-3 py-2 font-compute text-xs text-white-ghost focus:outline-none focus:border-gold/30"
+                  className="w-full bg-[var(--portal-card)] border border-[var(--portal-card-line)] rounded px-3 py-2 font-compute text-xs text-[var(--portal-ink)] focus:outline-none focus:border-[var(--portal-gold-ink)]"
                 >
                   <option value="">Unknown</option>
                   {DECADES.map(d => <option key={d} value={d}>{d}</option>)}
@@ -515,24 +515,24 @@ export default function UploadClient({ archiveId }: Props) {
             </div>
 
             <div>
-              <label className="font-compute text-xs text-white-ghost/40 tracking-wider block mb-1.5">TITLE (optional, AI will generate if blank)</label>
+              <label className="font-compute text-xs text-[var(--portal-secondary)] tracking-wider block mb-1.5">TITLE (optional, AI will generate if blank)</label>
               <input
                 type="text"
                 value={videoTitle}
                 onChange={e => setVideoTitle(e.target.value)}
                 placeholder="e.g. Christmas morning 1987"
-                className="w-full bg-monolith border border-white/10 rounded px-3 py-2 font-compute text-xs text-white-ghost placeholder-white/20 focus:outline-none focus:border-gold/30"
+                className="w-full bg-[var(--portal-card)] border border-[var(--portal-card-line)] rounded px-3 py-2 font-compute text-xs text-[var(--portal-ink)] placeholder-[var(--portal-label)] focus:outline-none focus:border-[var(--portal-gold-ink)]"
               />
             </div>
 
             <div>
-              <label className="font-compute text-xs text-white-ghost/40 tracking-wider block mb-1.5">FILMED BY (optional)</label>
+              <label className="font-compute text-xs text-[var(--portal-secondary)] tracking-wider block mb-1.5">FILMED BY (optional)</label>
               <input
                 type="text"
                 value={videoCreatedBy}
                 onChange={e => setVideoCreatedBy(e.target.value)}
                 placeholder="e.g. Harold Whitmore"
-                className="w-full bg-monolith border border-white/10 rounded px-3 py-2 font-compute text-xs text-white-ghost placeholder-white/20 focus:outline-none focus:border-gold/30"
+                className="w-full bg-[var(--portal-card)] border border-[var(--portal-card-line)] rounded px-3 py-2 font-compute text-xs text-[var(--portal-ink)] placeholder-[var(--portal-label)] focus:outline-none focus:border-[var(--portal-gold-ink)]"
               />
             </div>
 
@@ -543,12 +543,12 @@ export default function UploadClient({ archiveId }: Props) {
             <button
               onClick={uploadVideo}
               disabled={!videoFile || videoUpload.status === 'uploading'}
-              className="w-full py-3 font-compute text-xs tracking-widest border border-gold/30 text-gold rounded hover:bg-gold/5 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              className="w-full py-3 font-compute text-xs tracking-widest border border-[var(--portal-gold-line)] text-[var(--portal-gold-ink)] rounded hover:bg-[var(--portal-tint)] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
             >
               {videoUpload.status === 'uploading' ? 'PROCESSING…' : 'UPLOAD & TRANSCRIBE'}
             </button>
 
-            <p className="font-compute text-xs text-white-ghost/25 text-center">
+            <p className="font-compute text-xs text-[var(--portal-label)] text-center">
               Audio is transcribed via Whisper. Language is detected automatically.
             </p>
           </div>
@@ -557,15 +557,15 @@ export default function UploadClient({ archiveId }: Props) {
         {/* VOICE */}
         {activeSection === 'voice' && (
           <div className="text-center py-16">
-            <svg className="mx-auto mb-4 text-white/20" width="48" height="48" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+            <svg className="mx-auto mb-4 text-[var(--portal-label)]" width="48" height="48" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
               <rect x="9" y="2" width="6" height="12" rx="3"/>
               <path d="M5 10a7 7 0 0014 0M12 19v3M8 22h8"/>
             </svg>
-            <p className="font-legacy text-2xl text-white-ghost/60 mb-3">Voice Recording</p>
-            <p className="font-compute text-xs text-white-ghost/30 mb-6">Record your voice directly in the archive.</p>
+            <p className="font-legacy text-2xl text-[var(--portal-secondary)] mb-3">Voice Recording</p>
+            <p className="font-compute text-xs text-[var(--portal-label)] mb-6">Record your voice directly in the archive.</p>
             <a
               href="/archive/voice"
-              className="inline-block px-8 py-3 font-compute text-xs tracking-widest border border-gold/30 text-gold rounded hover:bg-gold/5 transition-colors"
+              className="inline-block px-8 py-3 font-compute text-xs tracking-widest border border-[var(--portal-gold-line)] text-[var(--portal-gold-ink)] rounded hover:bg-[var(--portal-tint)] transition-colors"
             >
               GO TO VOICE RECORDING →
             </a>
@@ -586,7 +586,7 @@ function StatusBanner({ state, onDismiss }: { state: UploadState; onDismiss: () 
     <div className={`flex items-start justify-between gap-3 px-4 py-3 rounded border font-compute text-xs ${
       isError   ? 'bg-red-900/20 border-red-900/30 text-red-300' :
       isSuccess ? 'bg-green-900/20 border-green-900/30 text-green-300' :
-      'bg-gold/5 border-gold/20 text-gold'
+      'bg-[var(--portal-tint)] border-[var(--portal-gold-line)] text-[var(--portal-gold-ink)]'
     }`}>
       <span>{state.message}</span>
       {!isLoading && (

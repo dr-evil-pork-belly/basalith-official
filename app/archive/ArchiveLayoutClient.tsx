@@ -23,16 +23,6 @@ const LABEL: React.CSSProperties = {
 
 type NavItem = { href: string; label: string; hideForSuccession?: boolean }
 
-// TEMPORARY BRIDGE, slice 1 only. Routes not yet moved to stone still carry
-// bone text literals and rely on this layout for their dark ground. Until
-// their slice lands, the content area under those routes keeps the old void
-// so nothing renders bone on stone in production. These are the only hex
-// literals in the file; delete VOID_GROUND, VOID_TEXT and the branch in
-// <main> when slice 3 lands. Slice plan: docs/PORTAL_STONE_SLICE_1_2026-09-18.md.
-const STONE_ROUTES = ['/archive/dashboard', '/archive/founding']
-const VOID_GROUND  = '#0C0B09'
-const VOID_TEXT    = '#F0EDE6'
-
 const PRIMARY_NAV: NavItem[] = [
   { href: '/archive/dashboard',         label: 'Dashboard'         },
   { href: '/archive/founding',          label: 'Founding Sequence' },
@@ -104,8 +94,6 @@ export default function ArchiveLayoutClient({ children, tier }: { children: Reac
   // hideForSuccession flag above, filtered here.
   const isSuccession = tier === 'succession'
   const visible      = (items: NavItem[]) => items.filter(i => !(isSuccession && i.hideForSuccession))
-
-  const onStone = STONE_ROUTES.some(r => pathname === r || pathname.startsWith(r + '/'))
 
   const primaryNav    = visible(PRIMARY_NAV)
   const contributeNav = visible(CONTRIBUTE_NAV)
@@ -256,12 +244,7 @@ export default function ArchiveLayoutClient({ children, tier }: { children: Reac
       )}
 
       {/* Page content */}
-      <main
-        className="portal-main flex-1 md:px-10 px-5 pb-16 md:mt-0 mt-[56px]"
-        style={onStone
-          ? { paddingTop: '40px', minWidth: 0 }
-          : { paddingTop: '40px', minWidth: 0, background: VOID_GROUND, color: VOID_TEXT }}
-      >
+      <main className="portal-main flex-1 md:px-10 px-5 pb-16 md:mt-0 mt-[56px]" style={{ paddingTop: '40px', minWidth: 0 }}>
         {children}
       </main>
 

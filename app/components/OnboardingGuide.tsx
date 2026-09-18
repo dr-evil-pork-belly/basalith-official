@@ -108,24 +108,24 @@ export default function OnboardingGuide({
 
   // Permanently done
   if (dismissed && !reopened) {
-    // If all done — nothing to show
+    // If all done: nothing to show
     if (allDone) return null
     // Minimized state
     return (
       <div
         className="mb-8 flex items-center justify-between rounded-sm px-5 py-3 cursor-pointer"
-        style={{ background: 'rgba(196,162,74,0.04)', border: '1px solid rgba(196,162,74,0.1)', borderTop: '2px solid rgba(196,162,74,0.3)' }}
+        style={{ background: 'var(--portal-gold-wash)', border: '1px solid var(--portal-gold-line)', borderTop: '2px solid var(--portal-gold-line)' }}
         onClick={() => setReopened(true)}
       >
         <div className="flex items-center gap-3">
-          <span style={{ fontFamily: 'monospace', fontSize: '0.42rem', letterSpacing: '0.25em', color: 'rgba(196,162,74,0.7)' }}>
+          <span style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.25em', color: 'var(--portal-gold-ink)' }}>
             GETTING STARTED
           </span>
-          <span style={{ fontFamily: 'monospace', fontSize: '0.4rem', letterSpacing: '0.1em', color: '#5C6166' }}>
+          <span style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.1em', color: 'var(--portal-secondary)' }}>
             {completedCount} of 4 steps complete
           </span>
         </div>
-        <span style={{ fontFamily: 'monospace', fontSize: '0.42rem', letterSpacing: '0.15em', color: 'rgba(196,162,74,0.6)' }}>
+        <span style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.15em', color: 'var(--portal-gold-ink)' }}>
           CONTINUE →
         </span>
       </div>
@@ -136,16 +136,16 @@ export default function OnboardingGuide({
     <div
       className="mb-8 rounded-sm"
       style={{
-        background:  'rgba(196,162,74,0.04)',
-        border:      '1px solid rgba(196,162,74,0.15)',
-        borderTop:   '3px solid #C4A24A',
+        background:  'var(--portal-gold-wash)',
+        border:      '1px solid var(--portal-gold-line)',
+        borderTop:   '3px solid var(--portal-gold-ink)',
         padding:     '1.5rem 2rem',
       }}
     >
       {/* Header row */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-4">
-          <span style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.3em', color: 'rgba(196,162,74,0.9)' }}>
+          <span style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.3em', color: 'var(--portal-gold-ink)' }}>
             GETTING STARTED
           </span>
           {/* Progress pills */}
@@ -158,21 +158,21 @@ export default function OnboardingGuide({
                   height:       '4px',
                   borderRadius: '2px',
                   background:   completion[s.completedWhen as keyof typeof completion]
-                    ? 'rgba(196,162,74,0.8)'
+                    ? 'var(--portal-btn)'
                     : s.number === currentStep.number
-                      ? 'rgba(196,162,74,0.3)'
-                      : 'rgba(255,255,255,0.08)',
+                      ? 'var(--portal-tint)'
+                      : 'var(--portal-inset)',
                 }}
               />
             ))}
           </div>
-          <span style={{ fontFamily: 'monospace', fontSize: '0.4rem', letterSpacing: '0.1em', color: '#5C6166' }}>
+          <span style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.1em', color: 'var(--portal-secondary)' }}>
             {completedCount}/4
           </span>
         </div>
         <button
           onClick={dismiss}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#5C6166', fontSize: '1rem', lineHeight: 1, padding: '2px 4px' }}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--portal-secondary)', fontSize: '1rem', lineHeight: 1, padding: '2px 4px' }}
           aria-label="Dismiss getting started guide"
         >
           ×
@@ -181,36 +181,36 @@ export default function OnboardingGuide({
 
       {showComplete ? (
         <div>
-          <p className="font-serif font-semibold" style={{ fontSize: '1.2rem', color: '#F0EDE6', marginBottom: '0.4rem' }}>
+          <p className="font-serif font-semibold" style={{ fontSize: '1.2rem', color: 'var(--portal-ink)', marginBottom: '0.4rem' }}>
             Your archive is ready.
           </p>
-          <p className="font-serif italic" style={{ fontSize: '0.9rem', color: '#9DA3A8', lineHeight: 1.6 }}>
+          <p className="font-serif italic" style={{ fontSize: '0.9rem', color: 'var(--portal-body)', lineHeight: 1.6 }}>
             The journey begins tonight at 9pm.
           </p>
         </div>
       ) : (
         <div className="flex items-start gap-6">
           <div style={{ flexShrink: 0 }}>
-            <span className="font-serif" style={{ fontSize: '3rem', fontWeight: 700, color: 'rgba(196,162,74,0.25)', lineHeight: 1 }}>
+            <span className="font-serif" style={{ fontSize: '3rem', fontWeight: 700, color: 'var(--portal-gold-ink)', lineHeight: 1 }}>
               {currentStep.number}
             </span>
           </div>
           <div className="flex-1">
-            <p className="font-serif font-bold" style={{ fontSize: '1.15rem', color: '#F0EDE6', marginBottom: '0.4rem' }}>
+            <p className="font-serif font-bold" style={{ fontSize: '1.15rem', color: 'var(--portal-ink)', marginBottom: '0.4rem' }}>
               {currentStep.title}
             </p>
-            <p className="font-serif italic" style={{ fontSize: '0.9rem', color: '#9DA3A8', lineHeight: 1.6, marginBottom: '1rem' }}>
+            <p className="font-serif italic" style={{ fontSize: '0.9rem', color: 'var(--portal-body)', lineHeight: 1.6, marginBottom: '1rem' }}>
               {currentStep.description}
             </p>
             <Link
               href={currentStep.buttonHref}
               className="no-underline inline-block"
               style={{
-                fontFamily:    'monospace',
-                fontSize:      '0.44rem',
+                fontFamily: 'var(--portal-mono)',
+                fontSize: '11px',
                 letterSpacing: '0.25em',
-                color:         '#0A0908',
-                background:    '#C4A24A',
+                color:         'var(--portal-btn-label)',
+                background:    'var(--portal-btn)',
                 padding:       '0.55rem 1.25rem',
                 borderRadius:  '2px',
               }}
@@ -222,7 +222,7 @@ export default function OnboardingGuide({
             {completedCount > 0 && (
               <div className="flex flex-wrap gap-3 mt-3">
                 {STEPS.filter(s => completion[s.completedWhen as keyof typeof completion]).map(s => (
-                  <span key={s.number} style={{ fontFamily: 'monospace', fontSize: '0.38rem', letterSpacing: '0.1em', color: 'rgba(196,162,74,0.6)' }}>
+                  <span key={s.number} style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.1em', color: 'var(--portal-gold-ink)' }}>
                     ✓ {s.title}
                   </span>
                 ))}

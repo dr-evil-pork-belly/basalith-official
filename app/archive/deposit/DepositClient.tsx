@@ -64,13 +64,13 @@ export default function DepositClient({ archiveId }: { archiveId: string }) {
   if (submitted) {
     return (
       <div className="max-w-2xl mx-auto pt-16 text-center">
-        <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.8)', marginBottom: '1rem' }}>
+        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '1rem' }}>
           SAVED TO ARCHIVE
         </p>
-        <p className="font-serif italic" style={{ fontSize: '1.3rem', color: '#F0EDE6', lineHeight: 1.6 }}>
+        <p className="font-serif italic" style={{ fontSize: '1.3rem', color: 'var(--portal-ink)', lineHeight: 1.6 }}>
           Your memory has been preserved.
         </p>
-        <p className="font-sans text-[0.72rem] mt-3" style={{ color: '#5C6166' }}>Returning to your archive…</p>
+        <p className="font-sans text-[15px] mt-3" style={{ color: 'var(--portal-secondary)' }}>Returning to your archive…</p>
       </div>
     )
   }
@@ -79,19 +79,19 @@ export default function DepositClient({ archiveId }: { archiveId: string }) {
     <div className="max-w-2xl mx-auto">
 
       <div className="mb-10">
-        <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.7)', marginBottom: '0.5rem' }}>
+        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '0.5rem' }}>
           Add Your Memory
         </p>
-        <h1 className="font-serif font-semibold tracking-[-0.025em]" style={{ fontSize: 'clamp(1.8rem,3.5vw,2.8rem)', color: '#F0EDE6' }}>
+        <h1 className="font-serif font-semibold tracking-[-0.025em]" style={{ fontSize: 'clamp(1.8rem,3.5vw,2.8rem)', color: 'var(--portal-ink)' }}>
           What do you remember?
         </h1>
       </div>
 
       {/* Photograph */}
       {loading ? (
-        <div className="w-full rounded-sm mb-8" style={{ height: '280px', background: 'rgba(255,255,255,0.04)', animation: 'mysteryGlowPulse 1.8s ease-in-out infinite' }} />
+        <div className="w-full rounded-sm mb-8" style={{ height: '280px', background: 'var(--portal-inset)', animation: 'mysteryGlowPulse 1.8s ease-in-out infinite' }} />
       ) : photoUrl ? (
-        <div className="mb-8 rounded-sm overflow-hidden border" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+        <div className="mb-8 rounded-sm overflow-hidden border" style={{ borderColor: 'var(--portal-rule)' }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={photoUrl} alt="Archive photograph" className="w-full h-auto block" style={{ maxHeight: '420px', objectFit: 'cover' }} />
         </div>
@@ -99,18 +99,18 @@ export default function DepositClient({ archiveId }: { archiveId: string }) {
 
       {/* What contributors remembered */}
       {labels.length > 0 && (
-        <div className="mb-8 rounded-sm border px-6 py-6" style={{ background: '#111112', borderColor: 'rgba(255,255,255,0.06)' }}>
-          <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#5C6166', marginBottom: '1rem' }}>
+        <div className="mb-8 rounded-sm border px-6 py-6" style={{ background: 'var(--portal-card)', borderColor: 'var(--portal-rule)' }}>
+          <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--portal-secondary)', marginBottom: '1rem' }}>
             What others remembered
           </p>
           <div className="flex flex-col gap-4">
             {labels.map(l => (
               <div key={l.id}>
-                <p className="font-serif italic leading-[1.7]" style={{ fontSize: '0.95rem', color: '#B8B4AB' }}>
+                <p className="font-serif italic leading-[1.7]" style={{ fontSize: '0.95rem', color: 'var(--portal-body)' }}>
                   &ldquo;{l.what_was_happening}&rdquo;
                 </p>
-                <p style={{ fontFamily: 'monospace', fontSize: '0.48rem', letterSpacing: '0.1em', color: '#C4A24A', marginTop: '0.4rem' }}>
-                  — {l.labelled_by}{l.year_taken ? ' · ' + l.year_taken : ''}
+                <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.1em', color: 'var(--portal-gold-ink)', marginTop: '0.4rem' }}>
+                  {l.labelled_by}{l.year_taken ? ' · ' + l.year_taken : ''}
                 </p>
               </div>
             ))}
@@ -120,7 +120,7 @@ export default function DepositClient({ archiveId }: { archiveId: string }) {
 
       {/* Prompt */}
       <div className="mb-6">
-        <p className="font-serif font-light leading-[1.75] mb-5" style={{ fontSize: '1.1rem', color: '#9DA3A8' }}>
+        <p className="font-serif font-light leading-[1.75] mb-5" style={{ fontSize: '1.1rem', color: 'var(--portal-body)' }}>
           What do you remember about this moment that only you would know?
         </p>
         <textarea
@@ -130,11 +130,11 @@ export default function DepositClient({ archiveId }: { archiveId: string }) {
           placeholder="Write whatever comes to mind…"
           className="w-full rounded-sm px-4 py-4 font-serif leading-[1.8] resize-none focus:outline-none transition-colors duration-200"
           style={{
-            background:   '#0C0C0D',
-            border:       '1px solid rgba(255,255,255,0.08)',
-            color:        '#F0EDE6',
+            background:   'var(--portal-card)',
+            border:       '1px solid var(--portal-card-line)',
+            color:        'var(--portal-ink)',
             fontSize:     '1rem',
-            borderColor:  response ? 'rgba(196,162,74,0.35)' : 'rgba(255,255,255,0.08)',
+            borderColor:  response ? 'var(--portal-gold-line)' : 'var(--portal-card-line)',
           }}
         />
       </div>

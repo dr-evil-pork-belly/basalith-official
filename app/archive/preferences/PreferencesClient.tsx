@@ -28,21 +28,21 @@ function BirthYearSection({ archiveId }: { archiveId: string }) {
   }
 
   return (
-    <div className="rounded-sm border border-[rgba(255,255,255,0.06)] px-6 py-6 mb-4" style={{ background: '#111112' }}>
-      <p className="font-sans text-[0.6rem] font-bold tracking-[0.18em] uppercase text-[#5C6166] mb-2">Birth Year</p>
-      <p className="font-sans text-[0.75rem] mb-4" style={{ color: '#5C6166' }}>
+    <div className="rounded-sm border border-[var(--portal-card-line)] px-6 py-6 mb-4" style={{ background: 'var(--portal-card)' }}>
+      <p className="font-sans text-[11px] font-bold tracking-[0.18em] uppercase text-[var(--portal-secondary)] mb-2">Birth Year</p>
+      <p className="font-sans text-[15px] mb-4" style={{ color: 'var(--portal-secondary)' }}>
         Used to personalize your life timeline with accurate age ranges per decade.
       </p>
       <div className="flex items-center gap-4 flex-wrap">
         <input
           type="number" min={1900} max={new Date().getFullYear()}
           placeholder="e.g. 1949" value={year} onChange={e => setYear(e.target.value)}
-          className="bg-[#0C0C0D] border border-[rgba(255,255,255,0.08)] rounded-sm px-3 py-2 font-mono text-[0.85rem] text-[#F0F0EE] focus:outline-none focus:border-[rgba(196,162,74,0.4)] w-32"
+          className="bg-[var(--portal-card)] border border-[var(--portal-card-line)] rounded-sm px-3 py-2 font-mono text-[15.5px] text-[var(--portal-ink)] focus:outline-none focus:border-[var(--portal-gold-ink)] w-32"
         />
         <button onClick={save} disabled={saving} className="btn-monolith-ghost disabled:opacity-50">
           {saving ? 'Saving…' : saved ? 'Saved ✓' : 'Save'}
         </button>
-        {error && <p className="font-sans text-[0.72rem]" style={{ color: '#E57373' }}>{error}</p>}
+        {error && <p className="font-sans text-[15px]" style={{ color: 'var(--portal-error)' }}>{error}</p>}
       </div>
     </div>
   )
@@ -71,7 +71,7 @@ const TIMEZONES = [
   { value: 'Pacific/Honolulu',    label: 'Hawaii (HT)' },
 ]
 
-const inputCls = 'bg-[#0C0C0D] border border-[rgba(255,255,255,0.08)] rounded-sm px-3 py-2 font-sans text-[0.82rem] text-[#F0F0EE] focus:outline-none focus:border-[rgba(196,162,74,0.4)] transition-colors duration-200 w-full'
+const inputCls = 'bg-[var(--portal-card)] border border-[var(--portal-card-line)] rounded-sm px-3 py-2 font-sans text-[15.5px] text-[var(--portal-ink)] focus:outline-none focus:border-[var(--portal-gold-ink)] transition-colors duration-200 w-full'
 
 export default function PreferencesClient({ archiveId }: { archiveId: string }) {
   const [cadence,   setCadence]   = useState('daily')
@@ -193,7 +193,7 @@ export default function PreferencesClient({ archiveId }: { archiveId: string }) 
   if (loading) {
     return (
       <div className="max-w-2xl">
-        <p className="font-serif italic text-[#5C6166] text-[0.95rem]">Loading preferences…</p>
+        <p className="font-serif italic text-[var(--portal-secondary)] text-[0.95rem]">Loading preferences…</p>
       </div>
     )
   }
@@ -202,30 +202,30 @@ export default function PreferencesClient({ archiveId }: { archiveId: string }) 
     <div className="max-w-2xl">
 
       <div className="mb-10">
-        <p className="font-sans text-[0.62rem] font-bold tracking-[0.2em] uppercase mb-2" style={{ color: '#C4A24A' }}>Email Delivery</p>
-        <h1 className="font-serif font-semibold text-[#F0F0EE] tracking-[-0.025em]" style={{ fontSize: 'clamp(1.8rem,3vw,2.5rem)' }}>
+        <p className="font-sans text-[11.5px] font-bold tracking-[0.2em] uppercase mb-2" style={{ color: 'var(--portal-gold-ink)' }}>Email Delivery</p>
+        <h1 className="font-serif font-semibold text-[var(--portal-ink)] tracking-[-0.025em]" style={{ fontSize: 'clamp(1.8rem,3vw,2.5rem)' }}>
           Photograph Delivery
         </h1>
-        <p className="font-sans text-[0.75rem] mt-2" style={{ color: '#5C6166' }}>
+        <p className="font-sans text-[15px] mt-2" style={{ color: 'var(--portal-secondary)' }}>
           Contributors receive one photograph by email and reply with their memories.
         </p>
       </div>
 
       {/* Cadence */}
-      <div className="rounded-sm border border-[rgba(255,255,255,0.06)] px-6 py-6 mb-4" style={{ background: '#111112' }}>
-        <p className="font-sans text-[0.6rem] font-bold tracking-[0.18em] uppercase text-[#5C6166] mb-5">Cadence</p>
+      <div className="rounded-sm border border-[var(--portal-label)] px-6 py-6 mb-4" style={{ background: 'var(--portal-card)' }}>
+        <p className="font-sans text-[11px] font-bold tracking-[0.18em] uppercase text-[var(--portal-secondary)] mb-5">Cadence</p>
         <div className="flex flex-col gap-3">
           {CADENCES.map(c => (
             <label key={c.value} className="flex items-start gap-3 cursor-pointer group">
               <div
                 className="w-4 h-4 rounded-full border mt-0.5 shrink-0 flex items-center justify-center transition-colors duration-150"
                 style={{
-                  borderColor:     cadence === c.value ? '#C4A24A' : 'rgba(255,255,255,0.2)',
-                  backgroundColor: cadence === c.value ? 'rgba(196,162,74,0.15)' : 'transparent',
+                  borderColor:     cadence === c.value ? 'var(--portal-gold-ink)' : 'var(--portal-card-line)',
+                  backgroundColor: cadence === c.value ? 'var(--portal-tint)' : 'transparent',
                 }}
               >
                 {cadence === c.value && (
-                  <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#C4A24A' }} />
+                  <div className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--portal-btn)' }} />
                 )}
               </div>
               <input
@@ -237,10 +237,10 @@ export default function PreferencesClient({ archiveId }: { archiveId: string }) 
                 onChange={() => setCadence(c.value)}
               />
               <div>
-                <p className="font-sans text-[0.82rem] font-medium" style={{ color: cadence === c.value ? '#F0F0EE' : '#9DA3A8' }}>
+                <p className="font-sans text-[15.5px] font-medium" style={{ color: cadence === c.value ? 'var(--portal-ink)' : 'var(--portal-body)' }}>
                   {c.label}
                 </p>
-                <p className="font-sans text-[0.68rem] mt-0.5" style={{ color: '#5C6166' }}>{c.sub}</p>
+                <p className="font-sans text-[14.5px] mt-0.5" style={{ color: 'var(--portal-secondary)' }}>{c.sub}</p>
               </div>
             </label>
           ))}
@@ -249,24 +249,24 @@ export default function PreferencesClient({ archiveId }: { archiveId: string }) 
 
       {/* Time and timezone */}
       {cadence !== 'paused' && (
-        <div className="rounded-sm border border-[rgba(255,255,255,0.06)] px-6 py-6 mb-4" style={{ background: '#111112' }}>
-          <p className="font-sans text-[0.6rem] font-bold tracking-[0.18em] uppercase text-[#5C6166] mb-5">Delivery Time</p>
+        <div className="rounded-sm border border-[var(--portal-label)] px-6 py-6 mb-4" style={{ background: 'var(--portal-card)' }}>
+          <p className="font-sans text-[11px] font-bold tracking-[0.18em] uppercase text-[var(--portal-secondary)] mb-5">Delivery Time</p>
           <div className="grid sm:grid-cols-2 gap-3">
             <div>
-              <p className="font-sans text-[0.62rem] tracking-[0.1em] uppercase text-[#5C6166] mb-2">Time</p>
+              <p className="font-sans text-[11.5px] tracking-[0.1em] uppercase text-[var(--portal-secondary)] mb-2">Time</p>
               <select className={inputCls} value={sendTime} onChange={e => setSendTime(e.target.value)}
-                style={{ background: '#0C0C0D' }}>
+                style={{ background: 'var(--portal-card)' }}>
                 {SEND_TIMES.map(t => (
-                  <option key={t.value} value={t.value} style={{ background: '#0C0C0D' }}>{t.label}</option>
+                  <option key={t.value} value={t.value} style={{ background: 'var(--portal-card)' }}>{t.label}</option>
                 ))}
               </select>
             </div>
             <div>
-              <p className="font-sans text-[0.62rem] tracking-[0.1em] uppercase text-[#5C6166] mb-2">Timezone</p>
+              <p className="font-sans text-[11.5px] tracking-[0.1em] uppercase text-[var(--portal-secondary)] mb-2">Timezone</p>
               <select className={inputCls} value={timezone} onChange={e => setTimezone(e.target.value)}
-                style={{ background: '#0C0C0D' }}>
+                style={{ background: 'var(--portal-card)' }}>
                 {TIMEZONES.map(t => (
-                  <option key={t.value} value={t.value} style={{ background: '#0C0C0D' }}>{t.label}</option>
+                  <option key={t.value} value={t.value} style={{ background: 'var(--portal-card)' }}>{t.label}</option>
                 ))}
               </select>
             </div>
@@ -284,7 +284,7 @@ export default function PreferencesClient({ archiveId }: { archiveId: string }) 
           {saving ? 'Saving…' : saved ? 'Saved' : 'Save Preferences'}
         </button>
         {saved && (
-          <p className="font-sans text-[0.72rem]" style={{ color: '#4CAF50' }}>Preferences updated.</p>
+          <p className="font-sans text-[15px]" style={{ color: 'var(--portal-ok)' }}>Preferences updated.</p>
         )}
       </div>
 
@@ -292,11 +292,11 @@ export default function PreferencesClient({ archiveId }: { archiveId: string }) 
       <BirthYearSection archiveId={archiveId} />
 
       {/* Check replies */}
-      <div className="rounded-sm border border-[rgba(255,255,255,0.06)] px-6 py-6 mb-4" style={{ background: '#111112' }}>
-        <p className="font-sans text-[0.6rem] font-bold tracking-[0.18em] uppercase text-[#5C6166] mb-2">
+      <div className="rounded-sm border border-[var(--portal-label)] px-6 py-6 mb-4" style={{ background: 'var(--portal-card)' }}>
+        <p className="font-sans text-[11px] font-bold tracking-[0.18em] uppercase text-[var(--portal-secondary)] mb-2">
           Check for Replies
         </p>
-        <p className="font-sans text-[0.75rem] mb-5" style={{ color: '#5C6166' }}>
+        <p className="font-sans text-[15px] mb-5" style={{ color: 'var(--portal-secondary)' }}>
           Fetch and process any new replies from contributors that arrived since the last check.
         </p>
         <div className="flex items-center gap-4 flex-wrap">
@@ -308,7 +308,7 @@ export default function PreferencesClient({ archiveId }: { archiveId: string }) 
             {checking ? 'Checking…' : 'Check for Replies →'}
           </button>
           {replyMsg && (
-            <p className="font-sans text-[0.72rem]" style={{ color: replyMsg.startsWith('Found') ? '#4CAF50' : '#9DA3A8' }}>
+            <p className="font-sans text-[15px]" style={{ color: replyMsg.startsWith('Found') ? 'var(--portal-ok)' : 'var(--portal-body)' }}>
               {replyMsg}
             </p>
           )}
@@ -316,11 +316,11 @@ export default function PreferencesClient({ archiveId }: { archiveId: string }) 
       </div>
 
       {/* Test send */}
-      <div className="rounded-sm border border-[rgba(255,255,255,0.06)] px-6 py-6" style={{ background: '#111112' }}>
-        <p className="font-sans text-[0.6rem] font-bold tracking-[0.18em] uppercase text-[#5C6166] mb-2">
+      <div className="rounded-sm border border-[var(--portal-label)] px-6 py-6" style={{ background: 'var(--portal-card)' }}>
+        <p className="font-sans text-[11px] font-bold tracking-[0.18em] uppercase text-[var(--portal-secondary)] mb-2">
           Send a Test Photograph Now
         </p>
-        <p className="font-sans text-[0.75rem] mb-5" style={{ color: '#5C6166' }}>
+        <p className="font-sans text-[15px] mb-5" style={{ color: 'var(--portal-secondary)' }}>
           Immediately sends the next photograph in the queue to all active contributors.
           Useful for testing and first impressions.
         </p>
@@ -329,7 +329,7 @@ export default function PreferencesClient({ archiveId }: { archiveId: string }) 
             {sending ? 'Sending…' : 'Send Now →'}
           </button>
           {testMsg && (
-            <p className="font-sans text-[0.72rem]" style={{ color: testMsg.startsWith('Sent') ? '#4CAF50' : '#9DA3A8' }}>
+            <p className="font-sans text-[15px]" style={{ color: testMsg.startsWith('Sent') ? 'var(--portal-ok)' : 'var(--portal-body)' }}>
               {testMsg}
             </p>
           )}
@@ -338,23 +338,23 @@ export default function PreferencesClient({ archiveId }: { archiveId: string }) 
 
       {/* Data export */}
       <div className="mt-10 mb-4">
-        <p className="font-sans text-[0.62rem] font-bold tracking-[0.2em] uppercase mb-1" style={{ color: '#C4A24A' }}>Your Data</p>
-        <h2 className="font-serif font-semibold text-[#F0F0EE]" style={{ fontSize: 'clamp(1.4rem,2.5vw,1.9rem)' }}>
+        <p className="font-sans text-[11.5px] font-bold tracking-[0.2em] uppercase mb-1" style={{ color: 'var(--portal-gold-ink)' }}>Your Data</p>
+        <h2 className="font-serif font-semibold text-[var(--portal-ink)]" style={{ fontSize: 'clamp(1.4rem,2.5vw,1.9rem)' }}>
           Download Your Archive
         </h2>
-        <p className="font-sans text-[0.75rem] mt-2" style={{ color: '#5C6166' }}>
+        <p className="font-sans text-[15px] mt-2" style={{ color: 'var(--portal-secondary)' }}>
           You own your archive completely. Download everything at any time.
         </p>
       </div>
 
-      <div className="rounded-sm border border-[rgba(255,255,255,0.06)] px-6 py-6" style={{ background: '#111112' }}>
-        <p className="font-sans text-[0.6rem] font-bold tracking-[0.18em] uppercase text-[#5C6166] mb-2">Complete Archive Export</p>
-        <p className="font-sans text-[0.75rem] mb-5" style={{ color: '#9DA3A8' }}>
+      <div className="rounded-sm border border-[var(--portal-label)] px-6 py-6" style={{ background: 'var(--portal-card)' }}>
+        <p className="font-sans text-[11px] font-bold tracking-[0.18em] uppercase text-[var(--portal-secondary)] mb-2">Complete Archive Export</p>
+        <p className="font-sans text-[15px] mb-5" style={{ color: 'var(--portal-body)' }}>
           Your export is one zip file holding the actual contents of your archive.
           Your photographs, recordings, and video as real files, plus every record
           in plain JSON. It opens with no account and no connection to Basalith.
         </p>
-        <p className="font-sans text-[0.75rem] mb-5" style={{ color: '#5C6166' }}>
+        <p className="font-sans text-[15px] mb-5" style={{ color: 'var(--portal-secondary)' }}>
           We assemble it in the background and email you a download link when it is
           ready, usually within a few minutes. The link works for 7 days, and you can
           request another export at any time.
@@ -364,12 +364,12 @@ export default function PreferencesClient({ archiveId }: { archiveId: string }) 
             onClick={handleExport}
             disabled={exporting}
             className="btn-monolith-ghost disabled:opacity-50"
-            style={{ borderColor: 'rgba(196,162,74,0.4)', color: '#C4A24A' }}
+            style={{ borderColor: 'var(--portal-gold-line)', color: 'var(--portal-gold-ink)' }}
           >
             {exporting ? 'Requesting…' : 'Request Archive Export →'}
           </button>
           {exportMsg && (
-            <p className="font-sans text-[0.72rem]" style={{ color: '#9DA3A8' }}>{exportMsg}</p>
+            <p className="font-sans text-[15px]" style={{ color: 'var(--portal-body)' }}>{exportMsg}</p>
           )}
         </div>
       </div>

@@ -35,13 +35,15 @@ function Sigil({ size = 40, pulse = false }: { size?: number; pulse?: boolean })
   return (
     <svg width={size} height={size} viewBox="0 0 40 40" fill="none" aria-hidden="true"
       style={pulse ? { animation: 'sigilPulse 1.5s ease-in-out 2' } : undefined}>
-      <rect x="20" y="3"  width="12" height="12" transform="rotate(45 20 3)"  fill="none" stroke="rgba(196,162,74,0.45)" strokeWidth="1"/>
-      <rect x="20" y="10" width="8"  height="8"  transform="rotate(45 20 10)" fill="none" stroke="rgba(196,162,74,0.75)" strokeWidth="1"/>
-      <rect x="20" y="16" width="4"  height="4"  transform="rotate(45 20 16)" fill="rgba(196,162,74,0.95)"/>
+      <rect x="20" y="3"  width="12" height="12" transform="rotate(45 20 3)"  fill="none" stroke="var(--portal-gold-ink)" strokeWidth="1"/>
+      <rect x="20" y="10" width="8"  height="8"  transform="rotate(45 20 10)" fill="none" stroke="var(--portal-gold-ink)" strokeWidth="1"/>
+      <rect x="20" y="16" width="4"  height="4"  transform="rotate(45 20 16)" fill="var(--portal-gold-ink)"/>
     </svg>
   )
 }
 
+// The milestone moment fills the screen in the inverted register; every color
+// inside is an --invert-* value.
 function MilestoneOverlay({ count, onDone }: { count: number; onDone: () => void }) {
   const [showGhost, setShowGhost] = useState(false)
   const [showMain,  setShowMain]  = useState(false)
@@ -63,26 +65,27 @@ function MilestoneOverlay({ count, onDone }: { count: number; onDone: () => void
     <div
       className="fixed inset-0 z-[9999] flex items-center justify-center"
       style={{
-        background:    'rgba(2,2,1,0.97)',
+        background:    'var(--invert-bg)',
+        color:         'var(--invert-fg)',
         animation:     exiting ? 'milestoneOut 0.6s ease forwards' : 'milestoneGhostIn 0.4s ease forwards',
         pointerEvents: exiting ? 'none' : 'all',
       }}
     >
       {showGhost && (
         <p className="absolute select-none"
-          style={{ fontFamily: 'var(--font-cormorant), Georgia, serif', fontWeight: 700, fontSize: 'clamp(7rem,20vw,14rem)', color: 'rgba(196,162,74,0.12)', letterSpacing: '-0.05em', lineHeight: 1, userSelect: 'none', animation: 'milestoneGhostIn 0.5s ease forwards' }}>
+          style={{ fontFamily: 'var(--portal-serif)', fontWeight: 700, fontSize: 'clamp(7rem,20vw,14rem)', color: 'var(--invert-gold)', letterSpacing: '-0.05em', lineHeight: 1, userSelect: 'none', animation: 'milestoneGhostIn 0.5s ease forwards' }}>
           {count}
         </p>
       )}
       <div className="relative flex flex-col items-center gap-6 px-8 text-center" style={{ maxWidth: '500px' }}>
         <Sigil size={40} pulse />
         {showMain && (
-          <p style={{ fontFamily: 'var(--font-cormorant), Georgia, serif', fontStyle: 'italic', fontWeight: 300, fontSize: 'clamp(1.5rem,4vw,2.5rem)', color: '#F0F0EE', lineHeight: 1.3, whiteSpace: 'pre-line', animation: 'milestoneMainIn 0.6s cubic-bezier(0.16,1,0.3,1) forwards' }}>
+          <p style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', fontWeight: 300, fontSize: 'clamp(1.5rem,4vw,2.5rem)', color: 'var(--invert-fg)', lineHeight: 1.3, whiteSpace: 'pre-line', animation: 'milestoneMainIn 0.6s cubic-bezier(0.16,1,0.3,1) forwards' }}>
             {texts.main}
           </p>
         )}
         {showSub && (
-          <p style={{ fontFamily: 'monospace', fontSize: '0.48rem', letterSpacing: '0.4em', color: 'rgba(196,162,74,0.8)', textTransform: 'uppercase', animation: 'milestoneSubIn 0.4s ease forwards' }}>
+          <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.4em', color: 'var(--invert-gold)', textTransform: 'uppercase', animation: 'milestoneSubIn 0.4s ease forwards' }}>
             {texts.sub}
           </p>
         )}
@@ -112,7 +115,7 @@ interface UploadState {
 // Returns true on success, false on any failure.
 async function uploadFileDirect(file: File, archiveId: string): Promise<boolean> {
   try {
-    // Step 1 — get a presigned upload URL from our API (tiny JSON, no file data)
+    // Step 1: get a presigned upload URL from our API (tiny JSON, no file data)
     const urlRes = await fetch('/api/archive/upload-url', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -124,7 +127,7 @@ async function uploadFileDirect(file: File, archiveId: string): Promise<boolean>
     }
     const { uploadUrl, path } = await urlRes.json()
 
-    // Step 2 — PUT the file directly to Supabase (no Vercel 4.5 MB limit applies)
+    // Step 2: PUT the file directly to Supabase (no Vercel 4.5 MB limit applies)
     const storageRes = await fetch(uploadUrl, {
       method:  'PUT',
       headers: { 'Content-Type': file.type || 'image/jpeg' },
@@ -134,7 +137,7 @@ async function uploadFileDirect(file: File, archiveId: string): Promise<boolean>
       throw new Error(`Storage upload failed: HTTP ${storageRes.status}`)
     }
 
-    // Step 3 — register the DB record and fire Inngest (tiny JSON again)
+    // Step 3: register the DB record and fire Inngest (tiny JSON again)
     const regRes = await fetch('/api/archive/register-photo', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -236,7 +239,7 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
 
     setState({ status: 'selecting', totalSelected: 0, totalUploaded: 0, totalFailed: 0, currentFile: 0, lastError: '' })
 
-    // Iterate lazily — never call Array.from(fileList) on large iCloud libraries
+    // Iterate lazily: never call Array.from(fileList) on large iCloud libraries
     // as iOS resolves all iCloud references simultaneously, freezing the browser.
     const collected: File[] = []
     for (let i = 0; i < fileList.length; i++) {
@@ -281,10 +284,10 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
   if (state.status === 'selecting') {
     return (
       <div className="flex flex-col items-center gap-4 py-16 text-center">
-        <p className="font-serif" style={{ fontSize: '1.1rem', fontStyle: 'italic', color: '#F0EDE6' }}>
+        <p className="font-serif" style={{ fontSize: '1.1rem', fontStyle: 'italic', color: 'var(--portal-ink)' }}>
           Reading your photos…
         </p>
-        <p style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.22em', color: '#C4A24A' }}>
+        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.22em', color: 'var(--portal-gold-ink)' }}>
           {state.totalSelected} SELECTED
         </p>
       </div>
@@ -298,23 +301,23 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
       : 0
     return (
       <div style={{ padding: '2rem 0' }}>
-        <p className="font-serif" style={{ fontSize: '1.1rem', fontStyle: 'italic', color: '#F0EDE6', marginBottom: '0.5rem' }}>
+        <p className="font-serif" style={{ fontSize: '1.1rem', fontStyle: 'italic', color: 'var(--portal-ink)', marginBottom: '0.5rem' }}>
           Uploading your archive…
         </p>
-        <div className="w-full" style={{ height: '4px', background: 'rgba(240,237,230,0.08)', borderRadius: '2px', margin: '1rem 0', overflow: 'hidden' }}>
-          <div style={{ height: '100%', background: '#C4A24A', borderRadius: '2px', width: `${pct}%`, transition: 'width 0.4s ease' }} />
+        <div className="w-full" style={{ height: '4px', background: 'var(--portal-inset)', borderRadius: '2px', margin: '1rem 0', overflow: 'hidden' }}>
+          <div style={{ height: '100%', background: 'var(--portal-btn)', borderRadius: '2px', width: `${pct}%`, transition: 'width 0.4s ease' }} />
         </div>
-        <p style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.18em', color: '#5C6166' }}>
+        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', color: 'var(--portal-secondary)' }}>
           {state.currentFile} OF {state.totalSelected}
           {state.totalUploaded > 0 && ` · ${state.totalUploaded} UPLOADED`}
           {state.totalFailed  > 0 && ` · ${state.totalFailed} FAILED`}
         </p>
         {eta && (
-          <p style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.14em', color: 'rgba(196,162,74,0.5)', marginTop: '0.5rem' }}>
+          <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.14em', color: 'var(--portal-gold-ink)', marginTop: '0.5rem' }}>
             {eta.toUpperCase()}
           </p>
         )}
-        <p className="font-serif" style={{ fontSize: '0.85rem', fontStyle: 'italic', color: '#3A3830', marginTop: '1rem' }}>
+        <p className="font-serif" style={{ fontSize: '0.85rem', fontStyle: 'italic', color: 'var(--portal-label)', marginTop: '1rem' }}>
           Uploading {CONCURRENCY} photos at a time. Keep this page open.
         </p>
       </div>
@@ -327,25 +330,25 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
       <div className="flex flex-col items-center gap-6 py-16 text-center">
         <Sigil size={36} />
         <div>
-          <p className="font-serif font-semibold" style={{ fontSize: '2rem', color: '#F0F0EE', lineHeight: 1.1 }}>
+          <p className="font-serif font-semibold" style={{ fontSize: '2rem', color: 'var(--portal-ink)', lineHeight: 1.1 }}>
             {state.totalUploaded} photograph{state.totalUploaded === 1 ? '' : 's'} received.
           </p>
-          <p className="font-serif" style={{ fontSize: '1rem', color: 'rgba(196,162,74,0.7)', fontStyle: 'italic', marginTop: '0.5rem' }}>
+          <p className="font-serif" style={{ fontSize: '1rem', color: 'var(--portal-gold-ink)', fontStyle: 'italic', marginTop: '0.5rem' }}>
             Our AI is reviewing each one now.
           </p>
           {state.totalFailed > 0 && (
-            <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.1em', color: '#5C6166', marginTop: '0.75rem' }}>
+            <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.1em', color: 'var(--portal-secondary)', marginTop: '0.75rem' }}>
               {state.totalFailed} could not be uploaded
             </p>
           )}
         </div>
-        <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#5C6166', maxWidth: '320px' }}>
+        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-secondary)', maxWidth: '320px' }}>
           Check your gallery in 15–20 minutes. Blurry or unrelated photos will be filtered automatically.
         </p>
         <div className="flex gap-3 mt-2">
           <button onClick={reset} className="btn-monolith-amber">Upload More</button>
           <a href="/archive/gallery"
-            style={{ fontFamily: 'monospace', fontSize: '0.62rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#5C6166', display: 'flex', alignItems: 'center' }}>
+            style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--portal-secondary)', display: 'flex', alignItems: 'center' }}>
             View Gallery →
           </a>
         </div>
@@ -358,11 +361,11 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
     <div className="flex flex-col gap-6">
 
       {/* iPhone tip */}
-      <div style={{ background: 'rgba(196,162,74,0.04)', border: '1px solid rgba(196,162,74,0.12)', borderRadius: '2px', padding: '1rem 1.25rem' }}>
-        <p style={{ fontFamily: 'monospace', fontSize: '0.42rem', letterSpacing: '0.25em', color: '#C4A24A', marginBottom: '0.4rem' }}>
+      <div style={{ background: 'var(--portal-gold-wash)', border: '1px solid var(--portal-gold-line)', borderRadius: '2px', padding: '1rem 1.25rem' }}>
+        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.25em', color: 'var(--portal-gold-ink)', marginBottom: '0.4rem' }}>
           FOR IPHONE · ICLOUD LIBRARIES
         </p>
-        <p className="font-serif" style={{ fontSize: '0.88rem', fontStyle: 'italic', color: '#5C6166', lineHeight: 1.7, margin: 0 }}>
+        <p className="font-serif" style={{ fontSize: '0.88rem', fontStyle: 'italic', color: 'var(--portal-secondary)', lineHeight: 1.7, margin: 0 }}>
           Select photos in batches of 200–300 rather than tapping Select All. Choose by date range or album. Each photo uploads directly. No size limits.
         </p>
       </div>
@@ -375,18 +378,18 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
         onClick={() => inputRef.current?.click()}
         className="w-full flex flex-col items-center justify-center gap-3 rounded-sm border py-14 cursor-pointer transition-all duration-200"
         style={{
-          borderColor: dragging ? 'rgba(196,162,74,0.5)' : 'rgba(255,255,255,0.08)',
+          borderColor: dragging ? 'var(--portal-gold-line)' : 'var(--portal-card-line)',
           borderStyle: 'dashed',
-          background:  dragging ? 'rgba(196,162,74,0.04)' : '#111112',
+          background:  dragging ? 'var(--portal-gold-wash)' : 'var(--portal-card)',
         }}
       >
-        <div className="w-10 h-10 flex items-center justify-center rounded-sm border" style={{ borderColor: 'rgba(196,162,74,0.3)' }}>
-          <span style={{ color: 'rgba(196,162,74,0.6)', fontSize: '1.4rem', lineHeight: 1 }}>↑</span>
+        <div className="w-10 h-10 flex items-center justify-center rounded-sm border" style={{ borderColor: 'var(--portal-gold-line)' }}>
+          <span style={{ color: 'var(--portal-gold-ink)', fontSize: '1.4rem', lineHeight: 1 }}>↑</span>
         </div>
-        <p className="font-serif" style={{ color: '#F0F0EE', fontSize: '1rem', fontWeight: 300 }}>
+        <p className="font-serif" style={{ color: 'var(--portal-ink)', fontSize: '1rem', fontWeight: 300 }}>
           {dragging ? 'Drop them here.' : 'Drop photographs here, or click to select.'}
         </p>
-        <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.14em', color: '#5C6166', textTransform: 'uppercase' }}>
+        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.14em', color: 'var(--portal-secondary)', textTransform: 'uppercase' }}>
           JPG · PNG · HEIC · MOV · MP4 · Any format · No size limit
         </p>
         <input
@@ -399,12 +402,12 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
         />
       </div>
 
-      <p style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#3A3F44', textAlign: 'center' }}>
+      <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--portal-label)', textAlign: 'center' }}>
         Photos upload directly to the archive · AI reviews each one automatically
       </p>
 
       {/* Single-photo diagnostic test */}
-      <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '1.25rem' }}>
+      <div style={{ borderTop: '1px solid var(--portal-rule)', paddingTop: '1.25rem' }}>
         <input
           ref={testInputRef}
           type="file"
@@ -415,12 +418,12 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
         <button
           onClick={() => testInputRef.current?.click()}
           disabled={testLoading}
-          style={{ fontFamily: 'monospace', fontSize: '0.46rem', letterSpacing: '0.12em', color: '#5C6166', background: 'none', border: 'none', cursor: 'pointer', padding: 0, textDecoration: 'underline', textUnderlineOffset: '3px' }}
+          style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.12em', color: 'var(--portal-secondary)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, textDecoration: 'underline', textUnderlineOffset: '3px' }}
         >
           {testLoading ? 'Testing…' : 'Having trouble? Test with one photo first →'}
         </button>
         {testResult && (
-          <p style={{ marginTop: '0.6rem', fontFamily: 'monospace', fontSize: '0.5rem', color: testResult.startsWith('✓') ? 'rgba(100,200,100,0.8)' : 'rgba(196,162,74,0.7)', wordBreak: 'break-all' }}>
+          <p style={{ marginTop: '0.6rem', fontFamily: 'var(--portal-mono)', fontSize: '11px', color: testResult.startsWith('✓') ? 'var(--portal-ok)' : 'var(--portal-gold-ink)', wordBreak: 'break-all' }}>
             {testResult}
           </p>
         )}
@@ -544,7 +547,7 @@ export default function LabelClient({ archiveId }: { archiveId: string }) {
           }
         }
       } catch {
-        // DB failed — localStorage counts used for milestone check
+        // DB failed: localStorage counts used for milestone check
       }
 
       if (MILESTONE_THRESHOLDS.includes(localTotal) && milestoneCount === null) {
@@ -576,23 +579,23 @@ export default function LabelClient({ archiveId }: { archiveId: string }) {
           <MilestoneOverlay count={milestoneCount} onDone={() => setShowOverlay(false)} />
         )}
         <div className="max-w-lg mx-auto pt-12">
-          <div className="rounded-sm border px-10 py-10 text-center" style={{ background: '#111112', borderColor: 'rgba(196,162,74,0.2)' }}>
-            <p className="font-serif font-semibold" style={{ fontSize: '1.55rem', color: '#F0F0EE', lineHeight: 1.25 }}>Saved to your archive.</p>
-            <p className="font-serif" style={{ fontSize: '0.95rem', color: '#B8B4AB', lineHeight: 1.5, marginTop: '0.4rem', marginBottom: '2.25rem' }}>Your entity has this now.</p>
+          <div className="rounded-sm border px-10 py-10 text-center" style={{ background: 'var(--portal-card)', borderColor: 'var(--portal-gold-line)' }}>
+            <p className="font-serif font-semibold" style={{ fontSize: '1.55rem', color: 'var(--portal-ink)', lineHeight: 1.25 }}>Saved to your archive.</p>
+            <p className="font-serif" style={{ fontSize: '0.95rem', color: 'var(--portal-body)', lineHeight: 1.5, marginTop: '0.4rem', marginBottom: '2.25rem' }}>Your entity has this now.</p>
             <div className="flex items-center justify-center gap-6 mb-8">
               <div className="text-center">
-                <p className="font-serif font-semibold" style={{ fontSize: '1.6rem', color: '#F0F0EE', lineHeight: 1 }}>{streak}</p>
-                <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#5C6166', marginTop: '0.25rem' }}>Streak</p>
+                <p className="font-serif font-semibold" style={{ fontSize: '1.6rem', color: 'var(--portal-ink)', lineHeight: 1 }}>{streak}</p>
+                <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--portal-secondary)', marginTop: '0.25rem' }}>Streak</p>
               </div>
-              <div className="w-px h-10" style={{ background: 'rgba(255,255,255,0.06)' }} />
+              <div className="w-px h-10" style={{ background: 'var(--portal-inset)' }} />
               <div className="text-center">
-                <p className="font-serif font-semibold" style={{ fontSize: '1.6rem', color: '#F0F0EE', lineHeight: 1 }}>{totalLabeled}</p>
-                <p style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#5C6166', marginTop: '0.25rem' }}>Total Labeled</p>
+                <p className="font-serif font-semibold" style={{ fontSize: '1.6rem', color: 'var(--portal-ink)', lineHeight: 1 }}>{totalLabeled}</p>
+                <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--portal-secondary)', marginTop: '0.25rem' }}>Total Labeled</p>
               </div>
             </div>
             <div className="flex flex-col gap-3">
               <button onClick={reset} className="btn-monolith-amber w-full text-center">Add Another</button>
-              <a href="/archive/gallery" className="no-underline transition-colors duration-200" style={{ fontFamily: 'monospace', fontSize: '0.62rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#5C6166' }}>
+              <a href="/archive/gallery" className="no-underline transition-colors duration-200" style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--portal-secondary)' }}>
                 View Gallery →
               </a>
             </div>
@@ -602,9 +605,9 @@ export default function LabelClient({ archiveId }: { archiveId: string }) {
     )
   }
 
-  const monoLabel = { display: 'block', fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.35em', textTransform: 'uppercase' as const, color: 'rgba(196,162,74,0.75)', marginBottom: '0.75rem' }
-  const compactLabel = { display: 'block', fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.28em', textTransform: 'uppercase' as const, color: '#5C6166', marginBottom: '0.6rem' }
-  const baseInput = { width: '100%', background: 'transparent', color: '#F0F0EE', borderBottom: '1px solid rgba(255,255,255,0.10)', outline: 'none', fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: '1rem' }
+  const monoLabel = { display: 'block', fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.35em', textTransform: 'uppercase' as const, color: 'var(--portal-gold-ink)', marginBottom: '0.75rem' }
+  const compactLabel = { display: 'block', fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.28em', textTransform: 'uppercase' as const, color: 'var(--portal-secondary)', marginBottom: '0.6rem' }
+  const baseInput = { width: '100%', background: 'transparent', color: 'var(--portal-ink)', borderBottom: '1px solid var(--portal-card-line)', outline: 'none', fontFamily: 'var(--portal-serif)', fontSize: '1rem' }
 
   return (
     <>
@@ -615,25 +618,25 @@ export default function LabelClient({ archiveId }: { archiveId: string }) {
       <div className="max-w-2xl mx-auto">
         <div className="mb-8">
           <p className="eyebrow mb-3">Labeling Game</p>
-          <h1 className="font-serif font-semibold leading-[0.95] tracking-[-0.03em]" style={{ fontSize: 'clamp(1.8rem,3vw,2.4rem)', color: '#F0F0EE' }}>
+          <h1 className="font-serif font-semibold leading-[0.95] tracking-[-0.03em]" style={{ fontSize: 'clamp(1.8rem,3vw,2.4rem)', color: 'var(--portal-ink)' }}>
             {tab === 'single' ? 'Label a Memory' : 'Upload Everything'}
           </h1>
         </div>
 
         {/* Tab switcher */}
-        <div className="flex gap-0 mb-10 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+        <div className="flex gap-0 mb-10 border-b" style={{ borderColor: 'var(--portal-rule)' }}>
           {(['single', 'bulk'] as const).map(t => (
             <button
               key={t}
               onClick={() => setTab(t)}
               style={{
-                fontFamily:    'monospace',
-                fontSize:      '0.5rem',
+                fontFamily: 'var(--portal-mono)',
+                fontSize: '11px',
                 letterSpacing: '0.22em',
                 textTransform: 'uppercase',
                 padding:       '0.6rem 1.25rem',
-                color:         tab === t ? 'rgba(196,162,74,0.9)' : '#5C6166',
-                borderBottom:  tab === t ? '1px solid rgba(196,162,74,0.6)' : '1px solid transparent',
+                color:         tab === t ? 'var(--portal-gold-ink)' : 'var(--portal-secondary)',
+                borderBottom:  tab === t ? '1px solid var(--portal-gold-ink)' : '1px solid transparent',
                 marginBottom:  '-1px',
                 background:    'transparent',
                 transition:    'color 0.15s',
@@ -647,15 +650,15 @@ export default function LabelClient({ archiveId }: { archiveId: string }) {
         {tab === 'bulk' && <BulkUploadTab archiveId={archiveId} />}
 
         {tab === 'single' && (<>
-        <div className="flex items-center gap-6 mb-10 px-5 py-4 rounded-sm border" style={{ background: '#111112', borderColor: 'rgba(255,255,255,0.06)' }}>
+        <div className="flex items-center gap-6 mb-10 px-5 py-4 rounded-sm border" style={{ background: 'var(--portal-card)', borderColor: 'var(--portal-rule)' }}>
           <div>
-            <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#5C6166', marginBottom: '0.25rem' }}>Streak</p>
-            <p className="font-serif font-semibold" style={{ color: '#F0F0EE', fontSize: '1.3rem', lineHeight: 1 }}>{streak}</p>
+            <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--portal-secondary)', marginBottom: '0.25rem' }}>Streak</p>
+            <p className="font-serif font-semibold" style={{ color: 'var(--portal-ink)', fontSize: '1.3rem', lineHeight: 1 }}>{streak}</p>
           </div>
-          <div className="w-px h-8 shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <div className="w-px h-8 shrink-0" style={{ background: 'var(--portal-inset)' }} />
           <div>
-            <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#5C6166', marginBottom: '0.25rem' }}>Total Labeled</p>
-            <p className="font-serif font-semibold" style={{ color: '#F0F0EE', fontSize: '1.3rem', lineHeight: 1 }}>{totalLabeled}</p>
+            <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--portal-secondary)', marginBottom: '0.25rem' }}>Total Labeled</p>
+            <p className="font-serif font-semibold" style={{ color: 'var(--portal-ink)', fontSize: '1.3rem', lineHeight: 1 }}>{totalLabeled}</p>
           </div>
         </div>
 
@@ -666,20 +669,20 @@ export default function LabelClient({ archiveId }: { archiveId: string }) {
             {imagePreview ? (
               <div className="relative">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={imagePreview} alt="Preview" className="w-full rounded-sm" style={{ maxHeight: '280px', objectFit: 'cover', background: '#111112' }} />
+                <img src={imagePreview} alt="Preview" className="w-full rounded-sm" style={{ maxHeight: '280px', objectFit: 'cover', background: 'var(--portal-card)' }} />
                 <button type="button" onClick={removeImage} className="absolute top-2 right-2 rounded-sm"
-                  style={{ fontFamily: 'monospace', fontSize: '0.58rem', letterSpacing: '0.08em', textTransform: 'uppercase', padding: '0.25rem 0.5rem', background: 'rgba(12,12,13,0.9)', color: '#5C6166', border: '1px solid rgba(255,255,255,0.08)' }}>
+                  style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.08em', textTransform: 'uppercase', padding: '0.25rem 0.5rem', background: 'var(--portal-scrim)', color: 'var(--invert-fg)', border: '1px solid var(--invert-rule)' }}>
                   Remove
                 </button>
               </div>
             ) : (
               <button type="button" onClick={() => fileRef.current?.click()}
                 className="w-full flex flex-col items-center justify-center gap-2 rounded-sm border py-10 transition-colors duration-200"
-                style={{ borderColor: 'rgba(255,255,255,0.08)', borderStyle: 'dashed', background: '#111112' }}>
-                <div className="w-8 h-8 flex items-center justify-center rounded-sm border" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
-                  <span style={{ color: 'rgba(196,162,74,0.5)', fontSize: '1.1rem', lineHeight: 1 }}>+</span>
+                style={{ borderColor: 'var(--portal-card-line)', borderStyle: 'dashed', background: 'var(--portal-card)' }}>
+                <div className="w-8 h-8 flex items-center justify-center rounded-sm border" style={{ borderColor: 'var(--portal-card-line)' }}>
+                  <span style={{ color: 'var(--portal-gold-ink)', fontSize: '1.1rem', lineHeight: 1 }}>+</span>
                 </div>
-                <p style={{ fontFamily: 'monospace', fontSize: '0.58rem', letterSpacing: '0.08em', color: '#5C6166' }}>Upload image</p>
+                <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.08em', color: 'var(--portal-secondary)' }}>Upload image</p>
               </button>
             )}
             <input ref={fileRef} type="file" accept="image/*" onChange={handleImage} className="hidden" />
@@ -691,8 +694,8 @@ export default function LabelClient({ archiveId }: { archiveId: string }) {
               <textarea rows={8} value={form.story} onChange={setField('story')}
                 placeholder={"What was happening in this moment?\nWrite as much as you remember. Nothing is too small."}
                 className="w-full resize-none focus:outline-none placeholder:italic"
-                style={{ background: 'transparent', color: '#F0F0EE', borderBottom: '1px solid rgba(196,162,74,0.3)', fontFamily: 'var(--font-cormorant), Georgia, serif', fontStyle: 'normal', fontWeight: 300, fontSize: '1.15rem', lineHeight: 1.9, padding: '1rem 0' }} />
-              <p className="absolute bottom-2 right-0" style={{ fontFamily: 'monospace', fontSize: '0.4rem', color: '#3A3F44' }}>{form.story.length} characters</p>
+                style={{ background: 'transparent', color: 'var(--portal-ink)', borderBottom: '1px solid var(--portal-gold-line)', fontFamily: 'var(--portal-serif)', fontStyle: 'normal', fontWeight: 300, fontSize: '1.15rem', lineHeight: 1.9, padding: '1rem 0' }} />
+              <p className="absolute bottom-2 right-0" style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', color: 'var(--portal-label)' }}>{form.story.length} characters</p>
             </div>
           </div>
 
@@ -701,26 +704,26 @@ export default function LabelClient({ archiveId }: { archiveId: string }) {
             <textarea rows={5} value={form.essence} onChange={setField('essence')}
               placeholder={"What should the people who come after you understand about this moment?\nWhat it meant then. What it still means."}
               className="w-full resize-none focus:outline-none placeholder:italic"
-              style={{ background: 'transparent', color: '#F0F0EE', borderBottom: '1px solid rgba(255,255,255,0.10)', fontFamily: 'var(--font-cormorant), Georgia, serif', fontWeight: 300, fontSize: '1.05rem', lineHeight: 1.9, padding: '0.75rem 0' }} />
+              style={{ background: 'transparent', color: 'var(--portal-ink)', borderBottom: '1px solid var(--portal-card-line)', fontFamily: 'var(--portal-serif)', fontWeight: 300, fontSize: '1.05rem', lineHeight: 1.9, padding: '0.75rem 0' }} />
           </div>
 
           <div>
             <label style={compactLabel}>Who Is in This Photograph</label>
             <input type="text" placeholder="Names of people in this memory" value={form.people} onChange={setField('people')}
-              className="focus:outline-none placeholder:text-[#3A3F44]" style={{ ...baseInput, paddingBottom: '0.5rem' }} />
+              className="focus:outline-none placeholder:text-[var(--portal-label)]" style={{ ...baseInput, paddingBottom: '0.5rem' }} />
           </div>
 
           <div className="grid grid-cols-2 gap-6">
             <div>
               <label style={compactLabel}>Year</label>
               <input type="number" placeholder="e.g. 1974" min={1800} max={2030} value={form.year} onChange={setField('year')}
-                className="focus:outline-none placeholder:text-[#3A3F44]" style={{ ...baseInput, paddingBottom: '0.5rem' }} />
+                className="focus:outline-none placeholder:text-[var(--portal-label)]" style={{ ...baseInput, paddingBottom: '0.5rem' }} />
             </div>
             <div>
               <label style={compactLabel}>Season</label>
               <select value={form.season} onChange={setField('season')} className="focus:outline-none" style={{ ...baseInput, paddingBottom: '0.5rem', cursor: 'pointer' }}>
-                <option value="" disabled style={{ background: '#111112' }}>Select season</option>
-                {SEASONS.map(s => <option key={s} value={s} style={{ background: '#111112' }}>{s}</option>)}
+                <option value="" disabled style={{ background: 'var(--portal-card)' }}>Select season</option>
+                {SEASONS.map(s => <option key={s} value={s} style={{ background: 'var(--portal-card)' }}>{s}</option>)}
               </select>
             </div>
           </div>
@@ -728,15 +731,15 @@ export default function LabelClient({ archiveId }: { archiveId: string }) {
           <div>
             <label style={compactLabel}>Where</label>
             <input type="text" placeholder="City, State or Country" value={form.location} onChange={setField('location')}
-              className="focus:outline-none placeholder:text-[#3A3F44]" style={{ ...baseInput, paddingBottom: '0.5rem' }} />
+              className="focus:outline-none placeholder:text-[var(--portal-label)]" style={{ ...baseInput, paddingBottom: '0.5rem' }} />
           </div>
 
           <div>
-            <div className="mb-6" style={{ borderTop: '1px solid rgba(196,162,74,0.12)', paddingTop: '2rem' }}>
-              <label style={{ ...monoLabel, color: 'rgba(196,162,74,0.5)' }}>Who Else Would Remember This?</label>
+            <div className="mb-6" style={{ borderTop: '1px solid var(--portal-gold-line)', paddingTop: '2rem' }}>
+              <label style={{ ...monoLabel, color: 'var(--portal-gold-ink)' }}>Who Else Would Remember This?</label>
               <input type="email" placeholder="their@email.com" value={form.inviteEmail} onChange={setField('inviteEmail')}
-                className="focus:outline-none placeholder:text-[#3A3F44]" style={{ ...baseInput, paddingBottom: '0.5rem' }} />
-              <p style={{ fontFamily: 'monospace', fontSize: '0.5rem', letterSpacing: '0.08em', color: '#3A3F44', marginTop: '0.6rem' }}>
+                className="focus:outline-none placeholder:text-[var(--portal-label)]" style={{ ...baseInput, paddingBottom: '0.5rem' }} />
+              <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.08em', color: 'var(--portal-label)', marginTop: '0.6rem' }}>
                 Optional · They will be invited to contribute their own memories
               </p>
             </div>

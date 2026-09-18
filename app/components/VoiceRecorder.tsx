@@ -145,8 +145,8 @@ export default function VoiceRecorder({
 
   return (
     <div style={{
-      background:   'rgba(196,162,74,0.04)',
-      border:       '1px solid rgba(196,162,74,0.15)',
+      background:   'var(--portal-gold-wash)',
+      border:       '1px solid var(--portal-gold-line)',
       borderRadius: '4px',
       padding:      '2rem',
       maxWidth:     '520px',
@@ -155,8 +155,8 @@ export default function VoiceRecorder({
 
       {/* Prompt */}
       {prompt && (
-        <div style={{ borderLeft: '2px solid rgba(196,162,74,0.4)', paddingLeft: '1rem', marginBottom: '1.5rem' }}>
-          <p style={{ fontFamily: 'Georgia, serif', fontSize: '1rem', fontStyle: 'italic', color: '#F0EDE6', lineHeight: 1.7, margin: 0 }}>
+        <div style={{ borderLeft: '2px solid var(--portal-gold-line)', paddingLeft: '1rem', marginBottom: '1.5rem' }}>
+          <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '1rem', fontStyle: 'italic', color: 'var(--portal-ink)', lineHeight: 1.7, margin: 0 }}>
             &ldquo;{prompt}&rdquo;
           </p>
         </div>
@@ -165,10 +165,10 @@ export default function VoiceRecorder({
       {/* IDLE */}
       {state === 'idle' && (
         <div style={{ textAlign: 'center' }}>
-          <p style={{ fontFamily: 'Georgia, serif', fontSize: '0.95rem', fontStyle: 'italic', color: '#706C65', marginBottom: '0.5rem', lineHeight: 1.7 }}>
+          <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '0.95rem', fontStyle: 'italic', color: 'var(--portal-secondary)', marginBottom: '0.5rem', lineHeight: 1.7 }}>
             Speak naturally in any language.
           </p>
-          <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.62rem', letterSpacing: '0.12em', color: '#3A3830', marginBottom: '1.5rem' }}>
+          <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.12em', color: 'var(--portal-label)', marginBottom: '1.5rem' }}>
             VIETNAMESE · SPANISH · CANTONESE · ARABIC · TAGALOG · KOREAN · AND 93 MORE
           </p>
           <button
@@ -177,8 +177,8 @@ export default function VoiceRecorder({
               width:           '80px',
               height:          '80px',
               borderRadius:    '50%',
-              background:      'rgba(196,162,74,0.08)',
-              border:          '2px solid rgba(196,162,74,0.3)',
+              background:      'var(--portal-gold-wash)',
+              border:          '2px solid var(--portal-gold-line)',
               cursor:          'pointer',
               display:         'flex',
               alignItems:      'center',
@@ -187,24 +187,24 @@ export default function VoiceRecorder({
               transition:      'all 0.2s ease',
             }}
             onMouseEnter={e => {
-              e.currentTarget.style.background   = 'rgba(196,162,74,0.15)'
-              e.currentTarget.style.borderColor  = '#C4A24A'
+              e.currentTarget.style.background = 'var(--portal-tint)'
+              e.currentTarget.style.borderColor = 'var(--portal-gold-ink)'
               e.currentTarget.style.transform    = 'scale(1.05)'
             }}
             onMouseLeave={e => {
-              e.currentTarget.style.background   = 'rgba(196,162,74,0.08)'
-              e.currentTarget.style.borderColor  = 'rgba(196,162,74,0.3)'
+              e.currentTarget.style.background = 'var(--portal-gold-wash)'
+              e.currentTarget.style.borderColor = 'var(--portal-gold-line)'
               e.currentTarget.style.transform    = 'scale(1)'
             }}
           >
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#C4A24A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--portal-gold-ink)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
               <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
               <line x1="12" y1="19" x2="12" y2="23"/>
               <line x1="8"  y1="23" x2="16" y2="23"/>
             </svg>
           </button>
-          <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.62rem', letterSpacing: '0.2em', color: 'rgba(196,162,74,0.5)' }}>
+          <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.2em', color: 'var(--portal-gold-ink)' }}>
             TAP TO RECORD · UP TO 5 MINUTES
           </p>
         </div>
@@ -213,7 +213,7 @@ export default function VoiceRecorder({
       {/* REQUESTING */}
       {state === 'requesting' && (
         <div style={{ textAlign: 'center', padding: '1rem 0' }}>
-          <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', color: '#706C65' }}>
+          <p style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', color: 'var(--portal-secondary)' }}>
             Requesting microphone access...
           </p>
         </div>
@@ -232,30 +232,30 @@ export default function VoiceRecorder({
             width:           '80px',
             height:          '80px',
             borderRadius:    '50%',
-            background:      'rgba(180,60,60,0.12)',
-            border:          '2px solid rgba(180,60,60,0.5)',
+            background:      'var(--portal-tint)',
+            border:          '2px solid var(--portal-error)',
             display:         'flex',
             alignItems:      'center',
             justifyContent:  'center',
             margin:          '0 auto 1rem',
             animation:       'vr-pulse 1.2s ease-in-out infinite',
           }}>
-            <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: '#C43E3E' }} />
+            <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'var(--portal-error)' }} />
           </div>
-          <p style={{ fontFamily: '"Courier New", monospace', fontSize: '1.4rem', color: '#F0EDE6', letterSpacing: '0.05em', margin: '0 0 0.25rem' }}>
+          <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '1.4rem', color: 'var(--portal-ink)', letterSpacing: '0.05em', margin: '0 0 0.25rem' }}>
             {formatDuration(duration)}
           </p>
-          <p style={{ fontFamily: 'Georgia, serif', fontSize: '0.85rem', fontStyle: 'italic', color: '#706C65', marginBottom: '2rem' }}>
+          <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '0.85rem', fontStyle: 'italic', color: 'var(--portal-secondary)', marginBottom: '2rem' }}>
             Recording. Speak naturally.
           </p>
           <button
             onClick={stopRecording}
             style={{
-              fontFamily:    '"Courier New", monospace',
+              fontFamily: 'var(--portal-mono)',
               fontSize:      '0.72rem',
               letterSpacing: '0.25em',
-              color:         '#0A0908',
-              background:    '#C4A24A',
+              color:         'var(--portal-btn-label)',
+              background:    'var(--portal-btn)',
               border:        'none',
               padding:       '0.85rem 2.5rem',
               cursor:        'pointer',
@@ -270,10 +270,10 @@ export default function VoiceRecorder({
       {/* PROCESSING */}
       {state === 'processing' && (
         <div style={{ textAlign: 'center', padding: '1rem 0' }}>
-          <p style={{ fontFamily: 'Georgia, serif', fontSize: '1rem', fontStyle: 'italic', color: '#F0EDE6', marginBottom: '0.5rem' }}>
+          <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '1rem', fontStyle: 'italic', color: 'var(--portal-ink)', marginBottom: '0.5rem' }}>
             Transcribing your recording...
           </p>
-          <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.62rem', letterSpacing: '0.16em', color: '#706C65' }}>
+          <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.16em', color: 'var(--portal-secondary)' }}>
             {formatDuration(duration)} RECORDED · DETECTING LANGUAGE
           </p>
         </div>
@@ -283,38 +283,38 @@ export default function VoiceRecorder({
       {state === 'complete' && (
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-            <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.68rem', letterSpacing: '0.25em', color: '#C4A24A', margin: 0 }}>
+            <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.25em', color: 'var(--portal-gold-ink)', margin: 0 }}>
               ✓ SAVED TO YOUR ARCHIVE
             </p>
             {languageDetected && (
-              <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.62rem', letterSpacing: '0.12em', color: '#3A3830', margin: 0 }}>
+              <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.12em', color: 'var(--portal-label)', margin: 0 }}>
                 · {languageDetected.toUpperCase()}
               </p>
             )}
           </div>
-          <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.62rem', letterSpacing: '0.16em', color: '#706C65', marginBottom: '0.75rem' }}>
+          <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.16em', color: 'var(--portal-secondary)', marginBottom: '0.75rem' }}>
             TRANSCRIPT
           </p>
-          <div style={{ background: 'rgba(240,237,230,0.03)', border: '1px solid rgba(196,162,74,0.1)', borderRadius: '2px', padding: '1rem 1.25rem', marginBottom: '1.5rem', maxHeight: '200px', overflowY: 'auto' }}>
-            <p style={{ fontFamily: 'Georgia, serif', fontSize: '0.95rem', fontWeight: 300, color: '#B8B4AB', lineHeight: 1.85, margin: 0, fontStyle: 'italic' }}>
+          <div style={{ background: 'var(--portal-inset)', border: '1px solid var(--portal-gold-line)', borderRadius: '2px', padding: '1rem 1.25rem', marginBottom: '1.5rem', maxHeight: '200px', overflowY: 'auto' }}>
+            <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '0.95rem', fontWeight: 300, color: 'var(--portal-body)', lineHeight: 1.85, margin: 0, fontStyle: 'italic' }}>
               &ldquo;{transcript}&rdquo;
             </p>
           </div>
-          <p style={{ fontFamily: 'Georgia, serif', fontSize: '0.85rem', fontStyle: 'italic', color: '#3A3830', lineHeight: 1.7, marginBottom: '1.5rem' }}>
+          <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '0.85rem', fontStyle: 'italic', color: 'var(--portal-label)', lineHeight: 1.7, marginBottom: '1.5rem' }}>
             Your words have been transcribed and saved as a deposit.
             Your voice recording is preserved permanently in your archive.
           </p>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <button
               onClick={reset}
-              style={{ fontFamily: '"Courier New", monospace', fontSize: '0.64rem', letterSpacing: '0.2em', color: '#C4A24A', background: 'transparent', border: '1px solid rgba(196,162,74,0.3)', padding: '0.65rem 1.25rem', cursor: 'pointer', borderRadius: '2px' }}
+              style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.2em', color: 'var(--portal-gold-ink)', background: 'transparent', border: '1px solid var(--portal-gold-line)', padding: '0.65rem 1.25rem', cursor: 'pointer', borderRadius: '2px' }}
             >
               RECORD AGAIN
             </button>
             {onClose && (
               <button
                 onClick={onClose}
-                style={{ fontFamily: '"Courier New", monospace', fontSize: '0.64rem', letterSpacing: '0.2em', color: '#706C65', background: 'transparent', border: '1px solid rgba(240,237,230,0.08)', padding: '0.65rem 1.25rem', cursor: 'pointer', borderRadius: '2px' }}
+                style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.2em', color: 'var(--portal-secondary)', background: 'transparent', border: '1px solid var(--portal-card-line)', padding: '0.65rem 1.25rem', cursor: 'pointer', borderRadius: '2px' }}
               >
                 DONE
               </button>
@@ -326,12 +326,12 @@ export default function VoiceRecorder({
       {/* ERROR */}
       {state === 'error' && (
         <div style={{ textAlign: 'center' }}>
-          <p style={{ fontFamily: 'Georgia, serif', fontSize: '0.95rem', fontStyle: 'italic', color: '#B85C5C', marginBottom: '1.5rem', lineHeight: 1.7, maxWidth: '360px', margin: '0 auto 1.5rem' }}>
+          <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '0.95rem', fontStyle: 'italic', color: 'var(--portal-error)', marginBottom: '1.5rem', lineHeight: 1.7, maxWidth: '360px', margin: '0 auto 1.5rem' }}>
             {error}
           </p>
           <button
             onClick={reset}
-            style={{ fontFamily: '"Courier New", monospace', fontSize: '0.64rem', letterSpacing: '0.2em', color: '#C4A24A', background: 'transparent', border: '1px solid rgba(196,162,74,0.3)', padding: '0.65rem 1.25rem', cursor: 'pointer', borderRadius: '2px' }}
+            style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.2em', color: 'var(--portal-gold-ink)', background: 'transparent', border: '1px solid var(--portal-gold-line)', padding: '0.65rem 1.25rem', cursor: 'pointer', borderRadius: '2px' }}
           >
             TRY AGAIN
           </button>

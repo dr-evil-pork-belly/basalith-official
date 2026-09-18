@@ -49,31 +49,31 @@ function isToday(month: number, day: number): boolean {
 
 function dateTypeColor(type: string): string {
   switch (type) {
-    case 'birthday':            return '#C4A24A'
-    case 'death_anniversary':   return '#9DA3A8'
-    case 'wedding_anniversary': return '#F0EDE6'
-    default:                    return '#5C6166'
+    case 'birthday':            return 'var(--portal-gold-ink)'
+    case 'death_anniversary':   return 'var(--portal-secondary)'
+    case 'wedding_anniversary': return 'var(--portal-ink)'
+    default:                    return 'var(--portal-label)'
   }
 }
 
 const FIELD_LABEL_STYLE: React.CSSProperties = {
-  fontFamily:    "'Space Mono', monospace",
-  fontSize:      '0.44rem',
+  fontFamily:    'var(--portal-mono)',
+  fontSize: '11px',
   letterSpacing: '0.22em',
   textTransform: 'uppercase',
-  color:         '#C4A24A',
+  color:         'var(--portal-gold-ink)',
   display:       'block',
   marginBottom:  '0.4rem',
 }
 
 const INPUT_STYLE: React.CSSProperties = {
   width:        '100%',
-  background:   'rgba(255,255,255,0.04)',
-  border:       '1px solid rgba(255,255,255,0.08)',
+  background:   'var(--portal-inset)',
+  border:       '1px solid var(--portal-card-line)',
   borderRadius: '2px',
   padding:      '0.55rem 0.75rem',
-  color:        '#F0EDE6',
-  fontFamily:   'Georgia, serif',
+  color:        'var(--portal-ink)',
+  fontFamily: 'var(--portal-serif)',
   fontSize:     '0.9rem',
   outline:      'none',
   boxSizing:    'border-box',
@@ -199,21 +199,21 @@ export default function DatesClient({ archiveId }: { archiveId: string }) {
 
       {/* Header */}
       <div style={{ marginBottom: '2.5rem' }}>
-        <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.52rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: '#C4A24A', margin: '0 0 14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <span style={{ display: 'block', width: '20px', height: '1px', background: '#C4A24A', flexShrink: 0 }} aria-hidden="true" />
+        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', margin: '0 0 14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <span style={{ display: 'block', width: '20px', height: '1px', background: 'var(--portal-btn)', flexShrink: 0 }} aria-hidden="true" />
           Important Dates
         </p>
-        <h1 style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontWeight: 300, fontSize: 'clamp(1.8rem,3vw,2.4rem)', color: '#F0EDE6', margin: '0 0 12px', lineHeight: 1.15, letterSpacing: '-0.02em' }}>
+        <h1 style={{ fontFamily: 'var(--portal-serif)', fontWeight: 300, fontSize: 'clamp(1.8rem,3vw,2.4rem)', color: 'var(--portal-ink)', margin: '0 0 12px', lineHeight: 1.15, letterSpacing: '-0.02em' }}>
           Moments That Return
         </h1>
-        <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontWeight: 300, fontSize: '1rem', color: '#706C65', lineHeight: 1.75, margin: 0 }}>
+        <p style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', fontWeight: 300, fontSize: '1rem', color: 'var(--portal-secondary)', lineHeight: 1.75, margin: 0 }}>
           On these dates the archive automatically sends a curated photograph and memory to you and all contributors.
         </p>
       </div>
 
       {/* Add form */}
-      <div style={{ background: 'rgba(196,162,74,0.04)', border: '1px solid rgba(196,162,74,0.15)', borderTop: '2px solid rgba(196,162,74,0.4)', borderRadius: '2px', padding: '1.5rem', marginBottom: '2.5rem' }}>
-        <p style={{ fontFamily: 'monospace', fontSize: '0.58rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#C4A24A', margin: '0 0 1.25rem' }}>
+      <div style={{ background: 'var(--portal-gold-wash)', border: '1px solid var(--portal-gold-line)', borderTop: '2px solid var(--portal-gold-line)', borderRadius: '2px', padding: '1.5rem', marginBottom: '2.5rem' }}>
+        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', margin: '0 0 1.25rem' }}>
           Add a Date
         </p>
 
@@ -301,17 +301,17 @@ export default function DatesClient({ archiveId }: { archiveId: string }) {
             <button
               type="submit"
               disabled={saving}
-              style={{ background: 'rgba(196,162,74,1)', color: '#0A0A0B', fontFamily: 'monospace', fontSize: '0.58rem', letterSpacing: '0.22em', textTransform: 'uppercase', border: 'none', borderRadius: '2px', padding: '0.6rem 1.25rem', cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.6 : 1 }}
+              style={{ background: 'var(--portal-btn)', color: 'var(--portal-btn-label)', fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', border: 'none', borderRadius: '2px', padding: '0.6rem 1.25rem', cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.6 : 1 }}
             >
               {saving ? 'Saving...' : 'Add Date'}
             </button>
             {saved && (
-              <span style={{ fontFamily: 'monospace', fontSize: '0.58rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#C4A24A' }}>
+              <span style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)' }}>
                 Saved ✓
               </span>
             )}
             {saveErr && (
-              <span style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.12em', color: '#E05A5A' }}>
+              <span style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.12em', color: 'var(--portal-error)' }}>
                 Error: {saveErr}
               </span>
             )}
@@ -321,8 +321,8 @@ export default function DatesClient({ archiveId }: { archiveId: string }) {
 
       {/* Fetch error */}
       {fetchErr && (
-        <div style={{ background: 'rgba(224,90,90,0.06)', border: '1px solid rgba(224,90,90,0.2)', borderRadius: '2px', padding: '0.75rem 1rem', marginBottom: '1.5rem' }}>
-          <p style={{ fontFamily: 'monospace', fontSize: '0.54rem', letterSpacing: '0.12em', color: '#E05A5A', margin: 0 }}>
+        <div style={{ background: 'var(--portal-tint)', border: '1px solid var(--portal-error)', borderRadius: '2px', padding: '0.75rem 1rem', marginBottom: '1.5rem' }}>
+          <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.12em', color: 'var(--portal-error)', margin: 0 }}>
             Could not load dates: {fetchErr}
           </p>
         </div>
@@ -330,15 +330,15 @@ export default function DatesClient({ archiveId }: { archiveId: string }) {
 
       {/* Existing dates */}
       {loading ? (
-        <p style={{ fontFamily: 'monospace', fontSize: '0.6rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#3A3830' }}>
+        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-label)' }}>
           Loading...
         </p>
       ) : sortedDates.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '3rem 0' }}>
-          <p style={{ fontFamily: 'Georgia, serif', fontWeight: 600, color: '#9DA3A8', fontSize: '1rem', marginBottom: '0.5rem' }}>
+          <p style={{ fontFamily: 'var(--portal-serif)', fontWeight: 600, color: 'var(--portal-body)', fontSize: '1rem', marginBottom: '0.5rem' }}>
             No important dates added yet.
           </p>
-          <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', color: '#5C6166', fontSize: '0.9rem', lineHeight: 1.7, maxWidth: '360px', margin: '0 auto' }}>
+          <p style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', color: 'var(--portal-secondary)', fontSize: '0.9rem', lineHeight: 1.7, maxWidth: '360px', margin: '0 auto' }}>
             Add birthdays and anniversaries. Your archive will remember them automatically every year.
           </p>
         </div>
@@ -354,8 +354,8 @@ export default function DatesClient({ archiveId }: { archiveId: string }) {
               <div
                 key={dateRow.id}
                 style={{
-                  background:   today ? 'rgba(196,162,74,0.06)' : 'rgba(255,255,255,0.02)',
-                  border:       `1px solid ${today ? 'rgba(196,162,74,0.25)' : 'rgba(255,255,255,0.06)'}`,
+                  background:   today ? 'var(--portal-gold-wash)' : 'var(--portal-inset)',
+                  border:       `1px solid ${today ? 'var(--portal-gold-line)' : 'var(--portal-rule)'}`,
                   borderLeft:   `3px solid ${dateTypeColor(dateRow.date_type)}`,
                   borderRadius: '2px',
                   padding:      '1rem 1.25rem',
@@ -366,10 +366,10 @@ export default function DatesClient({ archiveId }: { archiveId: string }) {
               >
                 {/* Date badge */}
                 <div style={{ textAlign: 'center', minWidth: '48px', flexShrink: 0 }}>
-                  <p style={{ fontFamily: 'monospace', fontSize: '0.58rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#5C6166', margin: '0 0 2px' }}>
+                  <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--portal-secondary)', margin: '0 0 2px' }}>
                     {MONTH_NAMES[dateRow.month]?.slice(0, 3).toUpperCase()}
                   </p>
-                  <p className="font-serif" style={{ fontSize: '1.6rem', fontWeight: 700, color: today ? '#C4A24A' : '#F0EDE6', lineHeight: 1, margin: 0 }}>
+                  <p className="font-serif" style={{ fontSize: '1.6rem', fontWeight: 700, color: today ? 'var(--portal-gold-ink)' : 'var(--portal-ink)', lineHeight: 1, margin: 0 }}>
                     {dateRow.day}
                   </p>
                 </div>
@@ -377,16 +377,16 @@ export default function DatesClient({ archiveId }: { archiveId: string }) {
                 {/* Details */}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                    <p className="font-serif" style={{ fontSize: '0.95rem', fontWeight: 700, color: '#F0EDE6', margin: 0 }}>
+                    <p className="font-serif" style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--portal-ink)', margin: 0 }}>
                       {dateRow.person_name}
                     </p>
                     {today && (
-                      <span style={{ fontFamily: 'monospace', fontSize: '0.46rem', letterSpacing: '0.2em', textTransform: 'uppercase', background: 'rgba(196,162,74,0.15)', color: '#C4A24A', padding: '2px 6px', borderRadius: '2px' }}>
+                      <span style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', background: 'var(--portal-tint)', color: 'var(--portal-gold-ink)', padding: '2px 6px', borderRadius: '2px' }}>
                         TODAY
                       </span>
                     )}
                   </div>
-                  <p style={{ fontFamily: 'monospace', fontSize: '0.56rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#5C6166', margin: '4px 0 0' }}>
+                  <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--portal-secondary)', margin: '4px 0 0' }}>
                     {DATE_TYPES.find(t => t.value === dateRow.date_type)?.label}
                     {yearsAgo && dateRow.date_type === 'birthday' ? ` · Would be ${yearsAgo}` : ''}
                     {yearsAgo && dateRow.date_type === 'death_anniversary' ? ` · ${yearsAgo} years` : ''}
@@ -394,7 +394,7 @@ export default function DatesClient({ archiveId }: { archiveId: string }) {
                     {!today && ` · ${days} day${days === 1 ? '' : 's'} away`}
                   </p>
                   {dateRow.notes && (
-                    <p className="font-serif" style={{ fontStyle: 'italic', fontSize: '0.82rem', color: '#9DA3A8', margin: '6px 0 0', lineHeight: 1.6 }}>
+                    <p className="font-serif" style={{ fontStyle: 'italic', fontSize: '14.5px', color: 'var(--portal-body)', margin: '6px 0 0', lineHeight: 1.6 }}>
                       {dateRow.notes}
                     </p>
                   )}
@@ -406,14 +406,14 @@ export default function DatesClient({ archiveId }: { archiveId: string }) {
                     onClick={() => handleTestSend(dateRow)}
                     disabled={isSending}
                     title="Send now (test)"
-                    style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#C4A24A', background: 'none', border: '1px solid rgba(196,162,74,0.3)', borderRadius: '2px', padding: '4px 10px', cursor: isSending ? 'not-allowed' : 'pointer', opacity: isSending ? 0.5 : 1 }}
+                    style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', background: 'none', border: '1px solid var(--portal-gold-line)', borderRadius: '2px', padding: '4px 10px', cursor: isSending ? 'not-allowed' : 'pointer', opacity: isSending ? 0.5 : 1 }}
                   >
                     {isSending ? '...' : 'Send now →'}
                   </button>
                   <button
                     onClick={() => handleDelete(dateRow.id)}
                     title="Remove"
-                    style={{ fontFamily: 'monospace', fontSize: '0.52rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#5C6166', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0' }}
+                    style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--portal-secondary)', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0' }}
                   >
                     Remove
                   </button>

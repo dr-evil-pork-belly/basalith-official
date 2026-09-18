@@ -1,22 +1,9 @@
-import { redirect } from 'next/navigation'
-import { getSessionUser } from '@/lib/auth/getSessionUser'
-import { supabaseAdmin } from '@/lib/supabase-admin'
-import ScenariosClient from './ScenariosClient'
+import { permanentRedirect } from 'next/navigation'
 
-export default async function ScenariosPage() {
-  const session = await getSessionUser()
-  if (!session?.archiveId) redirect('/archive-login')
-
-  const { data: responses } = await supabaseAdmin
-    .from('b2b_scenario_responses')
-    .select('scenario_id, response, created_at')
-    .eq('archive_id', session.archiveId)
-    .order('created_at', { ascending: false })
-
-  return (
-    <ScenariosClient
-      archiveId={session.archiveId}
-      existingResponses={responses ?? []}
-    />
-  )
+// Retired September 18, 2026. This surface was cut from the archive sidebar on
+// September 16 and nothing links to it. The URL is kept as a 308 so held links
+// do not 404; the directory can be deleted after the redirect has lived a few
+// months. Do not reuse the route.
+export default function RetiredPage() {
+  permanentRedirect('/archive/dashboard')
 }
