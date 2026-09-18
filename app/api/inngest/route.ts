@@ -13,6 +13,7 @@ import {
 import { buildArchiveExportJob } from '@/lib/inngest/exportFunctions'
 import { storageBackupSync, storageBackupVerify } from '@/lib/inngest/storageBackupFunctions'
 import { computeCoverage, coverageMonthlySweep } from '@/lib/inngest/coverageFunctions'
+import { trialWarn, trialExpire } from '@/lib/inngest/trialFunctions'
 
 export const { GET, POST, PUT } = serve({
   client:    inngest,
@@ -30,6 +31,8 @@ export const { GET, POST, PUT } = serve({
     storageBackupVerify,
     computeCoverage,
     coverageMonthlySweep,
+    trialWarn,
+    trialExpire,
   ],
 })
 
