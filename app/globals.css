@@ -30,18 +30,37 @@
   --color-border:        rgba(26,24,20,0.08);
   --color-border-medium: rgba(26,24,20,0.15);
 
-  /* Portal dark theme. RETIRED September 18, 2026: no component ever read
-     these (portal pages carried hex literals inline). The portal now runs on
-     stone via .portal-stone at the bottom of this file, which redefines
-     --portal-bg inside its scope. Kept here, unused, until the last slice of
-     the portal migration lands; then delete this block. */
-  --portal-bg:      #0C0B09;
-  --portal-surface: #141210;
-  --portal-alt:     #1C1A17;
-  --portal-gold:    #C4A24A;
-  --portal-border:  rgba(196,162,74,0.1);
-  --portal-text:    #F0EDE6;
-  --portal-muted:   #706C65;
+  /* ── Portal, shared across both registers ────────────────────────────────
+     The retired dark --portal-* block that sat here was deleted September 19,
+     2026 with slice 3; no component ever read it.
+
+     The portal has two registers and they share these tokens, so a value
+     exists once:
+       .portal-stone      the workspace. Stone ground, ink text.
+       .portal-threshold  the way in (sign-in, /begin) and any surface that is
+                          Basalith's own frame rather than the founder's desk.
+                          Ink ground, bone text, from the --invert-* family.
+     The --invert-* family is also the block where the archive speaks, inside
+     .portal-stone. Same values, one meaning: dark is Basalith and the archive;
+     stone is the founder at work. */
+  --portal-serif:     var(--font-newsreader), Georgia, serif;
+  --portal-mono:      var(--font-space-mono), 'Courier New', monospace;
+
+  --invert-bg:        #14120F;
+  --invert-fg:        #F7F5F1;   /* 17.17:1 */
+  --invert-body:      #C7C1B8;   /* 10.46:1 */
+  --invert-dim:       rgba(247,245,241,0.62);   /* 7.08:1 */
+  --invert-gold:      #C4A24A;   /*  7.67:1 */
+  --invert-error:     #E08B8B;   /*  7.33:1 */
+  --invert-ok:        #7FB685;   /*  7.95:1 */
+  --invert-rule:      rgba(247,245,241,0.12);
+  --invert-field:     rgba(247,245,241,0.07);
+  --invert-gold-line: rgba(196,162,74,0.45);
+  --invert-gold-wash: rgba(196,162,74,0.10);
+
+  --portal-btn:       #C4A24A;   /* label #0A0908, 8.16:1 */
+  --portal-btn-hover: #B08F3E;   /* label #0A0908, 6.48:1 */
+  --portal-btn-label: #0A0908;
 
   /* Typography */
   --font-serif: 'Cormorant Garamond', Georgia, serif;
@@ -228,11 +247,19 @@ ON STONE (PORTAL, .portal-stone; worst case is the ground #ECE8E1; also #F3F0EB,
   NEVER USE:      #8A847B  FAIL   3.0:1   (the homepage --stone-label)
   NEVER USE:      #C4A24A  FAIL   2.0:1   (gold is a button fill on stone, never text)
 
-ON THE SPINE (#14120F, sidebar and mobile bar):
+ON INK (#14120F: the spine, the threshold, and the block where the archive speaks):
   Primary text:   #F7F5F1  PASS  17.17:1  (--spine-fg)
   Nav items:      #C7C1B8  PASS  10.46:1  (--spine-body)
   Group labels:   rgba(247,245,241,0.62)  PASS  7.08:1  (--spine-dim)
-  Active item:    #C4A24A  PASS   7.67:1  (--spine-gold)
+  Active item:    #C4A24A  PASS   7.67:1  (--spine-gold, --invert-gold)
+  Primary:        #F7F5F1  PASS  17.17:1  (--invert-fg)
+  Body:           #C7C1B8  PASS  10.46:1  (--invert-body)
+  Labels:         rgba(247,245,241,0.62)  PASS  7.08:1  (--invert-dim)
+  Error:          #E08B8B  PASS   7.33:1  (--invert-error)
+  Confirmation:   #7FB685  PASS   7.95:1  (--invert-ok)
+  NEVER USE:      #5C6166  FAIL   3.5:1   (the old portal dim; a label color on stone, never on ink)
+  NEVER USE:      #3A3F44  FAIL   1.7:1   (the old portal faint)
+  NEVER USE:      #C47D1A  FAIL   4.1:1   (the marketing .eyebrow orange)
 
 ON THE INVERTED BLOCK (#14120F, the only dark surface in the portal):
   Primary text:   #F7F5F1  PASS  17.17:1  (--invert-fg)
@@ -729,25 +756,47 @@ input[type='range'].range-amber::-webkit-slider-thumb {
   --portal-gold-line: rgba(138,110,48,0.30);
   --portal-gold-wash: rgba(138,110,48,0.07);
 
-  --portal-btn:       #C4A24A;   /* label #0A0908, 8.16:1 */
-  --portal-btn-hover: #B08F3E;   /* label #0A0908, 6.48:1 */
-  --portal-btn-label: #0A0908;
-
-  --invert-bg:        #14120F;
-  --invert-fg:        #F7F5F1;   /* 17.17:1 */
-  --invert-body:      #C7C1B8;   /* 10.46:1 */
-  --invert-gold:      #C4A24A;   /*  7.67:1 */
-  --invert-dim:       rgba(247,245,241,0.62);   /* 7.08:1 */
-  --invert-rule:      rgba(247,245,241,0.14);
-  --invert-field:     rgba(247,245,241,0.07);   /* text field ground on the inverted block */
-  --invert-gold-line: rgba(196,162,74,0.45);
   --portal-scrim:     rgba(20,18,15,0.88);      /* lightbox and modal backdrop; text on it uses --invert-* */
-
-  --portal-serif:     var(--font-newsreader), Georgia, serif;
-  --portal-mono:      var(--font-space-mono), 'Courier New', monospace;
 
   background: var(--portal-bg);
   color:      var(--portal-body);
+}
+
+/* ── The threshold ───────────────────────────────────────────────────────────
+   Sign-in, /begin, and any surface that is Basalith's own frame rather than
+   the founder's workspace. Ink ground, from the same --invert-* family as the
+   block where the archive speaks, so the product has one dark and not two. A
+   founder signs in through the dark and the workspace lights up. */
+.portal-threshold {
+  background:  var(--invert-bg);
+  color:       var(--invert-body);
+  font-family: var(--portal-serif);
+}
+.portal-threshold input,
+.portal-threshold textarea,
+.portal-threshold select {
+  color: var(--invert-fg);
+  background: var(--invert-field);
+  border: 1px solid var(--invert-rule);
+}
+.portal-threshold ::placeholder { color: var(--invert-dim); }
+.portal-threshold ::selection    { background: rgba(196,162,74,0.35); }
+.portal-threshold input:focus-visible,
+.portal-threshold textarea:focus-visible,
+.portal-threshold select:focus-visible,
+.portal-threshold button:focus-visible,
+.portal-threshold a:focus-visible {
+  outline: 2px solid var(--invert-gold);
+  outline-offset: 2px;
+}
+/* The marketing .eyebrow component (tailwind.config.ts) is orange on a light
+   ground. On the threshold it is the portal eyebrow: gold mono. */
+.portal-threshold .eyebrow {
+  font-family: var(--portal-mono);
+  font-size: 11.5px;
+  font-weight: 400;
+  letter-spacing: 0.24em;
+  color: var(--invert-gold);
 }
 
 /* Cards. Every block that paints itself with the card white lifts off the
@@ -789,13 +838,20 @@ input[type='range'].range-amber::-webkit-slider-thumb {
    two portal faces; a two-class selector outranks the single-class utility. */
 .portal-stone .font-serif,
 .portal-stone .font-sans,
-.portal-stone .font-legacy { font-family: var(--portal-serif); }
+.portal-stone .font-legacy,
+.portal-threshold .font-serif,
+.portal-threshold .font-sans,
+.portal-threshold .font-legacy { font-family: var(--portal-serif); }
 .portal-stone .font-mono,
-.portal-stone .font-compute { font-family: var(--portal-mono); }
+.portal-stone .font-compute,
+.portal-threshold .font-mono,
+.portal-threshold .font-compute { font-family: var(--portal-mono); }
 
 /* Vault-era button components (tailwind.config.ts) re-pointed for stone.
    Same shape, portal colors. Delete with the component definitions once no
    portal file uses them. */
+.portal-threshold .btn-monolith,
+.portal-threshold .btn-monolith-amber,
 .portal-stone .btn-monolith,
 .portal-stone .btn-monolith-amber {
   font-family: var(--portal-mono);
@@ -809,14 +865,41 @@ input[type='range'].range-amber::-webkit-slider-thumb {
   min-height: 44px;
   padding: 0 24px;
 }
+.portal-threshold .btn-monolith:hover,
+.portal-threshold .btn-monolith-amber:hover,
 .portal-stone .btn-monolith:hover,
 .portal-stone .btn-monolith-amber:hover {
   background: var(--portal-btn-hover);
   box-shadow: none;
   transform: none;
 }
+.portal-threshold .btn-monolith::before,
+.portal-threshold .btn-monolith-amber::before,
 .portal-stone .btn-monolith::before,
 .portal-stone .btn-monolith-amber::before { display: none; }
+.portal-threshold .btn-monolith-ghost {
+  font-family: var(--portal-mono);
+  font-size: 11.5px;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  color: var(--invert-gold);
+  background: transparent;
+  border: 1px solid var(--invert-gold-line);
+  min-height: 44px;
+  padding: 0 18px;
+}
+.portal-threshold .btn-monolith-ghost:hover {
+  color: var(--invert-fg);
+  border-color: var(--invert-gold);
+  background: var(--invert-field);
+}
+.portal-threshold .btn-monolith:focus-visible,
+.portal-threshold .btn-monolith-amber:focus-visible,
+.portal-threshold .btn-monolith-ghost:focus-visible {
+  box-shadow: none;
+  outline: 2px solid var(--invert-gold);
+  outline-offset: 2px;
+}
 .portal-stone .btn-monolith-ghost {
   font-family: var(--portal-mono);
   font-size: 11.5px;

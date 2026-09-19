@@ -212,26 +212,26 @@ function StoryGameSection({
 
   return (
     <div style={{ marginBottom: '1.75rem' }}>
-      <div style={{ background: '#FFFFFF', border: '1px solid rgba(26,24,20,0.08)', borderTop: '2px solid #B8963E', borderRadius: '2px', overflow: 'hidden' }}>
+      <div style={{ background: 'var(--portal-card)', border: '1px solid var(--portal-rule)', borderTop: '2px solid var(--portal-btn)', borderRadius: '2px', overflow: 'hidden' }}>
         {/* Header */}
-        <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid rgba(26,24,20,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid var(--portal-rule)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
-            <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontSize: '1.15rem', fontWeight: 700, color: '#1A1814', margin: 0 }}>{t.title}</p>
+            <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '1.15rem', fontWeight: 700, color: 'var(--portal-ink)', margin: 0 }}>{t.title}</p>
           </div>
-          <span style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.42rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#B8963E', background: 'rgba(184,150,62,0.08)', padding: '3px 8px' }}>{t.badge}</span>
+          <span style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', background: 'var(--portal-gold-ink)', padding: '3px 8px' }}>{t.badge}</span>
         </div>
 
         <div style={{ padding: '1.25rem' }}>
           {/* Scenario */}
-          <div style={{ borderLeft: '3px solid rgba(184,150,62,0.4)', padding: '14px 18px', marginBottom: '20px', background: 'rgba(184,150,62,0.04)' }}>
-            <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontSize: '1.2rem', fontStyle: 'italic', fontWeight: 300, color: '#1A1814', lineHeight: 1.7, margin: 0 }}>
+          <div style={{ borderLeft: '3px solid var(--portal-gold-line)', padding: '14px 18px', marginBottom: '20px', background: 'var(--portal-gold-line)' }}>
+            <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '1.2rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--portal-ink)', lineHeight: 1.7, margin: 0 }}>
               {game.scenarioText}
             </p>
           </div>
 
           {/* Status line */}
           {game.status === 'active' && (
-            <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.44rem', letterSpacing: '0.12em', color: '#8A8680', marginBottom: '16px' }}>
+            <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.12em', color: 'var(--portal-secondary)', marginBottom: '16px' }}>
               {t.responded(game.responseCount)} · answers revealed {revealDate}
             </p>
           )}
@@ -243,12 +243,12 @@ function StoryGameSection({
                 value={answer}
                 onChange={e => setAnswer(e.target.value)}
                 placeholder={t.noAnswer}
-                style={{ width: '100%', minHeight: '100px', padding: '12px', fontFamily: '"Cormorant Garamond",Georgia,serif', fontSize: '1rem', lineHeight: 1.65, color: '#1A1814', background: '#FAFAF8', border: '1px solid rgba(26,24,20,0.12)', borderRadius: '2px', resize: 'vertical', boxSizing: 'border-box', marginBottom: '12px' }}
+                style={{ width: '100%', minHeight: '100px', padding: '12px', fontFamily: 'var(--portal-serif)', fontSize: '1rem', lineHeight: 1.65, color: 'var(--portal-ink)', background: 'var(--portal-card)', border: '1px solid var(--portal-card-line)', borderRadius: '2px', resize: 'vertical', boxSizing: 'border-box', marginBottom: '12px' }}
               />
               <button
                 onClick={handleSubmit}
                 disabled={!answer.trim() || submitting}
-                style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.52rem', letterSpacing: '0.2em', textTransform: 'uppercase', background: answer.trim() && !submitting ? '#B8963E' : 'rgba(184,150,62,0.3)', color: '#FFFFFF', border: 'none', padding: '12px 24px', cursor: answer.trim() ? 'pointer' : 'not-allowed' }}
+                style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', background: answer.trim() && !submitting ? 'var(--portal-btn)' : 'var(--portal-tint)', color: answer.trim() && !submitting ? 'var(--portal-btn-label)' : 'var(--portal-gold-ink)', border: 'none', padding: '12px 24px', cursor: answer.trim() ? 'pointer' : 'not-allowed' }}
               >
                 {submitting ? '…' : t.cta}
               </button>
@@ -256,8 +256,8 @@ function StoryGameSection({
           )}
 
           {(game.alreadyAnswered || submitted) && game.status === 'active' && (
-            <div style={{ padding: '14px 18px', background: 'rgba(184,150,62,0.06)', border: '1px solid rgba(184,150,62,0.2)', borderRadius: '2px' }}>
-              <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.48rem', letterSpacing: '0.14em', color: '#B8963E', margin: 0 }}>
+            <div style={{ padding: '14px 18px', background: 'var(--portal-gold-wash)', border: '1px solid var(--portal-tint)', borderRadius: '2px' }}>
+              <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.14em', color: 'var(--portal-gold-ink)', margin: 0 }}>
                 ✓ {t.submitted} {revealDate}
               </p>
             </div>
@@ -266,13 +266,13 @@ function StoryGameSection({
           {/* Revealed: show all answers */}
           {game.status === 'revealed' && game.revealedAnswers && (
             <>
-              <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.44rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#B8963E', marginBottom: '16px' }}>
+              <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '16px' }}>
                 {t.revealTitle} · {game.revealedAnswers.length}
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 {game.revealedAnswers.map((a, i) => (
-                  <div key={i} style={{ border: '1px solid rgba(184,150,62,0.2)', padding: '14px 18px', background: 'rgba(184,150,62,0.02)' }}>
-                    <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontSize: '1rem', fontStyle: 'italic', color: '#1A1814', lineHeight: 1.7, margin: 0 }}>{a}</p>
+                  <div key={i} style={{ border: '1px solid var(--portal-gold-line)', padding: '14px 18px', background: 'var(--portal-gold-line)' }}>
+                    <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '1rem', fontStyle: 'italic', color: 'var(--portal-ink)', lineHeight: 1.7, margin: 0 }}>{a}</p>
                   </div>
                 ))}
               </div>
@@ -310,19 +310,19 @@ function SectionCard({
 }) {
   return (
     <div style={{
-      background:    '#FFFFFF',
-      border:        '1px solid rgba(26,24,20,0.08)',
-      borderTop:     prominent ? '2px solid #B8963E' : '2px solid rgba(184,150,62,0.25)',
+      background:    'var(--portal-card)',
+      border:        '1px solid var(--portal-rule)',
+      borderTop:     prominent ? '2px solid var(--portal-gold-ink)' : '2px solid var(--portal-gold-line)',
       borderRadius:  '4px',
       padding:       '24px',
       marginBottom:  '16px',
-      boxShadow:     prominent ? '0 4px 16px rgba(26,24,20,0.06)' : '0 1px 3px rgba(26,24,20,0.04)',
+      boxShadow:     prominent ? 'var(--portal-lift)' : 'none',
     }}>
-      <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.5rem', letterSpacing: '0.28em', textTransform: 'uppercase', color: prominent ? '#B8963E' : 'rgba(138,134,128,0.8)', margin: '0 0 6px' }}>
+      <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.28em', textTransform: 'uppercase', color: prominent ? 'var(--portal-gold-ink)' : 'var(--portal-secondary)', margin: '0 0 6px' }}>
         {title}
       </p>
       {subtitle && (
-        <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, color: '#4A4640', lineHeight: 1.7, marginBottom: '20px' }}>
+        <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--portal-body)', lineHeight: 1.7, marginBottom: '20px' }}>
           {subtitle}
         </p>
       )}
@@ -338,11 +338,11 @@ function SavedConfirmation({ lang }: { lang: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
       <span style={{
-        fontFamily:    '"Space Mono","Courier New",monospace',
-        fontSize:      '0.5rem',
+        fontFamily: 'var(--portal-mono)',
+        fontSize: '11px',
         letterSpacing: '0.25em',
         textTransform: 'uppercase',
-        color:         '#B8963E',
+        color:         'var(--portal-gold-ink)',
       }}>
         ✓ {t.savedConfirm}
       </span>
@@ -455,7 +455,7 @@ function QuestionsSection({
   if (loading) {
     return (
       <SectionCard title={PORTAL_UI[lang === 'zh' ? 'zh' : 'en'].questionsForYou} prominent>
-        <div style={{ height: '80px', background: 'rgba(255,255,255,0.03)', borderRadius: '2px', animation: 'pulse 1.5s ease-in-out infinite' }} />
+        <div style={{ height: '80px', background: 'var(--portal-inset)', borderRadius: '2px', animation: 'pulse 1.5s ease-in-out infinite' }} />
       </SectionCard>
     )
   }
@@ -463,7 +463,7 @@ function QuestionsSection({
   if (loadError) {
     return (
       <SectionCard title={PORTAL_UI[lang === 'zh' ? 'zh' : 'en'].questionsForYou} prominent>
-        <p style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.12em', color: '#C0392B' }}>
+        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.12em', color: 'var(--portal-error)' }}>
           Could not load questions. Please refresh the page.
         </p>
       </SectionCard>
@@ -475,10 +475,10 @@ function QuestionsSection({
     return (
       <SectionCard title={t.questionsForYou} prominent>
         {showSaved && <SavedConfirmation lang={lang} />}
-        <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.5rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#B8963E', marginBottom: '8px' }}>
+        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '8px' }}>
           {t.caughtUpTitle}
         </p>
-        <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontWeight: 300, fontSize: '1rem', color: '#4A4640', lineHeight: 1.8, margin: 0 }}>
+        <p style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', fontWeight: 300, fontSize: '1rem', color: 'var(--portal-body)', lineHeight: 1.8, margin: 0 }}>
           {t.caughtUpBody}
         </p>
       </SectionCard>
@@ -500,7 +500,7 @@ function QuestionsSection({
       {/* Honesty framing */}
       <div
         style={{
-          borderLeft:   '2px solid rgba(184,150,62,0.3)',
+          borderLeft:   '2px solid var(--portal-gold-line)',
           paddingLeft:  '20px',
           marginBottom: '32px',
           maxWidth:     '560px',
@@ -508,11 +508,11 @@ function QuestionsSection({
       >
         <p
           style={{
-            fontFamily:  '"Cormorant Garamond",Georgia,serif',
+            fontFamily: 'var(--portal-serif)',
             fontSize:    '1rem',
             fontStyle:   'italic',
             fontWeight:  300,
-            color:       '#4A4640',
+            color:       'var(--portal-body)',
             lineHeight:  1.8,
             margin:      0,
           }}
@@ -538,11 +538,11 @@ function QuestionsSection({
                 style={{ width: '100%', maxWidth: '280px', height: 'auto', borderRadius: '2px', marginBottom: '0.75rem', display: 'block' }}
               />
             )}
-            <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontWeight: 500, fontSize: '1.05rem', color: '#1A1814', lineHeight: 1.55, marginBottom: '16px' }}>
+            <p style={{ fontFamily: 'var(--portal-serif)', fontWeight: 500, fontSize: '1.05rem', color: 'var(--portal-ink)', lineHeight: 1.55, marginBottom: '16px' }}>
               {q.question_text.replace(/\[subject\]/gi, subjectName)}
             </p>
             {saved[q.id] ? (
-              <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.48rem', letterSpacing: '0.22em', color: '#B8963E' }}>
+              <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.22em', color: 'var(--portal-gold-ink)' }}>
                 Saved ✓
               </p>
             ) : (
@@ -555,11 +555,11 @@ function QuestionsSection({
                   style={{
                     width:        '100%',
                     minHeight:    '120px',
-                    background:   '#F5F3EE',
-                    border:       '1px solid rgba(26,24,20,0.08)',
+                    background:   'var(--portal-card)',
+                    border:       '1px solid var(--portal-rule)',
                     borderRadius: '2px',
-                    color:        '#1A1814',
-                    fontFamily:   '"Cormorant Garamond",Georgia,serif',
+                    color:        'var(--portal-ink)',
+                    fontFamily: 'var(--portal-serif)',
                     fontSize:     '1.05rem',
                     fontWeight:   300,
                     lineHeight:   1.75,
@@ -574,15 +574,15 @@ function QuestionsSection({
                   disabled={!answers[q.id]?.trim() || saving[q.id]}
                   style={{
                     marginTop:     '0.75rem',
-                    background:    saving[q.id] ? 'rgba(196,162,74,0.4)' : '#C4A24A',
+                    background:    saving[q.id] ? 'var(--portal-tint)' : 'var(--portal-btn)',
                     border:        'none',
                     borderRadius:  '2px',
                     padding:       '0.6rem 1.5rem',
-                    fontFamily:    'monospace',
-                    fontSize:      '0.4rem',
+                    fontFamily: 'var(--portal-mono)',
+                    fontSize: '11px',
                     letterSpacing: '0.25em',
                     textTransform: 'uppercase',
-                    color:         '#0A0908',
+                    color:         'var(--portal-btn-label)',
                     cursor:        saving[q.id] ? 'not-allowed' : 'pointer',
                     opacity:       !answers[q.id]?.trim() ? 0.4 : 1,
                   }}
@@ -590,7 +590,7 @@ function QuestionsSection({
                   {saving[q.id] ? 'Saving...' : 'Save Answer'}
                 </button>
                 {saveError[q.id] && (
-                  <p style={{ fontFamily: 'monospace', fontSize: '0.42rem', color: '#C0392B', marginTop: '0.4rem', letterSpacing: '0.08em' }}>
+                  <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', color: 'var(--portal-error)', marginTop: '0.4rem', letterSpacing: '0.08em' }}>
                     Could not save. Please try again.
                   </p>
                 )}
@@ -710,11 +710,11 @@ function PhotoUploadSection({
         : `Photographs you have of ${subjectName} from your own collection.`}
     >
       <p style={{
-        fontFamily:    '"Space Mono","Courier New",monospace',
-        fontSize:      '0.44rem',
+        fontFamily: 'var(--portal-mono)',
+        fontSize: '11px',
         letterSpacing: '0.18em',
         textTransform: 'uppercase' as const,
-        color:         'rgba(138,134,128,0.7)',
+        color:         'var(--portal-secondary)',
         marginBottom:  '16px',
         lineHeight:    1.7,
       }}>
@@ -723,12 +723,12 @@ function PhotoUploadSection({
 
       <div
         style={{
-          border:       `1px dashed ${dragging ? 'rgba(196,162,74,0.5)' : 'rgba(255,255,255,0.1)'}`,
+          border:       `1px dashed ${dragging ? 'var(--portal-gold-line)' : 'var(--portal-card-line)'}`,
           borderRadius: '2px',
           padding:      '2rem 1.5rem',
           textAlign:    'center',
           cursor:       'pointer',
-          background:   dragging ? 'rgba(196,162,74,0.04)' : 'transparent',
+          background:   dragging ? 'var(--portal-gold-wash)' : 'transparent',
           transition:   'all 0.15s',
           marginBottom: files.length ? '0.75rem' : 0,
         }}
@@ -753,7 +753,7 @@ function PhotoUploadSection({
             e.target.value = ''
           }}
         />
-        <p style={{ fontFamily: 'monospace', fontSize: '0.42rem', letterSpacing: '0.2em', color: '#5C6166', margin: 0 }}>
+        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.2em', color: 'var(--portal-secondary)', margin: 0 }}>
           {files.length ? `${files.length} PHOTO${files.length > 1 ? 'S' : ''} SELECTED` : 'TAP TO SELECT · DROP TO ADD'}
         </p>
       </div>
@@ -761,7 +761,7 @@ function PhotoUploadSection({
       {files.length > 0 && (
         <div className="flex flex-wrap" style={{ gap: '0.4rem', marginBottom: '0.75rem' }}>
           {files.map((f, i) => (
-            <span key={i} style={{ fontFamily: 'monospace', fontSize: '0.38rem', color: '#706C65', background: 'rgba(255,255,255,0.04)', padding: '2px 8px', borderRadius: '2px', maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <span key={i} style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', color: 'var(--portal-secondary)', background: 'var(--portal-inset)', border: '1px solid var(--portal-card-line)', padding: '2px 8px', borderRadius: '2px', maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {f.name}
             </span>
           ))}
@@ -770,23 +770,23 @@ function PhotoUploadSection({
 
       {status === 'uploading' && (
         <div style={{ marginBottom: '0.75rem' }}>
-          <div style={{ height: '3px', background: 'rgba(255,255,255,0.06)', borderRadius: '2px', overflow: 'hidden', marginBottom: '0.4rem' }}>
-            <div style={{ height: '100%', background: '#C4A24A', borderRadius: '2px', width: `${progress}%`, transition: 'width 0.3s ease' }} />
+          <div style={{ height: '3px', background: 'var(--portal-inset)', borderRadius: '2px', overflow: 'hidden', marginBottom: '0.4rem' }}>
+            <div style={{ height: '100%', background: 'var(--portal-btn)', borderRadius: '2px', width: `${progress}%`, transition: 'width 0.3s ease' }} />
           </div>
-          <p style={{ fontFamily: 'monospace', fontSize: '0.38rem', color: '#706C65', letterSpacing: '0.1em' }}>
+          <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', color: 'var(--portal-secondary)', letterSpacing: '0.1em' }}>
             UPLOADING... {progress}%
           </p>
         </div>
       )}
 
       {status === 'success' && (
-        <p style={{ fontFamily: 'monospace', fontSize: '0.4rem', letterSpacing: '0.2em', color: 'rgba(196,162,74,0.8)', marginBottom: '0.75rem' }}>
+        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.2em', color: 'var(--portal-gold-ink)', marginBottom: '0.75rem' }}>
           {message.toUpperCase()}
         </p>
       )}
 
       {status === 'error' && (
-        <p style={{ fontFamily: 'monospace', fontSize: '0.38rem', color: '#8B5555', marginBottom: '0.75rem' }}>
+        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', color: 'var(--portal-error)', marginBottom: '0.75rem' }}>
           {message}
         </p>
       )}
@@ -795,15 +795,15 @@ function PhotoUploadSection({
         onClick={handleUpload}
         disabled={!files.length || status === 'uploading'}
         style={{
-          background:    '#C4A24A',
+          background:    'var(--portal-btn)',
           border:        'none',
           borderRadius:  '2px',
           padding:       '0.6rem 1.5rem',
-          fontFamily:    'monospace',
-          fontSize:      '0.4rem',
+          fontFamily: 'var(--portal-mono)',
+          fontSize: '11px',
           letterSpacing: '0.25em',
           textTransform: 'uppercase',
-          color:         '#0A0908',
+          color:         'var(--portal-btn-label)',
           cursor:        (!files.length || status === 'uploading') ? 'not-allowed' : 'pointer',
           opacity:       !files.length ? 0.4 : 1,
         }}
@@ -907,11 +907,11 @@ function MediaUploadSection({
       subtitle={lang === 'zh' ? '家庭录像、信件、文件，您收藏中的任何内容。' : 'Home videos, letters, documents, anything from your collection.'}
     >
       <p style={{
-        fontFamily:    '"Space Mono","Courier New",monospace',
-        fontSize:      '0.44rem',
+        fontFamily: 'var(--portal-mono)',
+        fontSize: '11px',
         letterSpacing: '0.18em',
         textTransform: 'uppercase' as const,
-        color:         'rgba(138,134,128,0.7)',
+        color:         'var(--portal-secondary)',
         marginBottom:  '16px',
         lineHeight:    1.7,
       }}>
@@ -920,7 +920,7 @@ function MediaUploadSection({
 
       <div
         style={{
-          border:       '1px dashed rgba(255,255,255,0.1)',
+          border:       '1px dashed var(--portal-card-line)',
           borderRadius: '2px',
           padding:      '1.5rem',
           textAlign:    'center',
@@ -936,26 +936,26 @@ function MediaUploadSection({
           className="hidden"
           onChange={e => { setFile(e.target.files?.[0] ?? null); e.target.value = '' }}
         />
-        <p style={{ fontFamily: 'monospace', fontSize: '0.42rem', letterSpacing: '0.2em', color: '#5C6166', margin: 0 }}>
+        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.2em', color: 'var(--portal-secondary)', margin: 0 }}>
           {file ? file.name : 'TAP TO SELECT FILE'}
         </p>
-        <p style={{ fontFamily: 'monospace', fontSize: '0.38rem', color: '#3A3F44', margin: '0.3rem 0 0' }}>
+        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', color: 'var(--portal-label)', margin: '0.3rem 0 0' }}>
           MOV · MP4 · AVI · PDF · DOC · TXT
         </p>
       </div>
 
       {status === 'uploading' && (
-        <p style={{ fontFamily: 'monospace', fontSize: '0.38rem', letterSpacing: '0.15em', color: '#706C65', marginBottom: '0.75rem' }}>
+        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.15em', color: 'var(--portal-secondary)', marginBottom: '0.75rem' }}>
           UPLOADING...
         </p>
       )}
       {status === 'success' && (
-        <p style={{ fontFamily: 'monospace', fontSize: '0.4rem', letterSpacing: '0.2em', color: 'rgba(196,162,74,0.8)', marginBottom: '0.75rem' }}>
+        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.2em', color: 'var(--portal-gold-ink)', marginBottom: '0.75rem' }}>
           {message.toUpperCase()}
         </p>
       )}
       {status === 'error' && (
-        <p style={{ fontFamily: 'monospace', fontSize: '0.38rem', color: '#8B5555', marginBottom: '0.75rem' }}>
+        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', color: 'var(--portal-error)', marginBottom: '0.75rem' }}>
           {message}
         </p>
       )}
@@ -964,15 +964,15 @@ function MediaUploadSection({
         onClick={handleUpload}
         disabled={!file || status === 'uploading'}
         style={{
-          background:    '#C4A24A',
+          background:    'var(--portal-btn)',
           border:        'none',
           borderRadius:  '2px',
           padding:       '0.6rem 1.5rem',
-          fontFamily:    'monospace',
-          fontSize:      '0.4rem',
+          fontFamily: 'var(--portal-mono)',
+          fontSize: '11px',
           letterSpacing: '0.25em',
           textTransform: 'uppercase',
-          color:         '#0A0908',
+          color:         'var(--portal-btn-label)',
           cursor:        (!file || status === 'uploading') ? 'not-allowed' : 'pointer',
           opacity:       !file ? 0.4 : 1,
         }}
@@ -1010,14 +1010,14 @@ function VoiceSection({
           onClick={() => setShowRecorder(true)}
           style={{
             background:    'transparent',
-            border:        '1px solid rgba(196,162,74,0.3)',
+            border:        '1px solid var(--portal-gold-line)',
             borderRadius:  '2px',
             padding:       '0.6rem 1.5rem',
-            fontFamily:    'monospace',
-            fontSize:      '0.4rem',
+            fontFamily: 'var(--portal-mono)',
+            fontSize: '11px',
             letterSpacing: '0.25em',
             textTransform: 'uppercase',
-            color:         '#C4A24A',
+            color:         'var(--portal-gold-ink)',
             cursor:        'pointer',
           }}
         >
@@ -1080,20 +1080,20 @@ function PhoneCallSection({
     <SectionCard title={PORTAL_UI[lang === 'zh' ? 'zh' : 'en'].callInStories}>
       {phoneOnFile ? (
         <div>
-          <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontWeight: 500, fontSize: '1.8rem', color: '#1A1814', letterSpacing: '0.04em', marginBottom: '8px', lineHeight: 1 }}>
+          <p style={{ fontFamily: 'var(--portal-serif)', fontWeight: 500, fontSize: '1.8rem', color: 'var(--portal-ink)', letterSpacing: '0.04em', marginBottom: '8px', lineHeight: 1 }}>
             {twilioPhone}
           </p>
-          <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontSize: '0.95rem', fontStyle: 'italic', fontWeight: 300, color: '#4A4640', lineHeight: 1.75, marginBottom: '12px' }}>
+          <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '0.95rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--portal-body)', lineHeight: 1.75, marginBottom: '12px' }}>
             Call this number from your registered phone. A friendly voice will guide you through a question.
             No login or password needed.
           </p>
-          <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.42rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(138,134,128,0.6)' }}>
+          <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-secondary)' }}>
             Call from your registered phone · Any time
           </p>
         </div>
       ) : (
         <div>
-          <p className="font-serif italic" style={{ fontSize: '0.9rem', color: '#9DA3A8', lineHeight: 1.75, marginBottom: '1.25rem' }}>
+          <p className="font-serif italic" style={{ fontSize: '0.9rem', color: 'var(--portal-body)', lineHeight: 1.75, marginBottom: '1.25rem' }}>
             Add your phone number to record stories by phone call. No login needed. Just call and speak.
           </p>
           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-end', flexWrap: 'wrap' }}>
@@ -1105,9 +1105,9 @@ function PhoneCallSection({
               style={{
                 background:   'transparent',
                 border:       'none',
-                borderBottom: '1px solid rgba(255,255,255,0.15)',
-                color:        '#F0EDE6',
-                fontFamily:   'Georgia, serif',
+                borderBottom: '1px solid var(--portal-card-line)',
+                color:        'var(--portal-ink)',
+                fontFamily: 'var(--portal-serif)',
                 fontSize:     '1rem',
                 padding:      '0.4rem 0',
                 outline:      'none',
@@ -1119,23 +1119,23 @@ function PhoneCallSection({
               onClick={savePhone}
               disabled={!phone.trim() || saving}
               style={{
-                background:    phone.trim() ? '#C4A24A' : 'rgba(196,162,74,0.2)',
+                background:    phone.trim() ? 'var(--portal-btn)' : 'var(--portal-tint)',
                 border:        'none',
                 borderRadius:  '2px',
                 padding:       '0.5rem 1.25rem',
                 minHeight:     '44px',
-                fontFamily:    'monospace',
-                fontSize:      '0.4rem',
+                fontFamily: 'var(--portal-mono)',
+                fontSize: '11px',
                 letterSpacing: '0.25em',
                 textTransform: 'uppercase',
-                color:         phone.trim() ? '#0A0908' : '#5C6166',
+                color:         phone.trim() ? 'var(--portal-btn-label)' : 'var(--portal-secondary)',
                 cursor:        phone.trim() && !saving ? 'pointer' : 'not-allowed',
               }}
             >
               {saving ? 'Saving...' : saved ? 'Saved' : 'Save Number'}
             </button>
           </div>
-          <p style={{ fontFamily: 'monospace', fontSize: '0.38rem', letterSpacing: '0.1em', color: '#3A3F44', marginTop: '0.75rem' }}>
+          <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.1em', color: 'var(--portal-label)', marginTop: '0.75rem' }}>
             Include country code. Your number is only used for call-in recording.
           </p>
         </div>
@@ -1166,7 +1166,7 @@ function ContributionsSection({
   return (
     <SectionCard title={PORTAL_UI[lang === 'zh' ? 'zh' : 'en'].contributions}>
       {total === 0 ? (
-        <p className="font-serif italic" style={{ color: '#5C6166', fontSize: '0.9rem' }}>
+        <p className="font-serif italic" style={{ color: 'var(--portal-secondary)', fontSize: '0.9rem' }}>
           Nothing yet. Your first contribution is just above.
         </p>
       ) : (
@@ -1178,10 +1178,10 @@ function ContributionsSection({
             { label: 'Voice recordings',   value: voiceRecordings },
           ].filter(s => s.value > 0).map(({ label, value }) => (
             <div key={label}>
-              <p className="font-serif" style={{ fontWeight: 700, fontSize: '1.6rem', color: '#C4A24A', lineHeight: 1, marginBottom: '0.2rem' }}>
+              <p className="font-serif" style={{ fontWeight: 700, fontSize: '1.6rem', color: 'var(--portal-gold-ink)', lineHeight: 1, marginBottom: '0.2rem' }}>
                 {value}
               </p>
-              <p style={{ fontFamily: 'monospace', fontSize: '0.38rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#5C6166' }}>
+              <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--portal-secondary)' }}>
                 {label}
               </p>
             </div>
@@ -1247,9 +1247,12 @@ function ContributorEntitySection({
   }
 
   const SECTION_STYLE: React.CSSProperties = {
-    background:   '#0F0F10',
-    border:       '1px solid rgba(196,162,74,0.2)',
-    borderTop:    '3px solid rgba(196,162,74,0.5)',
+    /* The archive speaks: the inverted block. Every color inside is an
+       --invert-* value and nothing here inherits the stone text colors. */
+    background:   'var(--invert-bg)',
+    color:        'var(--invert-fg)',
+    border:       'none',
+    borderTop:    '3px solid var(--invert-gold)',
     borderRadius: '2px',
     marginBottom: '24px',
     padding:      'clamp(1.25rem,4vw,2rem)',
@@ -1258,24 +1261,24 @@ function ContributorEntitySection({
   if (!hasAccess) {
     return (
       <div style={SECTION_STYLE}>
-        <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.48rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.55)', marginBottom: '1.5rem' }}>
+        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '1.5rem' }}>
           {firstName}&rsquo;s Entity Is Learning
         </p>
-        <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontSize: '1.05rem', fontWeight: 300, color: '#9DA3A8', lineHeight: 1.85, marginBottom: '0.6rem' }}>
+        <p style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', fontSize: '1.05rem', fontWeight: 300, color: 'var(--portal-body)', lineHeight: 1.85, marginBottom: '0.6rem' }}>
           You are helping build it.
         </p>
-        <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontSize: '1.05rem', fontWeight: 300, color: '#706C65', lineHeight: 2.0, marginBottom: '1.25rem' }}>
+        <p style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', fontSize: '1.05rem', fontWeight: 300, color: 'var(--portal-secondary)', lineHeight: 2.0, marginBottom: '1.25rem' }}>
           Every photograph you label<br />
           every question you answer<br />
           every memory you share<br />
           teaches it something specific<br />
           about how {firstName} thinks.
         </p>
-        <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontSize: '1.0rem', fontWeight: 300, color: '#5C6166', lineHeight: 1.85, marginBottom: '1.25rem' }}>
+        <p style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', fontSize: '1.0rem', fontWeight: 300, color: 'var(--portal-secondary)', lineHeight: 1.85, marginBottom: '1.25rem' }}>
           When it is ready,<br />
           {firstName} will invite you to talk to it.
         </p>
-        <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontSize: '1.0rem', fontWeight: 300, color: 'rgba(196,162,74,0.45)', lineHeight: 1.85, margin: 0 }}>
+        <p style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', fontSize: '1.0rem', fontWeight: 300, color: 'var(--portal-gold-ink)', lineHeight: 1.85, margin: 0 }}>
           Keep contributing.<br />
           You are making it more accurate.
         </p>
@@ -1285,10 +1288,10 @@ function ContributorEntitySection({
 
   return (
     <div style={SECTION_STYLE}>
-      <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.48rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#C4A24A', marginBottom: '8px' }}>
+      <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '8px' }}>
         Talk to {firstName}&rsquo;s Entity
       </p>
-      <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontSize: '0.9rem', color: '#706C65', lineHeight: 1.7, marginBottom: '1.5rem' }}>
+      <p style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', fontSize: '0.9rem', color: 'var(--portal-secondary)', lineHeight: 1.7, marginBottom: '1.5rem' }}>
         This entity has learned from {firstName}&rsquo;s deposits, photographs, and your contributions.
         Ask it anything.
       </p>
@@ -1304,35 +1307,35 @@ function ContributorEntitySection({
               }}>
                 <div style={{
                   maxWidth:     '80%',
-                  background:   msg.role === 'user' ? 'rgba(196,162,74,0.1)' : 'rgba(255,255,255,0.03)',
-                  border:       msg.role === 'user' ? '1px solid rgba(196,162,74,0.2)' : '1px solid rgba(255,255,255,0.06)',
+                  background:   msg.role === 'user' ? 'var(--portal-gold-wash)' : 'var(--portal-inset)',
+                  border:       msg.role === 'user' ? '1px solid var(--portal-gold-line)' : '1px solid var(--portal-rule)',
                   borderRadius: '2px',
                   padding:      '0.65rem 0.9rem',
                 }}>
-                  <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontSize: '0.95rem', color: msg.role === 'user' ? '#D4C08A' : '#B8B4AB', lineHeight: 1.7, margin: 0 }}>
+                  <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '0.95rem', color: msg.role === 'user' ? 'var(--portal-ink)' : 'var(--portal-body)', lineHeight: 1.7, margin: 0 }}>
                     {msg.content}
                   </p>
                 </div>
               </div>
               {msg.role === 'entity' && !msg.rating && (
                 <div style={{ display: 'flex', gap: '0.4rem', marginTop: '4px', paddingLeft: '4px' }}>
-                  {([['accurate','✓','#4CAF50'], ['partial','~','#C4A24A'], ['inaccurate','✗','#ff6b6b']] as const).map(([r, icon, color]) => (
+                  {([['accurate','var(--invert-ok)'], ['partial','var(--invert-gold)'], ['inaccurate','var(--invert-error)']] as const).map(([r, color]) => (
                     <button key={r} onClick={() => rateMessage(msg.id, r)}
-                      style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.1em', color, background: 'transparent', border: `1px solid ${color}40`, padding: '2px 6px', cursor: 'pointer', borderRadius: '2px', opacity: 0.7 }}>
-                      {icon} {r}
+                      style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color, background: 'transparent', border: '1px solid var(--invert-rule)', padding: '6px 10px', minHeight: '32px', cursor: 'pointer', borderRadius: '2px' }}>
+                      {r}
                     </button>
                   ))}
                 </div>
               )}
               {msg.role === 'entity' && msg.rating && (
-                <p style={{ fontFamily: 'monospace', fontSize: '0.42rem', letterSpacing: '0.1em', color: '#5C6166', marginTop: '4px', paddingLeft: '4px' }}>
+                <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.1em', color: 'var(--portal-secondary)', marginTop: '4px', paddingLeft: '4px' }}>
                   Rated: {msg.rating}
                 </p>
               )}
             </div>
           ))}
           {loading && (
-            <p style={{ fontFamily: 'monospace', fontSize: '0.46rem', letterSpacing: '0.1em', color: 'rgba(196,162,74,0.5)', animation: 'mysteryGlowPulse 1.5s ease-in-out infinite' }}>
+            <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.1em', color: 'var(--portal-gold-ink)', animation: 'mysteryGlowPulse 1.5s ease-in-out infinite' }}>
               {firstName.toUpperCase()} IS THINKING…
             </p>
           )}
@@ -1349,11 +1352,11 @@ function ContributorEntitySection({
           rows={2}
           style={{
             flex:       1,
-            background: 'rgba(255,255,255,0.02)',
-            border:     '1px solid rgba(255,255,255,0.07)',
+            background: 'var(--portal-inset)',
+            border:     '1px solid var(--portal-rule)',
             borderRadius: '2px',
-            color:      '#F0EDE6',
-            fontFamily: '"Cormorant Garamond",Georgia,serif',
+            color:      'var(--portal-ink)',
+            fontFamily: 'var(--portal-serif)',
             fontSize:   '0.95rem',
             padding:    '0.6rem 0.75rem',
             resize:     'none',
@@ -1365,12 +1368,12 @@ function ContributorEntitySection({
           onClick={send}
           disabled={loading || !input.trim()}
           style={{
-            fontFamily:    '"Space Mono","Courier New",monospace',
-            fontSize:      '0.44rem',
+            fontFamily: 'var(--portal-mono)',
+            fontSize: '11px',
             letterSpacing: '0.2em',
             textTransform: 'uppercase',
-            color:         '#0A0908',
-            background:    loading || !input.trim() ? 'rgba(196,162,74,0.4)' : '#C4A24A',
+            color:         'var(--portal-btn-label)',
+            background:    loading || !input.trim() ? 'var(--portal-tint)' : 'var(--portal-btn)',
             border:        'none',
             padding:       '0 1rem',
             cursor:        loading || !input.trim() ? 'not-allowed' : 'pointer',
@@ -1408,26 +1411,26 @@ function MemoryMapTeaser({ token }: { token: string }) {
 
   function Bar({ pct, color }: { pct: number; color: string }) {
     return (
-      <div style={{ flex: 1, height: '6px', background: 'rgba(196,162,74,0.08)', borderRadius: '2px', overflow: 'hidden' }}>
+      <div style={{ flex: 1, height: '6px', background: 'var(--portal-gold-wash)', borderRadius: '2px', overflow: 'hidden' }}>
         <div style={{ height: '100%', width: `${Math.min(pct, 100)}%`, background: color, borderRadius: '2px' }} />
       </div>
     )
   }
 
   return (
-    <div style={{ background: 'rgba(196,162,74,0.04)', border: '1px solid rgba(196,162,74,0.15)', borderRadius: '2px', padding: '1.25rem', marginBottom: '24px' }}>
-      <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.44rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.7)', marginBottom: '1rem' }}>
+    <div style={{ background: 'var(--portal-gold-wash)', border: '1px solid var(--portal-tint)', borderRadius: '2px', padding: '1.25rem', marginBottom: '24px' }}>
+      <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '1rem' }}>
         Where the record is thin
       </p>
 
       {weakestDecade && (
         <div style={{ marginBottom: '0.75rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
-            <span style={{ fontFamily: '"Courier New",monospace', fontSize: '0.46rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#706C65', width: '64px', flexShrink: 0 }}>
+            <span style={{ fontFamily: '"Courier New",monospace', fontSize: '11px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--portal-secondary)', width: '64px', flexShrink: 0 }}>
               {weakestDecade.label}
             </span>
-            <Bar pct={weakestDecade.photoCount * 10} color="rgba(196,162,74,0.25)" />
-            <span style={{ fontFamily: '"Courier New",monospace', fontSize: '0.42rem', color: 'rgba(196,162,74,0.4)', flexShrink: 0 }}>
+            <Bar pct={weakestDecade.photoCount * 10} color="var(--portal-gold-ink)" />
+            <span style={{ fontFamily: '"Courier New",monospace', fontSize: '14.5px', color: 'var(--portal-gold-ink)', flexShrink: 0 }}>
               {weakestDecade.photoCount === 0 ? 'MISSING' : `${weakestDecade.photoCount} photos`}
             </span>
           </div>
@@ -1437,18 +1440,18 @@ function MemoryMapTeaser({ token }: { token: string }) {
       {weakestDimension && (
         <div style={{ marginBottom: '1rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontFamily: '"Courier New",monospace', fontSize: '0.46rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#706C65', width: '64px', flexShrink: 0 }}>
+            <span style={{ fontFamily: '"Courier New",monospace', fontSize: '11px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--portal-secondary)', width: '64px', flexShrink: 0 }}>
               {weakestDimension.label}
             </span>
-            <Bar pct={weakestDimension.score} color="rgba(196,162,74,0.25)" />
-            <span style={{ fontFamily: '"Courier New",monospace', fontSize: '0.42rem', color: 'rgba(196,162,74,0.4)', flexShrink: 0 }}>
+            <Bar pct={weakestDimension.score} color="var(--portal-gold-ink)" />
+            <span style={{ fontFamily: '"Courier New",monospace', fontSize: '14.5px', color: 'var(--portal-gold-ink)', flexShrink: 0 }}>
               {weakestDimension.score === 0 ? 'EMPTY' : `${weakestDimension.score}%`}
             </span>
           </div>
         </div>
       )}
 
-      <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontSize: '0.9rem', color: '#5C6166', lineHeight: 1.7, margin: 0 }}>
+      <p style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', fontSize: '0.9rem', color: 'var(--portal-secondary)', lineHeight: 1.7, margin: 0 }}>
         Do you have photographs or memories from these areas? Any detail helps.
       </p>
     </div>
@@ -1501,41 +1504,41 @@ export default function ContributeClient({
   const totalContribs = photosUploaded + videosUploaded + voiceRecordings + contributor.questions_answered + contributor.photos_labelled
 
   return (
-    <div style={{ background: '#FAFAF8', minHeight: '100svh', color: '#1A1814' }}>
+    <div className="portal-stone" style={{ background: 'var(--portal-bg)', minHeight: '100svh', color: 'var(--portal-body)' }}>
 
       {/* Header */}
-      <div style={{ textAlign: 'center', padding: 'clamp(40px,8vw,72px) 24px clamp(28px,5vw,40px)', background: '#FFFFFF', borderBottom: '1px solid rgba(26,24,20,0.06)' }}>
-        <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.52rem', letterSpacing: '0.35em', textTransform: 'uppercase', color: '#B8963E', margin: '0 0 12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-          <span style={{ display: 'block', width: '20px', height: '1px', background: '#B8963E', flexShrink: 0 }} aria-hidden="true" />
+      <div style={{ textAlign: 'center', padding: 'clamp(40px,8vw,72px) 24px clamp(28px,5vw,40px)', background: 'var(--portal-card)', borderBottom: '1px solid var(--portal-rule)' }}>
+        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.35em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', margin: '0 0 12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+          <span style={{ display: 'block', width: '20px', height: '1px', background: 'var(--portal-btn)', flexShrink: 0 }} aria-hidden="true" />
           {archive.name}
-          <span style={{ display: 'block', width: '20px', height: '1px', background: '#B8963E', flexShrink: 0 }} aria-hidden="true" />
+          <span style={{ display: 'block', width: '20px', height: '1px', background: 'var(--portal-btn)', flexShrink: 0 }} aria-hidden="true" />
         </p>
-        <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontWeight: 500, fontSize: 'clamp(1.4rem,4vw,2rem)', color: '#1A1814', margin: '0 0 8px', lineHeight: 1.2 }}>
+        <p style={{ fontFamily: 'var(--portal-serif)', fontWeight: 500, fontSize: 'clamp(1.4rem,4vw,2rem)', color: 'var(--portal-ink)', margin: '0 0 8px', lineHeight: 1.2 }}>
           {ui.welcome(firstName)}
         </p>
-        <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, color: '#8A8680', margin: '0 0 6px' }}>
+        <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--portal-secondary)', margin: '0 0 6px' }}>
           You have been invited to contribute to this Basalith.
         </p>
-        <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.44rem', letterSpacing: '0.15em', color: 'rgba(138,134,128,0.6)', margin: 0 }}>
+        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.15em', color: 'var(--portal-secondary)', margin: 0 }}>
           {relLabel}{totalContribs > 0 ? ` · ${ui.contributions_n(totalContribs)}` : ''}
         </p>
       </div>
 
       {/* Language switcher */}
-      <div style={{ background: '#FFFFFF', borderBottom: '1px solid rgba(26,24,20,0.06)', padding: '8px 24px', display: 'flex', justifyContent: 'flex-end' }}>
+      <div style={{ background: 'var(--portal-card)', borderBottom: '1px solid var(--portal-rule)', padding: '8px 24px', display: 'flex', justifyContent: 'flex-end' }}>
         <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           {PORTAL_LANGS.map(code => (
             <button
               key={code}
               onClick={() => switchPortalLang(code)}
               style={{
-                fontFamily:    '"Space Mono","Courier New",monospace',
-                fontSize:      '0.42rem',
+                fontFamily: 'var(--portal-mono)',
+                fontSize: '11px',
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase' as const,
-                color:         displayLang === code ? '#B8963E' : 'rgba(138,134,128,0.5)',
-                background:    displayLang === code ? 'rgba(184,150,62,0.08)' : 'transparent',
-                border:        displayLang === code ? '1px solid rgba(184,150,62,0.25)' : '1px solid transparent',
+                color:         displayLang === code ? 'var(--portal-gold-ink)' : 'var(--portal-secondary)',
+                background:    displayLang === code ? 'var(--portal-gold-wash)' : 'transparent',
+                border:        displayLang === code ? '1px solid var(--portal-gold-line)' : '1px solid transparent',
                 borderRadius:  '2px',
                 padding:       '4px 8px',
                 cursor:        'pointer',
@@ -1550,7 +1553,7 @@ export default function ContributeClient({
       </div>
 
       {/* Gold rule */}
-      <div style={{ height: '2px', background: 'linear-gradient(90deg, transparent, rgba(184,150,62,0.3), transparent)' }} aria-hidden="true" />
+      <div style={{ height: '2px', background: 'linear-gradient(90deg, transparent, var(--portal-tint), transparent)' }} aria-hidden="true" />
 
       {/* Content */}
       <div style={{ maxWidth: '560px', margin: '0 auto', padding: '1.5rem 1.25rem 4rem' }}>
@@ -1628,11 +1631,11 @@ export default function ContributeClient({
         />
 
         {/* Footer */}
-        <div style={{ textAlign: 'center', paddingTop: '32px', borderTop: '1px solid rgba(26,24,20,0.06)' }}>
-          <p style={{ fontFamily: '"Space Mono","Courier New",monospace', fontSize: '0.44rem', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'rgba(138,134,128,0.5)', margin: 0 }}>
+        <div style={{ textAlign: 'center', paddingTop: '32px', borderTop: '1px solid var(--portal-rule)' }}>
+          <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'var(--portal-secondary)', margin: 0 }}>
             Basalith · Heritage Nexus Inc.
           </p>
-          <p style={{ fontFamily: '"Cormorant Garamond",Georgia,serif', fontStyle: 'italic', fontSize: '0.85rem', color: 'rgba(138,134,128,0.5)', margin: '6px 0 0' }}>
+          <p style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', fontSize: '0.85rem', color: 'var(--portal-secondary)', margin: '6px 0 0' }}>
             {ui.footerNote}
           </p>
         </div>

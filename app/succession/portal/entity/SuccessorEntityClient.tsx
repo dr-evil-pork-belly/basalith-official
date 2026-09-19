@@ -3,8 +3,8 @@
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 
-const MONO: React.CSSProperties  = { fontFamily: "'Courier New', monospace" }
-const SERIF: React.CSSProperties = { fontFamily: 'Georgia, serif' }
+const MONO: React.CSSProperties  = { fontFamily: 'var(--portal-mono)' }
+const SERIF: React.CSSProperties = { fontFamily: 'var(--portal-serif)' }
 
 type Message = { id: string; role: 'user' | 'entity'; content: string }
 
@@ -92,22 +92,23 @@ export default function SuccessorEntityClient({ session, archiveName, ownerName,
   }
 
   return (
-    <main style={{ minHeight: '100vh', background: '#0A0908' }}>
+    <main className="portal-stone" style={{ minHeight: '100vh', background: 'var(--portal-bg)' }}>
 
-      {/* Top bar */}
-      <div style={{ borderBottom: '1px solid rgba(196,162,74,0.12)', padding: '18px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      {/* Top bar. The spine: this portal has no sidebar, so the ink bar is the
+          dark anchor. Colors inside it are --spine-* values. */}
+      <div style={{ background: 'var(--portal-spine)', color: 'var(--spine-fg)', padding: '18px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
-          <Link href="/succession/portal" style={{ ...MONO, fontSize: '0.56rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#5C6166', textDecoration: 'none' }}>
+          <Link href="/succession/portal" style={{ ...MONO, fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--spine-body)', textDecoration: 'none' }}>
             ← Portal
           </Link>
-          <span style={{ ...MONO, fontSize: '0.56rem', color: '#3A3F44', margin: '0 8px' }}>|</span>
-          <span style={{ ...MONO, fontSize: '0.62rem', letterSpacing: '3px', textTransform: 'uppercase', color: '#C4A24A' }}>
+          <span style={{ ...MONO, fontSize: '11px', color: 'var(--spine-dim)', margin: '0 8px' }}>|</span>
+          <span style={{ ...MONO, fontSize: '11px', letterSpacing: '0.24em', textTransform: 'uppercase', color: 'var(--spine-gold)' }}>
             Querying: {archiveName}
           </span>
         </div>
         <Link
           href="/succession/portal/context"
-          style={{ ...MONO, fontSize: '0.58rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#706C65', textDecoration: 'none' }}
+          style={{ ...MONO, fontSize: '11px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--spine-body)', textDecoration: 'none' }}
         >
           Add Context
         </Link>
@@ -116,7 +117,7 @@ export default function SuccessorEntityClient({ session, archiveName, ownerName,
       <div style={{ maxWidth: '800px', margin: '0 auto', padding: '40px 40px' }}>
 
         {/* Active context layer, collapsible */}
-        <div style={{ marginBottom: '32px', border: '1px solid rgba(196,162,74,0.18)', background: 'rgba(196,162,74,0.03)' }}>
+        <div style={{ marginBottom: '32px', border: '1px solid var(--portal-gold-line)', background: 'var(--portal-gold-line)' }}>
           <button
             onClick={() => setContextOpen(v => !v)}
             style={{
@@ -129,31 +130,31 @@ export default function SuccessorEntityClient({ session, archiveName, ownerName,
               background:     'none',
               border:         'none',
               cursor:         'pointer',
-              fontSize:       '0.6rem',
+              fontSize: '11px',
               letterSpacing:  '0.2em',
               textTransform:  'uppercase',
-              color:          '#C4A24A',
+              color:          'var(--portal-gold-ink)',
             }}
           >
             <span>Active Context Layer ({activeContexts.length})</span>
-            <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>{contextOpen ? '▲' : '▼'}</span>
+            <span style={{ fontSize: '14.5px', opacity: 0.6 }}>{contextOpen ? '▲' : '▼'}</span>
           </button>
 
           {contextOpen && (
-            <div style={{ borderTop: '1px solid rgba(196,162,74,0.12)', padding: '16px 20px' }}>
+            <div style={{ borderTop: '1px solid var(--portal-gold-line)', padding: '16px 20px' }}>
               {activeContexts.length === 0 ? (
-                <p style={{ ...SERIF, fontSize: '0.85rem', fontStyle: 'italic', color: '#5C6166', margin: 0 }}>
+                <p style={{ ...SERIF, fontSize: '0.85rem', fontStyle: 'italic', color: 'var(--portal-secondary)', margin: 0 }}>
                   No context injected. The entity draws only from the frozen fingerprint.{' '}
-                  <Link href="/succession/portal/context" style={{ color: '#C4A24A' }}>Add context →</Link>
+                  <Link href="/succession/portal/context" style={{ color: 'var(--portal-gold-ink)' }}>Add context →</Link>
                 </p>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {activeContexts.map(ctx => (
                     <div key={ctx.id}>
-                      <p style={{ ...MONO, fontSize: '0.56rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#706C65', margin: '0 0 4px' }}>
+                      <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--portal-secondary)', margin: '0 0 4px' }}>
                         {contextTypeLabel(ctx.context_type)} · {formatDate(ctx.created_at)}
                       </p>
-                      <p style={{ ...SERIF, fontSize: '0.85rem', fontWeight: 300, color: '#B8B4AB', margin: 0, lineHeight: 1.6 }}>
+                      <p style={{ ...SERIF, fontSize: '0.85rem', fontWeight: 300, color: 'var(--portal-body)', margin: 0, lineHeight: 1.6 }}>
                         {ctx.content.length > 200 ? ctx.content.slice(0, 200) + '…' : ctx.content}
                       </p>
                     </div>
@@ -166,8 +167,8 @@ export default function SuccessorEntityClient({ session, archiveName, ownerName,
 
         {/* Conversation area */}
         <div style={{
-          background:   'rgba(240,237,230,0.02)',
-          border:       '1px solid rgba(196,162,74,0.08)',
+          background:   'var(--portal-inset)',
+          border:       '1px solid var(--portal-gold-line)',
           padding:      '24px',
           minHeight:    '320px',
           maxHeight:    '520px',
@@ -177,14 +178,14 @@ export default function SuccessorEntityClient({ session, archiveName, ownerName,
           {messages.length === 0 && !loading && (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '240px', gap: '12px', textAlign: 'center' }}>
               <svg width="24" height="24" viewBox="0 0 36 36" fill="none" aria-hidden="true" style={{ opacity: 0.5 }}>
-                <rect x="18" y="2"  width="11.31" height="11.31" transform="rotate(45 18 2)"  fill="none" stroke="rgba(196,162,74,0.8)" strokeWidth="1"/>
-                <rect x="18" y="9"  width="7.07"  height="7.07"  transform="rotate(45 18 9)"  fill="none" stroke="rgba(196,162,74,0.5)" strokeWidth="0.75"/>
+                <rect x="18" y="2"  width="11.31" height="11.31" transform="rotate(45 18 2)"  fill="none" stroke="var(--portal-gold-ink)" strokeWidth="1"/>
+                <rect x="18" y="9"  width="7.07"  height="7.07"  transform="rotate(45 18 9)"  fill="none" stroke="var(--portal-gold-ink)" strokeWidth="0.75"/>
               </svg>
-              <p style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', color: '#9DA3A8', margin: 0 }}>
+              <p style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', color: 'var(--portal-body)', margin: 0 }}>
                 Ask the entity anything.
               </p>
               {ownerName && (
-                <p style={{ ...SERIF, fontSize: '0.85rem', fontStyle: 'italic', color: '#5C6166', margin: 0 }}>
+                <p style={{ ...SERIF, fontSize: '0.85rem', fontStyle: 'italic', color: 'var(--portal-secondary)', margin: 0 }}>
                   It will answer as {ownerName} would.
                 </p>
               )}
@@ -194,24 +195,29 @@ export default function SuccessorEntityClient({ session, archiveName, ownerName,
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             {messages.map(msg => (
               <div key={msg.id} style={{ display: 'flex', flexDirection: 'column', alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
-                <p style={{ ...MONO, fontSize: '0.36rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: msg.role === 'user' ? 'rgba(112,108,101,0.5)' : 'rgba(196,162,74,0.6)', marginBottom: '6px' }}>
+                <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: msg.role === 'user' ? 'var(--portal-secondary)' : 'var(--portal-gold-ink)', marginBottom: '6px' }}>
                   {msg.role === 'user' ? session.name.split(' ')[0] : archiveName}
                 </p>
+                {/* The founder's judgment, in the founder's words: the inverted
+                    block. This is the moment the whole succession product exists
+                    for, so it gets the same treatment as the proof card and the
+                    owner's entity. Every color inside is an --invert-* value. */}
                 <div style={{
-                  background:   msg.role === 'user' ? 'rgba(196,162,74,0.1)' : 'rgba(240,237,230,0.03)',
-                  border:       msg.role === 'user' ? '1px solid rgba(196,162,74,0.18)' : 'none',
-                  borderLeft:   msg.role === 'entity' ? '2px solid rgba(196,162,74,0.35)' : undefined,
-                  borderRadius: msg.role === 'user' ? '12px 12px 2px 12px' : '0 12px 12px 12px',
-                  padding:      msg.role === 'user' ? '12px 16px' : '12px 16px 12px 18px',
+                  background:   msg.role === 'user' ? 'var(--portal-gold-wash)' : 'var(--invert-bg)',
+                  color:        msg.role === 'user' ? 'var(--portal-ink)' : 'var(--invert-fg)',
+                  border:       msg.role === 'user' ? '1px solid var(--portal-gold-line)' : 'none',
+                  borderLeft:   msg.role === 'entity' ? '3px solid var(--invert-gold)' : undefined,
+                  borderRadius: '2px',
+                  padding:      msg.role === 'user' ? '14px 18px' : '16px 20px 16px 22px',
                   maxWidth:     '85%',
                 }}>
                   <p style={{
                     ...SERIF,
-                    fontSize:   msg.role === 'entity' ? '1.05rem' : '1rem',
+                    fontSize:   msg.role === 'entity' ? '18px' : '17px',
                     fontStyle:  msg.role === 'entity' ? 'italic' : 'normal',
                     fontWeight: 300,
-                    color:      msg.role === 'entity' ? '#E8E4DC' : '#D4CFC7',
-                    lineHeight: 1.85,
+                    color:      msg.role === 'entity' ? 'var(--invert-fg)' : 'var(--portal-ink)',
+                    lineHeight: 1.7,
                     margin:     0,
                     whiteSpace: 'pre-wrap',
                   }}>
@@ -223,11 +229,11 @@ export default function SuccessorEntityClient({ session, archiveName, ownerName,
 
             {loading && (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                <p style={{ ...MONO, fontSize: '0.36rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.6)', marginBottom: '6px' }}>
+                <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '6px' }}>
                   {archiveName}
                 </p>
-                <div style={{ borderLeft: '2px solid rgba(196,162,74,0.35)', paddingLeft: '18px', paddingTop: '12px', paddingBottom: '12px' }}>
-                  <p style={{ ...SERIF, fontSize: '0.95rem', fontStyle: 'italic', color: '#9DA3A8', margin: 0 }}>
+                <div style={{ borderLeft: '2px solid var(--portal-gold-line)', paddingLeft: '18px', paddingTop: '12px', paddingBottom: '12px' }}>
+                  <p style={{ ...SERIF, fontSize: '0.95rem', fontStyle: 'italic', color: 'var(--portal-body)', margin: 0 }}>
                     Drawing on the record
                     <span style={{ animation: 'pulse 1.5s ease-in-out infinite' }}>…</span>
                   </p>
@@ -239,7 +245,7 @@ export default function SuccessorEntityClient({ session, archiveName, ownerName,
         </div>
 
         {/* Input */}
-        <div style={{ borderTop: '1px solid rgba(196,162,74,0.1)', paddingTop: '16px', marginTop: 0 }}>
+        <div style={{ borderTop: '1px solid var(--portal-gold-line)', paddingTop: '16px', marginTop: 0 }}>
           <textarea
             ref={textareaRef}
             rows={2}
@@ -254,8 +260,8 @@ export default function SuccessorEntityClient({ session, archiveName, ownerName,
               width:        '100%',
               background:   'transparent',
               border:       'none',
-              borderBottom: input ? '1px solid rgba(196,162,74,0.5)' : '1px solid rgba(196,162,74,0.15)',
-              color:        '#F0EDE6',
+              borderBottom: input ? '1px solid var(--portal-gold-line)' : '1px solid var(--portal-gold-line)',
+              color:        'var(--portal-ink)',
               fontSize:     '1rem',
               fontWeight:   300,
               padding:      '0 0 8px',
@@ -271,13 +277,13 @@ export default function SuccessorEntityClient({ session, archiveName, ownerName,
               disabled={!input.trim() || loading}
               style={{
                 ...MONO,
-                background:    '#C4A24A',
+                background:    'var(--portal-btn)',
                 border:        'none',
                 padding:       '10px 28px',
-                fontSize:      '0.6rem',
+                fontSize: '11px',
                 letterSpacing: '3px',
                 textTransform: 'uppercase',
-                color:         '#0A0908',
+                color:         'var(--portal-btn-label)',
                 cursor:        !input.trim() || loading ? 'not-allowed' : 'pointer',
                 opacity:       !input.trim() || loading ? 0.4 : 1,
                 transition:    'opacity 0.15s',

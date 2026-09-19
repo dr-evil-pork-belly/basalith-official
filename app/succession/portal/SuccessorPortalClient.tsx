@@ -2,8 +2,8 @@
 
 import Link from 'next/link'
 
-const MONO: React.CSSProperties  = { fontFamily: "'Courier New', monospace" }
-const SERIF: React.CSSProperties = { fontFamily: 'Georgia, serif' }
+const MONO: React.CSSProperties  = { fontFamily: 'var(--portal-mono)' }
+const SERIF: React.CSSProperties = { fontFamily: 'var(--portal-serif)' }
 
 interface Context {
   id:           string
@@ -45,29 +45,32 @@ export default function SuccessorPortalClient({
   session, archiveName, ownerName, trainingPairCount, contextCount, recentContexts,
 }: Props) {
   return (
-    <main style={{ minHeight: '100vh', background: '#0A0908', padding: '0' }}>
+    <main className="portal-stone" style={{ minHeight: '100vh', background: 'var(--portal-bg)' }}>
 
-      {/* Top bar */}
+      {/* Top bar. This is the spine: the successor portal has no sidebar, so the
+          ink bar is the dark anchor every other portal page gets from its
+          sidebar. Colors inside it are --spine-* values. */}
       <div style={{
-        borderBottom: '1px solid rgba(196,162,74,0.12)',
-        padding:      '20px 40px',
+        background:   'var(--portal-spine)',
+        color:        'var(--spine-fg)',
+        padding:      '18px 40px',
         display:      'flex',
         alignItems:   'center',
         justifyContent: 'space-between',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <svg width="20" height="20" viewBox="0 0 36 36" fill="none" aria-hidden="true">
-            <rect x="18" y="2"  width="11.31" height="11.31" transform="rotate(45 18 2)"  fill="none" stroke="rgba(196,162,74,0.4)" strokeWidth="1"/>
-            <rect x="18" y="9"  width="7.07"  height="7.07"  transform="rotate(45 18 9)"  fill="none" stroke="rgba(196,162,74,0.7)" strokeWidth="1"/>
-            <rect x="18" y="14" width="4"     height="4"     transform="rotate(45 18 14)" fill="rgba(196,162,74,0.85)"/>
+            <rect x="18" y="2"  width="11.31" height="11.31" transform="rotate(45 18 2)"  fill="none" stroke="var(--spine-gold)" strokeWidth="1"/>
+            <rect x="18" y="9"  width="7.07"  height="7.07"  transform="rotate(45 18 9)"  fill="none" stroke="var(--spine-gold)" strokeWidth="1"/>
+            <rect x="18" y="14" width="4"     height="4"     transform="rotate(45 18 14)" fill="var(--spine-gold)"/>
           </svg>
-          <span style={{ ...MONO, fontSize: '0.62rem', letterSpacing: '3px', color: '#C4A24A', textTransform: 'uppercase' }}>
-            Successor Portal
+          <span style={{ ...MONO, fontSize: '11.5px', letterSpacing: '0.24em', color: 'var(--spine-gold)', textTransform: 'uppercase' }}>
+            Successor portal
           </span>
         </div>
         <button
           onClick={handleLogout}
-          style={{ ...MONO, background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.58rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#5C6166' }}
+          style={{ ...MONO, background: 'none', border: 'none', cursor: 'pointer', fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--spine-dim)', minHeight: '44px' }}
         >
           Sign out
         </button>
@@ -77,33 +80,33 @@ export default function SuccessorPortalClient({
 
         {/* Header */}
         <div style={{ marginBottom: '48px' }}>
-          <p style={{ ...MONO, fontSize: '0.6rem', letterSpacing: '3px', color: '#C4A24A', textTransform: 'uppercase', margin: '0 0 8px' }}>
+          <p style={{ ...MONO, fontSize: '11px', letterSpacing: '3px', color: 'var(--portal-gold-ink)', textTransform: 'uppercase', margin: '0 0 8px' }}>
             {session.organization ?? 'Succession Access'}
           </p>
-          <h1 style={{ ...SERIF, fontSize: 'clamp(1.8rem, 3vw, 2.6rem)', fontWeight: 300, color: '#F0EDE6', margin: '0 0 8px', lineHeight: 1.2 }}>
+          <h1 style={{ ...SERIF, fontSize: 'clamp(34px,4.2vw,50px)', fontWeight: 400, letterSpacing: '-0.015em', color: 'var(--portal-ink)', margin: '0 0 8px', lineHeight: 1.2 }}>
             {archiveName}
           </h1>
           {ownerName && (
-            <p style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', color: '#706C65', margin: 0 }}>
+            <p style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', color: 'var(--portal-secondary)', margin: 0 }}>
               Founder: {ownerName}
             </p>
           )}
         </div>
 
         {/* Stats row */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1px', background: 'rgba(196,162,74,0.1)', marginBottom: '48px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1px', background: 'var(--portal-card-line)', marginBottom: '48px' }}>
           {[
             { label: 'Frozen Cognitive Layer', value: trainingPairCount.toLocaleString(), sub: 'training pairs' },
             { label: 'Context Injections', value: contextCount.toLocaleString(), sub: 'added by you' },
           ].map(({ label, value, sub }) => (
-            <div key={label} style={{ background: '#0A0908', padding: '28px 32px' }}>
-              <p style={{ ...MONO, fontSize: '0.58rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#5C6166', margin: '0 0 10px' }}>
+            <div key={label} style={{ background: 'var(--portal-card)', padding: '28px 32px' }}>
+              <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-secondary)', margin: '0 0 10px' }}>
                 {label}
               </p>
-              <p style={{ ...SERIF, fontSize: '2.4rem', fontWeight: 300, color: '#C4A24A', margin: '0 0 4px', lineHeight: 1 }}>
+              <p style={{ ...SERIF, fontSize: '2.4rem', fontWeight: 300, color: 'var(--portal-ink)', margin: '0 0 4px', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
                 {value}
               </p>
-              <p style={{ ...MONO, fontSize: '0.56rem', letterSpacing: '0.12em', color: '#3A3F44', textTransform: 'uppercase', margin: 0 }}>
+              <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.12em', color: 'var(--portal-label)', textTransform: 'uppercase', margin: 0 }}>
                 {sub}
               </p>
             </div>
@@ -116,17 +119,17 @@ export default function SuccessorPortalClient({
             href="/succession/portal/entity"
             style={{
               display:       'block',
-              background:    '#C4A24A',
-              color:         '#0A0908',
+              background:    'var(--portal-btn)',
+              color:         'var(--portal-btn-label)',
               padding:       '20px 28px',
               textDecoration: 'none',
               border:        'none',
             }}
           >
-            <p style={{ ...MONO, fontSize: '0.62rem', letterSpacing: '3px', textTransform: 'uppercase', margin: '0 0 6px' }}>
+            <p style={{ ...MONO, fontSize: '11px', letterSpacing: '3px', textTransform: 'uppercase', margin: '0 0 6px' }}>
               Query the Entity
             </p>
-            <p style={{ ...SERIF, fontSize: '0.85rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(10,9,8,0.7)', margin: 0, lineHeight: 1.5 }}>
+            <p style={{ ...SERIF, fontSize: '0.85rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--portal-btn-label)', margin: 0, lineHeight: 1.5 }}>
               Apply the founder's judgment to current questions.
             </p>
           </Link>
@@ -135,16 +138,16 @@ export default function SuccessorPortalClient({
             style={{
               display:       'block',
               background:    'transparent',
-              color:         '#F0EDE6',
+              color:         'var(--portal-ink)',
               padding:       '20px 28px',
               textDecoration: 'none',
-              border:        '1px solid rgba(196,162,74,0.3)',
+              border:        '1px solid var(--portal-gold-line)',
             }}
           >
-            <p style={{ ...MONO, fontSize: '0.62rem', letterSpacing: '3px', textTransform: 'uppercase', color: '#C4A24A', margin: '0 0 6px' }}>
+            <p style={{ ...MONO, fontSize: '11px', letterSpacing: '3px', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', margin: '0 0 6px' }}>
               Add Context
             </p>
-            <p style={{ ...SERIF, fontSize: '0.85rem', fontStyle: 'italic', fontWeight: 300, color: '#706C65', margin: 0, lineHeight: 1.5 }}>
+            <p style={{ ...SERIF, fontSize: '0.85rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--portal-secondary)', margin: 0, lineHeight: 1.5 }}>
               Inject current business reality into the conversation.
             </p>
           </Link>
@@ -156,44 +159,44 @@ export default function SuccessorPortalClient({
           style={{
             display:        'block',
             background:     'transparent',
-            color:          '#F0EDE6',
+            color:          'var(--portal-ink)',
             padding:        '20px 28px',
             textDecoration: 'none',
-            border:         '1px solid rgba(196,162,74,0.15)',
+            border:         '1px solid var(--portal-gold-line)',
             marginBottom:   '56px',
           }}
         >
-          <p style={{ ...MONO, fontSize: '0.62rem', letterSpacing: '3px', textTransform: 'uppercase', color: 'rgba(196,162,74,0.6)', margin: '0 0 6px' }}>
+          <p style={{ ...MONO, fontSize: '11px', letterSpacing: '3px', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', margin: '0 0 6px' }}>
             Scenario Responses
           </p>
-          <p style={{ ...SERIF, fontSize: '0.85rem', fontStyle: 'italic', fontWeight: 300, color: '#706C65', margin: 0, lineHeight: 1.5 }}>
+          <p style={{ ...SERIF, fontSize: '0.85rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--portal-secondary)', margin: 0, lineHeight: 1.5 }}>
             How the founder would handle twenty structured business situations.
           </p>
         </Link>
 
         {/* Recent context injections */}
         <div>
-          <p style={{ ...MONO, fontSize: '0.6rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#5C6166', margin: '0 0 20px' }}>
+          <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--portal-secondary)', margin: '0 0 20px' }}>
             Recent Context Injections
           </p>
 
           {recentContexts.length === 0 ? (
-            <p style={{ ...SERIF, fontSize: '0.9rem', fontStyle: 'italic', color: '#3A3F44', margin: 0 }}>
+            <p style={{ ...SERIF, fontSize: '0.9rem', fontStyle: 'italic', color: 'var(--portal-label)', margin: 0 }}>
               No context added yet. The entity draws only from the frozen fingerprint until you inject context.
             </p>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', background: 'rgba(196,162,74,0.08)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', background: 'var(--portal-card-line)' }}>
               {recentContexts.map(ctx => (
-                <div key={ctx.id} style={{ background: '#0A0908', padding: '18px 24px' }}>
+                <div key={ctx.id} style={{ background: 'var(--portal-card)', padding: '18px 24px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                    <span style={{ ...MONO, fontSize: '0.56rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#C4A24A' }}>
+                    <span style={{ ...MONO, fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)' }}>
                       {contextTypeLabel(ctx.context_type)}
                     </span>
-                    <span style={{ ...MONO, fontSize: '0.54rem', color: '#3A3F44' }}>
+                    <span style={{ ...MONO, fontSize: '14.5px', color: 'var(--portal-label)' }}>
                       {formatDate(ctx.created_at)}
                     </span>
                   </div>
-                  <p style={{ ...SERIF, fontSize: '0.9rem', fontWeight: 300, color: '#B8B4AB', margin: 0, lineHeight: 1.6 }}>
+                  <p style={{ ...SERIF, fontSize: '0.9rem', fontWeight: 300, color: 'var(--portal-body)', margin: 0, lineHeight: 1.6 }}>
                     {ctx.content.length > 180 ? ctx.content.slice(0, 180) + '…' : ctx.content}
                   </p>
                 </div>
@@ -203,8 +206,8 @@ export default function SuccessorPortalClient({
         </div>
 
         {/* Footer */}
-        <div style={{ marginTop: '64px', paddingTop: '32px', borderTop: '1px solid rgba(240,237,230,0.05)' }}>
-          <p style={{ ...MONO, fontSize: '0.56rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#3A3F44', margin: 0 }}>
+        <div style={{ marginTop: '64px', paddingTop: '32px', borderTop: '1px solid var(--portal-card-line)' }}>
+          <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--portal-label)', margin: 0 }}>
             Basalith · Heritage Nexus Inc. · Authorized access only
           </p>
         </div>

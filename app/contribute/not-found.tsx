@@ -4,8 +4,8 @@ console.log('[contribute/not-found] rendering: notFound() was called in contribu
 
 export default function NotFound() {
   return (
-    <div style={{
-      background:      '#0A0908',
+    <div className="portal-threshold" style={{
+      background:      'var(--invert-bg)',
       minHeight:       '100vh',
       display:         'flex',
       flexDirection:   'column',
@@ -15,29 +15,29 @@ export default function NotFound() {
       textAlign:       'center',
     }}>
       <p style={{
-        fontFamily:    '"Courier New", monospace',
-        fontSize:      '0.44rem',
+        fontFamily: 'var(--portal-mono)',
+        fontSize: '11px',
         letterSpacing: '0.4em',
-        color:         '#C4A24A',
+        color:         'var(--invert-gold)',
         marginBottom:  '1.5rem',
       }}>
         BASALITH · XYZ
       </p>
       <h1 style={{
-        fontFamily:   'Georgia, serif',
+        fontFamily: 'var(--portal-serif)',
         fontSize:     '1.8rem',
         fontWeight:   700,
-        color:        '#F0EDE6',
+        color:        'var(--invert-fg)',
         marginBottom: '1rem',
         lineHeight:   1.3,
       }}>
         This link is no longer active.
       </h1>
       <p style={{
-        fontFamily: 'Georgia, serif',
+        fontFamily: 'var(--portal-serif)',
         fontSize:   '1rem',
         fontStyle:  'italic',
-        color:      '#706C65',
+        color:      'var(--invert-dim)',
         lineHeight: 1.8,
         maxWidth:   '400px',
       }}>

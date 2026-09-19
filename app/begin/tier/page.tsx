@@ -1,86 +1,11 @@
-'use client'
-import { useState, useEffect, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import Nav           from '../../components/Nav'
-import Footer        from '../../components/Footer'
-import BeginProgress from '../../components/BeginProgress'
+import { permanentRedirect } from 'next/navigation'
 
-const TIERS = [
-  { name: 'Active',  tagline: 'Your Basalith, in full. Weekly prompts, nightly emails, entity chat, contributor network.', price: '$3,600', monthly: '$360 / month', founding: '$2,500 one-time founding fee', featured: true },
-  { name: 'Resting', tagline: 'Your Basalith preserved and waiting. No emails. No prompts. Data safe until you return.',          price: '$600',   monthly: '$60 / month',  founding: '$2,500 one-time founding fee' },
-  { name: 'Legacy',  tagline: 'After the primary user passes. Family entity access. One-time payment.',                          price: '$2,500', monthly: 'One-time',      founding: 'No recurring billing' },
-]
-
-function TierPageContent() {
-  const router       = useRouter()
-  const searchParams = useSearchParams()
-  const [selected, setSelected] = useState<string | null>(null)
-
-  // Capture ?ref= on mount and persist through the flow
-  useEffect(() => {
-    const ref = searchParams.get('ref')
-    if (ref) localStorage.setItem('begin_ref', ref)
-  }, [searchParams])
-
-  function handleContinue() {
-    if (!selected) return
-    localStorage.setItem('begin_tier', selected)
-    router.push('/begin/details')
-  }
-
-  return (
-    <>
-      <Nav />
-      <main className="min-h-screen bg-obsidian-void px-8 md:px-16 lg:px-24 pt-36 pb-24">
-        <div className="max-w-4xl mx-auto">
-          <BeginProgress step={1} />
-          <p className="eyebrow mb-2">Step 1 of 3</p>
-          <h1 className="font-serif text-[2.5rem] font-semibold text-text-primary leading-tight tracking-[-0.02em] mb-2">Choose Your Tier</h1>
-          <p className="font-sans text-[0.95rem] text-text-secondary leading-relaxed mb-12">All plans begin with The Founding, a one-time $2,500 setup investment.</p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">
-            {TIERS.map(({ name, tagline, price, monthly, founding, featured }) => (
-              <button
-                key={name}
-                onClick={() => setSelected(name)}
-                className={[
-                  'text-left rounded-sm border p-7 transition-all duration-200 cursor-pointer',
-                  selected === name
-                    ? 'border-border-amber bg-obsidian-deep'
-                    : featured
-                    ? 'border-border-subtle bg-obsidian-deep'
-                    : 'border-border-subtle bg-obsidian hover:border-border-amber',
-                ].join(' ')}
-              >
-                {featured && (
-                  <span className="inline-block text-[0.6rem] font-bold tracking-[0.15em] uppercase text-amber bg-amber/10 px-2 py-0.5 rounded mb-3">
-                    Most Popular
-                  </span>
-                )}
-                <h3 className="font-serif text-[1.25rem] font-semibold text-text-primary mb-1">{name}</h3>
-                <p className="font-sans text-[0.8rem] text-text-secondary leading-relaxed mb-5">{tagline}</p>
-                <p className="font-serif text-[1.75rem] font-semibold text-text-primary leading-none mb-1">{price}</p>
-                <p className="font-sans text-[0.72rem] text-text-muted mb-3">{monthly}</p>
-                <p className="font-sans text-[0.72rem] text-text-muted border-t border-border-subtle pt-3">{founding}</p>
-                {selected === name && (
-                  <p className="font-sans text-[0.72rem] font-bold text-amber mt-3">Selected</p>
-                )}
-              </button>
-            ))}
-          </div>
-          <button onClick={handleContinue} disabled={!selected} className="btn-monolith-amber">
-            Continue →
-          </button>
-        </div>
-      </main>
-      <Footer />
-    </>
-  )
-}
-
-export default function TierPage() {
-  return (
-    <Suspense>
-      <TierPageContent />
-    </Suspense>
-  )
+// Retired September 19, 2026. This was the old three-step application flow
+// (tier, details, review, confirmed). The self-serve trial of September 17
+// replaced it: /begin is now one page, email to magic link to the first call.
+// Nothing linked here any more, not even the steps to each other. The URL is
+// kept as a 308 so held links do not 404; the directory can be deleted after
+// the redirect has lived a few months. Do not reuse the route.
+export default function RetiredPage() {
+  permanentRedirect('/begin')
 }

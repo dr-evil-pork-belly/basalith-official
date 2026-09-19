@@ -3,8 +3,8 @@
 import { useState } from 'react'
 import Link from 'next/link'
 
-const MONO: React.CSSProperties  = { fontFamily: "'Courier New', monospace" }
-const SERIF: React.CSSProperties = { fontFamily: 'Georgia, serif' }
+const MONO: React.CSSProperties  = { fontFamily: 'var(--portal-mono)' }
+const SERIF: React.CSSProperties = { fontFamily: 'var(--portal-serif)' }
 
 const CONTEXT_TYPES = [
   { value: 'business_update',       label: 'Business Update' },
@@ -79,9 +79,9 @@ export default function SuccessorContextClient({ session, archiveName, existingC
 
   const inputBase: React.CSSProperties = {
     width:        '100%',
-    background:   'rgba(240,237,230,0.03)',
-    border:       '1px solid rgba(196,162,74,0.18)',
-    color:        '#F0EDE6',
+    background:   'var(--portal-inset)',
+    border:       '1px solid var(--portal-gold-line)',
+    color:        'var(--portal-ink)',
     outline:      'none',
     padding:      '12px 16px',
     ...SERIF,
@@ -90,15 +90,16 @@ export default function SuccessorContextClient({ session, archiveName, existingC
   }
 
   return (
-    <main style={{ minHeight: '100vh', background: '#0A0908' }}>
+    <main className="portal-stone" style={{ minHeight: '100vh', background: 'var(--portal-bg)' }}>
 
-      {/* Top bar */}
-      <div style={{ borderBottom: '1px solid rgba(196,162,74,0.12)', padding: '18px 40px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-        <Link href="/succession/portal" style={{ ...MONO, fontSize: '0.56rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#5C6166', textDecoration: 'none' }}>
+      {/* Top bar. The spine: this portal has no sidebar, so the ink bar is the
+          dark anchor. Colors inside it are --spine-* values. */}
+      <div style={{ background: 'var(--portal-spine)', color: 'var(--spine-fg)', padding: '18px 40px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <Link href="/succession/portal" style={{ ...MONO, fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--spine-body)', textDecoration: 'none' }}>
           ← Portal
         </Link>
-        <span style={{ ...MONO, fontSize: '0.56rem', color: '#3A3F44' }}>|</span>
-        <span style={{ ...MONO, fontSize: '0.62rem', letterSpacing: '3px', textTransform: 'uppercase', color: '#C4A24A' }}>
+        <span style={{ ...MONO, fontSize: '11px', color: 'var(--spine-dim)' }}>|</span>
+        <span style={{ ...MONO, fontSize: '11px', letterSpacing: '0.24em', textTransform: 'uppercase', color: 'var(--spine-gold)' }}>
           Inject Context · {archiveName}
         </span>
       </div>
@@ -107,10 +108,10 @@ export default function SuccessorContextClient({ session, archiveName, existingC
 
         {/* Explainer */}
         <div style={{ marginBottom: '44px' }}>
-          <h1 style={{ ...SERIF, fontSize: '1.8rem', fontWeight: 300, color: '#F0EDE6', margin: '0 0 12px', lineHeight: 1.3 }}>
+          <h1 style={{ ...SERIF, fontSize: '1.8rem', fontWeight: 300, color: 'var(--portal-ink)', margin: '0 0 12px', lineHeight: 1.3 }}>
             Context Injection
           </h1>
-          <p style={{ ...SERIF, fontSize: '0.95rem', fontStyle: 'italic', fontWeight: 300, color: '#706C65', margin: 0, lineHeight: 1.7 }}>
+          <p style={{ ...SERIF, fontSize: '0.95rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--portal-secondary)', margin: 0, lineHeight: 1.7 }}>
             Describe the current business situation you want the entity to reason about.
             This context sits above the frozen cognitive fingerprint and shapes how the founder's
             judgment is applied to your questions.
@@ -122,7 +123,7 @@ export default function SuccessorContextClient({ session, archiveName, existingC
 
           {/* Context type */}
           <div>
-            <label style={{ ...MONO, fontSize: '0.58rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#5C6166', display: 'block', marginBottom: '10px' }}>
+            <label style={{ ...MONO, fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--portal-secondary)', display: 'block', marginBottom: '10px' }}>
               Context Type
             </label>
             <select
@@ -131,7 +132,7 @@ export default function SuccessorContextClient({ session, archiveName, existingC
               style={{ ...inputBase, cursor: 'pointer', appearance: 'none', WebkitAppearance: 'none' }}
             >
               {CONTEXT_TYPES.map(t => (
-                <option key={t.value} value={t.value} style={{ background: '#1A1918' }}>
+                <option key={t.value} value={t.value} style={{ background: 'var(--portal-card)' }}>
                   {t.label}
                 </option>
               ))}
@@ -140,7 +141,7 @@ export default function SuccessorContextClient({ session, archiveName, existingC
 
           {/* Content */}
           <div>
-            <label style={{ ...MONO, fontSize: '0.58rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#5C6166', display: 'block', marginBottom: '10px' }}>
+            <label style={{ ...MONO, fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--portal-secondary)', display: 'block', marginBottom: '10px' }}>
               Context
             </label>
             <textarea
@@ -152,20 +153,20 @@ export default function SuccessorContextClient({ session, archiveName, existingC
               minLength={50}
               style={{ ...inputBase, resize: 'vertical', lineHeight: 1.7 }}
             />
-            <p style={{ ...MONO, fontSize: '0.54rem', color: content.length < 50 ? '#5C6166' : 'rgba(196,162,74,0.5)', marginTop: '6px', textAlign: 'right' }}>
+            <p style={{ ...MONO, fontSize: '11px', color: content.length < 50 ? 'var(--portal-secondary)' : 'var(--portal-gold-ink)', marginTop: '6px', textAlign: 'right' }}>
               {content.length} / 50 min
             </p>
           </div>
 
           {error && (
-            <p style={{ ...MONO, fontSize: '0.6rem', letterSpacing: '0.06em', color: 'rgba(196,162,74,0.7)', margin: 0 }}>
+            <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.06em', color: 'var(--portal-gold-ink)', margin: 0 }}>
               {error}
             </p>
           )}
 
           {confirmed && (
-            <div style={{ background: 'rgba(196,162,74,0.06)', border: '1px solid rgba(196,162,74,0.25)', padding: '14px 18px' }}>
-              <p style={{ ...SERIF, fontSize: '0.9rem', fontStyle: 'italic', color: '#C4A24A', margin: 0 }}>
+            <div style={{ background: 'var(--portal-gold-wash)', border: '1px solid var(--portal-tint)', padding: '14px 18px' }}>
+              <p style={{ ...SERIF, fontSize: '0.9rem', fontStyle: 'italic', color: 'var(--portal-gold-ink)', margin: 0 }}>
                 Context added. It is now active in your conversations.
               </p>
             </div>
@@ -176,11 +177,11 @@ export default function SuccessorContextClient({ session, archiveName, existingC
             disabled={loading || content.trim().length < 50}
             style={{
               ...MONO,
-              background:    loading || content.trim().length < 50 ? 'rgba(196,162,74,0.15)' : '#C4A24A',
-              color:         loading || content.trim().length < 50 ? '#C4A24A' : '#0A0908',
-              border:        '1px solid rgba(196,162,74,0.3)',
+              background:    loading || content.trim().length < 50 ? 'var(--portal-tint)' : 'var(--portal-btn)',
+              color:         loading || content.trim().length < 50 ? 'var(--portal-gold-ink)' : 'var(--portal-btn-label)',
+              border:        '1px solid var(--portal-gold-line)',
               padding:       '14px 28px',
-              fontSize:      '0.62rem',
+              fontSize: '11px',
               letterSpacing: '3px',
               textTransform: 'uppercase',
               cursor:        loading || content.trim().length < 50 ? 'not-allowed' : 'pointer',
@@ -195,21 +196,21 @@ export default function SuccessorContextClient({ session, archiveName, existingC
         {/* Existing contexts */}
         {contexts.length > 0 && (
           <div>
-            <p style={{ ...MONO, fontSize: '0.6rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#5C6166', margin: '0 0 20px' }}>
+            <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--portal-secondary)', margin: '0 0 20px' }}>
               All Active Context ({contexts.length})
             </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', background: 'rgba(196,162,74,0.08)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', background: 'var(--portal-gold-wash)' }}>
               {contexts.map(ctx => (
-                <div key={ctx.id} style={{ background: '#0A0908', padding: '20px 24px' }}>
+                <div key={ctx.id} style={{ background: 'var(--portal-card)', padding: '20px 24px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '10px' }}>
-                    <span style={{ ...MONO, fontSize: '0.56rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#C4A24A' }}>
+                    <span style={{ ...MONO, fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)' }}>
                       {contextTypeLabel(ctx.context_type)}
                     </span>
-                    <span style={{ ...MONO, fontSize: '0.54rem', color: '#3A3F44' }}>
+                    <span style={{ ...MONO, fontSize: '14.5px', color: 'var(--portal-label)' }}>
                       {formatDate(ctx.created_at)}
                     </span>
                   </div>
-                  <p style={{ ...SERIF, fontSize: '0.9rem', fontWeight: 300, color: '#B8B4AB', margin: 0, lineHeight: 1.7 }}>
+                  <p style={{ ...SERIF, fontSize: '0.9rem', fontWeight: 300, color: 'var(--portal-body)', margin: 0, lineHeight: 1.7 }}>
                     {ctx.content}
                   </p>
                 </div>

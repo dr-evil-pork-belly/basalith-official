@@ -4,8 +4,8 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase-browser'
 
-const MONO: React.CSSProperties = { fontFamily: "'Courier New', monospace" }
-const SERIF: React.CSSProperties = { fontFamily: 'Georgia, serif' }
+const MONO: React.CSSProperties = { fontFamily: 'var(--portal-mono)' }
+const SERIF: React.CSSProperties = { fontFamily: 'var(--portal-serif)' }
 
 export default function SuccessorLoginPage() {
   const [email, setEmail]     = useState('')
@@ -40,20 +40,21 @@ export default function SuccessorLoginPage() {
     ...SERIF,
     width:        '100%',
     background:   'transparent',
-    color:        '#F0EDE6',
+    color:        'var(--invert-fg)',
     fontSize:     '1rem',
     fontWeight:   300,
     border:       'none',
-    borderBottom: '1px solid rgba(240,237,230,0.12)',
+    borderBottom: '1px solid var(--invert-rule)',
     outline:      'none',
     paddingBottom: '10px',
   }
 
   return (
     <main
+      className="portal-threshold"
       style={{
         minHeight:      '100vh',
-        background:     '#0A0908',
+        background:     'var(--invert-bg)',
         display:        'flex',
         flexDirection:  'column',
         alignItems:     'center',
@@ -66,9 +67,9 @@ export default function SuccessorLoginPage() {
         {/* Sigil */}
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '32px' }}>
           <svg width="32" height="32" viewBox="0 0 36 36" fill="none" aria-hidden="true">
-            <rect x="18" y="2"  width="11.31" height="11.31" transform="rotate(45 18 2)"  fill="none" stroke="rgba(196,162,74,0.4)" strokeWidth="1"/>
-            <rect x="18" y="9"  width="7.07"  height="7.07"  transform="rotate(45 18 9)"  fill="none" stroke="rgba(196,162,74,0.7)" strokeWidth="1"/>
-            <rect x="18" y="14" width="4"     height="4"     transform="rotate(45 18 14)" fill="rgba(196,162,74,0.85)"/>
+            <rect x="18" y="2"  width="11.31" height="11.31" transform="rotate(45 18 2)"  fill="none" stroke="var(--invert-gold)" strokeWidth="1"/>
+            <rect x="18" y="9"  width="7.07"  height="7.07"  transform="rotate(45 18 9)"  fill="none" stroke="var(--invert-gold)" strokeWidth="1"/>
+            <rect x="18" y="14" width="4"     height="4"     transform="rotate(45 18 14)" fill="var(--invert-gold)"/>
           </svg>
         </div>
 
@@ -81,13 +82,13 @@ export default function SuccessorLoginPage() {
               fontSize:      '0.7rem',
               letterSpacing: '0.22em',
               textTransform: 'uppercase',
-              color:         '#F0EDE6',
+              color:         'var(--invert-fg)',
               textDecoration: 'none',
             }}
           >
             Basalith
-            <span style={{ color: 'rgba(196,162,74,0.45)', margin: '0 0.3em' }}>·</span>
-            <span style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontWeight: 300, color: '#5C6166', fontSize: '0.85em' }}>ai</span>
+            <span style={{ color: 'var(--invert-gold)', margin: '0 0.3em' }}>·</span>
+            <span style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', fontWeight: 300, color: 'var(--invert-dim)', fontSize: '0.85em' }}>ai</span>
           </Link>
         </div>
 
@@ -95,9 +96,9 @@ export default function SuccessorLoginPage() {
         <p
           style={{
             ...MONO,
-            fontSize:      '0.65rem',
+            fontSize: '11px',
             letterSpacing: '3px',
-            color:         '#C4A24A',
+            color:         'var(--invert-gold)',
             textTransform: 'uppercase',
             textAlign:     'center',
             margin:        '0 0 10px',
@@ -113,7 +114,7 @@ export default function SuccessorLoginPage() {
             fontSize:   '0.9rem',
             fontWeight: 300,
             fontStyle:  'italic',
-            color:      '#706C65',
+            color:      'var(--invert-dim)',
             textAlign:  'center',
             margin:     '0 0 44px',
             lineHeight: 1.6,
@@ -124,10 +125,10 @@ export default function SuccessorLoginPage() {
 
         {sent ? (
           <div style={{ textAlign: 'center' }}>
-            <p style={{ ...SERIF, fontSize: '0.95rem', fontWeight: 300, color: '#F0EDE6', margin: '0 0 8px' }}>
+            <p style={{ ...SERIF, fontSize: '0.95rem', fontWeight: 300, color: 'var(--invert-fg)', margin: '0 0 8px' }}>
               Check your email
             </p>
-            <p style={{ ...MONO, fontSize: '0.65rem', letterSpacing: '0.06em', color: '#5C6166', lineHeight: 1.7 }}>
+            <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.06em', color: 'var(--invert-dim)', lineHeight: 1.7 }}>
               We sent a sign-in link to {email}. Open it on this device to enter the founder&rsquo;s Basalith.
             </p>
           </div>
@@ -139,10 +140,10 @@ export default function SuccessorLoginPage() {
               <label
                 style={{
                   ...MONO,
-                  fontSize:      '0.6rem',
+                  fontSize: '11px',
                   letterSpacing: '0.14em',
                   textTransform: 'uppercase',
-                  color:         '#5C6166',
+                  color:         'var(--invert-dim)',
                   display:       'block',
                   marginBottom:  '10px',
                 }}
@@ -157,7 +158,7 @@ export default function SuccessorLoginPage() {
                 placeholder="you@organization.com"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                style={{ ...inputStyle, caretColor: '#C4A24A' }}
+                style={{ ...inputStyle, caretColor: 'var(--invert-gold)' }}
               />
             </div>
 
@@ -166,9 +167,9 @@ export default function SuccessorLoginPage() {
               <p
                 style={{
                   ...MONO,
-                  fontSize:      '0.65rem',
+                  fontSize: '11px',
                   letterSpacing: '0.06em',
-                  color:         'rgba(196,162,74,0.7)',
+                  color:         'var(--invert-gold)',
                   textAlign:     'center',
                   margin:        0,
                 }}
@@ -183,12 +184,12 @@ export default function SuccessorLoginPage() {
               disabled={loading}
               style={{
                 ...MONO,
-                fontSize:        '0.65rem',
+                fontSize: '11px',
                 letterSpacing:   '3px',
                 textTransform:   'uppercase',
-                background:      loading ? 'rgba(196,162,74,0.15)' : '#C4A24A',
-                color:           loading ? '#C4A24A' : '#0A0908',
-                border:          '1px solid rgba(196,162,74,0.4)',
+                background:      loading ? 'var(--invert-gold-wash)' : 'var(--portal-btn)',
+                color:           loading ? 'var(--invert-gold)' : 'var(--portal-btn-label)',
+                border:          '1px solid var(--invert-gold-line)',
                 padding:         '14px 24px',
                 width:           '100%',
                 cursor:          loading ? 'not-allowed' : 'pointer',
@@ -205,10 +206,10 @@ export default function SuccessorLoginPage() {
         <p
           style={{
             ...MONO,
-            fontSize:      '0.58rem',
+            fontSize: '11px',
             letterSpacing: '0.1em',
             textTransform: 'uppercase',
-            color:         '#3A3F44',
+            color:         'var(--invert-dim)',
             textAlign:     'center',
             marginTop:     '36px',
           }}

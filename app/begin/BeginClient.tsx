@@ -24,17 +24,17 @@ function Sigil() {
   return (
     <div className="flex justify-center mb-10">
       <svg width="36" height="36" viewBox="0 0 36 36" fill="none" aria-hidden="true">
-        <rect x="18" y="2"  width="11.31" height="11.31" transform="rotate(45 18 2)"  fill="none" stroke="rgba(196,162,74,0.5)" strokeWidth="1"/>
-        <rect x="18" y="9"  width="7.07"  height="7.07"  transform="rotate(45 18 9)"  fill="none" stroke="rgba(196,162,74,0.8)" strokeWidth="1"/>
-        <rect x="18" y="14" width="4"     height="4"     transform="rotate(45 18 14)" fill="rgba(196,162,74,0.9)"/>
+        <rect x="18" y="2"  width="11.31" height="11.31" transform="rotate(45 18 2)"  fill="none" stroke="var(--invert-gold)" strokeWidth="1"/>
+        <rect x="18" y="9"  width="7.07"  height="7.07"  transform="rotate(45 18 9)"  fill="none" stroke="var(--invert-gold)" strokeWidth="1"/>
+        <rect x="18" y="14" width="4"     height="4"     transform="rotate(45 18 14)" fill="var(--invert-gold)"/>
       </svg>
     </div>
   )
 }
 
-const labelClass = 'font-sans text-[0.62rem] font-bold tracking-[0.14em] uppercase block mb-3'
-const inputClass = 'w-full bg-transparent font-serif text-[1.1rem] font-light placeholder:text-[#3A3F44] focus:outline-none pb-3 transition-colors duration-200'
-const inputStyle = { color: '#F0F0EE', borderBottom: '1px solid rgba(255,255,255,0.12)' } as const
+const labelClass = 'font-sans text-[11.5px] font-bold tracking-[0.14em] uppercase block mb-3'
+const inputClass = 'w-full bg-transparent font-serif text-[1.1rem] font-light placeholder:text-[var(--invert-dim)] focus:outline-none pb-3 transition-colors duration-200'
+const inputStyle = { color: 'var(--invert-fg)', borderBottom: '1px solid var(--invert-dim)' } as const
 
 export default function BeginClient({ signedInEmail }: { signedInEmail: string | null }) {
   const router = useRouter()
@@ -128,17 +128,17 @@ export default function BeginClient({ signedInEmail }: { signedInEmail: string |
 
   return (
     <main
-      className="min-h-screen flex flex-col items-center justify-center px-8 py-16"
-      style={{ background: '#0C0C0D' }}
+      className="portal-threshold min-h-screen flex flex-col items-center justify-center px-8 py-16"
+      style={{ background: 'var(--invert-bg)' }}
     >
       <div className="w-full max-w-sm">
         <Sigil />
 
         <div className="text-center mb-2">
-          <Link href="/" className="font-sans text-[0.75rem] font-bold tracking-[0.24em] uppercase no-underline" style={{ color: '#F0F0EE' }}>
+          <Link href="/" className="font-sans text-[15px] font-bold tracking-[0.24em] uppercase no-underline" style={{ color: 'var(--invert-fg)' }}>
             Basalith
-            <span style={{ color: 'rgba(196,162,74,0.5)', margin: '0 0.3em' }} aria-hidden="true">·</span>
-            <span style={{ fontStyle: 'italic', fontWeight: 300, color: 'var(--text-muted)', fontSize: '0.85em', textTransform: 'lowercase', letterSpacing: '0.08em' }}>ai</span>
+            <span style={{ color: 'var(--invert-gold)', margin: '0 0.3em' }} aria-hidden="true">·</span>
+            <span style={{ fontStyle: 'italic', fontWeight: 300, color: 'var(--invert-dim)', fontSize: '0.85em', textTransform: 'lowercase', letterSpacing: '0.08em' }}>ai</span>
           </Link>
         </div>
 
@@ -146,14 +146,14 @@ export default function BeginClient({ signedInEmail }: { signedInEmail: string |
 
         {screen === 'sent' ? (
           <div className="flex flex-col items-center gap-4 text-center" aria-live="polite">
-            <p className="font-serif text-[1.1rem] font-light" style={{ color: '#F0F0EE' }}>
+            <p className="font-serif text-[1.1rem] font-light" style={{ color: 'var(--invert-fg)' }}>
               Check your mail.
             </p>
-            <p className="font-sans text-[0.78rem] leading-relaxed" style={{ color: '#5C6166' }}>
+            <p className="font-sans text-[15px] leading-relaxed" style={{ color: 'var(--invert-dim)' }}>
               The link signs you in and opens your first call.
             </p>
             {resendIn > 0 ? (
-              <p className="font-sans text-[0.62rem] tracking-[0.1em] uppercase mt-6" style={{ color: '#3A3F44' }}>
+              <p className="font-sans text-[11.5px] tracking-[0.1em] uppercase mt-6" style={{ color: 'var(--invert-dim)' }}>
                 Send it again in {resendIn}s
               </p>
             ) : (
@@ -161,14 +161,14 @@ export default function BeginClient({ signedInEmail }: { signedInEmail: string |
                 type="button"
                 onClick={handleResend}
                 disabled={loading}
-                className="font-sans text-[0.62rem] tracking-[0.1em] uppercase mt-6 bg-transparent border-0 cursor-pointer disabled:opacity-50"
-                style={{ color: 'rgba(196,162,74,0.8)' }}
+                className="font-sans text-[11.5px] tracking-[0.1em] uppercase mt-6 bg-transparent border-0 cursor-pointer disabled:opacity-50"
+                style={{ color: 'var(--invert-gold)' }}
               >
                 {loading ? 'Sending…' : resent ? 'Sent again. Send once more' : 'Send the link again'}
               </button>
             )}
             {error && (
-              <p className="font-sans text-[0.72rem] tracking-[0.06em] text-center" style={{ color: 'rgba(196,162,74,0.7)' }}>
+              <p className="font-sans text-[15px] tracking-[0.06em] text-center" style={{ color: 'var(--invert-gold)' }}>
                 {error}
               </p>
             )}
@@ -176,22 +176,22 @@ export default function BeginClient({ signedInEmail }: { signedInEmail: string |
         ) : (
           <form onSubmit={handleSubmit} className="flex flex-col gap-7">
             {signedIn ? (
-              <p className="font-serif text-[1.25rem] font-light leading-snug" style={{ color: '#F0F0EE' }}>
+              <p className="font-serif text-[1.25rem] font-light leading-snug" style={{ color: 'var(--invert-fg)' }}>
                 You are signed in as {signedInEmail}. Begin your Basalith.
               </p>
             ) : (
               <>
-                <h1 className="font-serif text-[1.45rem] font-light leading-snug" style={{ color: '#F0F0EE' }}>
+                <h1 className="font-serif text-[1.45rem] font-light leading-snug" style={{ color: 'var(--invert-fg)' }}>
                   Tell us about the hardest call you ever made.
                 </h1>
-                <p className="font-sans text-[0.82rem] leading-relaxed" style={{ color: '#5C6166' }}>
+                <p className="font-sans text-[15.5px] leading-relaxed" style={{ color: 'var(--invert-dim)' }}>
                   Fifteen to thirty minutes, by voice or typed, on your own time. Nothing you say has to be important. When you are done, your Basalith answers one question in your own words and declines one it has no grounds for. That is how you know it is you.
                 </p>
               </>
             )}
 
             <div>
-              <label htmlFor="begin-name" className={labelClass} style={{ color: '#5C6166' }}>Your name</label>
+              <label htmlFor="begin-name" className={labelClass} style={{ color: 'var(--invert-dim)' }}>Your name</label>
               <input
                 id="begin-name"
                 type="text"
@@ -208,7 +208,7 @@ export default function BeginClient({ signedInEmail }: { signedInEmail: string |
 
             {!signedIn && (
               <div>
-                <label htmlFor="begin-email" className={labelClass} style={{ color: '#5C6166' }}>Your email</label>
+                <label htmlFor="begin-email" className={labelClass} style={{ color: 'var(--invert-dim)' }}>Your email</label>
                 <input
                   id="begin-email"
                   type="email"
@@ -224,17 +224,17 @@ export default function BeginClient({ signedInEmail }: { signedInEmail: string |
             )}
 
             <fieldset className="border-0 p-0 m-0">
-              <legend className={labelClass} style={{ color: '#5C6166' }}>This Basalith is for</legend>
+              <legend className={labelClass} style={{ color: 'var(--invert-dim)' }}>This Basalith is for</legend>
               <div className="flex gap-6">
                 {([['me', 'me'], ['someone', 'someone I am helping']] as [ForWhom, string][]).map(([value, text]) => (
-                  <label key={value} className="flex items-center gap-2 font-serif text-[1rem] font-light cursor-pointer" style={{ color: forWhom === value ? '#F0F0EE' : '#5C6166' }}>
+                  <label key={value} className="flex items-center gap-2 font-serif text-[1rem] font-light cursor-pointer" style={{ color: forWhom === value ? 'var(--invert-fg)' : 'var(--invert-dim)' }}>
                     <input
                       type="radio"
                       name="forWhom"
                       value={value}
                       checked={forWhom === value}
                       onChange={() => setForWhom(value)}
-                      className="accent-[#C4A24A]"
+                      className="accent-[var(--invert-gold)]"
                     />
                     {text}
                   </label>
@@ -243,7 +243,7 @@ export default function BeginClient({ signedInEmail }: { signedInEmail: string |
             </fieldset>
 
             <div>
-              <label htmlFor="begin-prompt" className={labelClass} style={{ color: '#5C6166' }}>What brought you here (optional, one line)</label>
+              <label htmlFor="begin-prompt" className={labelClass} style={{ color: 'var(--invert-dim)' }}>What brought you here (optional, one line)</label>
               <input
                 id="begin-prompt"
                 type="text"
@@ -256,7 +256,7 @@ export default function BeginClient({ signedInEmail }: { signedInEmail: string |
             </div>
 
             {error && (
-              <p className="font-sans text-[0.72rem] tracking-[0.06em] text-center" style={{ color: 'rgba(196,162,74,0.7)' }}>
+              <p className="font-sans text-[15px] tracking-[0.06em] text-center" style={{ color: 'var(--invert-gold)' }}>
                 {error}
               </p>
             )}
@@ -269,17 +269,17 @@ export default function BeginClient({ signedInEmail }: { signedInEmail: string |
               {loading ? 'One moment…' : 'Begin.'}
             </button>
 
-            <p className="font-sans text-[0.72rem] leading-relaxed text-center" style={{ color: '#5C6166' }}>
+            <p className="font-sans text-[15px] leading-relaxed text-center" style={{ color: 'var(--invert-dim)' }}>
               Your first call is yours. Found your Basalith to keep it.
             </p>
           </form>
         )}
 
-        <p className="font-sans text-[0.62rem] tracking-[0.1em] uppercase text-center mt-10" style={{ color: '#3A3F44' }}>
+        <p className="font-sans text-[11.5px] tracking-[0.1em] uppercase text-center mt-10" style={{ color: 'var(--invert-dim)' }}>
           {signedIn ? (
-            <a href="/api/auth/logout" className="no-underline" style={{ color: '#3A3F44' }}>Not you? Sign out</a>
+            <a href="/api/auth/logout" className="no-underline" style={{ color: 'var(--invert-dim)' }}>Not you? Sign out</a>
           ) : (
-            <Link href="/archive-login" className="no-underline" style={{ color: '#3A3F44' }}>Already have a Basalith? Sign in</Link>
+            <Link href="/archive-login" className="no-underline" style={{ color: 'var(--invert-dim)' }}>Already have a Basalith? Sign in</Link>
           )}
         </p>
       </div>
