@@ -132,7 +132,7 @@ function buildPortraitEmail(
     The more they contribute the more accurately it speaks.
   </p>
   <hr style="border:none;border-top:1px solid rgba(240,237,230,0.06);margin:0 0 20px">
-  <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:0">BASALITH · XYZ<br>${archiveName}</p>
+  <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:0">BASALITH<br>${archiveName}</p>
 </body>
 </html>`
 }

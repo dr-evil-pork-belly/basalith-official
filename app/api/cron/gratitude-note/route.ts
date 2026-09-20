@@ -188,7 +188,7 @@ function buildGratitudeEmail(
         ${lang === 'zh' ? '您的回忆已永久保存在档案中。' : 'Your memories are on the record permanently.'}
       </p>
       <a href="${siteUrl}" style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;text-decoration:none">
-        BASALITH · XYZ
+        BASALITH
       </a>
     </div>
 

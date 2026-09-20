@@ -287,7 +287,7 @@ function buildStoryPromptEmail(
     <a href="${portalUrl}" style="display:inline-block;background:transparent;color:#C4A24A;border:1px solid rgba(196,162,74,0.3);font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;text-decoration:none;padding:10px 20px">${ui.voiceCta}</a>
   </div>
   <div style="padding:0 32px 32px;border-top:1px solid rgba(240,237,230,0.06);margin-top:16px">
-    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:20px 0 0">BASALITH · XYZ<br>${archiveName}</p>
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:20px 0 0">BASALITH<br>${archiveName}</p>
   </div>
 </body>
 </html>`
@@ -319,7 +319,7 @@ function buildMondayPhotoEmail(
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#A08A52;margin:0">REVEAL ARRIVES FRIDAY · REPLY WITH WHAT YOU KNOW</p>
   </div>
   <div style="padding:0 32px 32px;border-top:1px solid rgba(240,237,230,0.06)">
-    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:20px 0 0">BASALITH · XYZ<br>The ${familyName} Basalith</p>
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:20px 0 0">BASALITH<br>The ${familyName} Basalith</p>
   </div>
 </body>
 </html>`

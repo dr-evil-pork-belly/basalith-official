@@ -143,20 +143,20 @@ function buildMagicLinkEmail({
     </p>
 
     <div style="background:rgba(196,162,74,0.06);border:1px solid rgba(196,162,74,0.2);padding:20px 24px;margin:0 0 28px">
-      <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;margin:0 0 12px">
+      <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#C4A24A;margin:0 0 12px">
         ${linkLabel}
       </p>
       <a href="${magicLinkUrl}" style="font-family:Georgia,serif;font-size:14px;color:#C4A24A;word-break:break-all">
         ${magicLinkUrl}
       </a>
-      <p style="font-family:Georgia,serif;font-size:13px;font-style:italic;color:#706C65;margin:12px 0 0;line-height:1.7">
+      <p style="font-family:Georgia,serif;font-size:13px;font-style:italic;color:#A29B90;margin:12px 0 0;line-height:1.7">
         ${bookmark}
       </p>
     </div>
 
     <div style="border-top:1px solid rgba(240,237,230,0.06);padding-top:24px">
-      <a href="${siteUrl}" style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830;text-decoration:none">
-        BASALITH · XYZ
+      <a href="${siteUrl}" style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;text-decoration:none">
+        BASALITH
       </a>
     </div>
 

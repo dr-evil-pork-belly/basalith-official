@@ -181,13 +181,13 @@ export async function POST(req: NextRequest) {
     <p style="font-family:Georgia,serif;font-size:18px;font-weight:700;color:#F0EDE6;margin:0 0 20px">
       ${contributorName} answered a question about you.
     </p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#706C65;margin:0 0 8px">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#A29B90;margin:0 0 8px">
       THE QUESTION
     </p>
     <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#9DA3A8;line-height:1.7;margin:0 0 20px">
       ${question.question_text}
     </p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#C4A24A;margin:0 0 8px">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#C4A24A;margin:0 0 8px">
       THEIR ANSWER
     </p>
     <div style="border-left:2px solid rgba(196,162,74,0.4);padding:0 0 0 20px">
@@ -196,10 +196,10 @@ export async function POST(req: NextRequest) {
       </p>
     </div>
     <div style="border-top:1px solid rgba(240,237,230,0.06);padding-top:20px;margin-top:28px">
-      <p style="font-family:Georgia,serif;font-size:13px;font-style:italic;color:#3A3830;margin:0 0 12px">
+      <p style="font-family:Georgia,serif;font-size:13px;font-style:italic;color:#8B9196;margin:0 0 12px">
         This answer is now on the record, permanently.
       </p>
-      <a href="${siteUrl}/archive/entity" style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#C4A24A;text-decoration:none">
+      <a href="${siteUrl}/archive/entity" style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#C4A24A;text-decoration:none">
         VIEW YOUR ENTITY →
       </a>
     </div>

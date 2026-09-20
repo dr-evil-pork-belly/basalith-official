@@ -45,7 +45,7 @@ function buildAllPhotosSentEmail(
       Every photograph in your Basalith has been sent to ${contributorName}.
       To continue the daily photograph series, upload more photographs to your Basalith.
     </p>
-    <p style="font-family:Georgia,serif;font-size:15px;font-weight:300;font-style:italic;color:#706C65;line-height:1.8;margin:0 0 32px">
+    <p style="font-family:Georgia,serif;font-size:15px;font-weight:300;font-style:italic;color:#A29B90;line-height:1.8;margin:0 0 32px">
       Each new photograph is an opportunity for ${contributorName} to share
       a memory you may not have heard. Old family albums, photographs from
       other relatives, and digitized prints all make excellent additions.
@@ -85,7 +85,7 @@ function buildSparkOnlyEmail(
 <body style="background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:600px;margin:0 auto;padding:0">
   <div style="padding:32px 32px 0">
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">${archiveName.toUpperCase()}</p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0">${label.toUpperCase()}</p>
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;margin:0">${label.toUpperCase()}</p>
   </div>
   <div style="padding:32px">
     <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#B8B4AB;margin:0 0 32px">${contributorName.split(' ')[0]},</p>
@@ -95,13 +95,13 @@ function buildSparkOnlyEmail(
     <p style="font-family:Georgia,serif;font-size:18px;font-weight:300;color:#F0EDE6;line-height:1.7;margin:0 0 8px;text-align:center">
       Just reply to this email.
     </p>
-    <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#706C65;line-height:1.7;margin:0 0 24px;text-align:center">
+    <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#A29B90;line-height:1.7;margin:0 0 24px;text-align:center">
       No login. No portal. Just your words sent back to us.
     </p>
-    ${portalUrl ? `<a href="${portalUrl}" style="display:inline-block;background:transparent;color:#C4A24A;border:1px solid rgba(196,162,74,0.3);font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;text-decoration:none;padding:10px 20px">Or record a voice note →</a>` : ''}
+    ${portalUrl ? `<a href="${portalUrl}" style="display:inline-block;background:transparent;color:#C4A24A;border:1px solid rgba(196,162,74,0.3);font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;text-decoration:none;padding:10px 20px">Or record a voice note →</a>` : ''}
   </div>
   <div style="padding:16px 32px 32px;border-top:1px solid rgba(240,237,230,0.06)">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:0">BASALITH · XYZ<br>${archiveName}<br>Heritage Nexus Inc.</p>
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:0">BASALITH<br>${archiveName}<br>Heritage Nexus Inc.</p>
   </div>
 </body>
 </html>`

@@ -1,190 +1,200 @@
-# Slice 5a: the emails are readable
+# Slice 5a, revised: the emails are readable, and the wordmark drops the .xyz
 
-September 20, 2026. Twenty-six files in `basalith-official`, written to the
-working tree by Cowork, uncommitted. This is the contrast fix only. The theme
-file and the shared shell are slice 5b, deliberately separate, and the reason
-is at the bottom.
+September 20, 2026. Thirty-five files in `basalith-official`, written to the
+working tree by Cowork, uncommitted. This replaces the earlier
+`EMAIL_CONTRAST_2026-09-20.md`, which covered twenty-six of them and missed
+thirteen.
 
-## First: one thing slipped through slice 4
+## What I missed the first time, and how
 
-`git rm -r app/archivist` does not match `app/archivist-login`, and my command
-list did not include it. The directory is still on disk. It is harmless right
-now, because `/archivist-login` is a 308 in `next.config.ts` and redirects run
-above route resolution, so the page is unreachable dead code. Still, delete it:
+The first pass swept `app/api/cron/*` and `lib/emails/*`, on the assumption that
+those were the email senders. They are not all of them. Thirteen more routes
+build and send customer email from elsewhere in `app/api`, and they carried the
+same two failing greys:
 
-    git rm -r app/archivist-login
+    app/api/archive/contribution-alert   app/api/contribute/answer
+    app/api/archive/contributors         app/api/demo/whitepaper
+    app/api/archive/invite-witness       app/api/god/email
+    app/api/archive/life-event           app/api/god/send-apology
+    app/api/archive/morning-digest       app/api/god/send-magic-link
+    app/api/archive/poll-replies         app/api/resend/inbound
+    app/api/archive/send-photo
 
-Two Guide-era cron routes also survived, because they live under `app/api/cron`
-rather than `app/api/archivist`:
+The right sweep was `grep -rl 'DOCTYPE html' app lib`, not a directory guess. It
+is in the verification list below so the next pass starts from the senders
+rather than from where I expect them to live.
 
-    app/api/cron/guide-quality-audit    scores archives, emails guides a report
-    app/api/cron/pay-residuals          computes a 12% commission, pays via Stripe Connect
+Three of those are the ones that matter most: `invite-witness` and
+`contributors` are the emails that bring a new family member into an archive,
+and `morning-digest` is the daily one, with eleven undersized labels and nine
+failing greys on its own.
 
-Neither is registered in `vercel.json`, so neither is scheduled and neither has
-been running. But `pay-residuals` is a money-moving POST endpoint guarded only
-by `CRON_SECRET`, sitting in the tree for a commission model that does not
-exist. It should not be one misconfigured schedule away from paying somebody.
+## The totals, both passes together
 
-    git rm -r app/api/cron/guide-quality-audit
-    git rm -r app/api/cron/pay-residuals
+    #5C6166  ->  #8B9196    98 replaced    3.18:1 -> 6.24:1
+    #706C65  ->  #A29B90    63 replaced    3.81:1 -> 7.23:1
+    #3A3830  ->  #8B9196     3 replaced    1.69:1 -> 6.24:1
+    font-size:10px -> 11px 138 replaced
+    font-size:9px  -> 11px   3 replaced
+    BASALITH · XYZ -> BASALITH  31 replaced
 
-## The decision: emails stay dark
+164 pieces of customer-facing text were below AA. All of them measured, on the
+email ground `#0A0908`, which is darker than the portal's `#14120F` and so has
+its own numbers.
 
-The register rule from slice 3 settles this without a debate. Dark is Basalith
-and the archive; stone is the founder at work. An email is not a workspace. It
-is Basalith speaking to you in your inbox, which is the same voice as the
-sign-in page and the block where the entity answers.
+The ladder, which is now the whole email palette:
 
-So slice 5 is not a repaint. Nothing changes color family. What changes is that
-the text becomes readable, which it currently is not.
+    #F0EDE6   17.02:1   headline and body          113 uses
+    #B8B4AB    9.62:1   secondary                   84 uses
+    #C4A24A    8.16:1   gold, and the button        75 uses
+    #9DA3A8    7.80:1   cool secondary              16 uses
+    #A29B90    7.23:1   explanatory prose           57 uses
+    #8B9196    6.24:1   eyebrows, footers, labels   98 uses
 
-## What was broken
+Everything else measured and passing: `#9A968C` 6.74, `#A08A52` 5.92, `#8A7A4A`
+4.70. The gold button's label, `#0A0908` and `#0A0A0B`, is 8.16:1 on the gold.
 
-Measured on the email ground `#0A0908`, which is one step darker than the
-portal's `#14120F`, so these numbers are specific to email:
+## The wordmark
 
-    #5C6166   3.18:1   FAIL   78 uses   mono eyebrows, footers, labels
-    #706C65   3.81:1   FAIL   50 uses   Georgia explanatory paragraphs
-    #3A3830   1.69:1   FAIL    1 use    the founding welcome footer
+`BASALITH · XYZ` is now `BASALITH`, in all 31 places. It does not need to name a
+domain at all, the company line under it already says Heritage Nexus Inc., and
+`BASALITH · AI` would have read as an AI product label, which the copy rules
+rule out anyway.
 
-129 pieces of text below AA, in mail that has already been sent to customers.
-And 101 instances of `font-size:10px`, letterspaced mono, which is under the
-floor the rest of the product now holds.
-
-The worst of it is not a label. In `entity-letter`, the paragraph that tells an
-owner the entity may be wrong and they should correct it was `#706C65` at
-3.81:1. That is the instruction that makes the correction loop work, rendered
-close to invisible, in the quarterly email whose whole job is to reopen the
-conversation.
-
-## What changed
-
-    #5C6166  ->  #8B9196   6.24:1   the dim tier, cool, chrome
-    #706C65  ->  #A29B90   7.23:1   the muted tier, warm, explanatory prose
-    #3A3830  ->  #8B9196   6.24:1
-    font-size:10px -> 11px          101 instances
-
-The two replacements keep the hue each one had, because the warm and cool greys
-were doing different jobs and the difference is worth keeping. The muted tier
-sits above the dim tier deliberately: explanatory prose should read louder than
-footer chrome, which is the same hierarchy mistake the dashboard had in the
-contrast revision.
-
-The full ladder on the email ground now runs:
-
-    #F0EDE6   17.02:1   headline and body          92 uses
-    #B8B4AB    9.62:1   secondary                  94 uses
-    #C4A24A    8.16:1   gold, and the button       59 uses
-    #A29B90    7.23:1   explanatory prose          49 uses
-    #8B9196    6.24:1   eyebrows, footers, labels  79 uses
-
-Every other literal still in these files was measured and passes: `#9DA3A8`
-7.80, `#9A968C` 6.74, `#A08A52` 5.92, `#8A7A4A` 4.70. The gold button's label
-`#0A0908` on `#C4A24A` is 8.16:1.
-
-## Deliberately not touched
-
-**The internal admin alerts.** `buildExportAdminAlert` in
-`lib/emails/archiveExport.ts` and the plain fallback in
-`foundingSequenceComplete.ts` are light-themed on purpose: `#111` on `#fff`,
-`#1A1814` on the client default. They go to you, not to a customer, and they
-are meant to be plain. They read as failures in an automated sweep, which is
-why this says so here. They are a third register, internal plain, and they
-should stay that way.
-
-**The em dashes in `lib/emailTranslations.ts`.** There are nine, in Chinese,
-Cantonese, Japanese, Vietnamese, Tagalog and Korean copy. The no-em-dash rule is
-an American English style rule. In Chinese and Japanese the em dash is the
-standard 破折号 and removing it would be a typographic error, not a copy fix.
-The rule should be read as English-only, and `CLAUDE.md` should say so before
-someone runs a global strip on that file.
-
-The em dashes in `console.log` calls and code comments were left alone for the
-same reason: they are not copy.
+This is the only part of the domain switch that is safe to do in code today.
+The rest is below, and it is not a code problem.
 
 ## Copy
 
-Two em dashes were in emitted English, both in `memory-game-monthly`:
+Two em dashes in emitted English in `memory-game-monthly`, and one more found in
+the second pass: the apology email opened `${firstName} —`, now `${firstName},`.
 
-    "Answers are shown without names — so be honest."
-      -> "Answers are shown without names, so be honest."
-    "N ANSWERS — NAMES NOT SHOWN"
-      -> "N ANSWERS · NAMES NOT SHOWN"
+The nine em dashes in `lib/emailTranslations.ts` stay. They are in Chinese,
+Cantonese, Japanese, Vietnamese, Tagalog and Korean copy. The no-em-dash rule is
+an American English style rule, and in Chinese and Japanese the em dash is the
+standard 破折号. `CLAUDE.md` should say the rule is English-only before somebody
+runs a global strip on that file.
+
+## The Guide routes that are still on disk
+
+`git rm -r app/archivist` does not match `app/archivist-login`, and
+`git rm -r app/api/archivist` does not match `app/api/archivist-*`. My slice 4
+command list was written as if it did. Seven paths survived:
+
+    app/archivist-login                  the sign-in page
+    app/api/archivist-apply              logs the body, returns 200
+    app/api/archivist-interest           logs the body, returns 200
+    app/api/archivist-login              returns 410, deprecated since Phase 4a
+    app/api/guide-onboard                the onboarding handler
+    app/api/admin/guide                  the admin tool for managing guides
+    app/api/cron/guide-quality-audit     scores archives, emails guides a report
+    app/api/cron/pay-residuals           12% commission, paid via Stripe Connect
+
+The three `archivist-*` API routes are harmless stubs. `pay-residuals` is not.
+It is a POST endpoint guarded only by `CRON_SECRET` that moves money to
+contractors who no longer exist. It is not in `vercel.json`, so it has never
+been scheduled and has never run, and it should not be sitting in the tree
+waiting for someone to schedule it by mistake.
 
 ## Run it
 
     npx tsc --noEmit
     git checkout -b email-contrast
     git rm -r app/archivist-login
+    git rm -r app/api/archivist-apply
+    git rm -r app/api/archivist-interest
+    git rm -r app/api/archivist-login
+    git rm -r app/api/guide-onboard
+    git rm -r app/api/admin/guide
     git rm -r app/api/cron/guide-quality-audit
     git rm -r app/api/cron/pay-residuals
-    git add app/api/cron lib/emails lib/pauseEmails.ts
+    git add app/api lib/emails lib/pauseEmails.ts app/contribute/not-found.tsx
     git add docs/EMAIL_CONTRAST_2026-09-20.md
-    git commit -m "Email contrast: 129 failing text colors fixed, type floor raised; drop the last Guide routes"
+    git commit -m "Email contrast: 164 failing text colors fixed, type floor raised, wordmark drops the .xyz; delete the last Guide routes"
     git checkout main
     git merge email-contrast
     git push origin main
 
-## The Supabase magic link, which is not in this repo
+Check `git status` after the `git rm` lines and before the commit. If any of
+those paths is already gone, git says so and the line is a no-op, which is fine.
 
-Sign-in uses `signInWithOtp` with `emailRedirectTo`, so what a new owner
-actually receives is Supabase's **Magic Link** template, edited in the dashboard
-under Authentication, Email Templates. It is still on the default light theme,
-which is why a new owner gets a white sign-in email and a dark welcome email
-within the same minute. I cannot reach the dashboard from here. Paste this in:
+## The domain switch, which is mostly not a code change
 
-    <!DOCTYPE html>
-    <html>
-    <body style="background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:600px;margin:0 auto;padding:0">
-      <div style="padding:32px 32px 0">
-        <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">BASALITH</p>
-        <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;margin:0">SIGN IN</p>
-      </div>
-      <div style="padding:32px">
-        <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#F0EDE6;line-height:1.8;margin:0 0 28px">
-          Use the link below to sign in. It works once, and it expires in an hour.
-        </p>
-        <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#C4A24A;color:#0A0908;font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;text-decoration:none;padding:14px 28px;border-radius:2px">
-          SIGN IN TO BASALITH
-        </a>
-        <p style="font-family:Georgia,serif;font-size:15px;font-weight:300;color:#A29B90;line-height:1.8;margin:28px 0 0">
-          If you did not ask to sign in, you can ignore this. Nothing happens until the link is used.
-        </p>
-      </div>
-      <div style="padding:16px 32px 32px;border-top:1px solid rgba(240,237,230,0.06);margin-top:8px">
-        <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:0">
-          BASALITH<br>Heritage Nexus Inc.
-        </p>
-      </div>
-    </body>
-    </html>
+Every `basalith.xyz` reference in the repo, counted:
 
-Same ground, same gold, same two grey tiers as everything above. Send yourself
-one and a welcome email back to back to confirm they now read as one product.
+    archive@basalith.xyz        45   the sending address, and the inbound reply address
+    unsubscribe@basalith.xyz    39   the List-Unsubscribe header
+    BASALITH · XYZ              31   the footer wordmark            DONE, above
+    legacy@basalith.xyz          8   the admin inbox
+    hello@basalith.xyz           4   the public contact address
+    davidha@basalith.xyz         3   the internal-alert sender
+    guide@basalith.xyz           2   Guide-era, deleted above
+    archivists@basalith.xyz      1   Guide-era, deleted above
+    https://basalith.xyz         1   the white paper URL
 
-## Why 5b is a separate commit
+That last one is already right under the split you described. `demo/whitepaper`
+points the boardroom demo at the research site, which is what .xyz is becoming.
+Leave it.
 
-Twenty of these files each carry their own copy of the same shell: the
-`<!DOCTYPE html>`, the `background:#0A0908;font-family:Georgia,serif` body, the
-wordmark eyebrow, the gold button, the `BASALITH · XYZ` footer. Extracting that
-into `lib/emails/theme.ts` plus a `renderEmail()` shell is worth doing, and it
-is what stops this drifting again.
+The other 99 are mail, and this is the part worth being careful about. Nothing
+in the product sends from basalith.ai today. All 35 `from:` literals are
+`archive@basalith.xyz`, and the internal alerts are `davidha@basalith.xyz`.
 
-It is also a refactor of twenty live customer email senders. This commit is 129
-color values and 101 font sizes, mechanical and reversible with a single revert.
-That one restructures the senders. If an email breaks next week, you want to
-know which of the two did it, and you cannot know that if they ship together.
+`archive@basalith.xyz` is not only the sending address. It is the address
+families reply to, and `app/api/resend/inbound` is what catches those replies
+and turns them into deposits. Changing the from-address in code without moving
+inbound routing first would not degrade anything visibly. It would just quietly
+stop the reply loop, which is the part of the product where a grandmother
+answers a photograph, and you would find out weeks later.
 
-So: this one first, watch a send cycle, then 5b.
+So the order has to be:
 
-One thing to decide before 5b, which is a question and not a defect: the footer
-reads `BASALITH · XYZ` in every template, while the live site is basalith.ai.
-If that is deliberate, it stays. If it is a leftover from when basalith.xyz was
-the primary domain, 5b is the moment to fix it in one place instead of twenty.
+1. Add basalith.ai as a domain in Resend. Publish the SPF, DKIM and DMARC
+   records it gives you. Wait for verification.
+2. Set up inbound routing for `archive@basalith.ai` in Resend, and confirm a
+   test reply reaches `/api/resend/inbound`. Keep the .xyz inbound route
+   running in parallel, because replies to old emails will keep arriving for
+   months and each one is a real memory someone typed.
+3. Create `unsubscribe@`, `legacy@`, `hello@` on basalith.ai and forward them
+   wherever you read mail now.
+4. Only then, the code: flip the literals, or better, set `RESEND_FROM_EMAIL`
+   and `ADMIN_EMAIL` in Vercel so the literals stop mattering.
 
-## What is left after this
+Which brings up the one thing I cannot see from here, and it changes how much
+work step 4 is: **are `RESEND_FROM_EMAIL` and `ADMIN_EMAIL` set in Vercel
+today?** If they are, every `?? 'archive@basalith.xyz'` in the repo is a dead
+fallback, the live from-address is whatever the env var says, and step 4 is two
+environment variables rather than 84 edits. If they are not, the fallbacks are
+the live addresses. I did not read your `.env` to find out, and you should not
+paste it here either. Vercel's project settings will say.
 
-**Slice 5b.** The theme file and the shared shell, above.
+## Verified here
 
-**The iOS app.** `basalith-app/src/theme.ts`, its own pass. That folder is not
-connected to this session, so it needs either a connect or a paste.
+Every `color:` value in all 35 files measured on the email ground; the only ones
+below 4.5:1 are the two internal admin alerts, which are deliberately light
+(`#111` on `#fff`), and the gold button labels, which are 8.16:1 on gold. No
+type under 11px. No em dashes in emitted English. No `BASALITH · XYZ` left.
+TypeScript under strict with `isolatedModules` reports no errors; the only
+diagnostics are the sandbox's missing `@types/node` and unresolved `@/lib/*`.
+Line endings match each file's original.
+
+## Not verified here
+
+Any of these actually rendering in a mail client. The three worth sending
+yourself before you trust the pass: the morning digest, which had the most
+damage; a witness invitation, which a stranger sees first; and the quarterly
+entity letter, where the paragraph asking the owner to correct the entity was
+the worst single instance at 3.81:1.
+
+## What is left
+
+**Slice 5b.** The theme file and the shared shell. Twenty-eight files now carry
+their own copy of the same `<!DOCTYPE>`, body style, eyebrow, button and footer.
+That duplication is why one sweep missed thirteen senders, and it is why the
+wordmark needed 31 edits instead of one. Extracting `lib/emails/theme.ts` and a
+`renderEmail()` shell is what makes the next change one edit.
+
+**The Supabase magic link.** Still the dashboard, not the repo. The drop-in
+template is in the earlier version of this document and unchanged by this pass.
+
+**The iOS app.** `basalith-app/src/theme.ts`, its own pass. Not connected here.

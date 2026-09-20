@@ -20,7 +20,7 @@ function wrap(archiveName: string, bodyHtml: string): string {
     ${bodyHtml}
   </div>
   <div style="padding:16px 32px 32px;border-top:1px solid rgba(240,237,230,0.06)">
-    <p style="${BASE_STYLES.footer}">BASALITH · XYZ<br>${archiveName}<br>Heritage Nexus Inc.</p>
+    <p style="${BASE_STYLES.footer}">BASALITH<br>${archiveName}<br>Heritage Nexus Inc.</p>
   </div>
 </body>
 </html>`

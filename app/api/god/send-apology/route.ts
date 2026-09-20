@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
       BASALITH
     </p>
     <p style="font-family:Georgia,serif;font-size:18px;font-weight:300;color:#F0EDE6;margin:0 0 20px">
-      ${contributor.name?.split(' ')[0] ?? 'Hi'} —
+      ${contributor.name?.split(' ')[0] ?? 'Hi'},
     </p>
     <p style="font-family:Georgia,serif;font-size:16px;font-weight:300;font-style:italic;color:#B8B4AB;line-height:1.9;margin:0 0 20px">
       We found and fixed a bug that was causing you to see the same photographs more than once.
@@ -61,10 +61,10 @@ export async function POST(req: NextRequest) {
     <p style="font-family:Georgia,serif;font-size:16px;font-weight:300;font-style:italic;color:#B8B4AB;line-height:1.9;margin:0 0 20px">
       Starting tonight, every photograph you receive will be one you have not seen before.
     </p>
-    <p style="font-family:Georgia,serif;font-size:16px;font-weight:300;font-style:italic;color:#706C65;line-height:1.9;margin:0 0 32px">
+    <p style="font-family:Georgia,serif;font-size:16px;font-weight:300;font-style:italic;color:#A29B90;line-height:1.9;margin:0 0 32px">
       Thank you for letting us know. Your feedback made the product better.
     </p>
-    <p style="font-family:Georgia,serif;font-size:15px;font-weight:300;color:#5C6166;margin:0">
+    <p style="font-family:Georgia,serif;font-size:15px;font-weight:300;color:#8B9196;margin:0">
       Basalith
     </p>
   </div>

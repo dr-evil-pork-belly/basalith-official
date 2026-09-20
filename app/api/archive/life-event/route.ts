@@ -196,7 +196,7 @@ Context from the owner's own words: ${depositContext || 'No context available.'}
     const archiveName = archive.name || "the family's Basalith"
 
     const yearsBlock = yearsAgo ? `
-  <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#C4A24A;margin:0 0 20px;text-transform:uppercase">
+  <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#C4A24A;margin:0 0 20px;text-transform:uppercase">
     ${yearsAgo} years
   </p>` : ''
 
@@ -208,7 +208,7 @@ Context from the owner's own words: ${depositContext || 'No context available.'}
     const photoBlock = photoUrl ? `
   <div style="margin:24px 0">
     <img src="${photoUrl}" alt="${archiveName}" style="width:100%;max-width:540px;display:block;border-radius:2px;filter:sepia(0.08)" />
-    ${chosenPhoto?.primary_label ? `<p style="font-family:'Courier New',monospace;font-size:9px;letter-spacing:2px;color:#5C6166;margin:8px 0 0;text-transform:uppercase">${chosenPhoto.primary_label}</p>` : ''}
+    ${chosenPhoto?.primary_label ? `<p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;margin:8px 0 0;text-transform:uppercase">${chosenPhoto.primary_label}</p>` : ''}
   </div>` : ''
 
     const html = `<body style="background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:600px;margin:0 auto;padding:0">
@@ -224,7 +224,7 @@ Context from the owner's own words: ${depositContext || 'No context available.'}
   </div>
 
   <div style="padding:32px">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#5C6166;text-transform:uppercase;margin:0 0 12px">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#8B9196;text-transform:uppercase;margin:0 0 12px">
       ${dateRow.date_type.replace(/_/g, ' ').toUpperCase()}
     </p>
     <p style="font-size:24px;font-style:italic;color:#F0EDE6;line-height:1.3;margin:0 0 6px">
@@ -234,14 +234,14 @@ Context from the owner's own words: ${depositContext || 'No context available.'}
     ${reflectionBlock}
     ${photoBlock}
     <div style="margin-top:28px">
-      <a href="${baseUrl}/archive/gallery" style="display:inline-block;background:rgba(196,162,74,1);color:#0A0A0B;font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;text-decoration:none;padding:10px 20px;border-radius:2px">
+      <a href="${baseUrl}/archive/gallery" style="display:inline-block;background:rgba(196,162,74,1);color:#0A0A0B;font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;text-decoration:none;padding:10px 20px;border-radius:2px">
         OPEN YOUR BASALITH →
       </a>
     </div>
   </div>
 
   <div style="padding:24px 32px;border-top:1px solid rgba(240,237,230,0.06)">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:0">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:0">
       BASALITH &middot; XYZ<br>
       ${archiveName} &middot; Generation I
     </p>

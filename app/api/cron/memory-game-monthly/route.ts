@@ -312,7 +312,7 @@ function buildGameStartEmail(firstName: string, archiveName: string, scenarioTex
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8A7A4A;margin:24px 0 0">ANSWERS REVEALED ${revealDate.toUpperCase()}</p>
   </div>
   <div style="padding:0 32px 32px;border-top:1px solid rgba(240,237,230,0.06);margin-top:16px">
-    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:20px 0 0">BASALITH · XYZ<br>${archiveName}</p>
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:20px 0 0">BASALITH<br>${archiveName}</p>
   </div>
 </body>
 </html>`
@@ -337,7 +337,7 @@ function buildRevealEmail(firstName: string, archiveName: string, scenarioText: 
     <a href="${portalUrl}" style="display:inline-block;border:1px solid rgba(196,162,74,0.3);color:#C4A24A;font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;text-decoration:none;padding:12px 24px">VISIT YOUR PORTAL →</a>
   </div>
   <div style="padding:0 32px 32px;border-top:1px solid rgba(240,237,230,0.06);margin-top:16px">
-    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:20px 0 0">BASALITH · XYZ<br>${archiveName}</p>
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:20px 0 0">BASALITH<br>${archiveName}</p>
   </div>
 </body>
 </html>`

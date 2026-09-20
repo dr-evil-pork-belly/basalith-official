@@ -357,9 +357,9 @@ export async function POST(req: Request) {
   <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#C4A24A;text-transform:uppercase">${archiveName}</p>
   <p style="font-size:18px;font-style:italic;color:#F0EDE6;line-height:1.6">Thank you${firstName ? ', ' + firstName : ''}.</p>
   <p style="font-size:15px;font-weight:300;color:#B8B4AB;line-height:1.8">Your memory has been added to ${archiveName} permanently.</p>
-  <blockquote style="border-left:2px solid rgba(196,162,74,0.4);padding-left:16px;margin:16px 0;font-style:italic;color:#706C65;font-size:14px">"${replyText.substring(0, 200)}${replyText.length > 200 ? '…' : ''}"</blockquote>
+  <blockquote style="border-left:2px solid rgba(196,162,74,0.4);padding-left:16px;margin:16px 0;font-style:italic;color:#A29B90;font-size:14px">"${replyText.substring(0, 200)}${replyText.length > 200 ? '…' : ''}"</blockquote>
   <hr style="border:none;border-top:1px solid rgba(240,237,230,0.06);margin:24px 0">
-  <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8">BASALITH · XYZ<br>${archiveName} · Generation I</p>
+  <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8">BASALITH<br>${archiveName} · Generation I</p>
 </body>`,
           })
         }

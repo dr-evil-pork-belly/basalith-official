@@ -78,7 +78,7 @@ export async function POST(req: Request) {
     <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#F0EDE6;line-height:1.75;margin:0 0 8px">
       &ldquo;${personalNote.trim()}&rdquo;
     </p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#C4A24A;margin:0">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#C4A24A;margin:0">
       &mdash; ${ownerName}
     </p>
   </div>` : ''
@@ -110,7 +110,7 @@ export async function POST(req: Request) {
     <p style="font-size:16px;color:#9DA3A8;line-height:1.75;margin:20px 0 8px">
       Your contribution is a guided session of 5 questions. Your answers go directly into the record and help train the entity that will carry ${subjectName}&rsquo;s wisdom forward for generations.
     </p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0 0 28px">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;margin:0 0 28px">
       It takes about ${sessionDef.estimatedMinutes} minutes.
     </p>
 
@@ -120,14 +120,14 @@ export async function POST(req: Request) {
       </a>
     </div>
 
-    <p style="font-family:Georgia,serif;font-size:13px;font-style:italic;color:#5C6166;line-height:1.7;text-align:center;margin:24px 0 0">
+    <p style="font-family:Georgia,serif;font-size:13px;font-style:italic;color:#8B9196;line-height:1.7;text-align:center;margin:24px 0 0">
       Your responses will be seen by ${ownerName} and their Custodian.<br>
       They are stored permanently as part of ${archiveName}.
     </p>
   </div>
 
   <div style="padding:20px 32px;border-top:1px solid rgba(240,237,230,0.06)">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:0">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:0">
       BASALITH &middot; XYZ<br>
       ${archiveName} &middot; Generation I
     </p>

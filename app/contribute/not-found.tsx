@@ -21,7 +21,7 @@ export default function NotFound() {
         color:         'var(--invert-gold)',
         marginBottom:  '1.5rem',
       }}>
-        BASALITH · XYZ
+        BASALITH
       </p>
       <h1 style={{
         fontFamily: 'var(--portal-serif)',

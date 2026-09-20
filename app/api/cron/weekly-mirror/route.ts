@@ -177,7 +177,7 @@ function buildMirrorEmail(archiveName: string, reflection: string, threadQuestio
   <div style="padding:0 36px 36px">
     <div style="border-top:1px solid rgba(240,237,230,0.06);padding-top:20px;margin-top:8px">
       <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:0">
-        BASALITH · XYZ<br>${escapeHtml(archiveName)}<br>Heritage Nexus Inc.
+        BASALITH<br>${escapeHtml(archiveName)}<br>Heritage Nexus Inc.
       </p>
     </div>
   </div>

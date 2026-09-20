@@ -93,7 +93,7 @@ export async function POST(req: Request) {
           <p style="font-family:Georgia,serif;font-size:16px;font-style:italic;color:#F0EDE6;line-height:1.7;margin:0 0 8px">
             &ldquo;${label.what_was_happening || ''}&rdquo;
           </p>
-          <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#C4A24A;margin:0">
+          <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#C4A24A;margin:0">
             &mdash; ${label.labelled_by || 'A contributor'}${photo?.ai_era_estimate ? ' &middot; ' + photo.ai_era_estimate : ''}
           </p>
         </div>
@@ -133,18 +133,18 @@ export async function POST(req: Request) {
 
     const upcomingDatesHtml = soonDates.length > 0 ? `
   <div style="margin:0 0 32px;padding:20px 24px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:2px">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#5C6166;text-transform:uppercase;margin:0 0 16px">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#8B9196;text-transform:uppercase;margin:0 0 16px">
       ${lang === 'zh' ? '本周即将到来' : 'COMING UP THIS WEEK'}
     </p>
     ${soonDates.map(d => `
     <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px">
       <div style="min-width:36px;text-align:center">
         <p style="font-family:Georgia,serif;font-weight:700;font-size:1.4rem;color:${d.days === 0 ? '#C4A24A' : '#F0EDE6'};line-height:1;margin:0">${d.day}</p>
-        <p style="font-family:'Courier New',monospace;font-size:9px;letter-spacing:1px;color:#5C6166;margin:0;text-transform:uppercase">${['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.month]}</p>
+        <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:1px;color:#8B9196;margin:0;text-transform:uppercase">${['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.month]}</p>
       </div>
       <div>
         <p style="font-family:Georgia,serif;font-size:15px;color:#F0EDE6;margin:0 0 2px">${d.person_name}</p>
-        <p style="font-family:'Courier New',monospace;font-size:9px;letter-spacing:2px;color:#5C6166;margin:0;text-transform:uppercase">
+        <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;margin:0;text-transform:uppercase">
           ${lang === 'zh'
   ? (d.days === 0 ? '今天' : d.days === 1 ? '明天' : `${d.days} 天后`)
   : (d.days === 0 ? 'TODAY' : d.days === 1 ? 'TOMORROW' : `IN ${d.days} DAYS`)}
@@ -190,7 +190,7 @@ export async function POST(req: Request) {
         const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
         wisdomSessionHtml = `
   <div style="margin:32px 0;padding:24px 32px;border-left:3px solid rgba(196,162,74,0.6);background:rgba(196,162,74,0.04)">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;text-transform:uppercase;margin:0 0 12px">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#C4A24A;text-transform:uppercase;margin:0 0 12px">
       ${lang === 'zh' ? '本月精华课程已就绪' : 'YOUR MONTHLY SESSION IS READY'}
     </p>
     <p style="font-family:Georgia,serif;font-size:18px;font-weight:700;color:#F0EDE6;margin:0 0 8px">
@@ -199,10 +199,10 @@ export async function POST(req: Request) {
     <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#9DA3A8;line-height:1.7;margin:0 0 16px">
       &ldquo;${session.intro}&rdquo;
     </p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#706C65;margin:0 0 20px">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#A29B90;margin:0 0 20px">
       5 QUESTIONS &middot; ${session.estimatedMinutes} MINUTES &middot; YOUR ENTITY IS WAITING
     </p>
-    <a href="${baseUrl}/archive/wisdom" style="display:inline-block;background:rgba(196,162,74,1);color:#0A0A0B;font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;text-decoration:none;padding:10px 20px;border-radius:2px">
+    <a href="${baseUrl}/archive/wisdom" style="display:inline-block;background:rgba(196,162,74,1);color:#0A0A0B;font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;text-decoration:none;padding:10px 20px;border-radius:2px">
       BEGIN THIS MONTH&rsquo;S SESSION →
     </a>
   </div>`
@@ -221,7 +221,7 @@ export async function POST(req: Request) {
         const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
         voiceNudgeHtml = `
   <div style="margin:32px 0;padding:24px 32px;border-left:3px solid rgba(196,162,74,0.3);background:rgba(196,162,74,0.03)">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#706C65;text-transform:uppercase;margin:0 0 12px">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#A29B90;text-transform:uppercase;margin:0 0 12px">
       ${lang === 'zh' ? '您的声音尚未保存到档案' : 'YOUR VOICE IS NOT ON THE RECORD YET'}
     </p>
     <p style="font-family:Georgia,serif;font-size:16px;font-style:italic;color:#F0EDE6;line-height:1.7;margin:0 0 8px">
@@ -230,7 +230,7 @@ export async function POST(req: Request) {
     <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#9DA3A8;line-height:1.7;margin:0 0 20px">
       Two minutes. Say anything. Any language.
     </p>
-    <a href="${baseUrl}/archive/voice" style="display:inline-block;background:transparent;color:#C4A24A;font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;text-decoration:none;padding:10px 20px;border-radius:2px;border:1px solid rgba(196,162,74,0.4)">
+    <a href="${baseUrl}/archive/voice" style="display:inline-block;background:transparent;color:#C4A24A;font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;text-decoration:none;padding:10px 20px;border-radius:2px;border:1px solid rgba(196,162,74,0.4)">
       RECORD YOUR VOICE &rarr;
     </a>
   </div>`
@@ -252,7 +252,7 @@ export async function POST(req: Request) {
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#C4A24A;text-transform:uppercase;margin:0 0 4px">
       ${archiveName.toUpperCase()}
     </p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;margin:0">
       ${dateStr.toUpperCase()}
     </p>
   </div>
@@ -282,15 +282,15 @@ export async function POST(req: Request) {
   ${voiceNudgeHtml}
 
     <div style="border-top:1px solid rgba(240,237,230,0.06);padding-top:24px">
-      <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#706C65;margin:0 0 4px">
+      <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#A29B90;margin:0 0 4px">
         DEPTH
       </p>
       <p style="font-size:28px;font-family:Georgia,serif;font-weight:700;color:#F0EDE6;margin:0 0 4px">
         ${archiveData?.labelled_photos || 0}
-        <span style="font-size:16px;font-weight:300;color:#706C65"> memories preserved</span>
+        <span style="font-size:16px;font-weight:300;color:#A29B90"> memories preserved</span>
       </p>
       ${topDecade ? `
-      <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#C4A24A;margin:4px 0 0">
+      <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#C4A24A;margin:4px 0 0">
         ${topDecade.decade.toUpperCase()} IS YOUR MOST DOCUMENTED DECADE
       </p>
       ` : ''}
@@ -299,7 +299,7 @@ export async function POST(req: Request) {
   </div>
 
   <div style="padding:0 32px 32px;border-top:1px solid rgba(240,237,230,0.06)">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:24px 0 0">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:24px 0 0">
       BASALITH &middot; XYZ<br>
       ${archiveName} &middot; Generation I<br>
       ${lang === 'zh' ? '您的档案每天都在成长。' : 'Your Basalith grows every day.'}

@@ -372,18 +372,18 @@ function buildContributorInviteEmail({
 
     ${portalUrl ? `
     <div style="background:rgba(196,162,74,0.06);border:1px solid rgba(196,162,74,0.2);padding:20px 24px;margin:0 0 28px">
-      <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;margin:0 0 12px">
+      <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#C4A24A;margin:0 0 12px">
         ${portalLabel}
       </p>
       <a href="${portalUrl}" style="font-family:Georgia,serif;font-size:14px;color:#C4A24A;word-break:break-all">
         ${portalUrl}
       </a>
-      <p style="font-family:Georgia,serif;font-size:13px;font-style:italic;color:#706C65;margin:12px 0 0;line-height:1.7">
+      <p style="font-family:Georgia,serif;font-size:13px;font-style:italic;color:#A29B90;margin:12px 0 0;line-height:1.7">
         ${bookmarkNote}
       </p>
     </div>
 
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#706C65;margin:0 0 8px">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#A29B90;margin:0 0 8px">
       ${portalCanLabel}
     </p>
     <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#9DA3A8;line-height:2;margin:0 0 28px">
@@ -397,21 +397,21 @@ function buildContributorInviteEmail({
 
     ${twilioPhone ? `
     <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);padding:20px 24px;margin:0 0 28px">
-      <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#9DA3A8;margin:0 0 10px">
+      <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#9DA3A8;margin:0 0 10px">
         ${phoneLabel}
       </p>
       <p style="font-family:Georgia,serif;font-size:28px;font-weight:700;color:#F0EDE6;margin:0 0 10px;letter-spacing:0.05em">
         ${twilioPhone}
       </p>
-      <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#706C65;line-height:1.7;margin:0">
+      <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#A29B90;line-height:1.7;margin:0">
         ${phoneNote}
       </p>
     </div>
     ` : ''}
 
     <div style="border-top:1px solid rgba(240,237,230,0.06);padding-top:24px">
-      <a href="${siteUrl}" style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;text-decoration:none">
-        BASALITH · XYZ
+      <a href="${siteUrl}" style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;text-decoration:none">
+        BASALITH
       </a>
     </div>
 

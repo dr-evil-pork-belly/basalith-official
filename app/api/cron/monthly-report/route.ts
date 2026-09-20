@@ -298,7 +298,7 @@ function buildMonthlyReportEmail({
 
   <div style="padding:0 32px 32px;border-top:1px solid rgba(240,237,230,0.06)">
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:20px 0 0">
-      BASALITH · XYZ<br>
+      BASALITH<br>
       ${archiveName}<br>
       Heritage Nexus Inc.
     </p>

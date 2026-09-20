@@ -88,13 +88,13 @@ export async function POST(req: Request) {
   ` : ''}
 
   <a href="${process.env.NEXT_PUBLIC_APP_URL ?? 'https://basalith.ai'}/archive/gallery"
-    style="display:inline-block;font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#C4A24A;text-decoration:none;border:1px solid rgba(196,162,74,0.3);padding:10px 20px">
+    style="display:inline-block;font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#C4A24A;text-decoration:none;border:1px solid rgba(196,162,74,0.3);padding:10px 20px">
     VIEW IN YOUR BASALITH &rarr;
   </a>
 
   <hr style="border:none;border-top:1px solid rgba(240,237,230,0.06);margin:32px 0">
 
-  <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:0">
+  <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:0">
     BASALITH &middot; XYZ<br>${archiveName} &middot; Generation I
   </p>
 

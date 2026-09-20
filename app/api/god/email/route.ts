@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
     <p style="font-family:Georgia,serif;font-size:15px;line-height:1.7;color:#9DA3A8;margin:0 0 24px">
       ${template.body}
     </p>
-    <a href="${siteUrl}/archive/dashboard" style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;text-decoration:none">
+    <a href="${siteUrl}/archive/dashboard" style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#C4A24A;text-decoration:none">
       OPEN YOUR ARCHIVE &rarr;
     </a>
   </div>
