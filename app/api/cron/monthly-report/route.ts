@@ -197,7 +197,7 @@ function buildMonthlyReportEmail({
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">
       ${archiveName.toUpperCase()}
     </p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;margin:0">
       ${lang === 'zh' ? `月度报告 · ${monthName}` : `MONTHLY REPORT · ${monthName.toUpperCase()}`}
     </p>
   </div>
@@ -207,19 +207,19 @@ function buildMonthlyReportEmail({
     <p style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#F0EDE6;margin:0 0 8px">
       ${hasActivity ? t('monthlyReportTitle', lang) : (lang === 'zh' ? '您的档案在等待您。' : 'Your Basalith is waiting for you.')}
     </p>
-    <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#706C65;margin:0 0 32px">
+    <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#A29B90;margin:0 0 32px">
       ${monthName} · ${archiveName}
     </p>
 
     ${hasActivity ? `
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;margin:0 0 16px">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#C4A24A;margin:0 0 16px">
       ${lang === 'zh' ? '本月' : 'THIS MONTH'}
     </p>
     <table style="width:100%;border-collapse:collapse;margin-bottom:32px">
       ${statRows.map(([n, label]) => `
       <tr>
         <td style="font-family:Georgia,serif;font-size:28px;font-weight:700;color:#F0EDE6;padding:6px 0;width:72px;vertical-align:baseline">${n}</td>
-        <td style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#706C65;padding:6px 0;vertical-align:baseline">${label}</td>
+        <td style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#A29B90;padding:6px 0;vertical-align:baseline">${label}</td>
       </tr>`).join('')}
     </table>
     ` : `
@@ -227,7 +227,7 @@ function buildMonthlyReportEmail({
       <p style="font-family:Georgia,serif;font-size:16px;font-style:italic;color:#B8B4AB;margin:0 0 8px">
         Your Basalith had no new activity this month.
       </p>
-      <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#706C65;margin:0">
+      <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#A29B90;margin:0">
         The best ones are built a little at a time. This week's Monday prompt is waiting for you.
       </p>
     </div>
@@ -235,38 +235,38 @@ function buildMonthlyReportEmail({
 
     ${mostActiveContributor ? `
     <div style="background:rgba(196,162,74,0.04);border:1px solid rgba(196,162,74,0.1);padding:16px 20px;margin-bottom:24px">
-      <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;margin:0 0 8px">
+      <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#C4A24A;margin:0 0 8px">
         ${lang === 'zh' ? '最活跃的贡献者' : 'MOST ACTIVE CONTRIBUTOR'}
       </p>
       <p style="font-family:Georgia,serif;font-size:18px;font-weight:700;color:#F0EDE6;margin:0 0 4px">
         ${mostActiveContributor}
       </p>
-      <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#706C65;margin:0">
+      <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#A29B90;margin:0">
         ${mostActiveCount} ${mostActiveCount === 1 ? 'memory' : 'memories'} contributed this month
       </p>
     </div>
     ` : ''}
 
     ${mostLabeledDecade ? `
-    <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#706C65;margin:0 0 24px">
+    <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#A29B90;margin:0 0 24px">
       Most documented decade this month: <span style="color:#F0EDE6;font-style:normal;font-weight:700">${mostLabeledDecade}</span>
     </p>
     ` : ''}
 
     <div style="border-top:1px solid rgba(240,237,230,0.06);margin:0 0 24px"></div>
 
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;margin:0 0 8px">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#C4A24A;margin:0 0 8px">
       ${lang === 'zh' ? '您的实体 · 整体深度' : 'YOUR ENTITY · OVERALL DEPTH'}
     </p>
     <p style="font-family:Georgia,serif;font-size:48px;font-weight:700;color:#F0EDE6;margin:0 0 4px;line-height:1">
       ${overallScore}%
     </p>
-    <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#706C65;margin:0 0 24px">
+    <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#A29B90;margin:0 0 24px">
       ${depthLabel}
     </p>
 
     ${weakestDimensions.length > 0 ? `
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#706C65;margin:0 0 12px">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#A29B90;margin:0 0 12px">
       WHAT WOULD DEEPEN YOUR ENTITY MOST
     </p>
     ${weakestDimensions.map(d => {
@@ -278,10 +278,10 @@ function buildMonthlyReportEmail({
     ` : ''}
 
     <div style="border-top:1px solid rgba(240,237,230,0.06);padding-top:20px;margin-bottom:24px">
-      <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#706C65;margin:0 0 12px">
+      <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#A29B90;margin:0 0 12px">
         YOUR BASALITH IN NUMBERS
       </p>
-      <p style="font-family:'Courier New',monospace;font-size:11px;color:#5C6166;line-height:2.2;margin:0">
+      <p style="font-family:'Courier New',monospace;font-size:11px;color:#8B9196;line-height:2.2;margin:0">
         ${totalPhotos} PHOTOGRAPHS<br>
         ${totalLabels} MEMORIES<br>
         ${totalContributors} CONTRIBUTORS<br>
@@ -297,7 +297,7 @@ function buildMonthlyReportEmail({
   </div>
 
   <div style="padding:0 32px 32px;border-top:1px solid rgba(240,237,230,0.06)">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:20px 0 0">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:20px 0 0">
       BASALITH · XYZ<br>
       ${archiveName}<br>
       Heritage Nexus Inc.

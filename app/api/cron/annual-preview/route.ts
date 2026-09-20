@@ -72,7 +72,7 @@ function buildAnnualPreviewEmail(
 
   <div style="padding:32px 32px 0">
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">${archiveName.toUpperCase()}</p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;margin:0">
       YEAR ${archiveYears} · A PREVIEW FROM THE FUTURE
     </p>
   </div>
@@ -82,7 +82,7 @@ function buildAnnualPreviewEmail(
     <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#B8B4AB;line-height:1.7;margin:0 0 8px">
       Your Basalith is ${archiveYears} year${archiveYears !== 1 ? 's' : ''} old.
     </p>
-    <p style="font-family:Georgia,serif;font-size:16px;font-weight:300;font-style:italic;color:#706C65;line-height:1.7;margin:0 0 32px">
+    <p style="font-family:Georgia,serif;font-size:16px;font-weight:300;font-style:italic;color:#A29B90;line-height:1.7;margin:0 0 32px">
       Here is a conversation your grandchildren might have with your entity someday.
     </p>
 
@@ -92,10 +92,10 @@ function buildAnnualPreviewEmail(
 
     <div style="height:1px;background:rgba(196,162,74,0.15);margin:0 0 28px"></div>
 
-    <p style="font-family:Georgia,serif;font-size:15px;font-weight:300;color:#706C65;line-height:1.8;margin:0 0 8px">
+    <p style="font-family:Georgia,serif;font-size:15px;font-weight:300;color:#A29B90;line-height:1.8;margin:0 0 8px">
       This is based on what is on the record today.
     </p>
-    <p style="font-family:Georgia,serif;font-size:15px;font-weight:300;color:#706C65;line-height:1.8;margin:0 0 32px">
+    <p style="font-family:Georgia,serif;font-size:15px;font-weight:300;color:#A29B90;line-height:1.8;margin:0 0 32px">
       The more you add the more accurately it speaks.
     </p>
 
@@ -109,7 +109,7 @@ function buildAnnualPreviewEmail(
   </div>
 
   <div style="padding:16px 32px 32px;border-top:1px solid rgba(240,237,230,0.06);margin-top:8px">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:0">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:0">
       BASALITH · XYZ<br>${archiveName}<br>Heritage Nexus Inc.
     </p>
   </div>

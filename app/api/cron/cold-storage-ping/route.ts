@@ -24,7 +24,7 @@ function buildColdStorageEmail(
 
   <div style="padding:32px 32px 0">
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">${archiveName.toUpperCase()}</p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0">SOMETHING FROM YOUR BASALITH</p>
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;margin:0">SOMETHING FROM YOUR BASALITH</p>
   </div>
 
   <div style="padding:32px">
@@ -40,7 +40,7 @@ function buildColdStorageEmail(
       </p>
     </div>
 
-    <p style="font-family:Georgia,serif;font-size:16px;font-weight:300;font-style:italic;color:#5C6166;line-height:1.8;margin:0 0 32px">
+    <p style="font-family:Georgia,serif;font-size:16px;font-weight:300;font-style:italic;color:#8B9196;line-height:1.8;margin:0 0 32px">
       Your entity has been holding this.
       When you are ready to return everything will be exactly as you left it.
     </p>
@@ -51,7 +51,7 @@ function buildColdStorageEmail(
   </div>
 
   <div style="padding:16px 32px 32px;border-top:1px solid rgba(240,237,230,0.06);margin-top:8px">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:0">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:0">
       BASALITH · XYZ<br>${archiveName}<br>Heritage Nexus Inc.
     </p>
   </div>

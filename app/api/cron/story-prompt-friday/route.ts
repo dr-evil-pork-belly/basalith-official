@@ -162,7 +162,7 @@ function buildFridayEmail(
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">
       THE ${familyName.toUpperCase()} BASALITH
     </p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;margin:0">
       FRIDAY REVEAL · ${dateStr}
     </p>
   </div>
@@ -171,7 +171,7 @@ function buildFridayEmail(
     <h2 style="font-family:Georgia,serif;font-size:24px;font-weight:700;color:#F0EDE6;margin:0 0 8px">
       ${hasResponses ? 'Here is what the family knows.' : 'This photograph is still a mystery.'}
     </h2>
-    <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#706C65;margin:0 0 16px">
+    <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#A29B90;margin:0 0 16px">
       ${hasResponses
         ? `${responses.length} ${responses.length === 1 ? 'memory' : 'memories'} contributed this week.`
         : 'Nobody has labeled this photograph yet. Do you know what was happening?'}
@@ -186,7 +186,7 @@ function buildFridayEmail(
   <div style="padding:32px">
 
     ${hasResponses ? `
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;margin:0 0 20px">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#C4A24A;margin:0 0 20px">
       WHAT YOUR FAMILY REMEMBERED
     </p>
 
@@ -195,16 +195,16 @@ function buildFridayEmail(
       <p style="font-family:Georgia,serif;font-size:16px;font-weight:300;color:#F0EDE6;line-height:1.8;font-style:italic;margin:0 0 8px">
         &ldquo;${r.text.length > 300 ? r.text.substring(0, 300) + '&hellip;' : r.text}&rdquo;
       </p>
-      <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#C4A24A;margin:0">
+      <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#C4A24A;margin:0">
         ${r.name}
       </p>
     </div>`).join('')}
 
     <div style="border-top:1px solid rgba(240,237,230,0.06);padding-top:20px;margin-top:24px">
-      <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#706C65;margin:0 0 8px">
+      <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#A29B90;margin:0 0 8px">
         ${eraEstimate ? `Our AI estimates this photograph is from ${eraEstimate}.` : 'This photograph has been added to your Basalith.'}
       </p>
-      <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#5C6166;margin:0">
+      <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#8B9196;margin:0">
         These memories are now on the record, permanently.
       </p>
     </div>
@@ -219,7 +219,7 @@ function buildFridayEmail(
   </div>
 
   <div style="padding:0 32px 32px;border-top:1px solid rgba(240,237,230,0.06)">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:20px 0 0">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:20px 0 0">
       BASALITH · XYZ<br>
       The ${familyName} Basalith<br>
       New mystery every Monday.

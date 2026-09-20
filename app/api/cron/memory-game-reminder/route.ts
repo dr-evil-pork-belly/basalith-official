@@ -91,7 +91,7 @@ export async function GET(req: NextRequest) {
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
     <span style="font-family:'Courier New',monospace;font-size:11px;color:#9DA3A8;min-width:120px">${name}</span>
     <div style="width:${barWidth}px;height:6px;background:rgba(196,162,74,0.4);border-radius:2px"></div>
-    <span style="font-family:'Courier New',monospace;font-size:10px;color:#706C65">${count}</span>
+    <span style="font-family:'Courier New',monospace;font-size:11px;color:#A29B90">${count}</span>
   </div>`
       }).join('')
 
@@ -109,14 +109,14 @@ export async function GET(req: NextRequest) {
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">
       THE ${(archive.family_name ?? archive.name).toUpperCase()} BASALITH
     </p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0 0 24px">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;margin:0 0 24px">
       MEMORY GAME · CLOSING ${hoursLeft <= 3 ? 'SOON' : 'TODAY'}
     </p>
 
     <p style="font-family:Georgia,serif;font-size:20px;font-weight:700;color:#F0EDE6;margin:0 0 8px">
       The game closes in ${hoursLeft} hour${hoursLeft !== 1 ? 's' : ''}.
     </p>
-    <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#706C65;line-height:1.7;margin:0 0 24px">
+    <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#A29B90;line-height:1.7;margin:0 0 24px">
       ${contributors.length} family member${contributors.length !== 1 ? 's' : ''} received this game.
       ${session.total_memories} memories have been contributed so far.
       ${topName ? `${topName} is leading with ${topCount} memories.` : ''}
@@ -126,26 +126,26 @@ export async function GET(req: NextRequest) {
     </p>
 
     <a href="${siteUrl}/game/${session.id}"
-      style="display:inline-block;font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#0A0908;background:#C4A24A;text-decoration:none;padding:10px 24px;border-radius:2px">
+      style="display:inline-block;font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#0A0908;background:#C4A24A;text-decoration:none;padding:10px 24px;border-radius:2px">
       PLAY NOW →
     </a>
   </div>
 
   ${leaderboardHtml ? `
   <div style="padding:0 32px 32px">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#5C6166;margin:0 0 12px">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#8B9196;margin:0 0 12px">
       CURRENT STANDINGS
     </p>
     ${leaderboardHtml}
     <div style="display:flex;align-items:center;gap:12px;margin-top:4px">
       <span style="font-family:'Courier New',monospace;font-size:11px;color:#C4A24A;min-width:120px">You</span>
       <div style="width:4px;height:6px;background:rgba(255,255,255,0.08);border-radius:2px"></div>
-      <span style="font-family:'Courier New',monospace;font-size:10px;color:#5C6166">0</span>
+      <span style="font-family:'Courier New',monospace;font-size:11px;color:#8B9196">0</span>
     </div>
   </div>` : ''}
 
   <div style="padding:0 32px 32px;border-top:1px solid rgba(240,237,230,0.06)">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:20px 0 0">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:20px 0 0">
       BASALITH · XYZ<br>
       The ${archive.family_name ?? archive.name} Basalith
     </p>

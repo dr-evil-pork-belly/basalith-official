@@ -61,7 +61,7 @@ export function buildFoundingCompleteOwnerEmail(input: FoundingCompleteInput): B
   const html = `
 <div style="background:#0A0908;padding:40px 20px;font-family:Georgia,serif;color:#F0EDE6">
   <div style="max-width:560px;margin:0 auto">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;margin:0 0 28px;text-transform:uppercase">Basalith</p>
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#C4A24A;margin:0 0 28px;text-transform:uppercase">Basalith</p>
     <p style="font-size:16px;font-weight:300;line-height:1.8;margin:0 0 16px">${greeting}</p>
     <p style="font-size:16px;font-weight:300;line-height:1.8;margin:0 0 16px;color:#B8B4AB">${what}</p>
     <p style="font-size:16px;font-weight:300;line-height:1.8;margin:0 0 24px;color:#B8B4AB">${count} in total. Nothing you said was rewritten.</p>
@@ -72,7 +72,7 @@ export function buildFoundingCompleteOwnerEmail(input: FoundingCompleteInput): B
     <p style="margin:0 0 24px"><a href="${SITE}/archive/founding" style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#C4A24A;text-decoration:none;text-transform:uppercase">Show me</a></p>
     <p style="font-size:15px;font-weight:300;line-height:1.8;margin:0 0 8px;color:#B8B4AB">Your record keeps growing from here. The dashboard has your next question whenever you are ready.</p>
     <p style="margin:0 0 32px"><a href="${SITE}/archive/dashboard" style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#C4A24A;text-decoration:none;text-transform:uppercase">Open your Basalith</a></p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#706C65;margin:0">Basalith · Heritage Nexus Inc.</p>
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#A29B90;margin:0">Basalith · Heritage Nexus Inc.</p>
   </div>
 </div>`.trim()
 

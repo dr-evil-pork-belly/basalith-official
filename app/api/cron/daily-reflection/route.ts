@@ -184,7 +184,7 @@ function buildDailyReflectionEmail(
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">
       ${archiveName.toUpperCase()}
     </p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;margin:0">
       今日问题 · ${dateStr}
     </p>
   </div>
@@ -217,26 +217,26 @@ function buildDailyReflectionEmail(
       <p style="font-family:Georgia,serif;font-size:28px;font-weight:700;color:#F0EDE6;margin:0 0 4px;letter-spacing:2px">
         ${phoneNumber}
       </p>
-      <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#706C65;margin:0">
+      <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#A29B90;margin:0">
         用普通话或广东话都可以。无需登录。
       </p>
     </div>
 
-    <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#5C6166;margin:0 0 16px;text-align:center">
+    <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#8B9196;margin:0 0 16px;text-align:center">
       或者
     </p>
 
     <div style="text-align:center;margin:0 0 24px">
-      <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#706C65;margin:0 0 8px">
+      <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#A29B90;margin:0 0 8px">
         直接回复这封邮件
       </p>
-      <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#706C65;margin:0">
+      <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#A29B90;margin:0">
         用中文写下您的回答即可
       </p>
     </div>
 
     <div style="border-top:1px solid rgba(240,237,230,0.06);padding-top:20px;text-align:center">
-      <p style="font-family:Georgia,serif;font-size:13px;font-style:italic;color:#5C6166;margin:0">
+      <p style="font-family:Georgia,serif;font-size:13px;font-style:italic;color:#8B9196;margin:0">
         您的故事值得被永远保存。
       </p>
     </div>
@@ -244,7 +244,7 @@ function buildDailyReflectionEmail(
   </div>
 
   <div style="padding:0 32px 32px">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:0">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:0">
       BASALITH · XYZ<br>${archiveName}<br>Heritage Nexus Inc.
     </p>
   </div>
@@ -261,7 +261,7 @@ function buildDailyReflectionEmail(
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">
       ${archiveName.toUpperCase()}
     </p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;margin:0">
       TODAY'S QUESTION · ${dateStr.toUpperCase()}
     </p>
   </div>
@@ -291,17 +291,17 @@ function buildDailyReflectionEmail(
       <p style="font-family:Georgia,serif;font-size:28px;font-weight:700;color:#F0EDE6;margin:0 0 4px;letter-spacing:2px">
         ${phoneNumber}
       </p>
-      <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#706C65;margin:0">
+      <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#A29B90;margin:0">
         Speak in any language. No login needed.
       </p>
     </div>
 
-    <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#706C65;margin:0 0 8px;text-align:center">
+    <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#A29B90;margin:0 0 8px;text-align:center">
       Or reply to this email with your answer.
     </p>
 
     <div style="border-top:1px solid rgba(240,237,230,0.06);padding-top:20px;text-align:center;margin-top:24px">
-      <p style="font-family:Georgia,serif;font-size:13px;font-style:italic;color:#5C6166;margin:0">
+      <p style="font-family:Georgia,serif;font-size:13px;font-style:italic;color:#8B9196;margin:0">
         Your stories are worth keeping.
       </p>
     </div>
@@ -309,7 +309,7 @@ function buildDailyReflectionEmail(
   </div>
 
   <div style="padding:0 32px 32px">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:0">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:0">
       BASALITH · XYZ<br>${archiveName}<br>Heritage Nexus Inc.
     </p>
   </div>
@@ -349,7 +349,7 @@ function buildSuccessionInviteEmail(
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">
       ${archiveName.toUpperCase()}
     </p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;margin:0">
       ${eyebrow} · ${dateStr.toUpperCase()}
     </p>
   </div>
@@ -381,7 +381,7 @@ function buildSuccessionInviteEmail(
     </div>
 
     <div style="border-top:1px solid rgba(240,237,230,0.06);padding-top:20px;text-align:center">
-      <p style="font-family:Georgia,serif;font-size:13px;font-style:italic;color:#5C6166;margin:0">
+      <p style="font-family:Georgia,serif;font-size:13px;font-style:italic;color:#8B9196;margin:0">
         Your judgment deserves to outlast you.
       </p>
     </div>
@@ -389,7 +389,7 @@ function buildSuccessionInviteEmail(
   </div>
 
   <div style="padding:0 32px 32px">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:0">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:0">
       BASALITH · XYZ<br>${archiveName}<br>Heritage Nexus Inc.
     </p>
   </div>

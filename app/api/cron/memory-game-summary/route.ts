@@ -113,23 +113,23 @@ export async function GET(req: NextRequest) {
         const barWidth = Math.round((count / maxCount) * 120)
         return `
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
-      <span style="font-family:'Courier New',monospace;font-size:11px;color:#5C6166;width:20px;flex-shrink:0">${i + 1}</span>
+      <span style="font-family:'Courier New',monospace;font-size:11px;color:#8B9196;width:20px;flex-shrink:0">${i + 1}</span>
       <span style="font-family:'Courier New',monospace;font-size:11px;color:${i === 0 ? '#C4A24A' : '#9DA3A8'};min-width:120px;flex-shrink:0">${name}</span>
       <div style="width:${barWidth}px;height:6px;background:${i === 0 ? 'rgba(196,162,74,0.6)' : 'rgba(240,237,230,0.12)'};border-radius:2px;flex-shrink:0"></div>
-      <span style="font-family:'Courier New',monospace;font-size:10px;color:#5C6166">${count}</span>
+      <span style="font-family:'Courier New',monospace;font-size:11px;color:#8B9196">${count}</span>
     </div>`
       }).join('')
 
       const noStoriesHtml = photosWithNoStories.length > 0 ? `
   <div style="margin:24px 0;padding:20px 24px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:2px">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#5C6166;margin:0 0 12px">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#8B9196;margin:0 0 12px">
       STILL MISSING STORIES (${photosWithNoStories.length})
     </p>
-    <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#706C65;margin:0 0 12px">
+    <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#A29B90;margin:0 0 12px">
       These photographs had no contributions this week.
     </p>
     <a href="${siteUrl}/game/${session.id}"
-      style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#C4A24A;text-decoration:none">
+      style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#C4A24A;text-decoration:none">
       ADD A MEMORY →
     </a>
   </div>` : ''
@@ -163,40 +163,40 @@ export async function GET(req: NextRequest) {
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">
       THE ${(archive.family_name ?? archive.name).toUpperCase()} BASALITH
     </p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0 0 24px">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;margin:0 0 24px">
       WEEKLY MEMORY GAME · SUMMARY · ${weekDate.toUpperCase()}
     </p>
 
     <h2 style="font-family:Georgia,serif;font-size:24px;font-weight:700;color:#F0EDE6;margin:0 0 8px">
       Game over.
     </h2>
-    <p style="font-family:Georgia,serif;font-size:16px;font-style:italic;color:#706C65;line-height:1.7;margin:0 0 24px">
+    <p style="font-family:Georgia,serif;font-size:16px;font-style:italic;color:#A29B90;line-height:1.7;margin:0 0 24px">
       This week your family contributed <strong style="color:#F0EDE6">${contributions.length} memories</strong> across ${session.photograph_ids?.length ?? 0} photographs.
     </p>
   </div>
 
   ${winner ? `
   <div style="margin:0 32px 24px;padding:20px 24px;border-left:3px solid rgba(196,162,74,0.6);background:rgba(196,162,74,0.04)">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;margin:0 0 8px">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#C4A24A;margin:0 0 8px">
       THIS WEEK'S WINNER
     </p>
     <p style="font-family:Georgia,serif;font-size:18px;font-weight:700;color:#F0EDE6;margin:0 0 4px">
       ${winner}
     </p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#706C65;margin:0 0 16px">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#A29B90;margin:0 0 16px">
       ${winnerCount} MEMORIES CONTRIBUTED
     </p>
     ${winnerBestMemory ? `
     <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#B8B4AB;line-height:1.7;margin:0">
       &ldquo;${winnerBestMemory.memory_text}&rdquo;
     </p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:8px 0 0">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;margin:8px 0 0">
       &mdash; ${winner}
     </p>` : ''}
   </div>` : ''}
 
   <div style="padding:0 32px 24px">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#5C6166;margin:0 0 16px">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#8B9196;margin:0 0 16px">
       FINAL STANDINGS
     </p>
     ${leaderboardHtml}
@@ -204,13 +204,13 @@ export async function GET(req: NextRequest) {
 
   ${bestMemory && bestMemory.contributor_name !== winner ? `
   <div style="margin:0 32px 24px;padding:20px 24px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:2px">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#5C6166;margin:0 0 12px">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#8B9196;margin:0 0 12px">
       BEST MEMORY OF THE WEEK
     </p>
     <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#B8B4AB;line-height:1.7;margin:0 0 8px">
       &ldquo;${bestMemory.memory_text}&rdquo;
     </p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;margin:0">
       &mdash; ${bestMemory.contributor_name || 'A contributor'}
     </p>
   </div>` : ''}
@@ -218,16 +218,16 @@ export async function GET(req: NextRequest) {
   ${noStoriesHtml}
 
   <div style="padding:16px 32px 32px">
-    <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#5C6166;line-height:1.7;margin:0 0 4px">
+    <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#8B9196;line-height:1.7;margin:0 0 4px">
       New game every Wednesday.
     </p>
-    <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#5C6166;margin:0 0 20px">
+    <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#8B9196;margin:0 0 20px">
       See you next week.
     </p>
   </div>
 
   <div style="padding:0 32px 32px;border-top:1px solid rgba(240,237,230,0.06)">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:20px 0 0">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:20px 0 0">
       BASALITH · XYZ<br>
       The ${archive.family_name ?? archive.name} Basalith
     </p>

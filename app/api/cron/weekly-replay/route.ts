@@ -156,7 +156,7 @@ function buildWeeklyReplayEmail({
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">
       ${archiveName.toUpperCase()}
     </p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;margin:0">
       WEEKLY REPLAY · ${dateStr.toUpperCase()}
     </p>
   </div>
@@ -170,7 +170,7 @@ function buildWeeklyReplayEmail({
     </p>
 
     <div style="border-left:3px solid rgba(196,162,74,0.4);padding:20px 24px;margin:0 0 28px;background:rgba(196,162,74,0.03)">
-      <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;margin:0 0 16px">
+      <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#C4A24A;margin:0 0 16px">
         THIS WEEK
       </p>
       ${summaryLines.map(line => `
@@ -181,7 +181,7 @@ function buildWeeklyReplayEmail({
 
     ${highlight ? `
     <div style="margin:0 0 28px">
-      <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;margin:0 0 14px">
+      <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#C4A24A;margin:0 0 14px">
         SOMETHING YOU SAID THIS WEEK
       </p>
       <div style="border-left:3px solid rgba(196,162,74,0.5);padding:20px 24px;background:rgba(196,162,74,0.04)">
@@ -194,13 +194,13 @@ function buildWeeklyReplayEmail({
 
     ${streak > 0 ? `
     <div style="background:rgba(196,162,74,0.06);border:1px solid rgba(196,162,74,0.2);padding:20px 24px;margin:0 0 28px;text-align:center">
-      <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;margin:0 0 8px">
+      <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#C4A24A;margin:0 0 8px">
         YOUR STREAK
       </p>
       <p style="font-family:Georgia,serif;font-size:36px;font-weight:300;color:#F0EDE6;margin:0 0 4px;line-height:1">
         ${streak}
       </p>
-      <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#706C65;margin:0">
+      <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#A29B90;margin:0">
         ${streak === 1 ? 'day' : 'days'} in a row
       </p>
     </div>
@@ -220,7 +220,7 @@ function buildWeeklyReplayEmail({
   </div>
 
   <div style="padding:0 32px 32px;border-top:1px solid rgba(240,237,230,0.06)">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:20px 0 0">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:20px 0 0">
       BASALITH · XYZ<br>${archiveName}<br>Heritage Nexus Inc.
     </p>
   </div>

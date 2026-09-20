@@ -6,7 +6,7 @@ const BASE_STYLES = {
   eyebrow:    "font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;text-transform:uppercase;margin:0 0 16px",
   goldBtn:    "display:inline-block;font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;text-decoration:none;color:#0A0908;background:#C4A24A;padding:12px 28px",
   ghostBtn:   "display:inline-block;font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;text-decoration:none;color:#C4A24A;border:1px solid rgba(196,162,74,0.4);padding:12px 28px",
-  footer:     "font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:0",
+  footer:     "font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:0",
 }
 
 function wrap(archiveName: string, bodyHtml: string): string {
@@ -53,7 +53,7 @@ export function buildPaymentFailedEmail(
       您所建立的一切都完好无损。请更新您的付款信息以继续您的档案。
     </p>
     ${invoiceUrl ? `<a href="${invoiceUrl}" style="${BASE_STYLES.goldBtn}">更新付款方式 →</a>` : ''}
-    <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#706C65;line-height:1.8;margin:32px 0 0">
+    <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#A29B90;line-height:1.8;margin:32px 0 0">
       如果您有任何问题，请回复此邮件。
     </p>
   ` : `
@@ -69,7 +69,7 @@ export function buildPaymentFailedEmail(
       to continue your Basalith without interruption.
     </p>
     ${invoiceUrl ? `<a href="${invoiceUrl}" style="${BASE_STYLES.goldBtn}">Update Payment Method →</a>` : ''}
-    <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#706C65;line-height:1.8;margin:32px 0 0">
+    <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#A29B90;line-height:1.8;margin:32px 0 0">
       If you have any questions reply to this email.
     </p>
   `
@@ -101,7 +101,7 @@ export function buildArchivePausedEmail(
       您的照片。您的声音。您的存档。您的贡献者。一切都完好无损。
     </p>
     <a href="${resumeUrl}" style="${BASE_STYLES.goldBtn}">恢复您的档案 →</a>
-    <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#706C65;line-height:1.8;margin:32px 0 0">
+    <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#A29B90;line-height:1.8;margin:32px 0 0">
       没有截止日期。您的档案将被保存，直到您回来。
     </p>
   ` : `
@@ -120,7 +120,7 @@ export function buildArchivePausedEmail(
       All of it is exactly as you left it.
     </p>
     <a href="${resumeUrl}" style="${BASE_STYLES.goldBtn}">Resume your Basalith →</a>
-    <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#706C65;line-height:1.8;margin:32px 0 0">
+    <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#A29B90;line-height:1.8;margin:32px 0 0">
       There is no deadline. Your Basalith will be preserved until you return.
     </p>
   `
@@ -240,7 +240,7 @@ export function buildTerminationEmail(
       If you change your mind before then, reply to this email and we will cancel the deletion.
       Your Basalith will remain intact until that date.
     </p>
-    <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#706C65;line-height:1.8;margin:0">
+    <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#A29B90;line-height:1.8;margin:0">
       Reply to this email at any time to cancel.
     </p>
   `

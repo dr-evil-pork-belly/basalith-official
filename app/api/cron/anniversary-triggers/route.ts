@@ -77,7 +77,7 @@ function buildAnniversaryEmail(
     : 'significant date'
 
   const yearsLine = yearsAgo && yearsAgo > 0
-    ? `<p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;margin:0 0 24px">${yearsAgo} YEARS AGO TODAY</p>`
+    ? `<p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#C4A24A;margin:0 0 24px">${yearsAgo} YEARS AGO TODAY</p>`
     : ''
 
   return `<!DOCTYPE html>
@@ -86,17 +86,17 @@ function buildAnniversaryEmail(
 
   <div style="padding:32px 32px 0">
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">${archiveName.toUpperCase()}</p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0">A QUESTION FOR TODAY</p>
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;margin:0">A QUESTION FOR TODAY</p>
   </div>
 
   <div style="padding:32px">
     <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#B8B4AB;margin:0 0 24px">${firstName},</p>
 
     <p style="font-family:Georgia,serif;font-size:22px;font-weight:300;color:#F0EDE6;line-height:1.3;margin:0 0 8px">${personName}</p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#5C6166;text-transform:uppercase;margin:0 0 20px">${typeLabel}</p>
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#8B9196;text-transform:uppercase;margin:0 0 20px">${typeLabel}</p>
     ${yearsLine}
 
-    <p style="font-family:Georgia,serif;font-size:15px;font-weight:300;font-style:italic;color:#706C65;line-height:1.8;margin:0 0 32px">
+    <p style="font-family:Georgia,serif;font-size:15px;font-weight:300;font-style:italic;color:#A29B90;line-height:1.8;margin:0 0 32px">
       The entity knows some of this story.
     </p>
 
@@ -112,7 +112,7 @@ function buildAnniversaryEmail(
   </div>
 
   <div style="padding:16px 32px 32px;border-top:1px solid rgba(240,237,230,0.06);margin-top:8px">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:0">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:0">
       BASALITH · XYZ<br>${archiveName}<br>Heritage Nexus Inc.
     </p>
   </div>

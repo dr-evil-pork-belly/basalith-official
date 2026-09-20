@@ -84,7 +84,7 @@ function buildMonthlyAccuracyEmail(
   portalUrl:         string,
 ): string {
   const rowsHtml = accuracyChanges.map(d => {
-    const changeColor = d.change > 0 ? '#C4A24A' : d.change < 0 ? '#C47A7A' : '#706C65'
+    const changeColor = d.change > 0 ? '#C4A24A' : d.change < 0 ? '#C47A7A' : '#A29B90'
     const changeText  = d.change > 0 ? `↑ +${d.change}` : d.change < 0 ? `↓ ${d.change}` : '→'
     return `
     <tr>
@@ -101,31 +101,31 @@ function buildMonthlyAccuracyEmail(
 
   <div style="padding:32px 32px 0">
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">${archiveName.toUpperCase()}</p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0">MONTHLY ENTITY REPORT</p>
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;margin:0">MONTHLY ENTITY REPORT</p>
   </div>
 
   <div style="padding:32px">
     <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#B8B4AB;margin:0 0 24px">${firstName},</p>
     <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#F0EDE6;line-height:1.7;margin:0 0 32px">Here is what your entity learned this month.</p>
 
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;margin:0 0 12px">WHAT CHANGED</p>
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#C4A24A;margin:0 0 12px">WHAT CHANGED</p>
     <table style="width:100%;border-collapse:collapse;margin:0 0 32px">${rowsHtml}</table>
 
     ${topDeposit ? `
     <div style="margin:0 0 32px">
-      <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;margin:0 0 12px">WHAT MOVED THE NEEDLE</p>
-      <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#706C65;line-height:1.8;margin:0">"${topDeposit}"</p>
+      <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#C4A24A;margin:0 0 12px">WHAT MOVED THE NEEDLE</p>
+      <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#A29B90;line-height:1.8;margin:0">"${topDeposit}"</p>
     </div>` : ''}
 
     <div style="margin:0 0 32px;padding:20px 24px;border-left:3px solid rgba(196,162,74,0.3);background:rgba(196,162,74,0.04)">
-      <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#A08A52;margin:0 0 8px">NEEDS ATTENTION</p>
+      <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#A08A52;margin:0 0 8px">NEEDS ATTENTION</p>
       <p style="font-family:Georgia,serif;font-size:15px;font-weight:300;color:#F0EDE6;line-height:1.7;margin:0">
         ${weakest.label} is at ${weakest.score}%. ${weakest.explanation}
       </p>
     </div>
 
     <div style="margin:0 0 32px;padding:24px 28px;border-left:3px solid rgba(196,162,74,0.5);background:rgba(196,162,74,0.04)">
-      <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#A08A52;margin:0 0 12px">ONE QUESTION THIS MONTH</p>
+      <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#A08A52;margin:0 0 12px">ONE QUESTION THIS MONTH</p>
       <p style="font-family:Georgia,serif;font-size:20px;font-weight:300;font-style:italic;color:#F0EDE6;line-height:1.7;margin:0">${targetQuestion}</p>
     </div>
 
@@ -135,7 +135,7 @@ function buildMonthlyAccuracyEmail(
   </div>
 
   <div style="padding:16px 32px 32px;border-top:1px solid rgba(240,237,230,0.06);margin-top:8px">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:0">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:0">
       BASALITH · ACTIVE ARCHIVE<br>${archiveName}<br>Heritage Nexus Inc.
     </p>
   </div>

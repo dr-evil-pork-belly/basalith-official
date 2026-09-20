@@ -274,7 +274,7 @@ function buildStoryPromptEmail(
 <body style="background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:600px;margin:0 auto;padding:0">
   <div style="padding:32px 32px 0">
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">${archiveName.toUpperCase()}</p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0">A MEMORY FOR THE RECORD</p>
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;margin:0">A MEMORY FOR THE RECORD</p>
   </div>
   <div style="padding:32px">
     <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#B8B4AB;margin:0 0 24px">${ui.greeting}</p>
@@ -283,11 +283,11 @@ function buildStoryPromptEmail(
       <p style="font-family:Georgia,serif;font-size:20px;font-weight:300;color:#F0EDE6;line-height:1.7;margin:0;font-style:italic">${promptText}</p>
     </div>
     <p style="font-family:Georgia,serif;font-size:18px;font-weight:300;color:#F0EDE6;line-height:1.7;margin:0 0 8px;text-align:center">${ui.replyLabel}</p>
-    <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#706C65;line-height:1.7;margin:0 0 28px;text-align:center">${ui.replyNote}</p>
-    <a href="${portalUrl}" style="display:inline-block;background:transparent;color:#C4A24A;border:1px solid rgba(196,162,74,0.3);font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;text-decoration:none;padding:10px 20px">${ui.voiceCta}</a>
+    <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#A29B90;line-height:1.7;margin:0 0 28px;text-align:center">${ui.replyNote}</p>
+    <a href="${portalUrl}" style="display:inline-block;background:transparent;color:#C4A24A;border:1px solid rgba(196,162,74,0.3);font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;text-decoration:none;padding:10px 20px">${ui.voiceCta}</a>
   </div>
   <div style="padding:0 32px 32px;border-top:1px solid rgba(240,237,230,0.06);margin-top:16px">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:20px 0 0">BASALITH · XYZ<br>${archiveName}</p>
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:20px 0 0">BASALITH · XYZ<br>${archiveName}</p>
   </div>
 </body>
 </html>`
@@ -304,11 +304,11 @@ function buildMondayPhotoEmail(
 <body style="background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:600px;margin:0 auto;padding:0">
   <div style="padding:32px 32px 0">
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">THE ${familyName.toUpperCase()} BASALITH</p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0">MONDAY MYSTERY · ${dateStr}</p>
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;margin:0">MONDAY MYSTERY · ${dateStr}</p>
   </div>
   <div style="padding:24px 32px 0">
     <h2 style="font-family:Georgia,serif;font-size:24px;font-weight:700;color:#F0EDE6;margin:0 0 8px">We found this photograph.</h2>
-    <p style="font-family:Georgia,serif;font-size:16px;font-style:italic;color:#706C65;margin:0 0 24px">Nobody has labeled it yet.${eraEstimate ? ` Our AI thinks it is from ${eraEstimate}.` : ''}</p>
+    <p style="font-family:Georgia,serif;font-size:16px;font-style:italic;color:#A29B90;margin:0 0 24px">Nobody has labeled it yet.${eraEstimate ? ` Our AI thinks it is from ${eraEstimate}.` : ''}</p>
   </div>
   <div style="margin:0"><img src="${photoUrl}" width="600" style="display:block;width:100%;max-width:600px;height:auto" alt="Monday mystery photograph"></div>
   <div style="padding:32px">
@@ -316,10 +316,10 @@ function buildMondayPhotoEmail(
       <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#F0EDE6;line-height:1.7;margin:0;font-style:italic">What do you think was happening here? Who do you recognize? Where do you think this was taken?</p>
     </div>
     <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#B8B4AB;line-height:1.7;margin:0 0 24px">Reply to this email with whatever you remember, or your best guess. On Friday we will share everything the family contributed about this photograph.</p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#A08A52;margin:0">REVEAL ARRIVES FRIDAY · REPLY WITH WHAT YOU KNOW</p>
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#A08A52;margin:0">REVEAL ARRIVES FRIDAY · REPLY WITH WHAT YOU KNOW</p>
   </div>
   <div style="padding:0 32px 32px;border-top:1px solid rgba(240,237,230,0.06)">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:20px 0 0">BASALITH · XYZ<br>The ${familyName} Basalith</p>
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:20px 0 0">BASALITH · XYZ<br>The ${familyName} Basalith</p>
   </div>
 </body>
 </html>`

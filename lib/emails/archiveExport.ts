@@ -17,7 +17,7 @@ const S = {
   pBright: 'font-family:Georgia,serif;font-size:17px;font-weight:300;color:#F0EDE6;line-height:1.8;margin:0 0 16px',
   goldBtn: "display:inline-block;font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;text-decoration:none;color:#0A0908;background:#C4A24A;padding:14px 30px",
   meta:    "font-family:'Courier New',monospace;font-size:12px;letter-spacing:1px;color:#B8B4AB;line-height:2;margin:0",
-  footer:  "font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#706C65;line-height:1.8;margin:0",
+  footer:  "font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#A29B90;line-height:1.8;margin:0",
   rule:    'border:0;border-top:1px solid rgba(240,237,230,0.08);margin:28px 0',
 }
 

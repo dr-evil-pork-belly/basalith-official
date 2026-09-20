@@ -78,7 +78,7 @@ export function buildTrialWarningEmail(input: TrialWarningInput): BuiltEmail {
   const html = `
 <div style="background:#0A0908;padding:40px 20px;font-family:Georgia,serif;color:#F0EDE6">
   <div style="max-width:560px;margin:0 auto">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;margin:0 0 28px;text-transform:uppercase">Basalith</p>
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#C4A24A;margin:0 0 28px;text-transform:uppercase">Basalith</p>
     <p style="font-size:16px;font-weight:300;line-height:1.8;margin:0 0 16px">${esc(l.greeting)}</p>
     <p style="font-size:16px;font-weight:300;line-height:1.8;margin:0 0 24px;color:#B8B4AB">${esc(l.body)}</p>
     <div style="border-left:2px solid rgba(196,162,74,0.5);padding:4px 0 4px 18px;margin:0 0 24px">
@@ -86,7 +86,7 @@ export function buildTrialWarningEmail(input: TrialWarningInput): BuiltEmail {
     </div>
     <p style="font-size:15px;font-weight:300;line-height:1.8;margin:0 0 8px;color:#B8B4AB">${esc(l.export)}</p>
     <p style="margin:0 0 32px"><a href="${l.exportUrl}" style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#C4A24A;text-decoration:none;text-transform:uppercase">Your Basalith settings</a></p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#706C65;margin:0">Basalith · Heritage Nexus Inc.</p>
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#A29B90;margin:0">Basalith · Heritage Nexus Inc.</p>
   </div>
 </div>`.trim()
 

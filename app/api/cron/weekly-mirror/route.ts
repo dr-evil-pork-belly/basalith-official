@@ -147,7 +147,7 @@ function buildMirrorEmail(archiveName: string, reflection: string, threadQuestio
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">
       ${escapeHtml(archiveName.toUpperCase())}
     </p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;margin:0">
       WHAT I AM LEARNING ABOUT YOU · ${dateStr.toUpperCase()}
     </p>
   </div>
@@ -168,7 +168,7 @@ function buildMirrorEmail(archiveName: string, reflection: string, threadQuestio
       </p>
     </div>
 
-    <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#706C65;margin:0">
+    <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#A29B90;margin:0">
       Just reply to this email.
     </p>
 
@@ -176,7 +176,7 @@ function buildMirrorEmail(archiveName: string, reflection: string, threadQuestio
 
   <div style="padding:0 36px 36px">
     <div style="border-top:1px solid rgba(240,237,230,0.06);padding-top:20px;margin-top:8px">
-      <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:0">
+      <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:0">
         BASALITH · XYZ<br>${escapeHtml(archiveName)}<br>Heritage Nexus Inc.
       </p>
     </div>

@@ -272,7 +272,7 @@ function buildWeeklyPromptEmail({
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">
       ${archiveName.toUpperCase()}
     </p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;margin:0">
       ${lang === 'zh' ? `每周提问 · 第${weekNumber}周 · ${dateStr}` : `MONDAY PROMPT · WEEK ${weekNumber} · ${dateStr}`}
     </p>
   </div>
@@ -280,20 +280,20 @@ function buildWeeklyPromptEmail({
   <div style="padding:32px">
 
     <div style="margin-bottom:24px">
-      <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;margin:0 0 8px">
+      <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#C4A24A;margin:0 0 8px">
         ${lang === 'zh' ? '本周焦点' : "THIS WEEK'S FOCUS"}
       </p>
       <p style="font-family:Georgia,serif;font-size:18px;font-weight:700;color:#F0EDE6;margin:0 0 4px">
         ${dimensionLabel}
       </p>
-      <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#706C65;margin:0 0 12px">
+      <p style="font-family:Georgia,serif;font-size:14px;font-style:italic;color:#A29B90;margin:0 0 12px">
         ${dimensionDesc}
       </p>
       <div style="display:flex;align-items:center;gap:12px">
         <div style="flex:1;height:4px;background:rgba(240,237,230,0.08);border-radius:2px;overflow:hidden">
           <div style="height:100%;background:#C4A24A;border-radius:2px;width:${weakestScore}%"></div>
         </div>
-        <p style="font-family:'Courier New',monospace;font-size:10px;color:#706C65;margin:0;white-space:nowrap">
+        <p style="font-family:'Courier New',monospace;font-size:11px;color:#A29B90;margin:0;white-space:nowrap">
           ${weakestScore}% DEPTH
         </p>
       </div>
@@ -310,32 +310,32 @@ function buildWeeklyPromptEmail({
       ${t('weeklyPromptCTA', lang)}
     </a>
 
-    <p style="font-family:Georgia,serif;font-size:13px;font-style:italic;color:#5C6166;text-align:center;margin:0 0 24px">
+    <p style="font-family:Georgia,serif;font-size:13px;font-style:italic;color:#8B9196;text-align:center;margin:0 0 24px">
       Takes about 5 minutes. Your answer goes directly into your entity.
     </p>
 
     <div style="border-top:1px solid rgba(240,237,230,0.06);margin:0 0 20px"></div>
 
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#706C65;margin:0 0 8px">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#A29B90;margin:0 0 8px">
       ${lang === 'zh' ? '您的实体 · 当前深度' : 'YOUR ENTITY · CURRENT DEPTH'}
     </p>
     <p style="font-family:Georgia,serif;font-size:36px;font-weight:700;color:#F0EDE6;margin:0 0 4px;line-height:1">
       ${overallScore}%
     </p>
-    <p style="font-family:Georgia,serif;font-size:13px;font-style:italic;color:#706C65;margin:0 0 12px">
+    <p style="font-family:Georgia,serif;font-size:13px;font-style:italic;color:#A29B90;margin:0 0 12px">
       ${depthLabel}
     </p>
-    <p style="font-family:Georgia,serif;font-size:13px;font-style:italic;color:#5C6166;margin:0">
+    <p style="font-family:Georgia,serif;font-size:13px;font-style:italic;color:#8B9196;margin:0">
       Answer this week's question and watch your ${dimensionLabel} score improve.
     </p>
 
   </div>
 
   <div style="padding:0 32px 32px;border-top:1px solid rgba(240,237,230,0.06)">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:20px 0 0">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:20px 0 0">
       BASALITH · XYZ<br>
       ${archiveName}<br>
-      <a href="${siteUrl}/archive/dashboard" style="color:#5C6166">View your Basalith</a>
+      <a href="${siteUrl}/archive/dashboard" style="color:#8B9196">View your Basalith</a>
     </p>
   </div>
 

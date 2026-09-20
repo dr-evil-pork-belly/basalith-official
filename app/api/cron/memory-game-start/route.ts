@@ -41,11 +41,11 @@ function buildGameStartEmail(
       style="display:block;width:100%;max-width:600px;height:auto;max-height:400px;object-fit:cover"
       alt="Photograph ${i + 1}">
     <div style="padding:12px 32px 20px;border-bottom:1px solid rgba(240,237,230,0.06)">
-      <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#706C65;margin:0 0 8px">
+      <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#A29B90;margin:0 0 8px">
         PHOTOGRAPH ${i + 1} OF ${photos.length}${photo.ai_era_estimate ? ' · ' + photo.ai_era_estimate.toUpperCase() : ''}
       </p>
       <a href="${siteUrl}/game/${sessionId}?photo=${photo.id}"
-        style="display:inline-block;font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;text-decoration:none;border:1px solid rgba(196,162,74,0.3);padding:8px 20px">
+        style="display:inline-block;font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#C4A24A;text-decoration:none;border:1px solid rgba(196,162,74,0.3);padding:8px 20px">
         ADD YOUR MEMORY →
       </a>
     </div>
@@ -60,7 +60,7 @@ function buildGameStartEmail(
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">
       THE ${familyName.toUpperCase()} BASALITH
     </p>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;margin:0">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;margin:0">
       WEEKLY MEMORY GAME · ${dateStr}
     </p>
   </div>
@@ -69,7 +69,7 @@ function buildGameStartEmail(
     <h2 style="font-family:Georgia,serif;font-size:26px;font-weight:700;color:#F0EDE6;margin:0 0 8px">
       This week's memory game is live.
     </h2>
-    <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#706C65;margin:0 0 20px">
+    <p style="font-family:Georgia,serif;font-size:15px;font-style:italic;color:#A29B90;margin:0 0 20px">
       ${photos.length} photograph${photos.length !== 1 ? 's' : ''}. ${contributorCount} family member${contributorCount !== 1 ? 's' : ''} playing.
       Closes ${closingTime}.
     </p>
@@ -83,16 +83,16 @@ function buildGameStartEmail(
       Click ADD YOUR MEMORY on any photograph to contribute.
     </p>
     <a href="${siteUrl}/game/${sessionId}"
-      style="display:inline-block;font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#0A0908;background:#C4A24A;text-decoration:none;padding:10px 24px;border-radius:2px">
+      style="display:inline-block;font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#0A0908;background:#C4A24A;text-decoration:none;padding:10px 24px;border-radius:2px">
       PLAY NOW →
     </a>
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#A08A52;margin:20px 0 0">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#A08A52;margin:20px 0 0">
       CLOSES ${closingTime.toUpperCase()}
     </p>
   </div>
 
   <div style="padding:0 32px 32px;border-top:1px solid rgba(240,237,230,0.06)">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#5C6166;line-height:1.8;margin:20px 0 0">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:20px 0 0">
       BASALITH · XYZ<br>
       The ${familyName} Basalith<br>
       Memory game every Wednesday.

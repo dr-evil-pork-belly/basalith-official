@@ -31,7 +31,7 @@ export function buildFoundingWelcomeEmail(input: FoundingWelcomeInput): BuiltEma
   const accessBlockHtml = magicLinkUrl
     ? `
   <div style="background:rgba(196,162,74,0.08);border:1px solid rgba(196,162,74,0.3);border-top:3px solid rgba(196,162,74,0.8);padding:24px;margin:0 0 24px">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;margin:0 0 12px;text-transform:uppercase">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#C4A24A;margin:0 0 12px;text-transform:uppercase">
       Your Basalith sign-in link
     </p>
     <p style="font-size:14px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 12px">
@@ -41,12 +41,12 @@ export function buildFoundingWelcomeEmail(input: FoundingWelcomeInput): BuiltEma
       style="display:inline-block;font-family:'Courier New',monospace;font-size:11px;color:#C4A24A;word-break:break-all;margin:0 0 10px">
       ${magicLinkUrl}
     </a>
-    <p style="font-size:12px;font-style:italic;color:#706C65;margin:0;line-height:1.7">
+    <p style="font-size:12px;font-style:italic;color:#A29B90;margin:0;line-height:1.7">
       Save this link. It is your entry to your Basalith.
     </p>
   </div>
   <div style="background:rgba(196,162,74,0.04);border:1px solid rgba(196,162,74,0.12);padding:20px;margin:0 0 24px">
-    <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:3px;color:#C4A24A;margin:0 0 12px;text-transform:uppercase">
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#C4A24A;margin:0 0 12px;text-transform:uppercase">
       Password Login
     </p>
     <p style="font-size:13px;color:#B8B4AB;margin:0 0 6px"><strong style="color:#F0EDE6">Address:</strong> ${loginUrl}</p>
@@ -82,7 +82,7 @@ export function buildFoundingWelcomeEmail(input: FoundingWelcomeInput): BuiltEma
     When you are ready, you can enter your Basalith and start adding your photographs and records. There is no rush. The Founding starts whenever you are ready: three of the hardest calls you ever made, in your own words.
   </p>
   <hr style="border:none;border-top:1px solid rgba(240,237,230,0.06);margin:24px 0">
-  <p style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;color:#3A3830;line-height:1.8;margin:0">
+  <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:0">
     BASALITH<br>The ${familyName} Basalith · Generation I<br>Heritage Nexus Inc.
   </p>
 </body>
