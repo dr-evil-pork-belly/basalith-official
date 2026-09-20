@@ -21,19 +21,23 @@ import type { GroundingBasis } from '@/lib/verifyGrounding'
 
 // Matches the live succession portal vocabulary and type system so the demo
 // looks like the actual product a prospect will use.
-const MONO: React.CSSProperties  = { fontFamily: "'Courier New', monospace" }
-const SERIF: React.CSSProperties = { fontFamily: 'Georgia, serif' }
+const MONO: React.CSSProperties  = { fontFamily: 'var(--portal-mono)' }
+const SERIF: React.CSSProperties = { fontFamily: 'var(--portal-serif)' }
 
+// Threshold register: the shared --invert-* family. Re-pointed September 20,
+// 2026 with the other two demos. dim was #706C65 (3.58:1) carrying eleven
+// pieces of text, and ghost was #3A3F44 (1.76:1) carrying two, on the one demo
+// that is public and shown to acquisition prospects.
 const C = {
-  bg:         '#0A0908',
-  panel:      '#0F0E0D',
-  gold:       '#C4A24A',
-  goldBright: '#D9C4A3',
-  bone:       '#F0EDE6',
-  muted:      '#B8B4AB',
-  dim:        '#706C65',
-  ghost:      '#3A3F44',
-  line:       'rgba(196,162,74,0.12)',
+  bg:         'var(--invert-bg)',
+  panel:      'var(--invert-field)',
+  gold:       'var(--invert-gold)',
+  goldBright: 'var(--invert-gold-pale)',
+  bone:       'var(--invert-fg)',
+  muted:      'var(--invert-body)',
+  dim:        'var(--invert-dim)',
+  ghost:      'var(--invert-rule)',
+  line:       'var(--invert-rule)',
 }
 
 const SUCCESSION_URL = 'https://basalith.ai/succession'
@@ -158,37 +162,37 @@ export default function SuccessionDemoClient() {
   }
 
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 60, overflowY: 'auto', background: `linear-gradient(180deg, #121110 0%, ${C.bg} 38%)`, color: C.bone }}>
+    <div style={{ position: 'fixed', inset: 0, zIndex: 60, overflowY: 'auto', background: `linear-gradient(180deg, var(--invert-raise) 0%, ${C.bg} 38%)`, color: C.bone }}>
       <style>{`
         @keyframes succBlink { 0%,100%{opacity:1} 50%{opacity:0} }
         @keyframes succFade  { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
         .succ-fade { animation: succFade 0.6s cubic-bezier(0.16,1,0.3,1) both; }
         .succ-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: ${C.line}; }
         @media (max-width: 900px) { .succ-grid { grid-template-columns: 1fr; } }
-        .succ-chip:hover { border-color: rgba(196,162,74,0.55) !important; color: ${C.bone} !important; }
+        .succ-chip:hover { border-color: var(--invert-gold) !important; color: ${C.bone} !important; }
       `}</style>
 
       {/* ── Top bar ── */}
       <div style={{ borderBottom: `1px solid ${C.line}`, padding: '16px clamp(20px,4vw,48px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px', minWidth: 0 }}>
-          <Link href="/succession" style={{ ...MONO, fontSize: '0.56rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: C.dim, textDecoration: 'none', whiteSpace: 'nowrap' }}>
+          <Link href="/succession" style={{ ...MONO, fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: C.dim, textDecoration: 'none', whiteSpace: 'nowrap' }}>
             &larr; Exit
           </Link>
-          <span style={{ ...MONO, fontSize: '0.56rem', color: C.ghost }}>|</span>
-          <span style={{ ...MONO, fontSize: '0.62rem', letterSpacing: '0.28em', textTransform: 'uppercase', color: C.gold, whiteSpace: 'nowrap' }}>
+          <span style={{ ...MONO, fontSize: '11px', color: C.dim }}>|</span>
+          <span style={{ ...MONO, fontSize: '11px', letterSpacing: '0.28em', textTransform: 'uppercase', color: C.gold, whiteSpace: 'nowrap' }}>
             Basalith &middot; Succession
           </span>
         </div>
-        <span style={{ ...MONO, fontSize: '0.56rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: C.dim, whiteSpace: 'nowrap' }}>
+        <span style={{ ...MONO, fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: C.dim, whiteSpace: 'nowrap' }}>
           Interactive Demonstration
         </span>
       </div>
 
       <div style={{ maxWidth: '1180px', margin: '0 auto', padding: 'clamp(28px,4vw,52px) clamp(20px,4vw,48px) 80px' }}>
 
-        {/* ══ ZONE 1 — header ══ */}
+        {/* ══ ZONE 1: header ══ */}
         <div className="succ-fade">
-          <p style={{ ...MONO, fontSize: '0.58rem', letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.7)', marginBottom: '18px', lineHeight: 1.7 }}>
+          <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.24em', textTransform: 'uppercase', color: 'var(--invert-gold)', marginBottom: '18px', lineHeight: 1.7 }}>
             {CATEGORY_LINE}
           </p>
 
@@ -203,7 +207,7 @@ export default function SuccessionDemoClient() {
                   aria-pressed={active}
                   style={{
                     ...MONO,
-                    fontSize:      '0.62rem',
+                    fontSize: '11px',
                     letterSpacing: '0.18em',
                     textTransform: 'uppercase',
                     padding:       '11px 22px',
@@ -231,8 +235,8 @@ export default function SuccessionDemoClient() {
           </p>
 
           {/* Fictional label. Always visible, both personas. */}
-          <div style={{ border: '1px solid rgba(196,162,74,0.28)', background: 'rgba(196,162,74,0.05)', padding: '13px 16px', maxWidth: '640px', marginBottom: '22px' }}>
-            <p style={{ ...MONO, fontSize: '0.5rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: C.gold, marginBottom: '7px' }}>
+          <div style={{ border: '1px solid var(--invert-gold-line)', background: 'var(--invert-gold-line)', padding: '13px 16px', maxWidth: '640px', marginBottom: '22px' }}>
+            <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: C.gold, marginBottom: '7px' }}>
               Fictional Founder
             </p>
             <p style={{ ...SERIF, fontSize: '0.88rem', fontWeight: 300, color: C.muted, lineHeight: 1.75, margin: 0 }}>
@@ -245,7 +249,7 @@ export default function SuccessionDemoClient() {
             <button
               onClick={() => setIntroOpen(o => !o)}
               aria-expanded={introOpen}
-              style={{ ...MONO, fontSize: '0.56rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: C.gold, background: 'transparent', border: 'none', padding: '6px 0', cursor: 'pointer' }}
+              style={{ ...MONO, fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: C.gold, background: 'transparent', border: 'none', padding: '6px 0', cursor: 'pointer' }}
             >
               {introOpen ? 'Hide how this works' : 'How this works'}
             </button>
@@ -257,7 +261,7 @@ export default function SuccessionDemoClient() {
           </div>
         </div>
 
-        {/* ══ ZONE 2 — contrast cards ══ */}
+        {/* ══ ZONE 2: contrast cards ══ */}
         <SectionHeader
           label={`What ${persona.metadata.successorLabel} expects`}
           title="Assumption Against the Record"
@@ -275,16 +279,16 @@ export default function SuccessionDemoClient() {
                 {st.reveal === 0 ? (
                   <button
                     onClick={() => advanceCard(card)}
-                    style={{ ...MONO, fontSize: '0.56rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: C.gold, background: 'transparent', border: `1px solid rgba(196,162,74,0.4)`, padding: '10px 16px', cursor: 'pointer', borderRadius: '2px' }}
+                    style={{ ...MONO, fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: C.gold, background: 'transparent', border: `1px solid var(--invert-gold)`, padding: '10px 16px', cursor: 'pointer', borderRadius: '2px' }}
                   >
                     Reveal
                   </button>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
-                    {/* Reveal 1 — the assumption */}
+                    {/* Reveal 1: the assumption */}
                     <div className="succ-fade">
-                      <p style={{ ...MONO, fontSize: '0.5rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: C.dim, marginBottom: '7px' }}>
+                      <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: C.dim, marginBottom: '7px' }}>
                         {persona.metadata.successorLabel} assumes
                       </p>
                       <p style={{ ...SERIF, fontSize: '0.92rem', fontWeight: 300, color: C.muted, lineHeight: 1.7, margin: 0, paddingLeft: '12px', borderLeft: `2px solid ${C.ghost}` }}>
@@ -292,13 +296,13 @@ export default function SuccessionDemoClient() {
                       </p>
                     </div>
 
-                    {/* Reveal 2 — the deposit */}
+                    {/* Reveal 2: the deposit */}
                     {st.reveal >= 2 && deposit && (
-                      <div className="succ-fade" style={{ border: '1px solid rgba(196,162,74,0.16)', background: 'rgba(196,162,74,0.03)', padding: '14px 16px' }}>
-                        <p style={{ ...MONO, fontSize: '0.5rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: C.gold, marginBottom: '9px' }}>
+                      <div className="succ-fade" style={{ border: '1px solid var(--invert-gold-line)', background: 'var(--invert-gold-line)', padding: '14px 16px' }}>
+                        <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: C.gold, marginBottom: '9px' }}>
                           From the record
                         </p>
-                        <p style={{ ...SERIF, fontSize: '0.82rem', fontStyle: 'italic', color: C.dim, lineHeight: 1.6, margin: '0 0 8px' }}>
+                        <p style={{ ...SERIF, fontSize: '14.5px', fontStyle: 'italic', color: C.dim, lineHeight: 1.6, margin: '0 0 8px' }}>
                           {deposit.prompt}
                         </p>
                         <p style={{ ...SERIF, fontSize: '0.9rem', fontWeight: 300, color: C.muted, lineHeight: 1.75, margin: 0 }}>
@@ -307,10 +311,10 @@ export default function SuccessionDemoClient() {
                       </div>
                     )}
 
-                    {/* Reveal 3 — the live entity answer */}
+                    {/* Reveal 3: the live entity answer */}
                     {st.reveal >= 3 && (
                       <div className="succ-fade">
-                        <p style={{ ...MONO, fontSize: '0.5rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.7)', marginBottom: '9px' }}>
+                        <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--invert-gold)', marginBottom: '9px' }}>
                           {persona.metadata.name}
                         </p>
                         {st.pending
@@ -322,7 +326,7 @@ export default function SuccessionDemoClient() {
                     {st.reveal < 3 && (
                       <button
                         onClick={() => advanceCard(card)}
-                        style={{ ...MONO, fontSize: '0.56rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: C.gold, background: 'transparent', border: `1px solid rgba(196,162,74,0.4)`, padding: '9px 15px', cursor: 'pointer', borderRadius: '2px', alignSelf: 'flex-start' }}
+                        style={{ ...MONO, fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: C.gold, background: 'transparent', border: `1px solid var(--invert-gold)`, padding: '9px 15px', cursor: 'pointer', borderRadius: '2px', alignSelf: 'flex-start' }}
                       >
                         {st.reveal === 1 ? 'Show the deposit' : `Ask ${firstName}`}
                       </button>
@@ -334,7 +338,7 @@ export default function SuccessionDemoClient() {
           })}
         </div>
 
-        {/* ══ ZONE 3 — ask anything ══ */}
+        {/* ══ ZONE 3: ask anything ══ */}
         <SectionHeader label="Free form" title={`Ask ${firstName} anything`} />
         <section style={{ background: C.panel, padding: 'clamp(20px,2.5vw,30px)', marginBottom: '36px' }}>
 
@@ -348,12 +352,12 @@ export default function SuccessionDemoClient() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '22px', marginBottom: turns.length ? '24px' : 0 }}>
             {turns.map((t, i) => (
               <div key={i} className="succ-fade">
-                <div style={{ background: 'rgba(196,162,74,0.08)', border: '1px solid rgba(196,162,74,0.16)', borderRadius: '10px 10px 10px 2px', padding: '12px 16px', marginBottom: '12px' }}>
-                  <p style={{ ...SERIF, fontSize: '0.95rem', fontWeight: 300, color: '#D4CFC7', lineHeight: 1.6, margin: 0 }}>
+                <div style={{ background: 'var(--invert-gold-wash)', border: '1px solid var(--invert-gold-wash)', borderRadius: '10px 10px 10px 2px', padding: '12px 16px', marginBottom: '12px' }}>
+                  <p style={{ ...SERIF, fontSize: '0.95rem', fontWeight: 300, color: C.muted, lineHeight: 1.6, margin: 0 }}>
                     {t.question}
                   </p>
                 </div>
-                <p style={{ ...MONO, fontSize: '0.5rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.7)', marginBottom: '9px' }}>
+                <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--invert-gold)', marginBottom: '9px' }}>
                   {persona.metadata.name}
                 </p>
                 {t.pending
@@ -366,8 +370,8 @@ export default function SuccessionDemoClient() {
 
           {/* Session cap card */}
           {capped ? (
-            <div className="succ-fade" style={{ border: `1px solid ${C.line}`, background: 'rgba(196,162,74,0.04)', padding: '20px 22px' }}>
-              <p style={{ ...MONO, fontSize: '0.5rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: C.gold, marginBottom: '10px' }}>
+            <div className="succ-fade" style={{ border: `1px solid ${C.line}`, background: 'var(--invert-gold-line)', padding: '20px 22px' }}>
+              <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: C.gold, marginBottom: '10px' }}>
                 Session Complete
               </p>
               <p style={{ ...SERIF, fontSize: '0.95rem', fontWeight: 300, color: C.muted, lineHeight: 1.8, margin: 0 }}>
@@ -388,7 +392,7 @@ export default function SuccessionDemoClient() {
                       ...SERIF,
                       fontSize:     '0.85rem',
                       fontWeight:   300,
-                      color:        busy ? C.ghost : C.muted,
+                      color:        busy ? C.dim : C.muted,
                       background:   'transparent',
                       border:       `1px solid ${C.ghost}`,
                       borderRadius: '999px',
@@ -423,7 +427,7 @@ export default function SuccessionDemoClient() {
                     fontSize:     '0.95rem',
                     fontWeight:   300,
                     color:        C.bone,
-                    background:   'rgba(240,237,230,0.04)',
+                    background:   'var(--invert-field)',
                     border:       `1px solid ${C.line}`,
                     borderRadius: '2px',
                     padding:      '13px 15px',
@@ -435,11 +439,11 @@ export default function SuccessionDemoClient() {
                   disabled={busy || !draft.trim()}
                   style={{
                     ...MONO,
-                    fontSize:      '0.6rem',
+                    fontSize: '11px',
                     letterSpacing: '0.2em',
                     textTransform: 'uppercase',
                     color:         C.bg,
-                    background:    busy || !draft.trim() ? 'rgba(196,162,74,0.35)' : C.gold,
+                    background:    busy || !draft.trim() ? 'var(--invert-gold-wash)' : C.gold,
                     border:        'none',
                     borderRadius:  '2px',
                     padding:       '0 24px',
@@ -450,7 +454,7 @@ export default function SuccessionDemoClient() {
                   Ask
                 </button>
               </form>
-              <p style={{ ...MONO, fontSize: '0.58rem', letterSpacing: '0.12em', color: C.dim, marginTop: '10px', marginBottom: 0 }}>
+              <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.12em', color: C.dim, marginTop: '10px', marginBottom: 0 }}>
                 {turns.filter(t => !t.failed).length} of {MAX_USER_MESSAGES} questions used
               </p>
             </>
@@ -459,12 +463,12 @@ export default function SuccessionDemoClient() {
 
         {/* ── CTA ── */}
         <div style={{ textAlign: 'center' }}>
-          <div style={{ width: '60px', height: '1px', background: 'rgba(196,162,74,0.4)', margin: '0 auto 28px' }} />
+          <div style={{ width: '60px', height: '1px', background: 'var(--invert-gold-wash)', margin: '0 auto 28px' }} />
           <a
             href={SUCCESSION_URL}
             target="_blank"
             rel="noopener noreferrer"
-            style={{ ...MONO, display: 'inline-block', fontSize: '0.66rem', letterSpacing: '0.26em', textTransform: 'uppercase', color: C.bg, background: C.gold, padding: '1.05rem 2.5rem', textDecoration: 'none', fontWeight: 700, borderRadius: '2px' }}
+            style={{ ...MONO, display: 'inline-block', fontSize: '11px', letterSpacing: '0.26em', textTransform: 'uppercase', color: C.bg, background: C.gold, padding: '1.05rem 2.5rem', textDecoration: 'none', fontWeight: 700, borderRadius: '2px' }}
           >
             Found a Basalith for the business &rarr;
           </a>
@@ -479,7 +483,7 @@ export default function SuccessionDemoClient() {
 function SectionHeader({ label, title }: { label: string; title: string }) {
   return (
     <div style={{ borderBottom: `1px solid ${C.line}`, paddingBottom: '14px', marginBottom: '24px' }}>
-      <p style={{ ...MONO, fontSize: '0.5rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.7)', marginBottom: '8px' }}>
+      <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--invert-gold)', marginBottom: '8px' }}>
         {label}
       </p>
       <h2 style={{ ...SERIF, fontSize: '1.35rem', fontWeight: 300, color: C.bone, margin: 0 }}>{title}</h2>
@@ -489,7 +493,7 @@ function SectionHeader({ label, title }: { label: string; title: string }) {
 
 function Thinking() {
   return (
-    <p style={{ ...MONO, fontSize: '0.56rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: C.dim, margin: 0 }}>
+    <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: C.dim, margin: 0 }}>
       Checking the record
       <span style={{ animation: 'succBlink 1s step-end infinite', color: C.gold, marginLeft: '4px' }}>&#9613;</span>
     </p>
@@ -529,7 +533,7 @@ function Answer({ text, grounded, basis, failed, metadata }: {
 
   if (failed) {
     return (
-      <div style={{ borderLeft: `2px solid ${C.ghost}`, background: 'rgba(240,237,230,0.02)', borderRadius: '0 8px 8px 8px', padding: '14px 16px 14px 18px' }}>
+      <div style={{ borderLeft: `2px solid ${C.ghost}`, background: 'var(--invert-rule)', borderRadius: '0 8px 8px 8px', padding: '14px 16px 14px 18px' }}>
         <p style={{ ...SERIF, fontSize: '0.95rem', fontWeight: 300, color: C.dim, lineHeight: 1.8, margin: 0 }}>{text}</p>
       </div>
     )
@@ -539,12 +543,12 @@ function Answer({ text, grounded, basis, failed, metadata }: {
     // Reasoned and no-deposit share this panel exactly. Only the label moves.
     const reasoned = demoAnswerState(basis) === 'reasoned'
     return (
-      <div style={{ borderLeft: `2px solid ${C.ghost}`, background: 'rgba(240,237,230,0.02)', borderRadius: '0 8px 8px 8px', padding: '14px 16px 14px 18px' }}>
+      <div style={{ borderLeft: `2px solid ${C.ghost}`, background: 'var(--invert-rule)', borderRadius: '0 8px 8px 8px', padding: '14px 16px 14px 18px' }}>
         <p style={{ ...SERIF, fontSize: '0.96rem', fontWeight: 300, color: C.muted, lineHeight: 1.85, margin: 0, whiteSpace: 'pre-wrap' }}>
           {text}
         </p>
-        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', marginTop: '14px', paddingTop: '12px', borderTop: `1px solid rgba(240,237,230,0.06)` }}>
-          <span style={{ ...MONO, fontSize: '0.5rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: C.dim, border: `1px solid ${C.ghost}`, padding: '3px 7px', borderRadius: '2px', whiteSpace: 'nowrap' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', marginTop: '14px', paddingTop: '12px', borderTop: `1px solid var(--invert-rule)` }}>
+          <span style={{ ...MONO, fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: C.dim, border: `1px solid ${C.ghost}`, padding: '3px 7px', borderRadius: '2px', whiteSpace: 'nowrap' }}>
             {reasoned ? REASONED_TAG : REFUSAL_TAG}
           </span>
           <span style={{ ...SERIF, fontSize: '0.85rem', fontStyle: 'italic', color: C.dim, lineHeight: 1.6, minWidth: 0 }}>
@@ -556,12 +560,12 @@ function Answer({ text, grounded, basis, failed, metadata }: {
   }
 
   return (
-    <div style={{ borderLeft: '2px solid rgba(196,162,74,0.45)', background: 'rgba(240,237,230,0.03)', borderRadius: '0 8px 8px 8px', padding: '14px 16px 14px 18px' }}>
+    <div style={{ borderLeft: '2px solid var(--invert-gold-line)', background: 'var(--invert-rule)', borderRadius: '0 8px 8px 8px', padding: '14px 16px 14px 18px' }}>
       <p style={{ ...SERIF, fontSize: '0.98rem', fontStyle: 'italic', fontWeight: 300, color: C.goldBright, lineHeight: 1.85, margin: 0, whiteSpace: 'pre-wrap' }}>
         {text}
       </p>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '14px', paddingTop: '12px', borderTop: '1px solid rgba(196,162,74,0.12)' }}>
-        <span style={{ ...MONO, fontSize: '0.5rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: C.bg, background: 'rgba(196,162,74,0.85)', padding: '3px 7px', borderRadius: '2px', whiteSpace: 'nowrap' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '14px', paddingTop: '12px', borderTop: '1px solid var(--invert-gold-line)' }}>
+        <span style={{ ...MONO, fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: C.bg, background: 'var(--invert-gold)', padding: '3px 7px', borderRadius: '2px', whiteSpace: 'nowrap' }}>
           Checked
         </span>
         <span style={{ ...SERIF, fontSize: '0.85rem', fontStyle: 'italic', color: C.dim }}>

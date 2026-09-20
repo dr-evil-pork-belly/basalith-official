@@ -50,6 +50,26 @@ const nextConfig: NextConfig = {
     qualities: [60, 75],
   },
 
+  // Retired routes. The Guide portal was removed on September 20, 2026 with the
+  // distribution model it served: there is no contractor sales force, so there
+  // is no pipeline, no commission ledger, no certification and no leaderboard.
+  // The two demos in that tree were kept and moved out (see /demo and
+  // /archive/demo/incident). These 308s keep held links working; the
+  // app/archivist, app/api/archivist and app/guide-onboard directories are
+  // deleted. Do not reuse these paths.
+  async redirects() {
+    return [
+      { source: '/archivist/demo',          destination: '/demo',                    permanent: true },
+      { source: '/archivist/demo/incident',  destination: '/archive/demo/incident',   permanent: true },
+      { source: '/archivist/demo/succession', destination: '/succession/demo',        permanent: true },
+      { source: '/archivist/:path*',        destination: '/archive/dashboard',        permanent: true },
+      { source: '/archivist',               destination: '/archive/dashboard',        permanent: true },
+      { source: '/archivist-login',         destination: '/archive-login',            permanent: true },
+      { source: '/guide-onboard',           destination: '/',                         permanent: true },
+      { source: '/api/archivist/demo/incident/:path*', destination: '/api/archive/demo/incident/:path*', permanent: true },
+    ]
+  },
+
   async headers() {
     return [
       {

@@ -53,6 +53,8 @@
   --invert-gold:      #C4A24A;   /*  7.67:1 */
   --invert-error:     #E08B8B;   /*  7.33:1 */
   --invert-ok:        #7FB685;   /*  7.95:1 */
+  --invert-gold-pale: #D9C4A3;   /* 11.02:1, the demos' bright gold */
+  --invert-raise:     #1C1A17;   /* the lighter end of the demos' gradient */
   --invert-rule:      rgba(247,245,241,0.12);
   --invert-field:     rgba(247,245,241,0.07);
   --invert-gold-line: rgba(196,162,74,0.45);
@@ -257,6 +259,7 @@ ON INK (#14120F: the spine, the threshold, and the block where the archive speak
   Labels:         rgba(247,245,241,0.62)  PASS  7.08:1  (--invert-dim)
   Error:          #E08B8B  PASS   7.33:1  (--invert-error)
   Confirmation:   #7FB685  PASS   7.95:1  (--invert-ok)
+  Pale gold:      #D9C4A3  PASS  11.02:1  (--invert-gold-pale)
   NEVER USE:      #5C6166  FAIL   3.5:1   (the old portal dim; a label color on stone, never on ink)
   NEVER USE:      #3A3F44  FAIL   1.7:1   (the old portal faint)
   NEVER USE:      #C47D1A  FAIL   4.1:1   (the marketing .eyebrow orange)
@@ -704,7 +707,7 @@ input[type='range'].range-amber::-webkit-slider-thumb {
 }
 
 /* ── Stone register, portal ───────────────────────────────────────────────────
-   Every signed-in surface (/archive/*, /succession/portal/*, /archivist/*,
+   Every signed-in surface (/archive/*, /succession/portal/*,
    /begin, the login pages) runs on the same stone the homepage runs on.
    Decision and measurements: docs/BASALITH_PORTAL_PALETTE_DECISION_2026-09-18.md.
 

@@ -30,8 +30,11 @@ acquisition or succession. Secondary is B2C: individuals and families. The engin
 the same. The lifecycle shape is not.
 
 Sales are founder-led. There is no contractor sales force and the public site no
-longer describes one (September 14, 2026). The Guide portal under `/archivist/*` and
-`/guide-onboard` remains as internal, gated tooling. Advisors (CPAs, exit planners,
+longer describes one (September 14, 2026). The Guide portal is gone too: on
+September 20, 2026 `/archivist/*`, `/archivist-login`, `/guide-onboard` and
+`/api/archivist/*` were deleted, and every one of those paths is a 308 in
+`next.config.ts`. Its two demos were kept and moved out, to `/demo` (public) and
+`/archive/demo/incident` (owner-gated). Advisors (CPAs, exit planners,
 attorneys) are a referral and partner channel, reached through the "Partnering as an
 advisor" topic on /contact. Do not reintroduce Guide recruiting copy or a "sold
 through Legacy Guides" framing anywhere public.
@@ -123,7 +126,7 @@ synthesis vendor. See section 6.
 Versions, VERIFIED from package.json July 2026: next 16.1.6 and eslint-config-next 16.1.6, both pinned exact. react and react-dom 19.2.3, pinned. tailwindcss 3.4.x, not v4. React Compiler is on via babel-plugin-react-compiler. Tests run with vitest (npm test runs vitest run). Next 16 renamed middleware.ts to proxy.ts, which is why proxy.ts sits at the repo root.
 
 **Route protection.** This repo HAS edge middleware, at `proxy.ts` in the repo root. It
-gates `/archive/*`, `/archivist/*`, and `/succession/portal/*` above route resolution.
+gates `/archive/*` and `/succession/portal/*` above route resolution.
 When reconning auth, search for BOTH `middleware.*` and `proxy.*`. Framework renames
 defeat filename memory. Any note saying protection is per-page only is stale.
 
@@ -531,10 +534,11 @@ regressions here are not theoretical.
   (say Custodian), "archive link" (say sign-in link). New rows in `archives` are
   named "The <family> Basalith" (`lib/billing/createArchive.ts`) or "<family>
   Basalith" (`app/api/trial/start`). Record: `docs/ARCHIVE_WORD_2026-09-18.md`.
-- "Legacy Guide," never "Archivist," in anything user-facing. The route may still be
-  `/archivist-login`, but the copy says Legacy Guide. As of September 14, 2026 the
-  public site does not name the role at all; delivery copy says "led in person" or
-  names the founder. The term survives only inside the gated Guide portal.
+- The Legacy Guide role no longer exists anywhere: not in copy, not in routes.
+  As of September 14, 2026 the public site does not name the role; delivery copy
+  says "led in person" or names the founder. As of September 20, 2026 the portal
+  and its routes are deleted. If you are writing something that needs a word for
+  who runs a session, the answer is the founder.
 - Locked tagline, always exactly two lines, never one, never three:
   > You never truly leave
   > if you leave enough of yourself behind.

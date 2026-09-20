@@ -1,9 +1,11 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+// /archivist was removed September 20, 2026 with the Guide portal. The one
+// gated page that survived that tree, the incident capture demo, moved under
+// /archive and is covered by the rule below.
 const PROTECTED: { prefix: string; loginPath: string }[] = [
   { prefix: '/archive',           loginPath: '/archive-login' },
-  { prefix: '/archivist',         loginPath: '/archivist-login' },
   { prefix: '/succession/portal', loginPath: '/succession/login' },
 ]
 
