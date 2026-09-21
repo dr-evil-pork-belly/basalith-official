@@ -108,7 +108,17 @@ export const RETRIEVAL_MAX_RETRIES = 1
 
 /** Environment switch. Anything other than 'off' (case-insensitive) leaves retrieval on. */
 export const RETRIEVAL_ENV_VAR = 'FROZEN_LAYER_RETRIEVAL'
-export function retrievalDisabledByEnv(env: NodeJS.ProcessEnv = process.env): boolean {
+
+/**
+ * Reads one variable, so it asks for one variable's worth of type. Do not
+ * narrow this back to `NodeJS.ProcessEnv`: Next augments that interface to make
+ * NODE_ENV required, which means no caller can pass a literal and every test
+ * case here fails to compile. `process.env` satisfies this signature, so the
+ * default argument is unaffected.
+ */
+type EnvLike = Readonly<Record<string, string | undefined>>
+
+export function retrievalDisabledByEnv(env: EnvLike = process.env): boolean {
   return (env[RETRIEVAL_ENV_VAR] ?? '').trim().toLowerCase() === 'off'
 }
 
