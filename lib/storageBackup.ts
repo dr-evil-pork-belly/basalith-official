@@ -128,6 +128,19 @@ export const LOCK_RETENTION_DAYS = 90
 export const SILENCE_SYNC_DAYS = 8
 export const SILENCE_VERIFY_DAYS = 10
 
+/**
+ * The invariant weekly verification actually owes: no object goes longer than
+ * this without being re-hashed from B2.
+ *
+ * It is not an arbitrary comfort number, it encodes capacity. A weekly verify
+ * re-hashes MAX_COPIES_PER_RUN objects, so this window covers
+ * MAX_COPIES_PER_RUN * (VERIFY_STALE_DAYS / 7) = 1,200 objects. Under that, the
+ * rotation keeps the invariant on its own and A8 is a notice. Over it, no
+ * ordering can help and A11 fires, because the honest answer is a second weekly
+ * run or a larger cap, not a quieter alarm.
+ */
+export const VERIFY_STALE_DAYS = 28
+
 // ── Alarms ───────────────────────────────────────────────────────────────────
 
 /**
@@ -144,6 +157,15 @@ export const SILENCE_VERIFY_DAYS = 10
  *       a hard alarm in prose ("Object Lock should make this impossible, so it
  *       firing means the lock is not doing what we believe") but the section 7
  *       table has no code for it.
+ *   A11 An object has gone VERIFY_STALE_DAYS without being re-hashed. Added
+ *       September 21, 2026 with the verification rotation, and it is the alarm
+ *       A8 was being asked to be and could not. A8 says a run hit its cap,
+ *       which after the rotation is normal and permanent, so it is a notice.
+ *       A11 says the invariant broke, which is the thing worth waking up for.
+ *       A permanent alarm is one an operator learns to scroll past; that is how
+ *       a 22% coverage gap sat behind a green heartbeat from August 14 to
+ *       September 21, 2026. A11 is hard on purpose and must stay out of
+ *       SOFT_ALARMS.
  */
 export const ALARM = {
   A1_MISSING_IN_DEST: 'A1_MISSING_IN_DEST',
@@ -156,6 +178,7 @@ export const ALARM = {
   A8_CAPPED: 'A8_CAPPED',
   A9_ALLOWLIST_BUCKET_MISSING: 'A9_ALLOWLIST_BUCKET_MISSING',
   A10_MANIFEST_MISSING_IN_DEST: 'A10_MANIFEST_MISSING_IN_DEST',
+  A11_VERIFY_STALE: 'A11_VERIFY_STALE',
 } as const
 
 export type AlarmCode = (typeof ALARM)[keyof typeof ALARM]

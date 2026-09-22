@@ -23,6 +23,7 @@ import {
   BUDGET_CHECK_EVERY,
   LOCK_RETENTION_DAYS,
   MAX_COPIES_PER_RUN,
+  VERIFY_STALE_DAYS,
   ROLLING_WINDOW_DAYS,
   SCOPED_RUN_KIND,
   SILENCE_SYNC_DAYS,
@@ -764,11 +765,11 @@ export const storageBackupVerify = inngest.createFunction(
 
         const manifest = await step.run('load-manifest', async () => {
           const PAGE = 1000
-          const rows: { b2_key: string; sha256: string; size_bytes: number }[] = []
+          const rows: { b2_key: string; sha256: string; size_bytes: number; last_verified_at: string | null }[] = []
           for (let from = 0; ; from += PAGE) {
             const { data: page, error } = await supabaseAdmin
               .from('storage_backup_objects')
-              .select('b2_key, sha256, size_bytes')
+              .select('b2_key, sha256, size_bytes, last_verified_at')
               .range(from, from + PAGE - 1)
             if (error) throw new Error(`load-manifest: ${error.message}`)
             const rowsPage = (page ?? []) as typeof rows
@@ -885,23 +886,85 @@ export const storageBackupVerify = inngest.createFunction(
 
         // Re-hash from B2, not from Supabase, so a verify spends zero Supabase
         // egress. That is what makes weekly verification affordable.
-        const toRehash = manifest.slice(0, MAX_COPIES_PER_RUN)
-        const deferred = Math.max(0, manifest.length - MAX_COPIES_PER_RUN)
+        //
+        // ROTATION, added September 21, 2026. This replaces
+        // `manifest.slice(0, MAX_COPIES_PER_RUN)`, which took the first N rows of
+        // a read with no ORDER BY. Postgres promises no order, so the rows past N
+        // were not merely deferred, they were undefined: nobody could say which
+        // objects were never verified, only how many. At 383 rows that was 83
+        // objects covered by nothing, reported behind an ok: true run.
+        //
+        // Least-recently-verified first, with b2_key breaking ties so the order
+        // is total and two runs over identical state pick identically. A null
+        // last_verified_at has never been re-hashed and sorts first, so a freshly
+        // seeded manifest drains oldest-debt-first without special casing.
+        //
+        // The sort is here and not in the query on purpose: the full manifest is
+        // still needed below for manifestKeys and the three way diff, so ordering
+        // in SQL would mean either a second query or an ORDER BY that a later
+        // edit could silently drop. In code it is one expression, next to the
+        // slice it feeds, where it cannot be separated from its reason.
+        const byStaleness = [...manifest].sort((a, b) => {
+          const at = a.last_verified_at === null ? -1 : Date.parse(a.last_verified_at)
+          const bt = b.last_verified_at === null ? -1 : Date.parse(b.last_verified_at)
+          if (at !== bt) return at - bt
+          return a.b2_key < b.b2_key ? -1 : a.b2_key > b.b2_key ? 1 : 0
+        })
+        const toRehash = byStaleness.slice(0, MAX_COPIES_PER_RUN)
+        const deferredRows = byStaleness.slice(MAX_COPIES_PER_RUN)
+        const deferred = deferredRows.length
+
+        const neverVerified = manifest.filter((r) => r.last_verified_at === null).length
+        const runsForFullCoverage = Math.ceil(manifest.length / MAX_COPIES_PER_RUN)
+
         if (deferred > 0) {
-          // This used to read "deferred to a continuation", which was false in
-          // the reassuring direction: it told an operator coverage was delayed
-          // when it is absent. Corrected August 14, 2026 alongside the removal
-          // of the self-emitted continuation. See the block above closeRun.
+          // A8 is now what its name says: this run hit its cap. With rotation
+          // that is normal and expected, so it stays soft and carries the
+          // forecast rather than a warning. The warning is A11 below.
           alarms.push({
             code: ALARM.A8_CAPPED,
             detail:
-              `${deferred} of ${manifest.length} manifest row(s) were NOT re-hashed this run, ` +
-              `and NOTHING WILL PICK THEM UP. No continuation is emitted. Weekly verification ` +
-              `currently covers only the first ${MAX_COPIES_PER_RUN} rows of an UNORDERED read ` +
-              `of storage_backup_objects: the query carries no ORDER BY, so which rows those ` +
-              `are is not determined by this code and can change between runs. This is a ` +
-              `standing coverage gap, not a delay. Closing it needs a stable cursor over the ` +
-              `manifest plus per-object verification state, neither of which exists yet.`,
+              `${deferred} of ${manifest.length} manifest row(s) deferred this run. Rotation ` +
+              `re-hashes least-recently-verified first, so every row is covered within ` +
+              `${runsForFullCoverage} run(s), about ${runsForFullCoverage} week(s). ` +
+              `${neverVerified} row(s) have never been re-hashed. Which rows are deferred is ` +
+              `determined by last_verified_at and b2_key, not by read order.`,
+          })
+        }
+
+        // A11: the invariant. Measured on the rows this run is NOT covering,
+        // because the ones it covers are about to be stamped fresh.
+        //
+        // Two ways it breaks. The oldest deferred row is already past the window,
+        // which means runs have been failing or skipped. Or full coverage now
+        // needs more runs than the window allows, which means the corpus outgrew
+        // a single weekly pass and the fix is a second run or a larger cap, not
+        // a later threshold.
+        const oldestDeferred = deferredRows.length ? deferredRows[0] : null
+        const oldestAgeDays =
+          oldestDeferred === null || oldestDeferred.last_verified_at === null
+            ? null
+            : (Date.now() - Date.parse(oldestDeferred.last_verified_at)) / 86_400_000
+        const windowRuns = VERIFY_STALE_DAYS / 7
+        const outOfCapacity = runsForFullCoverage > windowRuns
+        const pastWindow = oldestAgeDays !== null && oldestAgeDays > VERIFY_STALE_DAYS
+
+        if (outOfCapacity || pastWindow) {
+          alarms.push({
+            code: ALARM.A11_VERIFY_STALE,
+            detail:
+              (pastWindow
+                ? `Oldest deferred object was last re-hashed ${oldestAgeDays!.toFixed(1)} days ` +
+                  `ago, past the ${VERIFY_STALE_DAYS} day window: ${oldestDeferred!.b2_key}. `
+                : '') +
+              (outOfCapacity
+                ? `Full coverage needs ${runsForFullCoverage} weekly run(s) but the window allows ` +
+                  `${windowRuns}. At ${MAX_COPIES_PER_RUN} objects per run a weekly verify covers ` +
+                  `${MAX_COPIES_PER_RUN * windowRuns} objects and the manifest holds ` +
+                  `${manifest.length}. Add a second weekly run or raise the cap; the Inngest ` +
+                  `1000-step-per-run limit is what the cap is protecting. `
+                : '') +
+              `${neverVerified} row(s) have never been re-hashed.`,
           })
         }
 
@@ -919,6 +982,34 @@ export const storageBackupVerify = inngest.createFunction(
           rehashed += 1
           if (!result.match) mismatches.push(row.b2_key)
         }
+
+        // Stamp what was re-hashed. Without this the sort reads the same state
+        // every week and the rotation does not rotate, which would be the old
+        // bug wearing an ORDER BY.
+        //
+        // A mismatch still stamps. The object WAS verified; the answer was bad,
+        // and A3 below is what says so. Leaving it unstamped would make the
+        // worst object in the manifest the one the rotation keeps re-reading and
+        // never moves past.
+        //
+        // One step, chunked, after the loop rather than inside it: 300 writes
+        // inside the loop would be 300 more Inngest steps against the same 1000
+        // step limit the cap exists to respect. If the run dies before this, the
+        // work is simply redone next week, which is the cheap direction to fail.
+        await step.run('record-verification', async () => {
+          if (!toRehash.length) return { stamped: 0 }
+          const at = new Date().toISOString()
+          const CHUNK = 100
+          for (let i = 0; i < toRehash.length; i += CHUNK) {
+            const keys = toRehash.slice(i, i + CHUNK).map((r) => r.b2_key)
+            const { error } = await supabaseAdmin
+              .from('storage_backup_objects')
+              .update({ last_verified_at: at })
+              .in('b2_key', keys)
+            if (error) throw new Error(`record-verification: ${error.message}`)
+          }
+          return { stamped: toRehash.length, at }
+        })
 
         if (mismatches.length) {
           alarms.push({
@@ -993,11 +1084,20 @@ export const storageBackupVerify = inngest.createFunction(
         // still a legitimate way to run a verify. What had to stop is the job
         // emitting one to itself.
         //
-        // WHAT THIS DOES NOT FIX. Weekly verification still covers only the
-        // first MAX_COPIES_PER_RUN rows of an unordered read, and every row past
-        // that is never re-hashed by anything. Containing the loop does not
-        // close that gap, it stops the gap being paid for in unbounded B2 egress
-        // while reporting healthy. The real fix is a stable cursor over the
+        // WHAT THIS DID NOT FIX, AND WHAT DID. As written on August 14, weekly
+        // verification still covered only the first MAX_COPIES_PER_RUN rows of an
+        // unordered read, and every row past that was never re-hashed by
+        // anything. Containing the loop did not close that gap, it stopped the
+        // gap being paid for in unbounded B2 egress while reporting healthy.
+        //
+        // The rotation added September 21, 2026 closes it: last_verified_at on
+        // storage_backup_objects, a total order over (last_verified_at, b2_key),
+        // and a write-back step. A8 became the notice it always was and A11 is
+        // the alarm that fires when the invariant, rather than the cap, breaks.
+        // The paragraph below is kept because it is the original diagnosis and
+        // it is still the right description of the shape of the defect.
+        //
+        // The historical statement follows. The real fix is a stable cursor over the
         // manifest plus per-object verification state, so a run can resume where
         // the last one stopped. Neither exists today: nothing records that an
         // object was verified, as opposed to copied, and the only record of a
