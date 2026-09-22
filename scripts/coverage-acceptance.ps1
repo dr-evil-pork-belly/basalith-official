@@ -5,6 +5,7 @@
 #   .\scripts\coverage-acceptance.ps1 -SkipDrive
 #   .\scripts\coverage-acceptance.ps1 -SkipRegression   # prompt unchanged only
 #   .\scripts\coverage-acceptance.ps1 -SelfTest         # harness self-test, zero model calls
+#   .\scripts\coverage-acceptance.ps1 -OnlyDrive        # GATE 3 alone, prompt and fixtures unjudged
 #
 # Runs the three gates in order and stops at the first failure, because a later
 # gate cannot be interpreted if an earlier one failed. Everything is teed to a
@@ -137,10 +138,36 @@ param(
   # is the one that guards a public surface, and it costs about a tenth as much.
   # This is the flag to use when lib/entitySystemPrompt.ts changed and nothing
   # touched the coverage map.
-  [switch] $OnlyRegression
+  [switch] $OnlyRegression,
+  # Run GATE 3 alone and stop. Added 2026-09-22. This is the mirror of
+  # -OnlyRegression and exists for the same reason: there was no way to drive a
+  # real archive without also spending GATE 2's 384 model calls on fixtures that
+  # hold 15 and 17 pairs. Both sit under FROZEN_LAYER_LIMIT, so they make no
+  # retrieval call and cannot move when retrieval is the thing being tested.
+  # Worse than wasteful. Fixture drift runs 4 to 8 of 48 between identical runs,
+  # so two arms of an A/B would carry different fixture counts from noise alone,
+  # and a later reader has to know to ignore them. Keeping them out of the
+  # evidence beats explaining them inside it.
+  #
+  # Use this for a same-day control and treatment pair on one archive. Do NOT use
+  # it as acceptance for a change to the coverage map or to the shared prompt;
+  # the fixture probe is the only gate with known ground truth.
+  [switch] $OnlyDrive
 )
 
 $ErrorActionPreference = 'Continue'
+
+# Contradictory flag pairs, refused rather than resolved. A run that silently
+# dropped one of these would print a conclusion about gates it never ran, which
+# is the exact defect class the evidence capture above exists to prevent.
+if ($OnlyDrive -and $OnlyRegression) {
+  Write-Host 'ERROR: -OnlyDrive and -OnlyRegression are mutually exclusive.'
+  exit 1
+}
+if ($OnlyDrive -and $SkipDrive) {
+  Write-Host 'ERROR: -OnlyDrive with -SkipDrive would run no gate at all.'
+  exit 1
+}
 
 $stamp      = Get-Date -Format 'yyyyMMdd-HHmmss'
 $probeOut   = Join-Path (Get-Location) '.probe-out'
@@ -440,6 +467,8 @@ if (-not (Test-Path '.env.local')) {
 # code, and that is a deliberate exception rather than an oversight.
 if ($OnlyRegression) {
   Write-Gate 'GATE 1  SKIPPED (-OnlyRegression)'
+} elseif ($OnlyDrive) {
+  Write-Gate 'GATE 1  SKIPPED (-OnlyDrive)'
 } else {
   Write-Gate 'GATE 1  unit tests (npm test)'
   npm test
@@ -449,7 +478,9 @@ if ($OnlyRegression) {
 }
 
 # ── GATE 1b ───────────────────────────────────────────────────────────────────
-if ($SkipRegression) {
+if ($OnlyDrive) {
+  Write-Gate 'GATE 1b  SKIPPED (-OnlyDrive). The shared prompt is UNJUDGED by this run.'
+} elseif ($SkipRegression) {
   Write-Gate 'GATE 1b  SKIPPED (-SkipRegression). Only valid if the prompt is unchanged.'
 } else {
   Write-Gate 'GATE 1b  shared-prompt regression (two-layer + demo refusal)'
@@ -519,44 +550,52 @@ if ($OnlyRegression) {
 }
 
 # ── GATE 2 ────────────────────────────────────────────────────────────────────
-Write-Gate 'GATE 2  fixture probe (fictional personas, no archive table touched)'
-Write-Host 'Two runs per persona so domain stability can be gated. Budget 20 to 30 minutes.'
-Write-Host ''
-$g2 = Invoke-Gate -Name 'gate2-fixture' `
-                  -Script 'scripts/coverage-fixture-probe.ts' `
-                  -Sentinel '^SUMMARY$' `
-                  -SentinelSource 'scripts/coverage-fixture-probe.ts:390'
-$fixtureExit = $g2.ExitCode
+if ($OnlyDrive) {
+  Write-Gate 'GATE 2  SKIPPED (-OnlyDrive)'
+  Write-Host 'The fixture probe is the only gate with known ground truth, so the coverage'
+  Write-Host 'instrument itself is UNJUDGED by this run. Acceptable for an A/B on one'
+  Write-Host 'archive, where the fixtures sit under the cap and cannot move. Not acceptable'
+  Write-Host 'as acceptance for a change to the map.'
+} else {
+  Write-Gate 'GATE 2  fixture probe (fictional personas, no archive table touched)'
+  Write-Host 'Two runs per persona so domain stability can be gated. Budget 20 to 30 minutes.'
+  Write-Host ''
+  $g2 = Invoke-Gate -Name 'gate2-fixture' `
+                    -Script 'scripts/coverage-fixture-probe.ts' `
+                    -Sentinel '^SUMMARY$' `
+                    -SentinelSource 'scripts/coverage-fixture-probe.ts:390'
+  $fixtureExit = $g2.ExitCode
 
-# Exit code 2 is the harness failing, not a gate failing. The distinction is
-# load bearing: an earlier version printed "the map failed to discriminate" when
-# the real cause was a DNS lookup failing partway through, which is a conclusion
-# the run had not established.
-if ($fixtureExit -eq 2) {
-  Write-Host ''
-  Write-Host 'The fixture probe did not finish, so the map was NOT judged.'
-  Write-Host 'It is unmeasured, not wrong. Re-run when the network is healthy.'
-  Write-Host "Partial output, if any, is at $($g2.Capture)"
-  Stop-Here 'GATE 2 harness failure (not a gate result)'
-}
-if (-not $g2.Pass) {
-  Write-Host ''
-  Write-Host "  gate failed on: $($g2.Reasons -join '; ')"
-  if ($g2.ExitOk) {
-    Write-Host '  Note the exit code was ZERO. This is an evidence failure, not a map'
-    Write-Host '  failure. The map was not judged. Do not read it either way.'
-  } else {
-    Write-Host '  The map failed to discriminate on a fixture whose ground truth is known.'
-    Write-Host '  Do NOT run gate 3. A map that cannot be trusted on Margaret cannot be'
-    Write-Host '  read on a real archive, because nobody knows the right answer there.'
+  # Exit code 2 is the harness failing, not a gate failing. The distinction is
+  # load bearing: an earlier version printed "the map failed to discriminate" when
+  # the real cause was a DNS lookup failing partway through, which is a conclusion
+  # the run had not established.
+  if ($fixtureExit -eq 2) {
+    Write-Host ''
+    Write-Host 'The fixture probe did not finish, so the map was NOT judged.'
+    Write-Host 'It is unmeasured, not wrong. Re-run when the network is healthy.'
+    Write-Host "Partial output, if any, is at $($g2.Capture)"
+    Stop-Here 'GATE 2 harness failure (not a gate result)'
   }
-  Stop-Here 'GATE 2 fixture probe'
+  if (-not $g2.Pass) {
+    Write-Host ''
+    Write-Host "  gate failed on: $($g2.Reasons -join '; ')"
+    if ($g2.ExitOk) {
+      Write-Host '  Note the exit code was ZERO. This is an evidence failure, not a map'
+      Write-Host '  failure. The map was not judged. Do not read it either way.'
+    } else {
+      Write-Host '  The map failed to discriminate on a fixture whose ground truth is known.'
+      Write-Host '  Do NOT run gate 3. A map that cannot be trusted on Margaret cannot be'
+      Write-Host '  read on a real archive, because nobody knows the right answer there.'
+    }
+    Stop-Here 'GATE 2 fixture probe'
+  }
+  Write-Host ''
+  Write-Host 'GATE 2 PASS'
+  Write-Host 'Domain drift is now gated, not just reported. Probe-level drift is still'
+  Write-Host 'printed and is expected; it only matters when it moves a domain.'
+  Write-Host "Evidence: $($g2.Capture)   $($g2.Bytes) byte(s), $($g2.Lines) line(s)"
 }
-Write-Host ''
-Write-Host 'GATE 2 PASS'
-Write-Host 'Domain drift is now gated, not just reported. Probe-level drift is still'
-Write-Host 'printed and is expected; it only matters when it moves a domain.'
-Write-Host "Evidence: $($g2.Capture)   $($g2.Bytes) byte(s), $($g2.Lines) line(s)"
 
 # ── GATE 3 ────────────────────────────────────────────────────────────────────
 if ($SkipDrive) {
@@ -582,7 +621,14 @@ if ($SkipDrive) {
   Write-Host "Evidence: $($g3.Capture)   $($g3.Bytes) byte(s), $($g3.Lines) line(s)"
 }
 
-Write-Gate 'ALL GATES PASS'
+if ($OnlyDrive) {
+  Write-Gate 'GATE 3 PASS (-OnlyDrive). THIS IS NOT AN ACCEPTANCE RUN.'
+  Write-Host 'GATE 1, GATE 1b and GATE 2 were not run. The shared prompt and the coverage'
+  Write-Host 'instrument are UNJUDGED. Cite this transcript for the drive it contains and'
+  Write-Host 'for nothing else.'
+} else {
+  Write-Gate 'ALL GATES PASS'
+}
 Write-Host 'Read the open-domain replies printed by gate 3 before trusting the map.'
 Write-Host 'A domain reading open is a claim about the archive. If a reply there takes'
 Write-Host 'a clear position that a real deposit backs, the probe is wrong, not the'
