@@ -38,6 +38,17 @@ export const metadata: Metadata = {
   description: 'Knowledge transfer when a business changes hands. Basalith captures how an operator reasons, so it transfers through an acquisition or a succession.',
   metadataBase: new URL('https://basalith.ai'),
   manifest:    '/site.webmanifest',
+
+  // Google Search Console ownership, URL-prefix property https://basalith.ai,
+  // verified September 22, 2026. Renders as
+  // <meta name="google-site-verification" content="..."> in the head.
+  //
+  // Do not remove this. Deleting it de-verifies the property, which silently
+  // cuts off the sitemap submission, the URL Inspection tool, and the index
+  // coverage reports. Nothing in the app breaks, so nothing would tell us.
+  verification: {
+    google: 'M6CKgk4adouLw5_E1P9FIkiM9KgC40ukTl6006epCA4',
+  },
   icons: {
     icon: [
       { url: '/favicon.ico',        sizes: 'any' },

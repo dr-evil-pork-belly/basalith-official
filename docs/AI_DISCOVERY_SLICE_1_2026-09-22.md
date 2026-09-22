@@ -205,3 +205,36 @@ Nothing in this slice changes that. This slice makes the name resolve to the
 company. Tier two, the question-shaped pages, is what competes for the answer,
 and it should not ship before the name resolves, because driving strangers to a
 name that returns volcanic rock is worse than not driving them at all.
+
+---
+
+## 7. ADDENDUM. SEARCH CONSOLE VERIFICATION.
+
+Added to `app/layout.tsx` on September 22, after the rest of this slice was
+written.
+
+A URL-prefix property for `https://basalith.ai` was created in Google Search
+Console under mrdavidha@gmail.com. Ownership is proved by the HTML tag method
+rather than the HTML file method Google suggests by default, because a token in
+the metadata object travels with the code and a loose file in `public/` is
+something a future cleanup pass deletes without knowing what it was.
+
+The token lives in `metadata.verification.google` and renders as
+`<meta name="google-site-verification" content="...">`.
+
+**It must not be removed.** Deleting it de-verifies the property. Nothing in
+the app breaks when that happens, which is the problem: the sitemap submission,
+the URL Inspection tool and the index coverage reports all stop working and
+nothing reports it. The comment above the token in `layout.tsx` says the same
+thing at the place someone would delete it.
+
+Sequence, which matters: the token has to be live in production before the
+VERIFY button is clicked, because Google fetches the page to check. So this
+rides out with the rest of the push, and verification happens after.
+
+Two things this does not cover. It is a URL-prefix property, so it sees
+`https://basalith.ai` and not `www.` or any subdomain. The Domain property
+that covers everything needs a DNS TXT record under "Domain name provider" and
+is worth adding later. And basalith.xyz is a separate property that has not
+been created at all, which matters because the white paper is the other half of
+the entity and its indexing is currently unobserved.
