@@ -128,12 +128,12 @@ const SECURITY_BADGES: { icon: IconName; label: string }[] = [
 const SUCCESSION_FEATURES = [
   'The Founding, with a live successor session by video',
   'Business decision framework capture',
-  '20+ scenario training library',
+  'A map of where the record is thin, area by area, before the handover',
   'Successor access portal',
-  'Quarterly calibration sessions',
-  'Annual accuracy report',
-  'Board-level reporting',
-  'Priority support',
+  'Every answer checked against the record, or a plain no',
+  'Deposits are append-only. The database refuses the edit',
+  'A second copy offsite under a ninety-day lock nobody can shorten',
+  'Full export in open formats, any time',
 ]
 
 export default function PricingPage() {

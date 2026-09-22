@@ -60,13 +60,13 @@ const HANDOFF = [
   },
   {
     n:     '02',
-    title: 'Scenario capture.',
-    body:  'The operator works through 20 real business scenarios and 29 decision questions across 8 domains. Every response becomes training data.',
+    title: 'Filling the gaps.',
+    body:  'The map shows which of the eight areas of judgment are thin. Each one opens its own interview, seeded on a real moment rather than a hypothetical, because a position can be grounded in what the operator did and never in what they say they believe.',
   },
   {
     n:     '03',
     title: 'The check.',
-    body:  'Every response is scored before it can shape the model. What comes through reflects how the operator actually decided.',
+    body:  'Every answer the successor gets is read by a second model against the operator\u2019s own words before it is returned. Where nothing in the record backs it, the answer is replaced with a plain no.',
   },
   {
     n:     '04',
@@ -101,12 +101,12 @@ const TRUST = [
 const FEATURES = [
   'The Founding, with a live successor session by video',
   'Business decision framework capture',
-  '20+ scenario training library',
+  'A map of where the record is thin, area by area, before the handover',
   'Successor access portal',
-  'Quarterly calibration sessions',
-  'Annual accuracy report',
-  'Board-level reporting',
-  'Priority support',
+  'Every answer checked against the record, or a plain no',
+  'Deposits are append-only. The database refuses the edit',
+  'A second copy offsite under a ninety-day lock nobody can shorten',
+  'Full export in open formats, any time',
 ]
 
 export default function SuccessionPage() {
