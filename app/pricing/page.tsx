@@ -112,7 +112,7 @@ const FOUNDING_DELIVERABLES = [
 ]
 
 const TRUST_BADGES: { icon: IconName; label: string }[] = [
-  { icon: 'lock',       label: 'Immutability Vault after passing' },
+  { icon: 'lock',       label: 'Immutability Vault: a deposit cannot be edited or deleted, by anyone' },
   { icon: 'prohibited', label: 'Never used for other entities' },
   { icon: 'box',        label: 'Full export in open formats at any time. Nothing is stranded if we ever close.' },
 ]
@@ -433,10 +433,10 @@ export default function PricingPage() {
               <Mark name="lock" size={14} /> The Immutability Vault
             </p>
             <p style={{ ...SERIF, fontSize: '1rem', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-secondary)', margin: '0 0 8px' }}>
-              Your cognitive fingerprint is permanently frozen after you pass.
+              What you say is fixed the moment you say it, not after you pass. The database refuses any edit or deletion.
             </p>
             <p style={{ ...SERIF, fontSize: '1rem', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-secondary)', margin: '0 0 8px' }}>
-              Heirs can add context. Nobody can change what you said.
+              Heirs can add context. Nobody can reach back, including us.
             </p>
             <a href="/integrity" style={{ ...MONO, fontSize: '0.44rem', color: 'rgba(196,162,74,0.6)', textDecoration: 'none', display: 'inline-block', marginTop: '8px' }}>
               How this works →

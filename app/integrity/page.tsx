@@ -83,25 +83,29 @@ export default function IntegrityPage() {
         <section style={{ background: 'var(--color-void)', padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,80px)' }}>
           <div style={{ maxWidth: '680px', margin: '0 auto' }}>
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '24px' }}>
-              After You Pass
+              From The Moment You Say It
             </p>
             <h2 style={{ ...H2, color: 'rgba(250,248,244,0.9)', letterSpacing: '0.12em', textTransform: 'uppercase' as const, fontFamily: 'var(--font-space-mono, "Space Mono", "Courier New", monospace)', fontSize: 'clamp(1.1rem,2vw,1.5rem)', fontWeight: 500 }}>
               The Immutability Vault
             </h2>
 
             <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>
-              When you pass your Cognitive Fingerprint Layer is permanently frozen at the database level.
+              What you say is fixed the moment you say it. Not after you pass. Not when a setting is switched on.
             </p>
             <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>
-              Not locked behind a paywall. Not stored away in a format no one can access.
+              A deposit cannot be edited or deleted. Not by your heirs, not by you, and not by us. The database refuses the write.
             </p>
             <p style={{ ...BODY, color: 'rgba(250,248,244,0.9)', fontStyle: 'italic' }}>
-              Frozen.
+              Fixed.
             </p>
             <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>Your heirs can talk to your entity. Your grandchildren can add new context: a marriage, a grandchild, a company milestone.</p>
             <p style={{ ...BODY, color: 'rgba(250,248,244,0.85)' }}>
-              What they cannot do is change what you built. Your stated values.
-              Your voice recordings. Your deposits made while you were alive and thinking clearly.
+              What nobody can do is reach back. Your stated values. Your voice recordings.
+              Your deposits made while you were alive and thinking clearly.
+            </p>
+            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>
+              A record that turns out to be wrong is answered by a later record, never by a revision.
+              You correct yourself the way you would in a conversation, by saying the next thing, and both remain.
             </p>
             <div aria-hidden="true" style={{ width: '40px', height: '1px', background: 'var(--color-gold)', margin: '32px 0' }} />
             <p style={{ ...BODY, fontWeight: 500, color: 'rgba(250,248,244,0.9)' }}>
