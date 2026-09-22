@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import ApplyForm from './ApplyForm'
 
 export const metadata: Metadata = {
-  title: 'Apply · Basalith',
-  description: 'Apply to begin a Basalith, for a person, a family, or a business changing hands. We reply within 48 hours.',
+  title: 'Talk to us about a business changing hands · Basalith',
+  description: 'For a succession or an acquisition, tell us about the transition and we will reply within 48 hours. For a person or a family, begin directly at /begin.',
 }
 
 // searchParams is a Promise in Next 16. It was typed and read as a plain

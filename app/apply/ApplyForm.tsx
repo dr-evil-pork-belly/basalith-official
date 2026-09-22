@@ -37,13 +37,20 @@ const MONO: React.CSSProperties = {
   letterSpacing: '0.28em',
 }
 
-type ApplyType = 'legacy' | 'succession' | 'acquisition'
+// 'legacy' was removed on September 22, 2026. A personal Basalith is no longer
+// gated behind an application. /begin opens one directly, which is what the
+// September 17 operating model decided and what the code has done since slice A
+// shipped. This form is now the business door only, where a scoping call is
+// real work done by a person and the 48 hour reply is a promise we keep.
+//
+// The API still accepts 'legacy' for old links and stored rows, so nothing
+// breaks. An /apply?type=legacy URL lands on succession rather than 404ing.
+// See docs/BEGIN_PATH_2026-09-22.md.
+type ApplyType = 'succession' | 'acquisition'
 
-export default function ApplyForm({ initialType = 'legacy' }: { initialType?: string }) {
+export default function ApplyForm({ initialType = 'succession' }: { initialType?: string }) {
   const [applyType, setApplyType] = useState<ApplyType>(
-    initialType === 'succession'  ? 'succession'
-      : initialType === 'acquisition' ? 'acquisition'
-      : 'legacy'
+    initialType === 'acquisition' ? 'acquisition' : 'succession'
   )
   const [form, setForm] = useState({
     name:              '',
@@ -85,8 +92,6 @@ export default function ApplyForm({ initialType = 'legacy' }: { initialType?: st
     }
   }
 
-  const isBusiness = applyType === 'succession' || applyType === 'acquisition'
-
   return (
     <>
       <style>{`
@@ -106,9 +111,7 @@ export default function ApplyForm({ initialType = 'legacy' }: { initialType?: st
                 Received. We will be in touch.
               </h1>
               <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--color-text-secondary)', lineHeight: 1.9, maxWidth: '420px', margin: '0 auto 32px' }}>
-                {isBusiness
-                  ? 'We will contact you within 48 hours to talk through the transition and tell you plainly whether Basalith fits.'
-                  : <>We read every application ourselves. If your Basalith is a good fit, you will hear from us within 48 hours with next steps.<br /><br />If it is not a fit, we will not chase you.</>}
+                We will contact you within 48 hours to talk through the transition and tell you plainly whether Basalith fits.
               </p>
               <p style={{ ...MONO, fontSize: '0.48rem', color: 'var(--color-gold)' }}>Basalith · Heritage Nexus Inc.</p>
             </div>
@@ -122,7 +125,7 @@ export default function ApplyForm({ initialType = 'legacy' }: { initialType?: st
               <div style={{ marginBottom: '40px' }}>
                 <p style={{ ...LABEL, marginBottom: '12px' }}>This Basalith is for</p>
                 <div style={{ display: 'flex', gap: '10px' }}>
-                  {(['legacy', 'succession', 'acquisition'] as ApplyType[]).map(type => (
+                  {(['succession', 'acquisition'] as ApplyType[]).map(type => (
                     <button key={type} type="button" className="type-btn"
                       onClick={() => setApplyType(type)}
                       style={{
@@ -132,17 +135,20 @@ export default function ApplyForm({ initialType = 'legacy' }: { initialType?: st
                         color:      applyType === type ? 'var(--color-surface)' : 'var(--color-text-muted)',
                         cursor: 'pointer', borderRadius: 'var(--radius-sm)',
                       }}>
-                      {type === 'legacy' ? 'A person or family' : type === 'succession' ? 'A business succession' : 'A business acquisition'}
+                      {type === 'succession' ? 'A business succession' : 'A business acquisition'}
                     </button>
                   ))}
                 </div>
               </div>
 
-              {isBusiness && (
-                <p style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: 'var(--color-text-secondary)', marginBottom: '40px' }}>
-                  A few details and we will contact you within 48 hours. No deck, no pitch. A conversation about the transition and whether this fits.
-                </p>
-              )}
+              <p style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: 'var(--color-text-secondary)', marginBottom: '40px' }}>
+                A few details and we will contact you within 48 hours. No deck, no pitch. A conversation about the transition and whether this fits.
+              </p>
+
+              <p style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: 'var(--color-text-muted)', marginBottom: '40px' }}>
+                Building one for a person or a family instead?
+                {' '}<a href="/begin" style={{ color: 'var(--color-gold)', textDecoration: 'none' }}>Begin yours now &rarr;</a>
+              </p>
 
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
 
@@ -158,68 +164,55 @@ export default function ApplyForm({ initialType = 'legacy' }: { initialType?: st
                     value={form.email} onChange={set('email')} className="apply-input" style={INPUT} />
                 </div>
 
-                {isBusiness && (
-                  <>
-                    <div>
-                      <label style={LABEL} htmlFor="apply-company">{applyType === 'acquisition' ? 'Company Being Acquired' : 'Company Name'}</label>
-                      <input id="apply-company" type="text" required placeholder="Your company"
-                        value={form.companyName} onChange={set('companyName')} className="apply-input" style={INPUT} />
-                    </div>
-                    <div>
-                      <label style={LABEL} htmlFor="apply-industry">Industry</label>
-                      <input id="apply-industry" type="text" required placeholder="e.g. Manufacturing, Financial Services"
-                        value={form.industry} onChange={set('industry')} className="apply-input" style={INPUT} />
-                    </div>
-                    <div>
-                      <label style={LABEL} htmlFor="apply-employees">Number of Employees</label>
-                      <select id="apply-employees" required value={form.employees} onChange={set('employees')}
-                        className="apply-input" style={{ ...INPUT, cursor: 'pointer', appearance: 'none' as const }}>
-                        <option value="" disabled>Select range</option>
-                        <option>1 to 10</option><option>11 to 50</option>
-                        <option>51 to 200</option><option>201 to 1000</option><option>1000+</option>
-                      </select>
-                    </div>
-                    {applyType === 'acquisition' ? (
-                      <div>
-                        <label style={LABEL} htmlFor="apply-timeline">Deal stage</label>
-                        <select id="apply-timeline" required value={form.successionTimeline} onChange={set('successionTimeline')}
-                          className="apply-input" style={{ ...INPUT, cursor: 'pointer', appearance: 'none' as const }}>
-                          <option value="" disabled>Select one</option>
-                          <option>Exploring, no LOI yet</option><option>Under LOI</option>
-                          <option>In diligence</option><option>Signed, before close</option>
-                          <option>Recently closed</option>
-                        </select>
-                      </div>
-                    ) : (
-                      <div>
-                        <label style={LABEL} htmlFor="apply-timeline">Succession Timeline</label>
-                        <select id="apply-timeline" required value={form.successionTimeline} onChange={set('successionTimeline')}
-                          className="apply-input" style={{ ...INPUT, cursor: 'pointer', appearance: 'none' as const }}>
-                          <option value="" disabled>Select one</option>
-                          <option>Within 1 year</option><option>1 to 3 years</option>
-                          <option>3 to 5 years</option><option>Planning ahead</option>
-                        </select>
-                      </div>
-                    )}
-                  </>
-                )}
+                <div>
+                  <label style={LABEL} htmlFor="apply-company">{applyType === 'acquisition' ? 'Company Being Acquired' : 'Company Name'}</label>
+                  <input id="apply-company" type="text" required placeholder="Your company"
+                    value={form.companyName} onChange={set('companyName')} className="apply-input" style={INPUT} />
+                </div>
 
-                {!isBusiness && (
+                <div>
+                  <label style={LABEL} htmlFor="apply-industry">Industry</label>
+                  <input id="apply-industry" type="text" required placeholder="e.g. Manufacturing, Financial Services"
+                    value={form.industry} onChange={set('industry')} className="apply-input" style={INPUT} />
+                </div>
+
+                <div>
+                  <label style={LABEL} htmlFor="apply-employees">Number of Employees</label>
+                  <select id="apply-employees" required value={form.employees} onChange={set('employees')}
+                    className="apply-input" style={{ ...INPUT, cursor: 'pointer', appearance: 'none' as const }}>
+                    <option value="" disabled>Select range</option>
+                    <option>1 to 10</option><option>11 to 50</option>
+                    <option>51 to 200</option><option>201 to 1000</option><option>1000+</option>
+                  </select>
+                </div>
+
+                {applyType === 'acquisition' ? (
                   <div>
-                    <label style={LABEL} htmlFor="apply-subject">Who this Basalith is built around</label>
-                    <select id="apply-subject" required value={form.subject} onChange={set('subject')}
+                    <label style={LABEL} htmlFor="apply-timeline">Deal stage</label>
+                    <select id="apply-timeline" required value={form.successionTimeline} onChange={set('successionTimeline')}
                       className="apply-input" style={{ ...INPUT, cursor: 'pointer', appearance: 'none' as const }}>
                       <option value="" disabled>Select one</option>
-                      <option>Myself</option><option>A parent</option><option>A grandparent</option>
-                      <option>A spouse or partner</option><option>Someone who has passed</option><option>Other</option>
+                      <option>Exploring, no LOI yet</option><option>Under LOI</option>
+                      <option>In diligence</option><option>Signed, before close</option>
+                      <option>Recently closed</option>
+                    </select>
+                  </div>
+                ) : (
+                  <div>
+                    <label style={LABEL} htmlFor="apply-timeline">Succession Timeline</label>
+                    <select id="apply-timeline" required value={form.successionTimeline} onChange={set('successionTimeline')}
+                      className="apply-input" style={{ ...INPUT, cursor: 'pointer', appearance: 'none' as const }}>
+                      <option value="" disabled>Select one</option>
+                      <option>Within 1 year</option><option>1 to 3 years</option>
+                      <option>3 to 5 years</option><option>Planning ahead</option>
                     </select>
                   </div>
                 )}
 
                 <div>
-                  <label style={LABEL} htmlFor="apply-reason">{applyType === 'succession' ? 'Tell us about your succession situation' : applyType === 'acquisition' ? 'Tell us about the transaction' : 'What brings you to Basalith'}</label>
+                  <label style={LABEL} htmlFor="apply-reason">{applyType === 'succession' ? 'Tell us about your succession situation' : 'Tell us about the transaction'}</label>
                   <textarea id="apply-reason" rows={5} required
-                    placeholder={isBusiness ? 'The founder, the business, what is changing, and when.' : 'Who this is for, what you want to keep, and why now.'}
+                    placeholder="The founder, the business, what is changing, and when."
                     value={form.reason} onChange={set('reason')}
                     className="apply-input" style={{ ...INPUT, resize: 'none' as const, lineHeight: 1.75 }} />
                 </div>
@@ -260,7 +253,7 @@ export default function ApplyForm({ initialType = 'legacy' }: { initialType?: st
                   onMouseEnter={e => { if (!submitting) (e.currentTarget as HTMLElement).style.background = 'var(--color-gold-light)' }}
                   onMouseLeave={e => { if (!submitting) (e.currentTarget as HTMLElement).style.background = 'var(--color-gold)' }}
                 >
-                  {submitting ? 'Sending...' : isBusiness ? 'Start the conversation' : 'Request The Founding'}
+                  {submitting ? 'Sending...' : 'Start the conversation'}
                 </button>
 
               </form>

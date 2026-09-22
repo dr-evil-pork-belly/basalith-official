@@ -136,7 +136,7 @@ export default function Nav() {
 
           {/* Begin CTA — desktop only */}
           <Link
-            href="/apply"
+            href="/begin"
             className="hidden md:block"
             style={{
               ...MONO,
@@ -272,7 +272,7 @@ export default function Nav() {
           {/* Begin CTA */}
           <div style={{ padding: '0 24px' }}>
             <Link
-              href="/apply"
+              href="/begin"
               onClick={() => setOpen(false)}
               style={{
                 display:        'flex',

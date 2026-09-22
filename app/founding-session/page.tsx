@@ -95,7 +95,7 @@ export default function FoundingSessionPage() {
           </p>
 
           <a
-            href="/apply"
+            href="/begin"
             style={{
               fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
               fontSize:      'var(--text-caption)',

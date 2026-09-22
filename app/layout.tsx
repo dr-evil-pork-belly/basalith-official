@@ -3,6 +3,7 @@ import { Cormorant_Garamond, Space_Mono, Newsreader } from 'next/font/google'
 import './globals.css'
 import ScrollReveal      from './components/ScrollReveal'
 import AuthErrorRedirect from './components/AuthErrorRedirect'
+import { ORG_SCHEMA, WEBSITE_SCHEMA, ld } from '@/lib/structuredData'
 
 const cormorant = Cormorant_Garamond({
   subsets:  ['latin'],
@@ -70,6 +71,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${cormorant.variable} ${spaceMono.variable} ${newsreader.variable}`}>
       <body>
+        {/* Organization and WebSite nodes, emitted on every route rather than
+            on the homepage alone. An answer engine that lands on /faq or
+            /succession from a query fan-out should be able to resolve who is
+            speaking without first crawling back to /. */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: ld(ORG_SCHEMA) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: ld(WEBSITE_SCHEMA) }}
+        />
         <div className="grain fixed inset-0 z-[9997] pointer-events-none" aria-hidden="true" />
         <AuthErrorRedirect />
         <ScrollReveal />

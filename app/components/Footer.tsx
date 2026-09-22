@@ -18,10 +18,15 @@ const COLS: { heading: string; links: { label: string; href: string }[] }[] = [
   {
     heading: 'Company',
     links: [
-      { label: 'About',      href: '/about'   },
-      { label: 'The Method', href: '/method'  },
-      { label: 'Contact',    href: '/contact' },
-      { label: 'FAQ',        href: '/faq'     },
+      // Linked from every page on purpose. The page exists to give the name an
+      // anchor a search engine can separate from basalt, and an orphan page
+      // does not get crawled. See docs/AI_DISCOVERY_SLICE_1_2026-09-22.md.
+      { label: 'What is Basalith', href: '/what-is-basalith' },
+      { label: 'Answers',          href: '/answers'          },
+      { label: 'About',            href: '/about'            },
+      { label: 'The Method',       href: '/method'           },
+      { label: 'Contact',          href: '/contact'          },
+      { label: 'FAQ',              href: '/faq'              },
     ],
   },
   {

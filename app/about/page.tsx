@@ -325,7 +325,7 @@ export default function AboutPage() {
               Every year you wait is a year it has less.
             </p>
             <a
-              href="/apply"
+              href="/begin"
               style={{
                 fontFamily:     'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
                 fontSize:       'var(--text-caption)',

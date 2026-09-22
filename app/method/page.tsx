@@ -264,7 +264,7 @@ export default function MethodPage() {
               For a family Basalith, photographs are filtered and ranked before anyone is asked to label them, so the family only sees what is worth their time.
             </p>
             <a
-              href="/apply"
+              href="/begin"
               style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px', border: '1px solid rgba(184,150,62,0.4)', padding: '12px 24px' }}
             >
               Begin a family Basalith <span aria-hidden="true">→</span>

@@ -1,6 +1,7 @@
 import Nav    from '../components/Nav'
 import Footer from '../components/Footer'
 import type { Metadata } from 'next'
+import { faqSchema, ld, type FaqEntry } from '@/lib/structuredData'
 
 export const metadata: Metadata = {
   title:       'FAQ · Basalith',
@@ -12,7 +13,14 @@ const LINK: React.CSSProperties = { color: 'var(--color-gold)', textDecoration: 
 // Every answer here states only what is live. Prices come from the pricing
 // page, milestones from the four-stage system, languages from
 // lib/emailTranslations.ts. If any of those change, change this too.
-const QA: { q: string; a: React.ReactNode }[] = [
+//
+// `plain` carries the same answer as plain text, for the FAQPage structured
+// data emitted below. It is required on every entry whose `a` is JSX, and it
+// must say the same thing the reader sees. Answer engines quote this block
+// directly, and schema that does not match the rendered page is the same
+// failure as copy that does not match the code. The trailing navigation links
+// are left out of `plain` on purpose; they are navigation, not answer.
+const QA: { q: string; a: React.ReactNode; plain?: string }[] = [
   {
     q: 'What is Basalith?',
     a: 'Basalith builds a cognitive reference model of one person, from what they deposit and from what the people around them observe. For a business, that person is the operator, and the model transfers with the company through an acquisition or a succession. For a family, it is a parent or a grandparent, and the model stays with the people who relied on their judgment.',
@@ -27,6 +35,7 @@ const QA: { q: string; a: React.ReactNode }[] = [
       It starts with The Founding: three of the hardest calls you ever made, in your own words, by voice or typed, in your own time, then a first read with the founder of Basalith by video. From there your Basalith grows through guided questions, real scenarios, voice recordings, photographs, and contributions from the people around them. Every deposit is scored before it can shape the model.
       {' '}<a href="/method" style={LINK}>Read the method &rarr;</a>
     </>,
+    plain: 'It starts with The Founding: three of the hardest calls you ever made, in your own words, by voice or typed, in your own time, then a first read with the founder of Basalith by video. From there your Basalith grows through guided questions, real scenarios, voice recordings, photographs, and contributions from the people around them. Every deposit is scored before it can shape the model.',
   },
   {
     q: 'What is the difference between the record and the entity?',
@@ -42,6 +51,7 @@ const QA: { q: string; a: React.ReactNode }[] = [
       The operator’s cognitive fingerprint is frozen at transition. The successor or acquirer gets portal access and can add today’s context, but nobody can rewrite what the operator said.
       {' '}<a href="/succession" style={LINK}>How the handoff works &rarr;</a>
     </>,
+    plain: 'The operator’s cognitive fingerprint is frozen at transition. The successor or acquirer gets portal access and can add today’s context, but nobody can rewrite what the operator said.',
   },
   {
     q: 'What happens when I am gone?',
@@ -53,6 +63,7 @@ const QA: { q: string; a: React.ReactNode }[] = [
       For a business succession, $12,000 a year plus a one-time $5,000 Founding fee. Acquisition engagements start at $50,000, scaled to the transaction. For individuals and families, a one-time $2,500 founding fee, then Active at $3,600 a year, Resting at $600 a year, or Legacy at $1,200 a year.
       {' '}<a href="/pricing" style={LINK}>See pricing in full &rarr;</a>
     </>,
+    plain: 'For a business succession, $12,000 a year plus a one-time $5,000 Founding fee. Acquisition engagements start at $50,000, scaled to the transaction. For individuals and families, a one-time $2,500 founding fee, then Active at $3,600 a year, Resting at $600 a year, or Legacy at $1,200 a year.',
   },
   {
     q: 'How do family members or colleagues contribute?',
@@ -69,6 +80,7 @@ const QA: { q: string; a: React.ReactNode }[] = [
       {' '}<a href="/data-ownership" style={LINK}>Data ownership &rarr;</a>
       {' '}<a href="/security" style={LINK}>Security &rarr;</a>
     </>,
+    plain: 'You own it. We are the custodian, not the owner. Your Basalith is encrypted at rest and in transit, kept in private storage, and never shared, sold, or used to train another company’s model. You can export all of it in open formats any time you ask, so nothing is stranded if we ever close.',
   },
   {
     q: 'Can I try it before I commit?',
@@ -76,12 +88,20 @@ const QA: { q: string; a: React.ReactNode }[] = [
       Yes. The demo runs on a fictional founder and the same pipeline as production. Ask it something. Then ask it something the founder never answered, and watch what it does.
       {' '}<a href="/succession/demo" style={LINK}>Open the demo &rarr;</a>
     </>,
+    plain: 'Yes. The demo runs on a fictional founder and the same pipeline as production. Ask it something. Then ask it something the founder never answered, and watch what it does.',
   },
   {
     q: 'How do I begin?',
-    a: 'Apply. We review every application ourselves and will be in touch within 48 hours. Once your Basalith is open, The Founding starts whenever you are ready.',
+    a: 'For a person or a family, begin directly. Your name, your email, and the first call: fifteen to thirty minutes, by voice or typed, on your own time. There is no application and no approval. When the call is in, your Basalith answers one question in your own words and declines one it has no grounds for. For a business succession or an acquisition, it starts with a conversation instead, and we reply within 48 hours.',
   },
 ]
+
+// Only entries whose answer resolves to plain text are published as schema. A
+// JSX answer with no `plain` is skipped rather than guessed at.
+const FAQ_ENTRIES: FaqEntry[] = QA.flatMap(({ q, a, plain }) => {
+  const answer = plain ?? (typeof a === 'string' ? a : null)
+  return answer ? [{ question: q, answer }] : []
+})
 
 const SERIF: React.CSSProperties = {
   fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
@@ -95,6 +115,10 @@ const MONO: React.CSSProperties = {
 export default function FAQPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: ld(faqSchema(FAQ_ENTRIES)) }}
+      />
       <Nav />
       <main style={{ background: 'var(--color-bg)' }}>
         <section
@@ -191,12 +215,12 @@ export default function FAQPage() {
                 marginBottom: '28px',
               }}
             >
-              Still have a question? Ask it in the application.
+              Still have a question? <a href="/contact" style={LINK}>Write to us</a> and a real person answers within 48 hours.
               <br />
-              We will answer it before you begin.
+              You do not have to ask before you begin.
             </p>
             <a
-              href="/apply"
+              href="/begin"
               style={{
                 ...MONO,
                 fontSize:       'var(--text-caption)',
@@ -208,7 +232,7 @@ export default function FAQPage() {
                 borderRadius:   'var(--radius-sm)',
               }}
             >
-              Apply to begin
+              Begin your Basalith
             </a>
           </div>
         </section>

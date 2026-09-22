@@ -122,7 +122,7 @@ export default function FamiliesPage() {
           </p>
           <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'center', marginTop: '44px' }}>
             <Link
-              href="/apply"
+              href="/begin"
               className="families-cta"
               style={{
                 ...MONO,
@@ -283,7 +283,7 @@ export default function FamiliesPage() {
               What a person has learned can keep working long after they step back. The only question is whether it is captured while they are the one giving it.
             </p>
             <Link
-              href="/apply"
+              href="/begin"
               className="families-cta"
               style={{
                 ...MONO,
@@ -299,7 +299,7 @@ export default function FamiliesPage() {
               Begin a family Basalith
             </Link>
             <p style={{ ...GEORGIA, fontSize: '0.95rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: ON_DARK_3, margin: '28px 0 0' }}>
-              A personal Basalith is accepted by application. We review every one ourselves.
+              No application and no approval. Your name, your email, and the first call. You see what your Basalith does with your own words before anything is owed.
               {' '}
               <Link href="/pricing" style={{ color: 'var(--color-gold)', textDecoration: 'none' }}>
                 See pricing <span aria-hidden="true">&rarr;</span>
