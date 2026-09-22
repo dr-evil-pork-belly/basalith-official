@@ -38,7 +38,11 @@ export const ORG_SCHEMA = {
   legalName:  'Heritage Nexus Inc.',
   url:        SITE_URL,
   logo:       `${SITE_URL}/icon-512x512.png`,
-  foundingDate: '2026',
+  // foundingDate is deliberately absent. The value read '2026' while Delaware
+  // formation was still in progress, which asserts a date to a search engine
+  // before it is true. Flagged by the AI discovery recon, September 21, 2026.
+  // Restore it with the real date once formation completes, in this file and
+  // in basalith-xyz/app/layout.tsx if that block ever carries one.
 
   description:
     'Basalith builds a cognitive reference model of the operator of a business, from what they deposit and from what the people around them observe, so the way they reason transfers through an acquisition or a succession. Also available for one person or a family.',
