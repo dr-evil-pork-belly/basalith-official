@@ -108,6 +108,29 @@ export default function Footer() {
           >
             The infrastructure of human continuation.
           </p>
+          {/* The sibling properties. basalith.life had no inbound link from here
+              until September 22, 2026; see docs/LIFE_REBUILD_2026-09-22.md in
+              basalith-life. www because the apex redirects there. */}
+          <p
+            style={{
+              fontFamily: SERIF,
+              fontSize:   '0.9rem',
+              fontWeight: 300,
+              lineHeight: 1.9,
+              color:      C.brandLine,
+              marginTop:  '24px',
+            }}
+          >
+            <a className="bsl-ft-link" href="https://www.basalith.life" style={{ color: C.link, textDecoration: 'none' }}>
+              basalith.life
+            </a>
+            , the why
+            <br />
+            <a className="bsl-ft-link" href="https://basalith.xyz" style={{ color: C.link, textDecoration: 'none' }}>
+              basalith.xyz
+            </a>
+            , the engineering
+          </p>
         </div>
 
         {/* Link columns */}
