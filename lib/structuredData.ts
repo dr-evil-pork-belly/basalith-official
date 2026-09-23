@@ -91,10 +91,15 @@ export const ORG_SCHEMA = {
   // rather than a typo. Every URL here must resolve and must point back.
   // Add the LinkedIn company page and the SSRN author page when they exist.
   // Do not add a URL before it is live.
+  // osf.io/pvw26 is the OSF project; osf.io/25srd is the Stage 1 registration
+  // filed September 2, 2026, cited as reference 10 on the basalith.xyz white
+  // paper. Both are public and both resolve, so both belong here. Keep this
+  // list identical to the one in basalith-xyz/app/layout.tsx.
   sameAs: [
     'https://basalith.xyz',
     'https://basalith.life',
     'https://osf.io/pvw26',
+    'https://osf.io/25srd',
     'https://orcid.org/0009-0000-0795-0066',
   ],
 } as const
