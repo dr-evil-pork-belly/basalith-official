@@ -179,3 +179,64 @@ tables are inert: nothing reads them. To remove entirely:
   a real business. Provision it through the normal path when you are ready to
   run its founding calls.
 - The `void classifyDeposit` fix in the inbound handler, as its own small slice.
+
+## t1 read and t2 (same day)
+
+The first backfill of the Dr Ha Basalith under t1: 106 deposits read, 0 errors,
+139 threads, 4 invented quotes caught and dropped by the verbatim check. The
+recurring decisions were the strongest material (walking away from a business
+relationship even after repayment, extending credit and getting burned, letting a
+son fail, cost against care when cash was tight, buying back the childhood
+apartment complex). Five defects, all fixed in extractor t2:
+
+1. Fragmentation. Cindy was seven threads, Kate four, Warren's Vegas birthday
+   four, Lincoln Heights four, the molar five. Only about 6 of 145 mentions
+   merged. t2 shows the model the Basalith's existing threads as T1, T2, ... and
+   lets it attach a mention; a new person's label is only what the owner calls
+   them; a "new" label that already exists is turned into a mention by code.
+2. Trivia. Photo captions became threads (chocolate bars, sports on TV, a museum,
+   a celebrity). t2 asks only for threads that carry a decision, a judgment, a
+   turning point, or a relationship that shapes choices, and names what to skip.
+3. Weight. Ambition and a zero-revenue startup were marked 3. t1's prompt said
+   "when unsure, choose the heavier." t2 reserves 3 for a closed list and says
+   ambition and money pressure are 2.
+4. Health. Dental details were ordinary threads. t2 adds `sensitive` (health or
+   medical or dental care, legal trouble, police, crime or fights, addiction,
+   sex). A sensitive thread is never pushed by a daily question or named in an
+   email.
+5. No dates. A reversed decision (recruiting Guides) would read as current. t2
+   records `first_said_at` and `last_said_at` from the deposits.
+
+Coverage note from the read: threads only reflect what is in the deposits. The
+Dr Ha record is mostly family and photo captions with one strong business
+incident; real estate, the research, and the music barely appear. That is the gap
+the planner aims at, not an extraction defect.
+
+### t2 files
+
+New: `supabase/migrations/20260924b_record_threads_t2.sql` (three columns,
+`attach_record_thread`, new `upsert_record_thread` signature, `pending_thread_extractions`
+now returns `created_at`, and the clear of the Dr Ha t1 read).
+Changed: `lib/threadExtract.ts` (t2), `lib/threadExtract.test.ts` (36 tests),
+`lib/inngest/threadFunctions.ts` (dates, created and attached counts),
+`scripts/backfill-threads.ts` (dates and SENSITIVE in the report),
+`lib/cronGates.test.ts` (pins the gate in the t2 migration).
+
+Verified in Cowork: tsc clean with Next's `ProcessEnv` simulated; 59 tests pass
+across the two files; the migration on throwaway Postgres 16 applies and
+re-pastes clean, clears the t1 rows, returns `created_at`, widens dates, ORs
+`sensitive`, maxes weight, does not duplicate a deposit on repeat, refuses an
+attach across Basaliths, drops the old upsert signature, and leaves anon and
+authenticated with no execute.
+
+### t2 run order
+
+1. Paste `20260924b_record_threads_t2.sql` into the SQL editor, then run its two
+   PROVE IT queries and paste the output.
+2. `npx tsc --noEmit 2>&1 | Select-String "error TS"` prints nothing, and
+   `npm test` is green.
+3. Commit on a branch, fast-forward main, push.
+4. `npx tsx scripts/backfill-threads.ts --archive a38e4503-c7d2-4af3-af8c-cacd66974e0b --commit`
+   and read the report again. Expect far fewer threads, one per person, dates
+   on every line, SENSITIVE on the dental ones.
+5. Only then `THREAD_EXTRACTION=on`.

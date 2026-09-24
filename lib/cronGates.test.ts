@@ -70,10 +70,11 @@ describe('every cron that reads archives selects status = active', () => {
     expect(fn).toContain('loadPendingDeposits(')
     expect(fn).not.toMatch(READS_ARCHIVES)
     const sql = readFileSync(
-      path.resolve(__dirname, '..', 'supabase', 'migrations', '20260924_record_threads.sql'),
+      path.resolve(__dirname, '..', 'supabase', 'migrations', '20260924b_record_threads_t2.sql'),
       'utf8',
     )
-    const body = sql.slice(sql.indexOf('CREATE OR REPLACE FUNCTION pending_thread_extractions'))
+    // The latest definition of the function lives in the t2 migration.
+    const body = sql.slice(sql.indexOf('CREATE FUNCTION pending_thread_extractions'))
     expect(body).toMatch(/WHERE a\.status = 'active'/)
   })
 })

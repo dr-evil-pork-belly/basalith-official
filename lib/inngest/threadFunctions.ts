@@ -26,7 +26,10 @@ import {
 // lib/cronGates.test.ts). Owner deposits only; no contributor text, no eval
 // holdout, no test artifact.
 //
-// COST. One Haiku call per new owner deposit, at most BATCH per hour.
+// COST. One Haiku call per new owner deposit, at most BATCH per hour, plus one
+// read of that Basalith's existing threads (extractor t2 attaches to them).
+// Deposits run in created_at order, one at a time, so each read sees every
+// thread the previous deposit made.
 // ─────────────────────────────────────────────────────────────────────────────
 
 const BATCH = 40
@@ -46,8 +49,9 @@ export const threadExtractionSweep = inngest.createFunction(
 
     const pending = await step.run('load-pending', () => loadPendingDeposits(BATCH))
 
-    let threads = 0
-    let errors  = 0
+    let created  = 0
+    let attached = 0
+    let errors   = 0
     for (const d of pending) {
       // One step per deposit, so a retry replays one model call, not the batch.
       const outcome = await step.run(`extract:${d.deposit_id}`, () =>
@@ -57,12 +61,14 @@ export const threadExtractionSweep = inngest.createFunction(
           tier:      d.tier,
           prompt:    d.prompt,
           response:  d.response ?? '',
-        }).then(o => ({ threadsFound: o.threadsFound, error: o.error, dropped: o.dropped.length })),
+          saidAt:    d.created_at,
+        }).then(o => ({ created: o.created, attached: o.attached, error: o.error, dropped: o.dropped.length })),
       )
-      threads += outcome.threadsFound
+      created  += outcome.created
+      attached += outcome.attached
       if (outcome.error) errors += 1
     }
 
-    return { deposits: pending.length, threads, errors }
+    return { deposits: pending.length, created, attached, errors }
   },
 )

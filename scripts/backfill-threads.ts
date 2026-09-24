@@ -43,7 +43,7 @@ const sleep = (ms: number) => new Promise(r => setTimeout(r, ms))
 async function report(archiveId: string) {
   const { data, error } = await supabaseAdmin
     .from('record_threads')
-    .select('kind, label, domain_hint, weight, quote, deposit_ids, status')
+    .select('kind, label, domain_hint, weight, sensitive, quote, deposit_ids, status, first_said_at, last_said_at, extractor_version')
     .eq('archive_id', archiveId)
     .order('kind', { ascending: true })
     .order('created_at', { ascending: true })
@@ -55,7 +55,17 @@ async function report(archiveId: string) {
   for (const r of rows) {
     if (r.kind !== kind) { kind = r.kind; console.log(`\n${kind.toUpperCase()}`) }
     const mentions = (r.deposit_ids as string[]).length
-    console.log(`  ${r.label}  [${r.domain_hint ?? 'no area'} · weight ${r.weight} · ${mentions} mention${mentions === 1 ? '' : 's'}${r.status !== 'open' ? ` · ${r.status}` : ''}]`)
+    const day = (v: unknown) => (typeof v === 'string' ? v.slice(0, 10) : '?')
+    const said = r.first_said_at === r.last_said_at ? day(r.first_said_at) : `${day(r.first_said_at)} to ${day(r.last_said_at)}`
+    const flags = [
+      r.domain_hint ?? 'no area',
+      `weight ${r.weight}`,
+      `${mentions} mention${mentions === 1 ? '' : 's'}`,
+      said,
+      r.sensitive ? 'SENSITIVE' : null,
+      r.status !== 'open' ? r.status : null,
+    ].filter(Boolean).join(' · ')
+    console.log(`  ${r.label}  [${flags}]`)
     console.log(`    "${r.quote}"`)
   }
 
@@ -101,22 +111,25 @@ async function main() {
   console.log(`Already read:            ${eligible.length - pending.length}`)
   console.log(`Pending:                 ${pending.length}\n`)
 
-  let threads = 0
-  let errors  = 0
+  let created  = 0
+  let attached = 0
+  let errors   = 0
   for (const d of pending) {
     if (!COMMIT) { console.log(`would read ${d.id} (${(d.response ?? '').length} chars)`); continue }
     const out = await extractThreadsForDeposit({
       depositId: d.id, archiveId, tier: archive.tier, prompt: d.prompt, response: d.response ?? '',
+      saidAt: d.created_at,
     })
-    threads += out.threadsFound
+    created  += out.created
+    attached += out.attached
     if (out.error) errors += 1
     const drops = out.dropped.length ? `, dropped ${out.dropped.map(x => x.reason).join('/')}` : ''
-    console.log(`${d.id}: ${out.error ? `ERROR ${out.error}` : `${out.threadsFound} threads${drops}`}`)
+    console.log(`${d.id}: ${out.error ? `ERROR ${out.error}` : `${out.created} new, ${out.attached} attached${drops}`}`)
     await sleep(300)
   }
 
   if (COMMIT) {
-    console.log(`\nThreads written or merged: ${threads}. Errors: ${errors}.`)
+    console.log(`\nNew threads: ${created}. Mentions attached: ${attached}. Errors: ${errors}.`)
     await report(archiveId)
   } else {
     console.log('\nDry run. Re-run with --commit to extract.\n')
