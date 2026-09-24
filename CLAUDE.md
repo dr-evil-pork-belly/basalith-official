@@ -168,6 +168,19 @@ one thin area of the coverage map, opened from the "Deposit here" link on a map 
 closes, `/answer` sends `coverage.run.requested` so the map is read again. One open
 incident per archive still holds; the page explains when another must finish first.
 
+**Record threads.** `lib/threadExtract.ts`, `lib/inngest/threadFunctions.ts`,
+migration `20260924_record_threads.sql`, September 24, 2026. Slice 1 of tailored
+questions (`docs/TAILORED_QUESTIONS_2026-09-24.md`). One Haiku call per owner deposit
+lists the people, projects, events, places, recurring decisions, chapters, and arenas
+the owner named, each with a quote that code confirms is a literal span of the deposit.
+An hourly sweep (`thread-extraction-sweep`, off unless `THREAD_EXTRACTION=on`) reads
+pending deposits through `pending_thread_extractions`: active Basaliths, owner deposits
+only, never an eval holdout or a test artifact. The ledger `record_thread_extractions`
+makes it idempotent across every capture route. Write-only until slice 3. HARD RULE:
+threads steer questions and are never evidence. The entity prompt, frozen layer,
+verifier, saturation check, founding proof, and coverage run must never read them;
+`lib/threadExtract.test.ts` pins that on source text.
+
 **Self-serve trial.** `/begin` (`app/begin`), `POST /api/trial/start`, `lib/trial.ts`,
 September 17, 2026. A person types a name and an email; the route creates the auth
 user with `app_metadata.role = 'owner'` forced (`getOrCreateAuthUser` `forceRole`),
@@ -351,6 +364,14 @@ the code does not implement. Consequence: the engine's own `isQuestionEligible` 
 (180-day answered cooldown vs 30-day unanswered re-entry) is reading fiction on nearly
 every row.
 
+UPDATE September 24, 2026, from reading the code, not live data: the inbound handler now
+prefers `email_reply_sessions.question_history_id`, which `selectNextQuestion` carries
+onto every elicitation email, and falls back to the 14-day guess only for sessions minted
+before that column existed (`app/api/resend/inbound/route.ts`, pinned by
+`inbound-question-link.test.ts`). Whether live rows now populate correctly has not been
+re-measured. The same handler still calls `classifyDeposit` as `void`, which dies on
+lambda freeze, so email-reply deposits may be missing domain scores.
+
 **The elicitation engine has produced no answers.** All 224 `question_history` rows are
 `channel = 'daily_email'`. The declared channels `mirror_thread`, `app_companion`,
 `app_spark`, and `founder_web` have zero rows. On the Dr Ha archive, 27 questions
@@ -367,6 +388,11 @@ does not exist.
 such column, and the inbound handler never checks expiry. The `session.replied` guard
 makes each token effectively single-use, which caps exposure, but an unreplied token is
 a permanent bearer credential for writing into an archive.
+
+UPDATE September 24, 2026, from reading the code: `lib/emailReplySessions.ts` now mints
+every token with `expires_at` (30 days, migration `20260806_email_reply_sessions_expiry.sql`)
+and `resolveReplySession` fails closed on a missing or past expiry. The paragraph above
+describes the state before August 6.
 
 **Two deposit-count definitions.** `lib/selectNextQuestion.ts` counts owner deposits only
 (`contributor_id IS NULL`) and feeds the band. `lib/entityReadiness.ts` counts all

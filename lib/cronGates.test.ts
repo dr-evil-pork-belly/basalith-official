@@ -61,4 +61,19 @@ describe('every cron that reads archives selects status = active', () => {
     const sweep = source.slice(source.indexOf("id:          'coverage-monthly-sweep'"))
     expect(ACTIVE_FILTER.test(sweep)).toBe(true)
   })
+
+  it('the thread extraction sweep reads only active Basaliths', () => {
+    // lib/inngest/threadFunctions.ts selects through the SQL function
+    // pending_thread_extractions, so the gate lives in the migration, not in a
+    // .eq() call. Pin the SQL line, and pin that the sweep goes through it.
+    const fn = readFileSync(path.resolve(__dirname, 'inngest', 'threadFunctions.ts'), 'utf8')
+    expect(fn).toContain('loadPendingDeposits(')
+    expect(fn).not.toMatch(READS_ARCHIVES)
+    const sql = readFileSync(
+      path.resolve(__dirname, '..', 'supabase', 'migrations', '20260924_record_threads.sql'),
+      'utf8',
+    )
+    const body = sql.slice(sql.indexOf('CREATE OR REPLACE FUNCTION pending_thread_extractions'))
+    expect(body).toMatch(/WHERE a\.status = 'active'/)
+  })
 })
