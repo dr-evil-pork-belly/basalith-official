@@ -575,17 +575,18 @@ describe('the sync wiring applies the scope where it actually matters', () => {
     // stay under lock, stay in the manifest, and stay eligible for re-hashing,
     // so the dissolution filter never removes anything from verification.
     //
-    // Whether the manifest is actually COVERED is a separate matter and it is
-    // currently broken. toRehash is the first MAX_COPIES_PER_RUN rows of a read
-    // with no ORDER BY, every row past that is re-hashed by nothing, and as of
-    // August 14, 2026 no continuation is emitted to pretend otherwise. This
-    // comment used to claim objects "stay re-hashed every run, nothing stops
-    // being verified", which was false. See the block above closeRun in
-    // storageBackupFunctions.ts's verify handler for the full record and for
-    // what the real fix requires. Do not read the second assertion below as a
-    // statement that the cap is correct. It pins the line's current shape only.
+    // Coverage is a separate matter. Until September 21, 2026 toRehash was the
+    // first MAX_COPIES_PER_RUN rows of a read with no ORDER BY, so every row past
+    // the cap was re-hashed by nothing. The verify rotation
+    // (docs/VERIFY_ROTATION_2026-09-21.md) sorts a copy of the whole, unfiltered
+    // manifest least-recently-verified first and re-hashes the head of that, so
+    // every row is reached within ceil(manifest / cap) runs and A11 fires when
+    // that exceeds the window. This assertion was left pinning the pre-rotation
+    // line and failed from that day; updated September 24, 2026. It still pins
+    // shape only: the rotation reads from `manifest` itself, not a filtered view.
     expect(code).toMatch(/manifestKeys: manifest\.map\(\(m\) => m\.b2_key\)/)
-    expect(code).toMatch(/const toRehash = manifest\.slice\(0, MAX_COPIES_PER_RUN\)/)
+    expect(code).toMatch(/const byStaleness = \[\.\.\.manifest\]\.sort\(/)
+    expect(code).toMatch(/const toRehash = byStaleness\.slice\(0, MAX_COPIES_PER_RUN\)/)
   })
 
   it('the snapshot is filtered and its own count is reported separately', () => {
