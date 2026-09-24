@@ -9,6 +9,8 @@ import {
   extractThreadsForDeposit,
   buildExtractSystem,
   renderExisting,
+  isSensitiveText,
+  SENSITIVE_WORDS,
   scopeForTier,
   threadExtractionEnabled,
   MAX_THREADS_PER_DEPOSIT,
@@ -103,7 +105,8 @@ describe('parseExtraction', () => {
   it('clamps weight to 1, 2, or 3 and reads sensitive only when exactly true', () => {
     const r = parseExtraction(
       json([
-        { kind: 'person', label: 'Dave', quote: 'My partner Dave wanted to fight it', weight: 7, sensitive: 'yes' },
+        // A neutral quote: "fight" would trip the word backstop, tested below.
+        { kind: 'event', label: 'Calling the GC', quote: 'I called the GC myself', weight: 7, sensitive: 'yes' },
         { kind: 'event', label: 'Winter of 2019', quote: 'in the winter of 2019', weight: 3, sensitive: true },
       ]),
       DEPOSIT,
@@ -176,6 +179,52 @@ describe('parseExtraction', () => {
     )
     expect(r.ops).toHaveLength(1)
     expect(r.dropped[0].reason).toBe('duplicate')
+  })
+})
+
+describe('sensitive backstop', () => {
+  it('marks violence, the law, and health by word even when the model says false', () => {
+    const text = 'there was a bunch of these neighborhood thugs that were much older that would beat us up. ' +
+      'In my teenage years, i thought rules and even the law didnt apply to me. ' +
+      'I remember me and Cindy getting food poisoning in pattaya and we were sick for days.'
+    const r = parseExtraction(json([
+      { kind: 'event', label: 'Neighborhood older kids', quote: 'neighborhood thugs that were much older that would beat us up', weight: 2, sensitive: false },
+      { kind: 'chapter', label: 'Teenage years', quote: 'i thought rules and even the law didnt apply to me', weight: 2, sensitive: false },
+    ]), text, 'personal')
+    expect(r.ops.map(o => o.op === 'new' && o.thread.sensitive)).toEqual([true, true])
+  })
+
+  it('leaves an ordinary thread alone and matches whole words only', () => {
+    expect(isSensitiveText('I called the GC myself')).toBe(false)
+    expect(isSensitiveText('a painful lesson about lawns')).toBe(false)
+    expect(isSensitiveText('the police came')).toBe(true)
+    expect(isSensitiveText('My cracked Molar')).toBe(true)
+  })
+
+  it('lets a mention raise an event to sensitive, never a person', () => {
+    const text = 'I remember me and Cindy getting food poisoning in pattaya and we were sick for days.'
+    const existing: ExistingThread[] = [
+      { id: 'uuid-cindy', kind: 'person', label: 'Cindy', labelNorm: 'cindy' },
+      { id: 'uuid-trip',  kind: 'event',  label: 'Thailand trip', labelNorm: 'thailand trip' },
+    ]
+    const r = parseExtraction(json([
+      { match: 'T1', quote: 'me and Cindy getting food poisoning in pattaya', weight: 1, sensitive: true },
+      { match: 'T2', quote: 'we were sick for days', weight: 1, sensitive: false },
+    ]), text, 'personal', existing)
+    expect(r.ops).toEqual([
+      expect.objectContaining({ threadId: 'uuid-cindy', sensitive: false }),
+      expect.objectContaining({ threadId: 'uuid-trip',  sensitive: true }),
+    ])
+  })
+
+  it('carries the same word list as the SQL that fixed the rows written before it', () => {
+    const sql = readFileSync(
+      path.resolve(__dirname, '..', 'supabase', 'migrations', '20260924c_record_threads_sensitive.sql'),
+      'utf8',
+    )
+    const m = sql.match(/'\\m\(([^)]*)\)\\M'/)
+    expect(m, 'word pattern not found in the migration').not.toBeNull()
+    expect(m![1].split('|').sort()).toEqual([...SENSITIVE_WORDS].sort())
   })
 })
 

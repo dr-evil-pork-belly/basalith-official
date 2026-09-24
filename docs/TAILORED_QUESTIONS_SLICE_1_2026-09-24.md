@@ -240,3 +240,49 @@ authenticated with no execute.
    and read the report again. Expect far fewer threads, one per person, dates
    on every line, SENSITIVE on the dental ones.
 5. Only then `THREAD_EXTRACTION=on`.
+
+## t2 read and backstop (same day)
+
+The t2 backfill of the Dr Ha Basalith: 106 deposits, 66 threads (from 139), 63
+mentions attached (from about 6), every thread dated, the dental threads marked
+sensitive, 0 errors. Kate, Warren, Blake, Mom, and the Vegas trip are one
+thread each; no ambition thread is weight 3.
+
+Three defects remained:
+
+1. The model's `sensitive` flag missed a violence thread (neighborhood thugs),
+   three threads about the law, and a health quote. Fixed with a code backstop:
+   `SENSITIVE_WORDS` in `lib/threadExtract.ts`, whole word, any case, applied to
+   every new thread's quote and label and to every mention of a non-person
+   thread. It over-marks on purpose. `20260924c_record_threads_sensitive.sql`
+   applies the same list once to existing rows; a test fails if the two lists
+   drift.
+2. A mention can no longer raise a PERSON thread to sensitive. One mention of
+   Cindy being sick must not wall off every question that names her. Slice 3's
+   writer checks each cited deposit's own text with the same list.
+3. "my wife" (7 mentions) and "Cindy" (1) were two threads. Merged once in the
+   same migration under the label "Cindy", keeping the "my wife" quote. An
+   owner-facing merge belongs on the "What Basalith is asking from" page.
+
+Also noted for the planner: an incident interview writes one deposit per turn,
+so a thread from one September 15 interview shows 8 mentions. Rank threads by
+distinct days, not by deposit count.
+
+The t2 migration's clear of the Dr Ha rows is commented out after it ran, so a
+re-paste cannot wipe this read.
+
+Verified in Cowork: tsc clean; 63 tests pass across the two files; the new
+migration on throwaway Postgres 16 against rows copied from the real report
+merges the two rows (deposit ids deduped, dates widened, not sensitive), flags
+the thugs, both law threads, and the hospital line, leaves "trusting people
+without legal protection" alone, and on re-paste merges nothing and changes
+nothing.
+
+### Run order
+
+1. Paste `20260924c_record_threads_sensitive.sql`, run its two PROVE IT queries,
+   paste the output.
+2. tsc prints nothing; `npm test` is green.
+3. Commit, fast-forward main, push.
+4. `THREAD_EXTRACTION=on` in Vercel production, then redeploy.
+

@@ -18,7 +18,8 @@
 -- changes its return type, so it is dropped and recreated. upsert_record_thread
 -- gains two parameters, so the old signature is dropped too.
 --
--- Applied by pasting into the Supabase SQL editor. Re-paste safe.
+-- Applied by pasting into the Supabase SQL editor. Re-paste safe (the clear
+-- at the bottom is commented out since it ran).
 
 ALTER TABLE record_threads ADD COLUMN IF NOT EXISTS sensitive     BOOLEAN     NOT NULL DEFAULT FALSE;
 ALTER TABLE record_threads ADD COLUMN IF NOT EXISTS first_said_at TIMESTAMPTZ;
@@ -142,8 +143,12 @@ GRANT EXECUTE ON FUNCTION pending_thread_extractions(INTEGER) TO service_role;
 -- ── Clear the t1 read of the Dr Ha Basalith so t2 reads it fresh ─────────────
 -- These two tables carry no append-only trigger; only owner_deposits does.
 -- Nothing reads threads yet, so clearing them affects no surface.
-DELETE FROM record_thread_extractions WHERE archive_id = 'a38e4503-c7d2-4af3-af8c-cacd66974e0b';
-DELETE FROM record_threads            WHERE archive_id = 'a38e4503-c7d2-4af3-af8c-cacd66974e0b';
+--
+-- APPLIED September 24, 2026 (proof pasted: threads 0, ledger 0, pending 172).
+-- Commented out afterward so a re-paste of this file cannot wipe the t2 read
+-- and the merge in 20260924c. To clear again on purpose, run these by hand.
+-- DELETE FROM record_thread_extractions WHERE archive_id = 'a38e4503-c7d2-4af3-af8c-cacd66974e0b';
+-- DELETE FROM record_threads            WHERE archive_id = 'a38e4503-c7d2-4af3-af8c-cacd66974e0b';
 
 -- ── PROVE IT (paste the output back) ──────────────────────────────────────────
 --

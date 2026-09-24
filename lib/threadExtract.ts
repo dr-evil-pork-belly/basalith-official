@@ -26,7 +26,8 @@
  * the saturation check, and the founding proof must never read them.
  * lib/threadExtract.test.ts pins that on the source text of those files.
  * A `sensitive` thread is never pushed by a daily question and never named in
- * an email; only the owner opens it.
+ * an email; only the owner opens it. The model's flag is backed by a fixed word
+ * list in code (SENSITIVE_WORDS), because the model alone misses some.
  *
  * Owner deposits only. Contributor text, eval holdouts, and test artifacts are
  * excluded upstream by pending_thread_extractions.
@@ -59,6 +60,45 @@ export const MAX_QUOTE_WORDS         = 40
 export const MIN_QUOTE_CHARS         = 8
 /** How many existing threads the model is shown. Most recently touched first. */
 export const EXISTING_THREADS_SHOWN  = 150
+
+/**
+ * The sensitive backstop. The model marks `sensitive` inconsistently (the first
+ * t2 read missed a violence thread and three about the law), so code also marks
+ * any thread whose quote or new label contains one of these words, whole word,
+ * any case. It over-marks on purpose ("hospital" in a birth story, "court" in a
+ * sports one): a false positive keeps a harmless thread out of daily questions,
+ * a false negative puts a violence or health detail into one. Always degrade
+ * toward sensitive.
+ *
+ * Kept in step with supabase/migrations/20260924c_record_threads_sensitive.sql,
+ * which applied the same list to rows written before the backstop existed.
+ * lib/threadExtract.test.ts fails if the two lists drift.
+ */
+export const SENSITIVE_WORDS = [
+  // violence and crime
+  'beat', 'beats', 'beaten', 'beating', 'fight', 'fights', 'fighting', 'fought',
+  'punch', 'punched', 'stab', 'stabbed', 'shot', 'gun', 'assault', 'assaulted',
+  'rob', 'robbed', 'robbery', 'thug', 'thugs', 'gang', 'violence', 'violent',
+  'abuse', 'abused',
+  // law and police
+  'police', 'cop', 'cops', 'arrest', 'arrested', 'jail', 'prison', 'court',
+  'lawsuit', 'sued', 'law', 'illegal', 'crime', 'criminal', 'probation',
+  // health and care
+  'sick', 'illness', 'hospital', 'doctor', 'surgery', 'cancer', 'disease',
+  'diagnosis', 'diagnosed', 'injury', 'injured', 'pain', 'dental', 'dentist',
+  'tooth', 'teeth', 'molar', 'poisoning', 'medication', 'therapy', 'therapist',
+  'depression', 'depressed', 'anxiety', 'pregnant', 'pregnancy', 'miscarriage',
+  // addiction
+  'drunk', 'drug', 'drugs', 'alcohol', 'addict', 'addicted', 'addiction', 'rehab', 'overdose',
+  // sex, self-harm, death
+  'sex', 'sexual', 'suicide', 'died', 'death', 'funeral',
+] as const
+
+const SENSITIVE_RE = new RegExp(`\\b(${SENSITIVE_WORDS.join('|')})\\b`, 'i')
+
+export function isSensitiveText(...texts: (string | null | undefined)[]): boolean {
+  return texts.some(t => typeof t === 'string' && SENSITIVE_RE.test(t))
+}
 
 export interface ExtractedThread {
   kind:       ThreadKind
@@ -231,7 +271,7 @@ export function parseExtraction(
     const t = (item ?? {}) as Record<string, unknown>
     const rawLabel  = typeof t.label === 'string' ? t.label : (typeof t.match === 'string' ? t.match : '')
     const weight    = clampWeight(t.weight)
-    const sensitive = t.sensitive === true
+    const modelSays = t.sensitive === true
 
     const quote = findVerbatim(depositText, typeof t.quote === 'string' ? t.quote : '')
     if (!quote)                             { dropped.push({ label: rawLabel, reason: 'quote_not_found' }); continue }
@@ -260,9 +300,19 @@ export function parseExtraction(
       target = byNorm.get(labelNorm)
       if (!target) {
         const hint = typeof t.domain === 'string' && areas.has(t.domain) ? t.domain : null
+        const sensitive = modelSays || isSensitiveText(quote, label)
         fresh = { kind, label, labelNorm, domainHint: hint, weight, sensitive, quote }
       }
     }
+
+    // A mention can raise a thread to sensitive, except a mention of a PERSON.
+    // A person thread keeps only its first quote; one mention of Cindy being
+    // sick must not wall off every future question that names Cindy. Whether a
+    // question may cite that particular deposit is the writer's check (slice 3),
+    // on the deposit's own text, with this same word list.
+    const attachSensitive = target
+      ? target.kind !== 'person' && (modelSays || isSensitiveText(quote))
+      : false
 
     const key = target ? target.id : fresh!.labelNorm
     if (touched.has(key)) { dropped.push({ label: target?.label ?? fresh!.label, reason: 'duplicate' }); continue }
@@ -270,7 +320,7 @@ export function parseExtraction(
     touched.add(key)
 
     ops.push(target
-      ? { op: 'attach', threadId: target.id, label: target.label, quote, weight, sensitive }
+      ? { op: 'attach', threadId: target.id, label: target.label, quote, weight, sensitive: attachSensitive }
       : { op: 'new', thread: fresh! })
   }
 
