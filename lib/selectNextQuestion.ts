@@ -1,5 +1,13 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { supabaseAdmin } from './supabase-admin'
+import { AREA_SEEDS, seedForArea } from './areaSeeds'
+import {
+  areaForSlug,
+  loadAreaReadings,
+  orderAreas,
+  WARMUP_SLUGS,
+  type AreaReading,
+} from './questionPlanner'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -24,6 +32,10 @@ export interface HistoryEntry {
   b2bQuestionId: string | null
   servedAt:      string
   answeredAt:    string | null
+  /** Carried since slice 2 so an area opener served as a daily question (no
+   *  bank id, no domain id) can be recognized for its cooldown. Optional so a
+   *  history row built without it still type-checks. */
+  questionText?: string | null
 }
 
 export interface ElicitationQuestion {
@@ -90,6 +102,12 @@ export interface Deps {
   generateFramingSentence: (anchor: AnchorDeposit, questionText: string, domainEmotionalWeight: number) => Promise<string | null>
   generateP0Question:     (reflection: MirrorReflectionRow, anchor: AnchorDeposit | null) => Promise<{ questionText: string; framingUsed: string | null }>
   /** Resolves to the new row's id, or null if the insert failed. Never throws. */
+  /**
+   * The coverage reading the planner aims at (lib/questionPlanner.ts). Optional:
+   * when absent, or when it returns no rows, selection is exactly the
+   * pre-planner behavior. The real dependency is wired in defaultDeps.
+   */
+  getAreaReadings?:       (archiveId: string, scope: Scope) => Promise<AreaReading[]>
   insertQuestionHistory:  (row: {
     archiveId:     string
     domainId:      number | null
@@ -387,9 +405,55 @@ export async function selectNextQuestion(
   const coverage     = await deps.getCoverage(archiveId, scope)
   const history      = await deps.getQuestionHistory(archiveId)
 
+  // ── Planner: aim at the coverage map (B2C, past the first ten answers) ──
+  // Slice 2 of tailored questions. With a coverage reading, the next question
+  // aims at the neediest area: a bank question mapped to that area if one is
+  // eligible, else that area's call opener. With no reading, fall through to
+  // the density path below, unchanged except that warm-ups stop here.
+  if (scope === 'b2c' && b !== 'p1' && deps.getAreaReadings) {
+    const readings = await deps.getAreaReadings(archiveId, scope)
+    if (readings.length > 0) {
+      const planned = await planB2C(readings, coverage, history, b, deps, now)
+      if (planned) {
+        let framingUsed: string | null = null
+        if (planned.domain) {
+          const anchor = await deps.getAnchorDeposit(archiveId, planned.domain.domainId)
+          if (anchor) {
+            const sentence = await deps.generateFramingSentence(anchor, planned.questionText, planned.domain.emotionalWeight)
+            if (validateGroundedFraming(sentence)) framingUsed = sentence!.trim()
+          }
+        }
+        const questionHistoryId = await deps.insertQuestionHistory({
+          archiveId,
+          domainId:      planned.domain?.domainId ?? null,
+          questionId:    planned.questionId,
+          b2bQuestionId: null,
+          questionText:  planned.questionText,
+          source:        b,
+          channel,
+          framingUsed,
+        })
+        return {
+          questionText:  planned.questionText,
+          domainId:      planned.domain?.domainId ?? null,
+          questionId:    planned.questionId,
+          b2bQuestionId: null,
+          framingUsed,
+          source:        b,
+          questionHistoryId,
+        }
+      }
+    }
+  }
+
+  // Warm-ups (senses, joy) are for the first ten answers only (decided
+  // September 24, 2026). Past p1 they leave the pool, unless nothing else is
+  // left in it.
+  const pool = scope === 'b2c' && b !== 'p1' ? withoutWarmups(coverage) : coverage
+
   const domain = b === 'p1'
     ? pickDomainP1(coverage, history, now)
-    : pickDomainP2P3(coverage, history, b, deps.random, now)
+    : pickDomainP2P3(pool, history, b, deps.random, now)
 
   if (!domain) {
     throw new Error(`selectNextQuestion: no eligible domain for archive ${archiveId} (scope ${scope}, band ${b})`)
@@ -436,6 +500,80 @@ export async function selectNextQuestion(
   })
 
   return { questionText, domainId: domain.domainId, questionId, b2bQuestionId, framingUsed, source: b, questionHistoryId }
+}
+
+// ── Planner helpers (slice 2) ───────────────────────────────────────────────
+
+export function withoutWarmups(coverage: DomainCoverage[]): DomainCoverage[] {
+  const kept = coverage.filter(d => !(WARMUP_SLUGS as readonly string[]).includes(d.slug))
+  return kept.length > 0 ? kept : coverage
+}
+
+const PERSONAL_SEED_AREA = new Map(AREA_SEEDS.personal.map(s => [s.question, s.area]))
+
+/** The area the most recent serve aimed at: by bank domain, or by opener text. */
+export function lastServedArea(history: HistoryEntry[], coverage: DomainCoverage[]): string | null {
+  const last = history[0]
+  if (!last) return null
+  if (last.domainId !== null) {
+    const d = coverage.find(c => c.domainId === last.domainId)
+    return d ? areaForSlug(d.slug) : null
+  }
+  return last.questionText ? PERSONAL_SEED_AREA.get(last.questionText) ?? null : null
+}
+
+/** Same cooldowns as a bank question, keyed on the opener's text. */
+export function isOpenerEligible(text: string, history: HistoryEntry[], now: Date): boolean {
+  for (const h of history) {
+    if (h.questionText !== text) continue
+    const t = new Date(h.answeredAt ?? h.servedAt).getTime()
+    const days = h.answeredAt ? ANSWERED_COOLDOWN_DAYS : UNANSWERED_REENTRY_DAYS
+    if (now.getTime() - t < days * DAY_MS) return false
+  }
+  return true
+}
+
+export interface PlannedQuestion {
+  questionText: string
+  questionId:   number | null
+  domain:       DomainCoverage | null
+  area:         string
+}
+
+/**
+ * Walk the areas in the planner's order. In each, serve an eligible bank
+ * question mapped to the area (lowest density domain first, weight-3 rules
+ * applied), else the area's call opener if it is off cooldown. Null when no
+ * area has anything to serve; the caller then uses the density path.
+ */
+export async function planB2C(
+  readings: AreaReading[],
+  coverage: DomainCoverage[],
+  history:  HistoryEntry[],
+  b:        Band,
+  deps:     Pick<Deps, 'getElicitationQuestions' | 'random'>,
+  now:      Date,
+): Promise<PlannedQuestion | null> {
+  const order = orderAreas(readings, lastServedArea(history, coverage), deps.random)
+
+  for (const area of order) {
+    // Eligibility is judged against the whole list, so the weight-3 rule still
+    // sees a heavy domain served last in another area.
+    const eligible = getEligibleDomains(coverage, history, now).filter(d => areaForSlug(d.slug) === area)
+    if (eligible.length > 0) {
+      const bank = await deps.getElicitationQuestions(eligible.map(d => d.domainId))
+      for (const d of [...eligible].sort((x, y) => rankValue(x, b) - rankValue(y, b))) {
+        const q = pickQuestionB2C(d.domainId, b, history, bank, now)
+        if (q) return { questionText: q.questionText, questionId: q.id, domain: d, area }
+      }
+    }
+
+    const seed = seedForArea('personal', area)
+    if (seed && isOpenerEligible(seed.question, history, now)) {
+      return { questionText: seed.question, questionId: null, domain: null, area }
+    }
+  }
+  return null
 }
 
 // ── Default (real) dependency implementations ───────────────────────────────
@@ -559,7 +697,7 @@ async function defaultGetCoverage(archiveId: string, scope: Scope): Promise<Doma
 async function defaultGetQuestionHistory(archiveId: string): Promise<HistoryEntry[]> {
   const { data, error } = await supabaseAdmin
     .from('question_history')
-    .select('domain_id, question_id, b2b_question_id, served_at, answered_at')
+    .select('domain_id, question_id, b2b_question_id, served_at, answered_at, question_text')
     .eq('archive_id', archiveId)
     .order('served_at', { ascending: false })
     .limit(500)
@@ -571,6 +709,7 @@ async function defaultGetQuestionHistory(archiveId: string): Promise<HistoryEntr
     b2bQuestionId: row.b2b_question_id,
     servedAt:      row.served_at,
     answeredAt:    row.answered_at,
+    questionText:  row.question_text ?? null,
   }))
 }
 
@@ -723,5 +862,6 @@ export const defaultDeps: Deps = {
   generateFramingSentence:    defaultGenerateFramingSentence,
   generateP0Question:         defaultGenerateP0Question,
   insertQuestionHistory:      defaultInsertQuestionHistory,
+  getAreaReadings:            (archiveId, scope) => loadAreaReadings(archiveId, scope === 'b2b' ? 'succession' : null),
   random:                     Math.random,
 }

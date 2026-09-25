@@ -19,6 +19,8 @@
  */
 
 import { supabaseAdmin } from './supabase-admin'
+import { AREA_SEEDS } from './areaSeeds'
+import { chooseOpener, loadAreaReadings, orderAreas, type Opener } from './questionPlanner'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -597,11 +599,30 @@ export async function completeIncident(session: IncidentSession): Promise<void> 
 // ── Incident seed picker ──────────────────────────────────────────────────────
 // Dedicated to the narrative incident seeds (b2b_questions.is_incident_seed =
 // true), which selectNextQuestion deliberately excludes from the topic-question
-// path. Rotates across categories by preferring a seed this archive has never
-// run, then the least-recently-used one.
-export async function pickIncidentSeed(
-  archiveId: string,
-): Promise<{ questionId: string; category: string; seedText: string } | null> {
+// path.
+//
+// Since September 24, 2026 (tailored questions, slice 2) the pick is aimed at
+// the coverage map when the Basalith has a reading: the neediest domain first
+// (lib/questionPlanner.ts), its narrative seed if never run, else that domain's
+// area call opener (lib/areaSeeds.ts), else the least recently run of the two.
+// Deterministic on purpose: the daily email and the portal call this
+// separately and must show the same opener. An area opener is returned with
+// `areaCall: true` so the caller marks the incident exactly as an area call
+// from the map would be, and closing it requests a fresh coverage reading.
+//
+// With no reading, the pre-slice behavior is unchanged: rotate across the
+// narrative seeds, never-run first, then least recently used.
+export interface PickedSeed {
+  questionId: string | null
+  category:   string
+  seedText:   string
+  /** The coverage domain aimed at; null on the pre-slice path. */
+  area:       string | null
+  /** True when the opener is the area call seed, not a narrative seed. */
+  areaCall:   boolean
+}
+
+export async function pickIncidentSeed(archiveId: string): Promise<PickedSeed | null> {
   const { data: seeds } = await supabaseAdmin
     .from('b2b_questions')
     .select('id, category, question, order_index')
@@ -611,14 +632,41 @@ export async function pickIncidentSeed(
 
   const { data: priors } = await supabaseAdmin
     .from('incident_sessions')
-    .select('seed_question_id, created_at')
+    .select('seed_question_id, created_at, state')
     .eq('archive_id', archiveId)
     .order('created_at', { ascending: false })
 
-  const lastUsedAt = new Map<string, number>()
+  const seedById = new Map(seeds.map(s => [s.id as string, s]))
+  const lastUsedAt = new Map<string, number>()   // narrative seeds, by id (pre-slice key)
+  const lastRunAt  = new Map<string, number>()   // every opener, by openerKey
+  let lastArea: string | null = null
   for (const p of priors ?? []) {
-    const id = (p as { seed_question_id: string | null }).seed_question_id
-    if (id && !lastUsedAt.has(id)) lastUsedAt.set(id, new Date((p as { created_at: string }).created_at).getTime())
+    const row = p as { seed_question_id: string | null; created_at: string; state: IncidentState | null }
+    const at = new Date(row.created_at).getTime()
+    const id = row.seed_question_id
+    const area = row.state?.areaCall?.scope === 'business' ? row.state.areaCall.area : null
+    if (id && !lastUsedAt.has(id)) lastUsedAt.set(id, at)
+    const key = id ? `incident:${id}` : area ? `area:${area}` : null
+    if (key && !lastRunAt.has(key)) lastRunAt.set(key, at)
+    if (lastArea === null) lastArea = area ?? (id ? (seedById.get(id)?.category as string | undefined) ?? null : null)
+  }
+
+  const readings = await loadAreaReadings(archiveId, 'succession')
+  if (readings.length > 0) {
+    const openers: Opener[] = [
+      ...seeds.map(s => ({ kind: 'incident' as const, area: s.category as string, questionId: s.id as string, text: s.question as string })),
+      ...AREA_SEEDS.business.map(s => ({ kind: 'area' as const, area: s.area, questionId: null, text: s.question })),
+    ]
+    const chosen = chooseOpener(orderAreas(readings, lastArea), openers, lastRunAt)
+    if (chosen) {
+      return {
+        questionId: chosen.questionId,
+        category:   chosen.area,
+        seedText:   chosen.text,
+        area:       chosen.area,
+        areaCall:   chosen.kind === 'area',
+      }
+    }
   }
 
   // Unused seeds (never run) sort first via -Infinity; otherwise least-recent.
@@ -628,5 +676,5 @@ export async function pickIncidentSeed(
     return la - lb
   })[0]
 
-  return { questionId: chosen.id, category: chosen.category, seedText: chosen.question }
+  return { questionId: chosen.id, category: chosen.category, seedText: chosen.question, area: null, areaCall: false }
 }

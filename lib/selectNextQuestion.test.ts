@@ -488,3 +488,112 @@ describe('selectNextQuestion end-to-end (P2/P3)', () => {
     expect(deps.generateFramingSentence).not.toHaveBeenCalled()
   })
 })
+
+// ── Planner (tailored questions, slice 2) ────────────────────────────────────
+
+describe('coverage planner on the B2C path', () => {
+  const personal = (slug: string, domainId: number, over: Partial<DomainCoverage> = {}): DomainCoverage =>
+    domain({ domainId, slug, ...over })
+  const coverage = [
+    personal('senses', 1, { density: 0 }),
+    personal('people', 2, { density: 5 }),
+    personal('decisions', 3, { density: 9 }),
+  ]
+  const reading = (area: string, state: 'open' | 'partial' | 'backed', order: number) =>
+    ({ area, state, overreach: 'none' as const, order })
+
+  it('with no getAreaReadings dependency, behaves exactly as before (density path)', async () => {
+    const deps = makeDeps({
+      getCoverage:             vi.fn().mockResolvedValue([personal('people', 2, { density: 5 }), personal('decisions', 3, { density: 1 })]),
+      getElicitationQuestions: vi.fn().mockResolvedValue([{ id: 30, domainId: 3, tier: 'onramp', questionText: 'decisions q' }]),
+    })
+    const r = await selectNextQuestion({ archiveId: 'a', channel: 'daily_email', now: NOW }, deps)
+    expect(r.domainId).toBe(3)
+  })
+
+  it('aims at the neediest area and serves a bank question mapped to it', async () => {
+    const deps = makeDeps({
+      getCoverage:             vi.fn().mockResolvedValue(coverage),
+      getAreaReadings:         vi.fn().mockResolvedValue([reading('People', 'backed', 2), reading('Decision-Making', 'open', 1)]),
+      getElicitationQuestions: vi.fn().mockResolvedValue([
+        { id: 20, domainId: 2, tier: 'onramp', questionText: 'people q' },
+        { id: 30, domainId: 3, tier: 'onramp', questionText: 'decisions q' },
+      ]),
+    })
+    const r = await selectNextQuestion({ archiveId: 'a', channel: 'daily_email', now: NOW }, deps)
+    expect(r).toMatchObject({ domainId: 3, questionId: 30, questionText: 'decisions q', source: 'p2' })
+  })
+
+  it('serves the area opener when the neediest area has no bank questions (Money)', async () => {
+    const deps = makeDeps({
+      getCoverage:             vi.fn().mockResolvedValue(coverage),
+      getAreaReadings:         vi.fn().mockResolvedValue([reading('Money', 'open', 4), reading('People', 'backed', 2)]),
+      getElicitationQuestions: vi.fn().mockResolvedValue([]),
+    })
+    const r = await selectNextQuestion({ archiveId: 'a', channel: 'daily_email', now: NOW }, deps)
+    expect(r.domainId).toBeNull()
+    expect(r.questionId).toBeNull()
+    expect(r.questionText).toMatch(/^Tell me about a time money was tight/)
+    expect(deps.insertQuestionHistory).toHaveBeenCalledWith(expect.objectContaining({ domainId: null, questionText: r.questionText }))
+  })
+
+  it('does not repeat an area opener inside its cooldown, and moves to the next area', async () => {
+    const moneyOpener = 'Tell me about a time money was tight and something had to give. What was going on, and what did you choose to protect?'
+    const deps = makeDeps({
+      getCoverage:             vi.fn().mockResolvedValue(coverage),
+      getQuestionHistory:      vi.fn().mockResolvedValue([
+        { domainId: null, questionId: null, b2bQuestionId: null, servedAt: daysAgo(3), answeredAt: null, questionText: moneyOpener },
+      ]),
+      getAreaReadings:         vi.fn().mockResolvedValue([reading('Money', 'open', 4), reading('People', 'partial', 2)]),
+      getElicitationQuestions: vi.fn().mockResolvedValue([{ id: 20, domainId: 2, tier: 'onramp', questionText: 'people q' }]),
+    })
+    const r = await selectNextQuestion({ archiveId: 'a', channel: 'daily_email', now: NOW }, deps)
+    expect(r.questionText).toBe('people q')
+  })
+
+  it('never serves a warm-up through the planner', async () => {
+    const deps = makeDeps({
+      getCoverage:             vi.fn().mockResolvedValue([personal('senses', 1, { density: 0 })]),
+      getAreaReadings:         vi.fn().mockResolvedValue([reading('Legacy', 'open', 8)]),
+      getElicitationQuestions: vi.fn().mockResolvedValue([{ id: 10, domainId: 1, tier: 'onramp', questionText: 'senses q' }]),
+    })
+    const r = await selectNextQuestion({ archiveId: 'a', channel: 'daily_email', now: NOW }, deps)
+    expect(r.questionText).toMatch(/^Tell me about a time you handed something that mattered/)
+  })
+
+  it('drops warm-ups from the density path after the first ten answers', async () => {
+    const deps = makeDeps({
+      getCoverage:             vi.fn().mockResolvedValue([personal('senses', 1, { density: 0 }), personal('people', 2, { density: 5 })]),
+      getElicitationQuestions: vi.fn().mockResolvedValue([
+        { id: 10, domainId: 1, tier: 'onramp', questionText: 'senses q' },
+        { id: 20, domainId: 2, tier: 'onramp', questionText: 'people q' },
+      ]),
+    })
+    const r = await selectNextQuestion({ archiveId: 'a', channel: 'daily_email', now: NOW }, deps)
+    expect(r.domainId).toBe(2)
+  })
+
+  it('still serves warm-ups before ten answers (p1), planner or not', async () => {
+    const deps = makeDeps({
+      getOwnerDepositCount:    vi.fn().mockResolvedValue(3),
+      getCoverage:             vi.fn().mockResolvedValue([personal('senses', 1, { density: 0 })]),
+      getAreaReadings:         vi.fn().mockResolvedValue([reading('Money', 'open', 4)]),
+      getElicitationQuestions: vi.fn().mockResolvedValue([{ id: 10, domainId: 1, tier: 'onramp', questionText: 'senses q' }]),
+    })
+    const r = await selectNextQuestion({ archiveId: 'a', channel: 'daily_email', now: NOW }, deps)
+    expect(r).toMatchObject({ questionText: 'senses q', source: 'p1' })
+    expect(deps.getAreaReadings).not.toHaveBeenCalled()
+  })
+
+  it('leaves the B2B bank path alone', async () => {
+    const deps = makeDeps({
+      getArchiveScope: vi.fn().mockResolvedValue('b2b'),
+      getCoverage:     vi.fn().mockResolvedValue([domain({ domainId: 11, slug: 'decision-making' })]),
+      getB2BQuestions: vi.fn().mockResolvedValue([{ id: 'b1', domainId: 11, question: 'b2b q', orderIndex: 1 }]),
+      getAreaReadings: vi.fn().mockResolvedValue([reading('Capital', 'open', 4)]),
+    })
+    const r = await selectNextQuestion({ archiveId: 'a', channel: 'founder_web', now: NOW }, deps)
+    expect(r.questionText).toBe('b2b q')
+    expect(deps.getAreaReadings).not.toHaveBeenCalled()
+  })
+})

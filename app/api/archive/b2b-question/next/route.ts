@@ -68,6 +68,13 @@ export async function GET() {
     return NextResponse.json({ error: 'Could not start incident' }, { status: 500 })
   }
 
+  // An area opener chosen by the planner is marked exactly as an area call from
+  // the coverage map, so the map shows "Continue your call" on that domain and
+  // closing it requests a fresh reading (tailored questions, slice 2).
+  if (seed.areaCall && seed.area) {
+    incident.state.areaCall = { area: seed.area, scope: 'business', startedAt: new Date().toISOString() }
+  }
+
   const seedProbe = renderProbe({ probeType: 'SEED', anchor: '', seedText: seed.seedText })
   incident.state.pendingQuestion    = seedProbe
   incident.state.pendingProbeType   = 'SEED'

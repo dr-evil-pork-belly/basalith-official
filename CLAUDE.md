@@ -181,6 +181,17 @@ threads steer questions and are never evidence. The entity prompt, frozen layer,
 verifier, saturation check, founding proof, and coverage run must never read them;
 `lib/threadExtract.test.ts` pins that on source text.
 
+**Question planner.** `lib/questionPlanner.ts`, September 24, 2026, slice 2 of tailored
+questions (`docs/TAILORED_QUESTIONS_SLICE_2_2026-09-24.md`). Ranks a Basalith's eight
+coverage areas from `archive_coverage` (open above partial above backed, overreach
+raises an area, the area asked last goes to the end). B2C: past the first ten answers
+`selectNextQuestion` aims the daily question at the neediest area, serving a bank
+question mapped to it (`B2C_SLUG_TO_AREA`) or, where the bank has none (Risk, Money),
+the area's call opener; senses and joy warm-ups are p1 only. Succession:
+`pickIncidentSeed` picks the neediest domain's narrative seed, then its area opener
+(`lib/areaSeeds.ts`), deterministically so email and portal agree; an area opener is
+marked as an area call. No reading, or an off-label one: the pre-slice behavior.
+
 **Self-serve trial.** `/begin` (`app/begin`), `POST /api/trial/start`, `lib/trial.ts`,
 September 17, 2026. A person types a name and an email; the route creates the auth
 user with `app_metadata.role = 'owner'` forced (`getOrCreateAuthUser` `forceRole`),
