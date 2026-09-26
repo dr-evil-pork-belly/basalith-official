@@ -7,7 +7,14 @@
  * Neither column exists in this database (the 20260429 migration that would add
  * them was never applied), so that version returned 404 on every call. This is a
  * schema-correct minimal replacement: it activates the archive, reactivates
- * credentials, regenerates the login password, and emails the owner + admin.
+ * credentials, and emails the owner + admin.
+ *
+ * September 25, 2026: it no longer regenerates or emails a password. Password
+ * sign-in is retired (app/api/archive-login and app/api/archive/mobile-login
+ * answer 410), so the password opened nothing. The email sends the owner to
+ * /archive-login instead of the legacy magic_link_token route, whose behavior
+ * this change did not verify, and does not claim a payment
+ * (docs/SUCCESSION_CHECKOUT_FIXES_2026-09-25.md).
  * The guide commission is intentionally not handled here — the new paid flow
  * (provisionOnFoundingFee) owns commissions.
  */
@@ -53,21 +60,8 @@ export async function activateArchiveById(archiveId: string): Promise<Activation
     .eq('archive_id', archiveId)
     .then(() => {})
 
-  // Regenerate the login password (the stored hash is not recoverable).
-  const { default: bcrypt } = await import('bcryptjs')
-  const familyName  = archive.family_name ?? ''
-  const newPassword = `${familyName.replace(/\s+/g, '').replace(/[^a-zA-Z]/g, '')}${new Date().getFullYear()}${Math.random().toString(36).slice(2, 6).toUpperCase()}!`
-  const newHash     = await bcrypt.hash(newPassword, 12)
-  await supabaseAdmin
-    .from('archive_credentials')
-    .update({ password_hash: newHash })
-    .eq('archive_id', archiveId)
-    .then(() => {})
-
-  const siteUrl      = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
-  const magicLinkUrl = archive.magic_link_token
-    ? `${siteUrl}/api/archive/magic-login?token=${archive.magic_link_token}`
-    : null
+  const familyName = archive.family_name ?? ''
+  const siteUrl    = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
   const clientName = archive.owner_name ?? familyName
   const firstName  = clientName.split(' ')[0]
   const tierLabel  = TIER_LABELS[archive.tier] ?? 'The Estate'
@@ -79,8 +73,9 @@ export async function activateArchiveById(archiveId: string): Promise<Activation
       firstName,
       guideName:    null,
       tierLabel,
-      magicLinkUrl,
-      password:     newPassword,
+      segment:      archive.tier === 'succession' ? 'succession' : 'b2c',
+      paid:         false,
+      magicLinkUrl: null,
       loginUrl:     `${siteUrl}/archive-login`,
     })
     await resend.emails.send({

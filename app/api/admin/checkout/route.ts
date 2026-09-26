@@ -16,6 +16,7 @@ import { getGodModeAuth } from '@/lib/apiSecurity'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { getStripe } from '@/lib/stripe/client'
 import { priceId, type PriceName } from '@/lib/stripe/prices'
+import { FAMILY_TIERS, provisionedTier } from '@/lib/billing/archiveTier'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -36,7 +37,7 @@ const SELLABLE_TIERS: Record<Segment, PriceName[]> = {
   succession: ['succession_year'],
 }
 
-const ARCHIVE_TIERS = ['archive', 'estate', 'dynasty'] as const
+const ARCHIVE_TIERS = FAMILY_TIERS
 
 // Resolve the recurring tier price name from the request, allowing a base name
 // ('b2c_active' | 'succession') plus billingPeriod, or a full PriceName.
@@ -160,7 +161,11 @@ export async function POST(req: NextRequest) {
     application_id: applicationId,
     segment,
     tier:           skuBase(tierName),
-    archive_tier:   archiveTier ?? 'estate',
+    // The segment decides the kind of Basalith: 'succession' for a succession
+    // application, else the family tier (default 'estate'). provisionOnFoundingFee
+    // applies the same rule, so an old link with 'estate' on a succession
+    // subscription still provisions a succession Basalith.
+    archive_tier:   provisionedTier(segment, archiveTier),
     family_name:    familyName,
   }
   if (guideId) metadata.guide_id = guideId

@@ -7,6 +7,16 @@
  * sentences, no invented numbers, timelines,
  * or mechanisms, and no selling with "AI". The email states what the customer
  * bought and what happens next. It promises nothing that is not real.
+ *
+ * September 25, 2026 (docs/SUCCESSION_CHECKOUT_FIXES_2026-09-25.md):
+ * - It no longer says "Your founding is complete." Payment opens the Basalith;
+ *   the Founding (three calls, lib/foundingSequence.ts) has not started yet.
+ * - It no longer prints a password. Password sign-in is retired
+ *   (app/api/archive-login and app/api/archive/mobile-login answer 410), so the
+ *   password it printed opened nothing and sat in an inbox in plain text.
+ * - It no longer says to save the sign-in link as a permanent entry. A
+ *   generated sign-in link works once and expires.
+ * - It is succession-aware: a business owner reads about the business.
  */
 
 export type FoundingWelcomeInput = {
@@ -14,108 +24,140 @@ export type FoundingWelcomeInput = {
   firstName:    string
   guideName:    string | null
   tierLabel:    string
+  /** 'succession' or 'b2c'. Anything else reads as b2c. */
+  segment:      string
+  /**
+   * True (the default) when this email follows a payment. The manual activation
+   * shim (lib/billing/legacyActivation.ts) passes false: it also resumes paused
+   * Basaliths and can run with no payment, so it says neither that a payment
+   * went through nor that the Founding has not started.
+   */
+  paid?:        boolean
   magicLinkUrl: string | null
-  password:     string
   loginUrl:     string
 }
 
 export type BuiltEmail = { subject: string; html: string; text: string }
 
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+}
+
 export function buildFoundingWelcomeEmail(input: FoundingWelcomeInput): BuiltEmail {
-  const { familyName, firstName, magicLinkUrl, password, loginUrl } = input
+  const { familyName, firstName, magicLinkUrl, loginUrl } = input
+  const succession = input.segment === 'succession'
   // No Guide network (September 2026). The founder reads and runs every founding.
   const guideName = input.guideName ?? 'The founder of Basalith'
+  const foundingUrl = loginUrl.replace(/\/archive-login\/?$/, '/archive/founding')
 
-  const subject = `The ${familyName} Basalith is active.`
+  const h = {
+    family:  escapeHtml(familyName),
+    first:   escapeHtml(firstName),
+    guide:   escapeHtml(guideName),
+    login:   escapeHtml(loginUrl),
+    founding: escapeHtml(foundingUrl),
+    link:    magicLinkUrl ? escapeHtml(magicLinkUrl) : null,
+  }
 
-  const accessBlockHtml = magicLinkUrl
+  const subject = `The ${familyName} Basalith is open.`
+
+  const paid = input.paid !== false
+  const opened = paid
+    ? `Your payment went through, and the ${familyName} Basalith is open. It is private and held in your name.`
+    : `The ${familyName} Basalith is active. It is private and held in your name.`
+  const calls = succession
+    ? 'three conversations about the hardest calls you made running the business, in your own words'
+    : 'three conversations about the hardest calls you ever made, in your own words'
+  const founding = paid
+    ? `The first step is the Founding: ${calls}. Begin whenever you are ready. There is no rush.`
+    : `If you have not begun the Founding, it is the place to start: ${calls}. Begin whenever you are ready. There is no rush.`
+  const extra = succession
+    ? null
+    : 'You can also start adding your photographs and records at any time.'
+  const personal = `${guideName} will be in touch.`
+  const linkNote = `This link works once and then expires. After that, sign in at ${loginUrl} with this email address and we will send you a new link.`
+  const footerLine = succession
+    ? `The ${familyName} Basalith`
+    : `The ${familyName} Basalith · Generation I`
+
+  const p = (text: string, margin = '0 0 20px', size = 15) =>
+    `<p style="font-size:${size}px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:${margin}">${text}</p>`
+
+  const accessBlockHtml = h.link
     ? `
   <div style="background:rgba(196,162,74,0.08);border:1px solid rgba(196,162,74,0.3);border-top:3px solid rgba(196,162,74,0.8);padding:24px;margin:0 0 24px">
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#C4A24A;margin:0 0 12px;text-transform:uppercase">
-      Your Basalith sign-in link
+      Your sign-in link
     </p>
     <p style="font-size:14px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 12px">
       Use the link below to enter your Basalith. No password is required.
     </p>
-    <a href="${magicLinkUrl}"
+    <a href="${h.link}"
       style="display:inline-block;font-family:'Courier New',monospace;font-size:11px;color:#C4A24A;word-break:break-all;margin:0 0 10px">
-      ${magicLinkUrl}
+      ${h.link}
     </a>
-    <p style="font-size:12px;font-style:italic;color:#A29B90;margin:0;line-height:1.7">
-      Save this link. It is your entry to your Basalith.
+    <p style="font-size:13px;color:#B8B4AB;margin:0;line-height:1.7">
+      ${escapeHtml(linkNote)}
     </p>
-  </div>
-  <div style="background:rgba(196,162,74,0.04);border:1px solid rgba(196,162,74,0.12);padding:20px;margin:0 0 24px">
-    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#C4A24A;margin:0 0 12px;text-transform:uppercase">
-      Password Login
-    </p>
-    <p style="font-size:13px;color:#B8B4AB;margin:0 0 6px"><strong style="color:#F0EDE6">Address:</strong> ${loginUrl}</p>
-    <p style="font-size:13px;color:#B8B4AB;margin:0"><strong style="color:#F0EDE6">Password:</strong> ${password}</p>
   </div>`
     : `
   <div style="background:rgba(196,162,74,0.04);border:1px solid rgba(196,162,74,0.15);padding:24px;margin:0 0 24px">
-    <p style="font-size:14px;color:#B8B4AB;line-height:1.8;margin:0 0 8px">
-      Sign in any time at <strong style="color:#F0EDE6">${loginUrl}</strong> with this email address. We will send you a sign-in link.
+    <p style="font-size:14px;color:#B8B4AB;line-height:1.8;margin:0">
+      Sign in at <strong style="color:#F0EDE6">${h.login}</strong> with this email address. We will send you a sign-in link.
     </p>
-    <p style="font-size:13px;color:#B8B4AB;margin:0"><strong style="color:#F0EDE6">Password:</strong> ${password}</p>
   </div>`
 
   const html = `<!DOCTYPE html>
 <html>
 <body style="background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:600px;margin:0 auto;padding:32px">
   <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;text-transform:uppercase;margin:0 0 16px">
-    THE ${familyName.toUpperCase()} BASALITH
+    THE ${h.family.toUpperCase()} BASALITH
   </p>
   <h1 style="font-size:26px;font-weight:300;color:#F0EDE6;margin:0 0 16px">
-    Welcome to Basalith, ${firstName}.
+    Welcome to Basalith, ${h.first}.
   </h1>
-  <p style="font-size:15px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 20px">
-    Your founding is complete. The ${familyName} Basalith is now active.
-  </p>
-  <p style="font-size:15px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 24px">
-    ${guideName} will contact you to begin. Your Basalith is private and held in your name.
-  </p>
+  ${p(escapeHtml(opened))}
 
   ${accessBlockHtml}
 
-  <p style="font-size:14px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 24px">
-    When you are ready, you can enter your Basalith and start adding your photographs and records. There is no rush. The Founding starts whenever you are ready: three of the hardest calls you ever made, in your own words.
+  ${p(escapeHtml(founding), '0 0 12px', 14)}
+  <p style="font-size:14px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 20px">
+    Begin the Founding at <a href="${h.founding}" style="color:#C4A24A">${h.founding}</a>
   </p>
+  ${extra ? p(escapeHtml(extra), '0 0 20px', 14) : ''}
+  ${p(escapeHtml(personal), '0 0 24px', 14)}
   <hr style="border:none;border-top:1px solid rgba(240,237,230,0.06);margin:24px 0">
   <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:0">
-    BASALITH<br>The ${familyName} Basalith · Generation I<br>Heritage Nexus Inc.
+    BASALITH<br>${escapeHtml(footerLine)}<br>Heritage Nexus Inc.
   </p>
 </body>
 </html>`
 
   const accessTextLines = magicLinkUrl
-    ? [
-        'Your Basalith sign-in link (no password required):',
-        magicLinkUrl,
-        '',
-        `Password login: ${loginUrl}`,
-        `Password: ${password}`,
-      ]
-    : [
-        `Sign in at ${loginUrl} with this email address. We will send you a sign-in link.`,
-        `Password: ${password}`,
-      ]
+    ? ['Your sign-in link (no password required):', magicLinkUrl, linkNote]
+    : [`Sign in at ${loginUrl} with this email address. We will send you a sign-in link.`]
 
   const text = [
     `THE ${familyName.toUpperCase()} BASALITH`,
     '',
     `Welcome to Basalith, ${firstName}.`,
     '',
-    `Your founding is complete. The ${familyName} Basalith is now active.`,
-    '',
-    `${guideName} will contact you to begin. Your Basalith is private and held in your name.`,
+    opened,
     '',
     ...accessTextLines,
     '',
-    'When you are ready, you can enter your Basalith and start adding your photographs and records. There is no rush. The Founding starts whenever you are ready: three of the hardest calls you ever made, in your own words.',
+    founding,
+    `Begin the Founding at ${foundingUrl}`,
+    '',
+    ...(extra ? [extra, ''] : []),
+    personal,
     '',
     'BASALITH',
-    `The ${familyName} Basalith · Generation I`,
+    footerLine,
     'Heritage Nexus Inc.',
   ].join('\n')
 

@@ -2,8 +2,9 @@ import { inngest } from '@/lib/inngest'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
 import { getStripe } from '@/lib/stripe/client'
-import { createArchiveWithCredentials } from '@/lib/billing/createArchive'
+import { createArchiveWithCredentials, generateOwnerSignInLink } from '@/lib/billing/createArchive'
 import { buildFoundingWelcomeEmail } from '@/lib/emails/foundingWelcome'
+import { provisionedTier } from '@/lib/billing/archiveTier'
 import {
   buildPaymentFailedEmail,
   buildPaymentFailedSubject,
@@ -14,9 +15,10 @@ const RESEND_FROM = process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? 'legacy@basalith.xyz'
 
 const TIER_LABELS: Record<string, string> = {
-  archive: 'The Archive',
-  estate:  'The Estate',
-  dynasty: 'The Dynasty',
+  archive:    'The Archive',
+  estate:     'The Estate',
+  dynasty:    'The Dynasty',
+  succession: 'Succession',
 }
 
 async function resolveGuideName(guideId: string | null): Promise<string | null> {
@@ -124,7 +126,10 @@ export const provisionOnFoundingFee = inngest.createFunction(
     })
 
     const segment     = (billing.segment ?? meta.segment ?? 'b2c') as string
-    const archiveTier = (meta.archiveTier ?? 'estate') as string // archives.tier vocabulary
+    // archives.tier vocabulary. The segment decides the kind of Basalith: a
+    // succession purchase is 'succession', never the 'estate' default a family
+    // purchase falls back to (lib/billing/archiveTier.ts, September 25, 2026).
+    const archiveTier = provisionedTier(segment, meta.archiveTier)
     const ownerEmail  = (application?.email as string) ?? null
     const ownerName   = (application?.name as string) ?? null
     const familyName  = (meta.familyName ?? '').trim() // supplied by the human at checkout
@@ -139,7 +144,12 @@ export const provisionOnFoundingFee = inngest.createFunction(
     // 5. Create the archive (shared helper). If a partial prior run already
     //    linked an archive, reuse it instead of creating a second one.
     const created = await step.run('create-archive', async () => {
-      if (billing.archive_id) return { archiveId: billing.archive_id as string, password: '', magicLinkUrl: null as string | null, reused: true }
+      // A step's return value is stored in the Inngest run history, so neither
+      // the generated password nor the sign-in link leaves this step. The
+      // password is not emailed either: password sign-in is retired
+      // (app/api/archive-login and app/api/archive/mobile-login answer 410).
+      // The welcome step mints its own sign-in link.
+      if (billing.archive_id) return { archiveId: billing.archive_id as string, reused: true }
       const c = await createArchiveWithCredentials({
         familyName,
         ownerEmail,
@@ -147,7 +157,7 @@ export const provisionOnFoundingFee = inngest.createFunction(
         tier: archiveTier,
         credentialsCreatedBy: meta.guideId ?? null,
       })
-      return { archiveId: c.archiveId, password: c.password, magicLinkUrl: c.magicLinkUrl, reused: false }
+      return { archiveId: c.archiveId, reused: false }
     })
     const archiveId = created.archiveId
 
@@ -214,13 +224,16 @@ export const provisionOnFoundingFee = inngest.createFunction(
       const siteUrl   = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
       const tierLabel = TIER_LABELS[archiveTier] ?? 'The Estate'
       const guideName = await resolveGuideName(meta.guideId)
+      // Minted here, not returned from a step (see create-archive). A retry of
+      // this step mints a fresh link, so the one sent is never stale.
+      const magicLinkUrl = await generateOwnerSignInLink(ownerEmail)
       const email = buildFoundingWelcomeEmail({
         familyName,
         firstName:    (ownerName ?? familyName).split(' ')[0],
         guideName,
         tierLabel,
-        magicLinkUrl: created.magicLinkUrl,
-        password:     created.password,
+        segment,
+        magicLinkUrl,
         loginUrl:     `${siteUrl}/archive-login`,
       })
       try {

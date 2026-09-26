@@ -261,8 +261,8 @@ async function main() {
     firstName: (application.name ?? 'Marcus').split(' ')[0],
     guideName: guide.name,
     tierLabel: 'The Estate',
+    segment: 'b2c',
     magicLinkUrl: 'https://basalith.ai/api/archive/magic-login?token=SAMPLE',
-    password: 'Calder2026ABCD!',
     loginUrl: 'https://basalith.ai/archive-login',
   })
   console.log('SUBJECT:', rendered.subject)

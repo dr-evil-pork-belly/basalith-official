@@ -94,8 +94,20 @@ export async function createArchiveWithCredentials(input: {
   if (ownerLinkError) throw new Error('Failed to link owner account: ' + ownerLinkError.message)
 
   // ── magic link (non-fatal) ──────────────────────────────────────────────
+  const magicLinkUrl = await generateOwnerSignInLink(ownerEmail)
+
+  return { archiveId: archive.id, archive, password, ownerUserId, magicLinkUrl }
+}
+
+/**
+ * A one-time sign-in link for an owner, or null when Supabase refuses one (the
+ * owner can still request a link at /archive-login). A sign-in link is a bearer
+ * credential until it is used or expires, so a caller inside an Inngest step
+ * generates it in the step that sends it and never returns it from a step:
+ * step results are kept in the run history.
+ */
+export async function generateOwnerSignInLink(ownerEmail: string): Promise<string | null> {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
-  let magicLinkUrl: string | null = null
   try {
     const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
       type:  'magiclink',
@@ -103,11 +115,9 @@ export async function createArchiveWithCredentials(input: {
       options: { redirectTo: `${siteUrl}/auth/callback` },
     })
     if (linkError) throw linkError
-    magicLinkUrl = linkData.properties?.action_link ?? null
+    return linkData.properties?.action_link ?? null
   } catch (linkErr: unknown) {
     console.error('[createArchive] Magic link generation failed:', linkErr instanceof Error ? linkErr.message : linkErr)
-    // Non-fatal — owner can still request a sign-in link at /archive-login
+    return null
   }
-
-  return { archiveId: archive.id, archive, password, ownerUserId, magicLinkUrl }
 }
