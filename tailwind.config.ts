@@ -9,8 +9,9 @@ const config: Config = {
   theme: {
     // ─── FONTS ────────────────────────────────────────────────────────────
     fontFamily: {
-      serif: ['var(--font-cormorant)', 'Georgia', 'serif'],
-      sans:  ['var(--font-public-sans)', 'system-ui', 'sans-serif'],
+      serif: ['var(--font-newsreader)', 'Georgia', 'serif'],
+      sans:  ['var(--font-newsreader)', 'Georgia', 'serif'],
+      mono:  ['var(--font-space-mono)', '"Courier New"', 'monospace'],
     },
 
     // ─── COLORS ───────────────────────────────────────────────────────────
@@ -21,9 +22,9 @@ const config: Config = {
       black: '#000000',
 
       obsidian: {
-        DEFAULT: '#1A1A1B',
-        deep:    '#111112',
-        void:    '#0C0C0D',
+        DEFAULT: '#15130F',
+        deep:    '#1E1B17',
+        void:    '#15130F',
       },
       basalt: {
         DEFAULT: '#4A4E51',
@@ -31,11 +32,14 @@ const config: Config = {
         mid:     '#5C6166',
         dark:    '#2D2F31',
       },
+      // The vault-era amber. Every surviving `text-amber` sits on an ink
+      // ground (data-ownership, continuity, not-found), so it is champagne.
+      // The terms page re-themes itself to light and overrides these to bronze.
       amber: {
-        DEFAULT: '#FFB347',
-        light:   '#FFCA7A',
-        dim:     '#C47D1A',
-        whisper: 'rgba(255,179,71,0.07)',
+        DEFAULT: '#CDB27A',
+        light:   '#D9C4A3',
+        dim:     '#CDB27A',
+        whisper: 'rgba(205,178,122,0.06)',
       },
       surface: {
         0: '#1A1A1B',
@@ -48,14 +52,14 @@ const config: Config = {
         primary:   '#F0F0EE',
         secondary: '#9DA3A8',
         muted:     '#5C6166',
-        amber:     '#FFB347',
+        amber:     '#CDB27A',
         inverse:   '#1A1A1B',
       },
       border: {
         subtle:  'rgba(255,255,255,0.06)',
         default: 'rgba(255,255,255,0.10)',
         strong:  'rgba(255,255,255,0.18)',
-        amber:   'rgba(255,179,71,0.35)',
+        amber:   'rgba(205,178,122,0.30)',
       },
     },
 
@@ -140,9 +144,9 @@ const config: Config = {
       md:             '0 8px 24px rgba(0,0,0,0.6)',
       lg:             '0 16px 48px rgba(0,0,0,0.7)',
       xl:             '0 24px 64px rgba(0,0,0,0.8)',
-      'amber-sm':     '0 0 8px rgba(255,179,71,0.25)',
-      'amber-md':     '0 0 20px rgba(255,179,71,0.4), 0 0 40px rgba(255,179,71,0.15)',
-      'amber-lg':     '0 0 40px rgba(255,179,71,0.5), 0 0 80px rgba(255,179,71,0.2)',
+      'amber-sm':     '0 0 8px rgba(205,178,122,0.25)',
+      'amber-md':     '0 0 20px rgba(205,178,122,0.4), 0 0 40px rgba(205,178,122,0.15)',
+      'amber-lg':     '0 0 40px rgba(205,178,122,0.5), 0 0 80px rgba(205,178,122,0.2)',
       'monolith':     '0 6px 20px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.07)',
       'monolith-hover':'0 12px 32px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.10)',
       'glass-inset':  'inset 0 1px 0 rgba(255,255,255,0.08)',
@@ -174,21 +178,21 @@ const config: Config = {
       // The Spark — Lucent Amber AI pulse
       spark: {
         '0%,100%': {
-          boxShadow: '0 0 6px rgba(255,179,71,0.15), 0 0 12px rgba(255,179,71,0.08)',
+          boxShadow: '0 0 6px rgba(205,178,122,0.15), 0 0 12px rgba(205,178,122,0.08)',
           opacity: '0.85',
         },
         '50%': {
-          boxShadow: '0 0 20px rgba(255,179,71,0.6), 0 0 40px rgba(255,179,71,0.3), 0 0 80px rgba(255,179,71,0.12)',
+          boxShadow: '0 0 20px rgba(205,178,122,0.6), 0 0 40px rgba(205,178,122,0.3), 0 0 80px rgba(205,178,122,0.12)',
           opacity: '1',
         },
       },
       'spark-text': {
-        '0%,100%': { textShadow: '0 0 8px rgba(255,179,71,0.2)',  color: '#FFB347' },
-        '50%':     { textShadow: '0 0 24px rgba(255,179,71,0.8), 0 0 48px rgba(255,179,71,0.3)', color: '#FFCA7A' },
+        '0%,100%': { textShadow: '0 0 8px rgba(205,178,122,0.2)',  color: '#CDB27A' },
+        '50%':     { textShadow: '0 0 24px rgba(205,178,122,0.8), 0 0 48px rgba(205,178,122,0.3)', color: '#D9C4A3' },
       },
       'spark-border': {
-        '0%,100%': { borderColor: 'rgba(255,179,71,0.2)' },
-        '50%':     { borderColor: 'rgba(255,179,71,0.7)' },
+        '0%,100%': { borderColor: 'rgba(205,178,122,0.2)' },
+        '50%':     { borderColor: 'rgba(205,178,122,0.7)' },
       },
       // Reveals
       'fade-up': {
@@ -243,14 +247,14 @@ const config: Config = {
     extend: {
       // Portal design system utilities used by archive/* client components.
       colors: {
-        gold:          '#C4A24A',
+        gold:          '#6B5522',
         'white-ghost': '#E8E8EE',
         monolith:      '#141416',
-        obsidian:      '#0C0B09',
+        obsidian:      '#15130F',
       },
       fontFamily: {
-        compute: ['"Space Mono"', '"Courier New"', 'monospace'],
-        legacy:  ['"Cormorant Garamond"', 'Georgia', 'serif'],
+        compute: ['var(--font-space-mono)', '"Courier New"', 'monospace'],
+        legacy:  ['var(--font-newsreader)', 'Georgia', 'serif'],
       },
     },
   },
@@ -267,14 +271,13 @@ const config: Config = {
           textRendering: 'optimizeLegibility',
         },
         '::selection': {
-          background: 'rgba(255,179,71,0.22)',
-          color: '#F0F0EE',
+          background: 'rgba(107,85,34,0.22)',
         },
         '::-webkit-scrollbar':       { width: '4px' },
-        '::-webkit-scrollbar-track': { background: '#0C0C0D' },
-        '::-webkit-scrollbar-thumb': { background: '#2D2F31', borderRadius: '2px' },
+        '::-webkit-scrollbar-track': { background: 'transparent' },
+        '::-webkit-scrollbar-thumb': { background: 'rgba(21,19,15,0.25)', borderRadius: '2px' },
         ':focus-visible': {
-          outline: '2px solid #FFB347',
+          outline: '2px solid currentColor',
           outlineOffset: '3px',
           borderRadius: '2px',
         },
@@ -307,8 +310,8 @@ const config: Config = {
           background: 'rgba(40,30,15,0.62)',
           backdropFilter: 'blur(16px) saturate(150%)',
           WebkitBackdropFilter: 'blur(16px) saturate(150%)',
-          border: '1px solid rgba(255,179,71,0.18)',
-          boxShadow: 'inset 0 1px 0 rgba(255,179,71,0.08), 0 0 40px rgba(255,179,71,0.07), 0 12px 40px rgba(0,0,0,0.6)',
+          border: '1px solid rgba(205,178,122,0.18)',
+          boxShadow: 'inset 0 1px 0 rgba(205,178,122,0.08), 0 0 40px rgba(205,178,122,0.07), 0 12px 40px rgba(0,0,0,0.6)',
         },
       })
 
@@ -341,7 +344,7 @@ const config: Config = {
         },
         '.divider-amber': {
           height: '1px',
-          background: 'linear-gradient(90deg,transparent,rgba(255,179,71,0.4) 30%,rgba(255,179,71,0.4) 70%,transparent)',
+          background: 'linear-gradient(90deg,transparent,rgba(205,178,122,0.4) 30%,rgba(205,178,122,0.4) 70%,transparent)',
           border: 'none',
         },
       })
@@ -351,12 +354,12 @@ const config: Config = {
 
         // Eyebrow label
         '.eyebrow': {
-          fontFamily: 'var(--font-public-sans), system-ui, sans-serif',
-          fontSize: '0.6875rem',
-          fontWeight: '700',
-          letterSpacing: '0.2em',
+          fontFamily: 'var(--font-space-mono), "Courier New", monospace',
+          fontSize: '0.72rem',
+          fontWeight: '400',
+          letterSpacing: '0.16em',
           textTransform: 'uppercase',
-          color: '#C47D1A',
+          color: 'var(--color-gold-on-light)',
         },
 
         // AI badge
@@ -366,14 +369,14 @@ const config: Config = {
           gap: '0.375rem',
           padding: '0.25rem 0.625rem',
           borderRadius: '2px',
-          border: '1px solid rgba(255,179,71,0.25)',
+          border: '1px solid rgba(205,178,122,0.25)',
           background: 'rgba(40,30,15,0.5)',
           fontFamily: 'var(--font-public-sans), system-ui, sans-serif',
           fontSize: '0.625rem',
           fontWeight: '700',
           letterSpacing: '0.16em',
           textTransform: 'uppercase',
-          color: '#FFB347',
+          color: '#CDB27A',
           animation: 'spark-border 3s ease-in-out infinite',
         },
 
@@ -383,7 +386,7 @@ const config: Config = {
           width: '6px',
           height: '6px',
           borderRadius: '50%',
-          background: '#FFB347',
+          background: '#CDB27A',
           animation: 'spark 2.5s ease-in-out infinite',
           flexShrink: '0',
         },
@@ -432,7 +435,7 @@ const config: Config = {
           },
           '&:focus-visible': {
             outline: 'none',
-            boxShadow: '0 0 0 2px #FFB347, 0 6px 20px rgba(0,0,0,0.6)',
+            boxShadow: '0 0 0 2px #CDB27A, 0 6px 20px rgba(0,0,0,0.6)',
           },
           '&:disabled': { opacity: '0.4', cursor: 'not-allowed', pointerEvents: 'none' },
         },
@@ -454,9 +457,9 @@ const config: Config = {
           textDecoration: 'none',
           color: '#1A1A1B',
           borderRadius: '2px',
-          border: '1px solid rgba(255,179,71,0.6)',
-          background: 'linear-gradient(180deg,#FFCA7A 0%,#FFB347 50%,#E09535 100%)',
-          boxShadow: '0 6px 20px rgba(0,0,0,0.6), 0 0 24px rgba(255,179,71,0.25), inset 0 1px 0 rgba(255,255,255,0.35)',
+          border: '1px solid rgba(205,178,122,0.6)',
+          background: 'linear-gradient(180deg,#D9C4A3 0%,#CDB27A 50%,#B89A5E 100%)',
+          boxShadow: '0 6px 20px rgba(0,0,0,0.6), 0 0 24px rgba(205,178,122,0.25), inset 0 1px 0 rgba(255,255,255,0.35)',
           cursor: 'pointer',
           userSelect: 'none',
           WebkitTapHighlightColor: 'transparent',
@@ -468,19 +471,19 @@ const config: Config = {
             background: 'rgba(255,255,255,0.5)',
           },
           '&:hover': {
-            background: 'linear-gradient(180deg,#FFD494 0%,#FFC060 50%,#FFB347 100%)',
-            boxShadow: '0 12px 32px rgba(0,0,0,0.7), 0 0 44px rgba(255,179,71,0.45), inset 0 1px 0 rgba(255,255,255,0.4)',
+            background: 'linear-gradient(180deg,#E3D3B0 0%,#CDB27A 50%,#CDB27A 100%)',
+            boxShadow: '0 12px 32px rgba(0,0,0,0.7), 0 0 44px rgba(205,178,122,0.45), inset 0 1px 0 rgba(255,255,255,0.4)',
             transform: 'translateY(-1px)',
           },
           '&:active': {
-            background: 'linear-gradient(180deg,#E09535 0%,#FFB347 100%)',
+            background: 'linear-gradient(180deg,#B89A5E 0%,#CDB27A 100%)',
             boxShadow: '0 3px 10px rgba(0,0,0,0.5)',
             transform: 'translateY(2px)',
             transition: 'all 80ms ease',
           },
           '&:focus-visible': {
             outline: 'none',
-            boxShadow: '0 0 0 2px #F0F0EE, 0 0 24px rgba(255,179,71,0.4)',
+            boxShadow: '0 0 0 2px #F0F0EE, 0 0 24px rgba(205,178,122,0.4)',
           },
           '&:disabled': { opacity: '0.4', cursor: 'not-allowed', pointerEvents: 'none' },
         },
@@ -513,7 +516,7 @@ const config: Config = {
             background: 'rgba(255,255,255,0.04)',
           },
           '&:active': { transform: 'translateY(1px)' },
-          '&:focus-visible': { outline: 'none', boxShadow: '0 0 0 2px #FFB347' },
+          '&:focus-visible': { outline: 'none', boxShadow: '0 0 0 2px #CDB27A' },
         },
       })
     }),

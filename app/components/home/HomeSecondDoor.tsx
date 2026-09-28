@@ -17,7 +17,7 @@ export default function HomeSecondDoor() {
           style={{
             ...serif,
             fontSize:      'var(--stone-fs-h2-door)',
-            fontWeight:    300,
+            fontWeight: 400,
             lineHeight:    1.14,
             letterSpacing: '-0.02em',
             color:         'var(--stone-invert-fg)',
@@ -32,7 +32,7 @@ export default function HomeSecondDoor() {
             ...serif,
             fontSize:   'var(--stone-fs-body)',
             fontStyle:  'italic',
-            fontWeight: 300,
+            fontWeight: 400,
             lineHeight: 1.55,
             color:      'var(--stone-invert-body)',
             margin:     0,

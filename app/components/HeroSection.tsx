@@ -4,9 +4,9 @@ import Link from 'next/link'
 import { CATEGORY_LINE } from '@/lib/copy'
 
 const MONO: React.CSSProperties = {
-  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+  fontFamily:    'var(--font-space-mono)',
   fontSize:      'var(--text-caption)',
-  letterSpacing: '0.35em',
+  letterSpacing: '0.18em',
   textTransform: 'uppercase' as const,
 }
 
@@ -51,9 +51,9 @@ export default function HeroSection() {
         {/* Display headline — two lines */}
         <h1
           style={{
-            fontFamily:    'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+            fontFamily:    'var(--font-newsreader), Georgia, serif',
             fontSize:      'var(--text-display)',
-            fontWeight:    300,
+            fontWeight: 400,
             lineHeight:    1.04,
             letterSpacing: '-0.025em',
             color:         'var(--color-text-primary)',
@@ -67,10 +67,10 @@ export default function HeroSection() {
         {/* Sub copy */}
         <p
           style={{
-            fontFamily:  'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+            fontFamily:  'var(--font-newsreader), Georgia, serif',
             fontSize:    '1.15rem',
             fontStyle:   'italic',
-            fontWeight:  300,
+            fontWeight: 400,
             lineHeight:  1.9,
             color:       'var(--color-text-secondary)',
             maxWidth:    '500px',
@@ -92,8 +92,8 @@ export default function HeroSection() {
             gap:            '10px',
             alignSelf:      'flex-start',
             textDecoration: 'none',
-            color:          '#0A0908',
-            background:     'var(--b2b-btn)',
+            color: 'var(--btn-label)',
+            background:     'var(--btn)',
             padding:        '14px 28px',
             opacity:        0,
             animation:      'lineReveal 600ms cubic-bezier(0.16,1,0.3,1) 700ms both',
@@ -110,12 +110,12 @@ export default function HeroSection() {
       {/* ── Right: Dark archive art ── */}
       <div
         aria-hidden="true"
-        className="hero-image-col"
+        className="section-dark hero-image-col"
         style={{
           position:  'relative',
           overflow:  'hidden',
           minHeight: 'clamp(400px, 60vh, 900px)',
-          background: '#1A1510',
+          background: 'var(--color-void)',
         }}
       >
         {/* Dark warm gradient base */}
@@ -123,9 +123,9 @@ export default function HeroSection() {
           position: 'absolute',
           inset:    0,
           background: [
-            'radial-gradient(ellipse at 40% 50%, rgba(184,150,62,0.2) 0%, transparent 60%)',
-            'radial-gradient(ellipse at 80% 20%, rgba(184,150,62,0.1) 0%, transparent 50%)',
-            'linear-gradient(160deg, #2A2018 0%, #1A1510 40%, #0F0D0A 100%)',
+            'radial-gradient(ellipse at 40% 50%, rgba(160,132,80,0.2) 0%, transparent 60%)',
+            'radial-gradient(ellipse at 80% 20%, rgba(160,132,80,0.1) 0%, transparent 50%)',
+            'linear-gradient(160deg, var(--invert-raise) 0%, var(--color-void) 60%)',
           ].join(', '),
         }} />
 
@@ -136,16 +136,16 @@ export default function HeroSection() {
           preserveAspectRatio="xMidYMid slice"
           aria-hidden="true"
         >
-          <rect x="32" y="32" width="436" height="636" fill="none" stroke="rgba(184,150,62,0.4)" strokeWidth="1" />
-          <rect x="48" y="48" width="404" height="604" fill="none" stroke="rgba(184,150,62,0.2)" strokeWidth="0.5" />
-          <line x1="32"  y1="72"  x2="72"  y2="72"  stroke="rgba(184,150,62,0.6)" strokeWidth="1.5" />
-          <line x1="72"  y1="32"  x2="72"  y2="72"  stroke="rgba(184,150,62,0.6)" strokeWidth="1.5" />
-          <line x1="428" y1="72"  x2="468" y2="72"  stroke="rgba(184,150,62,0.6)" strokeWidth="1.5" />
-          <line x1="428" y1="32"  x2="428" y2="72"  stroke="rgba(184,150,62,0.6)" strokeWidth="1.5" />
-          <line x1="32"  y1="628" x2="72"  y2="628" stroke="rgba(184,150,62,0.6)" strokeWidth="1.5" />
-          <line x1="72"  y1="628" x2="72"  y2="668" stroke="rgba(184,150,62,0.6)" strokeWidth="1.5" />
-          <line x1="428" y1="628" x2="468" y2="628" stroke="rgba(184,150,62,0.6)" strokeWidth="1.5" />
-          <line x1="428" y1="628" x2="428" y2="668" stroke="rgba(184,150,62,0.6)" strokeWidth="1.5" />
+          <rect x="32" y="32" width="436" height="636" fill="none" stroke="rgba(160,132,80,0.4)" strokeWidth="1" />
+          <rect x="48" y="48" width="404" height="604" fill="none" stroke="rgba(160,132,80,0.2)" strokeWidth="0.5" />
+          <line x1="32"  y1="72"  x2="72"  y2="72"  stroke="rgba(160,132,80,0.6)" strokeWidth="1.5" />
+          <line x1="72"  y1="32"  x2="72"  y2="72"  stroke="rgba(160,132,80,0.6)" strokeWidth="1.5" />
+          <line x1="428" y1="72"  x2="468" y2="72"  stroke="rgba(160,132,80,0.6)" strokeWidth="1.5" />
+          <line x1="428" y1="32"  x2="428" y2="72"  stroke="rgba(160,132,80,0.6)" strokeWidth="1.5" />
+          <line x1="32"  y1="628" x2="72"  y2="628" stroke="rgba(160,132,80,0.6)" strokeWidth="1.5" />
+          <line x1="72"  y1="628" x2="72"  y2="668" stroke="rgba(160,132,80,0.6)" strokeWidth="1.5" />
+          <line x1="428" y1="628" x2="468" y2="628" stroke="rgba(160,132,80,0.6)" strokeWidth="1.5" />
+          <line x1="428" y1="628" x2="428" y2="668" stroke="rgba(160,132,80,0.6)" strokeWidth="1.5" />
           {/* Cognitive fingerprint — streamlines of a loop+delta orientation field
               filling an oval (the full thumbprint), with a brain silhouette drawn
               as an overlay outline ON TOP. Ridges run through and past the brain
@@ -192,8 +192,8 @@ export default function HeroSection() {
           {/* Desktop caption (SVG). Hidden on mobile, where the slice crop is
               unreliable near y=560 — the HTML twin below renders it instead. */}
           <g className="hero-fp-caption-svg">
-            <line x1="140" y1="548" x2="360" y2="548" stroke="rgba(184,150,62,0.2)" strokeWidth="0.5" />
-            <text x="250" y="560" textAnchor="middle" fill="rgba(184,150,62,0.3)" fontSize="8" fontFamily="monospace" letterSpacing="4">
+            <line x1="140" y1="548" x2="360" y2="548" stroke="rgba(160,132,80,0.2)" strokeWidth="0.5" />
+            <text x="250" y="560" textAnchor="middle" fill="rgba(160,132,80,0.3)" fontSize="8" fontFamily="monospace" letterSpacing="4">
               THE COGNITIVE FINGERPRINT
             </text>
           </g>
@@ -203,7 +203,7 @@ export default function HeroSection() {
         <div style={{
           position:   'absolute',
           inset:      0,
-          background: 'radial-gradient(ellipse at center, transparent 40%, rgba(10,9,8,0.4) 100%)',
+          background: 'radial-gradient(ellipse at center, transparent 40%, rgba(21,19,15,0.4) 100%)',
         }} />
 
         {/* Mobile caption twin — the SVG <text> at y=560 is sliced off the short,
@@ -211,13 +211,13 @@ export default function HeroSection() {
             HTML caption that anchors near the bottom of the stacked panel. Hidden
             on desktop (the SVG <text> shows there); shown via the mobile query. */}
         <div className="hero-fp-caption-mobile" aria-hidden="true" style={{ display: 'none' }}>
-          <span style={{ display: 'block', width: '120px', height: '1px', margin: '0 auto 12px', background: 'rgba(184,150,62,0.2)' }} />
+          <span style={{ display: 'block', width: '120px', height: '1px', margin: '0 auto 12px', background: 'rgba(160,132,80,0.2)' }} />
           <span style={{
-            fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
-            fontSize:      '0.6rem',
-            letterSpacing: '0.32em',
+            fontFamily:    'var(--font-space-mono)',
+            fontSize:      '0.78rem',
+            letterSpacing: '0.18em',
             textTransform: 'uppercase' as const,
-            color:         'rgba(184,150,62,0.45)',
+            color: 'var(--color-gold)',
           }}>
             The Cognitive Fingerprint
           </span>

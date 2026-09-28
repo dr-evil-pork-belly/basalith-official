@@ -98,7 +98,7 @@ export default function SuccessionClient({ archiveId: _archiveId, initialSuccess
     padding:    '10px 14px',
     ...SERIF,
     fontSize:   '0.95rem',
-    fontWeight: 300,
+    fontWeight: 400,
     boxSizing:  'border-box',
   }
 
@@ -109,13 +109,13 @@ export default function SuccessionClient({ archiveId: _archiveId, initialSuccess
 
       {/* Header */}
       <div style={{ marginBottom: '40px' }}>
-        <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '8px' }}>
+        <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '8px' }}>
           Succession Management
         </p>
-        <h1 style={{ ...SERIF, fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: 300, color: 'var(--portal-ink)', margin: '0 0 10px', lineHeight: 1.2 }}>
+        <h1 style={{ ...SERIF, fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: 400, color: 'var(--portal-ink)', margin: '0 0 10px', lineHeight: 1.2 }}>
           Successors
         </h1>
-        <p style={{ ...SERIF, fontSize: '0.95rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--portal-secondary)', margin: 0, lineHeight: 1.7 }}>
+        <p style={{ ...SERIF, fontSize: '0.95rem', fontStyle: 'italic', fontWeight: 400, color: 'var(--portal-secondary)', margin: 0, lineHeight: 1.7 }}>
           Successors can query your entity using the Successor Portal. Grant access to
           trusted individuals who may need to apply your judgment after you are gone.
         </p>

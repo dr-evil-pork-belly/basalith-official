@@ -10,9 +10,9 @@ export const metadata: Metadata = {
 // ── shared tokens ────────────────────────────────────────────────────────────
 
 const EYEBROW: React.CSSProperties = {
-  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
-  fontSize:      '0.52rem',
-  letterSpacing: '0.28em',
+  fontFamily:    'var(--font-space-mono)',
+  fontSize:      '0.78rem',
+  letterSpacing: '0.18em',
   textTransform: 'uppercase',
   color:         'var(--color-gold)',
   marginBottom:  '1.75rem',
@@ -20,8 +20,8 @@ const EYEBROW: React.CSSProperties = {
 }
 
 const H1: React.CSSProperties = {
-  fontFamily:    'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-  fontWeight:    300,
+  fontFamily:    'var(--font-newsreader), Georgia, serif',
+  fontWeight: 400,
   fontSize:      'clamp(2.2rem, 5vw, 3.4rem)',
   color:         'var(--color-text-primary)',
   lineHeight:    1.15,
@@ -30,7 +30,7 @@ const H1: React.CSSProperties = {
 }
 
 const H2: React.CSSProperties = {
-  fontFamily:    'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontFamily:    'var(--font-newsreader), Georgia, serif',
   fontWeight:    500,
   fontSize:      'clamp(1.7rem, 3.5vw, 2.4rem)',
   color:         'var(--color-text-primary)',
@@ -40,8 +40,8 @@ const H2: React.CSSProperties = {
 }
 
 const BODY: React.CSSProperties = {
-  fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-  fontWeight:   300,
+  fontFamily:   'var(--font-newsreader), Georgia, serif',
+  fontWeight: 400,
   fontSize:     '1.1rem',
   color:        'var(--color-text-secondary)',
   lineHeight:   1.9,
@@ -51,7 +51,7 @@ const BODY: React.CSSProperties = {
 const GOLD_RULE: React.CSSProperties = {
   height:     '1px',
   margin:     '4rem 0',
-  background: 'linear-gradient(90deg, transparent, rgba(196,162,74,0.35), transparent)',
+  background: 'linear-gradient(90deg, transparent, rgba(160,132,80,0.35), transparent)',
 }
 
 // ── Section 1 — Opening ──────────────────────────────────────────────────────
@@ -281,10 +281,10 @@ function TheProcess() {
               style={{ display: 'grid', gridTemplateColumns: '3rem 1fr', gap: '1.5rem', alignItems: 'start' }}
             >
               <span style={{
-                fontFamily:    "'Space Mono', 'DM Mono', monospace",
-                fontSize:      '0.62rem',
+                fontFamily:    "'DM Mono', monospace",
+                fontSize:      '0.78rem',
                 letterSpacing: '0.1em',
-                color:         'rgba(196,162,74,0.45)',
+                color: 'var(--color-gold)',
                 paddingTop:    '0.2rem',
                 display:       'block',
               }}>
@@ -292,11 +292,11 @@ function TheProcess() {
               </span>
               <div>
                 <p style={{
-                  fontFamily:    "'Space Mono', 'DM Mono', monospace",
-                  fontSize:      '0.6rem',
+                  fontFamily:    "'DM Mono', monospace",
+                  fontSize:      '0.78rem',
                   letterSpacing: '0.18em',
                   textTransform: 'uppercase',
-                  color:         '#C4A24A',
+                  color:         'var(--color-gold)',
                   marginBottom:  '0.6rem',
                 }}>
                   {name}
@@ -322,20 +322,20 @@ function Pricing() {
         <span style={EYEBROW}>Investment</span>
 
         {/* Part 1 — The Founding */}
-        <div style={{ border: '1px solid rgba(196,162,74,0.2)', borderTop: '2px solid rgba(196,162,74,0.5)', borderRadius: '2px', padding: '2.5rem', marginBottom: '1.5rem' }}>
-          <p style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.44rem', letterSpacing: '0.28em', textTransform: 'uppercase', color: '#C4A24A', marginBottom: '1rem' }}>
+        <div style={{ border: '1px solid rgba(160,132,80,0.2)', borderTop: '2px solid rgba(160,132,80,0.5)', borderRadius: '2px', padding: '2.5rem', marginBottom: '1.5rem' }}>
+          <p style={{ fontFamily: 'var(--font-space-mono), monospace', fontSize: '0.72rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '1rem' }}>
             The Witness Founding
           </p>
-          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 700, fontSize: '3rem', color: '#F0EDE6', lineHeight: 1, marginBottom: '0.4rem' }}>
+          <p style={{ fontFamily: "var(--font-newsreader), Georgia, serif", fontWeight: 700, fontSize: '3rem', color: 'var(--color-text-primary)', lineHeight: 1, marginBottom: '0.4rem' }}>
             $4,500
           </p>
-          <p style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.44rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#5C6166', marginBottom: '1rem' }}>
+          <p style={{ fontFamily: 'var(--font-space-mono), monospace', fontSize: '0.72rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: '1rem' }}>
             One-Time Engagement Fee
           </p>
-          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'italic', fontSize: '0.9rem', color: '#9DA3A8', lineHeight: 1.7, marginBottom: '1.5rem' }}>
+          <p style={{ fontFamily: "var(--font-newsreader), Georgia, serif", fontStyle: 'italic', fontSize: '0.9rem', color: 'var(--color-text-secondary)', lineHeight: 1.7, marginBottom: '1.5rem' }}>
             Six weeks. Every session. Everything that remains.
           </p>
-          <div style={{ borderTop: '1px solid rgba(196,162,74,0.2)', width: '80px', margin: '0 0 1.5rem' }} />
+          <div style={{ borderTop: '1px solid rgba(160,132,80,0.2)', width: '80px', margin: '0 0 1.5rem' }} />
           <p style={{ ...BODY, fontSize: '0.95rem', marginBottom: 0 }}>
             Higher than the standard Founding because the labor is different.
             There is no ongoing deposit. There is a fixed body of material and
@@ -345,16 +345,16 @@ function Pricing() {
 
         {/* Part 2 — Ongoing Care */}
         <div style={{ border: '1px solid rgba(255,255,255,0.06)', borderRadius: '2px', padding: '2.5rem', marginBottom: '2.5rem' }}>
-          <p style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.44rem', letterSpacing: '0.28em', textTransform: 'uppercase', color: '#C4A24A', marginBottom: '1rem' }}>
+          <p style={{ fontFamily: 'var(--font-space-mono), monospace', fontSize: '0.72rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '1rem' }}>
             Witness Basalith
           </p>
-          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontWeight: 700, fontSize: '2.5rem', color: '#F0EDE6', lineHeight: 1, marginBottom: '0.4rem' }}>
-            $3,600 <span style={{ fontSize: '1.2rem', fontWeight: 300 }}>/ year</span>
+          <p style={{ fontFamily: "var(--font-newsreader), Georgia, serif", fontWeight: 700, fontSize: '2.5rem', color: 'var(--color-text-primary)', lineHeight: 1, marginBottom: '0.4rem' }}>
+            $3,600 <span style={{ fontSize: '1.2rem', fontWeight: 400 }}>/ year</span>
           </p>
-          <p style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.44rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#5C6166', marginBottom: '0.75rem' }}>
+          <p style={{ fontFamily: 'var(--font-space-mono), monospace', fontSize: '0.72rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: '0.75rem' }}>
             Billed annually
           </p>
-          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'italic', fontSize: '0.85rem', color: '#9DA3A8', lineHeight: 1.65, marginBottom: '1.5rem' }}>
+          <p style={{ fontFamily: "var(--font-newsreader), Georgia, serif", fontStyle: 'italic', fontSize: '0.85rem', color: 'var(--color-text-secondary)', lineHeight: 1.65, marginBottom: '1.5rem' }}>
             The same infrastructure as any Active Basalith.
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginBottom: '1.5rem' }}>
@@ -369,14 +369,14 @@ function Pricing() {
             ].map(f => (
               <div key={f} style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0 }}>
-                  <circle cx="7" cy="7" r="6.5" stroke="rgba(255,179,71,0.3)" />
-                  <path d="M4 7l2 2 4-4" stroke="#FFB347" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <circle cx="7" cy="7" r="6.5" stroke="rgba(205,178,122,0.3)" />
+                  <path d="M4 7l2 2 4-4" stroke="var(--color-gold)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-                <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '0.95rem', color: '#B8B4AB', lineHeight: 1.5 }}>{f}</span>
+                <span style={{ fontFamily: "var(--font-newsreader), Georgia, serif", fontSize: '0.95rem', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>{f}</span>
               </div>
             ))}
           </div>
-          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'italic', fontSize: '0.85rem', color: '#5C6166', lineHeight: 1.75, margin: 0 }}>
+          <p style={{ fontFamily: "var(--font-newsreader), Georgia, serif", fontStyle: 'italic', fontSize: '0.85rem', color: 'var(--color-text-muted)', lineHeight: 1.75, margin: 0 }}>
             Your Basalith begins after The Witness Founding is complete. Renews annually.
             Cancel at any time. Cancelling ends the subscription. It does not delete your
             Basalith. Your content is preserved, and permanent deletion happens only
@@ -385,7 +385,7 @@ function Pricing() {
         </div>
 
         {/* Consultation note + CTA */}
-        <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'italic', fontSize: '0.95rem', color: '#9DA3A8', lineHeight: 1.8, marginBottom: '2rem', maxWidth: '560px' }}>
+        <p style={{ fontFamily: "var(--font-newsreader), Georgia, serif", fontStyle: 'italic', fontSize: '0.95rem', color: 'var(--color-text-secondary)', lineHeight: 1.8, marginBottom: '2rem', maxWidth: '560px' }}>
           The Witness Founding requires a consultation before engagement.
           Every family&rsquo;s situation is different. We will tell you honestly
           what we can build, and what it will cost, before you commit to anything.
@@ -395,18 +395,18 @@ function Pricing() {
           href="/apply"
           style={{
             display:        'inline-block',
-            fontFamily:     "'Space Mono', monospace",
-            fontSize:       '0.58rem',
-            letterSpacing:  '0.22em',
+            fontFamily:     "monospace",
+            fontSize:       '0.78rem',
+            letterSpacing:  '0.18em',
             textTransform:  'uppercase',
-            color:          '#B8B4AB',
+            color:          'var(--color-text-secondary)',
             textDecoration: 'none',
-            border:         '1px solid rgba(196,162,74,0.3)',
+            border:         '1px solid rgba(160,132,80,0.3)',
             borderRadius:   '2px',
             padding:        '1rem 2rem',
             transition:     'border-color 0.2s, color 0.2s',
           }}
-          className="hover:border-amber hover:text-amber"
+          className="hover:border-current"
         >
           Request a Consultation
         </a>
@@ -422,11 +422,11 @@ function ClosingQuote() {
     <section aria-label="Closing" style={{ background: 'var(--color-bg)', padding: '7rem 2rem', textAlign: 'center' }}>
       <div style={{ maxWidth: '560px', margin: '0 auto' }}>
         <p style={{
-          fontFamily:   "'Cormorant Garamond', Georgia, serif",
-          fontWeight:   300,
+          fontFamily:   "var(--font-newsreader), Georgia, serif",
+          fontWeight: 400,
           fontSize:     '1.3rem',
           fontStyle:    'italic',
-          color:        '#9DA3A8',
+          color:        'var(--color-text-secondary)',
           lineHeight:   1.85,
           marginBottom: '3rem',
         }}>
@@ -448,11 +448,11 @@ function ClosingQuote() {
         </p>
 
         <p style={{
-          fontFamily:    "'Space Mono', 'DM Mono', monospace",
-          fontSize:      '0.44rem',
-          letterSpacing: '0.28em',
+          fontFamily:    "'DM Mono', monospace",
+          fontSize:      '0.72rem',
+          letterSpacing: '0.18em',
           textTransform: 'uppercase',
-          color:         '#C4A24A',
+          color:         'var(--color-gold)',
         }}>
           The Witness Basalith
         </p>

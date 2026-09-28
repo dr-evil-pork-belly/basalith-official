@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 
-const MONO: React.CSSProperties = { fontFamily: 'var(--portal-mono)', textTransform: 'uppercase' as const, letterSpacing: '0.22em' }
+const MONO: React.CSSProperties = { fontFamily: 'var(--portal-mono)', textTransform: 'uppercase' as const, letterSpacing: '0.18em' }
 
 interface SignificantDate { year: number; label: string; type: string }
 interface DecadeData {
@@ -97,7 +97,7 @@ export default function TimelineClient() {
       {/* Header */}
       <div style={{ marginBottom: '28px' }}>
         <p style={{ ...MONO, fontSize: '14.5px', color: 'var(--portal-gold-ink)', marginBottom: '8px' }}>Life Timeline</p>
-        <h1 style={{ fontFamily: 'var(--portal-serif)', fontSize: 'clamp(1.5rem,3vw,2.5rem)', fontWeight: 300, color: 'var(--portal-ink)', margin: '0 0 12px' }}>
+        <h1 style={{ fontFamily: 'var(--portal-serif)', fontSize: 'clamp(1.5rem,3vw,2.5rem)', fontWeight: 400, color: 'var(--portal-ink)', margin: '0 0 12px' }}>
           A life, decade by decade.
         </h1>
         <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '1rem', fontStyle: 'italic', color: 'var(--portal-secondary)', lineHeight: 1.7, maxWidth: '520px', margin: 0 }}>
@@ -141,7 +141,7 @@ export default function TimelineClient() {
         ].map(s => (
           <div key={s.label} style={{ background: 'var(--portal-gold-wash)', border: '1px solid var(--portal-gold-line)', borderRadius: '4px', padding: '14px 18px', minWidth: '110px' }}>
             <p style={{ ...MONO, fontSize: '14.5px', color: 'var(--portal-secondary)', margin: '0 0 6px' }}>{s.label}</p>
-            <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '1.75rem', fontWeight: 300, color: 'var(--portal-gold-ink)', margin: 0, lineHeight: 1 }}>{s.value}</p>
+            <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '1.75rem', fontWeight: 400, color: 'var(--portal-gold-ink)', margin: 0, lineHeight: 1 }}>{s.value}</p>
           </div>
         ))}
       </div>
@@ -189,11 +189,11 @@ export default function TimelineClient() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px', marginBottom: '20px' }}>
             <div>
               <p style={{ ...MONO, fontSize: '14.5px', color: 'var(--portal-gold-ink)', marginBottom: '6px' }}>{decadeHeading(selected)}</p>
-              <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '1.05rem', fontWeight: 300, color: 'var(--portal-ink)', margin: 0, lineHeight: 1.5, maxWidth: '400px' }}>
+              <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '1.05rem', fontWeight: 400, color: 'var(--portal-ink)', margin: 0, lineHeight: 1.5, maxWidth: '400px' }}>
                 {decadeDescription(selected, ownerFirstName)}
               </p>
             </div>
-            <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '2.5rem', fontWeight: 300, color: STATUS_COLOR[selected.status], letterSpacing: '-0.02em', margin: 0 }}>
+            <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '2.5rem', fontWeight: 400, color: STATUS_COLOR[selected.status], letterSpacing: '-0.02em', margin: 0 }}>
               {selected.coverage}%
             </p>
           </div>

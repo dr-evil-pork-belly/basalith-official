@@ -39,7 +39,7 @@ export default function HomeSuccession() {
           style={{
             ...serif,
             fontSize:      'var(--stone-fs-h2)',
-            fontWeight:    300,
+            fontWeight: 400,
             lineHeight:    1.14,
             letterSpacing: '-0.02em',
             color:         'var(--stone-ink)',
@@ -50,13 +50,13 @@ export default function HomeSuccession() {
           What built the company was never written down.
         </h2>
 
-        <p style={{ ...serif, fontSize: 'var(--stone-fs-body)', fontWeight: 300, lineHeight: 1.5, color: 'var(--stone-body)', margin: 0 }}>
+        <p style={{ ...serif, fontSize: 'var(--stone-fs-body)', fontWeight: 400, lineHeight: 1.5, color: 'var(--stone-body)', margin: 0 }}>
           It is in which deals you walked away from. The hires you trusted against the resume. When you held the line, and when you bent it.
         </p>
-        <p style={{ ...serif, fontSize: 'var(--stone-fs-body)', fontWeight: 300, lineHeight: 1.5, color: 'var(--stone-body)', margin: 0 }}>
+        <p style={{ ...serif, fontSize: 'var(--stone-fs-body)', fontWeight: 400, lineHeight: 1.5, color: 'var(--stone-body)', margin: 0 }}>
           Decades of calls that looked like instinct and were really pattern.
         </p>
-        <p style={{ ...serif, fontSize: 'var(--stone-fs-body)', fontWeight: 300, lineHeight: 1.5, color: 'var(--stone-ink)', margin: 0 }}>
+        <p style={{ ...serif, fontSize: 'var(--stone-fs-body)', fontWeight: 400, lineHeight: 1.5, color: 'var(--stone-ink)', margin: 0 }}>
           Basalith captures it while you are still making those calls. So the people who take over can ask how you would decide, instead of guessing.
         </p>
         <p
@@ -64,7 +64,7 @@ export default function HomeSuccession() {
             ...serif,
             fontSize:   'var(--stone-fs-lead)',
             fontStyle:  'italic',
-            fontWeight: 300,
+            fontWeight: 400,
             lineHeight: 1.5,
             color:      'var(--color-gold)',
             margin:     0,

@@ -80,12 +80,12 @@ function MilestoneOverlay({ count, onDone }: { count: number; onDone: () => void
       <div className="relative flex flex-col items-center gap-6 px-8 text-center" style={{ maxWidth: '500px' }}>
         <Sigil size={40} pulse />
         {showMain && (
-          <p style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', fontWeight: 300, fontSize: 'clamp(1.5rem,4vw,2.5rem)', color: 'var(--invert-fg)', lineHeight: 1.3, whiteSpace: 'pre-line', animation: 'milestoneMainIn 0.6s cubic-bezier(0.16,1,0.3,1) forwards' }}>
+          <p style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', fontWeight: 400, fontSize: 'clamp(1.5rem,4vw,2.5rem)', color: 'var(--invert-fg)', lineHeight: 1.3, whiteSpace: 'pre-line', animation: 'milestoneMainIn 0.6s cubic-bezier(0.16,1,0.3,1) forwards' }}>
             {texts.main}
           </p>
         )}
         {showSub && (
-          <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.4em', color: 'var(--invert-gold)', textTransform: 'uppercase', animation: 'milestoneSubIn 0.4s ease forwards' }}>
+          <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', color: 'var(--invert-gold)', textTransform: 'uppercase', animation: 'milestoneSubIn 0.4s ease forwards' }}>
             {texts.sub}
           </p>
         )}
@@ -287,7 +287,7 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
         <p className="font-serif" style={{ fontSize: '1.1rem', fontStyle: 'italic', color: 'var(--portal-ink)' }}>
           Reading your photos…
         </p>
-        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.22em', color: 'var(--portal-gold-ink)' }}>
+        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', color: 'var(--portal-gold-ink)' }}>
           {state.totalSelected} SELECTED
         </p>
       </div>
@@ -362,7 +362,7 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
 
       {/* iPhone tip */}
       <div style={{ background: 'var(--portal-gold-wash)', border: '1px solid var(--portal-gold-line)', borderRadius: '2px', padding: '1rem 1.25rem' }}>
-        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.25em', color: 'var(--portal-gold-ink)', marginBottom: '0.4rem' }}>
+        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', color: 'var(--portal-gold-ink)', marginBottom: '0.4rem' }}>
           FOR IPHONE · ICLOUD LIBRARIES
         </p>
         <p className="font-serif" style={{ fontSize: '0.88rem', fontStyle: 'italic', color: 'var(--portal-secondary)', lineHeight: 1.7, margin: 0 }}>
@@ -386,7 +386,7 @@ function BulkUploadTab({ archiveId }: { archiveId: string }) {
         <div className="w-10 h-10 flex items-center justify-center rounded-sm border" style={{ borderColor: 'var(--portal-gold-line)' }}>
           <span style={{ color: 'var(--portal-gold-ink)', fontSize: '1.4rem', lineHeight: 1 }}>↑</span>
         </div>
-        <p className="font-serif" style={{ color: 'var(--portal-ink)', fontSize: '1rem', fontWeight: 300 }}>
+        <p className="font-serif" style={{ color: 'var(--portal-ink)', fontSize: '1rem', fontWeight: 400 }}>
           {dragging ? 'Drop them here.' : 'Drop photographs here, or click to select.'}
         </p>
         <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.14em', color: 'var(--portal-secondary)', textTransform: 'uppercase' }}>
@@ -605,8 +605,8 @@ export default function LabelClient({ archiveId }: { archiveId: string }) {
     )
   }
 
-  const monoLabel = { display: 'block', fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.35em', textTransform: 'uppercase' as const, color: 'var(--portal-gold-ink)', marginBottom: '0.75rem' }
-  const compactLabel = { display: 'block', fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.28em', textTransform: 'uppercase' as const, color: 'var(--portal-secondary)', marginBottom: '0.6rem' }
+  const monoLabel = { display: 'block', fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase' as const, color: 'var(--portal-gold-ink)', marginBottom: '0.75rem' }
+  const compactLabel = { display: 'block', fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase' as const, color: 'var(--portal-secondary)', marginBottom: '0.6rem' }
   const baseInput = { width: '100%', background: 'transparent', color: 'var(--portal-ink)', borderBottom: '1px solid var(--portal-card-line)', outline: 'none', fontFamily: 'var(--portal-serif)', fontSize: '1rem' }
 
   return (
@@ -632,7 +632,7 @@ export default function LabelClient({ archiveId }: { archiveId: string }) {
               style={{
                 fontFamily: 'var(--portal-mono)',
                 fontSize: '11px',
-                letterSpacing: '0.22em',
+                letterSpacing: '0.18em',
                 textTransform: 'uppercase',
                 padding:       '0.6rem 1.25rem',
                 color:         tab === t ? 'var(--portal-gold-ink)' : 'var(--portal-secondary)',
@@ -694,7 +694,7 @@ export default function LabelClient({ archiveId }: { archiveId: string }) {
               <textarea rows={8} value={form.story} onChange={setField('story')}
                 placeholder={"What was happening in this moment?\nWrite as much as you remember. Nothing is too small."}
                 className="w-full resize-none focus:outline-none placeholder:italic"
-                style={{ background: 'transparent', color: 'var(--portal-ink)', borderBottom: '1px solid var(--portal-gold-line)', fontFamily: 'var(--portal-serif)', fontStyle: 'normal', fontWeight: 300, fontSize: '1.15rem', lineHeight: 1.9, padding: '1rem 0' }} />
+                style={{ background: 'transparent', color: 'var(--portal-ink)', borderBottom: '1px solid var(--portal-gold-line)', fontFamily: 'var(--portal-serif)', fontStyle: 'normal', fontWeight: 400, fontSize: '1.15rem', lineHeight: 1.9, padding: '1rem 0' }} />
               <p className="absolute bottom-2 right-0" style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', color: 'var(--portal-label)' }}>{form.story.length} characters</p>
             </div>
           </div>
@@ -704,7 +704,7 @@ export default function LabelClient({ archiveId }: { archiveId: string }) {
             <textarea rows={5} value={form.essence} onChange={setField('essence')}
               placeholder={"What should the people who come after you understand about this moment?\nWhat it meant then. What it still means."}
               className="w-full resize-none focus:outline-none placeholder:italic"
-              style={{ background: 'transparent', color: 'var(--portal-ink)', borderBottom: '1px solid var(--portal-card-line)', fontFamily: 'var(--portal-serif)', fontWeight: 300, fontSize: '1.05rem', lineHeight: 1.9, padding: '0.75rem 0' }} />
+              style={{ background: 'transparent', color: 'var(--portal-ink)', borderBottom: '1px solid var(--portal-card-line)', fontFamily: 'var(--portal-serif)', fontWeight: 400, fontSize: '1.05rem', lineHeight: 1.9, padding: '0.75rem 0' }} />
           </div>
 
           <div>

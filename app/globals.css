@@ -1,7 +1,25 @@
 /* ─────────────────────────────────────────────────────────────────────────
    BASALITH: GLOBAL CSS
-   Light luxury design system (marketing). Portal runs on the stone register
-   via .portal-stone (bottom of file); portal components read var(--portal-*).
+   One design system, two grounds. Recut September 28, 2026:
+   docs/DESIGN_RECUT_2026-09-28.md is the record; the comp is the Artifact
+   "Basalith Recut".
+
+   Paper  #F5F3EE  every marketing page (the old light, paper and stone
+                   registers collapse into this one ground)
+   Stone  #ECE9E2  every signed-in surface, via .portal-stone
+   Ink    #15130F  text, the spine, the threshold, the block where the
+                   record speaks, and the primary button on a light ground
+
+   Gold is a thread, never a fill. Bronze #6B5522 for eyebrows, rules and
+   accent text on light; champagne #CDB27A for the same jobs on ink. The
+   primary button is the opposite of its ground: ink on paper and stone,
+   bone on ink. Gold does not fill a button anywhere.
+
+   Type: Newsreader for everything a person reads (Cormorant is retired),
+   IBM Plex Mono for eyebrows, timestamps and button labels, never below
+   11 px. The mono variable is still named --font-space-mono so that no
+   component had to change; layout.tsx loads Plex Mono into it.
+
    Design references: Rolex, Patek Philippe: restrained, generous, serious.
 ───────────────────────────────────────────────────────────────────────── */
 
@@ -11,24 +29,50 @@
 
 /* ── Design System: CSS Variables ── */
 :root {
-  /* Marketing site: light theme */
-  --color-bg:           #FAFAF8;
+  /* Marketing site: paper */
+  --color-bg:           #F5F3EE;
   --color-surface:      #FFFFFF;
-  --color-surface-alt:  #F5F3EE;
-  --color-void:         #0A0908;
+  --color-surface-alt:  #ECE9E2;
+  --color-void:         #15130F;
 
-  --color-gold:         #B8963E;
-  --color-gold-light:   #C4A24A;
-  --color-gold-subtle:  rgba(184,150,62,0.08);
-  --color-gold-border:  rgba(184,150,62,0.2);
+  /* --color-gold is bronze by default, because the default ground is paper.
+     Every dark scope (.section-dark, .stone-invert, .portal-threshold,
+     .portal-invert) re-points it to champagne. A dark block therefore has to
+     carry one of those classes; an inline var(--color-void) background with
+     no class leaves gold and the button on their light values. */
+  --color-gold:         #6B5522;   /* 6.42:1 on paper, 5.88:1 on stone */
+  --color-gold-light:   #6B5522;   /* the hover step on light is the same bronze */
+  --color-gold-on-dark: #CDB27A;   /* 9.05:1 on ink; the dark scopes read this */
 
-  --color-text-primary:   #1A1814;
-  --color-text-secondary: #4A4640;
-  --color-text-muted:     #6A6660;
-  --color-text-faint:     #9A9690;
+  /* On-light text that never flips, for a white card that sits inside a
+     dark section. The --color-text-* family re-points inside .section-dark;
+     these do not. */
+  --paper-ink:   #15130F;
+  --paper-body:  #3B3730;
+  --paper-muted: #5C574F;
+  --paper-rule:  rgba(21,19,15,0.10);
+  --color-gold-subtle:  rgba(107,85,34,0.06);
+  --color-gold-border:  rgba(107,85,34,0.22);
 
-  --color-border:        rgba(26,24,20,0.08);
-  --color-border-medium: rgba(26,24,20,0.15);
+  --color-text-primary:   #15130F;
+  --color-text-secondary: #3B3730;
+  --color-text-muted:     #5C574F;
+  --color-text-faint:     #665F56;   /* 5.68:1 on paper; the floor for readable text */
+
+  --color-border:        rgba(21,19,15,0.10);
+  --color-border-medium: rgba(21,19,15,0.18);
+
+  /* Text on ink. Every marketing dark section reads these three. */
+  --on-dark:    #F7F5F1;   /* 17.04:1 */
+  --on-dark-2:  #C9C3BA;   /* 10.60:1 */
+  --on-dark-3:  #A8A199;   /*  7.26:1, the floor for readable text on ink */
+  --on-dark-rule: rgba(247,245,241,0.12);
+
+  /* The one button. Ink on a light ground; the dark scopes flip it. */
+  --btn:        #15130F;
+  --btn-hover:  #2A2620;
+  --btn-label:  #F7F5F1;   /* 17.04:1 on --btn */
+  --btn-quiet:  #15130F;   /* the outline button's line and text */
 
   /* ── Portal, shared across both registers ────────────────────────────────
      The retired dark --portal-* block that sat here was deleted September 19,
@@ -46,33 +90,38 @@
   --portal-serif:     var(--font-newsreader), Georgia, serif;
   --portal-mono:      var(--font-space-mono), 'Courier New', monospace;
 
-  --invert-bg:        #14120F;
-  --invert-fg:        #F7F5F1;   /* 17.17:1 */
-  --invert-body:      #C7C1B8;   /* 10.46:1 */
-  --invert-dim:       rgba(247,245,241,0.62);   /* 7.08:1 */
-  --invert-gold:      #C4A24A;   /*  7.67:1 */
-  --invert-error:     #E08B8B;   /*  7.33:1 */
-  --invert-ok:        #7FB685;   /*  7.95:1 */
-  --invert-gold-pale: #D9C4A3;   /* 11.02:1, the demos' bright gold */
-  --invert-raise:     #1C1A17;   /* the lighter end of the demos' gradient */
+  --invert-bg:        #15130F;
+  --invert-fg:        #F7F5F1;   /* 17.04:1 */
+  --invert-body:      #C9C3BA;   /* 10.60:1 */
+  --invert-dim:       #A8A199;   /*  7.26:1 */
+  --invert-gold:      #CDB27A;   /*  9.05:1, champagne */
+  --invert-error:     #E08B8B;   /*  7.28:1 */
+  --invert-ok:        #7FB685;   /*  7.89:1 */
+  --invert-gold-pale: #D9C4A3;   /* 10.9:1, the demos' bright gold */
+  --invert-raise:     #1E1B17;   /* the lighter end of the demos' gradient */
   --invert-rule:      rgba(247,245,241,0.12);
   --invert-field:     rgba(247,245,241,0.07);
-  --invert-gold-line: rgba(196,162,74,0.45);
-  --invert-gold-wash: rgba(196,162,74,0.10);
+  --invert-gold-line: rgba(205,178,122,0.40);
+  --invert-gold-wash: rgba(205,178,122,0.10);
 
-  --portal-btn:       #C4A24A;   /* label #0A0908, 8.16:1 */
-  --portal-btn-hover: #B08F3E;   /* label #0A0908, 6.48:1 */
-  --portal-btn-label: #0A0908;
+  /* The portal button is the same one button. Ink on stone. The threshold
+     and the inverted block flip it (see .portal-threshold). */
+  --portal-btn:       var(--btn);
+  --portal-btn-hover: var(--btn-hover);
+  --portal-btn-label: var(--btn-label);
 
-  /* Typography */
-  --font-serif: 'Cormorant Garamond', Georgia, serif;
-  --font-mono:  'Space Mono', 'Courier New', monospace;
+  /* Typography. One serif. Cormorant Garamond is retired; the variable
+     name survives so no component had to change. */
+  --font-serif: var(--font-newsreader), Georgia, serif;
+  --font-mono:  var(--font-space-mono), 'Courier New', monospace;
 
   /* These mirror next/font CSS variables */
-  --font-cormorant:   'Cormorant Garamond', Georgia, serif;
-  --font-public-sans: 'Public Sans', system-ui, sans-serif;
+  --font-cormorant:   var(--font-newsreader), Georgia, serif;
+  --font-public-sans: var(--font-newsreader), Georgia, serif;
 
-  /* Type scale */
+  /* Type scale. The label and caption steps were 10.4 px and 8.8 px, below
+     anything a seventy year old can read on an iPad. 11.5 px is the floor
+     for mono anywhere on the site. */
   --text-display: clamp(3rem, 7vw, 7rem);
   --text-hero:    clamp(2.5rem, 5vw, 5rem);
   --text-h1:      clamp(2rem, 4vw, 3.5rem);
@@ -81,8 +130,8 @@
   --text-body-lg: 1.25rem;
   --text-body:    1.1rem;
   --text-body-sm: 1rem;
-  --text-label:   0.65rem;
-  --text-caption: 0.55rem;
+  --text-label:   0.78rem;
+  --text-caption: 0.72rem;
 
   /* Spacing */
   --space-1: 4px;
@@ -108,12 +157,12 @@
 
   --text-section:     clamp(2.1rem, 3.8vw, 3.4rem);
   --text-lead:        clamp(1.15rem, 1.6vw, 1.4rem);
-  --eyebrow-size:     0.55rem;
-  --eyebrow-tracking: 0.25em;
+  --eyebrow-size:     0.72rem;
+  --eyebrow-tracking: 0.16em;
 
-  --text-on-dark:   #F0EDE6;
-  --text-on-dark-2: rgba(240,237,230,0.7);
-  --text-on-dark-3: rgba(240,237,230,0.45);
+  --text-on-dark:   var(--on-dark);
+  --text-on-dark-2: var(--on-dark-2);
+  --text-on-dark-3: var(--on-dark-3);
 
   /* Motion */
   --ease-expo:     cubic-bezier(0.16, 1, 0.3, 1);
@@ -128,26 +177,31 @@
   --radius-lg:   8px;
   --radius-full: 9999px;
 
-  /* Contrast-safe gold for light backgrounds (passes 4.5:1 on #FAFAF8) */
-  --color-gold-on-light: #8A6E30;
+  /* Bronze: the gold for text and hairlines on any light ground.
+     5.88:1 on stone, 6.42:1 on paper, 7.1:1 on white. */
+  --color-gold-on-light: #6B5522;
+  --gold-line:           rgba(107,85,34,0.30);   /* the eyebrow dash, rules */
+  --gold-wash:           rgba(107,85,34,0.06);
 
   /* Nav */
   --nav-height: 100px;
 
   /* Shadows */
-  --shadow-sm:   0 1px 3px rgba(26,24,20,0.06);
-  --shadow-md:   0 4px 16px rgba(26,24,20,0.08);
-  --shadow-lg:   0 16px 48px rgba(26,24,20,0.12);
-  --shadow-gold: 0 4px 24px rgba(184,150,62,0.15);
+  --shadow-sm:   0 1px 3px rgba(21,19,15,0.06);
+  --shadow-md:   0 4px 16px rgba(21,19,15,0.08);
+  --shadow-lg:   0 16px 48px rgba(21,19,15,0.12);
+  --shadow-gold: 0 4px 24px rgba(107,85,34,0.10);
 
-  /* Institutional "paper" register: B2B marketing spine (scoped via .b2b-paper) */
-  --b2b-paper:     #F4F1EA;
-  --b2b-paper-alt: #EAE6DC;
-  --b2b-ink-faint: #857F75;
-  --b2b-rule:      rgba(26,24,20,0.12);
-  --b2b-gold-line: rgba(138,110,48,0.30);
-  --b2b-btn:       #C4A24A;   /* paper CTA bg: ~8:1 behind the #0A0908 label */
-  --b2b-btn-hover: #B08F3E;   /* paper CTA hover: darker, real delta */
+  /* The old "paper" register (#F4F1EA) collapsed into the one paper ground.
+     The tokens survive so .b2b-paper still resolves; they now equal the
+     root values. */
+  --b2b-paper:     #F5F3EE;
+  --b2b-paper-alt: #ECE9E2;
+  --b2b-ink-faint: #665F56;
+  --b2b-rule:      rgba(21,19,15,0.14);
+  --b2b-gold-line: var(--gold-line);
+  --b2b-btn:       var(--btn);
+  --b2b-btn-hover: var(--btn-hover);
 }
 
 html {
@@ -182,7 +236,7 @@ textarea {
   justify-content: center;
 }
 
-/* ── Body defaults: light marketing theme ── */
+/* ── Body defaults: paper ── */
 body {
   font-family:              var(--font-cormorant);
   background-color:         var(--color-bg);
@@ -195,89 +249,99 @@ body {
 /*
 CONTRAST RULES. READ BEFORE USING.
 
-Every ratio below is measured, not estimated. The previous version of this
-table carried estimates, and three of them were wrong in the unsafe
-direction. rgba(250,248,244,0.4) was documented as passing at roughly 6:1.
-It is 3.62:1 and it fails. The footer took its link color from that line and
-shipped failing text on 29 routes. If you change a value here, measure it.
+Every ratio below is measured with the WCAG formula on the exact hex pair.
+Estimates are not accepted in this table; the September 2025 version carried
+three estimates that were wrong in the unsafe direction and shipped failing
+text on 29 routes. If you change a value, measure it.
 
 AA is 4.5:1 for body text. 3:1 applies only at 24px, or 18.66px bold.
 Almost nothing in this design system is large enough to use the 3:1 floor,
 so treat 4.5:1 as the bar unless you have checked the rendered size.
 
-Ratios are quoted against the worst case of the listed backgrounds.
+Ratios are quoted against the worst case of the listed grounds.
 
-ON DARK BACKGROUNDS (#0A0908, #0D0C0A):
-  Primary text:   rgba(250,248,244,0.9)  PASS  15.09:1
-  Secondary text: rgba(250,248,244,0.5)  PASS   5.11:1
-  Gold accent:    #B8963E                PASS   7.08:1
-  NEVER USE:      rgba(250,248,244,0.4)  FAIL   3.62:1  (was documented ~6:1)
-  NEVER USE:      var(--color-text-primary)   #1A1814  FAIL  1.12:1
-  NEVER USE:      var(--color-text-secondary) #4A4640  FAIL  2.12:1
-  NEVER USE:      var(--color-text-muted)     #6A6660  FAIL  3.49:1
-                  Light-mode token. It was never listed here, which is how
-                  the footer tagline shipped at 3.49:1.
-  Lowest passing alpha on this background is 0.46. Use 0.55 or higher.
+ON PAPER (#F5F3EE, the marketing ground; also #ECE9E2 and #FFFFFF):
+  Ink:            #15130F  PASS  15.30:1  (--color-text-primary)
+  Body:           #3B3730  PASS   9.76:1  (--color-text-secondary)
+  Muted:          #5C574F  PASS   5.91:1  (--color-text-muted)
+  Label:          #665F56  PASS   5.19:1  (--color-text-faint; the floor for readable text)
+  Bronze:         #6B5522  PASS   5.88:1  (--color-gold and --color-gold-on-light on any light ground)
+  Error:          #8E2F2F  PASS   6.67:1
+  Confirmation:   #2F6B3A  PASS   5.27:1
+  NEVER USE:      #CDB27A  FAIL   2.1:1   (champagne is an on-ink color)
+  NEVER USE:      #C4A24A  FAIL   2.0:1   (the retired mustard; not a token any more)
+  NEVER USE:      #8A6E30  FAIL   3.9:1   (the retired on-light gold)
+  NEVER USE:      #9A9690  FAIL   2.7:1   (the retired faint)
 
-ON LIGHT BACKGROUNDS (#FAFAF8, #FFFFFF, #F5F3EE):
-  Primary text:   #1A1814  PASS  15.99:1
-  Secondary text: #4A4640  PASS   8.45:1
-  Muted text:     #6A6660  PASS   5.14:1
-  NEVER USE:      #9A9690  FAIL   2.65:1  (var(--color-text-faint))
-  NEVER USE:      #B8963E  FAIL   2.54:1  (var(--color-gold) on light)
-  Gold adjusted:  #8A6E30  MIXED         (var(--color-gold-on-light))
-                  4.82:1 on #FFFFFF and 4.62:1 on #FAFAF8, both pass.
-                  4.35:1 on #F5F3EE, which fails. Do not use it for text on
-                  --color-surface-alt.
+ON INK (#15130F: every dark section, the spine, the threshold, the block
+where the record speaks):
+  Primary text:   #F7F5F1  PASS  17.04:1  (--on-dark, --invert-fg, --spine-fg)
+  Body:           #C9C3BA  PASS  10.60:1  (--on-dark-2, --invert-body, --spine-body)
+  Dim:            #A8A199  PASS   7.26:1  (--on-dark-3, --invert-dim, --spine-dim; the floor)
+  Champagne:      #CDB27A  PASS   9.05:1  (--color-gold inside a dark scope, --color-gold-on-dark, --invert-gold, --spine-gold)
+  Pale gold:      #D9C4A3  PASS  10.9:1   (--invert-gold-pale)
+  Error:          #E08B8B  PASS   7.28:1  (--invert-error)
+  Confirmation:   #7FB685  PASS   7.89:1  (--invert-ok)
+  NEVER USE:      rgba(250,248,244,0.5) and below  FAIL  (the old alpha text; 5.0:1 at 0.5, 2.5:1 at 0.3)
+  NEVER USE:      #6B5522  FAIL   2.6:1   (bronze is an on-light color)
+  NEVER USE:      #5C6166, #9DA3A8, #706C65, #3A3830  FAIL  (vault-era greys)
 
-ON GOLD BUTTON (#B8963E):
-  ONLY USE:       #0A0908  PASS  7.08:1
-  NEVER USE:      #FAFAF8  FAIL  2.69:1
-  NEVER USE:      #FFFFFF  FAIL  2.81:1
+ON STONE (PORTAL, .portal-stone; worst case is the ground #ECE9E2; also #F1EEE8, #FFFFFF):
+  Ink:            #15130F  PASS  15.30:1  (--portal-ink)
+  Body:           #3B3730  PASS   9.76:1  (--portal-body)
+  Secondary:      #5C574F  PASS   5.91:1  (--portal-secondary)
+  Label:          #665F56  PASS   5.19:1  (--portal-label, the floor for readable text)
+  Bronze:         #6B5522  PASS   5.88:1  (--portal-gold-ink)
+  Error:          #8E2F2F  PASS   6.67:1  (--portal-error)
+  Confirmation:   #2F6B3A  PASS   5.27:1  (--portal-ok)
 
-ON STONE (PORTAL, .portal-stone; worst case is the ground #ECE8E1; also #F3F0EB, #F7F2E6, #FFFFFF):
-  Ink:            #14120F  PASS  15.31:1  (--portal-ink)
-  Body:           #3A352E  PASS   9.95:1  (--portal-body)
-  Secondary:      #5C574F  PASS   5.87:1  (--portal-secondary)
-  Label:          #665F56  PASS   5.15:1  (--portal-label, the floor for readable text)
-  Gold text:      #6B5522  PASS   5.83:1  (--portal-gold-ink)
-  Error:          #8E2F2F  PASS   6.62:1  (--portal-error)
-  Confirmation:   #2F6B3A  PASS   5.23:1  (--portal-ok)
-  NEVER USE:      #6E685F  FAIL   4.52:1  (the September 18 label; marginal on the deeper ground)
-  NEVER USE:      #7A6129  MIXED  4.82:1  (the September 18 gold ink; passes, but --portal-gold-ink is darker now)
-  NEVER USE:      #8A6E30  FAIL   3.9:1   (var(--color-gold-on-light); marketing token, not a portal text color)
-  NEVER USE:      #8A847B  FAIL   3.0:1   (the homepage --stone-label)
-  NEVER USE:      #C4A24A  FAIL   2.0:1   (gold is a button fill on stone, never text)
-
-ON INK (#14120F: the spine, the threshold, and the block where the archive speaks):
-  Primary text:   #F7F5F1  PASS  17.17:1  (--spine-fg)
-  Nav items:      #C7C1B8  PASS  10.46:1  (--spine-body)
-  Group labels:   rgba(247,245,241,0.62)  PASS  7.08:1  (--spine-dim)
-  Active item:    #C4A24A  PASS   7.67:1  (--spine-gold, --invert-gold)
-  Primary:        #F7F5F1  PASS  17.17:1  (--invert-fg)
-  Body:           #C7C1B8  PASS  10.46:1  (--invert-body)
-  Labels:         rgba(247,245,241,0.62)  PASS  7.08:1  (--invert-dim)
-  Error:          #E08B8B  PASS   7.33:1  (--invert-error)
-  Confirmation:   #7FB685  PASS   7.95:1  (--invert-ok)
-  Pale gold:      #D9C4A3  PASS  11.02:1  (--invert-gold-pale)
-  NEVER USE:      #5C6166  FAIL   3.5:1   (the old portal dim; a label color on stone, never on ink)
-  NEVER USE:      #3A3F44  FAIL   1.7:1   (the old portal faint)
-  NEVER USE:      #C47D1A  FAIL   4.1:1   (the marketing .eyebrow orange)
-
-ON THE INVERTED BLOCK (#14120F, the only dark surface in the portal):
-  Primary text:   #F7F5F1  PASS  17.17:1  (--invert-fg)
-  Body:           #C7C1B8  PASS  10.46:1  (--invert-body)
-  Gold:           #C4A24A  PASS   7.67:1  (--invert-gold)
-  Dim label:      rgba(247,245,241,0.62)  PASS  7.08:1  (composited: #A19F9B)
-
-ON PORTAL BUTTON (#C4A24A, hover #B08F3E):
-  ONLY USE:       #0A0908  PASS  8.16:1 (6.48:1 on hover)
+THE ONE BUTTON:
+  On paper and stone: bg #15130F, label #F7F5F1   PASS 17.04:1  (--btn, --btn-label)
+  On ink:             bg #F7F5F1, label #15130F   PASS 17.04:1  (the dark scopes flip the same tokens)
+  Quiet:              1px outline and text in the ground's text color
+  Disabled:           outline in the rule color, text in the label color
+  Gold never fills a button. #C4A24A with #0A0908 is retired.
 */
 
 /* ── Contrast-safe section utilities ── */
 .section-dark {
-  background: #0A0908;
-  color: rgba(250,248,244,0.9);
+  background: var(--color-void);
+  color: var(--on-dark);
+  /* Gold is champagne on ink, and the one button flips on ink. Every dark
+     block carries this class (or .stone-invert, .portal-threshold,
+     .portal-invert) so its tokens read correctly. */
+  --color-gold:          var(--color-gold-on-dark);
+  --color-gold-light:    #D9C4A3;
+  --color-gold-on-light: var(--color-gold-on-dark);
+  --btn:        #F7F5F1;
+  --btn-hover:  #FFFFFF;
+  --btn-label:  #15130F;
+  --btn-quiet:  #F7F5F1;
+  --gold-line:  var(--invert-gold-line);
+  --gold-wash:  var(--invert-gold-wash);
+  --color-text-primary:   var(--on-dark);
+  --color-text-secondary: var(--on-dark-2);
+  --color-text-muted:     var(--on-dark-3);
+  --color-text-faint:     var(--on-dark-3);
+  --color-border:         var(--on-dark-rule);
+  --color-border-medium:  rgba(247,245,241,0.2);
+}
+/* A white card that sits inside a dark section. */
+.section-dark .paper-card {
+  --color-text-primary:   var(--paper-ink);
+  --color-text-secondary: var(--paper-body);
+  --color-text-muted:     var(--paper-muted);
+  --color-text-faint:     var(--paper-muted);
+  --color-border:         var(--paper-rule);
+  --color-border-medium:  rgba(21,19,15,0.18);
+  --color-gold:           #6B5522;
+  --color-gold-light:     #6B5522;
+  --color-gold-on-light:  #6B5522;
+  --btn:        #15130F;
+  --btn-hover:  #2A2620;
+  --btn-label:  #F7F5F1;
+  --btn-quiet:  #15130F;
+  color: var(--paper-body);
 }
 .section-dark p,
 .section-dark h1,
@@ -297,28 +361,26 @@ ON PORTAL BUTTON (#C4A24A, hover #B08F3E):
 .section-light li {
   color: inherit;
 }
-.section-dark .text-muted  { color: rgba(250,248,244,0.45); }
+.section-dark .text-muted  { color: var(--on-dark-3); }
 .section-light .text-muted { color: var(--color-text-muted); }
 .section-dark .text-gold,
 .section-dark .eyebrow-light { color: var(--color-gold); }
 .section-light .text-gold,
 .section-light .eyebrow-light { color: var(--color-gold-on-light); }
 
-/* ── Institutional "paper" register ──────────────────────────────────────────
-   Scoped re-point: wrap a B2B light section in `.b2b-paper` and every
-   `var(--color-*)` underneath retints to the paper palette, with no component
-   edits. Void interludes must stay OUTSIDE this wrapper so their gold stays
-   #C4A24A on dark.
-   Gold accents (eyebrows, section numbers, the emphasis line, hairlines) re-point
-   to the contrast-safe #8A6E30 (~4.6:1 on paper). Gold-backed BUTTONS do NOT use
-   --color-gold; they point at the dedicated --b2b-btn / --b2b-btn-hover tokens, so
-   the label keeps ~8:1 without dragging the accents bright. */
+/* ── The light scope ──────────────────────────────────────────────────────────
+   `.b2b-paper` and `.home-stone` used to be two different palettes. They are
+   now the same scope: wrap a light section in either and var(--color-gold)
+   beneath it reads bronze, so eyebrows and rules are the on-light gold with no
+   component edits. Dark interludes stay OUTSIDE these wrappers so their gold
+   stays champagne. The old paper values (#F4F1EA, #EAE6DC) are retired. */
 .b2b-paper {
   --color-bg:            var(--b2b-paper);
-  --color-surface:       var(--b2b-paper);
+  --color-surface:       var(--color-surface);
   --color-surface-alt:   var(--b2b-paper-alt);
   --color-text-faint:    var(--b2b-ink-faint);
   --color-gold:          var(--color-gold-on-light);
+  --color-gold-light:    var(--color-gold-on-light);
   --color-border:        var(--b2b-rule);
   --color-border-medium: var(--b2b-rule);
   --font-cormorant:      var(--font-newsreader);
@@ -363,11 +425,11 @@ ON PORTAL BUTTON (#C4A24A, hover #B08F3E):
   .editorial-prose{ max-width:none; }
 }
 
-/* Eyebrow text: Space Mono, gold, tracking */
+/* Eyebrow text: mono, gold, tracking. 11.5 px, never smaller. */
 .eyebrow-light {
   font-family:    var(--font-mono);
   font-size:      var(--text-caption);
-  letter-spacing: 0.35em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color:          var(--color-gold);
   display:        flex;
@@ -377,9 +439,10 @@ ON PORTAL BUTTON (#C4A24A, hover #B08F3E):
 .eyebrow-light::before {
   content:    '';
   display:    block;
-  width:      24px;
+  width:      22px;
   height:     1px;
   background: var(--color-gold);
+  opacity:    0.55;
   flex-shrink: 0;
 }
 
@@ -480,7 +543,7 @@ input[type='range'].range-amber {
   -webkit-appearance: none;
   appearance:         none;
   height:             2px;
-  background:         rgba(196,162,74,0.2);
+  background:         var(--portal-card-line, rgba(21,19,15,0.2));
   border-radius:      9999px;
   outline:            none;
   cursor:             pointer;
@@ -491,7 +554,7 @@ input[type='range'].range-amber::-webkit-slider-thumb {
   appearance:         none;
   width:              16px;
   height:             16px;
-  background:         #C4A24A;
+  background:         var(--portal-ink, #15130F);
   border:             none;
   border-radius:      2px;
   transform:          rotate(45deg);
@@ -508,37 +571,34 @@ input[type='range'].range-amber::-webkit-slider-thumb {
   }
 }
 
-/* ── Stone register, homepage only ────────────────────────────────────────────
+/* ── Stone register, homepage ─────────────────────────────────────────────────
    Scoped re-point on the same pattern as `.b2b-paper`. Wrapping the homepage in
-   `.home-stone` retints every `var(--color-*)` beneath it to the stone palette
-   with no edits to any :root token definition and no effect on other routes.
-
-   Palette values are read from the approved design direction 1d. Type family and
-   the gold accent are NOT taken from 1d; they stay on the existing stack per
-   CLAUDE.md section 9. --font-cormorant re-points to Newsreader exactly as
-   .b2b-paper does, so the homepage display face is unchanged by this build.
-
-   Do not use for anything other than the homepage. /succession keeps .b2b-paper. */
+   `.home-stone` retints every `var(--color-*)` beneath it. Since the recut the
+   values equal the paper ground; the scope survives for its type scale and
+   layout tokens (--stone-fs-*, --stone-measure, --stone-gutter). */
 .home-stone {
-  /* Stone scale, direction 1d */
-  --stone-bg:          #F2F0EC;
-  --stone-ink:         #14120F;
-  --stone-body:        #3A352E;
+  /* Stone scale, recut September 28, 2026 onto the one paper ground. The
+     homepage no longer runs its own greige; it is the same paper as every
+     other marketing page. --stone-label was #8A847B, which measured 3.0:1
+     and failed; it is now the site label color. */
+  --stone-bg:          #F5F3EE;
+  --stone-ink:         #15130F;
+  --stone-body:        #3B3730;
   --stone-secondary:   #5C574F;
-  --stone-label:       #8A847B;
-  --stone-rule:        #DDD9D2;
-  --stone-rule-soft:   #E5E1DA;
+  --stone-label:       #665F56;
+  --stone-rule:        #D6D0C6;
+  --stone-rule-soft:   #E0DBD2;
   --stone-card:        #FFFFFF;
-  --stone-card-line:   #D6D1C9;
-  --stone-inset:       #F4F2EE;
-  --stone-invert-bg:   #14120F;
+  --stone-card-line:   #C9C2B6;
+  --stone-inset:       #ECE9E2;
+  --stone-invert-bg:   #15130F;
   --stone-invert-fg:   #F7F5F1;
-  --stone-invert-body: #C7C1B8;
+  --stone-invert-body: #C9C3BA;
 
   /* The on-dark gold, held locally because the scope below re-points
      --color-gold to the on-light value for the stone surface. Inverted blocks
-     point back at this so their accent keeps ~7.4:1 instead of ~2.7:1. */
-  --stone-gold-on-dark: #B8963E;
+     point back at this so their accent reads champagne, 9.05:1. */
+  --stone-gold-on-dark: #CDB27A;
 
   /* Layout rhythm, direction 1d. Flat 20px gutter on mobile, modest growth up. */
   --stone-gutter:      clamp(20px, 5vw, 32px);
@@ -564,8 +624,8 @@ input[type='range'].range-amber::-webkit-slider-thumb {
   --stone-fs-row-title: 15.5px;
   --stone-fs-row-body:  14px;
   --stone-fs-note:      14px;
-  --stone-fs-mono:      10.5px;
-  --stone-fs-mono-sm:   9.5px;
+  --stone-fs-mono:      11.5px;
+  --stone-fs-mono-sm:   11px;
 
   /* Desktop ceiling for the CTA boxes. Full width is right at 390px and wrong
      across a 796px measure, so the buttons stop growing at the tablet step. */
@@ -591,8 +651,17 @@ input[type='range'].range-amber::-webkit-slider-thumb {
   padding-top: var(--nav-height);
 }
 
-/* Inverted ink block. Gold points back to the on-dark value. */
-.home-stone .stone-invert { --color-gold: var(--stone-gold-on-dark); }
+/* Inverted ink block. Gold points back to the on-dark value, and the one
+   button flips to bone on ink. */
+.home-stone .stone-invert {
+  --color-gold: var(--stone-gold-on-dark);
+  --color-gold-light: #D9C4A3;
+  --btn:        #F7F5F1;
+  --btn-hover:  #FFFFFF;
+  --btn-label:  #15130F;
+  --btn-quiet:  #F7F5F1;
+  --gold-line:  var(--invert-gold-line);
+}
 
 /* Hairline row, the numbered-list primitive from 1d. Last row closes the stack. */
 .home-stone .stone-row {
@@ -647,8 +716,8 @@ input[type='range'].range-amber::-webkit-slider-thumb {
     --stone-fs-row-title: 16.5px;
     --stone-fs-row-body:  15px;
     --stone-fs-note:      15px;
-    --stone-fs-mono:      11px;
-    --stone-fs-mono-sm:   10px;
+    --stone-fs-mono:      11.5px;
+    --stone-fs-mono-sm:   11px;
   }
 
   /* Defect 1. The photograph is 100vw at a locked 3022:2083, so its height is a
@@ -701,68 +770,83 @@ input[type='range'].range-amber::-webkit-slider-thumb {
     --stone-fs-row-title: 17.5px;
     --stone-fs-row-body:  16px;
     --stone-fs-note:      15px;
-    --stone-fs-mono:      11.5px;
-    --stone-fs-mono-sm:   10.5px;
+    --stone-fs-mono:      12px;
+    --stone-fs-mono-sm:   11.5px;
   }
 }
 
 /* ── Stone register, portal ───────────────────────────────────────────────────
-   Every signed-in surface (/archive/*, /succession/portal/*,
-   /begin, the login pages) runs on the same stone the homepage runs on.
-   Decision and measurements: docs/BASALITH_PORTAL_PALETTE_DECISION_2026-09-18.md.
+   Every signed-in surface (/archive/*, /succession/portal/*) runs on stone,
+   one step deeper than the marketing paper so white cards lift off it.
+   Decision: docs/BASALITH_PORTAL_PALETTE_DECISION_2026-09-18.md, amended by
+   docs/PORTAL_STONE_CONTRAST_2026-09-19.md and docs/DESIGN_RECUT_2026-09-28.md.
 
    Portal components carry their colors as React inline styles, which outrank
    any stylesheet rule, so this block does not restyle anything by itself. It
    defines the tokens; each component reads them with var(--portal-*). That
    keeps one place to change a value and one grep to prove no literal is left.
 
-   The gold used for TEXT here is #7A6129, not --color-gold-on-light (#8A6E30),
-   which measures 4.24:1 on #F2F0EC and fails. Filled buttons keep #C4A24A with
-   the #0A0908 label from the design system.
-
-   The --invert-* tokens are the one dark surface in the portal: the block where
-   the archive speaks (the founding proof card, the entity's answers). Anything
-   drawn inside it hardcodes --invert-* values and never inherits the stone
-   text colors. */
+   The --invert-* tokens are the block where the record speaks (the founding
+   proof card, the entity's answers). Anything drawn inside it hardcodes
+   --invert-* values and never inherits the stone text colors. */
 .portal-stone {
-  /* Revised September 19, 2026: the first production read was washed out.
-     Every surface sat in one narrow band of near-white, the rules measured
-     1.2:1 against the ground, and the only dark thing on a page was the h1.
-     The ground is now one step deeper so white cards lift off it, the rules
-     are a step darker so edges exist, and the sidebar is the same ink as the
-     inverted block (--portal-spine), so every page has a spine. */
-  --portal-bg:        #ECE8E1;
-  --portal-inset:     #F3F0EB;
+  --portal-bg:        #ECE9E2;
+  --portal-inset:     #F1EEE8;
   --portal-card:      #FFFFFF;
-  --portal-tint:      #F7F2E6;
+  --portal-tint:      #F3EFE6;
 
-  --portal-ink:       #14120F;   /* 15.31:1 on bg */
-  --portal-body:      #3A352E;   /*  9.95:1 */
-  --portal-secondary: #5C574F;   /*  5.87:1 */
-  --portal-label:     #665F56;   /*  5.15:1, the floor for readable text */
-  --portal-gold-ink:  #6B5522;   /*  5.83:1 on bg, 7.12:1 on card */
-  --portal-error:     #8E2F2F;   /*  6.62:1 */
-  --portal-ok:        #2F6B3A;   /*  5.23:1, confirmations only */
+  --portal-ink:       #15130F;   /* 15.30:1 on bg */
+  --portal-body:      #3B3730;   /*  9.76:1 */
+  --portal-secondary: #5C574F;   /*  5.91:1 */
+  --portal-label:     #665F56;   /*  5.19:1, the floor for readable text */
+  --portal-gold-ink:  #6B5522;   /*  5.88:1 on bg, 7.1:1 on card */
+  --portal-error:     #8E2F2F;   /*  6.67:1 */
+  --portal-ok:        #2F6B3A;   /*  5.27:1, confirmations only */
 
-  --portal-rule:      #D2CBC0;
-  --portal-card-line: #C8C0B4;
-  --portal-lift:      0 1px 0 rgba(20,18,15,0.05), 0 10px 28px rgba(20,18,15,0.07);
+  --portal-rule:      #D6D0C6;
+  --portal-card-line: #C9C2B6;
+  --portal-lift:      0 1px 0 rgba(21,19,15,0.05), 0 10px 28px rgba(21,19,15,0.07);
 
-  /* The spine: sidebar and mobile bar. Same ink as the inverted block. */
-  --portal-spine:     #14120F;
-  --spine-fg:         #F7F5F1;   /* 17.17:1 */
-  --spine-body:       #C7C1B8;   /* 10.46:1 */
-  --spine-dim:        rgba(247,245,241,0.62);   /* 7.08:1 */
+  /* The spine: sidebar and mobile bar. Same ink as the inverted block. The
+     active item is bone with a champagne rule, not a gold item on a wash. */
+  --portal-spine:     #15130F;
+  --spine-fg:         #F7F5F1;   /* 17.04:1 */
+  --spine-body:       #C9C3BA;   /* 10.60:1 */
+  --spine-dim:        #A8A199;   /*  7.26:1 */
   --spine-rule:       rgba(247,245,241,0.12);
-  --spine-gold:       #C4A24A;   /*  7.67:1 */
-  --spine-gold-wash:  rgba(196,162,74,0.10);
-  --portal-gold-line: rgba(138,110,48,0.30);
-  --portal-gold-wash: rgba(138,110,48,0.07);
+  --spine-gold:       #CDB27A;   /*  9.05:1 */
+  --spine-gold-wash:  rgba(205,178,122,0.08);
+  --portal-gold-line: var(--gold-line);
+  --portal-gold-wash: var(--gold-wash);
 
-  --portal-scrim:     rgba(20,18,15,0.88);      /* lightbox and modal backdrop; text on it uses --invert-* */
+  --portal-scrim:     rgba(21,19,15,0.88);      /* lightbox and modal backdrop; text on it uses --invert-* */
+
+  /* Gold used to be a button fill on stone. It is not any more; these read
+     the one button. */
+  --portal-btn:       var(--btn);
+  --portal-btn-hover: var(--btn-hover);
+  --portal-btn-label: var(--btn-label);
 
   background: var(--portal-bg);
   color:      var(--portal-body);
+  font-family: var(--portal-serif);
+}
+
+/* The block where the record speaks, when a component opts in by class. The
+   one button flips to bone on ink inside it. */
+.portal-stone .portal-invert,
+.portal-stone [data-invert] {
+  --color-gold:       var(--invert-gold);
+  --color-gold-light: var(--invert-gold-pale);
+  --gold-line:        var(--invert-gold-line);
+  --gold-wash:        var(--invert-gold-wash);
+  --btn:        #F7F5F1;
+  --btn-hover:  #FFFFFF;
+  --btn-label:  #15130F;
+  --btn-quiet:  #F7F5F1;
+  --portal-btn:       var(--btn);
+  --portal-btn-hover: var(--btn-hover);
+  --portal-btn-label: var(--btn-label);
 }
 
 /* ── The threshold ───────────────────────────────────────────────────────────
@@ -774,16 +858,28 @@ input[type='range'].range-amber::-webkit-slider-thumb {
   background:  var(--invert-bg);
   color:       var(--invert-body);
   font-family: var(--portal-serif);
+  /* The one button, flipped: bone on ink. */
+  --btn:        #F7F5F1;
+  --btn-hover:  #FFFFFF;
+  --btn-label:  #15130F;
+  --btn-quiet:  #F7F5F1;
+  --portal-btn:       var(--btn);
+  --portal-btn-hover: var(--btn-hover);
+  --portal-btn-label: var(--btn-label);
+  --color-gold:       var(--invert-gold);
+  --color-gold-light: var(--invert-gold-pale);
+  --gold-line:        var(--invert-gold-line);
+  --gold-wash:        var(--invert-gold-wash);
 }
 .portal-threshold input,
 .portal-threshold textarea,
 .portal-threshold select {
   color: var(--invert-fg);
   background: var(--invert-field);
-  border: 1px solid var(--invert-rule);
+  border: 1px solid rgba(247,245,241,0.22);
 }
 .portal-threshold ::placeholder { color: var(--invert-dim); }
-.portal-threshold ::selection    { background: rgba(196,162,74,0.35); }
+.portal-threshold ::selection    { background: rgba(205,178,122,0.35); }
 .portal-threshold input:focus-visible,
 .portal-threshold textarea:focus-visible,
 .portal-threshold select:focus-visible,
@@ -792,13 +888,18 @@ input[type='range'].range-amber::-webkit-slider-thumb {
   outline: 2px solid var(--invert-gold);
   outline-offset: 2px;
 }
-/* The marketing .eyebrow component (tailwind.config.ts) is orange on a light
-   ground. On the threshold it is the portal eyebrow: gold mono. */
+/* The marketing .eyebrow component (tailwind.config.ts) is bronze mono on a
+   light ground. On any ink ground it is champagne. */
+.section-dark .eyebrow,
+.stone-invert .eyebrow,
+.bg-obsidian .eyebrow,
+.bg-obsidian-deep .eyebrow,
+.bg-obsidian-void .eyebrow,
 .portal-threshold .eyebrow {
   font-family: var(--portal-mono);
   font-size: 11.5px;
   font-weight: 400;
-  letter-spacing: 0.24em;
+  letter-spacing: 0.16em;
   color: var(--invert-gold);
 }
 
@@ -833,7 +934,7 @@ input[type='range'].range-amber::-webkit-slider-thumb {
   outline-offset: 2px;
 }
 .portal-stone ::placeholder { color: var(--portal-label); }
-.portal-stone ::selection   { background: rgba(196,162,74,0.35); }
+.portal-stone ::selection   { background: rgba(107,85,34,0.22); }
 
 /* Font utility classes inside the portal. Older portal files carry Tailwind
    font classes (font-serif, font-sans, and the retired font-compute and
@@ -860,7 +961,7 @@ input[type='range'].range-amber::-webkit-slider-thumb {
   font-family: var(--portal-mono);
   font-size: 12px;
   font-weight: 400;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.14em;
   color: var(--portal-btn-label);
   background: var(--portal-btn);
   border: none;
@@ -884,16 +985,16 @@ input[type='range'].range-amber::-webkit-slider-thumb {
   font-family: var(--portal-mono);
   font-size: 11.5px;
   font-weight: 400;
-  letter-spacing: 0.16em;
-  color: var(--invert-gold);
+  letter-spacing: 0.14em;
+  color: var(--invert-fg);
   background: transparent;
-  border: 1px solid var(--invert-gold-line);
+  border: 1px solid rgba(247,245,241,0.35);
   min-height: 44px;
   padding: 0 18px;
 }
 .portal-threshold .btn-monolith-ghost:hover {
   color: var(--invert-fg);
-  border-color: var(--invert-gold);
+  border-color: var(--invert-fg);
   background: var(--invert-field);
 }
 .portal-threshold .btn-monolith:focus-visible,
@@ -907,16 +1008,16 @@ input[type='range'].range-amber::-webkit-slider-thumb {
   font-family: var(--portal-mono);
   font-size: 11.5px;
   font-weight: 400;
-  letter-spacing: 0.16em;
-  color: var(--portal-gold-ink);
-  background: var(--portal-card);
-  border: 1px solid var(--portal-gold-line);
+  letter-spacing: 0.14em;
+  color: var(--portal-ink);
+  background: transparent;
+  border: 1px solid var(--portal-ink);
   min-height: 44px;
   padding: 0 18px;
 }
 .portal-stone .btn-monolith-ghost:hover {
   color: var(--portal-ink);
-  border-color: var(--portal-gold-ink);
+  border-color: var(--portal-ink);
   background: var(--portal-card);
 }
 .portal-stone .btn-monolith:focus-visible,

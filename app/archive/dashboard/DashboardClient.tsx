@@ -194,7 +194,7 @@ function MemoryGameCard({ archiveId }: { archiveId: string }) {
   const maxCount = leaderboard[0]?.count ?? 1
 
   return (
-    <div className="rounded-sm mb-8 portal-card" style={{ background: CARD, border: `1px solid ${LINE}`, borderTop: '3px solid var(--portal-btn)' }}>
+    <div className="rounded-sm mb-8 portal-card" style={{ background: CARD, border: `1px solid ${LINE}`, borderTop: '2px solid var(--portal-gold-ink)' }}>
       <div style={{ padding: '1.25rem 1.5rem', borderBottom: `1px solid ${RULE}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={GOLD} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }} aria-hidden="true">
@@ -433,7 +433,7 @@ function RandomThoughtCapture({ archiveId }: { archiveId: string }) {
 
   return (
     <div style={{ background: CARD, border: `1px solid ${LINE}`, borderRadius: '4px', padding: '20px 24px', marginBottom: '24px' }}>
-      <p style={{ fontFamily: MONO, fontSize: '11.5px', letterSpacing: '0.24em', textTransform: 'uppercase' as const, color: GOLD, marginBottom: '12px' }}>
+      <p style={{ fontFamily: MONO, fontSize: '11.5px', letterSpacing: '0.18em', textTransform: 'uppercase' as const, color: GOLD, marginBottom: '12px' }}>
         Capture this thought
       </p>
       <textarea
@@ -582,7 +582,7 @@ function MirrorCard({ archiveId }: { archiveId: string }) {
 
   return (
     <div
-      className="rounded-sm mb-8"
+      className="rounded-sm mb-8 portal-invert"
       style={{
         background: 'var(--invert-bg)',
         color:      'var(--invert-fg)',
@@ -591,12 +591,12 @@ function MirrorCard({ archiveId }: { archiveId: string }) {
       }}
     >
       {/* Eyebrow */}
-      <p style={{ fontFamily: MONO, fontSize: '11.5px', letterSpacing: '0.24em', textTransform: 'uppercase', color: 'var(--invert-gold)', marginBottom: '1.4rem' }}>
+      <p style={{ fontFamily: MONO, fontSize: '11.5px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--invert-gold)', marginBottom: '1.4rem' }}>
         What your entity is learning
       </p>
 
       {/* Reflection, the hero. The entity speaking, so the block is dark. */}
-      <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 300, fontSize: 'clamp(20px,2.6vw,26px)', color: 'var(--invert-fg)', lineHeight: 1.7, whiteSpace: 'pre-wrap', margin: 0, maxWidth: '60ch' }}>
+      <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400, fontSize: 'clamp(20px,2.6vw,26px)', color: 'var(--invert-fg)', lineHeight: 1.7, whiteSpace: 'pre-wrap', margin: 0, maxWidth: '60ch' }}>
         {mirror.reflection}
       </p>
 
@@ -640,7 +640,7 @@ function MirrorCard({ archiveId }: { archiveId: string }) {
             <button
               onClick={saveResponse}
               disabled={saving || responseText.trim().length < 5}
-              style={{ fontFamily: MONO, fontSize: '12px', letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: 'var(--portal-btn-label)', background: 'var(--invert-gold)', border: 'none', borderRadius: '2px', padding: '0 20px', minHeight: '44px', cursor: saving ? 'not-allowed' : 'pointer', opacity: responseText.trim().length < 5 ? 0.5 : 1 }}
+              style={{ fontFamily: MONO, fontSize: '12px', letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: 'var(--portal-btn-label)', background: 'var(--portal-btn)', border: 'none', borderRadius: '2px', padding: '0 20px', minHeight: '44px', cursor: saving ? 'not-allowed' : 'pointer', opacity: responseText.trim().length < 5 ? 0.5 : 1 }}
             >
               {saving ? 'Saving' : 'Save'}
             </button>
@@ -655,7 +655,7 @@ function MirrorCard({ archiveId }: { archiveId: string }) {
       ) : (
         <button
           onClick={() => setRespondOpen(true)}
-          style={{ fontFamily: MONO, fontSize: '12px', letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: 'var(--portal-btn-label)', background: 'var(--invert-gold)', border: 'none', borderRadius: '2px', padding: '0 22px', minHeight: '44px', cursor: 'pointer' }}
+          style={{ fontFamily: MONO, fontSize: '12px', letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: 'var(--portal-btn-label)', background: 'var(--portal-btn)', border: 'none', borderRadius: '2px', padding: '0 22px', minHeight: '44px', cursor: 'pointer' }}
         >
           Respond
         </button>

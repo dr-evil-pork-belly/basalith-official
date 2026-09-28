@@ -52,24 +52,24 @@ function PhilosophyView({ audience }: { audience: Audience | null }) {
           <p style={{ ...mono, fontSize: 'var(--eyebrow-size)', letterSpacing: 'var(--eyebrow-tracking)', color: 'var(--color-gold)', marginBottom: 'var(--space-4)' }}>
             WHAT BASALITH PRESERVES
           </p>
-          <h2 style={{ ...serif, fontSize: 'var(--text-section)', fontWeight: 300, lineHeight: 1.15, letterSpacing: '-0.02em', color: 'var(--text-on-dark)', margin: 0 }}>
+          <h2 style={{ ...serif, fontSize: 'var(--text-section)', fontWeight: 400, lineHeight: 1.15, letterSpacing: '-0.02em', color: 'var(--text-on-dark)', margin: 0 }}>
             What you know is not in any document.
           </h2>
         </div>
 
         {/* Prose sizes/line-height come from .editorial-prose p in globals.css */}
         <div className="editorial-prose">
-          <p style={{ ...serif, fontWeight: 300, color: 'var(--text-on-dark-2)', margin: '0 0 var(--space-4)' }}>
+          <p style={{ ...serif, fontWeight: 400, color: 'var(--text-on-dark-2)', margin: '0 0 var(--space-4)' }}>
             It is in how you evaluate risk. How you read people. When you walk away. What you look for before anyone else sees it.
           </p>
-          <p style={{ ...serif, fontWeight: 300, color: 'var(--text-on-dark-2)', margin: '0 0 var(--space-4)' }}>
+          <p style={{ ...serif, fontWeight: 400, color: 'var(--text-on-dark-2)', margin: '0 0 var(--space-4)' }}>
             Thirty years of pattern recognition. A lifetime of calibrated judgment.
           </p>
-          <p style={{ ...serif, fontWeight: 300, color: 'var(--text-on-dark)', margin: '0 0 var(--space-4)' }}>
+          <p style={{ ...serif, fontWeight: 400, color: 'var(--text-on-dark)', margin: '0 0 var(--space-4)' }}>
             Basalith learns this while you are here to teach it. So it can speak when you cannot.
           </p>
           {/* Emphasis: the only italic in the section; size overrides .editorial-prose p */}
-          <p style={{ ...serif, fontSize: '1.32rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--color-gold)', whiteSpace: 'pre-line', margin: 0 }}>
+          <p style={{ ...serif, fontSize: '1.32rem', fontStyle: 'italic', fontWeight: 400, color: 'var(--color-gold)', whiteSpace: 'pre-line', margin: 0 }}>
             {variant.closingLine}
           </p>
         </div>
@@ -89,7 +89,7 @@ function PhilosophyView({ audience }: { audience: Audience | null }) {
               {title}
             </h3>
             {/* Pillar body size/line-height come from .pillar p in globals.css */}
-            <p style={{ ...serif, fontWeight: 300, color: 'var(--text-on-dark-3)', whiteSpace: 'pre-line', margin: 0 }}>
+            <p style={{ ...serif, fontWeight: 400, color: 'var(--text-on-dark-3)', whiteSpace: 'pre-line', margin: 0 }}>
               {n === '03' ? variant.pillar3Body : body}
             </p>
           </div>

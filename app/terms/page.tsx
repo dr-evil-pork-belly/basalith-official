@@ -119,9 +119,9 @@ export default function TermsPage() {
         [data-theme-terms] .text-text-primary   { color: var(--color-text-primary) !important; }
         [data-theme-terms] .text-text-secondary { color: var(--color-text-secondary) !important; }
         [data-theme-terms] .text-text-muted     { color: var(--color-text-muted) !important; }
-        [data-theme-terms] .text-amber { color: var(--color-gold) !important; }
-        [data-theme-terms] .text-amber-dim { color: var(--color-gold) !important; }
-        [data-theme-terms] .text-amber\\/20 { color: rgba(184,150,62,0.15) !important; }
+        [data-theme-terms] .text-amber { color: var(--color-gold-on-light) !important; }
+        [data-theme-terms] .text-amber-dim { color: var(--color-gold-on-light) !important; }
+        [data-theme-terms] .text-amber\\/20 { color: rgba(160,132,80,0.15) !important; }
         /* REMOVED 2026-08-12 with the Basalith Agreement notice section: the
            rules for .border-border-amber, .via-border-amber, .via-amber/45, and
            the 160deg gradient card selector. That section was their only
@@ -153,7 +153,7 @@ export default function TermsPage() {
           />
           <div
             className="absolute inset-0 pointer-events-none"
-            style={{ background: 'radial-gradient(ellipse 55% 55% at 50% 60%,rgba(255,179,71,0.06) 0%,transparent 65%)' }}
+            style={{ background: 'radial-gradient(ellipse 55% 55% at 50% 60%,rgba(205,178,122,0.06) 0%,transparent 65%)' }}
             aria-hidden="true"
           />
 

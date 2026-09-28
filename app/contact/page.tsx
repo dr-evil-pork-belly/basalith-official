@@ -15,18 +15,18 @@ const INTENTS: { value: Intent; label: string }[] = [
 ]
 
 const SERIF: React.CSSProperties = {
-  fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontFamily: 'var(--font-newsreader), Georgia, serif',
 }
 const MONO: React.CSSProperties = {
-  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+  fontFamily:    'var(--font-space-mono)',
   textTransform: 'uppercase' as const,
-  letterSpacing: '0.28em',
+  letterSpacing: '0.18em',
 }
 const LABEL: React.CSSProperties = {
   display:       'block',
-  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
-  fontSize:      '0.52rem',
-  letterSpacing: '0.28em',
+  fontFamily:    'var(--font-space-mono)',
+  fontSize:      '0.78rem',
+  letterSpacing: '0.18em',
   textTransform: 'uppercase' as const,
   color:         'var(--color-text-muted)',
   marginBottom:  '8px',
@@ -37,9 +37,9 @@ const INPUT: React.CSSProperties = {
   border:       '1px solid var(--color-border)',
   borderRadius: 'var(--radius-sm)',
   outline:      'none',
-  fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontFamily:   'var(--font-newsreader), Georgia, serif',
   fontSize:     '1.05rem',
-  fontWeight:   300,
+  fontWeight: 400,
   color:        'var(--color-text-primary)',
   padding:      '12px 16px',
   lineHeight:   1.5,
@@ -95,11 +95,11 @@ export default function ContactPage() {
             Get In Touch
             <span style={{ display: 'block', width: '24px', height: '1px', background: 'var(--color-gold)', flexShrink: 0 }} aria-hidden="true" />
           </p>
-          <h1 style={{ ...SERIF, fontWeight: 300, fontSize: 'var(--text-h1)', color: 'var(--color-text-primary)', letterSpacing: '-0.025em', lineHeight: 1.1, marginBottom: '20px' }}>
+          <h1 style={{ ...SERIF, fontWeight: 400, fontSize: 'var(--text-h1)', color: 'var(--color-text-primary)', letterSpacing: '-0.025em', lineHeight: 1.1, marginBottom: '20px' }}>
             Tell us what is changing.{' '}
             <em style={{ fontStyle: 'italic', color: 'var(--color-gold)' }}>We will tell you if this fits.</em>
           </h1>
-          <p style={{ ...SERIF, fontStyle: 'italic', fontWeight: 300, fontSize: '1.1rem', color: 'var(--color-text-secondary)', lineHeight: 1.8, maxWidth: '460px', margin: '0 auto' }}>
+          <p style={{ ...SERIF, fontStyle: 'italic', fontWeight: 400, fontSize: '1.1rem', color: 'var(--color-text-secondary)', lineHeight: 1.8, maxWidth: '460px', margin: '0 auto' }}>
             We are a small team and we read every message ourselves. A business handing over, a parent whose thinking you want to keep, a question about how any of this works. Start here.
           </p>
         </section>
@@ -114,7 +114,7 @@ export default function ContactPage() {
                 <h2 style={{ ...SERIF, fontSize: '1.75rem', fontWeight: 500, color: 'var(--color-text-primary)', marginBottom: '16px' }}>
                   Got it. We will be in touch.
                 </h2>
-                <p style={{ ...SERIF, fontStyle: 'italic', fontWeight: 300, fontSize: '1rem', color: 'var(--color-text-secondary)', lineHeight: 1.8 }}>
+                <p style={{ ...SERIF, fontStyle: 'italic', fontWeight: 400, fontSize: '1rem', color: 'var(--color-text-secondary)', lineHeight: 1.8 }}>
                   Thank you for writing. A real person reads every message and replies within 48 hours.
                 </p>
               </div>
@@ -123,7 +123,7 @@ export default function ContactPage() {
 
                 <div>
                   <h2 style={{ ...SERIF, fontSize: '1.4rem', fontWeight: 500, color: 'var(--color-text-primary)', marginBottom: '4px' }}>Send a message</h2>
-                  <p style={{ ...SERIF, fontStyle: 'italic', fontWeight: 300, fontSize: '0.95rem', color: 'var(--color-text-muted)' }}>A real person replies within 48 hours.</p>
+                  <p style={{ ...SERIF, fontStyle: 'italic', fontWeight: 400, fontSize: '0.95rem', color: 'var(--color-text-muted)' }}>A real person replies within 48 hours.</p>
                 </div>
 
                 <div>
@@ -162,7 +162,7 @@ export default function ContactPage() {
                     style={{
                       ...MONO,
                       fontSize:      'var(--text-caption)',
-                      background:    status === 'loading' ? 'rgba(184,150,62,0.6)' : 'var(--color-gold)',
+                      background:    status === 'loading' ? 'rgba(21,19,15,0.45)' : 'var(--btn)',
                       color:         'var(--color-bg)',
                       border:        'none',
                       borderRadius:  'var(--radius-sm)',
@@ -173,7 +173,7 @@ export default function ContactPage() {
                   >
                     {status === 'loading' ? 'Sending…' : 'Send Message →'}
                   </button>
-                  <p style={{ ...SERIF, fontStyle: 'italic', fontWeight: 300, fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>
+                  <p style={{ ...SERIF, fontStyle: 'italic', fontWeight: 400, fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>
                     Or email{' '}
                     <a href="mailto:legacy@basalith.xyz" style={{ color: 'var(--color-gold)', textDecoration: 'none' }}>
                       legacy@basalith.xyz

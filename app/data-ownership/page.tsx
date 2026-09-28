@@ -68,7 +68,7 @@ export default function DataOwnershipPage() {
           />
           <div
             className="absolute inset-0 pointer-events-none"
-            style={{ background: 'radial-gradient(ellipse 60% 55% at 50% 55%,rgba(255,179,71,0.08) 0%,transparent 65%)' }}
+            style={{ background: 'radial-gradient(ellipse 60% 55% at 50% 55%,rgba(205,178,122,0.08) 0%,transparent 65%)' }}
             aria-hidden="true"
           />
 
@@ -163,7 +163,7 @@ export default function DataOwnershipPage() {
               width: 1000, height: 500,
               top: '50%', left: '50%',
               transform: 'translate(-50%,-50%)',
-              background: 'radial-gradient(ellipse,rgba(255,179,71,0.08) 0%,transparent 60%)',
+              background: 'radial-gradient(ellipse,rgba(205,178,122,0.08) 0%,transparent 60%)',
             }}
             aria-hidden="true"
           />

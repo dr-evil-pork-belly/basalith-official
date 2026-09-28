@@ -102,7 +102,7 @@ export default function SuccessorEntityClient({ session, archiveName, ownerName,
             ← Portal
           </Link>
           <span style={{ ...MONO, fontSize: '11px', color: 'var(--spine-dim)', margin: '0 8px' }}>|</span>
-          <span style={{ ...MONO, fontSize: '11px', letterSpacing: '0.24em', textTransform: 'uppercase', color: 'var(--spine-gold)' }}>
+          <span style={{ ...MONO, fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--spine-gold)' }}>
             Querying: {archiveName}
           </span>
         </div>
@@ -154,7 +154,7 @@ export default function SuccessorEntityClient({ session, archiveName, ownerName,
                       <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--portal-secondary)', margin: '0 0 4px' }}>
                         {contextTypeLabel(ctx.context_type)} · {formatDate(ctx.created_at)}
                       </p>
-                      <p style={{ ...SERIF, fontSize: '0.85rem', fontWeight: 300, color: 'var(--portal-body)', margin: 0, lineHeight: 1.6 }}>
+                      <p style={{ ...SERIF, fontSize: '0.85rem', fontWeight: 400, color: 'var(--portal-body)', margin: 0, lineHeight: 1.6 }}>
                         {ctx.content.length > 200 ? ctx.content.slice(0, 200) + '…' : ctx.content}
                       </p>
                     </div>
@@ -215,7 +215,7 @@ export default function SuccessorEntityClient({ session, archiveName, ownerName,
                     ...SERIF,
                     fontSize:   msg.role === 'entity' ? '18px' : '17px',
                     fontStyle:  msg.role === 'entity' ? 'italic' : 'normal',
-                    fontWeight: 300,
+                    fontWeight: 400,
                     color:      msg.role === 'entity' ? 'var(--invert-fg)' : 'var(--portal-ink)',
                     lineHeight: 1.7,
                     margin:     0,
@@ -263,7 +263,7 @@ export default function SuccessorEntityClient({ session, archiveName, ownerName,
               borderBottom: input ? '1px solid var(--portal-gold-line)' : '1px solid var(--portal-gold-line)',
               color:        'var(--portal-ink)',
               fontSize:     '1rem',
-              fontWeight:   300,
+              fontWeight: 400,
               padding:      '0 0 8px',
               resize:       'none',
               outline:      'none',

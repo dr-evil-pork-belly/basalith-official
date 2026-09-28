@@ -118,7 +118,7 @@ export default function OnboardingGuide({
         onClick={() => setReopened(true)}
       >
         <div className="flex items-center gap-3">
-          <span style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.25em', color: 'var(--portal-gold-ink)' }}>
+          <span style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', color: 'var(--portal-gold-ink)' }}>
             Getting started
           </span>
           <span style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.1em', color: 'var(--portal-secondary)' }}>
@@ -145,7 +145,7 @@ export default function OnboardingGuide({
       {/* Header row */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-4">
-          <span style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.3em', color: 'var(--portal-gold-ink)' }}>
+          <span style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', color: 'var(--portal-gold-ink)' }}>
             Getting started
           </span>
           {/* Progress pills */}

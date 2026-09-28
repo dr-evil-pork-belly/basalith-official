@@ -16,7 +16,7 @@ import { mono, serif, StoneBlock } from './StonePrimitives'
 // below hold a floor across the text band and still leave the upper 38% of the
 // photograph clean. Measured worst case 7.88:1, mean 14.36:1.
 const SCRIM =
-  'linear-gradient(to top, rgba(20,18,15,0.88) 0%, rgba(20,18,15,0.74) 60%, rgba(20,18,15,0) 100%)'
+  'linear-gradient(to top, rgba(21,19,15,0.88) 0%, rgba(21,19,15,0.74) 60%, rgba(21,19,15,0) 100%)'
 
 export default function HomeHero() {
   return (
@@ -109,7 +109,7 @@ export default function HomeHero() {
           style={{
             ...serif,
             fontSize:   'var(--stone-fs-body)',
-            fontWeight: 300,
+            fontWeight: 400,
             lineHeight: 1.5,
             color:      'var(--stone-body)',
             margin:     0,
@@ -128,8 +128,8 @@ export default function HomeHero() {
             textAlign:      'center',
             textDecoration: 'none',
             fontSize:       '11px',
-            color:          '#0A0908',
-            background:     'var(--b2b-btn)',
+            color: 'var(--btn-label)',
+            background:     'var(--btn)',
             padding:        '15px',
             minHeight:      '48px',
             boxSizing:      'border-box',

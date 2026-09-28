@@ -25,8 +25,8 @@ const MONO: React.CSSProperties  = { fontFamily: 'var(--portal-mono)' }
 const SERIF: React.CSSProperties = { fontFamily: 'var(--portal-serif)' }
 
 // Threshold register: the shared --invert-* family. Re-pointed September 20,
-// 2026 with the other two demos. dim was #706C65 (3.58:1) carrying eleven
-// pieces of text, and ghost was #3A3F44 (1.76:1) carrying two, on the one demo
+// 2026 with the other two demos. dim was var(--on-dark-3) (3.58:1) carrying eleven
+// pieces of text, and ghost was rgba(247,245,241,0.12) (1.76:1) carrying two, on the one demo
 // that is public and shown to acquisition prospects.
 const C = {
   bg:         'var(--invert-bg)',
@@ -179,11 +179,11 @@ export default function SuccessionDemoClient() {
             &larr; Exit
           </Link>
           <span style={{ ...MONO, fontSize: '11px', color: C.dim }}>|</span>
-          <span style={{ ...MONO, fontSize: '11px', letterSpacing: '0.28em', textTransform: 'uppercase', color: C.gold, whiteSpace: 'nowrap' }}>
+          <span style={{ ...MONO, fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: C.gold, whiteSpace: 'nowrap' }}>
             Basalith &middot; Succession
           </span>
         </div>
-        <span style={{ ...MONO, fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: C.dim, whiteSpace: 'nowrap' }}>
+        <span style={{ ...MONO, fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: C.dim, whiteSpace: 'nowrap' }}>
           Interactive Demonstration
         </span>
       </div>
@@ -192,7 +192,7 @@ export default function SuccessionDemoClient() {
 
         {/* ══ ZONE 1: header ══ */}
         <div className="succ-fade">
-          <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.24em', textTransform: 'uppercase', color: 'var(--invert-gold)', marginBottom: '18px', lineHeight: 1.7 }}>
+          <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--invert-gold)', marginBottom: '18px', lineHeight: 1.7 }}>
             {CATEGORY_LINE}
           </p>
 
@@ -224,13 +224,13 @@ export default function SuccessionDemoClient() {
             })}
           </div>
 
-          <h1 style={{ ...SERIF, fontSize: 'clamp(2rem,4.5vw,3rem)', fontWeight: 300, color: C.bone, lineHeight: 1.1, marginBottom: '8px', letterSpacing: '-0.01em' }}>
+          <h1 style={{ ...SERIF, fontSize: 'clamp(2rem,4.5vw,3rem)', fontWeight: 400, color: C.bone, lineHeight: 1.1, marginBottom: '8px', letterSpacing: '-0.01em' }}>
             {persona.metadata.name}
           </h1>
-          <p style={{ ...SERIF, fontSize: 'clamp(1rem,2vw,1.2rem)', fontStyle: 'italic', fontWeight: 300, color: C.gold, marginBottom: '14px' }}>
+          <p style={{ ...SERIF, fontSize: 'clamp(1rem,2vw,1.2rem)', fontStyle: 'italic', fontWeight: 400, color: C.gold, marginBottom: '14px' }}>
             {persona.metadata.role}
           </p>
-          <p style={{ ...SERIF, fontSize: '0.95rem', fontWeight: 300, color: C.muted, lineHeight: 1.7, maxWidth: '640px', marginBottom: '18px' }}>
+          <p style={{ ...SERIF, fontSize: '0.95rem', fontWeight: 400, color: C.muted, lineHeight: 1.7, maxWidth: '640px', marginBottom: '18px' }}>
             {persona.metadata.bioLine}
           </p>
 
@@ -239,7 +239,7 @@ export default function SuccessionDemoClient() {
             <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: C.gold, marginBottom: '7px' }}>
               Fictional Founder
             </p>
-            <p style={{ ...SERIF, fontSize: '0.88rem', fontWeight: 300, color: C.muted, lineHeight: 1.75, margin: 0 }}>
+            <p style={{ ...SERIF, fontSize: '0.88rem', fontWeight: 400, color: C.muted, lineHeight: 1.75, margin: 0 }}>
               {persona.metadata.fictionalLabel}
             </p>
           </div>
@@ -254,7 +254,7 @@ export default function SuccessionDemoClient() {
               {introOpen ? 'Hide how this works' : 'How this works'}
             </button>
             {introOpen && (
-              <p className="succ-fade" style={{ ...SERIF, fontSize: '0.9rem', fontWeight: 300, color: C.muted, lineHeight: 1.85, marginTop: '10px' }}>
+              <p className="succ-fade" style={{ ...SERIF, fontSize: '0.9rem', fontWeight: 400, color: C.muted, lineHeight: 1.85, marginTop: '10px' }}>
                 {COLLAPSED_INTRO}
               </p>
             )}
@@ -272,7 +272,7 @@ export default function SuccessionDemoClient() {
             const deposit = persona.pairs.find(p => p.id === card.groundedInPairId)
             return (
               <section key={card.id} style={{ background: C.panel, padding: 'clamp(20px,2.5vw,28px)' }}>
-                <p style={{ ...SERIF, fontSize: '1.1rem', fontWeight: 300, color: C.bone, lineHeight: 1.5, marginBottom: '16px' }}>
+                <p style={{ ...SERIF, fontSize: '1.1rem', fontWeight: 400, color: C.bone, lineHeight: 1.5, marginBottom: '16px' }}>
                   {card.question}
                 </p>
 
@@ -291,7 +291,7 @@ export default function SuccessionDemoClient() {
                       <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: C.dim, marginBottom: '7px' }}>
                         {persona.metadata.successorLabel} assumes
                       </p>
-                      <p style={{ ...SERIF, fontSize: '0.92rem', fontWeight: 300, color: C.muted, lineHeight: 1.7, margin: 0, paddingLeft: '12px', borderLeft: `2px solid ${C.ghost}` }}>
+                      <p style={{ ...SERIF, fontSize: '0.92rem', fontWeight: 400, color: C.muted, lineHeight: 1.7, margin: 0, paddingLeft: '12px', borderLeft: `2px solid ${C.ghost}` }}>
                         {card.successorAssumes}
                       </p>
                     </div>
@@ -305,7 +305,7 @@ export default function SuccessionDemoClient() {
                         <p style={{ ...SERIF, fontSize: '14.5px', fontStyle: 'italic', color: C.dim, lineHeight: 1.6, margin: '0 0 8px' }}>
                           {deposit.prompt}
                         </p>
-                        <p style={{ ...SERIF, fontSize: '0.9rem', fontWeight: 300, color: C.muted, lineHeight: 1.75, margin: 0 }}>
+                        <p style={{ ...SERIF, fontSize: '0.9rem', fontWeight: 400, color: C.muted, lineHeight: 1.75, margin: 0 }}>
                           {deposit.completion}
                         </p>
                       </div>
@@ -343,7 +343,7 @@ export default function SuccessionDemoClient() {
         <section style={{ background: C.panel, padding: 'clamp(20px,2.5vw,30px)', marginBottom: '36px' }}>
 
           {turns.length === 0 && (
-            <p style={{ ...SERIF, fontSize: '0.9rem', fontStyle: 'italic', fontWeight: 300, color: C.dim, lineHeight: 1.75, marginTop: 0, marginBottom: '20px' }}>
+            <p style={{ ...SERIF, fontSize: '0.9rem', fontStyle: 'italic', fontWeight: 400, color: C.dim, lineHeight: 1.75, marginTop: 0, marginBottom: '20px' }}>
               The record holds fifteen deposits. Ask something it covers, and something it does not.
             </p>
           )}
@@ -353,7 +353,7 @@ export default function SuccessionDemoClient() {
             {turns.map((t, i) => (
               <div key={i} className="succ-fade">
                 <div style={{ background: 'var(--invert-gold-wash)', border: '1px solid var(--invert-gold-wash)', borderRadius: '10px 10px 10px 2px', padding: '12px 16px', marginBottom: '12px' }}>
-                  <p style={{ ...SERIF, fontSize: '0.95rem', fontWeight: 300, color: C.muted, lineHeight: 1.6, margin: 0 }}>
+                  <p style={{ ...SERIF, fontSize: '0.95rem', fontWeight: 400, color: C.muted, lineHeight: 1.6, margin: 0 }}>
                     {t.question}
                   </p>
                 </div>
@@ -374,7 +374,7 @@ export default function SuccessionDemoClient() {
               <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: C.gold, marginBottom: '10px' }}>
                 Session Complete
               </p>
-              <p style={{ ...SERIF, fontSize: '0.95rem', fontWeight: 300, color: C.muted, lineHeight: 1.8, margin: 0 }}>
+              <p style={{ ...SERIF, fontSize: '0.95rem', fontWeight: 400, color: C.muted, lineHeight: 1.8, margin: 0 }}>
                 {SESSION_CAP_CARD}
               </p>
             </div>
@@ -391,7 +391,7 @@ export default function SuccessionDemoClient() {
                     style={{
                       ...SERIF,
                       fontSize:     '0.85rem',
-                      fontWeight:   300,
+                      fontWeight: 400,
                       color:        busy ? C.dim : C.muted,
                       background:   'transparent',
                       border:       `1px solid ${C.ghost}`,
@@ -425,7 +425,7 @@ export default function SuccessionDemoClient() {
                     ...SERIF,
                     flex:         1,
                     fontSize:     '0.95rem',
-                    fontWeight:   300,
+                    fontWeight: 400,
                     color:        C.bone,
                     background:   'var(--invert-field)',
                     border:       `1px solid ${C.line}`,
@@ -468,7 +468,7 @@ export default function SuccessionDemoClient() {
             href={SUCCESSION_URL}
             target="_blank"
             rel="noopener noreferrer"
-            style={{ ...MONO, display: 'inline-block', fontSize: '11px', letterSpacing: '0.26em', textTransform: 'uppercase', color: C.bg, background: C.gold, padding: '1.05rem 2.5rem', textDecoration: 'none', fontWeight: 700, borderRadius: '2px' }}
+            style={{ ...MONO, display: 'inline-block', fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: C.bg, background: C.gold, padding: '1.05rem 2.5rem', textDecoration: 'none', fontWeight: 700, borderRadius: '2px' }}
           >
             Found a Basalith for the business &rarr;
           </a>
@@ -486,7 +486,7 @@ function SectionHeader({ label, title }: { label: string; title: string }) {
       <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--invert-gold)', marginBottom: '8px' }}>
         {label}
       </p>
-      <h2 style={{ ...SERIF, fontSize: '1.35rem', fontWeight: 300, color: C.bone, margin: 0 }}>{title}</h2>
+      <h2 style={{ ...SERIF, fontSize: '1.35rem', fontWeight: 400, color: C.bone, margin: 0 }}>{title}</h2>
     </div>
   )
 }
@@ -534,7 +534,7 @@ function Answer({ text, grounded, basis, failed, metadata }: {
   if (failed) {
     return (
       <div style={{ borderLeft: `2px solid ${C.ghost}`, background: 'var(--invert-rule)', borderRadius: '0 8px 8px 8px', padding: '14px 16px 14px 18px' }}>
-        <p style={{ ...SERIF, fontSize: '0.95rem', fontWeight: 300, color: C.dim, lineHeight: 1.8, margin: 0 }}>{text}</p>
+        <p style={{ ...SERIF, fontSize: '0.95rem', fontWeight: 400, color: C.dim, lineHeight: 1.8, margin: 0 }}>{text}</p>
       </div>
     )
   }
@@ -544,7 +544,7 @@ function Answer({ text, grounded, basis, failed, metadata }: {
     const reasoned = demoAnswerState(basis) === 'reasoned'
     return (
       <div style={{ borderLeft: `2px solid ${C.ghost}`, background: 'var(--invert-rule)', borderRadius: '0 8px 8px 8px', padding: '14px 16px 14px 18px' }}>
-        <p style={{ ...SERIF, fontSize: '0.96rem', fontWeight: 300, color: C.muted, lineHeight: 1.85, margin: 0, whiteSpace: 'pre-wrap' }}>
+        <p style={{ ...SERIF, fontSize: '0.96rem', fontWeight: 400, color: C.muted, lineHeight: 1.85, margin: 0, whiteSpace: 'pre-wrap' }}>
           {text}
         </p>
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', marginTop: '14px', paddingTop: '12px', borderTop: `1px solid var(--invert-rule)` }}>
@@ -561,7 +561,7 @@ function Answer({ text, grounded, basis, failed, metadata }: {
 
   return (
     <div style={{ borderLeft: '2px solid var(--invert-gold-line)', background: 'var(--invert-rule)', borderRadius: '0 8px 8px 8px', padding: '14px 16px 14px 18px' }}>
-      <p style={{ ...SERIF, fontSize: '0.98rem', fontStyle: 'italic', fontWeight: 300, color: C.goldBright, lineHeight: 1.85, margin: 0, whiteSpace: 'pre-wrap' }}>
+      <p style={{ ...SERIF, fontSize: '0.98rem', fontStyle: 'italic', fontWeight: 400, color: C.goldBright, lineHeight: 1.85, margin: 0, whiteSpace: 'pre-wrap' }}>
         {text}
       </p>
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '14px', paddingTop: '12px', borderTop: '1px solid var(--invert-gold-line)' }}>

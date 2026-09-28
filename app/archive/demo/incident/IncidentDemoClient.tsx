@@ -164,7 +164,7 @@ export default function IncidentDemoClient() {
         href="/archive/dashboard"
         style={{
           position: 'fixed', top: '20px', right: '24px', zIndex: 70,
-          fontFamily: MONO, fontSize: '11px', letterSpacing: '0.24em',
+          fontFamily: MONO, fontSize: '11px', letterSpacing: '0.18em',
           textTransform: 'uppercase', color: C.dim, textDecoration: 'none',
         }}
       >
@@ -186,7 +186,7 @@ export default function IncidentDemoClient() {
       {step === 'intro' && (
         <Stage>
           <Eyebrow>Incident Capture</Eyebrow>
-          <h1 className="id-fade-up" style={{ fontFamily: SERIF, fontWeight: 300, fontSize: 'clamp(2.2rem,5vw,3.6rem)', color: C.text, lineHeight: 1.1, marginBottom: '0.6rem' }}>
+          <h1 className="id-fade-up" style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 'clamp(2.2rem,5vw,3.6rem)', color: C.text, lineHeight: 1.1, marginBottom: '0.6rem' }}>
             One real decision, in depth
           </h1>
           <p className="id-fade-up" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(1rem,2vw,1.25rem)', color: C.muted, lineHeight: 1.7, maxWidth: '560px', marginBottom: '2.75rem' }}>
@@ -219,15 +219,15 @@ export default function IncidentDemoClient() {
       {step === 'interview' && probe && (
         <Stage>
           <div style={{ width: '100%', maxWidth: '720px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
-            <span style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.24em', textTransform: 'uppercase', color: 'var(--invert-gold)' }}>
+            <span style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--invert-gold)' }}>
               {PROBE_LABEL[probe.probeType] ?? probe.probeType}
             </span>
-            <span style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.24em', textTransform: 'uppercase', color: C.dim }}>
+            <span style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: C.dim }}>
               Probe {probeCount}
             </span>
           </div>
 
-          <p key={probeCount} className="id-fade-up" style={{ fontFamily: SERIF, fontWeight: 300, fontSize: 'clamp(1.7rem,3.4vw,2.5rem)', color: C.text, lineHeight: 1.3, maxWidth: '760px', marginBottom: '2rem' }}>
+          <p key={probeCount} className="id-fade-up" style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 'clamp(1.7rem,3.4vw,2.5rem)', color: C.text, lineHeight: 1.3, maxWidth: '760px', marginBottom: '2rem' }}>
             {probe.question}
           </p>
 
@@ -244,7 +244,7 @@ export default function IncidentDemoClient() {
               background: 'var(--invert-field)',
               border: '1px solid var(--invert-gold-line)', borderRadius: '3px',
               padding: '1.1rem 1.25rem', fontFamily: SERIF, fontSize: '1.15rem',
-              fontWeight: 300, color: C.text, lineHeight: 1.7, outline: 'none',
+              fontWeight: 400, color: C.text, lineHeight: 1.7, outline: 'none',
               resize: 'none', opacity: turnState === 'thinking' ? 0.5 : 1,
             }}
           />
@@ -271,13 +271,13 @@ export default function IncidentDemoClient() {
       {step === 'complete' && (
         <Stage>
           <Eyebrow>Capture Complete</Eyebrow>
-          <h1 className="id-fade-up" style={{ fontFamily: SERIF, fontWeight: 300, fontSize: 'clamp(2rem,4.5vw,3.2rem)', color: C.text, lineHeight: 1.15, marginBottom: '1.5rem' }}>
+          <h1 className="id-fade-up" style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 'clamp(2rem,4.5vw,3.2rem)', color: C.text, lineHeight: 1.15, marginBottom: '1.5rem' }}>
             One decision, fully walked
           </h1>
 
           <DimensionTray dimensions={dimensions} large />
 
-          <p className="id-fade-up" style={{ fontFamily: SERIF, fontWeight: 300, fontSize: 'clamp(1.1rem,2.4vw,1.5rem)', color: C.muted, lineHeight: 1.7, maxWidth: '620px', margin: '2.5rem 0 1rem' }}>
+          <p className="id-fade-up" style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 'clamp(1.1rem,2.4vw,1.5rem)', color: C.muted, lineHeight: 1.7, maxWidth: '620px', margin: '2.5rem 0 1rem' }}>
             That is one decision, followed all the way down. A full archive builds
             from many of these, in the founder{"'"}s own words.
           </p>
@@ -290,7 +290,7 @@ export default function IncidentDemoClient() {
             style={{
               background: 'transparent', border: `1px solid var(--invert-gold-wash)`,
               cursor: 'pointer', fontFamily: MONO, fontSize: '11px',
-              letterSpacing: '0.26em', textTransform: 'uppercase', color: C.muted,
+              letterSpacing: '0.18em', textTransform: 'uppercase', color: C.muted,
               padding: '1rem 2rem', borderRadius: '2px',
             }}
           >
@@ -344,7 +344,7 @@ function Stage({ children }: { children: React.ReactNode }) {
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
-    <p style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.4em', textTransform: 'uppercase', color: 'var(--invert-gold)', marginBottom: '1.5rem' }}>
+    <p style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--invert-gold)', marginBottom: '1.5rem' }}>
       {children}
     </p>
   )
@@ -363,7 +363,7 @@ function Field({ label, value, onChange, placeholder, onEnter }: {
 }) {
   return (
     <label style={{ display: 'block' }}>
-      <span style={{ display: 'block', fontFamily: MONO, fontSize: '11px', letterSpacing: '0.24em', textTransform: 'uppercase', color: C.dim, marginBottom: '0.6rem' }}>
+      <span style={{ display: 'block', fontFamily: MONO, fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: C.dim, marginBottom: '0.6rem' }}>
         {label}
       </span>
       <input
@@ -372,7 +372,7 @@ function Field({ label, value, onChange, placeholder, onEnter }: {
         onChange={e => onChange(e.target.value)}
         onKeyDown={e => { if (e.key === 'Enter' && onEnter) { e.preventDefault(); onEnter() } }}
         placeholder={placeholder}
-        style={{ width: '100%', background: 'transparent', border: 'none', borderBottom: '1px solid var(--invert-gold-wash)', color: C.text, fontFamily: SERIF, fontSize: '1.35rem', fontWeight: 300, padding: '0.4rem 0', outline: 'none' }}
+        style={{ width: '100%', background: 'transparent', border: 'none', borderBottom: '1px solid var(--invert-gold-wash)', color: C.text, fontFamily: SERIF, fontSize: '1.35rem', fontWeight: 400, padding: '0.4rem 0', outline: 'none' }}
       />
     </label>
   )
@@ -385,7 +385,7 @@ function PrimaryButton({ children, onClick, disabled }: {
     <button
       onClick={onClick}
       disabled={disabled}
-      style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.3em', textTransform: 'uppercase', color: C.void, background: C.gold, border: 'none', padding: '1.05rem 2.5rem', cursor: disabled ? 'default' : 'pointer', opacity: disabled ? 0.35 : 1, fontWeight: 700, borderRadius: '2px', transition: 'opacity 0.2s' }}
+      style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: C.void, background: C.gold, border: 'none', padding: '1.05rem 2.5rem', cursor: disabled ? 'default' : 'pointer', opacity: disabled ? 0.35 : 1, fontWeight: 700, borderRadius: '2px', transition: 'opacity 0.2s' }}
     >
       {children}
     </button>

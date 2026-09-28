@@ -14,12 +14,12 @@ export const metadata: Metadata = {
 }
 
 const SERIF: React.CSSProperties = {
-  fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontFamily: 'var(--font-newsreader), Georgia, serif',
 }
 const MONO: React.CSSProperties = {
-  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+  fontFamily:    'var(--font-space-mono)',
   textTransform: 'uppercase' as const,
-  letterSpacing: '0.28em',
+  letterSpacing: '0.18em',
 }
 
 export default function AnswersIndexPage() {
@@ -56,7 +56,7 @@ export default function AnswersIndexPage() {
             style={{
               ...SERIF,
               fontSize:      'clamp(2rem, 4vw, 3rem)',
-              fontWeight:    300,
+              fontWeight: 400,
               lineHeight:    1.15,
               letterSpacing: '-0.02em',
               color:         'var(--color-text-primary)',
@@ -70,7 +70,7 @@ export default function AnswersIndexPage() {
             style={{
               ...SERIF,
               fontSize:     '1.15rem',
-              fontWeight:   300,
+              fontWeight: 400,
               lineHeight:   1.85,
               color:        'var(--color-text-secondary)',
               marginBottom: '64px',
@@ -94,7 +94,7 @@ export default function AnswersIndexPage() {
                   style={{
                     ...SERIF,
                     fontSize:      '1.35rem',
-                    fontWeight:    300,
+                    fontWeight: 400,
                     lineHeight:    1.4,
                     letterSpacing: '-0.01em',
                     color:         'var(--color-text-primary)',
@@ -107,7 +107,7 @@ export default function AnswersIndexPage() {
                   style={{
                     ...SERIF,
                     fontSize:   '1.05rem',
-                    fontWeight: 300,
+                    fontWeight: 400,
                     lineHeight: 1.8,
                     color:      'var(--color-text-secondary)',
                     margin:     0,

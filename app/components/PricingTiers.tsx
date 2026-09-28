@@ -3,13 +3,13 @@
 import { useState } from 'react'
 
 const MONO: React.CSSProperties = {
-  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+  fontFamily:    'var(--font-space-mono)',
   textTransform: 'uppercase' as const,
-  letterSpacing: '0.28em',
+  letterSpacing: '0.18em',
 }
 
 const SERIF: React.CSSProperties = {
-  fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontFamily: 'var(--font-newsreader), Georgia, serif',
 }
 
 interface Tier {
@@ -101,7 +101,7 @@ const TIERS: Tier[] = [
 function Check() {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0, marginTop: '3px' }} aria-hidden="true">
-      <circle cx="7" cy="7" r="6.5" stroke="rgba(184,150,62,0.3)" />
+      <circle cx="7" cy="7" r="6.5" stroke="rgba(160,132,80,0.3)" />
       <path d="M4 7l2 2 4-4" stroke="var(--color-gold)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
@@ -142,7 +142,7 @@ export default function PricingTiers() {
           style={{
             ...SERIF,
             fontSize:      'var(--text-h1)',
-            fontWeight:    300,
+            fontWeight: 400,
             color:         'var(--color-text-primary)',
             letterSpacing: '-0.02em',
             marginBottom:  '16px',
@@ -156,7 +156,7 @@ export default function PricingTiers() {
             ...SERIF,
             fontSize:   '1.05rem',
             fontStyle:  'italic',
-            fontWeight: 300,
+            fontWeight: 400,
             lineHeight: 1.8,
             color:      'var(--color-text-secondary)',
             marginBottom: '32px',
@@ -166,7 +166,7 @@ export default function PricingTiers() {
         </p>
 
         {/* Founding fee — legible subhead, not a faint mono eyebrow */}
-        <p style={{ ...SERIF, fontSize: '1.05rem', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-primary)', marginBottom: '24px' }}>
+        <p style={{ ...SERIF, fontSize: '1.05rem', fontWeight: 400, lineHeight: 1.8, color: 'var(--color-text-primary)', marginBottom: '24px' }}>
           Every plan begins with The Founding, a one-time $2,500 fee.
         </p>
 
@@ -180,9 +180,9 @@ export default function PricingTiers() {
             onClick={() => setBilling('annual')}
             aria-pressed={isAnnual}
             style={{
-              fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
-              fontSize:      '0.6rem',
-              letterSpacing: '0.25em',
+              fontFamily:    'var(--font-space-mono)',
+              fontSize:      '0.78rem',
+              letterSpacing: '0.18em',
               textTransform: 'uppercase' as const,
               padding:       '10px 24px',
               border:        '1px solid var(--color-border-medium)',
@@ -198,8 +198,8 @@ export default function PricingTiers() {
           <div
             aria-hidden="true"
             style={{
-              fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
-              fontSize:      '0.5rem',
+              fontFamily:    'var(--font-space-mono)',
+              fontSize:      '0.78rem',
               letterSpacing: '0.2em',
               textTransform: 'uppercase' as const,
               color:         'var(--color-gold)',
@@ -214,9 +214,9 @@ export default function PricingTiers() {
             onClick={() => setBilling('monthly')}
             aria-pressed={!isAnnual}
             style={{
-              fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
-              fontSize:      '0.6rem',
-              letterSpacing: '0.25em',
+              fontFamily:    'var(--font-space-mono)',
+              fontSize:      '0.78rem',
+              letterSpacing: '0.18em',
               textTransform: 'uppercase' as const,
               padding:       '10px 24px',
               border:        '1px solid var(--color-border-medium)',
@@ -247,13 +247,14 @@ export default function PricingTiers() {
           <div
             key={id}
             style={{
-              background:    featured ? 'var(--color-void)' : 'var(--color-surface)',
-              border:        featured ? '1px solid rgba(184,150,62,0.35)' : '1px solid var(--color-border)',
+              background:    'var(--color-surface)',
+              border:        featured ? '1px solid var(--color-border-medium)' : '1px solid var(--color-border)',
+              borderTop:     featured ? '2px solid var(--color-gold)' : '1px solid var(--color-border)',
               borderRadius:  'var(--radius-md)',
               padding:       '36px',
               display:       'flex',
               flexDirection: 'column',
-              boxShadow:     featured ? 'var(--shadow-gold)' : 'var(--shadow-sm)',
+              boxShadow:     featured ? 'var(--shadow-md)' : 'var(--shadow-sm)',
               position:      'relative',
             }}
           >
@@ -266,13 +267,13 @@ export default function PricingTiers() {
                   left:       '15%',
                   right:      '15%',
                   height:     '1px',
-                  background: 'linear-gradient(90deg,transparent,rgba(184,150,62,0.5),transparent)',
+                  background: 'linear-gradient(90deg,transparent,rgba(160,132,80,0.5),transparent)',
                 }}
               />
             )}
 
             {/* Eyebrow */}
-            <p style={{ ...MONO, fontSize: '0.42rem', color: 'var(--color-gold)', marginBottom: '16px' }}>
+            <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)', marginBottom: '16px' }}>
               {eyebrow}
             </p>
 
@@ -282,7 +283,7 @@ export default function PricingTiers() {
                 ...SERIF,
                 fontSize:     '1.5rem',
                 fontWeight:   500,
-                color:        featured ? 'rgba(250,248,244,0.9)' : 'var(--color-text-primary)',
+                color:        'var(--color-text-primary)',
                 marginBottom: '16px',
               }}
             >
@@ -295,8 +296,8 @@ export default function PricingTiers() {
                 ...SERIF,
                 fontSize:     '0.9rem',
                 fontStyle:    'italic',
-                fontWeight:   300,
-                color:        featured ? 'rgba(250,248,244,0.4)' : 'var(--color-text-muted)',
+                fontWeight: 400,
+                color:        'var(--color-text-muted)',
                 marginBottom: '28px',
                 lineHeight:   1.65,
                 whiteSpace:   'pre-line',
@@ -308,32 +309,32 @@ export default function PricingTiers() {
             {/* Price */}
             {(isAnnual || annualOnly) ? (
               <>
-                <div style={{ ...SERIF, fontSize: 'clamp(2rem,3.5vw,3rem)', fontWeight: 300, color: 'var(--color-gold)', letterSpacing: '-0.025em', lineHeight: 1, marginBottom: '6px' }}>
+                <div style={{ ...SERIF, fontSize: 'clamp(2rem,3.5vw,3rem)', fontWeight: 400, color: 'var(--color-gold)', letterSpacing: '-0.025em', lineHeight: 1, marginBottom: '6px' }}>
                   {annualPrice}
                 </div>
-                <p style={{ ...MONO, fontSize: '0.5rem', letterSpacing: '0.2em', color: featured ? 'rgba(250,248,244,0.3)' : 'var(--color-text-faint)', marginBottom: '24px' }}>
+                <p style={{ ...MONO, fontSize: '0.78rem', letterSpacing: '0.2em', color: 'var(--color-text-faint)', marginBottom: '24px' }}>
                   Per year{annualSub ? ` · ${annualSub}` : ''}
                 </p>
               </>
             ) : (
               <>
-                <div style={{ ...SERIF, fontSize: 'clamp(2rem,3.5vw,3rem)', fontWeight: 300, color: 'var(--color-gold)', letterSpacing: '-0.025em', lineHeight: 1, marginBottom: '6px' }}>
+                <div style={{ ...SERIF, fontSize: 'clamp(2rem,3.5vw,3rem)', fontWeight: 400, color: 'var(--color-gold)', letterSpacing: '-0.025em', lineHeight: 1, marginBottom: '6px' }}>
                   {monthlyPrice}
                 </div>
-                <p style={{ ...MONO, fontSize: '0.5rem', letterSpacing: '0.2em', color: featured ? 'rgba(250,248,244,0.3)' : 'var(--color-text-faint)', marginBottom: '24px' }}>
+                <p style={{ ...MONO, fontSize: '0.78rem', letterSpacing: '0.2em', color: 'var(--color-text-faint)', marginBottom: '24px' }}>
                   Per month · Billed monthly
                 </p>
               </>
             )}
 
-            <div style={{ height: '1px', background: featured ? 'rgba(250,248,244,0.06)' : 'var(--color-border)', marginBottom: '24px' }} />
+            <div style={{ height: '1px', background: 'var(--color-border)', marginBottom: '24px' }} />
 
             {/* Features */}
             <ul style={{ listStyle: 'none', margin: contributorNote ? '0 0 16px' : '0 0 32px', padding: 0, display: 'flex', flexDirection: 'column', gap: '10px', flex: contributorNote ? 0 : 1 }}>
               {features.map(f => (
                 <li key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
                   <Check />
-                  <span style={{ ...SERIF, fontSize: '0.9rem', fontWeight: 300, lineHeight: 1.5, color: featured ? 'rgba(250,248,244,0.55)' : 'var(--color-text-secondary)' }}>
+                  <span style={{ ...SERIF, fontSize: '0.9rem', fontWeight: 400, lineHeight: 1.5, color: 'var(--color-text-secondary)' }}>
                     {f}
                   </span>
                 </li>
@@ -345,10 +346,10 @@ export default function PricingTiers() {
                 ...SERIF,
                 fontSize:     '0.85rem',
                 fontStyle:    'italic',
-                fontWeight:   300,
+                fontWeight: 400,
                 lineHeight:   1.75,
-                color:        'rgba(250,248,244,0.3)',
-                borderTop:    '1px solid rgba(250,248,244,0.06)',
+                color:        'var(--color-text-muted)',
+                borderTop:    '1px solid var(--color-border)',
                 paddingTop:   '16px',
                 marginBottom: '32px',
                 flex:         1,
@@ -368,8 +369,8 @@ export default function PricingTiers() {
                 padding:        '13px 24px',
                 borderRadius:   'var(--radius-sm)',
                 fontSize:       'var(--text-caption)',
-                background:     featured ? 'var(--color-gold)' : 'transparent',
-                color:          featured ? '#0A0908' : 'var(--color-text-secondary)',
+                background:     featured ? 'var(--btn)' : 'transparent',
+                color:          featured ? 'var(--btn-label)' : 'var(--color-text-primary)',
                 border:         featured ? 'none' : '1px solid var(--color-border-medium)',
                 transition:     'all 250ms ease',
                 marginBottom:   '12px',
@@ -379,7 +380,7 @@ export default function PricingTiers() {
             </a>
 
             {/* Note */}
-            <p style={{ ...SERIF, fontSize: '0.78rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--color-text-faint)', textAlign: 'center', lineHeight: 1.5 }}>
+            <p style={{ ...SERIF, fontSize: '0.78rem', fontStyle: 'italic', fontWeight: 400, color: 'var(--color-text-faint)', textAlign: 'center', lineHeight: 1.5 }}>
               {note}
             </p>
           </div>
@@ -388,7 +389,7 @@ export default function PricingTiers() {
 
       {/* Monthly minimum note */}
       {!isAnnual && (
-        <p style={{ ...MONO, fontSize: '0.5rem', letterSpacing: '0.2em', color: 'var(--color-text-faint)', textAlign: 'center', marginTop: '24px' }}>
+        <p style={{ ...MONO, fontSize: '0.78rem', letterSpacing: '0.2em', color: 'var(--color-text-faint)', textAlign: 'center', marginTop: '24px' }}>
           Monthly plans require a 12-month minimum commitment. Cancel anytime after month 12.
         </p>
       )}
@@ -398,7 +399,7 @@ export default function PricingTiers() {
         <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '20px' }}>
           A Note on Your Investment
         </p>
-        <div style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-secondary)' }}>
+        <div style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.8, color: 'var(--color-text-secondary)' }}>
           <p style={{ marginBottom: '16px' }}>
             If you work with an estate attorney or CPA, it is worth asking whether
             the annual Basalith fee qualifies as an estate planning expense.

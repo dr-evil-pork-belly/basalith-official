@@ -57,7 +57,7 @@ export default function ContinuityPillar() {
       {/* Bottom radiance */}
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse 65% 50% at 50% 100%,rgba(255,179,71,0.055) 0%,transparent 60%)' }}
+        style={{ background: 'radial-gradient(ellipse 65% 50% at 50% 100%,rgba(205,178,122,0.055) 0%,transparent 60%)' }}
         aria-hidden="true"
       />
 
@@ -65,17 +65,17 @@ export default function ContinuityPillar() {
       <div
         className="max-w-[680px] mx-auto mb-20 rounded-sm px-8 py-8 reveal"
         style={{
-          background:  'rgba(196,162,74,0.04)',
-          border:      '1px solid rgba(196,162,74,0.1)',
+          background:  'rgba(160,132,80,0.04)',
+          border:      '1px solid rgba(160,132,80,0.1)',
         }}
       >
         <p
           style={{
-            fontFamily:    'monospace',
-            fontSize:      '0.44rem',
-            letterSpacing: '0.28em',
+            fontFamily:    'var(--font-space-mono), monospace',
+            fontSize:      '0.72rem',
+            letterSpacing: '0.18em',
             textTransform: 'uppercase' as const,
-            color:         'rgba(196,162,74,0.65)',
+            color: 'var(--color-gold)',
             marginBottom:  '1rem',
           }}
         >
@@ -83,7 +83,7 @@ export default function ContinuityPillar() {
         </p>
         <p
           className="font-serif font-light leading-[1.85] mb-5"
-          style={{ fontSize: '1rem', color: '#9DA3A8' }}
+          style={{ fontSize: '1rem', color: 'var(--on-dark-2)' }}
         >
           Before your family labels a single photograph, our AI has already filtered
           tens of thousands of images down to the ones that matter, organized by decade,
@@ -94,7 +94,7 @@ export default function ContinuityPillar() {
         <a
           href="/#intelligence"
           className="font-serif no-underline transition-colors duration-200"
-          style={{ fontSize: '0.88rem', fontStyle: 'italic', color: 'rgba(196,162,74,0.6)' }}
+          style={{ fontSize: '0.88rem', fontStyle: 'italic', color: 'var(--color-gold)' }}
         >
           See how the Intelligence Layer works →
         </a>
@@ -127,7 +127,7 @@ export default function ContinuityPillar() {
           style={{
             top: '1.5rem',
             left: '12.5%', right: '12.5%',
-            background: 'linear-gradient(90deg,transparent,rgba(255,179,71,0.32) 10%,rgba(255,179,71,0.32) 90%,transparent)',
+            background: 'linear-gradient(90deg,transparent,rgba(205,178,122,0.32) 10%,rgba(205,178,122,0.32) 90%,transparent)',
           }}
           aria-hidden="true"
         />
@@ -208,7 +208,7 @@ export default function ContinuityPillar() {
       <div className="max-w-[680px] mx-auto mt-20 text-center reveal">
         <p
           className="font-serif font-light"
-          style={{ fontSize: '1.05rem', color: '#9DA3A8', lineHeight: 1.9, marginBottom: '1.5rem' }}
+          style={{ fontSize: '1.05rem', color: 'var(--on-dark-2)', lineHeight: 1.9, marginBottom: '1.5rem' }}
         >
           The entity improves with every generation of AI. What begins as a reasonable representation
           of your thinking becomes, over decades, something extraordinarily accurate. By the time your
@@ -216,13 +216,13 @@ export default function ContinuityPillar() {
         </p>
         <p
           className="font-serif font-light"
-          style={{ fontSize: '1.05rem', color: '#9DA3A8', lineHeight: 1.9, marginBottom: '0.75rem' }}
+          style={{ fontSize: '1.05rem', color: 'var(--on-dark-2)', lineHeight: 1.9, marginBottom: '0.75rem' }}
         >
           This is what generational wealth actually means.
         </p>
         <p
           className="font-serif"
-          style={{ fontStyle: 'italic', fontSize: '1.2rem', color: '#B8A86A', lineHeight: 1.6 }}
+          style={{ fontStyle: 'italic', fontSize: '1.2rem', color: 'var(--color-gold)', lineHeight: 1.6 }}
         >
           Not the transfer of money.<br />
           The transfer of the mind that earned it.

@@ -260,11 +260,11 @@ export default function GalleryClient({ archiveId }: { archiveId: string }) {
       `}</style>
 
       <div className="mb-8">
-        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
+        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
           <span style={{ display: 'block', width: '20px', height: '1px', background: 'var(--portal-btn)', flexShrink: 0 }} aria-hidden="true" />
           Memory Gallery
         </p>
-        <h1 style={{ fontFamily: 'var(--portal-serif)', fontSize: 'clamp(1.8rem,3vw,2.4rem)', fontWeight: 300, letterSpacing: '-0.025em', color: 'var(--portal-ink)' }}>
+        <h1 style={{ fontFamily: 'var(--portal-serif)', fontSize: 'clamp(1.8rem,3vw,2.4rem)', fontWeight: 400, letterSpacing: '-0.025em', color: 'var(--portal-ink)' }}>
           {loading ? '' : `${total} ${total === 1 ? 'Memory' : 'Memories'} Preserved`}
         </h1>
       </div>
@@ -298,7 +298,7 @@ export default function GalleryClient({ archiveId }: { archiveId: string }) {
           <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '1rem', fontStyle: 'italic', color: 'var(--portal-ink)', margin: '0 0 4px' }}>
             Analysis complete.
           </p>
-          <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.25em', color: 'var(--portal-gold-ink)', margin: 0 }}>
+          <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', color: 'var(--portal-gold-ink)', margin: 0 }}>
             {processingStatus.kept} PHOTOGRAPHS READY · {processingStatus.discarded} REMOVED
           </p>
         </div>
@@ -315,7 +315,7 @@ export default function GalleryClient({ archiveId }: { archiveId: string }) {
             background:   'var(--portal-card)', border: '1px solid var(--portal-gold-line)',
             borderRadius: '2px', outline: 'none',
             fontFamily: 'var(--portal-serif)',
-            fontSize:     '1rem', fontStyle: 'italic', fontWeight: 300,
+            fontSize:     '1rem', fontStyle: 'italic', fontWeight: 400,
             color:        'var(--portal-ink)', padding: '10px 16px',
             boxSizing:    'border-box',
           }}
@@ -353,12 +353,12 @@ export default function GalleryClient({ archiveId }: { archiveId: string }) {
               <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '1.25rem', fontWeight: 500, color: 'var(--portal-ink)', marginBottom: '12px' }}>
                 Nothing here yet.
               </p>
-              <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--portal-secondary)', lineHeight: 1.8, maxWidth: '380px', margin: '0 auto 32px' }}>
+              <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '1rem', fontStyle: 'italic', fontWeight: 400, color: 'var(--portal-secondary)', lineHeight: 1.8, maxWidth: '380px', margin: '0 auto 32px' }}>
                 Upload your family photographs to begin. Every evening one photograph goes to every family member. They reply with what they remember.
               </p>
               <a
                 href="/archive/label"
-                style={{ display: 'inline-block', fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.25em', textTransform: 'uppercase', background: 'var(--portal-btn)', color: 'var(--portal-btn-label)', padding: '12px 24px', textDecoration: 'none' }}
+                style={{ display: 'inline-block', fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', background: 'var(--portal-btn)', color: 'var(--portal-btn-label)', padding: '12px 24px', textDecoration: 'none' }}
               >
                 Upload Your First Photos →
               </a>
@@ -398,7 +398,7 @@ export default function GalleryClient({ archiveId }: { archiveId: string }) {
                     {/* Hover overlay */}
                     <div className="gallery-card-overlay">
                       {/* Sits on the scrim over the photograph, so it takes the --invert-* text tokens. */}
-                      <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '15.5px', fontStyle: 'italic', fontWeight: 300, color: 'var(--invert-fg)', lineHeight: 1.4, marginBottom: '6px' }}>
+                      <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '15.5px', fontStyle: 'italic', fontWeight: 400, color: 'var(--invert-fg)', lineHeight: 1.4, marginBottom: '6px' }}>
                         {item.title?.slice(0, 60)}
                       </p>
                       <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--invert-gold)' }}>
@@ -414,7 +414,7 @@ export default function GalleryClient({ archiveId }: { archiveId: string }) {
                         No Image
                       </p>
                     </div>
-                    <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '0.88rem', fontWeight: 300, color: 'var(--portal-ink)', lineHeight: 1.5, marginBottom: '6px' }}>
+                    <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '0.88rem', fontWeight: 400, color: 'var(--portal-ink)', lineHeight: 1.5, marginBottom: '6px' }}>
                       {item.title}
                     </p>
                     <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', color: 'var(--portal-secondary)', letterSpacing: '0.1em' }}>
@@ -477,13 +477,13 @@ export default function GalleryClient({ archiveId }: { archiveId: string }) {
                   {selected.people && (
                     <div>
                       <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-secondary)', marginBottom: '4px' }}>People</p>
-                      <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '0.95rem', fontWeight: 300, color: 'var(--portal-body)' }}>{selected.people}</p>
+                      <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '0.95rem', fontWeight: 400, color: 'var(--portal-body)' }}>{selected.people}</p>
                     </div>
                   )}
                   {selected.contributor && (
                     <div>
                       <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-secondary)', marginBottom: '4px' }}>Labeled by</p>
-                      <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '0.95rem', fontWeight: 300, color: 'var(--portal-body)' }}>{selected.contributor}</p>
+                      <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '0.95rem', fontWeight: 400, color: 'var(--portal-body)' }}>{selected.contributor}</p>
                     </div>
                   )}
                 </div>
@@ -492,14 +492,14 @@ export default function GalleryClient({ archiveId }: { archiveId: string }) {
               {selected.description && (
                 <div style={{ marginBottom: '20px', paddingTop: '20px', borderTop: '1px solid var(--portal-gold-line)' }}>
                   <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-secondary)', marginBottom: '10px' }}>What Was Happening</p>
-                  <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '1rem', fontWeight: 300, lineHeight: 1.8, color: 'var(--portal-body)' }}>{selected.description}</p>
+                  <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '1rem', fontWeight: 400, lineHeight: 1.8, color: 'var(--portal-body)' }}>{selected.description}</p>
                 </div>
               )}
 
               {selected.legacyNote && (
                 <div style={{ marginBottom: '20px', paddingTop: '16px', borderTop: '1px solid var(--portal-gold-line)' }}>
                   <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '10px' }}>Legacy Note</p>
-                  <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '0.95rem', fontWeight: 300, fontStyle: 'italic', lineHeight: 1.8, color: 'var(--portal-body)' }}>{selected.legacyNote}</p>
+                  <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '0.95rem', fontWeight: 400, fontStyle: 'italic', lineHeight: 1.8, color: 'var(--portal-body)' }}>{selected.legacyNote}</p>
                 </div>
               )}
 

@@ -8,12 +8,12 @@ export const metadata: Metadata = {
 }
 
 const SERIF: React.CSSProperties = {
-  fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontFamily: 'var(--font-newsreader), Georgia, serif',
 }
 const MONO: React.CSSProperties = {
-  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+  fontFamily:    'var(--font-space-mono)',
   textTransform: 'uppercase' as const,
-  letterSpacing: '0.28em',
+  letterSpacing: '0.18em',
 }
 const H2: React.CSSProperties = {
   ...SERIF,
@@ -27,7 +27,7 @@ const H2: React.CSSProperties = {
 const BODY: React.CSSProperties = {
   ...SERIF,
   fontSize:     '1.1rem',
-  fontWeight:   300,
+  fontWeight: 400,
   lineHeight:   1.9,
   color:        'var(--color-text-secondary)',
   marginBottom: '20px',
@@ -102,7 +102,7 @@ export default function MethodPage() {
             style={{
               ...SERIF,
               fontSize:      'var(--text-h1)',
-              fontWeight:    300,
+              fontWeight: 400,
               lineHeight:    1.15,
               color:         'var(--color-text-primary)',
               letterSpacing: '-0.025em',
@@ -118,7 +118,7 @@ export default function MethodPage() {
               ...SERIF,
               fontSize:  '1.2rem',
               fontStyle: 'italic',
-              fontWeight: 300,
+              fontWeight: 400,
               lineHeight: 1.8,
               color:     'var(--color-text-muted)',
               maxWidth:  '520px',
@@ -137,7 +137,7 @@ export default function MethodPage() {
           {STEPS.map(({ n, title, body }, i) => (
             <div key={n} style={{ display: 'grid', gridTemplateColumns: '3rem 1fr', gap: '32px', marginBottom: '56px' }}>
               <div>
-                <p style={{ ...MONO, fontSize: '0.52rem', color: 'var(--color-gold)', paddingTop: '4px' }}>{n}</p>
+                <p style={{ ...MONO, fontSize: '0.78rem', color: 'var(--color-gold)', paddingTop: '4px' }}>{n}</p>
               </div>
               <div>
                 <h2 style={{ ...H2, marginTop: 0 }}>{title}</h2>
@@ -171,49 +171,49 @@ export default function MethodPage() {
         </div>
 
         {/* Two-tier quality system */}
-        <section style={{ padding: 'clamp(80px,10vw,120px) clamp(24px,6vw,80px)', background: 'var(--color-void)', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <section className="section-dark" style={{ padding: 'clamp(80px,10vw,120px) clamp(24px,6vw,80px)', background: 'var(--color-void)', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
           <div style={{ maxWidth: 'calc(var(--max-width-text) + 160px)', margin: '0 auto' }}>
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '24px' }}>
               How We Evaluate What You Share
             </p>
-            <h2 style={{ ...H2, color: 'rgba(250,248,244,0.9)', fontSize: 'clamp(1.6rem,3vw,2.4rem)', marginTop: 0, marginBottom: '28px' }}>
+            <h2 style={{ ...H2, color: 'var(--on-dark)', fontSize: 'clamp(1.6rem,3vw,2.4rem)', marginTop: 0, marginBottom: '28px' }}>
               Not everything you deposit is equally valuable.
             </h2>
-            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)', maxWidth: '580px', marginBottom: '48px' }}>
+            <p style={{ ...BODY, color: 'var(--on-dark-3)', maxWidth: '580px', marginBottom: '48px' }}>
               A specific story about a specific morning in 1974 is worth more than a general
               statement about hard work. Every deposit is evaluated to reflect that distinction.
             </p>
 
             <div className="quality-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px', maxWidth: '680px', marginBottom: '32px' }}>
-              <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', padding: 'clamp(28px,3vw,40px)' }}>
-                <p style={{ ...MONO, fontSize: '0.44rem', color: 'var(--color-gold-on-light)', marginBottom: '20px' }}>First Review</p>
+              <div className="paper-card" style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', padding: 'clamp(28px,3vw,40px)' }}>
+                <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold-on-light)', marginBottom: '20px' }}>First Review</p>
                 {[
                   'Volume scoring',
                   'Speed and coverage',
                   'Every deposit',
                 ].map(item => (
-                  <p key={item} style={{ ...SERIF, fontSize: '0.9rem', fontWeight: 300, color: 'var(--color-text-secondary)', lineHeight: 1.7, marginBottom: '8px' }}>{item}</p>
+                  <p key={item} style={{ ...SERIF, fontSize: '0.9rem', fontWeight: 400, color: 'var(--color-text-secondary)', lineHeight: 1.7, marginBottom: '8px' }}>{item}</p>
                 ))}
               </div>
-              <div style={{ background: 'rgba(196,162,74,0.04)', border: '1px solid rgba(196,162,74,0.25)', padding: 'clamp(28px,3vw,40px)' }}>
-                <p style={{ ...MONO, fontSize: '0.44rem', color: 'var(--color-gold)', marginBottom: '20px' }}>Second Review</p>
+              <div style={{ background: 'rgba(160,132,80,0.04)', border: '1px solid rgba(160,132,80,0.25)', padding: 'clamp(28px,3vw,40px)' }}>
+                <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)', marginBottom: '20px' }}>Second Review</p>
                 {[
                   'Deep evaluation',
                   'Ambiguous cases',
                   'High-stakes decisions',
                 ].map(item => (
-                  <p key={item} style={{ ...SERIF, fontSize: '0.9rem', fontWeight: 300, color: 'rgba(250,248,244,0.5)', lineHeight: 1.7, marginBottom: '8px' }}>{item}</p>
+                  <p key={item} style={{ ...SERIF, fontSize: '0.9rem', fontWeight: 400, color: 'var(--on-dark-3)', lineHeight: 1.7, marginBottom: '8px' }}>{item}</p>
                 ))}
               </div>
             </div>
 
             <div style={{ maxWidth: '680px', textAlign: 'center', padding: '16px 0', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-              <p style={{ ...MONO, fontSize: '0.44rem', color: 'rgba(250,248,244,0.35)', letterSpacing: '0.2em' }}>
+              <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--on-dark-3)', letterSpacing: '0.2em' }}>
                 A deposit shapes your entity only after it has passed review
               </p>
             </div>
 
-            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)', maxWidth: '580px', marginTop: '40px' }}>
+            <p style={{ ...BODY, color: 'var(--on-dark-3)', maxWidth: '580px', marginTop: '40px' }}>
               Your record is not scored by the cheapest available model.
               It is scored by the right model for each decision.
             </p>
@@ -224,7 +224,7 @@ export default function MethodPage() {
         <section className="b2b-paper" style={{ padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,80px)' }}>
           <div style={{ maxWidth: 'calc(var(--max-width-text) + 160px)', margin: '0 auto' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '3rem 1fr', gap: '32px' }}>
-              <p style={{ ...MONO, fontSize: '0.52rem', color: 'var(--color-gold)', paddingTop: '4px' }}>05</p>
+              <p style={{ ...MONO, fontSize: '0.78rem', color: 'var(--color-gold)', paddingTop: '4px' }}>05</p>
               <div>
                 <h2 style={{ ...H2, marginTop: 0 }}>Two layers, one handoff</h2>
                 <p style={BODY}>
@@ -248,24 +248,24 @@ export default function MethodPage() {
         </section>
 
         {/* Second door — families */}
-        <section style={{ padding: 'clamp(80px,12vw,140px) clamp(24px,6vw,80px)', background: 'var(--color-void)' }}>
+        <section className="section-dark" style={{ padding: 'clamp(80px,12vw,140px) clamp(24px,6vw,80px)', background: 'var(--color-void)' }}>
           <div style={{ maxWidth: '700px' }}>
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)', marginBottom: '24px' }}>
               The second door
             </p>
-            <h2 style={{ ...H2, color: 'rgba(250,250,248,0.9)', marginTop: 0 }}>
+            <h2 style={{ ...H2, color: 'var(--on-dark)', marginTop: 0 }}>
               Where this began: families.
             </h2>
-            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)', marginBottom: '24px' }}>
+            <p style={{ ...BODY, color: 'var(--on-dark-3)', marginBottom: '24px' }}>
               Basalith started as a way for families to keep how someone thinks while they are still here to get it right.
               The method is the same. The operator becomes a parent. The colleagues become the family. The scenario library becomes the stories told at the table.
             </p>
-            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)', marginBottom: '36px' }}>
+            <p style={{ ...BODY, color: 'var(--on-dark-3)', marginBottom: '36px' }}>
               For a family Basalith, photographs are filtered and ranked before anyone is asked to label them, so the family only sees what is worth their time.
             </p>
             <a
               href="/begin"
-              style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px', border: '1px solid rgba(184,150,62,0.4)', padding: '12px 24px' }}
+              style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px', border: '1px solid rgba(160,132,80,0.4)', padding: '12px 24px' }}
             >
               Begin a family Basalith <span aria-hidden="true">→</span>
             </a>

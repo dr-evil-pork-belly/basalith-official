@@ -77,8 +77,8 @@ export default function LeaderboardPage() {
 
   if (loading) {
     return (
-      <div style={{ minHeight: '100vh', background: '#0A0908', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', color: '#5C6166' }}>Loading…</p>
+      <div className="section-dark" style={{ minHeight: '100vh', background: 'var(--color-void)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <p style={{ fontFamily: 'var(--font-newsreader), Georgia, serif', fontStyle: 'italic', color: 'var(--on-dark-3)' }}>Loading…</p>
       </div>
     )
   }
@@ -88,15 +88,15 @@ export default function LeaderboardPage() {
   const isActive   = session && session.status === 'active' && new Date(session.closesAt) > new Date()
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0A0908', padding: '3rem 1.5rem' }}>
+    <div className="section-dark" style={{ minHeight: '100vh', background: 'var(--color-void)', padding: '3rem 1.5rem' }}>
       <div style={{ maxWidth: '540px', margin: '0 auto' }}>
 
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-          <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.7rem', letterSpacing: '0.28em', color: '#C4A24A', margin: '0 0 0.5rem' }}>
+          <p style={{ fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.7rem', letterSpacing: '0.18em', color: 'var(--color-gold)', margin: '0 0 0.5rem' }}>
             THE {familyName.toUpperCase()} BASALITH
           </p>
-          <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.62rem', letterSpacing: '0.18em', color: '#5C6166', margin: 0 }}>
+          <p style={{ fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.78rem', letterSpacing: '0.18em', color: 'var(--on-dark-3)', margin: 0 }}>
             MEMORY GAME · WEEK OF {session ? formatDate(session.closesAt).toUpperCase() : ''}
           </p>
         </div>
@@ -105,18 +105,18 @@ export default function LeaderboardPage() {
         {session && (
           <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center', marginBottom: '2.5rem', flexWrap: 'wrap' }}>
             <div style={{ textAlign: 'center' }}>
-              <p style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '2rem', color: '#F0EDE6', margin: '0 0 2px', lineHeight: 1 }}>
+              <p style={{ fontFamily: 'var(--font-newsreader), Georgia, serif', fontWeight: 700, fontSize: '2rem', color: 'var(--on-dark)', margin: '0 0 2px', lineHeight: 1 }}>
                 {session.totalMemories}
               </p>
-              <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.58rem', letterSpacing: '0.14em', color: '#5C6166', margin: 0 }}>
+              <p style={{ fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.78rem', letterSpacing: '0.14em', color: 'var(--on-dark-3)', margin: 0 }}>
                 MEMORIES
               </p>
             </div>
             <div style={{ textAlign: 'center' }}>
-              <p style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '2rem', color: isActive ? 'rgba(196,162,74,0.9)' : '#5C6166', margin: '0 0 2px', lineHeight: 1 }}>
+              <p style={{ fontFamily: 'var(--font-newsreader), Georgia, serif', fontWeight: 700, fontSize: '2rem', color: isActive ? 'rgba(160,132,80,0.9)' : 'var(--on-dark-3)', margin: '0 0 2px', lineHeight: 1 }}>
                 {isActive ? countdown : 'Closed'}
               </p>
-              <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.58rem', letterSpacing: '0.14em', color: '#5C6166', margin: 0 }}>
+              <p style={{ fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.78rem', letterSpacing: '0.14em', color: 'var(--on-dark-3)', margin: 0 }}>
                 {isActive ? 'REMAINING' : 'GAME OVER'}
               </p>
             </div>
@@ -125,12 +125,12 @@ export default function LeaderboardPage() {
 
         {/* Leaderboard */}
         <div style={{ marginBottom: '2.5rem' }}>
-          <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.64rem', letterSpacing: '0.22em', color: '#5C6166', marginBottom: '1.25rem' }}>
+          <p style={{ fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.78rem', letterSpacing: '0.18em', color: 'var(--on-dark-3)', marginBottom: '1.25rem' }}>
             STANDINGS
           </p>
 
           {leaderboard.length === 0 ? (
-            <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', color: '#3A3830', textAlign: 'center', padding: '2rem 0' }}>
+            <p style={{ fontFamily: 'var(--font-newsreader), Georgia, serif', fontStyle: 'italic', color: 'var(--on-dark-3)', textAlign: 'center', padding: '2rem 0' }}>
               No memories contributed yet. Be the first.
             </p>
           ) : (
@@ -139,14 +139,14 @@ export default function LeaderboardPage() {
               const width  = Math.round((row.count / maxCount) * 180)
               return (
                 <div key={row.name} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
-                  <span style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1rem', color: i === 0 ? '#C4A24A' : '#3A3F44', width: '20px', flexShrink: 0, letterSpacing: '-0.02em' }}>
+                  <span style={{ fontFamily: 'var(--font-newsreader), Georgia, serif', fontWeight: 700, fontSize: '1rem', color: i === 0 ? 'var(--color-gold)' : 'var(--on-dark-3)', width: '20px', flexShrink: 0, letterSpacing: '-0.02em' }}>
                     {i + 1}
                   </span>
-                  <span style={{ fontFamily: '"Courier New", monospace', fontSize: '0.7rem', color: isMe ? '#C4A24A' : '#F0EDE6', minWidth: '120px', flexShrink: 0 }}>
+                  <span style={{ fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.7rem', color: isMe ? 'var(--color-gold)' : 'var(--on-dark)', minWidth: '120px', flexShrink: 0 }}>
                     {row.name}{isMe ? ' (you)' : ''}
                   </span>
-                  <div style={{ width: `${width}px`, height: '6px', background: isMe ? 'rgba(196,162,74,0.7)' : i === 0 ? 'rgba(196,162,74,0.4)' : 'rgba(240,237,230,0.12)', borderRadius: '2px', flexShrink: 0, transition: 'width 0.4s ease-out' }} />
-                  <span style={{ fontFamily: '"Courier New", monospace', fontSize: '0.64rem', color: '#5C6166' }}>
+                  <div style={{ width: `${width}px`, height: '6px', background: isMe ? 'rgba(160,132,80,0.7)' : i === 0 ? 'rgba(160,132,80,0.4)' : 'rgba(247,245,241,0.12)', borderRadius: '2px', flexShrink: 0, transition: 'width 0.4s ease-out' }} />
+                  <span style={{ fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.78rem', color: 'var(--on-dark-3)' }}>
                     {row.count}
                   </span>
                 </div>
@@ -157,18 +157,18 @@ export default function LeaderboardPage() {
           {/* Current user row if not on leaderboard */}
           {myName && !leaderboard.find(r => r.name === myName.trim()) && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '0.5rem', paddingTop: '0.5rem', borderTop: '1px solid rgba(255,255,255,0.04)' }}>
-              <span style={{ fontFamily: 'Georgia, serif', fontSize: '1rem', color: '#3A3F44', width: '20px' }}>·</span>
-              <span style={{ fontFamily: '"Courier New", monospace', fontSize: '0.7rem', color: 'rgba(196,162,74,0.6)', minWidth: '120px' }}>
+              <span style={{ fontFamily: 'var(--font-newsreader), Georgia, serif', fontSize: '1rem', color: 'var(--on-dark-3)', width: '20px' }}>·</span>
+              <span style={{ fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.7rem', color: 'var(--color-gold)', minWidth: '120px' }}>
                 You
               </span>
               <div style={{ width: '4px', height: '6px', background: 'rgba(255,255,255,0.06)', borderRadius: '2px' }} />
-              <span style={{ fontFamily: '"Courier New", monospace', fontSize: '0.64rem', color: '#3A3830' }}>0</span>
+              <span style={{ fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.78rem', color: 'var(--on-dark-3)' }}>0</span>
             </div>
           )}
         </div>
 
         {/* Auto-refresh note */}
-        <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.58rem', letterSpacing: '0.12em', color: '#3A3830', textAlign: 'center', marginBottom: '2rem' }}>
+        <p style={{ fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.78rem', letterSpacing: '0.12em', color: 'var(--on-dark-3)', textAlign: 'center', marginBottom: '2rem' }}>
           UPDATES EVERY 30 SECONDS
         </p>
 
@@ -177,7 +177,7 @@ export default function LeaderboardPage() {
           <div style={{ textAlign: 'center' }}>
             <Link
               href={`/game/${sessionId}`}
-              style={{ display: 'inline-block', fontFamily: '"Courier New", monospace', fontSize: '0.68rem', letterSpacing: '0.25em', color: '#0A0908', background: '#C4A24A', textDecoration: 'none', padding: '0.85rem 2rem', borderRadius: '2px' }}
+              style={{ display: 'inline-block', fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.78rem', letterSpacing: '0.18em', color: 'var(--color-void)', background: 'var(--on-dark)', textDecoration: 'none', padding: '0.85rem 2rem', borderRadius: '2px' }}
             >
               {myName && leaderboard.find(r => r.name === myName.trim())
                 ? 'ADD MORE MEMORIES →'

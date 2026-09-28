@@ -56,17 +56,17 @@ const AGENTS = [
 function Connector() {
   return (
     <div className="flex flex-col items-center" aria-hidden="true">
-      <div style={{ width: '2px', height: '20px', background: 'rgba(196,162,74,0.3)' }} />
+      <div style={{ width: '2px', height: '20px', background: 'rgba(160,132,80,0.3)' }} />
       <div
         style={{
           width:     '8px',
           height:    '8px',
-          background: 'rgba(196,162,74,0.55)',
+          background: 'rgba(160,132,80,0.55)',
           transform:  'rotate(45deg)',
           flexShrink: 0,
         }}
       />
-      <div style={{ width: '2px', height: '20px', background: 'rgba(196,162,74,0.3)' }} />
+      <div style={{ width: '2px', height: '20px', background: 'rgba(160,132,80,0.3)' }} />
     </div>
   )
 }
@@ -81,7 +81,7 @@ export default function IntelligenceLayer() {
       {/* Ambient glow */}
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse 70% 50% at 50% 30%, rgba(196,162,74,0.04) 0%, transparent 65%)' }}
+        style={{ background: 'radial-gradient(ellipse 70% 50% at 50% 30%, rgba(160,132,80,0.04) 0%, transparent 65%)' }}
         aria-hidden="true"
       />
 
@@ -122,19 +122,19 @@ export default function IntelligenceLayer() {
             <div
               className="relative rounded-sm px-8 py-7"
               style={{
-                background:   'var(--obsidian-deep, #111112)',
-                border:       '1px solid rgba(196,162,74,0.12)',
-                borderLeft:   '3px solid rgba(196,162,74,0.4)',
+                background:   'var(--invert-raise)',
+                border:       '1px solid rgba(160,132,80,0.12)',
+                borderLeft:   '3px solid rgba(160,132,80,0.4)',
               }}
             >
               {/* Step number */}
               <p
                 style={{
-                  fontFamily:    'monospace',
-                  fontSize:      '0.44rem',
-                  letterSpacing: '0.3em',
+                  fontFamily:    'var(--font-space-mono), monospace',
+                  fontSize:      '0.72rem',
+                  letterSpacing: '0.18em',
                   textTransform: 'uppercase' as const,
-                  color:         'rgba(196,162,74,0.7)',
+                  color: 'var(--color-gold)',
                   marginBottom:  '0.6rem',
                 }}
               >
@@ -144,13 +144,13 @@ export default function IntelligenceLayer() {
               {/* Title + job */}
               <p
                 className="font-serif font-semibold leading-snug mb-1"
-                style={{ fontSize: '1.1rem', color: '#F0F0EE' }}
+                style={{ fontSize: '1.1rem', color: 'var(--on-dark)' }}
               >
                 {agent.title}
               </p>
               <p
                 className="font-serif"
-                style={{ fontSize: '0.9rem', fontStyle: 'italic', color: 'rgba(196,162,74,0.65)', marginBottom: '0.75rem', fontWeight: 300 }}
+                style={{ fontSize: '0.9rem', fontStyle: 'italic', color: 'var(--color-gold)', marginBottom: '0.75rem', fontWeight: 400 }}
               >
                 {agent.job}
               </p>
@@ -158,7 +158,7 @@ export default function IntelligenceLayer() {
               {/* Body */}
               <p
                 className="font-serif font-light leading-[1.8]"
-                style={{ fontSize: '0.95rem', color: '#9DA3A8' }}
+                style={{ fontSize: '0.95rem', color: 'var(--on-dark-2)' }}
               >
                 {agent.body}
               </p>
@@ -167,11 +167,11 @@ export default function IntelligenceLayer() {
               <p
                 className="text-right mt-4"
                 style={{
-                  fontFamily:    'monospace',
-                  fontSize:      '0.4rem',
+                  fontFamily:    'var(--font-space-mono), monospace',
+                  fontSize:      '0.72rem',
                   fontStyle:     'italic',
                   letterSpacing: '0.12em',
-                  color:         'rgba(196,162,74,0.6)',
+                  color: 'var(--color-gold)',
                   textTransform: 'uppercase' as const,
                 }}
               >
@@ -191,7 +191,7 @@ export default function IntelligenceLayer() {
 
         <p
           className="font-serif font-light leading-[1.8] mb-8"
-          style={{ fontSize: '1.3rem', fontStyle: 'italic', color: '#9DA3A8' }}
+          style={{ fontSize: '1.3rem', fontStyle: 'italic', color: 'var(--on-dark-2)' }}
         >
           Most families arrive with decades of visual memory in complete disorder.
           <br /><br />
@@ -201,11 +201,11 @@ export default function IntelligenceLayer() {
 
         <p
           style={{
-            fontFamily:    'monospace',
-            fontSize:      '0.46rem',
-            letterSpacing: '0.35em',
+            fontFamily:    'var(--font-space-mono), monospace',
+            fontSize:      '0.72rem',
+            letterSpacing: '0.18em',
             textTransform: 'uppercase' as const,
-            color:         'rgba(196,162,74,0.6)',
+            color: 'var(--color-gold)',
           }}
         >
           The Intelligence Layer Runs on Every Archive

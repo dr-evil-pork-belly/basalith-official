@@ -57,13 +57,13 @@ export default function FoundingBanner({ trial = false }: { trial?: boolean } = 
         display:    'block',
         background: 'var(--portal-card)',
         border:     '1px solid var(--portal-card-line)',
-        borderLeft: '4px solid var(--portal-btn)',
+        borderLeft: '3px solid var(--portal-gold-ink)',
         boxShadow:  'var(--portal-lift)',
         padding:    'clamp(1.1rem,3vw,1.5rem) clamp(1.1rem,3vw,1.75rem)',
         textDecoration: 'none',
       }}
     >
-      <p style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.24em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '10px' }}>
+      <p style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '10px' }}>
         The Founding Sequence
       </p>
       <p style={{ fontFamily: SERIF, fontSize: '26px', fontWeight: 500, color: 'var(--portal-ink)', lineHeight: 1.2, marginBottom: '8px', letterSpacing: '-0.01em' }}>

@@ -64,7 +64,7 @@ export default function SuccessorPortalClient({
             <rect x="18" y="9"  width="7.07"  height="7.07"  transform="rotate(45 18 9)"  fill="none" stroke="var(--spine-gold)" strokeWidth="1"/>
             <rect x="18" y="14" width="4"     height="4"     transform="rotate(45 18 14)" fill="var(--spine-gold)"/>
           </svg>
-          <span style={{ ...MONO, fontSize: '11.5px', letterSpacing: '0.24em', color: 'var(--spine-gold)', textTransform: 'uppercase' }}>
+          <span style={{ ...MONO, fontSize: '11.5px', letterSpacing: '0.18em', color: 'var(--spine-gold)', textTransform: 'uppercase' }}>
             Successor portal
           </span>
         </div>
@@ -103,7 +103,7 @@ export default function SuccessorPortalClient({
               <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-secondary)', margin: '0 0 10px' }}>
                 {label}
               </p>
-              <p style={{ ...SERIF, fontSize: '2.4rem', fontWeight: 300, color: 'var(--portal-ink)', margin: '0 0 4px', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+              <p style={{ ...SERIF, fontSize: '2.4rem', fontWeight: 400, color: 'var(--portal-ink)', margin: '0 0 4px', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
                 {value}
               </p>
               <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.12em', color: 'var(--portal-label)', textTransform: 'uppercase', margin: 0 }}>
@@ -129,7 +129,7 @@ export default function SuccessorPortalClient({
             <p style={{ ...MONO, fontSize: '11px', letterSpacing: '3px', textTransform: 'uppercase', margin: '0 0 6px' }}>
               Query the Entity
             </p>
-            <p style={{ ...SERIF, fontSize: '0.85rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--portal-btn-label)', margin: 0, lineHeight: 1.5 }}>
+            <p style={{ ...SERIF, fontSize: '0.85rem', fontStyle: 'italic', fontWeight: 400, color: 'var(--portal-btn-label)', margin: 0, lineHeight: 1.5 }}>
               Apply the founder's judgment to current questions.
             </p>
           </Link>
@@ -147,7 +147,7 @@ export default function SuccessorPortalClient({
             <p style={{ ...MONO, fontSize: '11px', letterSpacing: '3px', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', margin: '0 0 6px' }}>
               Add Context
             </p>
-            <p style={{ ...SERIF, fontSize: '0.85rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--portal-secondary)', margin: 0, lineHeight: 1.5 }}>
+            <p style={{ ...SERIF, fontSize: '0.85rem', fontStyle: 'italic', fontWeight: 400, color: 'var(--portal-secondary)', margin: 0, lineHeight: 1.5 }}>
               Inject current business reality into the conversation.
             </p>
           </Link>
@@ -169,7 +169,7 @@ export default function SuccessorPortalClient({
           <p style={{ ...MONO, fontSize: '11px', letterSpacing: '3px', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', margin: '0 0 6px' }}>
             Scenario Responses
           </p>
-          <p style={{ ...SERIF, fontSize: '0.85rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--portal-secondary)', margin: 0, lineHeight: 1.5 }}>
+          <p style={{ ...SERIF, fontSize: '0.85rem', fontStyle: 'italic', fontWeight: 400, color: 'var(--portal-secondary)', margin: 0, lineHeight: 1.5 }}>
             How the founder would handle twenty structured business situations.
           </p>
         </Link>
@@ -196,7 +196,7 @@ export default function SuccessorPortalClient({
                       {formatDate(ctx.created_at)}
                     </span>
                   </div>
-                  <p style={{ ...SERIF, fontSize: '0.9rem', fontWeight: 300, color: 'var(--portal-body)', margin: 0, lineHeight: 1.6 }}>
+                  <p style={{ ...SERIF, fontSize: '0.9rem', fontWeight: 400, color: 'var(--portal-body)', margin: 0, lineHeight: 1.6 }}>
                     {ctx.content.length > 180 ? ctx.content.slice(0, 180) + '…' : ctx.content}
                   </p>
                 </div>

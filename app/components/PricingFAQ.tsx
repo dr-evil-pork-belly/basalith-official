@@ -15,7 +15,7 @@ const ITEMS: Item[] = [
       the hardest calls you ever made, in your own words and your own time, plus your contributors invited,
       your records brought in, and a first read with the founder of Basalith by video. You pay it once, at
       the start. Your annual plan begins after The Founding is complete.
-      {' '}<a href="/founding-session" style={{ color: '#C4A24A', textDecoration: 'none' }}>
+      {' '}<a href="/founding-session" style={{ color: 'var(--color-gold)', textDecoration: 'none' }}>
         What happens in The Founding →
       </a>
     </>,
@@ -25,7 +25,7 @@ const ITEMS: Item[] = [
     a: <>
       You keep everything. You own your Basalith. We are the custodian, not the owner. You can
       export all of it in open formats any time you ask, so a closure cannot strand your data.
-      {' '}<a href="/data-ownership" style={{ color: '#C4A24A', textDecoration: 'none' }}>
+      {' '}<a href="/data-ownership" style={{ color: 'var(--color-gold)', textDecoration: 'none' }}>
         Read our data ownership commitments →
       </a>
     </>,
@@ -59,7 +59,7 @@ export default function PricingFAQ() {
 
   return (
     <section
-      className="relative bg-obsidian px-8 md:px-16 lg:px-24 py-24 overflow-hidden"
+      className="section-dark relative bg-obsidian px-8 md:px-16 lg:px-24 py-24 overflow-hidden"
       aria-label="Pricing FAQ"
     >
       <div className="max-w-3xl mx-auto">
@@ -75,7 +75,7 @@ export default function PricingFAQ() {
           {ITEMS.map(({ q, a }, i) => (
             <div
               key={i}
-              style={{ borderBottom: '1px solid rgba(240,237,230,0.06)' }}
+              style={{ borderBottom: '1px solid rgba(247,245,241,0.06)' }}
             >
               <button
                 onClick={() => setOpen(open === i ? -1 : i)}
@@ -88,7 +88,7 @@ export default function PricingFAQ() {
                   style={{
                     fontWeight:  700,
                     fontSize:    '1.05rem',
-                    color:       open === i ? '#F0EDE6' : '#B8B4AB',
+                    color:       open === i ? 'var(--on-dark)' : 'var(--on-dark-2)',
                     lineHeight:  1.35,
                     transition:  'color 0.2s',
                   }}
@@ -98,9 +98,9 @@ export default function PricingFAQ() {
                 <span
                   aria-hidden="true"
                   style={{
-                    fontFamily:    "'Space Mono', monospace",
+                    fontFamily:    "monospace",
                     fontSize:      '0.8rem',
-                    color:         '#C4A24A',
+                    color:         'var(--color-gold)',
                     flexShrink:    0,
                     transition:    'transform 0.2s',
                     transform:     open === i ? 'rotate(45deg)' : 'none',
@@ -117,9 +117,9 @@ export default function PricingFAQ() {
                   <p
                     className="font-serif"
                     style={{
-                      fontWeight:  300,
+                      fontWeight: 400,
                       fontSize:    '1rem',
-                      color:       '#9DA3A8',
+                      color:       'var(--on-dark-2)',
                       lineHeight:  1.85,
                     }}
                   >

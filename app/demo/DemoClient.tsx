@@ -13,7 +13,7 @@ import {
 // The demo is Basalith presenting itself to someone who is not a customer yet,
 // so it runs in the threshold register: the shared --invert-* family, the same
 // ink as the sign-in pages and the block where the archive speaks. Re-pointed
-// September 20, 2026; dim and ghost used to be #5C6166 (2.99:1) and #3A3F44
+// September 20, 2026; dim and ghost used to be var(--on-dark-3) (2.99:1) and rgba(247,245,241,0.12)
 // (1.76:1) and were carrying readable text in a room in front of prospects.
 const C = {
   void:       'var(--invert-bg)',
@@ -237,7 +237,7 @@ export default function DemoClient() {
           zIndex:        70,
           fontFamily:    MONO,
           fontSize: '11px',
-          letterSpacing: '0.24em',
+          letterSpacing: '0.18em',
           textTransform: 'uppercase',
           color:         C.dim,
           textDecoration:'none',
@@ -250,7 +250,7 @@ export default function DemoClient() {
       {step === 1 && (
         <Stage>
           <Eyebrow>Live Demonstration</Eyebrow>
-          <h1 className="demo-fade-up" style={{ fontFamily: SERIF, fontWeight: 300, fontSize: 'clamp(2.2rem,5vw,3.6rem)', color: C.text, lineHeight: 1.1, marginBottom: '0.6rem' }}>
+          <h1 className="demo-fade-up" style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 'clamp(2.2rem,5vw,3.6rem)', color: C.text, lineHeight: 1.1, marginBottom: '0.6rem' }}>
             Begin the experience
           </h1>
           <p className="demo-fade-up" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(1rem,2vw,1.25rem)', color: C.muted, lineHeight: 1.7, maxWidth: '540px', marginBottom: '3rem' }}>
@@ -289,10 +289,10 @@ export default function DemoClient() {
           {/* Progress + focus tag */}
           <div style={{ width: '100%', maxWidth: '620px', marginBottom: '2.5rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.9rem' }}>
-              <span style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.24em', textTransform: 'uppercase', color: C.dim }}>
+              <span style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: C.dim }}>
                 Question {qIndex + 1} of {TOTAL_Q}
               </span>
-              <span style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.24em', textTransform: 'uppercase', color: 'var(--invert-gold)' }}>
+              <span style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--invert-gold)' }}>
                 Focus · {focus.trim()}
               </span>
             </div>
@@ -315,7 +315,7 @@ export default function DemoClient() {
           </div>
 
           {/* The question */}
-          <p key={prompts[qIndex].id} className="demo-fade-up" style={{ fontFamily: SERIF, fontWeight: 300, fontSize: 'clamp(1.7rem,3.6vw,2.6rem)', color: C.text, lineHeight: 1.3, maxWidth: '760px', marginBottom: '2.25rem' }}>
+          <p key={prompts[qIndex].id} className="demo-fade-up" style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 'clamp(1.7rem,3.6vw,2.6rem)', color: C.text, lineHeight: 1.3, maxWidth: '760px', marginBottom: '2.25rem' }}>
             {prompts[qIndex].text}
           </p>
 
@@ -335,7 +335,7 @@ export default function DemoClient() {
               padding:      '1.1rem 1.25rem',
               fontFamily:   SERIF,
               fontSize:     '1.15rem',
-              fontWeight:   300,
+              fontWeight: 400,
               color:        C.text,
               lineHeight:   1.7,
               outline:      'none',
@@ -356,7 +356,7 @@ export default function DemoClient() {
             const used = usedFollowUps[qIndex] ?? new Set<number>()
             return (
               <div style={{ width: '100%', maxWidth: '760px', marginTop: '1.5rem' }}>
-                <p style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: C.dim, marginBottom: '0.65rem' }}>
+                <p style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: C.dim, marginBottom: '0.65rem' }}>
                   Draw them out
                 </p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
@@ -404,19 +404,19 @@ export default function DemoClient() {
         <Stage>
           {/* Single gold authentication sweep */}
           <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
-            <div style={{ position: 'absolute', left: 0, right: 0, top: 0, height: '2px', background: 'linear-gradient(90deg,transparent,var(--portal-btn),transparent)', animation: 'demoScan 3.4s cubic-bezier(0.16,1,0.3,1) both' }} />
+            <div style={{ position: 'absolute', left: 0, right: 0, top: 0, height: '2px', background: 'linear-gradient(90deg,transparent,var(--invert-gold),transparent)', animation: 'demoScan 3.4s cubic-bezier(0.16,1,0.3,1) both' }} />
           </div>
 
-          <p className="demo-fade" style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.4em', textTransform: 'uppercase', color: 'var(--invert-gold)', marginBottom: '1.75rem' }}>
+          <p className="demo-fade" style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--invert-gold)', marginBottom: '1.75rem' }}>
             Layer One Established
           </p>
-          <h1 className="demo-fade-up" style={{ fontFamily: SERIF, fontWeight: 300, fontSize: 'clamp(2.8rem,8vw,6rem)', color: C.gold, lineHeight: 1, letterSpacing: '-0.01em', marginBottom: '1.75rem', textShadow: '0 0 40px var(--invert-gold)' }}>
+          <h1 className="demo-fade-up" style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 'clamp(2.8rem,8vw,6rem)', color: C.gold, lineHeight: 1, letterSpacing: '-0.01em', marginBottom: '1.75rem', textShadow: '0 0 40px var(--invert-gold)' }}>
             The Echo Layer
           </h1>
           <p className="demo-fade-up" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(1.2rem,3vw,1.8rem)', color: C.text, marginBottom: '2rem' }}>
             Your entity echoes you back.
           </p>
-          <p className="demo-fade" style={{ fontFamily: SERIF, fontWeight: 300, fontSize: 'clamp(0.95rem,2vw,1.15rem)', color: C.muted, lineHeight: 1.8, maxWidth: '520px' }}>
+          <p className="demo-fade" style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 'clamp(0.95rem,2vw,1.15rem)', color: C.muted, lineHeight: 1.8, maxWidth: '520px' }}>
             {firstName} has answered {TOTAL_Q} questions. This is the beginning of a
             cognitive reference model.
           </p>
@@ -432,7 +432,7 @@ export default function DemoClient() {
                   cursor:        'pointer',
                   fontFamily:    MONO,
                   fontSize: '11px',
-                  letterSpacing: '0.3em',
+                  letterSpacing: '0.18em',
                   textTransform: 'uppercase',
                   color:         'var(--invert-gold)',
                   padding:       '0.5rem',
@@ -450,7 +450,7 @@ export default function DemoClient() {
         <Stage>
           <Eyebrow>The Entity Responds</Eyebrow>
 
-          <p className="demo-fade-up" style={{ fontFamily: SERIF, fontWeight: 300, fontSize: 'clamp(1.4rem,3vw,2rem)', color: C.muted, lineHeight: 1.4, maxWidth: '680px', marginBottom: '2.5rem' }}>
+          <p className="demo-fade-up" style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 'clamp(1.4rem,3vw,2rem)', color: C.muted, lineHeight: 1.4, maxWidth: '680px', marginBottom: '2.5rem' }}>
             A reflection on what {firstName} just said.
           </p>
 
@@ -480,7 +480,7 @@ export default function DemoClient() {
             )}
 
             {(entityState === 'streaming' || entityState === 'done') && (
-              <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 300, fontSize: 'clamp(1.2rem,2.4vw,1.5rem)', color: C.goldBright, lineHeight: 1.85 }}>
+              <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400, fontSize: 'clamp(1.2rem,2.4vw,1.5rem)', color: C.goldBright, lineHeight: 1.85 }}>
                 {typed}
                 {entityState === 'streaming' && (
                   <span style={{ animation: 'demoBlink 1s step-end infinite', color: C.gold }}>▍</span>
@@ -500,7 +500,7 @@ export default function DemoClient() {
                   cursor:        'pointer',
                   fontFamily:    MONO,
                   fontSize: '11px',
-                  letterSpacing: '0.3em',
+                  letterSpacing: '0.18em',
                   textTransform: 'uppercase',
                   color:         'var(--invert-gold)',
                   padding:       '0.5rem',
@@ -519,10 +519,10 @@ export default function DemoClient() {
           <Eyebrow>What You Just Watched</Eyebrow>
 
           <div className="demo-fade-up" style={{ maxWidth: '680px', marginBottom: '3.25rem' }}>
-            <p style={{ fontFamily: SERIF, fontWeight: 300, fontSize: 'clamp(1.5rem,3.2vw,2.2rem)', color: C.text, lineHeight: 1.5, marginBottom: '1.5rem' }}>
+            <p style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 'clamp(1.5rem,3.2vw,2.2rem)', color: C.text, lineHeight: 1.5, marginBottom: '1.5rem' }}>
               This is your archive after fifteen minutes.
             </p>
-            <p style={{ fontFamily: SERIF, fontWeight: 300, fontSize: 'clamp(1.2rem,2.6vw,1.6rem)', color: C.muted, lineHeight: 1.7, marginBottom: '1.5rem' }}>
+            <p style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 'clamp(1.2rem,2.6vw,1.6rem)', color: C.muted, lineHeight: 1.7, marginBottom: '1.5rem' }}>
               With daily deposits, it stops guessing and grounds in your real
               patterns. How you reason, what you weigh, how you decide, in the
               words that sound like you.
@@ -541,7 +541,7 @@ export default function DemoClient() {
               style={{
                 fontFamily:    MONO,
                 fontSize: '11px',
-                letterSpacing: '0.26em',
+                letterSpacing: '0.18em',
                 textTransform: 'uppercase',
                 color:         C.void,
                 background:    C.gold,
@@ -560,7 +560,7 @@ export default function DemoClient() {
                 style={{
                   fontFamily:    MONO,
                   fontSize: '11px',
-                  letterSpacing: '0.26em',
+                  letterSpacing: '0.18em',
                   textTransform: 'uppercase',
                   color:         C.muted,
                   background:    'transparent',
@@ -595,7 +595,7 @@ export default function DemoClient() {
                   style={{
                     fontFamily:    MONO,
                     fontSize: '11px',
-                    letterSpacing: '0.24em',
+                    letterSpacing: '0.18em',
                     textTransform: 'uppercase',
                     color:         C.void,
                     background:    C.gold,
@@ -633,7 +633,7 @@ export default function DemoClient() {
               cursor:        'pointer',
               fontFamily:    MONO,
               fontSize: '11px',
-              letterSpacing: '0.26em',
+              letterSpacing: '0.18em',
               textTransform: 'uppercase',
               color:         C.dim,
             }}
@@ -671,7 +671,7 @@ function Stage({ children }: { children: React.ReactNode }) {
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
-    <p className="demo-fade" style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.4em', textTransform: 'uppercase', color: 'var(--invert-gold)', marginBottom: '1.5rem' }}>
+    <p className="demo-fade" style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--invert-gold)', marginBottom: '1.5rem' }}>
       {children}
     </p>
   )
@@ -694,7 +694,7 @@ function Field({
 }) {
   return (
     <label style={{ display: 'block' }}>
-      <span style={{ display: 'block', fontFamily: MONO, fontSize: '11px', letterSpacing: '0.24em', textTransform: 'uppercase', color: C.dim, marginBottom: '0.6rem' }}>
+      <span style={{ display: 'block', fontFamily: MONO, fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: C.dim, marginBottom: '0.6rem' }}>
         {label}
       </span>
       <input
@@ -711,7 +711,7 @@ function Field({
           color:        C.text,
           fontFamily:   SERIF,
           fontSize:     '1.35rem',
-          fontWeight:   300,
+          fontWeight: 400,
           padding:      '0.4rem 0',
           outline:      'none',
         }}
@@ -736,7 +736,7 @@ function PrimaryButton({
       style={{
         fontFamily:    MONO,
         fontSize: '11px',
-        letterSpacing: '0.3em',
+        letterSpacing: '0.18em',
         textTransform: 'uppercase',
         color:         C.void,
         background:    C.gold,
@@ -759,15 +759,15 @@ function ScoreReadout({ score, dimension }: { score: number; dimension: string }
   return (
     <div style={{ width: '100%', maxWidth: '760px', marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.35rem', flexShrink: 0 }}>
-        <span style={{ fontFamily: SERIF, fontWeight: 300, fontSize: '2.2rem', color, lineHeight: 1, transition: 'color 0.3s' }}>
+        <span style={{ fontFamily: SERIF, fontWeight: 400, fontSize: '2.2rem', color, lineHeight: 1, transition: 'color 0.3s' }}>
           {score}
         </span>
-        <span style={{ fontFamily: SERIF, fontWeight: 300, fontSize: '0.95rem', color: C.dim }}>/100</span>
+        <span style={{ fontFamily: SERIF, fontWeight: 400, fontSize: '0.95rem', color: C.dim }}>/100</span>
       </div>
 
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.45rem' }}>
-          <span style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: C.dim }}>
+          <span style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: C.dim }}>
             Answer Quality
           </span>
           <span style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--invert-gold)' }}>
@@ -775,7 +775,7 @@ function ScoreReadout({ score, dimension }: { score: number; dimension: string }
           </span>
         </div>
         <div style={{ height: '4px', borderRadius: '2px', background: 'var(--invert-field)', overflow: 'hidden' }}>
-          <div style={{ height: '100%', borderRadius: '2px', width: `${score}%`, background: 'linear-gradient(90deg,var(--invert-gold-wash),var(--portal-btn))', transition: 'width 0.35s ease' }} />
+          <div style={{ height: '100%', borderRadius: '2px', width: `${score}%`, background: 'linear-gradient(90deg,var(--invert-gold-wash),var(--invert-gold))', transition: 'width 0.35s ease' }} />
         </div>
       </div>
     </div>

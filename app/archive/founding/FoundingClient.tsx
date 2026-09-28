@@ -191,7 +191,7 @@ export default function FoundingClient({
       {/* Header */}
       {activeArea ? (
         <>
-          <p className="founding-eyebrow" style={{ fontFamily: MONO, fontSize: '11.5px', letterSpacing: '0.24em', textTransform: 'uppercase', color: GOLD, marginBottom: '18px' }}>
+          <p className="founding-eyebrow" style={{ fontFamily: MONO, fontSize: '11.5px', letterSpacing: '0.18em', textTransform: 'uppercase', color: GOLD, marginBottom: '18px' }}>
             A call on {activeArea}
           </p>
           <h1 className="founding-h1" style={{ fontFamily: SERIF, fontSize: 'clamp(34px,4.2vw,50px)', fontWeight: 400, lineHeight: 1.08, letterSpacing: '-0.015em', color: INK, marginBottom: '16px' }}>
@@ -203,7 +203,7 @@ export default function FoundingClient({
         </>
       ) : (
         <>
-          <p className="founding-eyebrow" style={{ fontFamily: MONO, fontSize: '11.5px', letterSpacing: '0.24em', textTransform: 'uppercase', color: GOLD, marginBottom: '18px' }}>
+          <p className="founding-eyebrow" style={{ fontFamily: MONO, fontSize: '11.5px', letterSpacing: '0.18em', textTransform: 'uppercase', color: GOLD, marginBottom: '18px' }}>
             The Founding Sequence
           </p>
           <h1 className="founding-h1" style={{ fontFamily: SERIF, fontSize: 'clamp(34px,4.2vw,50px)', fontWeight: 400, lineHeight: 1.08, letterSpacing: '-0.015em', color: INK, marginBottom: '16px' }}>
@@ -272,7 +272,7 @@ export default function FoundingClient({
       {status?.done && !current && !areaClosed && !area && (
         <section aria-live="polite" style={panel()}>
           <p className="founding-eyebrow" style={eyebrow()}>Complete</p>
-          <h2 style={{ fontFamily: SERIF, fontSize: '30px', fontWeight: 300, color: INK, lineHeight: 1.2, marginBottom: '14px' }}>
+          <h2 style={{ fontFamily: SERIF, fontSize: '30px', fontWeight: 400, color: INK, lineHeight: 1.2, marginBottom: '14px' }}>
             {firstName ? `${firstName}, the Founding Sequence is complete.` : 'The Founding Sequence is complete.'}
           </h2>
           <p style={{ fontFamily: SERIF, fontSize: '17.5px', fontWeight: 400, lineHeight: 1.65, color: BODY, marginBottom: '14px', maxWidth: '58ch' }}>
@@ -290,7 +290,7 @@ export default function FoundingClient({
       {justClosed && !current && !status?.done && (
         <section aria-live="polite" style={panel()}>
           <p className="founding-eyebrow" style={eyebrow()}>Saved</p>
-          <h2 style={{ fontFamily: SERIF, fontSize: '30px', fontWeight: 300, color: INK, lineHeight: 1.2, marginBottom: '14px' }}>
+          <h2 style={{ fontFamily: SERIF, fontSize: '30px', fontWeight: 400, color: INK, lineHeight: 1.2, marginBottom: '14px' }}>
             Call {justClosed.call} is on the record.
           </h2>
           <p style={{ fontFamily: SERIF, fontSize: '17.5px', fontWeight: 400, lineHeight: 1.65, color: BODY, marginBottom: '26px', maxWidth: '58ch' }}>
@@ -310,7 +310,7 @@ export default function FoundingClient({
       {status && !current && !status.done && !justClosed && !areaClosed && !area && (
         <section style={panel()}>
           <p className="founding-eyebrow" style={eyebrow()}>{status.completed === 0 ? 'Begin' : 'Continue'}</p>
-          <h2 style={{ fontFamily: SERIF, fontSize: '30px', fontWeight: 300, color: INK, lineHeight: 1.2, marginBottom: '14px' }}>
+          <h2 style={{ fontFamily: SERIF, fontSize: '30px', fontWeight: 400, color: INK, lineHeight: 1.2, marginBottom: '14px' }}>
             Call {status.nextCall}. {status.calls.find(c => c.call === status.nextCall)?.title}.
           </h2>
           <p style={{ fontFamily: SERIF, fontSize: '17.5px', fontWeight: 400, lineHeight: 1.65, color: BODY, marginBottom: '26px', maxWidth: '58ch' }}>
@@ -328,7 +328,7 @@ export default function FoundingClient({
       {areaClosed && !current && (
         <section aria-live="polite" style={panel()}>
           <p className="founding-eyebrow" style={eyebrow()}>Saved</p>
-          <h2 style={{ fontFamily: SERIF, fontSize: '30px', fontWeight: 300, color: INK, lineHeight: 1.2, marginBottom: '14px' }}>
+          <h2 style={{ fontFamily: SERIF, fontSize: '30px', fontWeight: 400, color: INK, lineHeight: 1.2, marginBottom: '14px' }}>
             Your call on {areaClosed.area} is on the record.
           </h2>
           <p style={{ fontFamily: SERIF, fontSize: '17.5px', fontWeight: 400, lineHeight: 1.65, color: BODY, marginBottom: '26px', maxWidth: '58ch' }}>
@@ -494,7 +494,7 @@ function ProofCard({ trial = false, below = false }: { trial?: boolean; below?: 
   }
 
   const q = (text: string) => (
-    <p style={{ fontFamily: SERIF, fontSize: '19px', fontStyle: 'italic', fontWeight: 300, color: 'var(--invert-fg)', lineHeight: 1.5, margin: '0 0 12px' }}>
+    <p style={{ fontFamily: SERIF, fontSize: '19px', fontStyle: 'italic', fontWeight: 400, color: 'var(--invert-fg)', lineHeight: 1.5, margin: '0 0 12px' }}>
       {text}
     </p>
   )
@@ -560,7 +560,7 @@ function ProofCard({ trial = false, below = false }: { trial?: boolean; below?: 
             </div>
           )}
           {proof.note && (
-            <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '1rem', color: BODY, lineHeight: 1.7, margin: '14px 0 0' }}>
+            <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '1rem', color: 'var(--invert-body)', lineHeight: 1.7, margin: '14px 0 0' }}>
               {proof.note}
             </p>
           )}
@@ -744,7 +744,7 @@ function eyebrow(): React.CSSProperties {
   return {
     fontFamily:    MONO,
     fontSize:      '11.5px',
-    letterSpacing: '0.24em',
+    letterSpacing: '0.18em',
     textTransform: 'uppercase',
     color:         GOLD,
     marginBottom:  '18px',

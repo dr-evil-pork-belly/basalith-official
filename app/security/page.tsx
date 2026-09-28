@@ -8,9 +8,9 @@ export const metadata: Metadata = {
 }
 
 const EYEBROW: React.CSSProperties = {
-  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+  fontFamily:    'var(--font-space-mono)',
   fontSize:      'var(--text-caption)',
-  letterSpacing: '0.35em',
+  letterSpacing: '0.18em',
   textTransform: 'uppercase' as const,
   color:         'var(--color-gold)',
   marginBottom:  '20px',
@@ -19,7 +19,7 @@ const EYEBROW: React.CSSProperties = {
   gap:           '12px',
 }
 const H2: React.CSSProperties = {
-  fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontFamily:   'var(--font-newsreader), Georgia, serif',
   fontWeight:   500,
   fontSize:     '1.35rem',
   color:        'var(--color-text-primary)',
@@ -28,16 +28,16 @@ const H2: React.CSSProperties = {
   marginTop:    '48px',
 }
 const BODY: React.CSSProperties = {
-  fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-  fontWeight:   300,
+  fontFamily:   'var(--font-newsreader), Georgia, serif',
+  fontWeight: 400,
   fontSize:     '1.05rem',
   color:        'var(--color-text-secondary)',
   lineHeight:   1.85,
   marginBottom: '12px',
 }
 const LI: React.CSSProperties = {
-  fontFamily:    'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-  fontWeight:    300,
+  fontFamily:    'var(--font-newsreader), Georgia, serif',
+  fontWeight: 400,
   fontSize:      '1.05rem',
   color:         'var(--color-text-secondary)',
   lineHeight:    1.85,
@@ -46,11 +46,11 @@ const LI: React.CSSProperties = {
   position:      'relative' as const,
 }
 const CODE: React.CSSProperties = {
-  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+  fontFamily:    'var(--font-space-mono)',
   fontSize:      '0.85rem',
   letterSpacing: '0.05em',
   color:         'var(--color-gold)',
-  background:    'rgba(184,150,62,0.08)',
+  background:    'rgba(160,132,80,0.08)',
   padding:       '2px 6px',
   borderRadius:  '3px',
 }
@@ -78,8 +78,8 @@ export default function SecurityPage() {
             </p>
 
             <h1 style={{
-              fontFamily:    'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-              fontWeight:    300,
+              fontFamily:    'var(--font-newsreader), Georgia, serif',
+              fontWeight: 400,
               fontSize:      'clamp(2.5rem, 5vw, 4rem)',
               color:         'var(--color-text-primary)',
               lineHeight:    1.1,
@@ -90,8 +90,8 @@ export default function SecurityPage() {
             </h1>
 
             <p style={{
-              fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
-              fontSize:      '0.52rem',
+              fontFamily:    'var(--font-space-mono)',
+              fontSize:      '0.78rem',
               letterSpacing: '0.14em',
               textTransform: 'uppercase' as const,
               color:         'var(--color-text-faint)',
@@ -121,7 +121,7 @@ export default function SecurityPage() {
                 'No shared access: Your data is never visible to other owners, to contributors of another Basalith, or to Basalith employees in the normal course of operations.',
               ].map(item => (
                 <li key={item} style={LI}>
-                  <span style={{ color: 'rgba(196,162,74,0.5)', marginRight: '0.5rem' }}>·</span>{item}
+                  <span style={{ color: 'var(--color-gold)', marginRight: '0.5rem' }}>·</span>{item}
                 </li>
               ))}
             </ul>
@@ -133,15 +133,15 @@ export default function SecurityPage() {
             <div style={{ marginBottom: '16px' }}>
               {INFRA.map(row => (
                 <div key={row.label} style={{ display: 'flex', gap: '16px', padding: '8px 0', borderBottom: '1px solid var(--color-border)' }}>
-                  <span style={{ fontFamily: 'var(--font-space-mono)', fontSize: '0.52rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)', width: '130px', flexShrink: 0, paddingTop: '3px' }}>{row.label}</span>
-                  <span style={{ fontFamily: 'var(--font-cormorant)', fontSize: '1rem', fontWeight: 300, color: 'var(--color-text-secondary)' }}>{row.value}</span>
+                  <span style={{ fontFamily: 'var(--font-space-mono)', fontSize: '0.78rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)', width: '130px', flexShrink: 0, paddingTop: '3px' }}>{row.label}</span>
+                  <span style={{ fontFamily: 'var(--font-cormorant)', fontSize: '1rem', fontWeight: 400, color: 'var(--color-text-secondary)' }}>{row.value}</span>
                 </div>
               ))}
             </div>
             <p style={BODY}>Each platform has its own security certifications (SOC 2, ISO 27001).</p>
             <p style={BODY}>Anthropic does not train on API data by default. Your deposits and entity conversations do not improve Anthropic&rsquo;s general models.</p>
             <p style={BODY}>Voice and video recordings are sent to OpenAI for transcription. This covers voice recorded in the portal and the iOS app, deposits left on the phone line, and video you upload. Video is sent as a complete file and transcribed from its audio. The spoken language is detected automatically. Transcription is the only use. Nothing else on your record is sent to OpenAI.</p>
-            <p style={BODY}>For enterprise clients with specific data residency requirements contact <a href="mailto:enterprise@basalith.ai" style={{ color: '#C4A24A', textDecoration: 'none' }}>enterprise@basalith.ai</a></p>
+            <p style={BODY}>For enterprise clients with specific data residency requirements contact <a href="mailto:enterprise@basalith.ai" style={{ color: 'var(--color-gold)', textDecoration: 'none' }}>enterprise@basalith.ai</a></p>
 
             {/* 4 - Passwords and MFA */}
             <h2 style={H2}>4. Passwords and Multi-Factor Authentication</h2>
@@ -155,7 +155,7 @@ export default function SecurityPage() {
                 'Tell us immediately if you think someone else can read that inbox.',
               ].map(item => (
                 <li key={item} style={LI}>
-                  <span style={{ color: 'rgba(196,162,74,0.5)', marginRight: '0.5rem' }}>·</span>{item}
+                  <span style={{ color: 'var(--color-gold)', marginRight: '0.5rem' }}>·</span>{item}
                 </li>
               ))}
             </ul>
@@ -163,8 +163,8 @@ export default function SecurityPage() {
 
             {/* Contact */}
             <div aria-hidden="true" style={{ height: '1px', background: 'var(--color-border)', margin: '48px 0 32px' }} />
-            <p style={BODY}>Security concerns: <a href="mailto:security@basalith.ai" style={{ color: '#C4A24A', textDecoration: 'none' }}>security@basalith.ai</a></p>
-            <p style={BODY}>General privacy questions: <a href="mailto:privacy@basalith.ai" style={{ color: '#C4A24A', textDecoration: 'none' }}>privacy@basalith.ai</a></p>
+            <p style={BODY}>Security concerns: <a href="mailto:security@basalith.ai" style={{ color: 'var(--color-gold)', textDecoration: 'none' }}>security@basalith.ai</a></p>
+            <p style={BODY}>General privacy questions: <a href="mailto:privacy@basalith.ai" style={{ color: 'var(--color-gold)', textDecoration: 'none' }}>privacy@basalith.ai</a></p>
 
           </div>
         </section>

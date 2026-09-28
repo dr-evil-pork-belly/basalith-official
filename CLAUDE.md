@@ -602,17 +602,40 @@ the claim does not ship. Correct publicly rather than editing quietly.
 
 ## 9. DESIGN
 
-- `--void` #0A0908 background, `--gold` #C4A24A accent, `--gold-on-light` #8A6E30,
-  `--bone` #F0EDE6 primary text on dark, `--muted` #B8B4AB secondary, `--dim` #706C65
-  tertiary, `--faint` #3A3830, `--surface` #111009.
-- NEVER use `--faint` for text a user needs to read.
-- On light backgrounds use #1A1814 and #4A4640. Never `--muted` or `--gold` on light.
-- Gold buttons take #0A0908 text.
-- Display font Cormorant Garamond, body Georgia, mono and labels Courier New or Space
-  Mono.
-- Dark and typography-led. Negative space is intentional. Motion is restrained. No
-  decorative imagery without a reason.
-- Accessibility is not optional. Depositors are often older and often on tablets.
+Recut September 28, 2026. Record: `docs/DESIGN_RECUT_2026-09-28.md`. Comp: the
+Artifact "Basalith Recut". The contrast table in `app/globals.css` is the measured
+record; a pair not in it does not ship.
+
+- One system, two grounds. Paper #F5F3EE on every marketing page (`.b2b-paper` and
+  `.home-stone` both resolve to it). Stone #ECE9E2 on every signed-in surface
+  (`.portal-stone`). White cards lift off both. The old light (#FAFAF8), paper
+  (#F4F1EA) and stone (#F2F0EC) registers are gone.
+- Ink #15130F is text, the spine (sidebar, mobile bar, app tab bar), the threshold
+  (sign-in, /begin), every dark marketing section, and the block where the record
+  speaks. `--color-void` now resolves to it. Any dark block inside a light scope
+  carries `className="section-dark"` so its tokens flip.
+- Gold is a thread, never a fill. Bronze #6B5522 (`--color-gold-on-light`,
+  `--portal-gold-ink`, and `--color-gold` inside a light scope) for eyebrows, rules,
+  numbers and accent text on light. Champagne #CDB27A (`--color-gold`, `--invert-gold`,
+  `--spine-gold`) for the same jobs on ink. Mustard #C4A24A and #8A6E30 are retired.
+- The one button: `--btn` and `--btn-label`. Ink with a bone label on paper and
+  stone; bone with an ink label on ink (the dark scopes flip the same tokens). The
+  quiet button is a 1px outline in the ground's text color. Gold never fills a
+  button. Never hardcode a button color; read the tokens.
+- Text on ink reads `--on-dark` #F7F5F1, `--on-dark-2` #C9C3BA, `--on-dark-3`
+  #A8A199 (the floor). No alpha bone text below 0.85; the old rgba(250,248,244,0.5)
+  and thinner all failed.
+- Type: Newsreader for everything a person reads, weight 400 and 500, never 300.
+  `--font-cormorant` and `--font-serif` resolve to it; Cormorant Garamond is not
+  loaded. IBM Plex Mono, loaded into `--font-space-mono`, for eyebrows, timestamps and
+  button labels only: 11.5 px floor, 0.14 to 0.18em tracking, never a whole list, never
+  navigation or status text.
+- iOS mirrors this in `basalith-app/src/theme.ts`: stone ground, ink tab bar and
+  primary button, bronze accents, the entity's messages in an ink bubble.
+- Typography-led. Negative space is intentional. Motion is restrained. No decorative
+  imagery without a reason.
+- Accessibility is not optional. 4.5:1 for anything under 24 px. Depositors are often
+  older and often on tablets.
 
 ---
 

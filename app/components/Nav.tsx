@@ -37,22 +37,22 @@ export default function Nav() {
   }, [open])
 
   const MONO: React.CSSProperties = {
-    fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
-    fontSize:      '0.56rem',
-    letterSpacing: '0.22em',
+    fontFamily:    'var(--font-space-mono)',
+    fontSize:      '0.78rem',
+    letterSpacing: '0.18em',
     textTransform: 'uppercase' as const,
   }
 
   // The bar carries its own opaque paper surface on every route, so link colour no
   // longer depends on the hero tone behind it. All nav text uses the dark token path,
-  // which reads on the paper surface (and #0A0908 on the gold pill, for Begin).
+  // which reads on the paper surface (and var(--color-void) on the gold pill, for Begin).
   const wordmarkColor = 'var(--color-text-primary)'
   const linkColor     = 'var(--color-text-muted)'
   const linkHover     = 'var(--color-text-primary)'
 
   // Always paper-surfaced. scrolled still drives padding compaction + a lift shadow.
   const navBg     = 'var(--b2b-paper)'
-  const navShadow = scrolled ? '0 1px 0 rgba(26,24,20,0.06)' : 'none'
+  const navShadow = scrolled ? '0 1px 0 rgba(21,19,15,0.06)' : 'none'
 
   return (
     <>
@@ -81,8 +81,8 @@ export default function Nav() {
           href="/"
           style={{
             ...MONO,
-            fontSize:       '0.62rem',
-            letterSpacing:  '0.32em',
+            fontSize:       '0.78rem',
+            letterSpacing:  '0.18em',
             color:          wordmarkColor,
             textDecoration: 'none',
             fontWeight:     700,
@@ -140,16 +140,16 @@ export default function Nav() {
             className="hidden md:block"
             style={{
               ...MONO,
-              color:          '#0A0908',
+              color: 'var(--btn-label)',
               textDecoration: 'none',
-              background:     'var(--color-gold)',
+              background:     'var(--btn)',
               padding:        '11px 24px',
               borderRadius:   'var(--radius-sm)',
               transition:     'background 250ms ease',
               whiteSpace:     'nowrap',
             }}
-            onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'var(--color-gold-light)'}
-            onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'var(--color-gold)'}
+            onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'var(--btn-hover)'}
+            onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'var(--btn)'}
           >
             Begin
           </Link>
@@ -184,7 +184,7 @@ export default function Nav() {
 
       {/* Mobile full-screen overlay */}
       {open && (
-        <div
+        <div className="section-dark"
           style={{
             position:      'fixed',
             inset:         0,
@@ -210,12 +210,12 @@ export default function Nav() {
           >
             <span
               style={{
-                fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
-                fontSize:      '0.62rem',
-                letterSpacing: '0.32em',
+                fontFamily:    'var(--font-space-mono)',
+                fontSize:      '0.78rem',
+                letterSpacing: '0.18em',
                 textTransform: 'uppercase' as const,
                 fontWeight:    700,
-                color:         'rgba(250,250,248,0.3)',
+                color:         'var(--on-dark-3)',
               }}
             >
               Basalith
@@ -250,19 +250,19 @@ export default function Nav() {
                 href={href}
                 onClick={() => setOpen(false)}
                 style={{
-                  fontFamily:     'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+                  fontFamily:     'var(--font-newsreader), Georgia, serif',
                   fontSize:       '2rem',
-                  fontWeight:     300,
-                  color:          'rgba(250,250,248,0.85)',
+                  fontWeight: 400,
+                  color:          'var(--on-dark)',
                   textDecoration: 'none',
                   display:        'block',
                   padding:        '18px 24px',
-                  borderBottom:   '1px solid rgba(250,250,248,0.06)',
+                  borderBottom:   '1px solid rgba(247,245,241,0.06)',
                   lineHeight:     1.2,
                   transition:     'color 200ms ease',
                 }}
                 onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = 'var(--color-gold)'}
-                onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = 'rgba(250,250,248,0.85)'}
+                onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = 'var(--on-dark)'}
               >
                 {label}
               </Link>
@@ -278,13 +278,13 @@ export default function Nav() {
                 display:        'flex',
                 alignItems:     'center',
                 justifyContent: 'center',
-                fontFamily:     'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
-                fontSize:       '0.6rem',
-                letterSpacing:  '0.3em',
+                fontFamily:     'var(--font-space-mono)',
+                fontSize:       '0.78rem',
+                letterSpacing:  '0.18em',
                 textTransform:  'uppercase' as const,
-                color:          'var(--color-void)',
+                color:          'var(--btn-label)',
                 textDecoration: 'none',
-                background:     'var(--color-gold)',
+                background:     'var(--btn)',
                 padding:        '0 32px',
                 height:         '56px',
                 borderRadius:   'var(--radius-sm)',

@@ -17,7 +17,7 @@ export default function NotFound() {
       <p style={{
         fontFamily: 'var(--portal-mono)',
         fontSize: '11px',
-        letterSpacing: '0.4em',
+        letterSpacing: '0.18em',
         color:         'var(--invert-gold)',
         marginBottom:  '1.5rem',
       }}>

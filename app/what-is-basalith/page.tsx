@@ -28,12 +28,12 @@ export const metadata: Metadata = {
 const LINK: React.CSSProperties = { color: 'var(--color-gold)', textDecoration: 'none' }
 
 const SERIF: React.CSSProperties = {
-  fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontFamily: 'var(--font-newsreader), Georgia, serif',
 }
 const MONO: React.CSSProperties = {
-  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+  fontFamily:    'var(--font-space-mono)',
   textTransform: 'uppercase' as const,
-  letterSpacing: '0.28em',
+  letterSpacing: '0.18em',
 }
 
 // The plain text that backs the FAQPage block. Each string here is rendered
@@ -117,7 +117,7 @@ export default function WhatIsBasalithPage() {
             style={{
               ...SERIF,
               fontSize:      'clamp(2rem, 4vw, 3rem)',
-              fontWeight:    300,
+              fontWeight: 400,
               lineHeight:    1.15,
               letterSpacing: '-0.02em',
               color:         'var(--color-text-primary)',
@@ -135,7 +135,7 @@ export default function WhatIsBasalithPage() {
             style={{
               ...SERIF,
               fontSize:     'clamp(1.25rem, 2.2vw, 1.5rem)',
-              fontWeight:   300,
+              fontWeight: 400,
               lineHeight:   1.7,
               color:        'var(--color-text-primary)',
               marginBottom: '32px',
@@ -149,7 +149,7 @@ export default function WhatIsBasalithPage() {
 
           <div
             style={{
-              borderLeft:   '2px solid rgba(184,150,62,0.25)',
+              borderLeft:   '2px solid rgba(160,132,80,0.25)',
               paddingLeft:  '24px',
               marginBottom: '72px',
             }}
@@ -158,7 +158,7 @@ export default function WhatIsBasalithPage() {
               style={{
                 ...SERIF,
                 fontSize:   '1.05rem',
-                fontWeight: 300,
+                fontWeight: 400,
                 lineHeight: 1.9,
                 color:      'var(--color-text-secondary)',
                 margin:     0,
@@ -176,7 +176,7 @@ export default function WhatIsBasalithPage() {
                 <h2
                   style={{
                     ...MONO,
-                    fontSize:     '0.48rem',
+                    fontSize:     '0.72rem',
                     color:        'var(--color-gold)',
                     marginBottom: '16px',
                     fontWeight:   400,
@@ -186,7 +186,7 @@ export default function WhatIsBasalithPage() {
                 </h2>
                 <div
                   style={{
-                    borderLeft:  '2px solid rgba(184,150,62,0.25)',
+                    borderLeft:  '2px solid rgba(160,132,80,0.25)',
                     paddingLeft: '24px',
                   }}
                 >
@@ -194,7 +194,7 @@ export default function WhatIsBasalithPage() {
                     style={{
                       ...SERIF,
                       fontSize:   '1.1rem',
-                      fontWeight: 300,
+                      fontWeight: 400,
                       lineHeight: 1.9,
                       color:      'var(--color-text-secondary)',
                       margin:     0,
@@ -218,7 +218,7 @@ export default function WhatIsBasalithPage() {
               style={{
                 ...SERIF,
                 fontSize:     '1.1rem',
-                fontWeight:   300,
+                fontWeight: 400,
                 lineHeight:   1.9,
                 color:        'var(--color-text-secondary)',
                 marginBottom: '28px',

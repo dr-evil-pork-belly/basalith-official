@@ -1,9 +1,9 @@
 export default function AncestorSection() {
   return (
-    <section
+    <section className="section-dark"
       aria-label="A letter from the past"
       style={{
-        background: 'var(--void, #0A0908)',
+        background: 'var(--color-void)',
         padding:    '10rem 2rem',
       }}
     >
@@ -21,7 +21,7 @@ export default function AncestorSection() {
           style={{
             fontSize:  '1.15rem',
             fontStyle: 'italic',
-            color:     '#9DA3A8',
+            color:     'var(--on-dark-2)',
             lineHeight: 2.1,
             textAlign:  'left',
           }}
@@ -61,7 +61,7 @@ export default function AncestorSection() {
           style={{
             fontWeight:   700,
             fontSize:     'clamp(1.8rem, 4vw, 2.8rem)',
-            color:        '#F0EDE6',
+            color:        'var(--on-dark)',
             lineHeight:   1.3,
             fontStyle:    'normal',
             textAlign:    'center',
@@ -82,7 +82,7 @@ export default function AncestorSection() {
           style={{
             fontSize:  '1.2rem',
             fontStyle: 'italic',
-            color:     'rgba(196,162,74,0.9)',
+            color: 'var(--color-gold)',
             lineHeight: 1.8,
             textAlign: 'center',
           }}
@@ -108,7 +108,7 @@ export default function AncestorSection() {
             width:      '80px',
             height:     '1px',
             margin:     '0 auto',
-            background: 'rgba(196,162,74,0.4)',
+            background: 'rgba(160,132,80,0.4)',
           }}
         />
 
@@ -116,11 +116,11 @@ export default function AncestorSection() {
         <p
           style={{
             marginTop:     '1.5rem',
-            fontFamily:    "'Space Mono', 'DM Mono', monospace",
-            fontSize:      '0.42rem',
-            letterSpacing: '0.3em',
+            fontFamily:    "'DM Mono', monospace",
+            fontSize:      '0.72rem',
+            letterSpacing: '0.18em',
             textTransform: 'uppercase' as const,
-            color:         '#5C6166',
+            color:         'var(--on-dark-3)',
             textAlign:     'center',
           }}
         >

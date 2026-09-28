@@ -6,9 +6,9 @@ import Footer from '../components/Footer'
 
 const LABEL: React.CSSProperties = {
   display:       'block',
-  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
-  fontSize:      '0.52rem',
-  letterSpacing: '0.3em',
+  fontFamily:    'var(--font-space-mono)',
+  fontSize:      '0.78rem',
+  letterSpacing: '0.18em',
   textTransform: 'uppercase' as const,
   color:         'var(--color-text-muted)',
   marginBottom:  '8px',
@@ -19,9 +19,9 @@ const INPUT: React.CSSProperties = {
   border:       '1px solid var(--color-border)',
   borderRadius: 'var(--radius-sm)',
   outline:      'none',
-  fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontFamily:   'var(--font-newsreader), Georgia, serif',
   fontSize:     '1.1rem',
-  fontWeight:   300,
+  fontWeight: 400,
   color:        'var(--color-text-primary)',
   padding:      '14px 16px',
   lineHeight:   1.5,
@@ -29,12 +29,12 @@ const INPUT: React.CSSProperties = {
   transition:   'border-color 200ms ease, box-shadow 200ms ease',
 }
 const SERIF: React.CSSProperties = {
-  fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontFamily: 'var(--font-newsreader), Georgia, serif',
 }
 const MONO: React.CSSProperties = {
-  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+  fontFamily:    'var(--font-space-mono)',
   textTransform: 'uppercase' as const,
-  letterSpacing: '0.28em',
+  letterSpacing: '0.18em',
 }
 
 // 'legacy' was removed on September 22, 2026. A personal Basalith is no longer
@@ -110,14 +110,14 @@ export default function ApplyForm({ initialType = 'succession' }: { initialType?
               <h1 style={{ ...SERIF, fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: 500, color: 'var(--color-text-primary)', marginBottom: '20px', lineHeight: 1.2 }}>
                 Received. We will be in touch.
               </h1>
-              <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--color-text-secondary)', lineHeight: 1.9, maxWidth: '420px', margin: '0 auto 32px' }}>
+              <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 400, color: 'var(--color-text-secondary)', lineHeight: 1.9, maxWidth: '420px', margin: '0 auto 32px' }}>
                 We will contact you within 48 hours to talk through the transition and tell you plainly whether Basalith fits.
               </p>
-              <p style={{ ...MONO, fontSize: '0.48rem', color: 'var(--color-gold)' }}>Basalith · Heritage Nexus Inc.</p>
+              <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)' }}>Basalith · Heritage Nexus Inc.</p>
             </div>
           ) : (
             <>
-              <h1 style={{ ...SERIF, fontSize: 'var(--text-h1)', fontWeight: 300, lineHeight: 1.15, color: 'var(--color-text-primary)', letterSpacing: '-0.025em', marginBottom: '32px' }}>
+              <h1 style={{ ...SERIF, fontSize: 'var(--text-h1)', fontWeight: 400, lineHeight: 1.15, color: 'var(--color-text-primary)', letterSpacing: '-0.025em', marginBottom: '32px' }}>
                 Begin.
               </h1>
 
@@ -129,10 +129,10 @@ export default function ApplyForm({ initialType = 'succession' }: { initialType?
                     <button key={type} type="button" className="type-btn"
                       onClick={() => setApplyType(type)}
                       style={{
-                        ...MONO, fontSize: '0.52rem', flex: 1, minHeight: '48px', padding: '8px 6px', lineHeight: 1.3,
-                        border:     `1px solid ${applyType === type ? 'var(--color-gold)' : 'var(--color-border)'}`,
-                        background: applyType === type ? 'var(--color-gold)' : 'transparent',
-                        color:      applyType === type ? 'var(--color-surface)' : 'var(--color-text-muted)',
+                        ...MONO, fontSize: '0.78rem', flex: 1, minHeight: '48px', padding: '8px 6px', lineHeight: 1.3,
+                        border:     `1px solid ${applyType === type ? 'var(--btn)' : 'var(--color-border-medium)'}`,
+                        background: applyType === type ? 'var(--btn)' : 'transparent',
+                        color:      applyType === type ? 'var(--btn-label)' : 'var(--color-text-secondary)',
                         cursor: 'pointer', borderRadius: 'var(--radius-sm)',
                       }}>
                       {type === 'succession' ? 'A business succession' : 'A business acquisition'}
@@ -141,11 +141,11 @@ export default function ApplyForm({ initialType = 'succession' }: { initialType?
                 </div>
               </div>
 
-              <p style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: 'var(--color-text-secondary)', marginBottom: '40px' }}>
+              <p style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.85, color: 'var(--color-text-secondary)', marginBottom: '40px' }}>
                 A few details and we will contact you within 48 hours. No deck, no pitch. A conversation about the transition and whether this fits.
               </p>
 
-              <p style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: 'var(--color-text-muted)', marginBottom: '40px' }}>
+              <p style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.85, color: 'var(--color-text-muted)', marginBottom: '40px' }}>
                 Building one for a person or a family instead?
                 {' '}<a href="/begin" style={{ color: 'var(--color-gold)', textDecoration: 'none' }}>Begin yours now &rarr;</a>
               </p>
@@ -245,13 +245,13 @@ export default function ApplyForm({ initialType = 'succession' }: { initialType?
                 <button type="submit" disabled={submitting}
                   style={{
                     ...MONO, fontSize: 'var(--text-caption)',
-                    background: submitting ? 'rgba(184,150,62,0.6)' : 'var(--color-gold)',
-                    color: '#FAFAF8', border: 'none', borderRadius: 'var(--radius-sm)',
+                    background: submitting ? 'rgba(21,19,15,0.45)' : 'var(--btn)',
+                    color: 'var(--color-bg)', border: 'none', borderRadius: 'var(--radius-sm)',
                     padding: '16px 32px', cursor: submitting ? 'not-allowed' : 'pointer',
                     width: '100%', transition: 'background 250ms ease',
                   }}
-                  onMouseEnter={e => { if (!submitting) (e.currentTarget as HTMLElement).style.background = 'var(--color-gold-light)' }}
-                  onMouseLeave={e => { if (!submitting) (e.currentTarget as HTMLElement).style.background = 'var(--color-gold)' }}
+                  onMouseEnter={e => { if (!submitting) (e.currentTarget as HTMLElement).style.background = 'var(--btn-hover)' }}
+                  onMouseLeave={e => { if (!submitting) (e.currentTarget as HTMLElement).style.background = 'var(--btn)' }}
                 >
                   {submitting ? 'Sending...' : 'Start the conversation'}
                 </button>

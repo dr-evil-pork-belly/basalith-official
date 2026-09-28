@@ -106,7 +106,7 @@ function HomeContrastDemoSection({
           style={{
             ...serif,
             fontSize:      'var(--stone-fs-h2)',
-            fontWeight:    300,
+            fontWeight: 400,
             lineHeight:    1.14,
             letterSpacing: '-0.02em',
             color:         'var(--stone-ink)',
@@ -149,7 +149,7 @@ function HomeContrastDemoSection({
           style={{
             ...serif,
             fontSize:   'var(--stone-fs-question)',
-            fontWeight: 300,
+            fontWeight: 400,
             lineHeight: 1.3,
             color:      'var(--stone-ink)',
             margin:     0,
@@ -172,9 +172,9 @@ function HomeContrastDemoSection({
             background: 'var(--stone-card)',
             border:     '1px solid var(--stone-card-line)',
             padding:    '14px 13px',
-            fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+            fontFamily: 'var(--font-newsreader), Georgia, serif',
             fontSize:   '16px',
-            fontWeight: 300,
+            fontWeight: 400,
             lineHeight: 1.6,
             color:      'var(--stone-ink)',
             resize:     'vertical',
@@ -191,8 +191,8 @@ function HomeContrastDemoSection({
             display:    'block',
             width:      '100%',
             textAlign:  'center',
-            color:      '#0A0908',
-            background: 'var(--b2b-btn)',
+            color: 'var(--btn-label)',
+            background: 'var(--btn)',
             border:     'none',
             padding:    '15px',
             minHeight:  '48px',
@@ -215,7 +215,7 @@ function HomeContrastDemoSection({
                   style={{
                     ...serif,
                     fontSize:   'var(--stone-fs-body)',
-                    fontWeight: 300,
+                    fontWeight: 400,
                     lineHeight: 1.5,
                     color:      'var(--stone-ink)',
                     whiteSpace: 'pre-wrap',
@@ -224,7 +224,7 @@ function HomeContrastDemoSection({
                 >
                   {answered}
                 </p>
-                <p style={{ ...serif, fontSize: 'var(--stone-fs-note)', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.45, color: 'var(--stone-secondary)', margin: 0 }}>
+                <p style={{ ...serif, fontSize: 'var(--stone-fs-note)', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.45, color: 'var(--stone-secondary)', margin: 0 }}>
                   {LEFT_NOTE}
                 </p>
               </StoneCard>
@@ -243,7 +243,7 @@ function HomeContrastDemoSection({
                   {illustration.map((para, i) => (
                     <p
                       key={i}
-                      style={{ ...serif, fontSize: 'var(--stone-fs-body)', fontWeight: 300, lineHeight: 1.5, color: 'var(--stone-ink)', margin: 0 }}
+                      style={{ ...serif, fontSize: 'var(--stone-fs-body)', fontWeight: 400, lineHeight: 1.5, color: 'var(--stone-ink)', margin: 0 }}
                     >
                       {para}
                     </p>
@@ -255,10 +255,10 @@ function HomeContrastDemoSection({
               </StoneCard>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '8px' }}>
-                <p style={{ ...serif, fontSize: 'var(--stone-fs-h3)', fontWeight: 300, lineHeight: 1.2, color: 'var(--stone-ink)', margin: 0 }}>
+                <p style={{ ...serif, fontSize: 'var(--stone-fs-h3)', fontWeight: 400, lineHeight: 1.2, color: 'var(--stone-ink)', margin: 0 }}>
                   {CLOSING_LINE}
                 </p>
-                <p style={{ ...serif, fontSize: 'var(--stone-fs-body)', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.5, color: 'var(--stone-body)', margin: 0 }}>
+                <p style={{ ...serif, fontSize: 'var(--stone-fs-body)', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.5, color: 'var(--stone-body)', margin: 0 }}>
                   {CLOSING_SUB}
                 </p>
               </div>

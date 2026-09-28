@@ -114,7 +114,7 @@ function AnswersModal({ session, onClose }: { session: WitnessSessionRow; onClos
       >
         <div className="flex items-start justify-between mb-5">
           <div>
-            <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '0.3rem' }}>
+            <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '0.3rem' }}>
               Witness Session
             </p>
             <h3 className="font-serif" style={{ fontWeight: 700, fontSize: '1.2rem', color: 'var(--portal-ink)' }}>
@@ -296,7 +296,7 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
       {/* ── CONTRIBUTORS SECTION ── */}
       <div className="flex items-end justify-between mb-8 gap-4">
         <div>
-          <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11.5px', letterSpacing: '0.24em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '14px' }}>Contributors</p>
+          <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11.5px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '14px' }}>Contributors</p>
           <h1 className="font-serif" style={{ fontSize: 'clamp(34px,4.2vw,50px)', fontWeight: 400, lineHeight: 1.08, letterSpacing: '-0.015em', color: 'var(--portal-ink)' }}>
             The people who remember with you.
           </h1>
@@ -427,7 +427,7 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
       {contributors.some(c => c.access_token) && (
         <div style={{ marginTop: '3rem', paddingTop: '3rem', borderTop: '1px solid var(--portal-rule)' }}>
           <div className="mb-6">
-            <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '0.5rem' }}>
+            <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '0.5rem' }}>
               Contributor Portals
             </p>
             <h2 className="font-serif font-semibold" style={{ fontSize: 'clamp(1.5rem,2.5vw,2rem)', color: 'var(--portal-ink)', letterSpacing: '-0.02em' }}>
@@ -513,7 +513,7 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
       <div style={{ marginTop: '3rem', paddingTop: '3rem', borderTop: '1px solid var(--portal-rule)' }}>
 
         <div className="mb-6">
-          <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11.5px', letterSpacing: '0.24em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '14px' }}>
+          <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11.5px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '14px' }}>
             Witness sessions
           </p>
           <h2 className="font-serif" style={{ fontSize: '30px', fontWeight: 400, color: 'var(--portal-ink)', lineHeight: 1.2, marginBottom: '12px' }}>
@@ -603,7 +603,7 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
                 padding:       '0.7rem 2rem',
                 fontFamily: 'var(--portal-mono)',
                 fontSize: '11px',
-                letterSpacing: '0.3em',
+                letterSpacing: '0.18em',
                 textTransform: 'uppercase',
                 color:         'var(--portal-btn-label)',
                 cursor:        inviting ? 'not-allowed' : 'pointer',
@@ -617,7 +617,7 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
         {/* Sent invitations table */}
         {witnessSessions.length > 0 && (
           <div>
-            <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'var(--portal-secondary)', marginBottom: '1rem' }}>
+            <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-secondary)', marginBottom: '1rem' }}>
               Sent Invitations
             </p>
             <div className="rounded-sm border overflow-hidden" style={{ borderColor: 'var(--portal-rule)', overflowX: 'auto' }}>

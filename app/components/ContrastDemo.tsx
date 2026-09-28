@@ -6,13 +6,13 @@ import { useAudience } from '@/lib/useAudience'
 type Audience = 'founder' | 'family'
 
 const MONO: React.CSSProperties = {
-  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
-  fontSize:      '0.52rem',
-  letterSpacing: '0.3em',
+  fontFamily:    'var(--font-space-mono)',
+  fontSize:      '0.78rem',
+  letterSpacing: '0.18em',
   textTransform: 'uppercase' as const,
 }
 const SERIF: React.CSSProperties = {
-  fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontFamily: 'var(--font-newsreader), Georgia, serif',
 }
 
 const AUDIENCE_NAME: Record<Audience, string> = {
@@ -118,7 +118,7 @@ function ContrastDemoSection({
           style={{
             ...SERIF,
             fontSize:   'clamp(1.9rem,3.2vw,2.8rem)',
-            fontWeight: 300,
+            fontWeight: 400,
             lineHeight: 1.1,
             color:      'var(--color-text-primary)',
             margin:     '0 0 24px',
@@ -161,7 +161,7 @@ function ContrastDemoSection({
           style={{
             ...SERIF,
             fontSize:   'clamp(1.4rem,2.6vw,2rem)',
-            fontWeight: 300,
+            fontWeight: 400,
             lineHeight: 1.3,
             color:      'var(--color-text-primary)',
             maxWidth:   '760px',
@@ -186,9 +186,9 @@ function ContrastDemoSection({
             border:       '1px solid var(--color-border-medium)',
             borderRadius: 'var(--radius-sm)',
             padding:      '16px 18px',
-            fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+            fontFamily:   'var(--font-newsreader), Georgia, serif',
             fontSize:     '1.1rem',
-            fontWeight:   300,
+            fontWeight: 400,
             lineHeight:   1.7,
             color:        'var(--color-text-primary)',
             resize:       'vertical',
@@ -203,8 +203,8 @@ function ContrastDemoSection({
             style={{
               ...MONO,
               display:    'inline-block',
-              color:      '#0A0908',
-              background: 'var(--b2b-btn)',
+              color: 'var(--btn-label)',
+              background: 'var(--btn)',
               border:     'none',
               padding:    '14px 28px',
               cursor:     canSubmit ? 'pointer' : 'default',
@@ -240,7 +240,7 @@ function ContrastDemoSection({
                   style={{
                     ...SERIF,
                     fontSize:   '1.25rem',
-                    fontWeight: 300,
+                    fontWeight: 400,
                     lineHeight: 1.7,
                     color:      'var(--color-text-primary)',
                     whiteSpace: 'pre-wrap',
@@ -249,7 +249,7 @@ function ContrastDemoSection({
                 >
                   {answered}
                 </p>
-                <p style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.7, color: 'var(--color-text-secondary)', margin: 0 }}>
+                <p style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.7, color: 'var(--color-text-secondary)', margin: 0 }}>
                   {LEFT_NOTE}
                 </p>
               </div>
@@ -265,12 +265,12 @@ function ContrastDemoSection({
                 {illustration.map((para, i) => (
                   <p
                     key={i}
-                    style={{ ...SERIF, fontSize: '1.25rem', fontWeight: 300, lineHeight: 1.7, color: 'var(--color-text-primary)', margin: i === 0 ? '0 0 16px' : '0 0 24px' }}
+                    style={{ ...SERIF, fontSize: '1.25rem', fontWeight: 400, lineHeight: 1.7, color: 'var(--color-text-primary)', margin: i === 0 ? '0 0 16px' : '0 0 24px' }}
                   >
                     {para}
                   </p>
                 ))}
-                <p style={{ ...MONO, fontSize: '0.5rem', color: 'var(--color-text-muted)', margin: 0 }}>
+                <p style={{ ...MONO, fontSize: '0.78rem', color: 'var(--color-text-muted)', margin: 0 }}>
                   {ILLUSTRATION_CAPTION}
                 </p>
               </div>
@@ -278,10 +278,10 @@ function ContrastDemoSection({
 
             {/* Closing */}
             <div className="contrast-panel" style={{ marginTop: '56px', maxWidth: '640px' }}>
-              <p style={{ ...SERIF, fontSize: 'clamp(1.5rem,2.8vw,2.1rem)', fontWeight: 300, lineHeight: 1.3, color: 'var(--color-text-primary)', margin: '0 0 16px' }}>
+              <p style={{ ...SERIF, fontSize: 'clamp(1.5rem,2.8vw,2.1rem)', fontWeight: 400, lineHeight: 1.3, color: 'var(--color-text-primary)', margin: '0 0 16px' }}>
                 {CLOSING_LINE}
               </p>
-              <p style={{ ...SERIF, fontSize: '1.15rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.7, color: 'var(--color-text-secondary)', margin: 0 }}>
+              <p style={{ ...SERIF, fontSize: '1.15rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.7, color: 'var(--color-text-secondary)', margin: 0 }}>
                 {CLOSING_SUB}
               </p>
             </div>

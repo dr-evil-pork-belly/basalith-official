@@ -12,7 +12,7 @@ export default function LetterSection() {
           style={{
             fontSize:   '1.2rem',
             fontStyle:  'italic',
-            color:      '#9DA3A8',
+            color:      'var(--on-dark-2)',
             lineHeight: 2.0,
             whiteSpace: 'pre-line',
           }}
@@ -37,17 +37,17 @@ I would give almost anything to ask him about that grain elevator now.`}
           style={{
             height:     '1px',
             margin:     '3rem 0 2rem',
-            background: 'linear-gradient(90deg, transparent, rgba(196,162,74,0.35), transparent)',
+            background: 'linear-gradient(90deg, transparent, rgba(160,132,80,0.35), transparent)',
           }}
         />
 
         <p
           style={{
-            fontFamily:    'monospace',
-            fontSize:      '0.42rem',
-            letterSpacing: '0.25em',
+            fontFamily:    'var(--font-space-mono), monospace',
+            fontSize:      '0.72rem',
+            letterSpacing: '0.18em',
             textTransform: 'uppercase' as const,
-            color:         '#5C6166',
+            color:         'var(--on-dark-3)',
             marginBottom:  '1.25rem',
           }}
         >
@@ -59,7 +59,7 @@ I would give almost anything to ask him about that grain elevator now.`}
           style={{
             fontSize:  '1rem',
             fontStyle: 'italic',
-            color:     '#C4A24A',
+            color:     'var(--color-gold)',
           }}
         >
           This is why we built Basalith.

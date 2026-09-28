@@ -68,7 +68,7 @@ function HomeClosingView({ audience }: { audience: Audience | null }) {
           style={{
             ...serif,
             fontSize:      'var(--stone-fs-h2)',
-            fontWeight:    300,
+            fontWeight: 400,
             lineHeight:    1.14,
             letterSpacing: '-0.02em',
             color:         'var(--stone-ink)',
@@ -85,7 +85,7 @@ function HomeClosingView({ audience }: { audience: Audience | null }) {
             ...serif,
             fontSize:   'var(--stone-fs-body)',
             fontStyle:  'italic',
-            fontWeight: 300,
+            fontWeight: 400,
             lineHeight: 1.55,
             color:      'var(--stone-body)',
             margin:     0,
@@ -105,7 +105,7 @@ function HomeClosingView({ audience }: { audience: Audience | null }) {
           style={{
             ...serif,
             fontSize:   'var(--stone-fs-h3)',
-            fontWeight: 300,
+            fontWeight: 400,
             fontStyle:  'italic',
             lineHeight: 1.45,
             color:      'var(--stone-body)',

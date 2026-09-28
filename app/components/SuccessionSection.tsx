@@ -29,24 +29,24 @@ export default function SuccessionSection() {
           <p style={{ ...mono, fontSize: 'var(--eyebrow-size)', letterSpacing: 'var(--eyebrow-tracking)', color: 'var(--color-gold)', marginBottom: 'var(--space-4)' }}>
             WHAT SUCCESSION PRESERVES
           </p>
-          <h2 style={{ ...serif, fontSize: 'var(--text-section)', fontWeight: 300, lineHeight: 1.15, letterSpacing: '-0.02em', color: 'var(--color-text-primary)', margin: 0 }}>
+          <h2 style={{ ...serif, fontSize: 'var(--text-section)', fontWeight: 400, lineHeight: 1.15, letterSpacing: '-0.02em', color: 'var(--color-text-primary)', margin: 0 }}>
             What built the company was never written down.
           </h2>
         </div>
 
         {/* Prose sizes/line-height come from .editorial-prose p in globals.css */}
         <div className="editorial-prose">
-          <p style={{ ...serif, fontWeight: 300, color: 'var(--color-text-secondary)', margin: '0 0 var(--space-4)' }}>
+          <p style={{ ...serif, fontWeight: 400, color: 'var(--color-text-secondary)', margin: '0 0 var(--space-4)' }}>
             It is in which deals you walked away from. The hires you trusted against the resume. When you held the line, and when you bent it.
           </p>
-          <p style={{ ...serif, fontWeight: 300, color: 'var(--color-text-secondary)', margin: '0 0 var(--space-4)' }}>
+          <p style={{ ...serif, fontWeight: 400, color: 'var(--color-text-secondary)', margin: '0 0 var(--space-4)' }}>
             Decades of calls that looked like instinct and were really pattern.
           </p>
-          <p style={{ ...serif, fontWeight: 300, color: 'var(--color-text-primary)', margin: '0 0 var(--space-4)' }}>
+          <p style={{ ...serif, fontWeight: 400, color: 'var(--color-text-primary)', margin: '0 0 var(--space-4)' }}>
             Basalith captures it while you are still making those calls. So the people who take over can ask how you would decide, instead of guessing.
           </p>
           {/* Emphasis: the only italic in the section; size overrides .editorial-prose p */}
-          <p style={{ ...serif, fontSize: '1.32rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--color-gold)', whiteSpace: 'pre-line', margin: 0 }}>
+          <p style={{ ...serif, fontSize: '1.32rem', fontStyle: 'italic', fontWeight: 400, color: 'var(--color-gold)', whiteSpace: 'pre-line', margin: 0 }}>
             We built this so the judgment outlasts the tenure.
           </p>
         </div>
@@ -66,7 +66,7 @@ export default function SuccessionSection() {
               {title}
             </h3>
             {/* Pillar body size/line-height come from .pillar p in globals.css */}
-            <p style={{ ...serif, fontWeight: 300, color: 'var(--color-text-muted)', whiteSpace: 'pre-line', margin: 0 }}>
+            <p style={{ ...serif, fontWeight: 400, color: 'var(--color-text-muted)', whiteSpace: 'pre-line', margin: 0 }}>
               {body}
             </p>
           </div>
@@ -79,7 +79,7 @@ export default function SuccessionSection() {
           <p style={{ ...mono, fontSize: 'var(--eyebrow-size)', color: 'var(--color-gold)', marginBottom: '12px' }}>
             Acquisition
           </p>
-          <p style={{ ...serif, fontSize: '1.15rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.7, color: 'var(--color-text-secondary)', margin: 0 }}>
+          <p style={{ ...serif, fontSize: '1.15rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.7, color: 'var(--color-text-secondary)', margin: 0 }}>
             You paid for how it was run. Make sure that transfers.
           </p>
         </div>
@@ -87,7 +87,7 @@ export default function SuccessionSection() {
           <p style={{ ...mono, fontSize: 'var(--eyebrow-size)', color: 'var(--color-gold)', marginBottom: '12px' }}>
             Succession
           </p>
-          <p style={{ ...serif, fontSize: '1.15rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.7, color: 'var(--color-text-secondary)', margin: 0 }}>
+          <p style={{ ...serif, fontSize: '1.15rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.7, color: 'var(--color-text-secondary)', margin: 0 }}>
             The successor gets the systems. Hand forward the thinking.
           </p>
         </div>

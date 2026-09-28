@@ -3,15 +3,15 @@
 import Link from 'next/link'
 
 const MONO: React.CSSProperties = {
-  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+  fontFamily:    'var(--font-space-mono)',
   fontSize:      'var(--text-caption)',
-  letterSpacing: '0.3em',
+  letterSpacing: '0.18em',
   textTransform: 'uppercase' as const,
 }
 
 export default function PricingTeaserSection() {
   return (
-    <section
+    <section className="section-dark"
       data-reveal
       aria-label="Pricing"
       style={{
@@ -22,11 +22,11 @@ export default function PricingTeaserSection() {
     >
       <h2
         style={{
-          fontFamily:    'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+          fontFamily:    'var(--font-newsreader), Georgia, serif',
           fontSize:      'var(--text-h2)',
-          fontWeight:    300,
+          fontWeight: 400,
           lineHeight:    1.3,
-          color:         'rgba(250,250,248,0.9)',
+          color:         'var(--on-dark)',
           marginBottom:  '32px',
           letterSpacing: '-0.01em',
           maxWidth:      '560px',
@@ -40,19 +40,19 @@ export default function PricingTeaserSection() {
 
       <div
         style={{
-          fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+          fontFamily:   'var(--font-newsreader), Georgia, serif',
           fontSize:     'clamp(1.05rem, 2vw, 1.2rem)',
           fontStyle:    'italic',
-          fontWeight:   300,
+          fontWeight: 400,
           lineHeight:   1.85,
-          color:        'rgba(250,250,248,0.4)',
+          color:        'var(--on-dark-3)',
           maxWidth:     '400px',
           margin:       '0 auto 48px',
         }}
       >
         <p style={{ marginBottom: '8px' }}>We built this for families</p>
         <p style={{ marginBottom: '24px' }}>not billionaires.</p>
-        <p style={{ margin: 0, color: 'rgba(250,250,248,0.6)' }}>The Estate is $3,600 a year.</p>
+        <p style={{ margin: 0, color: 'var(--on-dark-2)' }}>The Estate is $3,600 a year.</p>
       </div>
 
       <Link
@@ -60,15 +60,15 @@ export default function PricingTeaserSection() {
         style={{
           ...MONO,
           display:        'inline-block',
-          color:          'var(--color-surface)',
+          color:          'var(--btn-label)',
           textDecoration: 'none',
-          background:     'var(--color-gold)',
+          background:     'var(--btn)',
           padding:        '14px 32px',
           borderRadius:   'var(--radius-sm)',
           transition:     'background 250ms ease',
         }}
-        onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'var(--color-gold-light)'}
-        onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'var(--color-gold)'}
+        onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'var(--btn-hover)'}
+        onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'var(--btn)'}
       >
         Begin Your Application
       </Link>

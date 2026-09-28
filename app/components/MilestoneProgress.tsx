@@ -1,7 +1,7 @@
-// Renders on a void (#0A0908) band. Every color here is a dark-background
+// Renders on a void (var(--color-void)) band. Every color here is a dark-background
 // value, hardcoded on purpose. The root theme tokens on this site are the
 // LIGHT marketing palette (--color-surface is white, --color-text-muted is
-// #6A6660), and the locked state used to reach for them, which painted a
+// var(--color-text-muted)), and the locked state used to reach for them, which painted a
 // white card with dark grey text onto black and then faded the whole card to
 // 45 percent. Contrast table in globals.css: --color-text-muted on dark is
 // 3.49:1, never use. Fixed September 14, 2026.
@@ -46,22 +46,22 @@ const STAGES = [
 ]
 
 const MONO: React.CSSProperties = {
-  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+  fontFamily:    'var(--font-space-mono)',
   textTransform: 'uppercase' as const,
-  letterSpacing: '0.25em',
+  letterSpacing: '0.18em',
 }
 const SERIF: React.CSSProperties = {
-  fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontFamily: 'var(--font-newsreader), Georgia, serif',
 }
 
-// Measured against #0A0908. See the contrast table in globals.css.
+// Measured against var(--color-void). See the contrast table in globals.css.
 const ON_DARK = {
-  gold:      '#C4A24A',                 //  8.16:1
-  primary:   'rgba(250,248,244,0.9)',   // 15.09:1
-  body:      'rgba(250,248,244,0.62)',  //  7.36:1
-  label:     'rgba(250,248,244,0.55)',  //  5.94:1
-  cardLock:  'rgba(250,248,244,0.03)',
-  ruleLock:  'rgba(250,248,244,0.12)',
+  gold:      'var(--color-gold)',                 //  8.16:1
+  primary:   'var(--on-dark)',   // 15.09:1
+  body:      'var(--on-dark-2)',  //  7.36:1
+  label:     'var(--on-dark-2)',  //  5.94:1
+  cardLock:  'rgba(247,245,241,0.03)',
+  ruleLock:  'rgba(247,245,241,0.12)',
 }
 
 export default function MilestoneProgress({ currentDeposits = 0 }: { currentDeposits?: number }) {
@@ -76,13 +76,13 @@ export default function MilestoneProgress({ currentDeposits = 0 }: { currentDepo
   return (
     <section aria-label="Your progress" style={{ padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,80px)' }}>
       <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-        <p style={{ ...MONO, fontSize: '0.6rem', color: ON_DARK.gold, marginBottom: '12px' }}>
+        <p style={{ ...MONO, fontSize: '0.78rem', color: ON_DARK.gold, marginBottom: '12px' }}>
           Your progress
         </p>
         <h2 style={{
           ...SERIF,
           fontSize:      'clamp(1.75rem,3vw,2.5rem)',
-          fontWeight:    300,
+          fontWeight: 400,
           lineHeight:    1.15,
           color:         ON_DARK.primary,
           letterSpacing: '-0.02em',
@@ -106,31 +106,31 @@ export default function MilestoneProgress({ currentDeposits = 0 }: { currentDepo
                 key={stage.num}
                 style={{
                   padding:    '24px 20px',
-                  background: isComplete ? 'rgba(196,162,74,0.07)' : isActive ? 'rgba(196,162,74,0.04)' : ON_DARK.cardLock,
-                  border:     `1px solid ${isComplete ? 'rgba(196,162,74,0.4)' : isActive ? 'rgba(196,162,74,0.2)' : ON_DARK.ruleLock}`,
+                  background: isComplete ? 'rgba(160,132,80,0.07)' : isActive ? 'rgba(160,132,80,0.04)' : ON_DARK.cardLock,
+                  border:     `1px solid ${isComplete ? 'rgba(160,132,80,0.4)' : isActive ? 'rgba(160,132,80,0.2)' : ON_DARK.ruleLock}`,
                 }}
               >
-                <p style={{ ...MONO, fontSize: '0.56rem', color: ON_DARK.gold, marginBottom: '12px' }}>
+                <p style={{ ...MONO, fontSize: '0.78rem', color: ON_DARK.gold, marginBottom: '12px' }}>
                   {stage.num}
                 </p>
                 <p style={{
-                  ...MONO, fontSize: '0.64rem',
-                  color:        lit ? ON_DARK.primary : 'rgba(250,248,244,0.7)',
+                  ...MONO, fontSize: '0.78rem',
+                  color:        lit ? ON_DARK.primary : 'var(--on-dark-2)',
                   marginBottom: '16px', lineHeight: 1.4,
                 }}>
                   {stage.name}
                 </p>
                 <p style={{
-                  ...SERIF, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300,
+                  ...SERIF, fontSize: '1rem', fontStyle: 'italic', fontWeight: 400,
                   color:        ON_DARK.gold,
                   marginBottom: '14px', lineHeight: 1.65,
                 }}>
                   {stage.consumer}
                 </p>
-                <p style={{ ...SERIF, fontSize: '0.95rem', fontWeight: 300, color: ON_DARK.body, lineHeight: 1.7, marginBottom: '14px' }}>
+                <p style={{ ...SERIF, fontSize: '0.95rem', fontWeight: 400, color: ON_DARK.body, lineHeight: 1.7, marginBottom: '14px' }}>
                   {stage.unlocks}
                 </p>
-                <p style={{ ...MONO, fontSize: '0.52rem', color: ON_DARK.label, lineHeight: 1.6 }}>
+                <p style={{ ...MONO, fontSize: '0.78rem', color: ON_DARK.label, lineHeight: 1.6 }}>
                   {stage.threshold}+ deposits · {stage.timeline}
                 </p>
               </div>

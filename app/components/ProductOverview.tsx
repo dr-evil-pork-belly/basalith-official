@@ -37,9 +37,9 @@ export default function ProductOverview() {
           <div
             key={card.eyebrow}
             style={{
-              background:   'rgba(240,237,230,0.03)',
-              border:       '1px solid rgba(196,162,74,0.12)',
-              borderTop:    '2px solid rgba(196,162,74,0.4)',
+              background:   'rgba(247,245,241,0.03)',
+              border:       '1px solid rgba(160,132,80,0.12)',
+              borderTop:    '2px solid rgba(160,132,80,0.4)',
               borderRadius: '2px',
               padding:      '2rem',
               display:      'flex',
@@ -49,11 +49,11 @@ export default function ProductOverview() {
           >
             <p
               style={{
-                fontFamily:    "'Space Mono', monospace",
-                fontSize:      '0.42rem',
-                letterSpacing: '0.28em',
+                fontFamily:    "monospace",
+                fontSize:      '0.72rem',
+                letterSpacing: '0.18em',
                 textTransform: 'uppercase',
-                color:         'rgba(196,162,74,1)',
+                color: 'var(--color-gold)',
                 margin:        0,
               }}
             >
@@ -65,7 +65,7 @@ export default function ProductOverview() {
                 fontFamily:  'var(--font-serif, Georgia, serif)',
                 fontSize:    '1.3rem',
                 fontWeight:  700,
-                color:       '#F0EDE6',
+                color:       'var(--on-dark)',
                 lineHeight:  1.25,
                 margin:      0,
               }}
@@ -77,8 +77,8 @@ export default function ProductOverview() {
               style={{
                 fontFamily:  'var(--font-serif, Georgia, serif)',
                 fontSize:    '0.95rem',
-                fontWeight:  300,
-                color:       '#9DA3A8',
+                fontWeight: 400,
+                color:       'var(--on-dark-2)',
                 lineHeight:  1.8,
                 margin:      '0.25rem 0 0',
                 flex:        1,

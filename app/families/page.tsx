@@ -9,18 +9,18 @@ export const metadata: Metadata = {
 }
 
 const MONO: React.CSSProperties = {
-  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+  fontFamily:    'var(--font-space-mono)',
   textTransform: 'uppercase' as const,
-  letterSpacing: '0.28em',
+  letterSpacing: '0.18em',
 }
 const SERIF: React.CSSProperties = {
-  fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontFamily: 'var(--font-newsreader), Georgia, serif',
 }
 const GEORGIA: React.CSSProperties = {
-  fontFamily: 'Georgia, "Times New Roman", serif',
+  fontFamily: 'var(--font-newsreader), Georgia, serif',
 }
 const PAD  = 'clamp(24px,6vw,80px)'
-const RULE = '1px solid rgba(250,250,248,0.06)'
+const RULE = '1px solid rgba(247,245,241,0.06)'
 
 // Text tokens for the dark B2C surface. Mirrors SecondDoorSection, which is the
 // canonical family-facing component on the homepage.
@@ -95,20 +95,20 @@ export default function FamiliesPage() {
   return (
     <>
       <Nav />
-      <main style={{ background: 'var(--color-void)' }}>
+      <main className="section-dark" style={{ background: 'var(--color-void)' }}>
 
         {/* ── Section 1: The Premise ── */}
         <section style={{ padding: `clamp(140px,16vw,200px) ${PAD} clamp(72px,9vw,110px)`, maxWidth: '960px' }}>
           <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '16px' }}>
             Basalith for Individuals and Families
           </p>
-          <p style={{ ...MONO, fontSize: '0.46rem', color: 'rgba(196,162,74,0.7)', lineHeight: 1.8, marginBottom: '36px', maxWidth: '640px' }}>
+          <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)', lineHeight: 1.8, marginBottom: '36px', maxWidth: '640px' }}>
             How a person thinks, decides, and sees the world. Kept.
           </p>
           <h1 style={{
             ...SERIF,
             fontSize:      'clamp(2.6rem,5vw,3.25rem)',
-            fontWeight:    300,
+            fontWeight: 400,
             lineHeight:    1.08,
             letterSpacing: '-0.02em',
             color:         ON_DARK,
@@ -117,7 +117,7 @@ export default function FamiliesPage() {
           }}>
             You will have the photographs. You will not have the way they thought.
           </h1>
-          <p style={{ ...GEORGIA, fontSize: '1.2rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: ON_DARK_2, maxWidth: '660px', margin: 0 }}>
+          <p style={{ ...GEORGIA, fontSize: '1.2rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.85, color: ON_DARK_2, maxWidth: '660px', margin: 0 }}>
             Photographs hold a face. Letters hold a moment. Neither holds how a person reasoned, the advice they would give you, or the judgment the people around them lean on. Basalith keeps how a person thinks, captured while they are here and fully present.
           </p>
           <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'center', marginTop: '44px' }}>
@@ -128,16 +128,16 @@ export default function FamiliesPage() {
                 ...MONO,
                 fontSize:       'var(--text-caption)',
                 display:        'inline-block',
-                color:          '#0A0908',
+                color: 'var(--color-void)',
                 textDecoration: 'none',
-                background:     'var(--color-gold)',
+                background:     'var(--on-dark)',
                 padding:        '16px 32px',
                 transition:     'background 250ms ease',
               }}
             >
               Begin a family Basalith
             </Link>
-            <Link href="/pricing" style={{ ...MONO, fontSize: '0.46rem', color: 'var(--color-gold)', textDecoration: 'none' }}>
+            <Link href="/pricing" style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)', textDecoration: 'none' }}>
               See pricing <span aria-hidden="true">&rarr;</span>
             </Link>
           </div>
@@ -152,30 +152,30 @@ export default function FamiliesPage() {
             <div className="families-contrast" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px' }}>
 
               {/* Left: kept */}
-              <div style={{ background: 'rgba(250,248,244,0.02)', border: '1px solid rgba(255,255,255,0.06)', padding: 'clamp(28px,4vw,48px)' }}>
-                <p style={{ ...MONO, fontSize: '0.46rem', color: 'rgba(250,248,244,0.35)', marginBottom: '28px' }}>
+              <div style={{ background: 'rgba(247,245,241,0.02)', border: '1px solid rgba(255,255,255,0.06)', padding: 'clamp(28px,4vw,48px)' }}>
+                <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--on-dark-3)', marginBottom: '28px' }}>
                   What a family keeps
                 </p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
                   {KEPT.map(item => (
                     <div key={item} style={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
-                      <span style={{ ...MONO, fontSize: '0.4rem', color: 'rgba(250,248,244,0.2)', paddingTop: '2px', flexShrink: 0 }}>&#10003;</span>
-                      <p style={{ ...GEORGIA, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.7, color: 'rgba(250,248,244,0.35)', margin: 0 }}>{item}</p>
+                      <span style={{ ...MONO, fontSize: '0.72rem', color: 'var(--on-dark-3)', paddingTop: '2px', flexShrink: 0 }}>&#10003;</span>
+                      <p style={{ ...GEORGIA, fontSize: '1rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.7, color: 'var(--on-dark-3)', margin: 0 }}>{item}</p>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* Right: lost */}
-              <div style={{ background: 'rgba(196,162,74,0.04)', border: '1px solid rgba(196,162,74,0.2)', borderTop: '2px solid rgba(196,162,74,0.7)', padding: 'clamp(28px,4vw,48px)' }}>
-                <p style={{ ...MONO, fontSize: '0.46rem', color: 'var(--color-gold)', marginBottom: '28px' }}>
+              <div style={{ background: 'rgba(160,132,80,0.04)', border: '1px solid rgba(160,132,80,0.2)', borderTop: '2px solid rgba(160,132,80,0.7)', padding: 'clamp(28px,4vw,48px)' }}>
+                <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)', marginBottom: '28px' }}>
                   What usually disappears
                 </p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
                   {LOST.map(item => (
                     <div key={item} style={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
-                      <span style={{ ...MONO, fontSize: '0.4rem', color: 'rgba(196,162,74,0.5)', paddingTop: '2px', flexShrink: 0 }}>&#8594;</span>
-                      <p style={{ ...GEORGIA, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.7, color: 'rgba(250,248,244,0.75)', margin: 0 }}>{item}</p>
+                      <span style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)', paddingTop: '2px', flexShrink: 0 }}>&#8594;</span>
+                      <p style={{ ...GEORGIA, fontSize: '1rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.7, color: 'var(--on-dark-2)', margin: 0 }}>{item}</p>
                     </div>
                   ))}
                 </div>
@@ -191,14 +191,14 @@ export default function FamiliesPage() {
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '40px' }}>
               Basalith began here
             </p>
-            <p style={{ ...GEORGIA, fontSize: '1.15rem', fontWeight: 300, lineHeight: 1.9, color: ON_DARK, marginBottom: '32px' }}>
+            <p style={{ ...GEORGIA, fontSize: '1.15rem', fontWeight: 400, lineHeight: 1.9, color: ON_DARK, marginBottom: '32px' }}>
               Before Basalith was a way to hand forward how a business is run, it was a way to keep how a person thinks. The method has not changed. We build a cognitive reference model of the person while they are here and fully present. It is not a biography or a set of recorded interviews. It is a record of how they reason, what they weigh, and how they decide, that the people who come after can ask.
             </p>
-            <div style={{ borderLeft: '2px solid rgba(196,162,74,0.4)', paddingLeft: '24px', marginTop: '40px' }}>
-              <p style={{ ...MONO, fontSize: '0.42rem', color: 'rgba(196,162,74,0.6)', marginBottom: '12px' }}>
+            <div style={{ borderLeft: '2px solid rgba(160,132,80,0.4)', paddingLeft: '24px', marginTop: '40px' }}>
+              <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)', marginBottom: '12px' }}>
                 Built from them, not about them
               </p>
-              <p style={{ ...GEORGIA, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: ON_DARK_2, margin: 0 }}>
+              <p style={{ ...GEORGIA, fontSize: '1rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.85, color: ON_DARK_2, margin: 0 }}>
                 A Basalith built from the person is not the same as one built about them. The difference can only come from the person, while they are here to give it and to correct it.
               </p>
             </div>
@@ -214,10 +214,10 @@ export default function FamiliesPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
               {STEPS.map(({ n, title, body }) => (
                 <div key={n} style={{ display: 'grid', gridTemplateColumns: '3rem 1fr', gap: '24px' }}>
-                  <p style={{ ...MONO, fontSize: '0.52rem', color: 'var(--color-gold)', paddingTop: '4px' }}>{n}</p>
+                  <p style={{ ...MONO, fontSize: '0.78rem', color: 'var(--color-gold)', paddingTop: '4px' }}>{n}</p>
                   <div>
                     <h3 style={{ ...SERIF, fontSize: '1.4rem', fontWeight: 500, color: ON_DARK, marginBottom: '10px', lineHeight: 1.2 }}>{title}</h3>
-                    <p style={{ ...GEORGIA, fontSize: '1.05rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: ON_DARK_2, margin: 0 }}>{body}</p>
+                    <p style={{ ...GEORGIA, fontSize: '1.05rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.8, color: ON_DARK_2, margin: 0 }}>{body}</p>
                   </div>
                 </div>
               ))}
@@ -231,7 +231,7 @@ export default function FamiliesPage() {
             <h2 style={{
               ...SERIF,
               fontSize:      'clamp(1.8rem,3.4vw,2.6rem)',
-              fontWeight:    300,
+              fontWeight: 400,
               lineHeight:    1.15,
               letterSpacing: '-0.02em',
               color:         ON_DARK,
@@ -242,9 +242,9 @@ export default function FamiliesPage() {
             </h2>
             <div className="families-subjects" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px 24px' }}>
               {SUBJECTS.map(({ who, body }) => (
-                <div key={who} style={{ borderLeft: '3px solid rgba(196,162,74,0.5)', paddingLeft: 'clamp(20px,3vw,28px)' }}>
-                  <h3 style={{ ...SERIF, fontSize: '1.25rem', fontWeight: 300, color: ON_DARK, lineHeight: 1.25, margin: '0 0 10px' }}>{who}</h3>
-                  <p style={{ ...GEORGIA, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: ON_DARK_3, margin: 0 }} dangerouslySetInnerHTML={{ __html: body }} />
+                <div key={who} style={{ borderLeft: '3px solid rgba(160,132,80,0.5)', paddingLeft: 'clamp(20px,3vw,28px)' }}>
+                  <h3 style={{ ...SERIF, fontSize: '1.25rem', fontWeight: 400, color: ON_DARK, lineHeight: 1.25, margin: '0 0 10px' }}>{who}</h3>
+                  <p style={{ ...GEORGIA, fontSize: '1rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.8, color: ON_DARK_3, margin: 0 }} dangerouslySetInnerHTML={{ __html: body }} />
                 </div>
               ))}
             </div>
@@ -259,9 +259,9 @@ export default function FamiliesPage() {
             </p>
             <div className="families-trust" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px 24px', marginTop: '24px' }}>
               {TRUST.map(({ title, body }) => (
-                <div key={title} style={{ borderLeft: '3px solid rgba(196,162,74,0.5)', paddingLeft: 'clamp(20px,3vw,28px)' }}>
-                  <h3 style={{ ...SERIF, fontSize: '1.25rem', fontWeight: 300, color: ON_DARK, lineHeight: 1.25, margin: '0 0 10px' }} dangerouslySetInnerHTML={{ __html: title }} />
-                  <p style={{ ...GEORGIA, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: ON_DARK_3, margin: 0 }} dangerouslySetInnerHTML={{ __html: body }} />
+                <div key={title} style={{ borderLeft: '3px solid rgba(160,132,80,0.5)', paddingLeft: 'clamp(20px,3vw,28px)' }}>
+                  <h3 style={{ ...SERIF, fontSize: '1.25rem', fontWeight: 400, color: ON_DARK, lineHeight: 1.25, margin: '0 0 10px' }} dangerouslySetInnerHTML={{ __html: title }} />
+                  <p style={{ ...GEORGIA, fontSize: '1rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.8, color: ON_DARK_3, margin: 0 }} dangerouslySetInnerHTML={{ __html: body }} />
                 </div>
               ))}
             </div>
@@ -274,10 +274,10 @@ export default function FamiliesPage() {
             <p style={{
               ...SERIF,
               fontSize:      'clamp(1.6rem,3.2vw,2.4rem)',
-              fontWeight:    300,
+              fontWeight: 400,
               lineHeight:    1.3,
               letterSpacing: '-0.02em',
-              color:         'rgba(250,248,244,0.9)',
+              color:         'var(--on-dark)',
               marginBottom:  '40px',
             }}>
               What a person has learned can keep working long after they step back. The only question is whether it is captured while they are the one giving it.
@@ -289,16 +289,16 @@ export default function FamiliesPage() {
                 ...MONO,
                 fontSize:       'var(--text-caption)',
                 display:        'inline-block',
-                color:          '#0A0908',
+                color: 'var(--color-void)',
                 textDecoration: 'none',
-                background:     'var(--color-gold)',
+                background:     'var(--on-dark)',
                 padding:        '16px 48px',
                 transition:     'background 250ms ease',
               }}
             >
               Begin a family Basalith
             </Link>
-            <p style={{ ...GEORGIA, fontSize: '0.95rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: ON_DARK_3, margin: '28px 0 0' }}>
+            <p style={{ ...GEORGIA, fontSize: '0.95rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.8, color: ON_DARK_3, margin: '28px 0 0' }}>
               No application and no approval. Your name, your email, and the first call. You see what your Basalith does with your own words before anything is owed.
               {' '}
               <Link href="/pricing" style={{ color: 'var(--color-gold)', textDecoration: 'none' }}>
@@ -312,7 +312,7 @@ export default function FamiliesPage() {
       <Footer />
 
       <style>{`
-        .families-cta:hover { background: var(--color-gold-light) !important; }
+        .families-cta:hover { background: #FFFFFF !important; }
         @media (max-width: 680px) {
           .families-contrast { grid-template-columns: 1fr !important; }
           .families-subjects { grid-template-columns: 1fr !important; }

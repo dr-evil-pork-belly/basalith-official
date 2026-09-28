@@ -70,10 +70,10 @@ function NavGroup({ label, items, pathname }: { label: string; items: NavItem[];
               fontWeight:      active ? 500 : 400,
               display:         'block',
               padding:         '9px 26px 9px 24px',
-              color:           active ? 'var(--spine-gold)' : 'var(--spine-body)',
+              color:           active ? 'var(--spine-fg)' : 'var(--spine-body)',
               textDecoration:  'none',
-              background:      active ? 'var(--spine-gold-wash)' : 'transparent',
-              borderLeft:      active ? '2px solid var(--spine-gold)' : '2px solid transparent',
+              background:      'transparent',
+              borderLeft:      active ? '1px solid var(--spine-gold)' : '1px solid transparent',
               transition:      'color 150ms ease, background 150ms ease',
             }}
             onMouseEnter={e => { if (!active) (e.currentTarget as HTMLElement).style.color = 'var(--spine-fg)' }}
@@ -214,14 +214,14 @@ export default function ArchiveLayoutClient({ children, tier }: { children: Reac
                     fontFamily:      SERIF,
                     fontSize:        isPrimary ? '19px' : '17px',
                     fontWeight:      active ? 500 : 400,
-                    color:           active ? 'var(--spine-gold)' : isPrimary ? 'var(--spine-fg)' : 'var(--spine-body)',
+                    color:           active ? 'var(--spine-fg)' : isPrimary ? 'var(--spine-fg)' : 'var(--spine-body)',
                     textDecoration:  'none',
                     padding:         '0 24px',
                     minHeight:       '56px',
                     display:         'flex',
                     alignItems:      'center',
-                    borderLeft:      active ? '2px solid var(--spine-gold)' : '2px solid transparent',
-                    background:      active ? 'var(--spine-gold-wash)' : 'transparent',
+                    borderLeft:      active ? '1px solid var(--spine-gold)' : '1px solid transparent',
+                    background:      'transparent',
                   }}
                 >
                   {lbl}

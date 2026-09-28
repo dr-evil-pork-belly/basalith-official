@@ -144,19 +144,19 @@ export default function VoiceClient({ archiveId }: { archiveId: string }) {
       `}</style>
 
       {/* ── Header ── */}
-      <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.3em', color: 'var(--portal-gold-ink)', textTransform: 'uppercase', margin: '0 0 14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', color: 'var(--portal-gold-ink)', textTransform: 'uppercase', margin: '0 0 14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
         <span style={{ display: 'block', width: '20px', height: '1px', background: 'var(--portal-btn)', flexShrink: 0 }} aria-hidden="true" />
         Voice
       </p>
-      <h1 style={{ fontFamily: 'var(--portal-serif)', fontWeight: 300, fontSize: 'clamp(1.8rem,3vw,2.4rem)', color: 'var(--portal-ink)', margin: '0 0 16px', lineHeight: 1.15, letterSpacing: '-0.02em' }}>
+      <h1 style={{ fontFamily: 'var(--portal-serif)', fontWeight: 400, fontSize: 'clamp(1.8rem,3vw,2.4rem)', color: 'var(--portal-ink)', margin: '0 0 16px', lineHeight: 1.15, letterSpacing: '-0.02em' }}>
         Your voice. Preserved.
       </h1>
-      <p style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', fontWeight: 300, fontSize: '1.05rem', color: 'var(--portal-body)', lineHeight: 1.8, maxWidth: '560px', margin: '0 0 12px' }}>
+      <p style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', fontWeight: 400, fontSize: '1.05rem', color: 'var(--portal-body)', lineHeight: 1.8, maxWidth: '560px', margin: '0 0 12px' }}>
         Speak your memories, wisdom, and stories in any language.
         Every recording is transcribed and saved to the record permanently.
         Your voice is preserved alongside your words.
       </p>
-      <p style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', fontWeight: 300, fontSize: '1.05rem', color: 'var(--portal-body)', lineHeight: 1.8, maxWidth: '560px', margin: '0 0 12px' }}>
+      <p style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', fontWeight: 400, fontSize: '1.05rem', color: 'var(--portal-body)', lineHeight: 1.8, maxWidth: '560px', margin: '0 0 12px' }}>
         Or call{' '}
         <a href="tel:+18886889168" style={{ color: 'var(--portal-gold-ink)', textDecoration: 'none', whiteSpace: 'nowrap' }}>1-888-688-9168</a>
         {' '}and talk.
@@ -294,7 +294,7 @@ export default function VoiceClient({ archiveId }: { archiveId: string }) {
       <div style={{ marginTop: '3rem' }}>
         <div style={{ width: '100%', height: '1px', background: 'var(--portal-gold-wash)', marginBottom: '2rem' }} />
 
-        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.25em', color: 'var(--portal-secondary)', marginBottom: '1.5rem' }}>
+        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', color: 'var(--portal-secondary)', marginBottom: '1.5rem' }}>
           YOUR RECORDINGS
         </p>
 

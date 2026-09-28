@@ -9,12 +9,12 @@ export const metadata: Metadata = {
 }
 
 const SERIF: React.CSSProperties = {
-  fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontFamily: 'var(--font-newsreader), Georgia, serif',
 }
 
 const P: React.CSSProperties = {
   ...SERIF,
-  fontWeight:   300,
+  fontWeight: 400,
   fontSize:     '1.1rem',
   lineHeight:   1.9,
   color:        'var(--color-text-secondary)',
@@ -36,7 +36,7 @@ export default function FoundingSessionPage() {
           <h1
             style={{
               ...SERIF,
-              fontWeight:    300,
+              fontWeight: 400,
               fontSize:      'clamp(2rem,5vw,3.5rem)',
               color:         'var(--color-text-primary)',
               lineHeight:    1.15,
@@ -97,13 +97,13 @@ export default function FoundingSessionPage() {
           <a
             href="/begin"
             style={{
-              fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+              fontFamily:    'var(--font-space-mono)',
               fontSize:      'var(--text-caption)',
-              letterSpacing: '0.3em',
+              letterSpacing: '0.18em',
               textTransform: 'uppercase' as const,
               display:       'inline-block',
-              background:    'var(--color-gold)',
-              color:         'var(--color-bg)',
+              background:    'var(--btn)',
+              color:         'var(--btn-label)',
               textDecoration: 'none',
               padding:       '14px 32px',
               borderRadius:  'var(--radius-sm)',
@@ -140,26 +140,26 @@ export default function FoundingSessionPage() {
         </section>
 
         {/* 4-stage milestone roadmap */}
-        <div style={{ borderTop: '1px solid var(--color-border)', background: 'var(--color-void)' }}>
+        <div className="section-dark" style={{ borderTop: '1px solid var(--color-border)', background: 'var(--color-void)' }}>
           <div style={{ maxWidth: '640px', margin: '0 auto', padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,48px) 0' }}>
             <p style={{
-              fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+              fontFamily:   'var(--font-newsreader), Georgia, serif',
               fontSize:     '1.05rem',
               fontStyle:    'italic',
-              fontWeight:   300,
+              fontWeight: 400,
               lineHeight:   1.85,
-              color:        'rgba(250,248,244,0.5)',
+              color:        'var(--on-dark-3)',
               marginBottom: '8px',
             }}>
               You are starting at Stage 1.
             </p>
             <p style={{
-              fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+              fontFamily:   'var(--font-newsreader), Georgia, serif',
               fontSize:     '1.05rem',
               fontStyle:    'italic',
-              fontWeight:   300,
+              fontWeight: 400,
               lineHeight:   1.85,
-              color:        'rgba(250,248,244,0.5)',
+              color:        'var(--on-dark-3)',
               marginBottom: '4px',
             }}>
               Here is what unlocks as you build.

@@ -38,9 +38,9 @@ function Sigil({ size = 40, pulse = false }: { size?: number; pulse?: boolean })
       className={pulse ? 'animate-pulse' : ''}
     >
       <rect x={half - d} y={half - d} width={d * 2} height={d * 2}
-        stroke="rgba(196,162,74,0.9)" strokeWidth="1.2" transform={`rotate(45 ${half} ${half})`} />
+        stroke="rgba(160,132,80,0.9)" strokeWidth="1.2" transform={`rotate(45 ${half} ${half})`} />
       <rect x={half - d * 0.55} y={half - d * 0.55} width={d * 1.1} height={d * 1.1}
-        stroke="rgba(196,162,74,0.45)" strokeWidth="0.8" transform={`rotate(45 ${half} ${half})`} />
+        stroke="rgba(160,132,80,0.45)" strokeWidth="0.8" transform={`rotate(45 ${half} ${half})`} />
     </svg>
   )
 }
@@ -61,11 +61,11 @@ function ProgressDots({ total, current }: { total: number; current: number }) {
               height:       active ? '10px' : '8px',
               borderRadius: '50%',
               background:   done
-                ? 'rgba(196,162,74,1)'
+                ? 'var(--color-gold)'
                 : active
-                  ? 'rgba(196,162,74,0.9)'
-                  : 'rgba(196,162,74,0.15)',
-              border:     active ? '1px solid rgba(196,162,74,0.6)' : 'none',
+                  ? 'rgba(160,132,80,0.9)'
+                  : 'rgba(160,132,80,0.15)',
+              border:     active ? '1px solid rgba(160,132,80,0.6)' : 'none',
               transition: 'all 0.3s',
             }}
           />
@@ -153,10 +153,10 @@ export default function WitnessClient({ sessionId }: { sessionId: string }) {
 
   // ── PAGE SHELL ─────────────────────────────────────────────────────────────
   const shell = (children: React.ReactNode) => (
-    <div
+    <div className="section-dark"
       style={{
         minHeight:    '100vh',
-        background:   '#0A0908',
+        background:   'var(--color-void)',
         display:      'flex',
         alignItems:   'center',
         justifyContent: 'center',
@@ -173,7 +173,7 @@ export default function WitnessClient({ sessionId }: { sessionId: string }) {
   if (view === 'loading') return shell(
     <div className="flex flex-col items-center gap-4">
       <Sigil size={32} pulse />
-      <p style={{ fontFamily: 'monospace', fontSize: '0.42rem', letterSpacing: '0.3em', color: 'rgba(196,162,74,0.5)', textTransform: 'uppercase' }}>
+      <p style={{ fontFamily: 'var(--font-space-mono), monospace', fontSize: '0.72rem', letterSpacing: '0.18em', color: 'var(--color-gold)', textTransform: 'uppercase' }}>
         Loading session…
       </p>
     </div>
@@ -182,7 +182,7 @@ export default function WitnessClient({ sessionId }: { sessionId: string }) {
   // ── ERROR ──────────────────────────────────────────────────────────────────
   if (view === 'error') return shell(
     <div className="text-center">
-      <p className="font-serif italic" style={{ fontSize: '1rem', color: '#9DA3A8', lineHeight: 1.8 }}>
+      <p className="font-serif italic" style={{ fontSize: '1rem', color: 'var(--on-dark-2)', lineHeight: 1.8 }}>
         {errorMsg || 'This session could not be found.'}
       </p>
     </div>
@@ -199,11 +199,11 @@ export default function WitnessClient({ sessionId }: { sessionId: string }) {
     <div className="flex flex-col items-center text-center gap-6">
       <Sigil size={40} pulse />
 
-      <h1 className="font-serif" style={{ fontWeight: 700, fontSize: '2rem', color: '#F0EDE6', lineHeight: 1.2 }}>
+      <h1 className="font-serif" style={{ fontWeight: 700, fontSize: '2rem', color: 'var(--on-dark)', lineHeight: 1.2 }}>
         Thank you, {contributorName}.
       </h1>
 
-      <p className="font-serif italic font-light" style={{ fontSize: '1rem', color: '#9DA3A8', lineHeight: 1.9, maxWidth: '480px' }}>
+      <p className="font-serif italic font-light" style={{ fontSize: '1rem', color: 'var(--on-dark-2)', lineHeight: 1.9, maxWidth: '480px' }}>
         Your memories are now part of {archiveName} permanently.
         <br /><br />
         {subjectName}&rsquo;s entity will carry what you shared. In twenty years,
@@ -213,7 +213,7 @@ export default function WitnessClient({ sessionId }: { sessionId: string }) {
         That is what you just gave them.
       </p>
 
-      <div style={{ width: '60px', height: '1px', background: 'rgba(196,162,74,0.3)', marginTop: '1rem' }} />
+      <div style={{ width: '60px', height: '1px', background: 'rgba(160,132,80,0.3)', marginTop: '1rem' }} />
     </div>
   )
 
@@ -222,15 +222,15 @@ export default function WitnessClient({ sessionId }: { sessionId: string }) {
     <div className="flex flex-col items-center text-center gap-6">
       <Sigil size={40} />
 
-      <p style={{ fontFamily: 'monospace', fontSize: '0.44rem', letterSpacing: '0.4em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.8)' }}>
+      <p style={{ fontFamily: 'var(--font-space-mono), monospace', fontSize: '0.72rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>
         {archiveName}
       </p>
 
-      <h1 className="font-serif" style={{ fontWeight: 700, fontSize: 'clamp(1.8rem,4vw,2.5rem)', color: '#F0EDE6', lineHeight: 1.2, letterSpacing: '-0.02em' }}>
+      <h1 className="font-serif" style={{ fontWeight: 700, fontSize: 'clamp(1.8rem,4vw,2.5rem)', color: 'var(--on-dark)', lineHeight: 1.2, letterSpacing: '-0.02em' }}>
         Your memories of {subjectName} belong on the record.
       </h1>
 
-      <p className="font-serif italic font-light" style={{ fontSize: '1rem', color: '#9DA3A8', lineHeight: 1.9, maxWidth: '520px' }}>
+      <p className="font-serif italic font-light" style={{ fontSize: '1rem', color: 'var(--on-dark-2)', lineHeight: 1.9, maxWidth: '520px' }}>
         {subjectName} is building a permanent record of their life, one that their
         grandchildren and great-grandchildren will be able to access for generations.
         <br /><br />
@@ -243,22 +243,22 @@ export default function WitnessClient({ sessionId }: { sessionId: string }) {
         There are no right or wrong answers. Just what you remember and what you observed.
       </p>
 
-      <p style={{ fontFamily: 'monospace', fontSize: '0.42rem', letterSpacing: '0.14em', color: '#5C6166' }}>
+      <p style={{ fontFamily: 'var(--font-space-mono), monospace', fontSize: '0.72rem', letterSpacing: '0.14em', color: 'var(--on-dark-3)' }}>
         5 questions · ~{session.estimatedMinutes} minutes
       </p>
 
       <button
         onClick={beginSession}
         style={{
-          background:    'rgba(196,162,74,1)',
+          background:    'var(--on-dark)',
           border:        'none',
           borderRadius:  '2px',
           padding:       '0.9rem 3rem',
-          fontFamily:    'monospace',
-          fontSize:      '0.44rem',
-          letterSpacing: '0.3em',
+          fontFamily:    'var(--font-space-mono), monospace',
+          fontSize:      '0.72rem',
+          letterSpacing: '0.18em',
           textTransform: 'uppercase',
-          color:         '#0A0A0B',
+          color:         'var(--color-void)',
           cursor:        'pointer',
           marginTop:     '0.5rem',
         }}
@@ -266,7 +266,7 @@ export default function WitnessClient({ sessionId }: { sessionId: string }) {
         Begin →
       </button>
 
-      <p className="font-serif italic" style={{ fontSize: '0.8rem', color: '#5C6166', lineHeight: 1.7 }}>
+      <p className="font-serif italic" style={{ fontSize: '0.8rem', color: 'var(--on-dark-3)', lineHeight: 1.7 }}>
         Your responses will be seen by {subjectName} and their Custodian.
       </p>
     </div>
@@ -277,15 +277,15 @@ export default function WitnessClient({ sessionId }: { sessionId: string }) {
   const canSave        = answer.trim().length >= 20
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0A0908', padding: '3rem 1.5rem' }}>
+    <div className="section-dark" style={{ minHeight: '100vh', background: 'var(--color-void)', padding: '3rem 1.5rem' }}>
       <div style={{ maxWidth: '640px', margin: '0 auto' }}>
 
         {/* Top bar */}
         <div className="flex items-center justify-between mb-8">
-          <p style={{ fontFamily: 'monospace', fontSize: '0.42rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.6)' }}>
+          <p style={{ fontFamily: 'var(--font-space-mono), monospace', fontSize: '0.72rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>
             {archiveName}
           </p>
-          <p style={{ fontFamily: 'monospace', fontSize: '0.42rem', letterSpacing: '0.12em', color: '#5C6166' }}>
+          <p style={{ fontFamily: 'var(--font-space-mono), monospace', fontSize: '0.72rem', letterSpacing: '0.12em', color: 'var(--on-dark-3)' }}>
             {session.title}
           </p>
         </div>
@@ -293,7 +293,7 @@ export default function WitnessClient({ sessionId }: { sessionId: string }) {
         {/* Progress */}
         <div className="flex flex-col items-center gap-3 mb-10">
           <ProgressDots total={session.totalQuestions} current={currentIndex} />
-          <p style={{ fontFamily: 'monospace', fontSize: '0.42rem', letterSpacing: '0.12em', color: '#5C6166' }}>
+          <p style={{ fontFamily: 'var(--font-space-mono), monospace', fontSize: '0.72rem', letterSpacing: '0.12em', color: 'var(--on-dark-3)' }}>
             Question {questionNumber} of {session.totalQuestions}
           </p>
         </div>
@@ -301,16 +301,16 @@ export default function WitnessClient({ sessionId }: { sessionId: string }) {
         {/* Question */}
         {currentQuestion && (
           <div style={{
-            background:   'rgba(196,162,74,0.03)',
-            border:       '1px solid rgba(196,162,74,0.1)',
-            borderTop:    '3px solid rgba(196,162,74,0.5)',
+            background:   'rgba(160,132,80,0.03)',
+            border:       '1px solid rgba(160,132,80,0.1)',
+            borderTop:    '3px solid rgba(160,132,80,0.5)',
             borderRadius: '2px',
             padding:      '2.5rem 2.5rem 2rem',
           }}>
-            <p className="font-serif" style={{ fontWeight: 700, fontSize: 'clamp(1.1rem,2.5vw,1.3rem)', color: '#F0EDE6', lineHeight: 1.6, marginBottom: '1rem' }}>
+            <p className="font-serif" style={{ fontWeight: 700, fontSize: 'clamp(1.1rem,2.5vw,1.3rem)', color: 'var(--on-dark)', lineHeight: 1.6, marginBottom: '1rem' }}>
               {currentQuestion.question}
             </p>
-            <p className="font-serif italic font-light" style={{ fontSize: '0.9rem', color: '#9DA3A8', lineHeight: 1.7, marginBottom: '2rem' }}>
+            <p className="font-serif italic font-light" style={{ fontSize: '0.9rem', color: 'var(--on-dark-2)', lineHeight: 1.7, marginBottom: '2rem' }}>
               {currentQuestion.prompt}
             </p>
 
@@ -325,11 +325,11 @@ export default function WitnessClient({ sessionId }: { sessionId: string }) {
                 maxHeight:    '400px',
                 resize:       'vertical',
                 fontSize:     '1.05rem',
-                color:        '#F0EDE6',
+                color:        'var(--on-dark)',
                 lineHeight:   1.9,
                 background:   'transparent',
                 border:       'none',
-                borderBottom: '1px solid rgba(196,162,74,0.3)',
+                borderBottom: '1px solid rgba(160,132,80,0.3)',
                 padding:      '0.5rem 0 1rem',
                 display:      'block',
                 width:        '100%',
@@ -337,12 +337,12 @@ export default function WitnessClient({ sessionId }: { sessionId: string }) {
               }}
             />
 
-            <p style={{ fontFamily: 'monospace', fontSize: '0.38rem', color: '#5C6166', marginTop: '0.5rem', marginBottom: '1.5rem' }}>
+            <p style={{ fontFamily: 'var(--font-space-mono), monospace', fontSize: '0.72rem', color: 'var(--on-dark-3)', marginTop: '0.5rem', marginBottom: '1.5rem' }}>
               {answer.length > 0 ? `${answer.length} characters` : '\u00A0'}
             </p>
 
             {savedMsg && (
-              <p style={{ fontFamily: 'monospace', fontSize: '0.42rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(196,162,74,0.9)', marginBottom: '1rem' }}>
+              <p style={{ fontFamily: 'var(--font-space-mono), monospace', fontSize: '0.72rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '1rem' }}>
                 On the record
               </p>
             )}
@@ -355,16 +355,16 @@ export default function WitnessClient({ sessionId }: { sessionId: string }) {
                   background:    'none',
                   border:        'none',
                   cursor:        'pointer',
-                  fontFamily:    'monospace',
-                  fontSize:      '0.38rem',
+                  fontFamily:    'var(--font-space-mono), monospace',
+                  fontSize:      '0.72rem',
                   letterSpacing: '0.12em',
                   textTransform: 'uppercase',
-                  color:         '#5C6166',
+                  color:         'var(--on-dark-3)',
                   padding:       0,
                   opacity:       saving ? 0.4 : 1,
                 }}
-                onMouseEnter={e => (e.currentTarget.style.color = '#9DA3A8')}
-                onMouseLeave={e => (e.currentTarget.style.color = '#5C6166')}
+                onMouseEnter={e => (e.currentTarget.style.color = 'var(--on-dark-2)')}
+                onMouseLeave={e => (e.currentTarget.style.color = 'var(--on-dark-3)')}
               >
                 I don&rsquo;t have a memory for this one →
               </button>
@@ -373,15 +373,15 @@ export default function WitnessClient({ sessionId }: { sessionId: string }) {
                 onClick={() => saveAndContinue(false)}
                 disabled={!canSave || saving}
                 style={{
-                  background:    canSave && !saving ? 'rgba(196,162,74,1)' : 'rgba(196,162,74,0.25)',
+                  background:    canSave && !saving ? 'var(--on-dark)' : 'rgba(247,245,241,0.18)',
                   border:        'none',
                   borderRadius:  '2px',
                   padding:       '0.7rem 2rem',
-                  fontFamily:    'monospace',
-                  fontSize:      '0.44rem',
-                  letterSpacing: '0.3em',
+                  fontFamily:    'var(--font-space-mono), monospace',
+                  fontSize:      '0.72rem',
+                  letterSpacing: '0.18em',
                   textTransform: 'uppercase',
-                  color:         canSave && !saving ? '#0A0A0B' : '#5C6166',
+                  color:         canSave && !saving ? 'var(--color-void)' : 'var(--on-dark-3)',
                   cursor:        canSave && !saving ? 'pointer' : 'not-allowed',
                   transition:    'all 0.2s',
                   flexShrink:    0,

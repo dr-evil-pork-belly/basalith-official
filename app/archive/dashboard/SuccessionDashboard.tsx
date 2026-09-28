@@ -131,7 +131,7 @@ export default function SuccessionDashboard({
           padding:    'clamp(1.6rem,4vw,2.25rem) clamp(1.35rem,4vw,2.25rem)',
         }}
       >
-        <p style={{ fontFamily: MONO, fontSize: '11.5px', letterSpacing: '0.24em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '14px' }}>
+        <p style={{ fontFamily: MONO, fontSize: '11.5px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '14px' }}>
           Answer your first judgment question
         </p>
         <p style={{ fontFamily: SERIF, fontSize: '17.5px', fontWeight: 400, color: 'var(--portal-body)', lineHeight: 1.65, marginBottom: '22px', maxWidth: '58ch' }}>

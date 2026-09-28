@@ -88,14 +88,14 @@ export default function TrainingDataCard() {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
         <div>
-          <p style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.24em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '6px' }}>
+          <p style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '6px' }}>
             {current ? current.name : 'Building your Basalith'}
           </p>
           <p style={{ fontFamily: SERIF, fontSize: '17px', fontStyle: 'italic', fontWeight: 400, color: 'var(--portal-ink)', margin: 0, lineHeight: 1.5 }}>
             {current ? current.consumer : 'Keep adding memories.'}
           </p>
         </div>
-        <p style={{ fontFamily: SERIF, fontSize: '28px', fontWeight: 300, color: 'var(--portal-ink)', letterSpacing: '-0.01em', margin: 0, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+        <p style={{ fontFamily: SERIF, fontSize: '28px', fontWeight: 400, color: 'var(--portal-ink)', letterSpacing: '-0.01em', margin: 0, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
           {count}
           <span style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--portal-label)', marginLeft: '8px' }}>
             deposits

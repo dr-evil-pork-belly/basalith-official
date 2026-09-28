@@ -16,7 +16,7 @@ import type { CSSProperties, ReactNode } from 'react'
 // the desktop steps are set by media query in globals.css. An inline style
 // outranks a stylesheet rule, so a token is what makes those steps reachable.
 export const mono: CSSProperties = {
-  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+  fontFamily:    'var(--font-space-mono)',
   textTransform: 'uppercase',
   letterSpacing: '0.1em',
   fontSize:      'var(--stone-fs-mono)',
@@ -24,7 +24,7 @@ export const mono: CSSProperties = {
 }
 
 export const serif: CSSProperties = {
-  fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontFamily: 'var(--font-newsreader), Georgia, serif',
 }
 
 export function StoneBlock({
@@ -101,7 +101,7 @@ export function StoneRow({
         <span style={{ ...serif, fontWeight: 600, fontSize: 'var(--stone-fs-row-title)', lineHeight: 1.25, color: 'var(--stone-ink)' }}>
           {title}
         </span>
-        <span style={{ ...serif, fontWeight: 300, fontSize: 'var(--stone-fs-row-body)', lineHeight: 1.45, color: 'var(--stone-secondary)' }}>
+        <span style={{ ...serif, fontWeight: 400, fontSize: 'var(--stone-fs-row-body)', lineHeight: 1.45, color: 'var(--stone-secondary)' }}>
           {body}
         </span>
       </div>
@@ -127,7 +127,7 @@ export function StoneLabelRow({
           ...serif,
           fontSize:   'var(--stone-fs-body)',
           fontStyle:  'italic',
-          fontWeight: 300,
+          fontWeight: 400,
           lineHeight: 1.5,
           color:      'var(--stone-body)',
         }}

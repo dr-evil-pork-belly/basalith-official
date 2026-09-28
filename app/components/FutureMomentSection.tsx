@@ -11,7 +11,7 @@ export default function FutureMomentSection() {
           className="font-serif font-light"
           style={{
             fontSize:     'clamp(1.8rem, 4vw, 2.8rem)',
-            color:        '#F0EDE6',
+            color:        'var(--on-dark)',
             lineHeight:   1.35,
             letterSpacing: '-0.02em',
             marginBottom: '2rem',
@@ -26,7 +26,7 @@ export default function FutureMomentSection() {
           style={{
             fontSize:     '1.1rem',
             fontStyle:    'italic',
-            color:        '#9DA3A8',
+            color:        'var(--on-dark-2)',
             lineHeight:   1.9,
             marginBottom: '3.5rem',
             maxWidth:     '560px',
@@ -44,7 +44,7 @@ export default function FutureMomentSection() {
             height:     '1px',
             margin:     '0 auto 3.5rem',
             maxWidth:   '320px',
-            background: 'linear-gradient(90deg, transparent, rgba(196,162,74,0.4), transparent)',
+            background: 'linear-gradient(90deg, transparent, rgba(160,132,80,0.4), transparent)',
           }}
         />
 

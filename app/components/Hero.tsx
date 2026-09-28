@@ -40,8 +40,8 @@ function MonolithSlab() {
         className="relative w-full rounded-sm overflow-hidden border border-white/[0.08]"
         style={{
           aspectRatio: '3/4',
-          background: 'linear-gradient(148deg,#2B2B2F 0%,#1E1E22 45%,#17171B 75%,#222226 100%)',
-          boxShadow: '0 0 0 1px rgba(0,0,0,0.5), 0 40px 80px rgba(0,0,0,0.85), 0 0 60px rgba(255,179,71,0.05), inset 0 1px 0 rgba(255,255,255,0.07)',
+          background: 'linear-gradient(148deg,var(--invert-raise) 0%,var(--color-void) 100%)',
+          boxShadow: '0 0 0 1px rgba(0,0,0,0.5), 0 40px 80px rgba(0,0,0,0.85), 0 0 60px rgba(205,178,122,0.05), inset 0 1px 0 rgba(255,255,255,0.07)',
         }}
       >
         {/* Top edge gloss */}
@@ -50,7 +50,7 @@ function MonolithSlab() {
         {/* Ambient amber glow */}
         <div
           className="absolute inset-0 animate-spark"
-          style={{ background: 'radial-gradient(ellipse 55% 45% at 50% 55%, rgba(255,179,71,0.10) 0%, transparent 70%)' }}
+          style={{ background: 'radial-gradient(ellipse 55% 45% at 50% 55%, rgba(205,178,122,0.10) 0%, transparent 70%)' }}
         />
 
         {/* Content */}
@@ -81,7 +81,7 @@ function MonolithSlab() {
                       className="h-full rounded-full origin-left animate-reveal-line"
                       style={{
                         width: `${pct}%`,
-                        background: 'linear-gradient(90deg,#C47D1A,#FFB347)',
+                        background: 'linear-gradient(90deg,var(--color-gold-on-light),var(--color-gold))',
                         animationDelay: delay,
                       }}
                     />
@@ -150,7 +150,7 @@ export default function Hero() {
       {/* Right amber radiance */}
       <div
         className="absolute right-0 top-0 bottom-0 w-1/2 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse 90% 65% at 90% 50%,rgba(255,179,71,0.065) 0%,transparent 65%)' }}
+        style={{ background: 'radial-gradient(ellipse 90% 65% at 90% 50%,rgba(205,178,122,0.065) 0%,transparent 65%)' }}
         aria-hidden="true"
       />
 
@@ -194,7 +194,7 @@ export default function Hero() {
               marginTop:  '1.25rem',
               fontSize:   '0.95rem',
               fontStyle:  'italic',
-              color:      '#5C6166',
+              color:      'var(--on-dark-3)',
               lineHeight: 1.7,
             }}
           >

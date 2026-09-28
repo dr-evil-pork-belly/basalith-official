@@ -274,7 +274,7 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
 
       {/* ── Page header ── */}
       <div className="mb-8">
-        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '0.5rem' }}>
+        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '0.5rem' }}>
           Basalith
         </p>
         <h1 className="font-serif font-semibold tracking-[-0.025em]" style={{ fontSize: 'clamp(1.8rem,3vw,2.6rem)', color: 'var(--portal-ink)' }}>
@@ -324,7 +324,7 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
 
           {/* Entity state */}
           <div className="mb-6">
-            <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '0.75rem' }}>
+            <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '0.75rem' }}>
               Your Entity
             </p>
 
@@ -351,7 +351,7 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
 
           {/* Suggested prompts */}
           <div className="mb-5">
-            <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'var(--portal-secondary)', marginBottom: '0.75rem' }}>
+            <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-secondary)', marginBottom: '0.75rem' }}>
               Start Here
             </p>
             <div className="flex flex-col gap-2">
@@ -495,7 +495,7 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
                         padding:      '12px 16px',
                         maxWidth:     '80%',
                       }}>
-                        <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '1rem', fontWeight: 300, color: 'var(--portal-ink)', lineHeight: 1.75 }}>
+                        <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '1rem', fontWeight: 400, color: 'var(--portal-ink)', lineHeight: 1.75 }}>
                           {msg.content}
                         </p>
                       </div>
@@ -515,7 +515,7 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
                         padding:      '16px 20px 16px 22px',
                         maxWidth:     '90%',
                       }}>
-                        <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '18px', fontStyle: 'italic', fontWeight: 300, color: 'var(--invert-fg)', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
+                        <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '18px', fontStyle: 'italic', fontWeight: 400, color: 'var(--invert-fg)', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
                           {msg.content}
                         </p>
                       </div>
@@ -719,7 +719,7 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
                     minHeight:     '44px',
                     fontFamily: 'var(--portal-mono)',
                     fontSize: '11px',
-                    letterSpacing: '0.3em',
+                    letterSpacing: '0.18em',
                     textTransform: 'uppercase',
                     color:         'var(--portal-body)',
                     cursor:        'pointer',
@@ -750,7 +750,7 @@ export default function EntityClient({ archiveId }: { archiveId: string }) {
                     minHeight:     '44px',
                     fontFamily: 'var(--portal-mono)',
                     fontSize: '11px',
-                    letterSpacing: '0.3em',
+                    letterSpacing: '0.18em',
                     textTransform: 'uppercase',
                     color:         'var(--portal-btn-label)',
                     cursor:        'pointer',

@@ -1,13 +1,13 @@
 import Link from 'next/link'
 
 const MONO: React.CSSProperties = {
-  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
-  fontSize:      '0.52rem',
-  letterSpacing: '0.3em',
+  fontFamily:    'var(--font-space-mono)',
+  fontSize:      '0.78rem',
+  letterSpacing: '0.18em',
   textTransform: 'uppercase' as const,
 }
 const SERIF: React.CSSProperties = {
-  fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontFamily: 'var(--font-newsreader), Georgia, serif',
 }
 
 // The second door. B2C is deliberately secondary to the business spine, so this
@@ -15,13 +15,13 @@ const SERIF: React.CSSProperties = {
 // shared scroll helper targets.
 export default function SecondDoorSection() {
   return (
-    <section
+    <section className="section-dark"
       id="audience"
       aria-label="The second door"
       style={{
         background: 'var(--color-void)',
         padding:    'clamp(64px,9vw,110px) clamp(24px,6vw,80px)',
-        borderTop:  '1px solid rgba(250,250,248,0.06)',
+        borderTop:  '1px solid rgba(247,245,241,0.06)',
       }}
     >
       <div style={{ maxWidth: '620px', margin: '0 auto' }}>
@@ -32,7 +32,7 @@ export default function SecondDoorSection() {
           style={{
             ...SERIF,
             fontSize:   'clamp(1.6rem,2.8vw,2.2rem)',
-            fontWeight: 300,
+            fontWeight: 400,
             lineHeight: 1.2,
             color:      'var(--text-on-dark)',
             margin:     '0 0 20px',
@@ -40,7 +40,7 @@ export default function SecondDoorSection() {
         >
           Basalith began with families.
         </h2>
-        <p style={{ ...SERIF, fontSize: '1.05rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: 'var(--text-on-dark-2)', margin: '0 0 28px' }}>
+        <p style={{ ...SERIF, fontSize: '1.05rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.8, color: 'var(--text-on-dark-2)', margin: '0 0 28px' }}>
           Before it was a way to hand forward how a business is run, it was a way to preserve how a person thinks while they are still here to get it right. That path is still open. The method is the same.
         </p>
         <Link
@@ -52,7 +52,7 @@ export default function SecondDoorSection() {
             gap:            '8px',
             color:          'var(--color-gold)',
             textDecoration: 'none',
-            border:         '1px solid rgba(196,162,74,0.4)',
+            border:         '1px solid rgba(160,132,80,0.4)',
             padding:        '12px 24px',
           }}
         >

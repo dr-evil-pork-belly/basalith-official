@@ -253,7 +253,7 @@ export default function VoiceRecorder({
             style={{
               fontFamily: 'var(--portal-mono)',
               fontSize:      '0.72rem',
-              letterSpacing: '0.25em',
+              letterSpacing: '0.18em',
               color:         'var(--portal-btn-label)',
               background:    'var(--portal-btn)',
               border:        'none',
@@ -283,7 +283,7 @@ export default function VoiceRecorder({
       {state === 'complete' && (
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-            <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.25em', color: 'var(--portal-gold-ink)', margin: 0 }}>
+            <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', color: 'var(--portal-gold-ink)', margin: 0 }}>
               ✓ ON THE RECORD
             </p>
             {languageDetected && (
@@ -296,7 +296,7 @@ export default function VoiceRecorder({
             TRANSCRIPT
           </p>
           <div style={{ background: 'var(--portal-inset)', border: '1px solid var(--portal-gold-line)', borderRadius: '2px', padding: '1rem 1.25rem', marginBottom: '1.5rem', maxHeight: '200px', overflowY: 'auto' }}>
-            <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '0.95rem', fontWeight: 300, color: 'var(--portal-body)', lineHeight: 1.85, margin: 0, fontStyle: 'italic' }}>
+            <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '0.95rem', fontWeight: 400, color: 'var(--portal-body)', lineHeight: 1.85, margin: 0, fontStyle: 'italic' }}>
               &ldquo;{transcript}&rdquo;
             </p>
           </div>

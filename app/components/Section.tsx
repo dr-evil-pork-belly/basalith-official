@@ -3,13 +3,13 @@ import type { CSSProperties, ReactNode } from 'react'
 // Shared type styles, to replace the per-file re-declared MONO/SERIF consts.
 // (Only PhilosophySection consumes these in stage 1; other files are left as-is.)
 export const mono: CSSProperties = {
-  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+  fontFamily:    'var(--font-space-mono)',
   textTransform: 'uppercase',
   letterSpacing: 'var(--eyebrow-tracking)',
 }
 
 export const serif: CSSProperties = {
-  fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontFamily: 'var(--font-newsreader), Georgia, serif',
 }
 
 type Tone  = 'dark' | 'light'
@@ -37,7 +37,7 @@ export default function Section({
     <section
       aria-label={ariaLabel}
       data-reveal={reveal ? '' : undefined}
-      className={className}
+      className={[tone === 'dark' ? 'section-dark' : '', className].filter(Boolean).join(' ') || undefined}
       style={{
         background:   tone === 'dark' ? 'var(--color-void)' : 'var(--color-bg)',
         paddingBlock: 'var(--section-y)',

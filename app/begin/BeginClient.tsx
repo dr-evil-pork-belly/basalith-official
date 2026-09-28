@@ -138,7 +138,7 @@ export default function BeginClient({ signedInEmail }: { signedInEmail: string |
           <Link href="/" className="font-sans text-[15px] font-bold tracking-[0.24em] uppercase no-underline" style={{ color: 'var(--invert-fg)' }}>
             Basalith
             <span style={{ color: 'var(--invert-gold)', margin: '0 0.3em' }} aria-hidden="true">·</span>
-            <span style={{ fontStyle: 'italic', fontWeight: 300, color: 'var(--invert-dim)', fontSize: '0.85em', textTransform: 'lowercase', letterSpacing: '0.08em' }}>ai</span>
+            <span style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--invert-dim)', fontSize: '0.85em', textTransform: 'lowercase', letterSpacing: '0.08em' }}>ai</span>
           </Link>
         </div>
 

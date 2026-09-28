@@ -8,9 +8,9 @@ export const metadata: Metadata = {
 }
 
 const eyebrow: React.CSSProperties = {
-  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
-  fontSize:      '0.52rem',
-  letterSpacing: '0.35em',
+  fontFamily:    'var(--font-space-mono)',
+  fontSize:      '0.78rem',
+  letterSpacing: '0.18em',
   color:         'var(--color-gold)',
   textTransform: 'uppercase',
   marginBottom:  '20px',
@@ -20,9 +20,9 @@ const eyebrow: React.CSSProperties = {
 }
 
 const h1: React.CSSProperties = {
-  fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontFamily:   'var(--font-newsreader), Georgia, serif',
   fontSize:     'clamp(2rem, 5vw, 3.5rem)',
-  fontWeight:   300,
+  fontWeight: 400,
   color:        'var(--color-text-primary)',
   lineHeight:   1.15,
   letterSpacing: '-0.025em',
@@ -30,16 +30,16 @@ const h1: React.CSSProperties = {
 }
 
 const sub: React.CSSProperties = {
-  fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontFamily:   'var(--font-newsreader), Georgia, serif',
   fontSize:     '1.15rem',
   fontStyle:    'italic',
-  fontWeight:   300,
+  fontWeight: 400,
   color:        'var(--color-text-muted)',
   marginBottom: '48px',
 }
 
 const h2: React.CSSProperties = {
-  fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontFamily:   'var(--font-newsreader), Georgia, serif',
   fontSize:     'clamp(1.3rem, 2.5vw, 1.75rem)',
   fontWeight:   500,
   color:        'var(--color-text-primary)',
@@ -48,16 +48,16 @@ const h2: React.CSSProperties = {
 }
 
 const body: React.CSSProperties = {
-  fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontFamily:   'var(--font-newsreader), Georgia, serif',
   fontSize:     '1.05rem',
-  fontWeight:   300,
+  fontWeight: 400,
   color:        'var(--color-text-secondary)',
   lineHeight:   1.9,
   marginBottom: '1.5rem',
 }
 
 const divider: React.CSSProperties = {
-  borderTop: '1px solid rgba(196,162,74,0.2)',
+  borderTop: '1px solid rgba(160,132,80,0.2)',
   margin:    '3rem auto',
   maxWidth:  '120px',
 }
@@ -117,7 +117,7 @@ export default function AssetPage() {
             the person who built it.
           </p>
           <p style={body}>Every generation starts over. They inherit the money but not the mind that made it.</p>
-          <p style={{ ...body, fontSize: '1.15rem', color: '#F0EDE6', fontStyle: 'italic' }}>
+          <p style={{ ...body, fontSize: '1.15rem', color: 'var(--color-text-primary)', fontStyle: 'italic' }}>
             Basalith changes that.
           </p>
 
@@ -143,10 +143,10 @@ export default function AssetPage() {
             <a
               href="/method"
               style={{
-                fontFamily:     "'Space Mono', monospace",
-                fontSize:       '0.44rem',
-                letterSpacing:  '0.35em',
-                color:          '#C4A24A',
+                fontFamily:     "monospace",
+                fontSize:       '0.72rem',
+                letterSpacing:  '0.18em',
+                color:          'var(--color-gold)',
                 textDecoration: 'none',
                 textTransform:  'uppercase',
                 display:        'block',
@@ -159,11 +159,11 @@ export default function AssetPage() {
               href="/pricing"
               style={{
                 display:        'inline-block',
-                fontFamily:     "'Space Mono', monospace",
-                fontSize:       '0.44rem',
-                letterSpacing:  '0.35em',
-                color:          '#0A0908',
-                backgroundColor:'#C4A24A',
+                fontFamily:     "monospace",
+                fontSize:       '0.72rem',
+                letterSpacing:  '0.18em',
+                color: 'var(--btn-label)',
+                backgroundColor:'var(--btn)',
                 textDecoration: 'none',
                 textTransform:  'uppercase',
                 padding:        '0.75rem 2rem',

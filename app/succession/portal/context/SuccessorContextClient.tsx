@@ -86,7 +86,7 @@ export default function SuccessorContextClient({ session, archiveName, existingC
     padding:      '12px 16px',
     ...SERIF,
     fontSize:     '0.95rem',
-    fontWeight:   300,
+    fontWeight: 400,
   }
 
   return (
@@ -99,7 +99,7 @@ export default function SuccessorContextClient({ session, archiveName, existingC
           ← Portal
         </Link>
         <span style={{ ...MONO, fontSize: '11px', color: 'var(--spine-dim)' }}>|</span>
-        <span style={{ ...MONO, fontSize: '11px', letterSpacing: '0.24em', textTransform: 'uppercase', color: 'var(--spine-gold)' }}>
+        <span style={{ ...MONO, fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--spine-gold)' }}>
           Inject Context · {archiveName}
         </span>
       </div>
@@ -108,10 +108,10 @@ export default function SuccessorContextClient({ session, archiveName, existingC
 
         {/* Explainer */}
         <div style={{ marginBottom: '44px' }}>
-          <h1 style={{ ...SERIF, fontSize: '1.8rem', fontWeight: 300, color: 'var(--portal-ink)', margin: '0 0 12px', lineHeight: 1.3 }}>
+          <h1 style={{ ...SERIF, fontSize: '1.8rem', fontWeight: 400, color: 'var(--portal-ink)', margin: '0 0 12px', lineHeight: 1.3 }}>
             Context Injection
           </h1>
-          <p style={{ ...SERIF, fontSize: '0.95rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--portal-secondary)', margin: 0, lineHeight: 1.7 }}>
+          <p style={{ ...SERIF, fontSize: '0.95rem', fontStyle: 'italic', fontWeight: 400, color: 'var(--portal-secondary)', margin: 0, lineHeight: 1.7 }}>
             Describe the current business situation you want the entity to reason about.
             This context sits above the frozen cognitive fingerprint and shapes how the founder's
             judgment is applied to your questions.
@@ -210,7 +210,7 @@ export default function SuccessorContextClient({ session, archiveName, existingC
                       {formatDate(ctx.created_at)}
                     </span>
                   </div>
-                  <p style={{ ...SERIF, fontSize: '0.9rem', fontWeight: 300, color: 'var(--portal-body)', margin: 0, lineHeight: 1.7 }}>
+                  <p style={{ ...SERIF, fontSize: '0.9rem', fontWeight: 400, color: 'var(--portal-body)', margin: 0, lineHeight: 1.7 }}>
                     {ctx.content}
                   </p>
                 </div>

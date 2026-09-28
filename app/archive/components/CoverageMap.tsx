@@ -79,7 +79,7 @@ export default function CoverageMap({ link }: { link?: { href: string; label: st
       style={{ background: 'var(--portal-card)', border: '1px solid var(--portal-card-line)', padding: 'clamp(1.5rem,4vw,2rem)' }}
     >
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap', marginBottom: '6px' }}>
-        <p style={{ fontFamily: MONO, fontSize: '11.5px', letterSpacing: '0.24em', textTransform: 'uppercase', color: GOLD }}>
+        <p style={{ fontFamily: MONO, fontSize: '11.5px', letterSpacing: '0.18em', textTransform: 'uppercase', color: GOLD }}>
           Where your record is thin
         </p>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: '18px', flexWrap: 'wrap' }}>

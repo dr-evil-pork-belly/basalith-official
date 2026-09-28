@@ -9,9 +9,9 @@ export const metadata: Metadata = {
 }
 
 const EYEBROW: React.CSSProperties = {
-  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+  fontFamily:    'var(--font-space-mono)',
   fontSize:      'var(--text-caption)',
-  letterSpacing: '0.35em',
+  letterSpacing: '0.18em',
   textTransform: 'uppercase' as const,
   color:         'var(--color-gold)',
   marginBottom:  '20px',
@@ -21,7 +21,7 @@ const EYEBROW: React.CSSProperties = {
 }
 
 const H2: React.CSSProperties = {
-  fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontFamily:   'var(--font-newsreader), Georgia, serif',
   fontWeight:   500,
   fontSize:     '1.35rem',
   color:        'var(--color-text-primary)',
@@ -31,8 +31,8 @@ const H2: React.CSSProperties = {
 }
 
 const BODY: React.CSSProperties = {
-  fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-  fontWeight:   300,
+  fontFamily:   'var(--font-newsreader), Georgia, serif',
+  fontWeight: 400,
   fontSize:     '1.05rem',
   color:        'var(--color-text-secondary)',
   lineHeight:   1.85,
@@ -40,8 +40,8 @@ const BODY: React.CSSProperties = {
 }
 
 const LI: React.CSSProperties = {
-  fontFamily:    'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-  fontWeight:    300,
+  fontFamily:    'var(--font-newsreader), Georgia, serif',
+  fontWeight: 400,
   fontSize:      '1.05rem',
   color:         'var(--color-text-secondary)',
   lineHeight:    1.85,
@@ -64,8 +64,8 @@ export default function PrivacyPage() {
             </p>
 
             <h1 style={{
-              fontFamily:    'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-              fontWeight:    300,
+              fontFamily:    'var(--font-newsreader), Georgia, serif',
+              fontWeight: 400,
               fontSize:      'clamp(2.5rem, 5vw, 4rem)',
               color:         'var(--color-text-primary)',
               lineHeight:    1.1,
@@ -76,8 +76,8 @@ export default function PrivacyPage() {
             </h1>
 
             <p style={{
-              fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
-              fontSize:      '0.52rem',
+              fontFamily:    'var(--font-space-mono)',
+              fontSize:      '0.78rem',
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
               color:         'var(--color-text-faint)',
@@ -91,7 +91,7 @@ export default function PrivacyPage() {
             {/* 1 */}
             <h2 style={H2}>1. Who We Are</h2>
             <p style={BODY}>Basalith is a digital legacy platform operated by Heritage Nexus Inc. We build a permanent record of human memory for families and individuals. Each one is a Basalith: the record and the entity built for one person or one business.</p>
-            <p style={BODY}>Contact: <a href="mailto:privacy@basalith.xyz" style={{ color: '#C4A24A', textDecoration: 'none' }}>privacy@basalith.xyz</a></p>
+            <p style={BODY}>Contact: <a href="mailto:privacy@basalith.xyz" style={{ color: 'var(--color-gold)', textDecoration: 'none' }}>privacy@basalith.xyz</a></p>
 
             {/* 2 */}
             <h2 style={H2}>2. What We Collect</h2>
@@ -109,7 +109,7 @@ export default function PrivacyPage() {
                 'Contact form messages, including your name, email address, the nature of your enquiry, and any message content you choose to provide',
               ].map((item) => (
                 <li key={item} style={LI}>
-                  <span style={{ color: 'rgba(196,162,74,0.5)', marginRight: '0.5rem' }}>·</span>
+                  <span style={{ color: 'var(--color-gold)', marginRight: '0.5rem' }}>·</span>
                   {item}
                 </li>
               ))}
@@ -128,12 +128,12 @@ export default function PrivacyPage() {
                 'Improve our services',
               ].map((item) => (
                 <li key={item} style={LI}>
-                  <span style={{ color: 'rgba(196,162,74,0.5)', marginRight: '0.5rem' }}>·</span>
+                  <span style={{ color: 'var(--color-gold)', marginRight: '0.5rem' }}>·</span>
                   {item}
                 </li>
               ))}
             </ul>
-            <p style={{ ...BODY, color: '#E8E4DC', fontStyle: 'italic' }}>We do not sell your personal information or the content of your Basalith to any third party. Ever.</p>
+            <p style={{ ...BODY, color: 'var(--color-text-primary)', fontStyle: 'italic' }}>We do not sell your personal information or the content of your Basalith to any third party. Ever.</p>
             <p style={{ ...BODY, fontStyle: 'italic' }}>We do not use the content of your Basalith to train general-purpose models. Your data trains only your entity.</p>
 
             {/* 4 */}
@@ -156,13 +156,13 @@ export default function PrivacyPage() {
                 { name: 'Backblaze', role: 'Offsite backup copies of photographs, voice recordings, video, and documents.' },
               ].map(row => (
                 <div key={row.name} style={{ display: 'flex', gap: '16px', padding: '8px 0', borderBottom: '1px solid var(--color-border)' }}>
-                  <span style={{ fontFamily: 'var(--font-space-mono, "Space Mono", "Courier New", monospace)', fontSize: '0.52rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)', width: '110px', flexShrink: 0, paddingTop: '3px' }}>{row.name}</span>
-                  <span style={{ fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)', fontSize: '1rem', fontWeight: 300, color: 'var(--color-text-secondary)' }}>{row.role}</span>
+                  <span style={{ fontFamily: 'var(--font-space-mono)', fontSize: '0.78rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-text-muted)', width: '110px', flexShrink: 0, paddingTop: '3px' }}>{row.name}</span>
+                  <span style={{ fontFamily: 'var(--font-newsreader), Georgia, serif', fontSize: '1rem', fontWeight: 400, color: 'var(--color-text-secondary)' }}>{row.role}</span>
                 </div>
               ))}
             </div>
             <p style={BODY}>The content of your Basalith, meaning your photographs, voice recordings, video, and written deposits, is held in the United States.</p>
-            <p style={BODY}>The Anthropic API, which powers entity responses, does not train on API submissions by default. Their data usage policy is available at <a href="https://anthropic.com/legal/privacy" style={{ color: '#C4A24A', textDecoration: 'none' }} target="_blank" rel="noopener noreferrer">anthropic.com/legal/privacy</a>.</p>
+            <p style={BODY}>The Anthropic API, which powers entity responses, does not train on API submissions by default. Their data usage policy is available at <a href="https://anthropic.com/legal/privacy" style={{ color: 'var(--color-gold)', textDecoration: 'none' }} target="_blank" rel="noopener noreferrer">anthropic.com/legal/privacy</a>.</p>
             <p style={BODY}>Voice and video deposits are sent to OpenAI for transcription. This covers voice recorded in the portal and the iOS app, deposits left on the phone line, and video you upload. Video is sent as a complete file and transcribed from its audio. The spoken language is detected automatically, in every language. Transcription is the only use. No other content of your Basalith is sent to OpenAI.</p>
 
             {/* 6 */}
@@ -182,7 +182,7 @@ export default function PrivacyPage() {
                 'Face data is stored only within your Basalith and never shared',
               ].map((item) => (
                 <li key={item} style={LI}>
-                  <span style={{ color: 'rgba(196,162,74,0.5)', marginRight: '0.5rem' }}>·</span>
+                  <span style={{ color: 'var(--color-gold)', marginRight: '0.5rem' }}>·</span>
                   {item}
                 </li>
               ))}
@@ -194,11 +194,11 @@ export default function PrivacyPage() {
 
             <h3 style={{ ...H2, fontSize: '1.1rem', marginTop: '24px' }}>Your Basalith</h3>
             <p style={BODY}>You own your Basalith, and you may request a complete export of it in open, portable formats. Export requests are fulfilled within 30 business days. If a payment is missed, your Basalith moves to Resting status. Your content is preserved and is never deleted for non-payment. Permanent deletion occurs only when you, or an executor with documented authority, make a verified written request. After that request is verified, we hold your Basalith for 12 months, then permanently delete it and confirm in writing.</p>
-            <p style={BODY}>Because you keep ownership and can export, your Basalith does not depend on the continued existence of Basalith as a company. Basalith is the custodian, not the owner. <a href="/data-ownership" style={{ color: '#C4A24A', textDecoration: 'none' }}>Read our data ownership commitments →</a></p>
+            <p style={BODY}>Because you keep ownership and can export, your Basalith does not depend on the continued existence of Basalith as a company. Basalith is the custodian, not the owner. <a href="/data-ownership" style={{ color: 'var(--color-gold)', textDecoration: 'none' }}>Read our data ownership commitments →</a></p>
 
             <h3 style={{ ...H2, fontSize: '1.1rem', marginTop: '24px' }}>Enquiry data</h3>
             <p style={BODY}>Applications and contact form submissions are enquiry data. They are not the content of your Basalith, and the commitments above for your Basalith do not apply to them.</p>
-            <p style={BODY}>We retain enquiry data for as long as is necessary to manage your enquiry and keep a record of our correspondence. If an enquiry does not result in an active Basalith, we delete the submission within 24 months of your last interaction with us, or sooner on a verified deletion request. Send deletion requests to <a href="mailto:privacy@basalith.xyz" style={{ color: '#C4A24A', textDecoration: 'none' }}>privacy@basalith.xyz</a> from the address associated with your submission. We confirm receipt within 5 business days and complete the deletion within 30 days, unless we are legally required to retain the data for longer.</p>
+            <p style={BODY}>We retain enquiry data for as long as is necessary to manage your enquiry and keep a record of our correspondence. If an enquiry does not result in an active Basalith, we delete the submission within 24 months of your last interaction with us, or sooner on a verified deletion request. Send deletion requests to <a href="mailto:privacy@basalith.xyz" style={{ color: 'var(--color-gold)', textDecoration: 'none' }}>privacy@basalith.xyz</a> from the address associated with your submission. We confirm receipt within 5 business days and complete the deletion within 30 days, unless we are legally required to retain the data for longer.</p>
             <p style={BODY}>Deleting enquiry data does not affect an active Basalith. The commitments above apply to the content of your Basalith and are unchanged by it.</p>
 
             {/* 9 */}
@@ -214,12 +214,12 @@ export default function PrivacyPage() {
                 'Close your account and request an export of your data',
               ].map((item) => (
                 <li key={item} style={LI}>
-                  <span style={{ color: 'rgba(196,162,74,0.5)', marginRight: '0.5rem' }}>·</span>
+                  <span style={{ color: 'var(--color-gold)', marginRight: '0.5rem' }}>·</span>
                   {item}
                 </li>
               ))}
             </ul>
-            <p style={BODY}>To exercise any of these rights: <a href="mailto:privacy@basalith.xyz" style={{ color: '#C4A24A', textDecoration: 'none' }}>privacy@basalith.xyz</a></p>
+            <p style={BODY}>To exercise any of these rights: <a href="mailto:privacy@basalith.xyz" style={{ color: 'var(--color-gold)', textDecoration: 'none' }}>privacy@basalith.xyz</a></p>
 
             {/* 10 */}
             <h2 style={H2}>10. Cookies and Browser Storage</h2>
@@ -236,7 +236,7 @@ export default function PrivacyPage() {
 
             {/* 13 */}
             <h2 style={H2}>13. Contact</h2>
-            <p style={BODY}>Questions about this policy: <a href="mailto:privacy@basalith.xyz" style={{ color: '#C4A24A', textDecoration: 'none' }}>privacy@basalith.xyz</a></p>
+            <p style={BODY}>Questions about this policy: <a href="mailto:privacy@basalith.xyz" style={{ color: 'var(--color-gold)', textDecoration: 'none' }}>privacy@basalith.xyz</a></p>
 
             {/* Ownership section */}
             <div aria-hidden="true" style={{ height: '1px', background: 'var(--color-border)', margin: '48px 0' }} />
@@ -259,7 +259,7 @@ export default function PrivacyPage() {
                 'If we are acquired, the acquiring entity must honor these same commitments as a condition of the acquisition.',
               ].map(item => (
                 <li key={item} style={LI}>
-                  <span style={{ color: 'rgba(196,162,74,0.5)', marginRight: '0.5rem' }}>·</span>{item}
+                  <span style={{ color: 'var(--color-gold)', marginRight: '0.5rem' }}>·</span>{item}
                 </li>
               ))}
             </ul>
@@ -268,7 +268,7 @@ export default function PrivacyPage() {
             <p style={BODY}>The data in your Basalith is never used to train models for other users. Not now. Not ever.</p>
             <p style={BODY}>Each Basalith is a closed system. What you deposit trains your entity. It does not train anyone else&rsquo;s entity. It does not train Basalith&rsquo;s general models. It does not leave your Basalith except to the service providers named in section 5, and only for the purposes stated there.</p>
 
-            <p style={{ ...BODY, marginTop: '32px' }}>For security questions: <a href="mailto:security@basalith.ai" style={{ color: '#C4A24A', textDecoration: 'none' }}>security@basalith.ai</a></p>
+            <p style={{ ...BODY, marginTop: '32px' }}>For security questions: <a href="mailto:security@basalith.ai" style={{ color: 'var(--color-gold)', textDecoration: 'none' }}>security@basalith.ai</a></p>
 
           </div>
         </section>

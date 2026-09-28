@@ -11,13 +11,13 @@ export const metadata: Metadata = {
 }
 
 const MONO: React.CSSProperties = {
-  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+  fontFamily:    'var(--font-space-mono)',
   textTransform: 'uppercase' as const,
-  letterSpacing: '0.28em',
+  letterSpacing: '0.18em',
 }
 
 const SERIF: React.CSSProperties = {
-  fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontFamily: 'var(--font-newsreader), Georgia, serif',
 }
 
 // Inline stroke marks — match the page's existing hand-drawn <svg> convention
@@ -171,7 +171,7 @@ export default function PricingPage() {
             style={{
               ...SERIF,
               fontSize:      'var(--text-hero)',
-              fontWeight:    300,
+              fontWeight: 400,
               lineHeight:    1.1,
               color:         'var(--color-text-primary)',
               letterSpacing: '-0.025em',
@@ -185,7 +185,7 @@ export default function PricingPage() {
               ...SERIF,
               fontSize:   '1.15rem',
               fontStyle:  'italic',
-              fontWeight: 300,
+              fontWeight: 400,
               lineHeight: 1.85,
               color:      'var(--color-text-secondary)',
               maxWidth:   '520px',
@@ -206,8 +206,8 @@ export default function PricingPage() {
         }}>
           {TRUST_BADGES.map(b => (
             <span key={b.label} style={{
-              fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
-              fontSize:      '0.48rem',
+              fontFamily:    'var(--font-space-mono)',
+              fontSize:      '0.72rem',
               letterSpacing: '0.15em',
               textTransform: 'uppercase' as const,
               color:         'var(--color-text-muted)',
@@ -221,66 +221,66 @@ export default function PricingPage() {
         </div>
 
         {/* Succession leads */}
-        <section style={{ background: 'var(--color-void)', padding: 'clamp(72px,10vw,120px) clamp(24px,6vw,80px)' }}>
+        <section className="b2b-paper" style={{ background: 'var(--color-bg)', padding: 'clamp(72px,10vw,120px) clamp(24px,6vw,80px)', borderTop: '1px solid var(--color-border)' }}>
           <div style={{ maxWidth: '700px', margin: '0 auto' }}>
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '16px' }}>For Business</p>
-            <h2 style={{ ...SERIF, fontSize: 'clamp(2rem,4vw,3rem)', fontWeight: 300, lineHeight: 1.1, color: 'rgba(250,248,244,0.9)', marginBottom: '16px' }}>
+            <h2 style={{ ...SERIF, fontSize: 'clamp(2rem,4vw,3rem)', fontWeight: 400, lineHeight: 1.1, color: 'var(--color-text-primary)', marginBottom: '16px' }}>
               Succession
             </h2>
-            <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: 'rgba(250,248,244,0.55)', marginBottom: '16px' }}>
+            <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.85, color: 'var(--color-text-secondary)', marginBottom: '16px' }}>
               For founders and partners preparing to step back.
             </p>
-            <p style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: 'rgba(250,248,244,0.5)', marginBottom: '48px' }}>
+            <p style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.85, color: 'var(--color-text-muted)', marginBottom: '48px' }}>
               The pattern recognition nobody wrote down. The sense of risk built over decades. The judgment no handbook can hold. That is what Basalith captures before the founder steps back, and what the successor gets to consult after.
             </p>
 
-            <div style={{ border: '1px solid rgba(184,150,62,0.35)', borderTop: '2px solid rgba(196,162,74,0.7)', padding: 'clamp(32px,5vw,52px)', background: 'rgba(184,150,62,0.04)', marginBottom: '24px' }}>
-              <p style={{ ...MONO, fontSize: '0.48rem', color: 'var(--color-gold)', marginBottom: '16px' }}>Succession</p>
-              <p style={{ ...SERIF, fontSize: 'clamp(2.5rem,5vw,3.2rem)', fontWeight: 300, color: 'rgba(250,248,244,0.92)', lineHeight: 1, marginBottom: '4px' }}>$12,000</p>
-              <p style={{ ...MONO, fontSize: '0.44rem', color: 'rgba(250,248,244,0.4)', marginBottom: '8px' }}>per year</p>
+            <div style={{ border: '1px solid var(--color-border-medium)', borderTop: '2px solid var(--color-gold)', padding: 'clamp(32px,5vw,52px)', background: 'var(--color-surface)', boxShadow: 'var(--shadow-md)', marginBottom: '24px' }}>
+              <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)', marginBottom: '16px' }}>Succession</p>
+              <p style={{ ...SERIF, fontSize: 'clamp(2.5rem,5vw,3.2rem)', fontWeight: 400, color: 'var(--color-text-primary)', lineHeight: 1, marginBottom: '4px' }}>$12,000</p>
+              <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-text-muted)', marginBottom: '8px' }}>per year</p>
               <p style={{ ...SERIF, fontSize: '0.95rem', fontStyle: 'italic', color: 'var(--color-gold)', marginBottom: '28px' }}>+ $5,000 Founding (one-time)</p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 20px', marginBottom: '32px' }}>
                 {SUCCESSION_FEATURES.map(f => (
-                  <p key={f} style={{ ...MONO, fontSize: '0.43rem', color: 'rgba(250,248,244,0.5)', margin: 0 }}>&#10003; {f}</p>
+                  <p key={f} style={{ ...SERIF, fontSize: '0.98rem', lineHeight: 1.5, color: 'var(--color-text-secondary)', margin: 0, paddingLeft: '18px', textIndent: '-18px' }}><span aria-hidden="true" style={{ display: 'inline-block', width: '10px', height: '1px', background: 'var(--color-gold)', verticalAlign: 'middle', marginRight: '8px' }} />{f}</p>
                 ))}
               </div>
               <Link
                 href="/apply?type=succession"
-                className="pricing-cta"
-                style={{ ...MONO, fontSize: 'var(--text-caption)', display: 'block', textAlign: 'center', textDecoration: 'none', background: 'var(--color-gold)', color: '#0A0908', padding: '16px 32px', transition: 'background 250ms ease' }}
+                className="pricing-cta-paper"
+                style={{ ...MONO, fontSize: 'var(--text-caption)', display: 'block', textAlign: 'center', textDecoration: 'none', background: 'var(--btn)', color: 'var(--btn-label)', padding: '16px 32px', transition: 'background 250ms ease' }}
               >
                 Start the conversation
               </Link>
             </div>
 
-            <p style={{ ...SERIF, fontSize: '0.95rem', fontStyle: 'italic', color: 'rgba(250,248,244,0.4)', lineHeight: 1.8 }}>
+            <p style={{ ...SERIF, fontSize: '0.95rem', fontStyle: 'italic', color: 'var(--color-text-muted)', lineHeight: 1.8 }}>
               After transition: $3,600 a year keeps successor access open. No active sessions required.
             </p>
-            <Link href="/succession" className="pricing-ghost-link" style={{ ...MONO, fontSize: '0.46rem', color: 'rgba(196,162,74,0.7)', textDecoration: 'none', display: 'inline-block', marginTop: '16px' }}>
+            <Link href="/succession" className="pricing-ghost-link" style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)', textDecoration: 'none', display: 'inline-block', marginTop: '16px' }}>
               How succession works &rarr;
             </Link>
           </div>
         </section>
 
         {/* Acquisition — per-deal engagement. Distinct block, not a tier card, not in the Active/Resting/Legacy group. */}
-        <section className="b2b-paper" style={{ background: 'var(--color-bg)', padding: 'clamp(72px,10vw,120px) clamp(24px,6vw,80px)', borderTop: '1px solid rgba(196,162,74,0.18)' }}>
+        <section className="b2b-paper" style={{ background: 'var(--color-bg)', padding: 'clamp(72px,10vw,120px) clamp(24px,6vw,80px)', borderTop: '1px solid rgba(160,132,80,0.18)' }}>
           <div style={{ maxWidth: '700px', margin: '0 auto' }}>
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
               <span style={{ width: '24px', height: '1px', background: 'var(--color-gold)', display: 'block', flexShrink: 0 }} aria-hidden="true" />
               Acquisition
             </p>
-            <h2 style={{ ...SERIF, fontSize: 'clamp(2rem,4vw,3rem)', fontWeight: 300, lineHeight: 1.15, color: 'var(--color-text-primary)', letterSpacing: '-0.02em', marginBottom: '28px' }}>
+            <h2 style={{ ...SERIF, fontSize: 'clamp(2rem,4vw,3rem)', fontWeight: 400, lineHeight: 1.15, color: 'var(--color-text-primary)', letterSpacing: '-0.02em', marginBottom: '28px' }}>
               When you buy the company, you buy how it was run.
             </h2>
-            <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.85, color: 'var(--color-text-secondary)', marginBottom: '40px' }}>
+            <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.85, color: 'var(--color-text-secondary)', marginBottom: '40px' }}>
               For buyers. Quality of earnings tells you what the numbers were. Nothing in diligence tells you how the operator decided, and the earnout assumes that judgment comes with the building. Basalith captures it before the handoff, so what you paid for is still in the room after closing.
             </p>
 
-            <div style={{ borderTop: '1px solid rgba(196,162,74,0.18)', paddingTop: '36px', marginBottom: '40px' }}>
-              <p style={{ ...SERIF, fontSize: 'clamp(1.5rem,3vw,2rem)', fontWeight: 300, color: 'var(--color-text-primary)', lineHeight: 1.3, marginBottom: '16px' }}>
+            <div style={{ borderTop: '1px solid rgba(160,132,80,0.18)', paddingTop: '36px', marginBottom: '40px' }}>
+              <p style={{ ...SERIF, fontSize: 'clamp(1.5rem,3vw,2rem)', fontWeight: 400, color: 'var(--color-text-primary)', lineHeight: 1.3, marginBottom: '16px' }}>
                 Engagements start at $50,000, scaled to the size and complexity of the transaction.
               </p>
-              <p style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-secondary)', margin: 0 }}>
+              <p style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.8, color: 'var(--color-text-secondary)', margin: 0 }}>
                 Priced against the value at risk in the deal, as part of diligence, not as software. The buyer pays, because the buyer is the one holding the risk.
               </p>
             </div>
@@ -288,7 +288,7 @@ export default function PricingPage() {
             <Link
               href="/apply?type=acquisition"
               className="pricing-cta-paper"
-              style={{ ...MONO, fontSize: 'var(--text-caption)', display: 'inline-block', textDecoration: 'none', background: 'var(--b2b-btn)', color: '#0A0908', padding: '16px 32px', transition: 'background 250ms ease' }}
+              style={{ ...MONO, fontSize: 'var(--text-caption)', display: 'inline-block', textDecoration: 'none', background: 'var(--btn)', color: 'var(--btn-label)', padding: '16px 32px', transition: 'background 250ms ease' }}
             >
               Talk to us about a transaction
             </Link>
@@ -302,30 +302,30 @@ export default function PricingPage() {
             padding:    'clamp(64px,8vw,96px) clamp(24px,6vw,80px)',
           }}
         >
-          <div
+          <div className="section-dark"
             style={{
               maxWidth:       '860px',
               margin:         '0 auto',
-              border:         '1px solid rgba(196,162,74,0.18)',
-              borderTopColor: 'rgba(196,162,74,0.6)',
+              border:         '1px solid rgba(160,132,80,0.18)',
+              borderTopColor: 'rgba(160,132,80,0.6)',
               borderTopWidth: '2px',
               padding:        'clamp(40px,5vw,64px)',
-              background:     '#0D0C0A',
+              background:     'var(--color-void)',
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
-              <p style={{ ...MONO, fontSize: '0.52rem', color: 'var(--color-gold)' }}>The Founding</p>
+              <p style={{ ...MONO, fontSize: '0.78rem', color: 'var(--color-gold)' }}>The Founding</p>
               <svg width="32" height="32" viewBox="0 0 34 34" fill="none" aria-hidden="true" style={{ opacity: 0.5 }}>
-                <polygon points="17,1 33,17 17,33 1,17" fill="none" stroke="#C4A24A" strokeWidth="1.4"/>
-                <polygon points="17,7 27,17 17,27 7,17" fill="none" stroke="#C4A24A" strokeWidth="1.1"/>
-                <polygon points="17,13 21,17 17,21 13,17" fill="#C4A24A"/>
+                <polygon points="17,1 33,17 17,33 1,17" fill="none" stroke="var(--color-gold)" strokeWidth="1.4"/>
+                <polygon points="17,7 27,17 17,27 7,17" fill="none" stroke="var(--color-gold)" strokeWidth="1.1"/>
+                <polygon points="17,13 21,17 17,21 13,17" fill="var(--color-gold)"/>
               </svg>
             </div>
 
-            <h2 style={{ ...SERIF, fontSize: '2.25rem', fontWeight: 300, color: 'rgba(250,248,244,0.9)', marginBottom: '12px' }}>
+            <h2 style={{ ...SERIF, fontSize: '2.25rem', fontWeight: 400, color: 'var(--on-dark)', marginBottom: '12px' }}>
               The Founding
             </h2>
-            <div style={{ ...SERIF, fontSize: '1.05rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.45)', lineHeight: 1.8, marginBottom: '40px', maxWidth: '600px' }}>
+            <div style={{ ...SERIF, fontSize: '1.05rem', fontStyle: 'italic', fontWeight: 400, color: 'var(--on-dark-3)', lineHeight: 1.8, marginBottom: '40px', maxWidth: '600px' }}>
               <p style={{ marginBottom: '20px' }}>Every Basalith begins with The Founding.</p>
               <p style={{ marginBottom: '20px' }}>
                 Three of the hardest calls you ever made, in your own words, in your own
@@ -336,31 +336,31 @@ export default function PricingPage() {
               <p style={{ marginBottom: '20px' }}>
                 It is the foundation. Everything that follows builds on it.
               </p>
-              <p style={{ ...SERIF, fontSize: '0.88rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.28)', lineHeight: 1.85, margin: 0 }}>
+              <p style={{ ...SERIF, fontSize: '0.88rem', fontStyle: 'italic', fontWeight: 400, color: 'var(--on-dark-3)', lineHeight: 1.85, margin: 0 }}>
                 Your Basalith runs on two permanent layers: one that holds every fact and memory you have deposited, and one that learns how you express, reason, and decide. Neither replaces the other.
               </p>
             </div>
 
-            <div style={{ height: '1px', background: 'rgba(196,162,74,0.15)', marginBottom: '40px' }} />
+            <div style={{ height: '1px', background: 'rgba(160,132,80,0.15)', marginBottom: '40px' }} />
 
             <div className="founding-grid" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '48px' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
                 {FOUNDING_DELIVERABLES.map(({ n, title, desc }) => (
                   <div key={n} style={{ display: 'flex', gap: '20px' }}>
-                    <span style={{ ...MONO, fontSize: '0.48rem', color: 'var(--color-gold)', flexShrink: 0, paddingTop: '2px', width: '24px' }}>{n}</span>
+                    <span style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)', flexShrink: 0, paddingTop: '2px', width: '24px' }}>{n}</span>
                     <div>
-                      <p style={{ ...MONO, fontSize: '0.52rem', color: 'rgba(250,248,244,0.75)', marginBottom: '4px' }}>{title}</p>
-                      <p style={{ ...SERIF, fontSize: '0.9rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.35)', lineHeight: 1.7 }}>{desc}</p>
+                      <p style={{ ...MONO, fontSize: '0.78rem', color: 'var(--on-dark-2)', marginBottom: '4px' }}>{title}</p>
+                      <p style={{ ...SERIF, fontSize: '0.9rem', fontStyle: 'italic', fontWeight: 400, color: 'var(--on-dark-3)', lineHeight: 1.7 }}>{desc}</p>
                     </div>
                   </div>
                 ))}
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
-                <div style={{ borderTop: '1px solid rgba(196,162,74,0.15)', paddingTop: '32px' }}>
-                  <p style={{ ...SERIF, fontSize: '3.5rem', fontWeight: 300, color: 'rgba(250,248,244,0.9)', lineHeight: 1, letterSpacing: '-0.02em', marginBottom: '8px' }}>$5,000</p>
-                  <p style={{ ...MONO, fontSize: '0.48rem', color: 'var(--color-gold)', marginBottom: '16px' }}>Business founding, one-time</p>
-                  <p style={{ ...SERIF, fontSize: '0.88rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.3)', lineHeight: 1.7 }}>
+                <div style={{ borderTop: '1px solid rgba(160,132,80,0.15)', paddingTop: '32px' }}>
+                  <p style={{ ...SERIF, fontSize: '3.5rem', fontWeight: 400, color: 'var(--on-dark)', lineHeight: 1, letterSpacing: '-0.02em', marginBottom: '8px' }}>$5,000</p>
+                  <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)', marginBottom: '16px' }}>Business founding, one-time</p>
+                  <p style={{ ...SERIF, fontSize: '0.88rem', fontStyle: 'italic', fontWeight: 400, color: 'var(--on-dark-3)', lineHeight: 1.7 }}>
                     Individual and family founding is $2,500. Annual plan selected separately.
                     Three calls in your own words, then a first read by video.
                   </p>
@@ -369,7 +369,7 @@ export default function PricingPage() {
             </div>
 
             <div style={{ display: 'flex', gap: '24px', marginTop: '40px', flexWrap: 'wrap' }}>
-              <a href="/founding-session" className="pricing-ghost-link" style={{ ...SERIF, fontSize: '0.9rem', fontStyle: 'italic', color: 'rgba(196,162,74,0.6)', textDecoration: 'none', transition: 'color 200ms ease' }}>
+              <a href="/founding-session" className="pricing-ghost-link" style={{ ...SERIF, fontSize: '0.9rem', fontStyle: 'italic', color: 'var(--color-gold)', textDecoration: 'none', transition: 'color 200ms ease' }}>
                 What happens in The Founding →
               </a>
             </div>
@@ -382,10 +382,10 @@ export default function PricingPage() {
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)', marginBottom: '16px' }}>
               The second door &middot; Individuals and families
             </p>
-            <h2 style={{ ...SERIF, fontSize: 'clamp(1.75rem,3vw,2.5rem)', fontWeight: 300, lineHeight: 1.15, color: 'var(--color-text-primary)', letterSpacing: '-0.02em', marginBottom: '16px' }}>
+            <h2 style={{ ...SERIF, fontSize: 'clamp(1.75rem,3vw,2.5rem)', fontWeight: 400, lineHeight: 1.15, color: 'var(--color-text-primary)', letterSpacing: '-0.02em', marginBottom: '16px' }}>
               For a life, not a business.
             </h2>
-            <p style={{ ...SERIF, fontSize: '1.05rem', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-secondary)', margin: 0 }}>
+            <p style={{ ...SERIF, fontSize: '1.05rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.8, color: 'var(--color-text-secondary)', margin: 0 }}>
               The same method, pointed at a person instead of a company. Three plans, built to move with you as life changes.
             </p>
           </div>
@@ -405,8 +405,8 @@ export default function PricingPage() {
         }}>
           {SECURITY_BADGES.map(b => (
             <span key={b.label} style={{
-              fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
-              fontSize:      '0.48rem',
+              fontFamily:    'var(--font-space-mono)',
+              fontSize:      '0.72rem',
               letterSpacing: '0.15em',
               textTransform: 'uppercase' as const,
               color:         'var(--color-text-faint)',
@@ -424,21 +424,21 @@ export default function PricingPage() {
           <div style={{
             maxWidth:       '680px',
             margin:         '0 auto',
-            border:         '1px solid rgba(196,162,74,0.22)',
-            borderLeft:     '3px solid rgba(196,162,74,0.5)',
+            border:         '1px solid rgba(160,132,80,0.22)',
+            borderLeft:     '3px solid rgba(160,132,80,0.5)',
             padding:        'clamp(24px,3vw,36px) clamp(24px,3vw,40px)',
-            background:     'rgba(196,162,74,0.03)',
+            background:     'rgba(160,132,80,0.03)',
           }}>
-            <p style={{ ...MONO, fontSize: '0.5rem', color: 'var(--color-gold)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <p style={{ ...MONO, fontSize: '0.78rem', color: 'var(--color-gold)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Mark name="lock" size={14} /> The Immutability Vault
             </p>
-            <p style={{ ...SERIF, fontSize: '1rem', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-secondary)', margin: '0 0 8px' }}>
+            <p style={{ ...SERIF, fontSize: '1rem', fontWeight: 400, lineHeight: 1.8, color: 'var(--color-text-secondary)', margin: '0 0 8px' }}>
               What you say is fixed the moment you say it, not after you pass. The database refuses any edit or deletion.
             </p>
-            <p style={{ ...SERIF, fontSize: '1rem', fontWeight: 300, lineHeight: 1.8, color: 'var(--color-text-secondary)', margin: '0 0 8px' }}>
+            <p style={{ ...SERIF, fontSize: '1rem', fontWeight: 400, lineHeight: 1.8, color: 'var(--color-text-secondary)', margin: '0 0 8px' }}>
               Heirs can add context. Nobody can reach back, including us.
             </p>
-            <a href="/integrity" style={{ ...MONO, fontSize: '0.44rem', color: 'rgba(196,162,74,0.6)', textDecoration: 'none', display: 'inline-block', marginTop: '8px' }}>
+            <a href="/integrity" style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)', textDecoration: 'none', display: 'inline-block', marginTop: '8px' }}>
               How this works →
             </a>
           </div>
@@ -448,16 +448,16 @@ export default function PricingPage() {
         <PricingFAQ />
 
         {/* CTA */}
-        <section style={{ background: 'var(--color-void)', padding: 'clamp(80px,12vw,120px) clamp(24px,6vw,80px)', textAlign: 'center' }}>
-          <p style={{ ...SERIF, fontSize: 'clamp(1.6rem,3vw,2.4rem)', fontWeight: 300, fontStyle: 'italic', lineHeight: 1.4, color: 'rgba(250,248,244,0.85)', maxWidth: '620px', margin: '0 auto 40px' }}>
+        <section className="section-dark" style={{ background: 'var(--color-void)', padding: 'clamp(80px,12vw,120px) clamp(24px,6vw,80px)', textAlign: 'center' }}>
+          <p style={{ ...SERIF, fontSize: 'clamp(1.6rem,3vw,2.4rem)', fontWeight: 400, fontStyle: 'italic', lineHeight: 1.4, color: 'var(--on-dark)', maxWidth: '620px', margin: '0 auto 40px' }}>
             Every Basalith starts with a conversation. Tell us what is changing and we will tell you, plainly, whether Basalith fits.
           </p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
-            <a href="/contact" className="pricing-cta" style={{ ...MONO, fontSize: 'var(--text-caption)', display: 'inline-block', textDecoration: 'none', background: 'var(--color-gold)', color: '#0A0908', padding: '16px 32px', borderRadius: 'var(--radius-sm)', transition: 'background 250ms ease' }}>
+            <a href="/contact" className="pricing-cta" style={{ ...MONO, fontSize: 'var(--text-caption)', display: 'inline-block', textDecoration: 'none', background: 'var(--on-dark)', color: 'var(--color-void)', padding: '16px 32px', borderRadius: 'var(--radius-sm)', transition: 'background 250ms ease' }}>
               Start the conversation
             </a>
           </div>
-          <p style={{ ...MONO, fontSize: '0.46rem', color: 'rgba(250,248,244,0.2)', marginTop: '24px' }}>
+          <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--on-dark-3)', marginTop: '24px' }}>
             hello@basalith.xyz
           </p>
         </section>
@@ -467,7 +467,7 @@ export default function PricingPage() {
 
       <style>{`
         .pricing-ghost-link:hover { color: var(--color-gold) !important; }
-        .pricing-cta:hover       { background: var(--color-gold-light) !important; }
+        .pricing-cta:hover       { background: #FFFFFF !important; }
         .pricing-cta-paper:hover { background: var(--b2b-btn-hover) !important; }
         @media (max-width: 900px) {
           .founding-grid {

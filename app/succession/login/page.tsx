@@ -42,7 +42,7 @@ export default function SuccessorLoginPage() {
     background:   'transparent',
     color:        'var(--invert-fg)',
     fontSize:     '1rem',
-    fontWeight:   300,
+    fontWeight: 400,
     border:       'none',
     borderBottom: '1px solid var(--invert-rule)',
     outline:      'none',
@@ -80,7 +80,7 @@ export default function SuccessorLoginPage() {
             style={{
               ...MONO,
               fontSize:      '0.7rem',
-              letterSpacing: '0.22em',
+              letterSpacing: '0.18em',
               textTransform: 'uppercase',
               color:         'var(--invert-fg)',
               textDecoration: 'none',
@@ -88,7 +88,7 @@ export default function SuccessorLoginPage() {
           >
             Basalith
             <span style={{ color: 'var(--invert-gold)', margin: '0 0.3em' }}>·</span>
-            <span style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', fontWeight: 300, color: 'var(--invert-dim)', fontSize: '0.85em' }}>ai</span>
+            <span style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', fontWeight: 400, color: 'var(--invert-dim)', fontSize: '0.85em' }}>ai</span>
           </Link>
         </div>
 
@@ -112,7 +112,7 @@ export default function SuccessorLoginPage() {
           style={{
             ...SERIF,
             fontSize:   '0.9rem',
-            fontWeight: 300,
+            fontWeight: 400,
             fontStyle:  'italic',
             color:      'var(--invert-dim)',
             textAlign:  'center',
@@ -125,7 +125,7 @@ export default function SuccessorLoginPage() {
 
         {sent ? (
           <div style={{ textAlign: 'center' }}>
-            <p style={{ ...SERIF, fontSize: '0.95rem', fontWeight: 300, color: 'var(--invert-fg)', margin: '0 0 8px' }}>
+            <p style={{ ...SERIF, fontSize: '0.95rem', fontWeight: 400, color: 'var(--invert-fg)', margin: '0 0 8px' }}>
               Check your email
             </p>
             <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.06em', color: 'var(--invert-dim)', lineHeight: 1.7 }}>

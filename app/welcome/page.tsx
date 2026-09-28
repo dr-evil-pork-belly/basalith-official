@@ -25,7 +25,7 @@ export default function WelcomePage() {
         {/* Amber radiance */}
         <div
           className="absolute inset-0 pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse 55% 45% at 50% 55%,rgba(255,179,71,0.06) 0%,transparent 65%)' }}
+          style={{ background: 'radial-gradient(ellipse 55% 45% at 50% 55%,rgba(205,178,122,0.06) 0%,transparent 65%)' }}
           aria-hidden="true"
         />
 

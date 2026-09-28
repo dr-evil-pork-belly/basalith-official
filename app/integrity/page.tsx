@@ -9,16 +9,16 @@ export const metadata: Metadata = {
 }
 
 const SERIF: React.CSSProperties = {
-  fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontFamily: 'var(--font-newsreader), Georgia, serif',
 }
 const MONO: React.CSSProperties = {
-  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+  fontFamily:    'var(--font-space-mono)',
   textTransform: 'uppercase' as const,
-  letterSpacing: '0.28em',
+  letterSpacing: '0.18em',
 }
 const BODY: React.CSSProperties = {
   ...SERIF,
-  fontWeight:   300,
+  fontWeight: 400,
   fontSize:     '1.1rem',
   lineHeight:   1.9,
   color:        'var(--color-text-secondary)',
@@ -26,7 +26,7 @@ const BODY: React.CSSProperties = {
 }
 const H2: React.CSSProperties = {
   ...SERIF,
-  fontWeight:    300,
+  fontWeight: 400,
   fontSize:      'clamp(1.75rem,3vw,2.6rem)',
   lineHeight:    1.15,
   color:         'var(--color-text-primary)',
@@ -62,7 +62,7 @@ export default function IntegrityPage() {
           </p>
           <h1 style={{
             ...SERIF,
-            fontWeight:    300,
+            fontWeight: 400,
             fontSize:      'clamp(2.4rem,5vw,4rem)',
             lineHeight:    1.08,
             letterSpacing: '-0.025em',
@@ -80,38 +80,38 @@ export default function IntegrityPage() {
         </section>
 
         {/* Section 1 — Immutability Vault */}
-        <section style={{ background: 'var(--color-void)', padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,80px)' }}>
+        <section className="section-dark" style={{ background: 'var(--color-void)', padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,80px)' }}>
           <div style={{ maxWidth: '680px', margin: '0 auto' }}>
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '24px' }}>
               From The Moment You Say It
             </p>
-            <h2 style={{ ...H2, color: 'rgba(250,248,244,0.9)', letterSpacing: '0.12em', textTransform: 'uppercase' as const, fontFamily: 'var(--font-space-mono, "Space Mono", "Courier New", monospace)', fontSize: 'clamp(1.1rem,2vw,1.5rem)', fontWeight: 500 }}>
+            <h2 style={{ ...H2, color: 'var(--on-dark)', letterSpacing: '0.12em', textTransform: 'uppercase' as const, fontFamily: 'var(--font-space-mono)', fontSize: 'clamp(1.1rem,2vw,1.5rem)', fontWeight: 500 }}>
               The Immutability Vault
             </h2>
 
-            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>
+            <p style={{ ...BODY, color: 'var(--on-dark-3)' }}>
               What you say is fixed the moment you say it. Not after you pass. Not when a setting is switched on.
             </p>
-            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>
+            <p style={{ ...BODY, color: 'var(--on-dark-3)' }}>
               A deposit cannot be edited or deleted. Not by your heirs, not by you, and not by us. The database refuses the write.
             </p>
-            <p style={{ ...BODY, color: 'rgba(250,248,244,0.9)', fontStyle: 'italic' }}>
+            <p style={{ ...BODY, color: 'var(--on-dark)', fontStyle: 'italic' }}>
               Fixed.
             </p>
-            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>Your heirs can talk to your entity. Your grandchildren can add new context: a marriage, a grandchild, a company milestone.</p>
-            <p style={{ ...BODY, color: 'rgba(250,248,244,0.85)' }}>
+            <p style={{ ...BODY, color: 'var(--on-dark-3)' }}>Your heirs can talk to your entity. Your grandchildren can add new context: a marriage, a grandchild, a company milestone.</p>
+            <p style={{ ...BODY, color: 'var(--on-dark)' }}>
               What nobody can do is reach back. Your stated values. Your voice recordings.
               Your deposits made while you were alive and thinking clearly.
             </p>
-            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>
+            <p style={{ ...BODY, color: 'var(--on-dark-3)' }}>
               A record that turns out to be wrong is answered by a later record, never by a revision.
               You correct yourself the way you would in a conversation, by saying the next thing, and both remain.
             </p>
             <div aria-hidden="true" style={{ width: '40px', height: '1px', background: 'var(--color-gold)', margin: '32px 0' }} />
-            <p style={{ ...BODY, fontWeight: 500, color: 'rgba(250,248,244,0.9)' }}>
+            <p style={{ ...BODY, fontWeight: 500, color: 'var(--on-dark)' }}>
               Two layers. One permanent. One active.
             </p>
-            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>
+            <p style={{ ...BODY, color: 'var(--on-dark-3)' }}>
               The permanent layer is who you were.
               The active layer is how the world around you continued after you left.
             </p>
@@ -141,7 +141,7 @@ export default function IntegrityPage() {
                   }}>
                     {card.headline}
                   </p>
-                  <p style={{ ...SERIF, fontWeight: 300, fontSize: '1rem', color: 'var(--color-text-secondary)', lineHeight: 1.8, margin: 0 }}>
+                  <p style={{ ...SERIF, fontWeight: 400, fontSize: '1rem', color: 'var(--color-text-secondary)', lineHeight: 1.8, margin: 0 }}>
                     {card.body}
                   </p>
                 </div>
@@ -151,14 +151,14 @@ export default function IntegrityPage() {
         </section>
 
         {/* Section 3 — If We Close */}
-        <section style={{ background: 'var(--color-void)', padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,80px)' }}>
+        <section className="section-dark" style={{ background: 'var(--color-void)', padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,80px)' }}>
           <div style={{ maxWidth: '680px', margin: '0 auto' }}>
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '24px' }}>
               If Basalith Closes
             </p>
-            <h2 style={{ ...H2, color: 'rgba(250,248,244,0.9)' }}>You will not lose what you built.</h2>
-            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)', fontStyle: 'italic' }}>Startups close. We know this.</p>
-            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>
+            <h2 style={{ ...H2, color: 'var(--on-dark)' }}>You will not lose what you built.</h2>
+            <p style={{ ...BODY, color: 'var(--on-dark-3)', fontStyle: 'italic' }}>Startups close. We know this.</p>
+            <p style={{ ...BODY, color: 'var(--on-dark-3)' }}>
               If Heritage Nexus Inc. ever faces dissolution we commit to three things:
             </p>
             {[
@@ -167,11 +167,11 @@ export default function IntegrityPage() {
               'No sale of your data. Your memories are not a corporate asset we can liquidate. They are yours.',
             ].map((item, i) => (
               <div key={i} style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
-                <span style={{ ...MONO, fontSize: '0.52rem', color: 'var(--color-gold)', paddingTop: '5px', flexShrink: 0 }}>0{i + 1}</span>
-                <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)', margin: 0 }}>{item}</p>
+                <span style={{ ...MONO, fontSize: '0.78rem', color: 'var(--color-gold)', paddingTop: '5px', flexShrink: 0 }}>0{i + 1}</span>
+                <p style={{ ...BODY, color: 'var(--on-dark-3)', margin: 0 }}>{item}</p>
               </div>
             ))}
-            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)', marginTop: '24px' }}>
+            <p style={{ ...BODY, color: 'var(--on-dark-3)', marginTop: '24px' }}>
               We cannot promise we will exist forever. We can promise your Basalith is always
               yours to hold, in full, in formats you can take anywhere.
             </p>
@@ -187,7 +187,7 @@ export default function IntegrityPage() {
             <h2 style={H2}>Two systems protect what you actually said.</h2>
             <div className="data-cards" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div style={{ border: '1px solid var(--color-border)', padding: 'clamp(24px,3vw,36px)', background: 'var(--color-surface)' }}>
-                <p style={{ ...MONO, fontSize: '0.48rem', color: 'var(--color-gold-on-light)', marginBottom: '16px' }}>The Memory Vault</p>
+                <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold-on-light)', marginBottom: '16px' }}>The Memory Vault</p>
                 <p style={{ ...BODY, margin: 0 }}>
                   Every deposit you make is stored permanently. When your entity answers a question
                   it reaches for your actual words first.
@@ -195,8 +195,8 @@ export default function IntegrityPage() {
                   And when there is no deposit behind a question, the entity is built to say so instead of guessing. A gap is better than something that sounds like you but is not from you.
                 </p>
               </div>
-              <div style={{ border: '1px solid rgba(196,162,74,0.3)', padding: 'clamp(24px,3vw,36px)', background: 'rgba(196,162,74,0.03)' }}>
-                <p style={{ ...MONO, fontSize: '0.48rem', color: 'var(--color-gold-on-light)', marginBottom: '16px' }}>The Voice Layer</p>
+              <div style={{ border: '1px solid rgba(160,132,80,0.3)', padding: 'clamp(24px,3vw,36px)', background: 'rgba(160,132,80,0.03)' }}>
+                <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold-on-light)', marginBottom: '16px' }}>The Voice Layer</p>
                 <p style={{ ...BODY, margin: 0 }}>
                   As your record grows a second system learns how you say things: your phrasing,
                   your characteristic way of expressing uncertainty, the specific words you reach for.
@@ -212,50 +212,50 @@ export default function IntegrityPage() {
             after he ran The Founding on his own archive. His words, lightly
             set. "Machines" rather than the word the copy rules keep off this
             site. */}
-        <section style={{ background: 'var(--color-void)', padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,80px)' }}>
+        <section className="section-dark" style={{ background: 'var(--color-void)', padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,80px)' }}>
           <div style={{ maxWidth: '680px', margin: '0 auto' }}>
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '24px' }}>
               From the founder
             </p>
-            <h2 style={{ ...H2, color: 'rgba(250,248,244,0.9)' }}>The trust of our truth.</h2>
-            <p style={{ ...BODY, color: 'rgba(250,248,244,0.62)' }}>
+            <h2 style={{ ...H2, color: 'var(--on-dark)' }}>The trust of our truth.</h2>
+            <p style={{ ...BODY, color: 'var(--on-dark-2)' }}>
               I ran The Founding on my own Basalith before anyone else did. What hit home
               was not the answer that read like my own thinking, word for word. It was the
               question it declined. It gave me a rule I had actually laid down, then said
               I had left no position on the rest and it would not manufacture one. It does
               not try to be me and come out as something I can tell is not me.
             </p>
-            <p style={{ ...BODY, color: 'rgba(250,248,244,0.62)' }}>
+            <p style={{ ...BODY, color: 'var(--on-dark-2)' }}>
               As machines get better at sounding like anyone, that is the one thing worth
               counting on. The trust of our truth. What you actually said, and nothing you
               did not.
             </p>
-            <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'rgba(250,248,244,0.55)', marginTop: '28px' }}>
+            <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--on-dark-2)', marginTop: '28px' }}>
               David Ha, Founder
             </p>
           </div>
         </section>
 
         {/* Closing CTA */}
-        <section style={{ background: 'var(--color-void)', padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,80px)', textAlign: 'center' }}>
-          <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.5)', marginBottom: '8px', lineHeight: 1.85 }}>
+        <section className="section-dark" style={{ background: 'var(--color-void)', padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,80px)', textAlign: 'center' }}>
+          <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 400, color: 'var(--on-dark-3)', marginBottom: '8px', lineHeight: 1.85 }}>
             These are not marketing claims.
           </p>
-          <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.5)', marginBottom: '40px', lineHeight: 1.85 }}>
+          <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 400, color: 'var(--on-dark-3)', marginBottom: '40px', lineHeight: 1.85 }}>
             They are the rules this company runs on.
             If there is a question we have not answered here, ask us directly. You will get a straight answer.
           </p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
             <a href="mailto:hello@basalith.xyz"
-              style={{ ...MONO, fontSize: 'var(--text-caption)', display: 'inline-block', background: 'var(--color-gold)', color: '#0A0908', textDecoration: 'none', padding: '14px 28px' }}>
+              style={{ ...MONO, fontSize: 'var(--text-caption)', display: 'inline-block', background: 'var(--on-dark)', color: 'var(--color-void)', textDecoration: 'none', padding: '14px 28px' }}>
               hello@basalith.xyz
             </a>
             <Link href="/privacy"
-              style={{ ...MONO, fontSize: 'var(--text-caption)', display: 'inline-block', border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(250,248,244,0.55)', textDecoration: 'none', padding: '13px 27px' }}>
+              style={{ ...MONO, fontSize: 'var(--text-caption)', display: 'inline-block', border: '1px solid rgba(255,255,255,0.15)', color: 'var(--on-dark-2)', textDecoration: 'none', padding: '13px 27px' }}>
               Privacy Policy
             </Link>
             <Link href="/security"
-              style={{ ...MONO, fontSize: 'var(--text-caption)', display: 'inline-block', border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(250,248,244,0.55)', textDecoration: 'none', padding: '13px 27px' }}>
+              style={{ ...MONO, fontSize: 'var(--text-caption)', display: 'inline-block', border: '1px solid rgba(255,255,255,0.15)', color: 'var(--on-dark-2)', textDecoration: 'none', padding: '13px 27px' }}>
               Security Practices
             </Link>
           </div>

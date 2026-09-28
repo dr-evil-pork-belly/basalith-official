@@ -104,12 +104,12 @@ const FAQ_ENTRIES: FaqEntry[] = QA.flatMap(({ q, a, plain }) => {
 })
 
 const SERIF: React.CSSProperties = {
-  fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontFamily: 'var(--font-newsreader), Georgia, serif',
 }
 const MONO: React.CSSProperties = {
-  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+  fontFamily:    'var(--font-space-mono)',
   textTransform: 'uppercase' as const,
-  letterSpacing: '0.28em',
+  letterSpacing: '0.18em',
 }
 
 export default function FAQPage() {
@@ -147,7 +147,7 @@ export default function FAQPage() {
             style={{
               ...SERIF,
               fontSize:      'clamp(2rem, 4vw, 3rem)',
-              fontWeight:    300,
+              fontWeight: 400,
               lineHeight:    1.15,
               letterSpacing: '-0.02em',
               color:         'var(--color-text-primary)',
@@ -165,7 +165,7 @@ export default function FAQPage() {
                 <p
                   style={{
                     ...MONO,
-                    fontSize:     '0.48rem',
+                    fontSize:     '0.72rem',
                     color:        'var(--color-gold)',
                     marginBottom: '16px',
                   }}
@@ -174,7 +174,7 @@ export default function FAQPage() {
                 </p>
                 <div
                   style={{
-                    borderLeft:  '2px solid rgba(184,150,62,0.25)',
+                    borderLeft:  '2px solid rgba(160,132,80,0.25)',
                     paddingLeft: '24px',
                   }}
                 >
@@ -182,7 +182,7 @@ export default function FAQPage() {
                     style={{
                       ...SERIF,
                       fontSize:   '1.1rem',
-                      fontWeight: 300,
+                      fontWeight: 400,
                       lineHeight: 1.9,
                       color:      'var(--color-text-secondary)',
                       margin:     0,
@@ -209,7 +209,7 @@ export default function FAQPage() {
                 ...SERIF,
                 fontSize:     '1.1rem',
                 fontStyle:    'italic',
-                fontWeight:   300,
+                fontWeight: 400,
                 color:        'var(--color-text-secondary)',
                 lineHeight:   1.85,
                 marginBottom: '28px',
@@ -225,8 +225,8 @@ export default function FAQPage() {
                 ...MONO,
                 fontSize:       'var(--text-caption)',
                 display:        'inline-block',
-                background:     'var(--color-gold)',
-                color:          'var(--color-bg)',
+                background:     'var(--btn)',
+                color:          'var(--btn-label)',
                 textDecoration: 'none',
                 padding:        '14px 32px',
                 borderRadius:   'var(--radius-sm)',

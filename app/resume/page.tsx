@@ -7,15 +7,15 @@ export const metadata: Metadata = {
 }
 
 const MONO: React.CSSProperties = {
-  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+  fontFamily:    'var(--font-space-mono)',
   letterSpacing: '0.2em',
   textTransform: 'uppercase' as const,
 }
 
 export default function ResumePage() {
   return (
-    <main style={{
-      background:     'var(--color-void, #0A0908)',
+    <main className="section-dark" style={{
+      background:     'var(--color-void)',
       minHeight:      '100vh',
       display:        'flex',
       alignItems:     'center',
@@ -28,41 +28,41 @@ export default function ResumePage() {
         <div aria-hidden="true" style={{
           width:        '40px',
           height:       '1px',
-          background:   '#C4A24A',
+          background:   'var(--color-gold)',
           margin:       '0 auto 48px',
         }} />
 
         <h1 style={{
-          fontFamily:    '"Cormorant Garamond", Georgia, serif',
+          fontFamily:    'var(--font-newsreader), Georgia, serif',
           fontSize:      'clamp(2rem, 5vw, 3rem)',
-          fontWeight:    300,
+          fontWeight: 400,
           lineHeight:    1.2,
           letterSpacing: '-0.02em',
-          color:         'rgba(250,250,248,0.9)',
+          color:         'var(--on-dark)',
           marginBottom:  '32px',
         }}>
           Welcome back.
         </h1>
 
         <p style={{
-          fontFamily:   '"Cormorant Garamond", Georgia, serif',
+          fontFamily:   'var(--font-newsreader), Georgia, serif',
           fontSize:     '1.15rem',
           fontStyle:    'italic',
-          fontWeight:   300,
+          fontWeight: 400,
           lineHeight:   1.85,
-          color:        'rgba(250,250,248,0.5)',
+          color:        'var(--on-dark-3)',
           marginBottom: '16px',
         }}>
           Your Basalith has been waiting.
         </p>
 
         <p style={{
-          fontFamily:   '"Cormorant Garamond", Georgia, serif',
+          fontFamily:   'var(--font-newsreader), Georgia, serif',
           fontSize:     '1.15rem',
           fontStyle:    'italic',
-          fontWeight:   300,
+          fontWeight: 400,
           lineHeight:   1.85,
-          color:        'rgba(250,250,248,0.5)',
+          color:        'var(--on-dark-3)',
           marginBottom: '48px',
         }}>
           Everything is exactly as you left it.
@@ -72,7 +72,7 @@ export default function ResumePage() {
         <div aria-hidden="true" style={{
           width:        '40px',
           height:       '1px',
-          background:   '#C4A24A',
+          background:   'var(--color-gold)',
           margin:       '0 auto 48px',
         }} />
 
@@ -81,10 +81,10 @@ export default function ResumePage() {
           style={{
             ...MONO,
             display:        'inline-block',
-            fontSize:       '0.52rem',
-            color:          '#0A0908',
+            fontSize:       '0.78rem',
+            color: 'var(--color-void)',
             textDecoration: 'none',
-            background:     '#C4A24A',
+            background:     'var(--on-dark)',
             padding:        '16px 40px',
             borderRadius:   '2px',
             marginBottom:   '32px',
@@ -96,8 +96,8 @@ export default function ResumePage() {
         <p style={{
           ...MONO,
           display:    'block',
-          fontSize:   '0.42rem',
-          color:      'rgba(250,250,248,0.2)',
+          fontSize:   '0.72rem',
+          color:      'var(--on-dark-3)',
           marginTop:  '16px',
         }}>
           Questions? Reply to any email from Basalith.

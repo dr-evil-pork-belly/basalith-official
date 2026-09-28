@@ -37,7 +37,7 @@ export default function SuccessorScenariosClient({ archiveName, ownerName, respo
           ← Portal
         </Link>
         <span style={{ ...MONO, fontSize: '11px', color: 'var(--spine-dim)' }}>|</span>
-        <span style={{ ...MONO, fontSize: '11px', letterSpacing: '0.24em', textTransform: 'uppercase', color: 'var(--spine-gold)' }}>
+        <span style={{ ...MONO, fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--spine-gold)' }}>
           Scenarios · {archiveName}
         </span>
       </div>
@@ -49,10 +49,10 @@ export default function SuccessorScenariosClient({ archiveName, ownerName, respo
           <p style={{ ...MONO, fontSize: '11px', letterSpacing: '3px', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '10px' }}>
             {ownerName ? `How ${ownerName} Would Handle It` : 'Scenario Responses'}
           </p>
-          <h1 style={{ ...SERIF, fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: 300, color: 'var(--portal-ink)', margin: '0 0 12px', lineHeight: 1.2 }}>
+          <h1 style={{ ...SERIF, fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: 400, color: 'var(--portal-ink)', margin: '0 0 12px', lineHeight: 1.2 }}>
             The Founder's Playbook
           </h1>
-          <p style={{ ...SERIF, fontSize: '0.95rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--portal-secondary)', margin: '0 0 14px', lineHeight: 1.7 }}>
+          <p style={{ ...SERIF, fontSize: '0.95rem', fontStyle: 'italic', fontWeight: 400, color: 'var(--portal-secondary)', margin: '0 0 14px', lineHeight: 1.7 }}>
             These are the founder's responses to structured business scenarios.
             Each answer is part of the cognitive fingerprint.
           </p>
@@ -81,7 +81,7 @@ export default function SuccessorScenariosClient({ archiveName, ownerName, respo
                 </p>
 
                 {/* Setup */}
-                <p style={{ ...SERIF, fontSize: '0.88rem', fontWeight: 300, color: 'var(--portal-secondary)', margin: '0 0 6px', lineHeight: 1.5 }}>
+                <p style={{ ...SERIF, fontSize: '0.88rem', fontWeight: 400, color: 'var(--portal-secondary)', margin: '0 0 6px', lineHeight: 1.5 }}>
                   {scenario.setup}
                 </p>
                 <p style={{ ...SERIF, fontSize: '0.88rem', fontStyle: 'italic', color: 'var(--portal-secondary)', margin: '0 0 16px', lineHeight: 1.5 }}>
@@ -91,7 +91,7 @@ export default function SuccessorScenariosClient({ archiveName, ownerName, respo
                 {/* Response or placeholder */}
                 {completed ? (
                   <div style={{ borderLeft: '2px solid var(--portal-gold-line)', paddingLeft: '16px' }}>
-                    <p style={{ ...SERIF, fontSize: '0.95rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--portal-ink)', margin: 0, lineHeight: 1.85, whiteSpace: 'pre-wrap' }}>
+                    <p style={{ ...SERIF, fontSize: '0.95rem', fontStyle: 'italic', fontWeight: 400, color: 'var(--portal-ink)', margin: 0, lineHeight: 1.85, whiteSpace: 'pre-wrap' }}>
                       {response}
                     </p>
                   </div>

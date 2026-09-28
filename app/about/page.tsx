@@ -8,16 +8,16 @@ export const metadata: Metadata = {
 }
 
 const SERIF: React.CSSProperties = {
-  fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontFamily: 'var(--font-newsreader), Georgia, serif',
 }
 const MONO: React.CSSProperties = {
-  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+  fontFamily:    'var(--font-space-mono)',
   textTransform: 'uppercase' as const,
-  letterSpacing: '0.28em',
+  letterSpacing: '0.18em',
 }
 const BODY: React.CSSProperties = {
   ...SERIF,
-  fontWeight:   300,
+  fontWeight: 400,
   fontSize:     '1.1rem',
   lineHeight:   1.9,
   color:        'var(--color-text-secondary)',
@@ -25,7 +25,7 @@ const BODY: React.CSSProperties = {
 }
 const H2: React.CSSProperties = {
   ...SERIF,
-  fontWeight:    300,
+  fontWeight: 400,
   fontSize:      'clamp(1.75rem,3vw,2.6rem)',
   lineHeight:    1.15,
   color:         'var(--color-text-primary)',
@@ -63,7 +63,7 @@ export default function AboutPage() {
           <h1
             style={{
               ...SERIF,
-              fontWeight:    300,
+              fontWeight: 400,
               fontSize:      'clamp(2.2rem,5vw,3.75rem)',
               lineHeight:    1.1,
               letterSpacing: '-0.025em',
@@ -101,7 +101,7 @@ export default function AboutPage() {
         </div>
 
         {/* Section 2 — The Ecosystem */}
-        <section style={{ background: 'var(--color-void)', padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,80px)' }}>
+        <section className="section-dark" style={{ background: 'var(--color-void)', padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,80px)' }}>
           <div style={{ maxWidth: '900px', margin: '0 auto' }}>
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '40px' }}>
               The Ecosystem
@@ -113,16 +113,17 @@ export default function AboutPage() {
               {ECOSYSTEM.map(({ name, body }) => (
                 <div
                   key={name}
+                  className="paper-card"
                   style={{
                     background: 'var(--color-surface)',
                     border:     '1px solid var(--color-border)',
                     padding:    'clamp(28px,3vw,40px)',
                   }}
                 >
-                  <p style={{ ...MONO, fontSize: '0.5rem', color: 'var(--color-gold-on-light)', marginBottom: '20px' }}>
+                  <p style={{ ...MONO, fontSize: '0.78rem', color: 'var(--color-gold-on-light)', marginBottom: '20px' }}>
                     {name}
                   </p>
-                  <p style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', fontWeight: 300, color: 'var(--color-text-secondary)', lineHeight: 1.8, margin: 0 }}>
+                  <p style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', fontWeight: 400, color: 'var(--color-text-secondary)', lineHeight: 1.8, margin: 0 }}>
                     {body}
                   </p>
                 </div>
@@ -216,9 +217,9 @@ export default function AboutPage() {
             </p>
 
             <p style={{
-              fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
-              fontSize:      '0.52rem',
-              letterSpacing: '0.22em',
+              fontFamily:    'var(--font-space-mono)',
+              fontSize:      '0.78rem',
+              letterSpacing: '0.18em',
               textTransform: 'uppercase' as const,
               color:         'var(--color-text-faint)',
               lineHeight:    1.9,
@@ -237,19 +238,19 @@ export default function AboutPage() {
             Founding Session became the Founding Sequence. This states the
             founder-led read that is true today. The day someone other than
             the founder reads a founding or runs a first read, this changes. */}
-        <section style={{ background: 'var(--color-void)', padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,80px)' }}>
+        <section className="section-dark" style={{ background: 'var(--color-void)', padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,80px)' }}>
           <div style={{ maxWidth: '680px', margin: '0 auto' }}>
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '24px' }}>
               Who runs it
             </p>
-            <h2 style={{ ...H2, color: 'rgba(250,248,244,0.9)' }}>Every Basalith is read by a person.</h2>
-            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>
+            <h2 style={{ ...H2, color: 'var(--on-dark)' }}>Every Basalith is read by a person.</h2>
+            <p style={{ ...BODY, color: 'var(--on-dark-3)' }}>
               The founder of Basalith reads every Founding Sequence and runs every
               first read himself today. One person, listening to how you decide,
               and staying with your Basalith as it grows.
             </p>
-            <p style={{ ...BODY, color: 'rgba(250,248,244,0.5)' }}>The technology handles the complexity. A person handles the rest.</p>
-            <p style={{ ...BODY, color: 'rgba(250,248,244,0.85)', fontStyle: 'italic' }}>
+            <p style={{ ...BODY, color: 'var(--on-dark-3)' }}>The technology handles the complexity. A person handles the rest.</p>
+            <p style={{ ...BODY, color: 'var(--on-dark)', fontStyle: 'italic' }}>
               Every Basalith is a relationship, not a subscription.
             </p>
           </div>
@@ -290,12 +291,12 @@ export default function AboutPage() {
         </section>
 
         {/* Section 5b — The second door */}
-        <section style={{ background: 'var(--color-void)', padding: 'clamp(56px,7vw,88px) clamp(24px,6vw,80px)' }}>
+        <section className="section-dark" style={{ background: 'var(--color-void)', padding: 'clamp(56px,7vw,88px) clamp(24px,6vw,80px)' }}>
           <div style={{ maxWidth: '640px', margin: '0 auto' }}>
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)', marginBottom: '20px' }}>
               The second door
             </p>
-            <p style={{ ...BODY, color: 'rgba(250,248,244,0.55)', marginBottom: '24px' }}>
+            <p style={{ ...BODY, color: 'var(--on-dark-2)', marginBottom: '24px' }}>
               Basalith began with families, and that door is still open. The same
               method, for keeping how a person thinks rather than how a business is run.
             </p>
@@ -309,31 +310,31 @@ export default function AboutPage() {
         </section>
 
         {/* Section 6 — Closing */}
-        <section style={{ background: 'var(--color-void)', padding: 'clamp(80px,12vw,140px) clamp(24px,6vw,80px)', textAlign: 'center' }}>
+        <section className="section-dark" style={{ background: 'var(--color-void)', padding: 'clamp(80px,12vw,140px) clamp(24px,6vw,80px)', textAlign: 'center' }}>
           <div style={{ maxWidth: '540px', margin: '0 auto' }}>
-            <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.5)', lineHeight: 1.85, marginBottom: '8px' }}>
+            <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 400, color: 'var(--on-dark-3)', lineHeight: 1.85, marginBottom: '8px' }}>
               We are early.
             </p>
-            <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.5)', lineHeight: 1.85, marginBottom: '8px' }}>
+            <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 400, color: 'var(--on-dark-3)', lineHeight: 1.85, marginBottom: '8px' }}>
               The Basalith you begin today will be worth the most
               in twenty years, because it will have had the most time.
             </p>
-            <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.5)', lineHeight: 1.85, marginBottom: '8px' }}>
+            <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 400, color: 'var(--on-dark-3)', lineHeight: 1.85, marginBottom: '8px' }}>
               Every year you begin is a year the entity has more to work with.
             </p>
-            <p style={{ ...SERIF, fontSize: '1.15rem', fontStyle: 'italic', fontWeight: 300, color: 'rgba(250,248,244,0.85)', lineHeight: 1.85, marginBottom: '40px' }}>
+            <p style={{ ...SERIF, fontSize: '1.15rem', fontStyle: 'italic', fontWeight: 400, color: 'var(--on-dark)', lineHeight: 1.85, marginBottom: '40px' }}>
               Every year you wait is a year it has less.
             </p>
             <a
               href="/begin"
               style={{
-                fontFamily:     'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+                fontFamily:     'var(--font-space-mono)',
                 fontSize:       'var(--text-caption)',
-                letterSpacing:  '0.3em',
+                letterSpacing:  '0.18em',
                 textTransform:  'uppercase' as const,
                 display:        'inline-block',
-                background:     'var(--color-gold)',
-                color:          '#0A0908',
+                background:     'var(--on-dark)',
+                color: 'var(--color-void)',
                 textDecoration: 'none',
                 padding:        '14px 32px',
                 borderRadius:   'var(--radius-sm)',

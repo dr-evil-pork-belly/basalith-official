@@ -59,7 +59,7 @@ function dateTypeColor(type: string): string {
 const FIELD_LABEL_STYLE: React.CSSProperties = {
   fontFamily:    'var(--portal-mono)',
   fontSize: '11px',
-  letterSpacing: '0.22em',
+  letterSpacing: '0.18em',
   textTransform: 'uppercase',
   color:         'var(--portal-gold-ink)',
   display:       'block',
@@ -199,21 +199,21 @@ export default function DatesClient({ archiveId }: { archiveId: string }) {
 
       {/* Header */}
       <div style={{ marginBottom: '2.5rem' }}>
-        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', margin: '0 0 14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', margin: '0 0 14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
           <span style={{ display: 'block', width: '20px', height: '1px', background: 'var(--portal-btn)', flexShrink: 0 }} aria-hidden="true" />
           Important Dates
         </p>
-        <h1 style={{ fontFamily: 'var(--portal-serif)', fontWeight: 300, fontSize: 'clamp(1.8rem,3vw,2.4rem)', color: 'var(--portal-ink)', margin: '0 0 12px', lineHeight: 1.15, letterSpacing: '-0.02em' }}>
+        <h1 style={{ fontFamily: 'var(--portal-serif)', fontWeight: 400, fontSize: 'clamp(1.8rem,3vw,2.4rem)', color: 'var(--portal-ink)', margin: '0 0 12px', lineHeight: 1.15, letterSpacing: '-0.02em' }}>
           Moments That Return
         </h1>
-        <p style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', fontWeight: 300, fontSize: '1rem', color: 'var(--portal-secondary)', lineHeight: 1.75, margin: 0 }}>
+        <p style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', fontWeight: 400, fontSize: '1rem', color: 'var(--portal-secondary)', lineHeight: 1.75, margin: 0 }}>
           On these dates Basalith automatically sends a photograph and memory to you and all contributors.
         </p>
       </div>
 
       {/* Add form */}
       <div style={{ background: 'var(--portal-gold-wash)', border: '1px solid var(--portal-gold-line)', borderTop: '2px solid var(--portal-gold-line)', borderRadius: '2px', padding: '1.5rem', marginBottom: '2.5rem' }}>
-        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', margin: '0 0 1.25rem' }}>
+        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', margin: '0 0 1.25rem' }}>
           Add a Date
         </p>
 
@@ -301,7 +301,7 @@ export default function DatesClient({ archiveId }: { archiveId: string }) {
             <button
               type="submit"
               disabled={saving}
-              style={{ background: 'var(--portal-btn)', color: 'var(--portal-btn-label)', fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', border: 'none', borderRadius: '2px', padding: '0.6rem 1.25rem', cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.6 : 1 }}
+              style={{ background: 'var(--portal-btn)', color: 'var(--portal-btn-label)', fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', border: 'none', borderRadius: '2px', padding: '0.6rem 1.25rem', cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.6 : 1 }}
             >
               {saving ? 'Saving...' : 'Add Date'}
             </button>

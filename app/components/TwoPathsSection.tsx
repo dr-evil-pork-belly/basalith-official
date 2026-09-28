@@ -3,13 +3,13 @@ import Link from 'next/link'
 type Audience = 'founder' | 'family'
 
 const MONO: React.CSSProperties = {
-  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
-  fontSize:      '0.52rem',
-  letterSpacing: '0.3em',
+  fontFamily:    'var(--font-space-mono)',
+  fontSize:      '0.78rem',
+  letterSpacing: '0.18em',
   textTransform: 'uppercase' as const,
 }
 const SERIF: React.CSSProperties = {
-  fontFamily: 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontFamily: 'var(--font-newsreader), Georgia, serif',
 }
 
 // Two paths mapped to the existing concepts: LEGACY -> /apply (family) and
@@ -61,7 +61,7 @@ export default function TwoPathsSection() {
           style={{
             ...SERIF,
             fontSize:   'clamp(1.9rem,3.2vw,2.8rem)',
-            fontWeight: 300,
+            fontWeight: 400,
             lineHeight: 1.1,
             color:      'var(--color-text-primary)',
             margin:     '0 0 48px',
@@ -106,7 +106,7 @@ export default function TwoPathsSection() {
                     ...SERIF,
                     display:      'block',
                     fontSize:     'clamp(1.5rem,2.5vw,2.1rem)',
-                    fontWeight:   300,
+                    fontWeight: 400,
                     lineHeight:   1.15,
                     color:        'var(--color-text-primary)',
                     marginBottom: '16px',
@@ -120,7 +120,7 @@ export default function TwoPathsSection() {
                     display:    'block',
                     fontSize:   '1.05rem',
                     fontStyle:  'italic',
-                    fontWeight: 300,
+                    fontWeight: 400,
                     lineHeight: 1.7,
                     color:      'var(--color-text-secondary)',
                   }}
@@ -136,8 +136,8 @@ export default function TwoPathsSection() {
                   style={{
                     ...MONO,
                     display:    'inline-block',
-                    color:      '#0A0908',
-                    background: 'var(--color-gold)',
+                    color: 'var(--btn-label)',
+                    background: 'var(--btn)',
                     padding:    '14px 28px',
                     transition: 'background 250ms ease',
                   }}
@@ -152,7 +152,7 @@ export default function TwoPathsSection() {
 
       <style>{`
         .path-card:hover { border-color: var(--color-gold-on-light); box-shadow: var(--shadow-gold); }
-        .path-card:hover .path-cta { background: var(--color-gold-light); }
+        .path-card:hover .path-cta { background: var(--btn-hover); }
         .path-card:focus-visible { outline: 2px solid var(--color-gold-on-light); outline-offset: 2px; }
         @media (max-width: 767px) {
           .two-paths-grid { grid-template-columns: 1fr !important; }

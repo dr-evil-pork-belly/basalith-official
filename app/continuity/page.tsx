@@ -8,8 +8,8 @@ export const metadata: Metadata = {
 }
 
 const body: React.CSSProperties = {
-  fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-  fontWeight:   300,
+  fontFamily:   'var(--font-newsreader), Georgia, serif',
+  fontWeight: 400,
   fontSize:     '1.05rem',
   lineHeight:   1.95,
   color:        'var(--color-text-secondary)',
@@ -17,7 +17,7 @@ const body: React.CSSProperties = {
 }
 
 const h2style: React.CSSProperties = {
-  fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+  fontFamily:   'var(--font-newsreader), Georgia, serif',
   fontWeight:   500,
   fontSize:     'clamp(1.4rem, 3vw, 1.9rem)',
   color:        'var(--color-text-primary)',
@@ -42,9 +42,9 @@ export default function ContinuityPage() {
         {/* ── HEADER ── */}
         <section style={{ padding: 'clamp(140px,16vw,180px) clamp(24px,6vw,80px) clamp(48px,6vw,64px)', textAlign: 'center', background: 'var(--color-bg)' }}>
           <p style={{
-            fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+            fontFamily:    'var(--font-space-mono)',
             fontSize:      'var(--text-caption)',
-            letterSpacing: '0.35em',
+            letterSpacing: '0.18em',
             textTransform: 'uppercase',
             color:         'var(--color-gold)',
             marginBottom:  '24px',
@@ -58,8 +58,8 @@ export default function ContinuityPage() {
             <span style={{ display: 'block', width: '24px', height: '1px', background: 'var(--color-gold)', flexShrink: 0 }} aria-hidden="true" />
           </p>
           <h1 style={{
-            fontFamily:    'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
-            fontWeight:    300,
+            fontFamily:    'var(--font-newsreader), Georgia, serif',
+            fontWeight: 400,
             fontSize:      'clamp(2.5rem, 6vw, 4.5rem)',
             color:         'var(--color-text-primary)',
             lineHeight:    1.05,
@@ -69,9 +69,9 @@ export default function ContinuityPage() {
             Built to outlast<br />the tools that built it.
           </h1>
           <p style={{
-            fontFamily:  'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+            fontFamily:  'var(--font-newsreader), Georgia, serif',
             fontStyle:   'italic',
-            fontWeight:  300,
+            fontWeight: 400,
             fontSize:    '1.15rem',
             color:       'var(--color-text-muted)',
             margin:      '0 auto',
@@ -157,7 +157,7 @@ export default function ContinuityPage() {
           <a
             href="/data-ownership"
             style={{
-              fontFamily:     'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+              fontFamily:     'var(--font-newsreader), Georgia, serif',
               fontStyle:      'italic',
               fontSize:       '0.95rem',
               color:          'var(--color-gold)',
@@ -172,13 +172,13 @@ export default function ContinuityPage() {
           <div style={rule} />
 
           {/* Closing */}
-          <div style={{ background: 'var(--color-void)', padding: '64px 24px', textAlign: 'center', maxWidth: '100vw', margin: '48px -24px 0', borderRadius: 0 }}>
+          <div className="section-dark" style={{ background: 'var(--color-void)', padding: '64px 24px', textAlign: 'center', maxWidth: '100vw', margin: '48px -24px 0', borderRadius: 0 }}>
             <p style={{
-              fontFamily:   'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)',
+              fontFamily:   'var(--font-newsreader), Georgia, serif',
               fontStyle:    'italic',
-              fontWeight:   300,
+              fontWeight: 400,
               fontSize:     '1.3rem',
-              color:        'rgba(250,248,244,0.6)',
+              color:        'var(--on-dark-2)',
               lineHeight:   1.85,
               marginBottom: '40px',
               maxWidth:     '560px',
@@ -194,9 +194,9 @@ export default function ContinuityPage() {
             </p>
 
             <p style={{
-              fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
-              fontSize:      '0.52rem',
-              letterSpacing: '0.35em',
+              fontFamily:    'var(--font-space-mono)',
+              fontSize:      '0.78rem',
+              letterSpacing: '0.18em',
               textTransform: 'uppercase',
               color:         'var(--color-gold)',
               marginBottom:  '40px',
@@ -208,11 +208,11 @@ export default function ContinuityPage() {
               href="/apply"
               style={{
                 display:       'inline-block',
-                background:    'var(--color-gold)',
-                color:         '#0A0908',
-                fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
-                fontSize:      '0.58rem',
-                letterSpacing: '0.3em',
+                background:    'var(--on-dark)',
+                color: 'var(--color-void)',
+                fontFamily:    'var(--font-space-mono)',
+                fontSize:      '0.78rem',
+                letterSpacing: '0.18em',
                 textTransform: 'uppercase',
                 textDecoration:'none',
                 padding:       '0.85rem 2rem',

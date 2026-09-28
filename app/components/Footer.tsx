@@ -47,28 +47,28 @@ const COLS: { heading: string; links: { label: string; href: string }[] }[] = [
 const COPYRIGHT_YEAR = process.env.NEXT_PUBLIC_COPYRIGHT_YEAR ?? '2026'
 
 const MONO: React.CSSProperties = {
-  fontFamily:    'var(--font-space-mono, "Space Mono", "Courier New", monospace)',
+  fontFamily:    'var(--font-space-mono)',
   letterSpacing: '0.2em',
   textTransform: 'uppercase' as const,
 }
 
-const SERIF = 'var(--font-cormorant, "Cormorant Garamond", Georgia, serif)'
+const SERIF = 'var(--font-newsreader), Georgia, serif'
 
-// Every value below is measured against --void #0A0908. Contrast ratios are in
+// Every value below is measured against --void var(--color-void). Contrast ratios are in
 // the table in globals.css. Nothing here drops under 4.5:1.
 const C = {
-  wordmark: 'rgba(250,250,248,0.9)',  // 15.34:1
-  brandLine:'rgba(250,250,248,0.6)',  //  7.06:1
-  heading:  'rgba(250,250,248,0.55)', //  6.06:1
-  link:     'rgba(250,250,248,0.65)', //  8.16:1
-  reg:      'rgba(250,250,248,0.6)',  //  7.06:1
-  regLink:  'rgba(250,250,248,0.75)', // 10.69:1
-  copy:     'rgba(250,250,248,0.55)', //  6.06:1
+  wordmark: 'var(--on-dark)',  // 15.34:1
+  brandLine:'var(--on-dark-2)',  //  7.06:1
+  heading:  'var(--on-dark-2)', //  6.06:1
+  link:     'var(--on-dark-2)', //  8.16:1
+  reg:      'var(--on-dark-2)',  //  7.06:1
+  regLink:  'var(--on-dark-2)', // 10.69:1
+  copy:     'var(--on-dark-2)', //  6.06:1
 }
 
 export default function Footer() {
   return (
-    <footer style={{ background: 'var(--color-void)' }}>
+    <footer className="section-dark" style={{ background: 'var(--color-void)' }}>
 
       {/* Main footer grid. Four children in four tracks. */}
       <div
@@ -78,7 +78,7 @@ export default function Footer() {
           gridTemplateColumns: '1.6fr 1fr 1fr 1fr',
           gap:                 '48px',
           padding:             'clamp(60px,8vw,96px) clamp(24px,6vw,80px)',
-          borderTop:           '1px solid rgba(250,250,248,0.06)',
+          borderTop:           '1px solid rgba(247,245,241,0.06)',
         }}
       >
         {/* Brand column */}
@@ -87,7 +87,7 @@ export default function Footer() {
             style={{
               ...MONO,
               fontSize:      '0.72rem',
-              letterSpacing: '0.3em',
+              letterSpacing: '0.18em',
               color:         C.wordmark,
               marginBottom:  '28px',
               fontWeight:    700,
@@ -100,7 +100,7 @@ export default function Footer() {
               fontFamily: SERIF,
               fontSize:   '0.9rem',
               fontStyle:  'italic',
-              fontWeight: 300,
+              fontWeight: 400,
               lineHeight: 1.7,
               color:      C.brandLine,
               maxWidth:   '220px',
@@ -115,7 +115,7 @@ export default function Footer() {
             style={{
               fontFamily: SERIF,
               fontSize:   '0.9rem',
-              fontWeight: 300,
+              fontWeight: 400,
               lineHeight: 1.9,
               color:      C.brandLine,
               marginTop:  '24px',
@@ -136,7 +136,7 @@ export default function Footer() {
         {/* Link columns */}
         {COLS.map(({ heading, links }) => (
           <div key={heading}>
-            <p style={{ ...MONO, fontSize: '0.7rem', color: C.heading, marginBottom: '20px' }}>
+            <p style={{ ...MONO, fontSize: '0.72rem', color: C.heading, marginBottom: '20px' }}>
               {heading}
             </p>
             <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -148,7 +148,7 @@ export default function Footer() {
                     style={{
                       fontFamily:     SERIF,
                       fontSize:       '0.95rem',
-                      fontWeight:     300,
+                      fontWeight: 400,
                       color:          C.link,
                       display:        'block',
                       textDecoration: 'none',
@@ -166,7 +166,7 @@ export default function Footer() {
       {/* Company registration */}
       <div
         style={{
-          borderTop: '1px solid rgba(250,250,248,0.04)',
+          borderTop: '1px solid rgba(247,245,241,0.04)',
           padding:   '32px clamp(24px,6vw,80px) 0',
           textAlign: 'center',
         }}
@@ -182,16 +182,16 @@ export default function Footer() {
 
       {/* Copyright */}
       <div style={{ padding: '20px clamp(24px,6vw,80px)', textAlign: 'center' }}>
-        <p style={{ ...MONO, fontSize: '0.7rem', letterSpacing: '0.14em', textTransform: 'none', color: C.copy }}>
+        <p style={{ ...MONO, fontSize: '0.72rem', letterSpacing: '0.14em', textTransform: 'none', color: C.copy }}>
           &copy; {COPYRIGHT_YEAR} Heritage Nexus Inc. All rights reserved. Wilmington, Delaware.
         </p>
       </div>
 
       <style>{`
         .bsl-ft-link { transition: color 200ms ease; }
-        .bsl-ft-link:hover { color: rgba(250,250,248,0.95) !important; }
+        .bsl-ft-link:hover { color: var(--on-dark) !important; }
         .bsl-ft-link:focus-visible {
-          color: rgba(250,250,248,0.95) !important;
+          color: var(--on-dark) !important;
           outline: 2px solid var(--color-gold);
           outline-offset: 3px;
         }

@@ -151,18 +151,18 @@ export default function GameClient({ sessionId }: { sessionId: string }) {
   // ── Loading ────────────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div style={{ minHeight: '100vh', background: '#0A0908', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', color: '#5C6166' }}>Loading game…</p>
+      <div className="section-dark" style={{ minHeight: '100vh', background: 'var(--color-void)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <p style={{ fontFamily: 'var(--font-newsreader), Georgia, serif', fontStyle: 'italic', color: 'var(--on-dark-3)' }}>Loading game…</p>
       </div>
     )
   }
 
   if (error || !data) {
     return (
-      <div style={{ minHeight: '100vh', background: '#0A0908', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+      <div className="section-dark" style={{ minHeight: '100vh', background: 'var(--color-void)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
         <div style={{ textAlign: 'center', maxWidth: '400px' }}>
-          <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.7rem', letterSpacing: '0.2em', color: '#5C6166', marginBottom: '1rem' }}>GAME NOT FOUND</p>
-          <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', color: '#706C65' }}>This game link is no longer valid.</p>
+          <p style={{ fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.7rem', letterSpacing: '0.2em', color: 'var(--on-dark-3)', marginBottom: '1rem' }}>GAME NOT FOUND</p>
+          <p style={{ fontFamily: 'var(--font-newsreader), Georgia, serif', fontStyle: 'italic', color: 'var(--on-dark-3)' }}>This game link is no longer valid.</p>
         </div>
       </div>
     )
@@ -175,14 +175,14 @@ export default function GameClient({ sessionId }: { sessionId: string }) {
   // ── Expired state ──────────────────────────────────────────────────────────
   if (isExpired) {
     return (
-      <div style={{ minHeight: '100vh', background: '#0A0908', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem', textAlign: 'center' }}>
-        <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.72rem', letterSpacing: '0.28em', color: '#C4A24A', marginBottom: '1.5rem' }}>
+      <div className="section-dark" style={{ minHeight: '100vh', background: 'var(--color-void)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem', textAlign: 'center' }}>
+        <p style={{ fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.72rem', letterSpacing: '0.18em', color: 'var(--color-gold)', marginBottom: '1.5rem' }}>
           THE {familyName.toUpperCase()} BASALITH
         </p>
-        <h1 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1.8rem', color: '#F0EDE6', margin: '0 0 1rem' }}>
+        <h1 style={{ fontFamily: 'var(--font-newsreader), Georgia, serif', fontWeight: 700, fontSize: '1.8rem', color: 'var(--on-dark)', margin: '0 0 1rem' }}>
           This game has closed.
         </h1>
-        <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: '1rem', color: '#706C65', maxWidth: '360px', lineHeight: 1.75 }}>
+        <p style={{ fontFamily: 'var(--font-newsreader), Georgia, serif', fontStyle: 'italic', fontSize: '1rem', color: 'var(--on-dark-3)', maxWidth: '360px', lineHeight: 1.75 }}>
           A new game opens every Wednesday.
         </p>
       </div>
@@ -193,27 +193,27 @@ export default function GameClient({ sessionId }: { sessionId: string }) {
   if (gameComplete) {
     const maxCount = data.leaderboard[0]?.count ?? 1
     return (
-      <div style={{ minHeight: '100vh', background: '#0A0908', padding: '3rem 1.5rem' }}>
+      <div className="section-dark" style={{ minHeight: '100vh', background: 'var(--color-void)', padding: '3rem 1.5rem' }}>
         <div style={{ maxWidth: '540px', margin: '0 auto' }}>
-          <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.7rem', letterSpacing: '0.28em', color: '#C4A24A', textAlign: 'center', marginBottom: '2rem' }}>
+          <p style={{ fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.7rem', letterSpacing: '0.18em', color: 'var(--color-gold)', textAlign: 'center', marginBottom: '2rem' }}>
             THE {familyName.toUpperCase()} BASALITH
           </p>
 
           <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-            <h1 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '2rem', color: '#F0EDE6', margin: '0 0 0.75rem' }}>
+            <h1 style={{ fontFamily: 'var(--font-newsreader), Georgia, serif', fontWeight: 700, fontSize: '2rem', color: 'var(--on-dark)', margin: '0 0 0.75rem' }}>
               You contributed {memoriesCount} {memoriesCount === 1 ? 'memory' : 'memories'}.
             </h1>
-            <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: '1rem', color: '#9DA3A8', lineHeight: 1.75, maxWidth: '400px', margin: '0 auto 0.5rem' }}>
+            <p style={{ fontFamily: 'var(--font-newsreader), Georgia, serif', fontStyle: 'italic', fontSize: '1rem', color: 'var(--on-dark-2)', lineHeight: 1.75, maxWidth: '400px', margin: '0 auto 0.5rem' }}>
               Every memory you shared is now permanently preserved in the {familyName} Basalith.
             </p>
-            <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: '0.9rem', color: '#5C6166' }}>
+            <p style={{ fontFamily: 'var(--font-newsreader), Georgia, serif', fontStyle: 'italic', fontSize: '0.9rem', color: 'var(--on-dark-3)' }}>
               The family leaderboard updates in real time.
             </p>
           </div>
 
           {data.leaderboard.length > 0 && (
             <div style={{ marginBottom: '2rem' }}>
-              <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.64rem', letterSpacing: '0.22em', color: '#5C6166', marginBottom: '1rem' }}>
+              <p style={{ fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.78rem', letterSpacing: '0.18em', color: 'var(--on-dark-3)', marginBottom: '1rem' }}>
                 CURRENT LEADERBOARD
               </p>
               {data.leaderboard.map((row, i) => {
@@ -221,14 +221,14 @@ export default function GameClient({ sessionId }: { sessionId: string }) {
                 const width = Math.round((row.count / maxCount) * 160)
                 return (
                   <div key={row.name} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.6rem' }}>
-                    <span style={{ fontFamily: '"Courier New", monospace', fontSize: '0.6rem', color: '#5C6166', width: '16px', flexShrink: 0 }}>
+                    <span style={{ fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.78rem', color: 'var(--on-dark-3)', width: '16px', flexShrink: 0 }}>
                       {i + 1}
                     </span>
-                    <span style={{ fontFamily: '"Courier New", monospace', fontSize: '0.7rem', color: isMe ? '#C4A24A' : '#9DA3A8', minWidth: '100px', flexShrink: 0 }}>
+                    <span style={{ fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.7rem', color: isMe ? 'var(--color-gold)' : 'var(--on-dark-2)', minWidth: '100px', flexShrink: 0 }}>
                       {row.name}{isMe ? ' (you)' : ''}
                     </span>
-                    <div style={{ width: `${width}px`, height: '6px', background: isMe ? 'rgba(196,162,74,0.7)' : 'rgba(240,237,230,0.15)', borderRadius: '2px', flexShrink: 0 }} />
-                    <span style={{ fontFamily: '"Courier New", monospace', fontSize: '0.62rem', color: '#5C6166' }}>{row.count}</span>
+                    <div style={{ width: `${width}px`, height: '6px', background: isMe ? 'rgba(160,132,80,0.7)' : 'rgba(247,245,241,0.15)', borderRadius: '2px', flexShrink: 0 }} />
+                    <span style={{ fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.78rem', color: 'var(--on-dark-3)' }}>{row.count}</span>
                   </div>
                 )
               })}
@@ -238,7 +238,7 @@ export default function GameClient({ sessionId }: { sessionId: string }) {
           <div style={{ textAlign: 'center' }}>
             <Link
               href={`/game/${sessionId}/leaderboard`}
-              style={{ display: 'inline-block', fontFamily: '"Courier New", monospace', fontSize: '0.68rem', letterSpacing: '0.25em', color: '#0A0908', background: '#C4A24A', textDecoration: 'none', padding: '0.85rem 2rem', borderRadius: '2px' }}
+              style={{ display: 'inline-block', fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.78rem', letterSpacing: '0.18em', color: 'var(--color-void)', background: 'var(--on-dark)', textDecoration: 'none', padding: '0.85rem 2rem', borderRadius: '2px' }}
             >
               SEE THE LEADERBOARD →
             </Link>
@@ -257,26 +257,26 @@ export default function GameClient({ sessionId }: { sessionId: string }) {
   // ── Identity gate ──────────────────────────────────────────────────────────
   if (!identified) {
     return (
-      <div style={{ minHeight: '100vh', background: '#0A0908', padding: '3rem 1.5rem' }}>
+      <div className="section-dark" style={{ minHeight: '100vh', background: 'var(--color-void)', padding: '3rem 1.5rem' }}>
         <div style={{ maxWidth: '480px', margin: '0 auto' }}>
-          <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.7rem', letterSpacing: '0.28em', color: '#C4A24A', marginBottom: '0.5rem' }}>
+          <p style={{ fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.7rem', letterSpacing: '0.18em', color: 'var(--color-gold)', marginBottom: '0.5rem' }}>
             THE {familyName.toUpperCase()} BASALITH
           </p>
-          <h1 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1.8rem', color: '#F0EDE6', margin: '0 0 0.5rem' }}>
+          <h1 style={{ fontFamily: 'var(--font-newsreader), Georgia, serif', fontWeight: 700, fontSize: '1.8rem', color: 'var(--on-dark)', margin: '0 0 0.5rem' }}>
             This week&rsquo;s memory game.
           </h1>
-          <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', color: '#9DA3A8', marginBottom: '0.5rem', lineHeight: 1.7 }}>
+          <p style={{ fontFamily: 'var(--font-newsreader), Georgia, serif', fontStyle: 'italic', color: 'var(--on-dark-2)', marginBottom: '0.5rem', lineHeight: 1.7 }}>
             {photos.length} photograph{photos.length !== 1 ? 's' : ''}.
             {data.session.totalMemories > 0 ? ` ${data.session.totalMemories} memories contributed so far.` : ''}
           </p>
-          <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.64rem', letterSpacing: '0.18em', color: 'rgba(196,162,74,0.7)', marginBottom: '2.5rem' }}>
+          <p style={{ fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.78rem', letterSpacing: '0.18em', color: 'var(--color-gold)', marginBottom: '2.5rem' }}>
             CLOSES IN {countdown}
           </p>
 
-          <div style={{ width: '100%', height: '1px', background: 'rgba(196,162,74,0.15)', marginBottom: '2rem' }} />
+          <div style={{ width: '100%', height: '1px', background: 'rgba(160,132,80,0.15)', marginBottom: '2rem' }} />
 
           <div style={{ marginBottom: '1.25rem' }}>
-            <label style={{ display: 'block', fontFamily: '"Courier New", monospace', fontSize: '0.64rem', letterSpacing: '0.18em', color: '#706C65', marginBottom: '0.5rem' }}>
+            <label style={{ display: 'block', fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.78rem', letterSpacing: '0.18em', color: 'var(--on-dark-3)', marginBottom: '0.5rem' }}>
               YOUR NAME
             </label>
             <input
@@ -286,16 +286,16 @@ export default function GameClient({ sessionId }: { sessionId: string }) {
               onKeyDown={e => { if (e.key === 'Enter') handleStart() }}
               placeholder="How the family knows you"
               autoFocus
-              style={{ width: '100%', background: 'transparent', border: 'none', borderBottom: `1px solid ${nameError ? 'rgba(180,60,60,0.6)' : 'rgba(196,162,74,0.3)'}`, color: '#F0EDE6', fontFamily: 'Georgia, serif', fontSize: '1rem', padding: '0.5rem 0', outline: 'none', boxSizing: 'border-box' }}
+              style={{ width: '100%', background: 'transparent', border: 'none', borderBottom: `1px solid ${nameError ? 'rgba(180,60,60,0.6)' : 'rgba(160,132,80,0.3)'}`, color: 'var(--on-dark)', fontFamily: 'var(--font-newsreader), Georgia, serif', fontSize: '1rem', padding: '0.5rem 0', outline: 'none', boxSizing: 'border-box' }}
             />
             {nameError && (
-              <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.6rem', color: '#B85C5C', marginTop: '0.4rem' }}>{nameError}</p>
+              <p style={{ fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.78rem', color: 'var(--invert-error)', marginTop: '0.4rem' }}>{nameError}</p>
             )}
           </div>
 
           <div style={{ marginBottom: '2rem' }}>
-            <label style={{ display: 'block', fontFamily: '"Courier New", monospace', fontSize: '0.64rem', letterSpacing: '0.18em', color: '#706C65', marginBottom: '0.5rem' }}>
-              YOUR EMAIL <span style={{ color: '#3A3830' }}>(optional, to receive the summary)</span>
+            <label style={{ display: 'block', fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.78rem', letterSpacing: '0.18em', color: 'var(--on-dark-3)', marginBottom: '0.5rem' }}>
+              YOUR EMAIL <span style={{ color: 'var(--on-dark-3)' }}>(optional, to receive the summary)</span>
             </label>
             <input
               type="email"
@@ -303,13 +303,13 @@ export default function GameClient({ sessionId }: { sessionId: string }) {
               onChange={e => setEmail(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') handleStart() }}
               placeholder="email@example.com"
-              style={{ width: '100%', background: 'transparent', border: 'none', borderBottom: '1px solid rgba(196,162,74,0.15)', color: '#F0EDE6', fontFamily: 'Georgia, serif', fontSize: '1rem', padding: '0.5rem 0', outline: 'none', boxSizing: 'border-box' }}
+              style={{ width: '100%', background: 'transparent', border: 'none', borderBottom: '1px solid rgba(160,132,80,0.15)', color: 'var(--on-dark)', fontFamily: 'var(--font-newsreader), Georgia, serif', fontSize: '1rem', padding: '0.5rem 0', outline: 'none', boxSizing: 'border-box' }}
             />
           </div>
 
           <button
             onClick={handleStart}
-            style={{ background: '#C4A24A', border: 'none', color: '#0A0908', fontFamily: '"Courier New", monospace', fontSize: '0.7rem', letterSpacing: '0.28em', padding: '0.85rem 2.5rem', cursor: 'pointer', borderRadius: '2px' }}
+            style={{ background: 'var(--on-dark)', border: 'none', color: 'var(--color-void)', fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.7rem', letterSpacing: '0.18em', padding: '0.85rem 2.5rem', cursor: 'pointer', borderRadius: '2px' }}
           >
             START PLAYING →
           </button>
@@ -320,24 +320,24 @@ export default function GameClient({ sessionId }: { sessionId: string }) {
 
   // ── Active game ────────────────────────────────────────────────────────────
   return (
-    <div style={{ minHeight: '100vh', background: '#0A0908' }}>
+    <div className="section-dark" style={{ minHeight: '100vh', background: 'var(--color-void)' }}>
 
       {/* Header */}
       <div style={{ padding: '1.5rem 1.5rem 1rem', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
         <div style={{ maxWidth: '680px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
           <div>
-            <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.68rem', letterSpacing: '0.25em', color: '#C4A24A', margin: '0 0 2px' }}>
+            <p style={{ fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.78rem', letterSpacing: '0.18em', color: 'var(--color-gold)', margin: '0 0 2px' }}>
               THE {familyName.toUpperCase()} BASALITH
             </p>
-            <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.6rem', letterSpacing: '0.14em', color: '#5C6166', margin: 0 }}>
+            <p style={{ fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.78rem', letterSpacing: '0.14em', color: 'var(--on-dark-3)', margin: 0 }}>
               MEMORY GAME
             </p>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.6rem', letterSpacing: '0.12em', color: '#706C65', margin: '0 0 2px' }}>
+            <p style={{ fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.78rem', letterSpacing: '0.12em', color: 'var(--on-dark-3)', margin: '0 0 2px' }}>
               {data.session.totalMemories + memoriesCount} {(data.session.totalMemories + memoriesCount) === 1 ? 'memory' : 'memories'} so far
             </p>
-            <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.6rem', letterSpacing: '0.12em', color: 'rgba(196,162,74,0.7)', margin: 0 }}>
+            <p style={{ fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.78rem', letterSpacing: '0.12em', color: 'var(--color-gold)', margin: 0 }}>
               Closes in {countdown}
             </p>
           </div>
@@ -349,7 +349,7 @@ export default function GameClient({ sessionId }: { sessionId: string }) {
 
         {/* Photo counter */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-          <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.64rem', letterSpacing: '0.18em', color: '#5C6166', margin: 0 }}>
+          <p style={{ fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.78rem', letterSpacing: '0.18em', color: 'var(--on-dark-3)', margin: 0 }}>
             PHOTO {photoIndex + 1} OF {photos.length}
           </p>
           <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -357,7 +357,7 @@ export default function GameClient({ sessionId }: { sessionId: string }) {
               <button
                 key={pid}
                 onClick={() => setPhotoIndex(i)}
-                style={{ width: '8px', height: '8px', borderRadius: '50%', background: i === photoIndex ? '#C4A24A' : savedPhotos.has(pid) ? 'rgba(196,162,74,0.4)' : 'rgba(255,255,255,0.12)', border: 'none', cursor: 'pointer', padding: 0 }}
+                style={{ width: '8px', height: '8px', borderRadius: '50%', background: i === photoIndex ? 'var(--color-gold)' : savedPhotos.has(pid) ? 'rgba(160,132,80,0.4)' : 'rgba(255,255,255,0.12)', border: 'none', cursor: 'pointer', padding: 0 }}
               />
             ))}
           </div>
@@ -373,7 +373,7 @@ export default function GameClient({ sessionId }: { sessionId: string }) {
               style={{ width: '100%', maxHeight: '480px', objectFit: 'cover', display: 'block', borderRadius: '2px' }}
             />
             {currentMeta?.ai_era_estimate && (
-              <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.6rem', letterSpacing: '0.14em', color: '#3A3830', marginTop: '0.5rem' }}>
+              <p style={{ fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.78rem', letterSpacing: '0.14em', color: 'var(--on-dark-3)', marginTop: '0.5rem' }}>
                 {currentMeta.ai_era_estimate.toUpperCase()}
               </p>
             )}
@@ -381,13 +381,13 @@ export default function GameClient({ sessionId }: { sessionId: string }) {
         )}
 
         {/* Memory input */}
-        <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: '1rem', color: '#9DA3A8', marginBottom: '0.75rem' }}>
+        <p style={{ fontFamily: 'var(--font-newsreader), Georgia, serif', fontStyle: 'italic', fontSize: '1rem', color: 'var(--on-dark-2)', marginBottom: '0.75rem' }}>
           What do you remember about this?
         </p>
 
         {alreadySaved ? (
-          <div style={{ padding: '1rem 0', borderBottom: '1px solid rgba(196,162,74,0.15)' }}>
-            <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.68rem', letterSpacing: '0.22em', color: '#C4A24A', margin: 0 }}>
+          <div style={{ padding: '1rem 0', borderBottom: '1px solid rgba(160,132,80,0.15)' }}>
+            <p style={{ fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.78rem', letterSpacing: '0.18em', color: 'var(--color-gold)', margin: 0 }}>
               ✓ SAVED
             </p>
           </div>
@@ -401,12 +401,12 @@ export default function GameClient({ sessionId }: { sessionId: string }) {
             }}
             placeholder="Any memory, any detail. Even partial memories help."
             rows={4}
-            style={{ width: '100%', minHeight: '120px', background: 'transparent', border: 'none', borderBottom: '1px solid rgba(196,162,74,0.3)', color: '#F0EDE6', fontFamily: 'Georgia, serif', fontSize: '1rem', fontStyle: 'italic', lineHeight: 1.7, padding: '0.5rem 0', outline: 'none', resize: 'vertical', boxSizing: 'border-box' }}
+            style={{ width: '100%', minHeight: '120px', background: 'transparent', border: 'none', borderBottom: '1px solid rgba(160,132,80,0.3)', color: 'var(--on-dark)', fontFamily: 'var(--font-newsreader), Georgia, serif', fontSize: '1rem', fontStyle: 'italic', lineHeight: 1.7, padding: '0.5rem 0', outline: 'none', resize: 'vertical', boxSizing: 'border-box' }}
           />
         )}
 
         {saveError && (
-          <p style={{ fontFamily: '"Courier New", monospace', fontSize: '0.62rem', color: '#B85C5C', marginTop: '0.5rem' }}>{saveError}</p>
+          <p style={{ fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.78rem', color: 'var(--invert-error)', marginTop: '0.5rem' }}>{saveError}</p>
         )}
 
         {!alreadySaved && (
@@ -415,14 +415,14 @@ export default function GameClient({ sessionId }: { sessionId: string }) {
               <button
                 onClick={() => setPhotoIndex(i => Math.max(0, i - 1))}
                 disabled={photoIndex === 0}
-                style={{ fontFamily: '"Courier New", monospace', fontSize: '0.62rem', letterSpacing: '0.15em', color: '#5C6166', background: 'transparent', border: '1px solid rgba(255,255,255,0.08)', padding: '0.55rem 1rem', cursor: photoIndex === 0 ? 'not-allowed' : 'pointer', borderRadius: '2px', opacity: photoIndex === 0 ? 0.35 : 1 }}
+                style={{ fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.78rem', letterSpacing: '0.15em', color: 'var(--on-dark-3)', background: 'transparent', border: '1px solid rgba(255,255,255,0.08)', padding: '0.55rem 1rem', cursor: photoIndex === 0 ? 'not-allowed' : 'pointer', borderRadius: '2px', opacity: photoIndex === 0 ? 0.35 : 1 }}
               >
                 ← PREV
               </button>
               <button
                 onClick={() => setPhotoIndex(i => Math.min(photos.length - 1, i + 1))}
                 disabled={photoIndex === photos.length - 1}
-                style={{ fontFamily: '"Courier New", monospace', fontSize: '0.62rem', letterSpacing: '0.15em', color: '#5C6166', background: 'transparent', border: '1px solid rgba(255,255,255,0.08)', padding: '0.55rem 1rem', cursor: photoIndex === photos.length - 1 ? 'not-allowed' : 'pointer', borderRadius: '2px', opacity: photoIndex === photos.length - 1 ? 0.35 : 1 }}
+                style={{ fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.78rem', letterSpacing: '0.15em', color: 'var(--on-dark-3)', background: 'transparent', border: '1px solid rgba(255,255,255,0.08)', padding: '0.55rem 1rem', cursor: photoIndex === photos.length - 1 ? 'not-allowed' : 'pointer', borderRadius: '2px', opacity: photoIndex === photos.length - 1 ? 0.35 : 1 }}
               >
                 NEXT →
               </button>
@@ -430,7 +430,7 @@ export default function GameClient({ sessionId }: { sessionId: string }) {
             <button
               onClick={handleSaveMemory}
               disabled={saving || !currentMemory.trim()}
-              style={{ background: saving || !currentMemory.trim() ? 'rgba(196,162,74,0.3)' : '#C4A24A', border: 'none', color: '#0A0908', fontFamily: '"Courier New", monospace', fontSize: '0.68rem', letterSpacing: '0.25em', padding: '0.85rem 2rem', cursor: saving || !currentMemory.trim() ? 'not-allowed' : 'pointer', borderRadius: '2px', transition: 'background 0.15s' }}
+              style={{ background: saving || !currentMemory.trim() ? 'transparent' : 'var(--on-dark)', border: saving || !currentMemory.trim() ? '1px solid var(--on-dark-rule)' : '1px solid transparent', color: saving || !currentMemory.trim() ? 'var(--on-dark-3)' : 'var(--color-void)', fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.78rem', letterSpacing: '0.18em', padding: '0.85rem 2rem', cursor: saving || !currentMemory.trim() ? 'not-allowed' : 'pointer', borderRadius: '2px', transition: 'background 0.15s' }}
             >
               {saving ? 'SAVING…' : 'SAVE THIS MEMORY'}
             </button>
@@ -442,21 +442,21 @@ export default function GameClient({ sessionId }: { sessionId: string }) {
             <button
               onClick={() => setPhotoIndex(i => Math.max(0, i - 1))}
               disabled={photoIndex === 0}
-              style={{ fontFamily: '"Courier New", monospace', fontSize: '0.62rem', letterSpacing: '0.15em', color: '#5C6166', background: 'transparent', border: '1px solid rgba(255,255,255,0.08)', padding: '0.55rem 1rem', cursor: photoIndex === 0 ? 'not-allowed' : 'pointer', borderRadius: '2px', opacity: photoIndex === 0 ? 0.35 : 1 }}
+              style={{ fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.78rem', letterSpacing: '0.15em', color: 'var(--on-dark-3)', background: 'transparent', border: '1px solid rgba(255,255,255,0.08)', padding: '0.55rem 1rem', cursor: photoIndex === 0 ? 'not-allowed' : 'pointer', borderRadius: '2px', opacity: photoIndex === 0 ? 0.35 : 1 }}
             >
               ← PREV
             </button>
             {photoIndex < photos.length - 1 ? (
               <button
                 onClick={() => setPhotoIndex(i => i + 1)}
-                style={{ fontFamily: '"Courier New", monospace', fontSize: '0.62rem', letterSpacing: '0.15em', color: '#C4A24A', background: 'transparent', border: '1px solid rgba(196,162,74,0.3)', padding: '0.55rem 1rem', cursor: 'pointer', borderRadius: '2px' }}
+                style={{ fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.78rem', letterSpacing: '0.15em', color: 'var(--color-gold)', background: 'transparent', border: '1px solid rgba(160,132,80,0.3)', padding: '0.55rem 1rem', cursor: 'pointer', borderRadius: '2px' }}
               >
                 NEXT PHOTO →
               </button>
             ) : (
               <button
                 onClick={() => setGameComplete(true)}
-                style={{ background: '#C4A24A', border: 'none', color: '#0A0908', fontFamily: '"Courier New", monospace', fontSize: '0.68rem', letterSpacing: '0.25em', padding: '0.55rem 1.5rem', cursor: 'pointer', borderRadius: '2px' }}
+                style={{ background: 'var(--on-dark)', border: 'none', color: 'var(--color-void)', fontFamily: 'var(--font-space-mono), "Courier New", monospace', fontSize: '0.78rem', letterSpacing: '0.18em', padding: '0.55rem 1.5rem', cursor: 'pointer', borderRadius: '2px' }}
               >
                 SEE RESULTS →
               </button>

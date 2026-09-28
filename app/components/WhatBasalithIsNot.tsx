@@ -34,7 +34,7 @@ export default function WhatBasalithIsNot() {
             WHAT BASALITH IS NOT
           </p>
           {/* Same treatment as the Philosophy heading */}
-          <h2 style={{ ...serif, fontSize: 'var(--text-section)', fontWeight: 300, lineHeight: 1.15, letterSpacing: '-0.02em', color: 'var(--text-on-dark)', margin: 0 }}>
+          <h2 style={{ ...serif, fontSize: 'var(--text-section)', fontWeight: 400, lineHeight: 1.15, letterSpacing: '-0.02em', color: 'var(--text-on-dark)', margin: 0 }}>
             Trust is the whole product.
           </h2>
         </div>
@@ -42,11 +42,11 @@ export default function WhatBasalithIsNot() {
         {/* Single stacked column; .neg h3 / .neg p sizing comes from globals.css */}
         <div className="negations">
           {ITEMS.map(item => (
-            <div key={item.title} className="neg" style={{ borderLeft: '3px solid rgba(196,162,74,0.5)', paddingLeft: 'clamp(20px,3vw,32px)' }}>
-              <h3 style={{ ...serif, fontWeight: 300, color: 'var(--text-on-dark)', letterSpacing: '-0.01em', lineHeight: 1.2, margin: '0 0 10px' }}>
+            <div key={item.title} className="neg" style={{ borderLeft: '3px solid rgba(160,132,80,0.5)', paddingLeft: 'clamp(20px,3vw,32px)' }}>
+              <h3 style={{ ...serif, fontWeight: 400, color: 'var(--text-on-dark)', letterSpacing: '-0.01em', lineHeight: 1.2, margin: '0 0 10px' }}>
                 {item.title}
               </h3>
-              <p style={{ ...serif, fontWeight: 300, color: 'var(--text-on-dark-2)', margin: 0 }}>
+              <p style={{ ...serif, fontWeight: 400, color: 'var(--text-on-dark-2)', margin: 0 }}>
                 {item.body}
               </p>
             </div>
