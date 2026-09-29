@@ -24,6 +24,9 @@
  * or Supabase.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { createHash } from 'crypto'
+import { readFileSync, existsSync } from 'fs'
+import path from 'path'
 
 type Row = Record<string, unknown>
 
@@ -136,7 +139,7 @@ vi.mock('@anthropic-ai/sdk', () => ({
   },
 }))
 
-import { runCoverage } from './coverageRun'
+import { runCoverage, supabaseCoverageStore } from './coverageRun'
 import { COVERAGE_PROBES, PROBE_SET_VERSION } from './coverageProbes'
 import { PERSONAL_COVERAGE_PROBES, PERSONAL_PROBE_SET_VERSION } from './coverageProbesPersonal'
 import { PERSONAL_DOMAINS } from './personalDomains'
@@ -245,8 +248,9 @@ describe('runCoverage default path, store neutrality', () => {
     console.log('\n  coverage_probe_results upsert payload:', JSON.stringify(first.payload))
     console.log('  coverage_probe_results conflict key  :', JSON.stringify(first.options))
 
+    // CHANGED 2026-09-28, calibration slice 1: layer_pair_ids joined the row.
     expect(Object.keys(first.payload as Row).sort()).toEqual(
-      ['basis', 'domain', 'probe_key', 'reply', 'run_id', 'topic'],
+      ['basis', 'domain', 'layer_pair_ids', 'probe_key', 'reply', 'run_id', 'topic'],
     )
     expect((first.payload as Row).run_id).toBe('run-1')
     expect(first.options).toEqual({ onConflict: 'run_id,probe_key' })
@@ -527,4 +531,110 @@ describe('runCoverage injected path', () => {
     expect(result.results.length).toBe(COVERAGE_PROBES.length)
     expect(result.complete).toBe(true)
   })
+})
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CALIBRATION SLICE 1, September 28, 2026. layer_pair_ids records which
+// training pairs sat in the frozen layer for each probe. Store only: the
+// prompt must not move by a byte, and nothing that builds a prompt or judges a
+// reply may ever read the column.
+// ─────────────────────────────────────────────────────────────────────────────
+describe('calibration slice 1, layer provenance', () => {
+  /**
+   * sha256 of every voice system prompt in one default-path run, joined on NUL.
+   * Taken from HEAD 777e110, before layer_pair_ids existed, over the same two
+   * pairs, owner, and name used below. A change here means the prompt moved.
+   */
+  const PROMPT_SHA256_BEFORE = {
+    succession: '065a776c699fb9c70777b8b3b70a069f28faae5e55ea3cbe49b3d17511c735d6',
+    b2c:        '14195caa8c88985b7aa8688ddc3e388d9482b9b813df17f37d42bb9647c46751',
+  }
+  const TWO_PAIRS = [
+    { id: 'tp-1', prompt: 'p1', completion: 'c1' },
+    { id: 'tp-2', prompt: 'p2', completion: 'c2' },
+  ]
+
+  for (const [tier, segment] of [['succession', 'succession'], ['active', 'b2c']] as const) {
+    it(`${segment}: prompt byte-identical to before, and every probe row carries the layer ids`, async () => {
+      H.state.archive = { id: ARCHIVE, name: 'Meridian', owner_name: 'Margaret', tier }
+      H.state.pairs   = TWO_PAIRS
+
+      await runCoverage({ archiveId: ARCHIVE })
+
+      const voices = M.calls.filter(c => c.model !== RETRIEVAL_MODEL)
+      const hash = createHash('sha256').update(voices.map(c => String(c.system)).join(' ')).digest('hex')
+      console.log(`  ${segment} voice prompts ${voices.length}, sha256 ${hash}`)
+      expect(voices.length).toBe(48)
+      expect(hash).toBe(PROMPT_SHA256_BEFORE[segment])
+
+      const writes = H.state.calls.filter(c => c.op === 'upsert' && c.table === 'coverage_probe_results')
+      console.log(`  ${segment} probe rows ${writes.length}, first layer_pair_ids ${JSON.stringify((writes[0].payload as Row).layer_pair_ids)}`)
+      expect(writes.length).toBe(48)
+      for (const w of writes) expect((w.payload as Row).layer_pair_ids).toEqual(['tp-1', 'tp-2'])
+    })
+  }
+
+  it('records the ids in the order the layer placed them, retriever picks included', async () => {
+    const { createInMemoryCoverageStore } = await import('./coverageStoreMemory')
+    const { FROZEN_LAYER_LIMIT } = await import('./coverageRun')
+    const mem = createInMemoryCoverageStore()
+    const oversized = Array.from({ length: FROZEN_LAYER_LIMIT + 5 }, (_, i) => ({
+      id: `tp-${i}`, prompt: `p${i}`, completion: `c${i}`,
+    }))
+    M.retrieverReply = `{"selected":[${oversized.length}]}`
+
+    await runCoverage({
+      archiveId: 'fixture:order',
+      content: { ownerName: 'X', archiveName: 'Y', segment: 'succession', pairs: oversized },
+      store: mem.store,
+    })
+
+    const expected = [...oversized.slice(0, FROZEN_LAYER_LIMIT - 1), oversized[oversized.length - 1]].map(p => p.id)
+    for (const r of mem.probes) expect(r.layerPairIds).toEqual(expected)
+  })
+
+  it('an empty selection writes layer_pair_ids: [], never null', async () => {
+    const { createInMemoryCoverageStore } = await import('./coverageStoreMemory')
+    const mem = createInMemoryCoverageStore()
+    await runCoverage({
+      archiveId: 'fixture:empty',
+      content: { ownerName: 'X', archiveName: 'Y', segment: 'succession', pairs: [] },
+      store: mem.store,
+    })
+    for (const r of mem.probes) expect(r.layerPairIds).toEqual([])
+
+    // And the Supabase row for an empty layer is '{}', not null.
+    H.state.calls = []
+    await supabaseCoverageStore.recordProbe({
+      runId: 'run-1', domain: 'd', probeKey: 'k', basis: 'no_position', topic: 't', reply: 'r',
+      verifierErrored: false, layerPairIds: [],
+    })
+    const row = H.state.calls.find(c => c.table === 'coverage_probe_results')!.payload as Row
+    console.log('  empty layer row layer_pair_ids:', JSON.stringify(row.layer_pair_ids))
+    expect(row.layer_pair_ids).toEqual([])
+  })
+
+  // BOUNDARY, permanent: provenance recording never becomes an input. Asserted
+  // on source text, the way lib/threadExtract.test.ts pins its boundary.
+  const ROOT = path.resolve(__dirname, '..')
+  const INPUT_PATHS = [
+    'lib/frozenLayer.ts',
+    'lib/entitySystemPrompt.ts',
+    'lib/verifyGrounding.ts',
+    'lib/entityContext.ts',
+    'lib/foundingProof.ts',
+    // The grounded family pipeline behind app/api/archive/entity-chat.
+    'lib/familyEntity.ts',
+    'app/api/succession/entity/chat/route.ts',
+    'app/api/archive/entity-chat/route.ts',
+  ]
+  const FORBIDDEN = /layer_pair_ids|layerPairIds/
+
+  for (const rel of INPUT_PATHS) {
+    it(`${rel} does not read layer provenance`, () => {
+      const file = path.join(ROOT, rel)
+      expect(existsSync(file), `${rel} moved; update this list rather than deleting the check`).toBe(true)
+      expect(FORBIDDEN.test(readFileSync(file, 'utf8'))).toBe(false)
+    })
+  }
 })

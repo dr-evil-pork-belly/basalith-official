@@ -272,6 +272,18 @@ export type ProbeRecord = {
    * third state that means nothing. Every caller states it.
    */
   verifierErrored: boolean
+  /**
+   * The ids of the training pairs placed in the frozen layer for this probe, in
+   * the order they were placed. Calibration slice 1, September 28, 2026: the
+   * record of what the model had in front of it, whatever the basis, so a
+   * decline or a caught overreach can be reviewed against its layer too.
+   *
+   * Empty for an empty layer, never absent. Injected fixtures carry no ids, so
+   * their layers record as empty; they write to the verification tables, which
+   * do not store this. Provenance only: nothing that builds a prompt or judges
+   * a reply may read it (pinned in lib/coverageRun.test.ts).
+   */
+  layerPairIds: string[]
 }
 
 export type PriorCoverage = {
@@ -393,6 +405,9 @@ export const supabaseCoverageStore: CoverageStore = {
         basis:     record.basis,
         topic:     record.topic,
         reply:     record.reply,
+        // Calibration slice 1. '{}' for an empty layer; null is reserved for
+        // rows written before migration 20260928_calibration_layer_pair_ids.sql.
+        layer_pair_ids: record.layerPairIds,
       },
       { onConflict: 'run_id,probe_key' },
     )
@@ -675,6 +690,8 @@ export async function runCoverage(params: {
           // Passing it means a store can record the distinction structurally
           // instead of a reader having to recover it from the topic string.
           verifierErrored: errored,
+          // From the selection already made above. No second selection.
+          layerPairIds: pairs.map(p => p.id).filter((id): id is string => typeof id === 'string'),
         })
 
         // JSON-safe on purpose: this value crosses the Inngest step boundary.

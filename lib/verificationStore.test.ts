@@ -107,6 +107,7 @@ async function fullRun(overrides: Partial<VerificationRunContext> = {}) {
     runId: opened.runId, domain: 'Capital', probeKey: 'capital-01',
     basis: 'no_position', topic: 'a topic', reply: 'a draft',
     verifierErrored: false,
+    layerPairIds: [],
   })
   await store.writeCoverage([])
   await store.finishRun({
@@ -205,6 +206,7 @@ describe('verification store', () => {
       topic: 'verifier failsafe, verdict discarded',
       reply: 'a draft',
       verifierErrored: true,
+      layerPairIds: [],
     })
 
     const probe = H.state.calls.find(c => c.table === 'verification_probe_results')!
@@ -256,7 +258,7 @@ describe('verification store', () => {
     H.state.upsertError = 'connection reset'
     await expect(store.recordProbe({
       runId: opened.runId, domain: 'Capital', probeKey: 'capital-02',
-      basis: 'deposit', topic: 't', reply: 'r', verifierErrored: false,
+      basis: 'deposit', topic: 't', reply: 'r', verifierErrored: false, layerPairIds: [],
     })).rejects.toThrow(/capital-02.*connection reset/)
   })
 
