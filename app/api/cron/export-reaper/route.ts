@@ -22,6 +22,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server'
 import { reapExpiredExports } from '@/lib/archiveExportReaper'
+import { withCronRun } from '@/lib/cronRun'
 
 export const dynamic = 'force-dynamic'
 
@@ -39,5 +40,24 @@ export async function GET(req: NextRequest) {
   // query string cannot silently turn the scheduled run into a no-op.
   const dryRun = searchParams.get('dryRun') === '1'
 
-  return NextResponse.json(await reapExpiredExports({ dryRun }))
+  // First adopter of the run ledger (lib/cronRun.ts, September 30, 2026). The
+  // response body is unchanged. A dry run is recorded as 'skipped', never 'ok',
+  // so a watcher counting 'ok' rows counts real reaps only. The summary carries
+  // counts and no paths: an export path contains an archive id.
+  const result = await withCronRun(
+    { job: 'export-reaper', scheduler: 'vercel' },
+    () => reapExpiredExports({ dryRun }),
+    (r) => ({
+      outcome: !r.ok ? 'failed' : r.dryRun ? 'skipped' : 'ok',
+      error:   r.error,
+      summary: {
+        dryRun:  r.dryRun,
+        scanned: r.scanned,
+        deleted: r.deleted,
+        kept:    r.kept?.length ?? 0,
+      },
+    }),
+  )
+
+  return NextResponse.json(result)
 }
