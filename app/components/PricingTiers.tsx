@@ -52,7 +52,7 @@ const TIERS: Tier[] = [
     contributorNote: 'Your contributors never need to log in, remember a password, or learn a new interface. They receive an email. They hit reply. Their memory is added. Or they hold a button in the app and speak for two minutes.',
     cta:     'Begin your Basalith',
     ctaHref: '/apply',
-    note:    'One-time founding fee of $2,500',
+    note:    'One time founding fee of $2,500',
   },
   {
     id:          'resting',
@@ -88,7 +88,7 @@ const TIERS: Tier[] = [
       'Your Basalith and entity continue for your heirs',
       'Full family contributor access',
       'Cognitive fingerprint frozen. Nobody can change what you said',
-      'A second copy offsite under a ninety-day lock nobody can shorten',
+      'A second copy offsite under a ninety day lock nobody can shorten',
       'Storage and security',
       'Full export in open formats, any time',
     ],
@@ -167,7 +167,7 @@ export default function PricingTiers() {
 
         {/* Founding fee — legible subhead, not a faint mono eyebrow */}
         <p style={{ ...SERIF, fontSize: '1.05rem', fontWeight: 400, lineHeight: 1.8, color: 'var(--color-text-primary)', marginBottom: '24px' }}>
-          Every plan begins with The Founding, a one-time $2,500 fee.
+          Every plan begins with The Founding, a one time $2,500 fee.
         </p>
 
         {/* Toggle — Annual / Monthly (Active + Resting only) */}
@@ -390,7 +390,7 @@ export default function PricingTiers() {
       {/* Monthly minimum note */}
       {!isAnnual && (
         <p style={{ ...MONO, fontSize: '0.78rem', letterSpacing: '0.2em', color: 'var(--color-text-faint)', textAlign: 'center', marginTop: '24px' }}>
-          Monthly plans require a 12-month minimum commitment. Cancel anytime after month 12.
+          Monthly plans require a 12 month minimum commitment. Cancel anytime after month 12.
         </p>
       )}
 

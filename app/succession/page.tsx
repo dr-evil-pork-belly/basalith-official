@@ -24,7 +24,7 @@ const GEORGIA: React.CSSProperties = {
 const PAD = 'clamp(24px,6vw,80px)'
 
 const DOCUMENTED = [
-  'Strategy and the long-range plan',
+  'Strategy and the long range plan',
   'Playbooks and process documents',
   'The org chart and who reports to whom',
   'The financial model and unit economics',
@@ -104,8 +104,8 @@ const FEATURES = [
   'A map of where the record is thin, area by area, before the handover',
   'Successor access portal',
   'Every answer checked against the record, or a plain no',
-  'Deposits are append-only. The database refuses the edit',
-  'A second copy offsite under a ninety-day lock nobody can shorten',
+  'Deposits are append only. The database refuses the edit',
+  'A second copy offsite under a ninety day lock nobody can shorten',
   'Full export in open formats, any time',
 ]
 
@@ -368,7 +368,7 @@ export default function SuccessionPage() {
                 background:  'rgba(160,132,80,0.03)',
               }}>
                 <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)', marginBottom: '20px', opacity: 0.7 }}>
-                  Active post-transition
+                  Active after transition
                 </p>
                 <h3 style={{
                   ...SERIF,
@@ -458,7 +458,7 @@ export default function SuccessionPage() {
                 per year
               </p>
               <p style={{ ...GEORGIA, fontSize: '0.95rem', fontStyle: 'italic', color: 'var(--color-gold)', marginBottom: '32px' }}>
-                + $5,000 Founding (one-time)
+                + $5,000 Founding (one time)
               </p>
 
               <div style={{ height: '1px', background: 'rgba(160,132,80,0.15)', marginBottom: '28px' }} />

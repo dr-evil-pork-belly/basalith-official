@@ -13,7 +13,7 @@ const AGENTS = [
     num:    '02',
     title:  'The Deduplication',
     job:    'Collapses twelve shots into one.',
-    body:   'You took eight photographs of the same moment hoping one turned out. We identify every cluster of near-identical images and surface only the best one. The rest are stored but never shown unless you ask.',
+    body:   'You took eight photographs of the same moment hoping one turned out. We identify every cluster of nearly identical images and surface only the best one. The rest are stored but never shown unless you ask.',
     result: 'Duplicate clusters collapsed',
   },
   {
@@ -21,7 +21,7 @@ const AGENTS = [
     title:  'The Classification',
     job:    'Understands what it is looking at.',
     body:   'Every photograph is analyzed for what it contains: faces, event type, setting, emotional register. When you open a photograph to label it, the form is already partially filled. You confirm. You correct. You add what only you would know.',
-    result: 'Labels pre-suggested by AI',
+    result: 'Labels suggested by AI',
   },
   {
     num:    '04',
@@ -195,7 +195,7 @@ export default function IntelligenceLayer() {
         >
           Most families arrive with decades of visual memory in complete disorder.
           <br /><br />
-          They leave The Founding with a curated, chronologically anchored, face-indexed
+          They leave The Founding with a curated, chronologically anchored, face indexed
           archive, ready to label, ready to share, ready to pass on.
         </p>
 

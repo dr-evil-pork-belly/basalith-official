@@ -28,7 +28,7 @@ export default function SuccessorLoginPage() {
     })
 
     if (error) {
-      setError('We could not send a sign-in link. Please check the email address and try again.')
+      setError('We could not send a sign in link. Please check the email address and try again.')
       setLoading(false)
     } else {
       setSent(true)
@@ -120,7 +120,7 @@ export default function SuccessorLoginPage() {
             lineHeight: 1.6,
           }}
         >
-          {sent ? 'A sign-in link is on its way to you.' : 'Enter your email to sign in to the founder\'s Basalith.'}
+          {sent ? 'A sign in link is on its way to you.' : 'Enter your email to sign in to the founder\'s Basalith.'}
         </p>
 
         {sent ? (
@@ -129,7 +129,7 @@ export default function SuccessorLoginPage() {
               Check your email
             </p>
             <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.06em', color: 'var(--invert-dim)', lineHeight: 1.7 }}>
-              We sent a sign-in link to {email}. Open it on this device to enter the founder&rsquo;s Basalith.
+              We sent a sign in link to {email}. Open it on this device to enter the founder&rsquo;s Basalith.
             </p>
           </div>
         ) : (
@@ -197,7 +197,7 @@ export default function SuccessorLoginPage() {
                 transition:      'background 0.2s, color 0.2s',
               }}
             >
-              {loading ? 'Sending…' : 'Send Sign-In Link'}
+              {loading ? 'Sending…' : 'Send Sign In Link'}
             </button>
           </form>
         )}

@@ -198,7 +198,7 @@ export default function AboutPage() {
             </p>
             <p style={BODY}>
               An owner's judgment and a parent's wisdom are the same problem wearing
-              different clothes. Both are decades of hard-won reasoning that usually
+              different clothes. Both are decades of hard won reasoning that usually
               transfer as fragments, if they transfer at all. Basalith captures how a
               person thinks while they are still here to keep it honest.
             </p>
@@ -263,9 +263,9 @@ export default function AboutPage() {
               Built on Evidence
             </p>
             <p style={BODY}>
-              The architecture behind Basalith draws on peer-reviewed research in
+              The architecture behind Basalith draws on peer reviewed research in
               succession planning, knowledge loss in organizations, personalized
-              language model fine-tuning, and oral history.
+              language model fine tuning, and oral history.
             </p>
             <p style={{ ...BODY, marginBottom: '36px' }}>
               All of it is documented at basalith.xyz, including what this technology

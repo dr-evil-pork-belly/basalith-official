@@ -11,7 +11,7 @@ const ITEMS: Item[] = [
   {
     q: 'What exactly is The Founding?',
     a: <>
-      The Founding is the one-time fee that opens your Basalith. It covers the Founding Sequence, three of
+      The Founding is the one time fee that opens your Basalith. It covers the Founding Sequence, three of
       the hardest calls you ever made, in your own words and your own time, plus your contributors invited,
       your records brought in, and a first read with the founder of Basalith by video. You pay it once, at
       the start. Your annual plan begins after The Founding is complete.

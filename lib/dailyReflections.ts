@@ -71,7 +71,7 @@ export const DAILY_REFLECTIONS_EN: Record<string, string[]> = {
     "What has surprised you most about getting older?",
     "What is something that seemed important when you were young that does not matter at all now?",
     "What is the most valuable thing you own that has no monetary value?",
-    "What would you tell your 20-year-old self?",
+    "What would you tell your 20 year old self?",
     "What have you changed your mind about as you have gotten older?",
     "What is the secret to a long and happy life?",
     "What do you want your grandchildren to understand about how to live?",

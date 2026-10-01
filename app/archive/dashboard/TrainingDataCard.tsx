@@ -134,7 +134,7 @@ export default function TrainingDataCard() {
         <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid var(--portal-rule)' }}>
           <p style={{ fontFamily: SERIF, fontSize: '15.5px', fontStyle: 'italic', color: 'var(--portal-gold-ink)', margin: 0, lineHeight: 1.7 }}>
             Your entity has reached The Cognitive Fingerprint.
-            Ask us about voice fine-tuning.
+            Ask us about voice fine tuning.
           </p>
         </div>
       )}

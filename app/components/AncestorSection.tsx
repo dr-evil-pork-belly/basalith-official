@@ -26,9 +26,9 @@ export default function AncestorSection() {
             textAlign:  'left',
           }}
         >
-          My great-grandmother came from a small village in 1907.
+          My great grandmother came from a small village in 1907.
           <br /><br />
-          She was twenty-two years old. She spoke no English. She had almost nothing.
+          She was twenty two years old. She spoke no English. She had almost nothing.
           <br /><br />
           I know these facts the way you know facts from a book, accurately, but
           without weight.
@@ -87,7 +87,7 @@ export default function AncestorSection() {
             textAlign: 'center',
           }}
         >
-          What would your great-grandchildren give to be able to talk to you,
+          What would your great grandchildren give to be able to talk to you,
           <br /><br />
           not read about you,
           <br /><br />

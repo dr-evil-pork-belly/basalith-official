@@ -181,7 +181,7 @@ export default function Hero() {
         <div ref={ref(2)} className="reveal reveal-delay-2 max-w-[440px]">
           <p className="font-sans font-light text-body-base leading-[1.82] text-text-secondary">
             While you are alive it studies you. It learns your judgment, your values,
-            your hard-won understanding of how the world works. When you are gone
+            your hard won understanding of how the world works. When you are gone
             it carries that knowledge forward.
           </p>
           <p className="font-sans font-light text-body-base leading-[1.82] text-text-secondary mt-3">

@@ -169,7 +169,7 @@ export function buildPausedReminderEmail(
       Your photographs. Your voice. Your deposits.
     </p>
     <p style="font-family:Georgia,serif;font-size:17px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 32px">
-      When you are ready to return reply to this email or use your sign-in link below.
+      When you are ready to return reply to this email or use your sign in link below.
       We will be here.
     </p>
     <a href="${resumeUrl}" style="${BASE_STYLES.goldBtn}">Return to your Basalith →</a>

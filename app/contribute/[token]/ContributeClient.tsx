@@ -1136,7 +1136,7 @@ function PhoneCallSection({
             </button>
           </div>
           <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.1em', color: 'var(--portal-label)', marginTop: '0.75rem' }}>
-            Include country code. Your number is only used for call-in recording.
+            Include country code. Your number is only used for call in recording.
           </p>
         </div>
       )}

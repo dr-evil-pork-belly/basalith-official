@@ -7,7 +7,7 @@ import PricingTiers from '../components/PricingTiers'
 
 export const metadata: Metadata = {
   title: 'Pricing · Basalith',
-  description: 'Basalith pricing, in full. Succession at $12,000 a year plus a one-time Founding fee. Acquisition engagements from $50,000. A Basalith for one person or a family from $2,500 to begin.',
+  description: 'Basalith pricing, in full. Succession at $12,000 a year plus a one time Founding fee. Acquisition engagements from $50,000. A Basalith for one person or a family from $2,500 to begin.',
 }
 
 const MONO: React.CSSProperties = {
@@ -103,7 +103,7 @@ const FOUNDING_DELIVERABLES = [
   // designation) described steps with no mechanism behind them and was flagged
   // as unverified in the September 8 pass. Nothing here is a promise the
   // product or the founder does not keep today.
-  { n: '01', title: 'Your Basalith, opened',           desc: 'Your Basalith and your sign-in, ready the day you begin.' },
+  { n: '01', title: 'Your Basalith, opened',           desc: 'Your Basalith and your login, ready the day you begin.' },
   { n: '02', title: 'The Founding Sequence',           desc: 'Three of the hardest calls you ever made, in your own words, in your own time. Speak or type. This is where it becomes real.' },
   { n: '03', title: 'The people around you',           desc: 'Contributors invited by email. They never need to log in.' },
   { n: '04', title: 'What you already have',           desc: 'Documents, photographs, and recordings brought onto the record.' },
@@ -121,7 +121,7 @@ const SECURITY_BADGES: { icon: IconName; label: string }[] = [
   { icon: 'lock',     label: 'AES-256 encrypted at rest' },
   { icon: 'lock-key', label: 'TLS 1.3 in transit' },
   { icon: 'box',      label: 'Full data export anytime' },
-  { icon: 'scales',   label: 'Delaware C-Corp' },
+  { icon: 'scales',   label: 'Delaware C Corp' },
   { icon: 'columns',  label: 'Academic research foundation' },
 ]
 
@@ -131,8 +131,8 @@ const SUCCESSION_FEATURES = [
   'A map of where the record is thin, area by area, before the handover',
   'Successor access portal',
   'Every answer checked against the record, or a plain no',
-  'Deposits are append-only. The database refuses the edit',
-  'A second copy offsite under a ninety-day lock nobody can shorten',
+  'Deposits are append only. The database refuses the edit',
+  'A second copy offsite under a ninety day lock nobody can shorten',
   'Full export in open formats, any time',
 ]
 
@@ -238,7 +238,7 @@ export default function PricingPage() {
               <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)', marginBottom: '16px' }}>Succession</p>
               <p style={{ ...SERIF, fontSize: 'clamp(2.5rem,5vw,3.2rem)', fontWeight: 400, color: 'var(--color-text-primary)', lineHeight: 1, marginBottom: '4px' }}>$12,000</p>
               <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-text-muted)', marginBottom: '8px' }}>per year</p>
-              <p style={{ ...SERIF, fontSize: '0.95rem', fontStyle: 'italic', color: 'var(--color-gold)', marginBottom: '28px' }}>+ $5,000 Founding (one-time)</p>
+              <p style={{ ...SERIF, fontSize: '0.95rem', fontStyle: 'italic', color: 'var(--color-gold)', marginBottom: '28px' }}>+ $5,000 Founding (one time)</p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 20px', marginBottom: '32px' }}>
                 {SUCCESSION_FEATURES.map(f => (
                   <p key={f} style={{ ...SERIF, fontSize: '0.98rem', lineHeight: 1.5, color: 'var(--color-text-secondary)', margin: 0, paddingLeft: '18px', textIndent: '-18px' }}><span aria-hidden="true" style={{ display: 'inline-block', width: '10px', height: '1px', background: 'var(--color-gold)', verticalAlign: 'middle', marginRight: '8px' }} />{f}</p>
@@ -359,7 +359,7 @@ export default function PricingPage() {
               <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
                 <div style={{ borderTop: '1px solid rgba(160,132,80,0.15)', paddingTop: '32px' }}>
                   <p style={{ ...SERIF, fontSize: '3.5rem', fontWeight: 400, color: 'var(--on-dark)', lineHeight: 1, letterSpacing: '-0.02em', marginBottom: '8px' }}>$5,000</p>
-                  <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)', marginBottom: '16px' }}>Business founding, one-time</p>
+                  <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)', marginBottom: '16px' }}>Business founding, one time</p>
                   <p style={{ ...SERIF, fontSize: '0.88rem', fontStyle: 'italic', fontWeight: 400, color: 'var(--on-dark-3)', lineHeight: 1.7 }}>
                     Individual and family founding is $2,500. Annual plan selected separately.
                     Three calls in your own words, then a first read by video.

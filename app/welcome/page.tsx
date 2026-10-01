@@ -41,15 +41,15 @@ export default function WelcomePage() {
             className="font-serif font-light text-text-secondary leading-[1.6] mb-6"
             style={{ fontSize: 'clamp(1.1rem,2vw,1.35rem)' }}
           >
-            Your Basalith is being set up now. A welcome email with your sign-in link is on its way to the address you used at checkout.
+            Your Basalith is being set up now. A welcome email with your sign in link is on its way to the address you used at checkout.
           </p>
           <p
             className="font-serif font-light text-text-secondary leading-[1.6] mb-12"
             style={{ fontSize: 'clamp(1.1rem,2vw,1.35rem)' }}
           >
-            If it has not arrived, check your spam folder. You can also request a sign-in link with that email address at any time.
+            If it has not arrived, check your spam folder. You can also request a sign in link with that email address at any time.
           </p>
-          <a href="/archive-login" className="btn-monolith-ghost">Request a sign-in link</a>
+          <a href="/archive-login" className="btn-monolith-ghost">Request a sign in link</a>
         </div>
 
       </main>

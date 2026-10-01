@@ -212,7 +212,7 @@ export default function ContinuityPillar() {
         >
           The entity improves with every generation of AI. What begins as a reasonable representation
           of your thinking becomes, over decades, something extraordinarily accurate. By the time your
-          great-grandchildren are old enough to ask it hard questions it will have the depth to answer them.
+          great grandchildren are old enough to ask it hard questions it will have the depth to answer them.
         </p>
         <p
           className="font-serif font-light"

@@ -45,14 +45,14 @@ const STEPS = [
     title: 'What the operator puts in',
     body:  [
       'The model learns from the operator first. Recorded sessions, decision frameworks, scenario responses, written deposits.',
-      'First-person reasoning. How they work a problem, what they weigh, what they took from the calls that went wrong. The specific logic of how this one mind decides.',
+      'First person reasoning. How they work a problem, what they weigh, what they took from the calls that went wrong. The specific logic of how this one mind decides.',
     ],
   },
   {
     n:     '02',
     title: 'What the people around them saw',
     body:  [
-      'The people who watched the operator decide notice what the operator would never think to record. A co-founder remembers how a deal got reasoned through. A long-tenured exec remembers the hire everyone else doubted.',
+      'The people who watched the operator decide notice what the operator would never think to record. A cofounder remembers how a deal got reasoned through. A long tenured exec remembers the hire everyone else doubted.',
       'The outside view catches the patterns the operator takes for granted. In a family, it is a daughter noticing how her father handled pressure. Same mechanism.',
     ],
   },
@@ -200,7 +200,7 @@ export default function MethodPage() {
                 {[
                   'Deep evaluation',
                   'Ambiguous cases',
-                  'High-stakes decisions',
+                  'High stakes decisions',
                 ].map(item => (
                   <p key={item} style={{ ...SERIF, fontSize: '0.9rem', fontWeight: 400, color: 'var(--on-dark-3)', lineHeight: 1.7, marginBottom: '8px' }}>{item}</p>
                 ))}

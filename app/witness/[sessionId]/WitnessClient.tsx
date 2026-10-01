@@ -232,7 +232,7 @@ export default function WitnessClient({ sessionId }: { sessionId: string }) {
 
       <p className="font-serif italic font-light" style={{ fontSize: '1rem', color: 'var(--on-dark-2)', lineHeight: 1.9, maxWidth: '520px' }}>
         {subjectName} is building a permanent record of their life, one that their
-        grandchildren and great-grandchildren will be able to access for generations.
+        grandchildren and great grandchildren will be able to access for generations.
         <br /><br />
         You have been invited because your perspective is irreplaceable. The things
         you have observed about {subjectName} are things only you can contribute.

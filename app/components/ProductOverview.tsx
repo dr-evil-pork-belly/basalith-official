@@ -8,7 +8,7 @@ export default function ProductOverview() {
     {
       eyebrow: 'The Intelligence',
       headline: 'An AI that learns how you think.',
-      body: 'Our seven-layer pipeline filters, organizes, and prioritizes your archive automatically. Your entity grows more accurate with every deposit.',
+      body: 'Our seven layer pipeline filters, organizes, and prioritizes your archive automatically. Your entity grows more accurate with every deposit.',
     },
     {
       eyebrow: 'The Continuity',

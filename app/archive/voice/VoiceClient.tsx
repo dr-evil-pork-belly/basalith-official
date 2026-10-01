@@ -23,7 +23,7 @@ const STORY_PROMPTS = [
   'Tell me about the day you met your partner.',
   'Describe a moment of real failure.',
   'Tell me about someone who changed your life.',
-  'What would you tell your 20-year-old self?',
+  'What would you tell your 20 year old self?',
   'Describe the best decision you ever made.',
   'Tell me about a time you were genuinely afraid.',
 ]

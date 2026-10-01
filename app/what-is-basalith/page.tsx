@@ -164,7 +164,7 @@ export default function WhatIsBasalithPage() {
                 margin:     0,
               }}
             >
-              The name joins basalt and monolith. It is said BAS-uh-lith.
+              The name joins basalt and monolith. It is said BAS uh lith.
               Basalith is not basalt, the volcanic rock, and it is not the
               basilisk. It is a company, operating under Heritage Nexus Inc.
             </p>

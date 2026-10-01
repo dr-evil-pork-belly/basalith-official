@@ -243,7 +243,7 @@ const STEPS = [
   {
     n:    '03',
     name: 'Guided Witness Sessions',
-    body: "Three 90-minute guided sessions with your family. We surface the photographs. We ask the witness questions, the ones designed to extract what only each person from their specific vantage point could know. A daughter gets different questions than a colleague. A childhood friend gets different questions than a spouse. Every perspective adds something no other perspective can.",
+    body: "Three 90 minute guided sessions with your family. We surface the photographs. We ask the witness questions, the ones designed to extract what only each person from their specific vantage point could know. A daughter gets different questions than a colleague. A childhood friend gets different questions than a spouse. Every perspective adds something no other perspective can.",
   },
   {
     n:    '04',
@@ -330,7 +330,7 @@ function Pricing() {
             $4,500
           </p>
           <p style={{ fontFamily: 'var(--font-space-mono), monospace', fontSize: '0.72rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: '1rem' }}>
-            One-Time Engagement Fee
+            One Time Engagement Fee
           </p>
           <p style={{ fontFamily: "var(--font-newsreader), Georgia, serif", fontStyle: 'italic', fontSize: '0.9rem', color: 'var(--color-text-secondary)', lineHeight: 1.7, marginBottom: '1.5rem' }}>
             Six weeks. Every session. Everything that remains.

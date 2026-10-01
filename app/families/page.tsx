@@ -56,7 +56,7 @@ const STEPS = [
   {
     n:     '03',
     title: 'The check.',
-    body:  'Every response is scored before it can shape the model. Lower-confidence responses get a closer pass. Their Basalith reflects how the person actually reasoned.',
+    body:  'Every response is scored before it can shape the model. Lower confidence responses get a closer pass. Their Basalith reflects how the person actually reasoned.',
   },
   {
     n:     '04',

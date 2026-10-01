@@ -60,10 +60,10 @@ const QA: { q: string; a: React.ReactNode; plain?: string }[] = [
   {
     q: 'What does it cost?',
     a: <>
-      For a business succession, $12,000 a year plus a one-time $5,000 Founding fee. Acquisition engagements start at $50,000, scaled to the transaction. For individuals and families, a one-time $2,500 founding fee, then Active at $3,600 a year, Resting at $600 a year, or Legacy at $1,200 a year.
+      For a business succession, $12,000 a year plus a one time $5,000 Founding fee. Acquisition engagements start at $50,000, scaled to the transaction. For individuals and families, a one time $2,500 founding fee, then Active at $3,600 a year, Resting at $600 a year, or Legacy at $1,200 a year.
       {' '}<a href="/pricing" style={LINK}>See pricing in full &rarr;</a>
     </>,
-    plain: 'For a business succession, $12,000 a year plus a one-time $5,000 Founding fee. Acquisition engagements start at $50,000, scaled to the transaction. For individuals and families, a one-time $2,500 founding fee, then Active at $3,600 a year, Resting at $600 a year, or Legacy at $1,200 a year.',
+    plain: 'For a business succession, $12,000 a year plus a one time $5,000 Founding fee. Acquisition engagements start at $50,000, scaled to the transaction. For individuals and families, a one time $2,500 founding fee, then Active at $3,600 a year, Resting at $600 a year, or Legacy at $1,200 a year.',
   },
   {
     q: 'How do family members or colleagues contribute?',

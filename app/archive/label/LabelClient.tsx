@@ -26,7 +26,7 @@ const MILESTONE_TEXTS: Record<number, { main: string; sub: string }> = {
   1:   { main: 'Your Basalith has begun.',                         sub: 'ONE PHOTOGRAPH · ONE MEMORY · PERMANENT'   },
   5:   { main: 'Five moments preserved.',                          sub: 'THE RECORD IS GROWING'                     },
   10:  { main: 'Ten photographs.\nA decade comes alive.',          sub: 'KEEP GOING'                                },
-  25:  { main: 'Twenty-five.\nThis family is being remembered.',   sub: 'YOUR BASALITH IS TAKING SHAPE'             },
+  25:  { main: 'Twenty five.\nThis family is being remembered.',   sub: 'YOUR BASALITH IS TAKING SHAPE'             },
   50:  { main: 'Fifty photographs.\nThis is a serious record.',    sub: 'HALF A CENTURY OF MOMENTS · PRESERVED'     },
   100: { main: 'One hundred.\nThis is a legacy.',                  sub: 'ONE HUNDRED MEMORIES · PRESERVED FOREVER'  },
 }

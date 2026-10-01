@@ -100,7 +100,7 @@ export default function BeginClient({ signedInEmail }: { signedInEmail: string |
 
       const sent = await sendLink(address)
       if (!sent) {
-        setError('We could not send a sign-in link. Please check the email address and try again.')
+        setError('We could not send a sign in link. Please check the email address and try again.')
         setLoading(false)
         return
       }
@@ -122,7 +122,7 @@ export default function BeginClient({ signedInEmail }: { signedInEmail: string |
       setResent(true)
       setResendIn(RESEND_AFTER_SECONDS)
     } else {
-      setError('We could not send a sign-in link. Please try again in a moment.')
+      setError('We could not send a sign in link. Please try again in a moment.')
     }
   }
 

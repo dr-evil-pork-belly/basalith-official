@@ -91,7 +91,7 @@ export function buildFoundingWelcomeEmail(input: FoundingWelcomeInput): BuiltEma
     ? `
   <div style="background:rgba(196,162,74,0.08);border:1px solid rgba(196,162,74,0.3);border-top:3px solid rgba(196,162,74,0.8);padding:24px;margin:0 0 24px">
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#C4A24A;margin:0 0 12px;text-transform:uppercase">
-      Your sign-in link
+      Your sign in link
     </p>
     <p style="font-size:14px;font-weight:300;color:#B8B4AB;line-height:1.8;margin:0 0 12px">
       Use the link below to enter your Basalith. No password is required.
@@ -107,7 +107,7 @@ export function buildFoundingWelcomeEmail(input: FoundingWelcomeInput): BuiltEma
     : `
   <div style="background:rgba(196,162,74,0.04);border:1px solid rgba(196,162,74,0.15);padding:24px;margin:0 0 24px">
     <p style="font-size:14px;color:#B8B4AB;line-height:1.8;margin:0">
-      Sign in at <strong style="color:#F0EDE6">${h.login}</strong> with this email address. We will send you a sign-in link.
+      Sign in at <strong style="color:#F0EDE6">${h.login}</strong> with this email address. We will send you a sign in link.
     </p>
   </div>`
 
@@ -138,8 +138,8 @@ export function buildFoundingWelcomeEmail(input: FoundingWelcomeInput): BuiltEma
 </html>`
 
   const accessTextLines = magicLinkUrl
-    ? ['Your sign-in link (no password required):', magicLinkUrl, linkNote]
-    : [`Sign in at ${loginUrl} with this email address. We will send you a sign-in link.`]
+    ? ['Your sign in link (no password required):', magicLinkUrl, linkNote]
+    : [`Sign in at ${loginUrl} with this email address. We will send you a sign in link.`]
 
   const text = [
     `THE ${familyName.toUpperCase()} BASALITH`,

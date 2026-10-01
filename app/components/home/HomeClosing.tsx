@@ -20,7 +20,7 @@ import { mono, serif, StoneBlock } from './StonePrimitives'
 // to roughly 1.3:1 on stone.
 
 const VARIANT: Record<'default' | Audience, { eyebrow: string; href: string; cta: string }> = {
-  default: { eyebrow: 'For the forward-thinking',     href: '/apply',                  cta: 'Begin your Basalith'      },
+  default: { eyebrow: 'For the forward thinking',     href: '/apply',                  cta: 'Begin your Basalith'      },
   family:  { eyebrow: 'For individuals and families', href: '/apply',                  cta: 'Begin a family Basalith'  },
   founder: { eyebrow: 'For founders and successors',  href: '/apply?type=succession',  cta: 'Tell us about the handoff' },
 }

@@ -134,12 +134,12 @@ export default function PrivacyPage() {
               ))}
             </ul>
             <p style={{ ...BODY, color: 'var(--color-text-primary)', fontStyle: 'italic' }}>We do not sell your personal information or the content of your Basalith to any third party. Ever.</p>
-            <p style={{ ...BODY, fontStyle: 'italic' }}>We do not use the content of your Basalith to train general-purpose models. Your data trains only your entity.</p>
+            <p style={{ ...BODY, fontStyle: 'italic' }}>We do not use the content of your Basalith to train general purpose models. Your data trains only your entity.</p>
 
             {/* 4 */}
             <h2 style={H2}>4. How We Store and Protect Your Data</h2>
             <p style={BODY}>Your photographs and the content of your Basalith are stored in encrypted private storage. Photographs are never publicly accessible. Access requires authenticated credentials specific to your Basalith.</p>
-            <p style={BODY}>We use industry-standard encryption for data in transit and at rest.</p>
+            <p style={BODY}>We use industry standard encryption for data in transit and at rest.</p>
 
             {/* 5 */}
             <h2 style={H2}>5. Service Providers and Data Location</h2>
@@ -193,7 +193,7 @@ export default function PrivacyPage() {
             <p style={BODY}>The content of your Basalith and enquiry data are governed separately. The two commitments below are not interchangeable, and neither one extends to the other.</p>
 
             <h3 style={{ ...H2, fontSize: '1.1rem', marginTop: '24px' }}>Your Basalith</h3>
-            <p style={BODY}>You own your Basalith, and you may request a complete export of it in open, portable formats. Export requests are fulfilled within 30 business days. If a payment is missed, your Basalith moves to Resting status. Your content is preserved and is never deleted for non-payment. Permanent deletion occurs only when you, or an executor with documented authority, make a verified written request. After that request is verified, we hold your Basalith for 12 months, then permanently delete it and confirm in writing.</p>
+            <p style={BODY}>You own your Basalith, and you may request a complete export of it in open, portable formats. Export requests are fulfilled within 30 business days. If a payment is missed, your Basalith moves to Resting status. Your content is preserved and is never deleted for nonpayment. Permanent deletion occurs only when you, or an executor with documented authority, make a verified written request. After that request is verified, we hold your Basalith for 12 months, then permanently delete it and confirm in writing.</p>
             <p style={BODY}>Because you keep ownership and can export, your Basalith does not depend on the continued existence of Basalith as a company. Basalith is the custodian, not the owner. <a href="/data-ownership" style={{ color: 'var(--color-gold)', textDecoration: 'none' }}>Read our data ownership commitments →</a></p>
 
             <h3 style={{ ...H2, fontSize: '1.1rem', marginTop: '24px' }}>Enquiry data</h3>
@@ -223,7 +223,7 @@ export default function PrivacyPage() {
 
             {/* 10 */}
             <h2 style={H2}>10. Cookies and Browser Storage</h2>
-            <p style={BODY}>We use essential cookies only, to maintain your authenticated session. We do not use advertising cookies, tracking pixels, or third-party analytics scripts, and we do not share cookie data with third parties.</p>
+            <p style={BODY}>We use essential cookies only, to maintain your authenticated session. We do not use advertising cookies, tracking pixels, or third party analytics scripts, and we do not share cookie data with third parties.</p>
             <p style={BODY}>Our onboarding flow holds your tier selection and the contact details you enter in your browser&rsquo;s localStorage, so the information carries across steps. That data stays on your device and is cleared when you complete the flow or abandon it.</p>
 
             {/* 11 */}

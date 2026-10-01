@@ -67,7 +67,7 @@ const SECTIONS: readonly AnswerSection[] = [
   {
     heading: 'What does it cost?',
     body:
-      'For a business succession, $12,000 a year plus a one-time $5,000 Founding fee. Acquisition engagements start at $50,000, scaled to the transaction. Engagements begin with one conversation about the transition and whether this fits.',
+      'For a business succession, $12,000 a year plus a one time $5,000 Founding fee. Acquisition engagements start at $50,000, scaled to the transaction. Engagements begin with one conversation about the transition and whether this fits.',
   },
 ]
 

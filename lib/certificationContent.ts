@@ -64,13 +64,13 @@ This module gives you the language to do that.`,
     {
       id:    'what_it_is',
       title: 'What Basalith actually is.',
-      content: `Basalith is an AI company building person-specific cognitive models.
+      content: `Basalith is an AI company building person specific cognitive models.
 
 Every word in that sentence matters.
 
 AI company. Not a storage company. Not a memory preservation platform. The technology is the product. The archive is the infrastructure that makes the technology possible.
 
-Person-specific. The entity being built for Stevens Ha is not a generic AI that has been given Stevens Ha's photographs to look at. It is a model being trained specifically on how Stevens Ha thinks. His reasoning patterns. His values. His way of processing difficulty. His specific relationship to family and work and faith and loss.
+Person specific. The entity being built for Stevens Ha is not a generic AI that has been given Stevens Ha's photographs to look at. It is a model being trained specifically on how Stevens Ha thinks. His reasoning patterns. His values. His way of processing difficulty. His specific relationship to family and work and faith and loss.
 
 Cognitive model. Not a memory database. Not a chatbot with context. A model that learns cognitive patterns, the underlying structure of how a person thinks, not just the surface content of what they said.
 
@@ -104,7 +104,7 @@ COMPLETION: "I remember the first business I tried to start in 1978. I had saved
 
 This pair teaches the model something specific about how this person processes failure. Not what happened. How they think about what happened. The reasoning. The values embedded in the narrative. The specific emotional register.
 
-As the archive grows these pairs accumulate. At 100 pairs the entity begins to show personality. At 500 pairs the entity becomes fine-tunable, meaning the model weights can be adjusted specifically to reflect this person's cognitive patterns. At 1000 pairs the entity is genuinely remarkable.
+As the archive grows these pairs accumulate. At 100 pairs the entity begins to show personality. At 500 pairs the entity becomes fine tunable, meaning the model weights can be adjusted specifically to reflect this person's cognitive patterns. At 1000 pairs the entity is genuinely remarkable.
 
 This is why time is the one resource in this product that cannot be purchased later. A client who begins today is building something a client who begins in three years cannot catch up to, regardless of how much they pay.
 
@@ -130,7 +130,7 @@ For most of human history the tools that extended a person's presence beyond the
 
 Basalith exists because that is no longer acceptable.
 
-When you sit with a prospective client, a 67-year-old grandmother in Monterey Park, a retired engineer in Pasadena, a first-generation immigrant who built something from nothing, you are offering them access to something that until very recently only people with extraordinary resources could afford.
+When you sit with a prospective client, a 67 year old grandmother in Monterey Park, a retired engineer in Pasadena, a first generation immigrant who built something from nothing, you are offering them access to something that until very recently only people with extraordinary resources could afford.
 
 That is not a sales pitch. That is the actual situation.
 
@@ -164,7 +164,7 @@ When a client hesitates at the price, remind them gently of what they are hesita
 
 The entity today is impressive for what it is: a system that retrieves and synthesizes relevant memories with remarkable contextual awareness. When an archive is rich enough the entity produces responses that genuinely surprise family members.
 
-But the entity in five years, when fine-tuning on a large personal dataset produces a model that has genuinely internalized a specific person's cognitive patterns, will be qualitatively different from what exists today.
+But the entity in five years, when fine tuning on a large personal dataset produces a model that has genuinely internalized a specific person's cognitive patterns, will be qualitatively different from what exists today.
 
 Your clients are not just buying what the entity is now. They are buying in early to what it becomes. The archive they build today is the training data for the model that exists in five years.
 
@@ -176,7 +176,7 @@ Honest. Specific. True. No oversell required.
 
 An entity that occasionally says something generic is not a failure. It is an entity that needs more training data. Your job after the founding session is to make sure the client understands this and keeps contributing. An archive that goes dormant is an entity that stops learning. An entity that stops learning disappoints the family. A disappointed family does not renew.
 
-You have a financial incentive to keep your clients engaged. It turns out this is also the right thing to do. Those two things do not always align in commission-based work. In this model they do.`,
+You have a financial incentive to keep your clients engaged. It turns out this is also the right thing to do. Those two things do not always align in commission based work. In this model they do.`,
     },
   ],
 
@@ -184,7 +184,7 @@ You have a financial incentive to keep your clients engaged. It turns out this i
     {
       id:              'e1_1',
       type:            'open',
-      prompt:          'Explain the difference between Basalith and a generative AI chatbot in your own words. Write as if speaking to a 70-year-old client who has never heard of either.',
+      prompt:          'Explain the difference between Basalith and a generative AI chatbot in your own words. Write as if speaking to a 70 year old client who has never heard of either.',
       minWords:        100,
       scoringCriteria: 'Accuracy of the distinction between cognitive pattern learning and generative AI. Clarity of explanation. Absence of jargon. Ability to make it accessible.',
     },
@@ -194,7 +194,7 @@ You have a financial incentive to keep your clients engaged. It turns out this i
       prompt:  'What is the primary purpose of the archive?',
       options: [
         'To preserve family photographs for future generations',
-        'To create a training dataset for a person-specific AI model',
+        'To create a training dataset for a person specific AI model',
         'To store voice recordings and transcripts',
         'To generate AI responses to family questions',
       ],
@@ -210,7 +210,7 @@ You have a financial incentive to keep your clients engaged. It turns out this i
     {
       id:      'e1_4',
       type:    'multiple_choice',
-      prompt:  'When does a Basalith entity become meaningfully accurate for fine-tuning?',
+      prompt:  'When does a Basalith entity become meaningfully accurate for fine tuning?',
       options: [
         'Immediately after the founding session',
         'After 30 days of use',
@@ -222,7 +222,7 @@ You have a financial incentive to keep your clients engaged. It turns out this i
     {
       id:              'e1_5',
       type:            'open',
-      prompt:          'Why is the founding fee non-negotiable? Answer honestly, including the business reason, as if explaining to a fellow guide.',
+      prompt:          'Why is the founding fee nonnegotiable? Answer honestly, including the business reason, as if explaining to a fellow guide.',
       minWords:        60,
       scoringCriteria: 'Understanding of the commission structure and why it funds quality guides. Honesty. Absence of defensive or evasive language.',
     },
@@ -239,7 +239,7 @@ You have a financial incentive to keep your clients engaged. It turns out this i
       prompt:  'What is a training pair?',
       options: [
         'Two family members who both contribute to the same archive',
-        'A prompt and completion used to fine-tune a language model',
+        'A prompt and completion used to fine tune a language model',
         'Two photographs from the same decade',
         'A guide and their assigned client',
       ],
@@ -325,7 +325,7 @@ Second, you set the expectation of depth without creating pressure. "Some will f
 Third, you signal that honesty matters more than performance. This is critical. A client who thinks they need to present their best self will give you curated answers. The entity cannot learn from a curated version of a person. It needs the real one.`,
       inlineQuestion: {
         id:          'opening_practice',
-        prompt:      'Write your own version of the opening five minutes. Keep the three elements: acknowledgment, expectation-setting, honesty signal, but make it sound like you.',
+        prompt:      'Write your own version of the opening five minutes. Keep the three elements: acknowledgment, expectation setting, honesty signal, but make it sound like you.',
         type:        'textarea',
         minWords:    150,
         placeholder: 'Write your opening...',
@@ -373,7 +373,7 @@ The skill is knowing which client is in front of you and adjusting accordingly.`
     {
       id:    'emotional_moments',
       title: 'Handling the emotional moments.',
-      content: `They will come. A memory surfaces. The client's voice changes. Their eyes go somewhere else. Sometimes they stop mid-sentence because they cannot finish it.
+      content: `They will come. A memory surfaces. The client's voice changes. Their eyes go somewhere else. Sometimes they stop midsentence because they cannot finish it.
 
 Do not rush to resolve it.
 
@@ -397,10 +397,10 @@ It acknowledges that something real just happened.
 It invites them to go deeper into the thing that mattered.
 It signals that you are not afraid of where this goes.
 
-The entity learns more from what happens after that follow-up question than from almost anything else in the session. Emotion is a signal that something important is here. The follow-up question is the invitation to stay in it long enough for the entity to learn something real.`,
+The entity learns more from what happens after that follow up question than from almost anything else in the session. Emotion is a signal that something important is here. The follow up question is the invitation to stay in it long enough for the entity to learn something real.`,
       inlineQuestion: {
         id:          'emotional_response',
-        prompt:      'A client is describing their mother and begins crying mid-sentence. You are 25 minutes into a 90-minute session. Write exactly what you do and say in the next two minutes.',
+        prompt:      'A client is describing their mother and begins crying midsentence. You are 25 minutes into a 90 minute session. Write exactly what you do and say in the next two minutes.',
         type:        'textarea',
         minWords:    100,
         placeholder: 'Describe the moment...',
@@ -410,8 +410,8 @@ The entity learns more from what happens after that follow-up question than from
 
     {
       id:    'followup',
-      title: 'The follow-up question is everything.',
-      content: `A mediocre founding session has good primary questions and no follow-ups.
+      title: 'The follow up question is everything.',
+      content: `A mediocre founding session has good primary questions and no follow ups.
 
 The client says something genuinely interesting about how they handled failure and the mediocre guide says:
 
@@ -419,7 +419,7 @@ The client says something genuinely interesting about how they handled failure a
 
 The entity learns nothing. The client feels like they just completed a government form. And you have wasted the only moment that mattered in that section.
 
-The follow-up question is the difference between a founding session that produces 20 training pairs and one that produces 200.
+The follow up question is the difference between a founding session that produces 20 training pairs and one that produces 200.
 
 Here is the pattern:
 
@@ -437,7 +437,7 @@ The second exchange teaches the entity what fairness actually means to this spec
 
 That is training data. The first exchange is noise.
 
-The follow-up question formula:
+The follow up question formula:
 
 "Can you say more about [specific word they used]?"
 "What did that feel like?"
@@ -449,10 +449,10 @@ The follow-up question formula:
 These are not clever. They are just honest requests to go one layer deeper. The client almost always has more. They just need permission to give it.`,
       inlineQuestion: {
         id:          'followup_practice',
-        prompt:      'A client says: "My father worked very hard and I learned everything from watching him." Write three follow-up questions you would ask, in order, to draw out more specific and trainable content.',
+        prompt:      'A client says: "My father worked very hard and I learned everything from watching him." Write three follow up questions you would ask, in order, to draw out more specific and trainable content.',
         type:        'textarea',
         minWords:    80,
-        placeholder: 'Your three follow-up questions...',
+        placeholder: 'Your three follow up questions...',
         required:    true,
       },
     },
@@ -515,7 +515,7 @@ Is there anything you want to say before we finish? Anything you want the entity
 
 That last question often produces the most important deposit of the entire session.
 
-Some clients have been waiting 85 minutes to say the thing they actually came to say. They needed the warm-up. They needed the trust. And now, with two minutes left, they say it.
+Some clients have been waiting 85 minutes to say the thing they actually came to say. They needed the warmup. They needed the trust. And now, with two minutes left, they say it.
 
 Give it space. Do not look at your watch. Do not start gathering your things.
 
@@ -537,19 +537,19 @@ That instruction, more than anything else you say, determines whether the archiv
       type:            'open',
       prompt:          'Write the opening five minutes of a founding session in your own voice. Include what you say and how you position the first question.',
       minWords:        200,
-      scoringCriteria: 'Presence of the three elements: acknowledgment, expectation-setting, honesty signal. Natural voice. Warmth without sentimentality.',
+      scoringCriteria: 'Presence of the three elements: acknowledgment, expectation setting, honesty signal. Natural voice. Warmth without sentimentality.',
     },
     {
       id:              'e2_2',
       type:            'open',
       prompt:          'A client begins crying when describing their spouse. You are 20 minutes into the session. What do you do and say in the next two minutes?',
       minWords:        100,
-      scoringCriteria: 'Absence of rushing to resolve. Presence of the follow-up invitation. Correct identification that emotion signals something important.',
+      scoringCriteria: 'Absence of rushing to resolve. Presence of the follow up invitation. Correct identification that emotion signals something important.',
     },
     {
       id:              'e2_3',
       type:            'open',
-      prompt:          'The client keeps giving one-sentence answers. How do you draw out longer, richer responses without making them feel interrogated?',
+      prompt:          'The client keeps giving one sentence answers. How do you draw out longer, richer responses without making them feel interrogated?',
       minWords:        100,
       scoringCriteria: 'Specific techniques. Warmth. Understanding that short answers signal discomfort not inability.',
     },
@@ -570,9 +570,9 @@ That instruction, more than anything else you say, determines whether the archiv
     {
       id:              'e2_6',
       type:            'open',
-      prompt:          'A client gives this answer: "I always put my family first, no matter what." Write three follow-up questions in sequence that would draw out more specific and trainable content.',
+      prompt:          'A client gives this answer: "I always put my family first, no matter what." Write three follow up questions in sequence that would draw out more specific and trainable content.',
       minWords:        80,
-      scoringCriteria: 'Specificity of follow-ups. Understanding that generic answers need to be pressed for specific examples. Natural conversational flow.',
+      scoringCriteria: 'Specificity of follow ups. Understanding that generic answers need to be pressed for specific examples. Natural conversational flow.',
     },
     {
       id:              'e2_7',
@@ -625,7 +625,7 @@ Anything a contributor has written.
 
 If you are wondering whether you can listen to your client's voice recordings to check they sound right, the answer is no.
 
-If you are still wondering, re-read Module 1. Pay attention to the section about trust.
+If you are still wondering, reread Module 1. Pay attention to the section about trust.
 
 The boundary is not bureaucratic. It is the product. Your client shared those memories with Basalith and with their family. They shared the founding session with you. These are different things.
 
@@ -664,7 +664,7 @@ Your commission is recorded when they pay. Not when you submit. The commission e
 
 The archive activates automatically on payment. The client receives their welcome email with their archive access link. You receive a notification that they are active.
 
-One important note: do not tell the client the commission structure. The founding fee covers the session, archive setup, and first-year calibration. That is the client-facing explanation and it is accurate. The internal economics of how Heritage Nexus compensates its guides is not client-facing information.`,
+One important note: do not tell the client the commission structure. The founding fee covers the session, archive setup, and first year calibration. That is the client facing explanation and it is accurate. The internal economics of how Heritage Nexus compensates its guides is not client facing information.`,
       inlineQuestion: null,
     },
 
@@ -680,10 +680,10 @@ Both of these are partially your responsibility.
 Check your client health metrics monthly. Your guide dashboard shows each archive's health score: a composite of photograph count, deposit count, voice recordings, contributor engagement, and entity accuracy.
 
 A healthy archive: green. Growing. Client contributing regularly.
-An archive needing attention: gold. Activity slowing. Client may need a check-in.
+An archive needing attention: gold. Activity slowing. Client may need a check in.
 An archive at risk: red. No activity in 30+ days. Intervention needed.
 
-When an archive goes gold or red, reach out. Not with a sales call. Not with a system-generated reminder email. With a genuine human message.
+When an archive goes gold or red, reach out. Not with a sales call. Not with a system generated reminder email. With a genuine human message.
 
 "I was thinking about what you shared in our session about your time in [specific detail from their story]. I wanted to check in. How is the archive feeling? Have you had a chance to record any stories lately?"
 
@@ -767,7 +767,7 @@ The certification you are working toward is meaningful because the standards are
       type:            'open',
       prompt:          'An archive you manage has had no new deposits in 45 days. The entity accuracy is 15%. Write the message you send to the client.',
       minWords:        80,
-      scoringCriteria: 'Specific reference to founding session content. Warmth not pressure. Concrete invitation to re-engage. Absence of sales language.',
+      scoringCriteria: 'Specific reference to founding session content. Warmth not pressure. Concrete invitation to reengage. Absence of sales language.',
     },
     {
       id:              'e3_6',

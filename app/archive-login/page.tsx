@@ -25,7 +25,7 @@ export default function ArchiveLoginPage() {
     })
 
     if (error) {
-      setError('We could not send a sign-in link. Please check the email address and try again.')
+      setError('We could not send a sign in link. Please check the email address and try again.')
       setLoading(false)
     } else {
       setSent(true)
@@ -66,7 +66,7 @@ export default function ArchiveLoginPage() {
               Check your email
             </p>
             <p className="font-sans text-[15px] leading-relaxed" style={{ color: 'var(--invert-dim)' }}>
-              We sent a sign-in link to {email}. Open it on this device to enter your Basalith.
+              We sent a sign in link to {email}. Open it on this device to enter your Basalith.
             </p>
           </div>
         ) : (
@@ -102,7 +102,7 @@ export default function ArchiveLoginPage() {
               disabled={loading}
               className="btn-monolith-amber w-full text-center mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Sending…' : 'Send Sign-In Link'}
+              {loading ? 'Sending…' : 'Send Sign In Link'}
             </button>
           </form>
         )}

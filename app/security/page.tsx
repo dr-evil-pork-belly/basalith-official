@@ -113,11 +113,11 @@ export default function SecurityPage() {
             <p style={BODY}>Only designated people can access your Basalith.</p>
             <ul style={{ paddingLeft: 0, margin: '0 0 12px' }}>
               {[
-                'Owners and successors: Sign-in is passwordless. You enter your email address and we send a one-time link. No password is stored anywhere, so there is none to guess, none reused from a site that was breached, and none to steal from us.',
-                'Contributors: Authenticated via a 64-character token drawn from a cryptographically secure random source, not guessable by brute force.',
-                'iOS app: Authenticated with a token issued by Supabase Auth and verified server-side on every request. A forged or expired token is refused exactly like a missing one.',
+                'Owners and successors: Signing in is passwordless. You enter your email address and we send a one time link. No password is stored anywhere, so there is none to guess, none reused from a site that was breached, and none to steal from us.',
+                'Contributors: Authenticated via a 64 character token drawn from a cryptographically secure random source, not guessable by brute force.',
+                'iOS app: Authenticated with a token issued by Supabase Auth and verified server side on every request. A forged or expired token is refused exactly like a missing one.',
                 'Database isolation: Row Level Security is enforced on every table at the database level, not just the application level. Even a misconfigured application cannot access data across the boundary of one Basalith.',
-                'Route enforcement: Every signed-in address is checked for a valid session before the page is resolved, not inside it.',
+                'Route enforcement: Every signed in address is checked for a valid session before the page is resolved, not inside it.',
                 'No shared access: Your data is never visible to other owners, to contributors of another Basalith, or to Basalith employees in the normal course of operations.',
               ].map(item => (
                 <li key={item} style={LI}>
@@ -144,13 +144,13 @@ export default function SecurityPage() {
             <p style={BODY}>For enterprise clients with specific data residency requirements contact <a href="mailto:enterprise@basalith.ai" style={{ color: 'var(--color-gold)', textDecoration: 'none' }}>enterprise@basalith.ai</a></p>
 
             {/* 4 - Passwords and MFA */}
-            <h2 style={H2}>4. Passwords and Multi-Factor Authentication</h2>
+            <h2 style={H2}>4. Passwords and Multifactor Authentication</h2>
             <p style={{ ...BODY, color: 'var(--color-gold)', fontStyle: 'italic' }}>Basalith has no passwords.</p>
-            <p style={BODY}>Sign-in works by sending a one-time link to your email address. Whoever holds that inbox can sign in, and nobody else can. That removes the most common way accounts are lost, which is a password reused on a site that was later breached, and it means there is no credential of ours for an attacker to steal.</p>
+            <p style={BODY}>Signing in works by sending a one time link to your email address. Whoever holds that inbox can sign in, and nobody else can. That removes the most common way accounts are lost, which is a password reused on a site that was later breached, and it means there is no credential of ours for an attacker to steal.</p>
             <p style={BODY}>It also means your Basalith is as protected as the email account it is registered to. So the advice that matters is about that account, not about us:</p>
             <ul style={{ paddingLeft: 0, margin: '0 0 12px' }}>
               {[
-                'Turn on two-factor authentication with your email provider.',
+                'Turn on two factor authentication with your email provider.',
                 'Use a password there that you use nowhere else.',
                 'Tell us immediately if you think someone else can read that inbox.',
               ].map(item => (
@@ -159,7 +159,7 @@ export default function SecurityPage() {
                 </li>
               ))}
             </ul>
-            <p style={BODY}>A second factor at sign-in is something we intend to add. Doing it without locking out a family who is entitled to reach an archive, at the moment they most need to, is the part that takes care.</p>
+            <p style={BODY}>A second factor when you sign in is something we intend to add. Doing it without locking out a family who is entitled to reach an archive, at the moment they most need to, is the part that takes care.</p>
 
             {/* Contact */}
             <div aria-hidden="true" style={{ height: '1px', background: 'var(--color-border)', margin: '48px 0 32px' }} />
