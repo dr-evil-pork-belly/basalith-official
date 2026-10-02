@@ -93,7 +93,7 @@ export default function ContinuityPage() {
             to be reading it this year.
           </p>
           <p style={body}>
-            That matters because the tools will change. The model that trains your entity
+            The tools will change. The model that trains your entity
             today will not be the best one in ten years. When a better instrument exists,
             the record is ready for it. Nothing has to be collected again, which is the
             point, because the people who gave it may no longer be here to give it twice.

@@ -175,7 +175,7 @@ export default function AboutPage() {
               They do not inherit the thinking behind the systems.
             </p>
             <p style={BODY}>
-              It is not only a business problem. My parents built their lives in
+              It is a family problem too. My parents built their lives in
               languages I do not fully speak, in a country that was not theirs,
               through decades I did not witness. What they know lives only in them.
               And I am still learning how to ask the right questions while they are

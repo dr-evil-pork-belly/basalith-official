@@ -276,7 +276,7 @@ export default function FoundingClient({
             {firstName ? `${firstName}, the Founding Sequence is complete.` : 'The Founding Sequence is complete.'}
           </h2>
           <p style={{ fontFamily: SERIF, fontSize: '17.5px', fontWeight: 400, lineHeight: 1.65, color: BODY, marginBottom: '14px', maxWidth: '58ch' }}>
-            We read every word ourselves. Within 48 hours we will be in touch to set up your first read: a short video call about what your record holds, where it is still thin, and what comes next.
+            We read every word ourselves. Within 48 hours we will be in touch to set up your first read: a short video call about what your record holds, where it is still thin, and where to go from here.
           </p>
           <p style={{ fontFamily: SERIF, fontSize: '17.5px', fontWeight: 400, lineHeight: 1.65, color: BODY, marginBottom: '26px', maxWidth: '58ch' }}>
             Your Basalith keeps growing from here. The dashboard has your next question whenever you are ready.

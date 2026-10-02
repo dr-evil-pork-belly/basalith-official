@@ -40,7 +40,7 @@ async function generateConversation(
         role:    'user',
         content: `Generate a simulated conversation between a future grandchild and this person's entity.
 
-The grandchild is asking something meaningful: not factual, but personal.
+The grandchild is asking something personal, not factual.
 
 Recent deposits for context (to make the answer feel specific to this person):
 ${recentPrompts.slice(0, 6).join('\n')}

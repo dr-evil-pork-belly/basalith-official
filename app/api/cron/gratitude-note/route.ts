@@ -147,9 +147,9 @@ Return only the note text. Nothing else.`,
 
 function fallbackNote(firstName: string, count: number, familyName: string, lang = 'en'): string {
   if (lang === 'zh') {
-    return `${firstName}，您本月为${familyName}档案贡献了${count}条回忆。正因为您，档案中存在着那些在其他任何地方都找不到的珍贵记录。这比您想象的更有意义。\n${familyName}档案`
+    return `${firstName}，您本月为${familyName}档案贡献了${count}条回忆。正因为您，档案中存在着那些在其他任何地方都找不到的珍贵记录。谢谢您。\n${familyName}档案`
   }
-  return `${firstName}, you contributed ${count} memories to the ${familyName} Basalith this month. Because of you, things exist on the record that would not exist anywhere else. That matters more than you know.\nThe ${familyName} Basalith`
+  return `${firstName}, you contributed ${count} memories to the ${familyName} Basalith this month. Because of you, things exist on the record that would not exist anywhere else. Thank you for that.\nThe ${familyName} Basalith`
 }
 
 function buildGratitudeEmail(

@@ -107,7 +107,7 @@ const FOUNDING_DELIVERABLES = [
   { n: '02', title: 'The Founding Sequence',           desc: 'Three of the hardest calls you ever made, in your own words, in your own time. Speak or type. This is where it becomes real.' },
   { n: '03', title: 'The people around you',           desc: 'Contributors invited by email. They never need to log in.' },
   { n: '04', title: 'What you already have',           desc: 'Documents, photographs, and recordings brought onto the record.' },
-  { n: '05', title: 'The first read',                  desc: 'A short video call with the founder of Basalith: what your Basalith holds, where it is still thin, and what comes next.' },
+  { n: '05', title: 'The first read',                  desc: 'A short video call with the founder of Basalith: what your Basalith holds, where it is still thin, and where to go from here.' },
   { n: '06', title: 'For a business, the successor',   desc: 'One live session by video with your successor in the room, working through the calls together.' },
 ]
 

@@ -75,7 +75,7 @@ const SUBJECTS = [
 const TRUST = [
   {
     title: 'Built while they are here.',
-    body:  'A Basalith is built while the person is present and fully participating. This is why the method matters, and why now matters.',
+    body:  'A Basalith is built while the person is present and fully participating. That is the method, and it is why the time to start is now.',
   },
   {
     title: 'Only ever them.',

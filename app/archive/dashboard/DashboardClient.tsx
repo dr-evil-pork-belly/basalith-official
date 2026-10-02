@@ -790,7 +790,7 @@ export default function DashboardClient({ archiveId }: { archiveId: string }) {
                 if (n === 0)       return 'Your Basalith is ready for its first photographs.'
                 if (n <= 10)       return `Your Basalith is growing. ${n} photograph${n !== 1 ? 's' : ''} preserved so far.`
                 if (n <= 50)       return `Your Basalith is taking shape. ${n} photographs preserved.`
-                return `A meaningful record. ${n} photographs and counting.`
+                return `A real record now. ${n} photographs and counting.`
               })()}
             </p>
           </>

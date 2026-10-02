@@ -46,7 +46,7 @@ export function buildFoundingCompleteOwnerEmail(input: FoundingCompleteInput): B
     what,
     `${count} in total. Nothing you said was rewritten.`,
     '',
-    'We read every word ourselves. Within 48 hours we will be in touch to set up your first read: a short video call to walk through what your record holds, where it is still thin, and what comes next.',
+    'We read every word ourselves. Within 48 hours we will be in touch to set up your first read: a short video call to walk through what your record holds, where it is still thin, and where to go from here.',
     '',
     'When you are ready, your Basalith can show you one thing it can already answer, in your words, and one thing it will not, because you never said.',
     `${SITE}/archive/founding`,
@@ -66,7 +66,7 @@ export function buildFoundingCompleteOwnerEmail(input: FoundingCompleteInput): B
     <p style="font-size:16px;font-weight:300;line-height:1.8;margin:0 0 16px;color:#B8B4AB">${what}</p>
     <p style="font-size:16px;font-weight:300;line-height:1.8;margin:0 0 24px;color:#B8B4AB">${count} in total. Nothing you said was rewritten.</p>
     <div style="border-left:2px solid rgba(196,162,74,0.5);padding:4px 0 4px 18px;margin:0 0 24px">
-      <p style="font-size:16px;font-weight:300;line-height:1.8;margin:0;color:#F0EDE6">We read every word ourselves. Within 48 hours we will be in touch to set up your first read: a short video call to walk through what your record holds, where it is still thin, and what comes next.</p>
+      <p style="font-size:16px;font-weight:300;line-height:1.8;margin:0;color:#F0EDE6">We read every word ourselves. Within 48 hours we will be in touch to set up your first read: a short video call to walk through what your record holds, where it is still thin, and where to go from here.</p>
     </div>
     <p style="font-size:15px;font-weight:300;line-height:1.8;margin:0 0 8px;color:#B8B4AB">When you are ready, your Basalith can show you one thing it can already answer, in your words, and one thing it will not, because you never said.</p>
     <p style="margin:0 0 24px"><a href="${SITE}/archive/founding" style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#C4A24A;text-decoration:none;text-transform:uppercase">Show me</a></p>

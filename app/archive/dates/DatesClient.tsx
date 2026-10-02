@@ -290,7 +290,7 @@ export default function DatesClient({ archiveId }: { archiveId: string }) {
               <label style={FIELD_LABEL_STYLE}>Personal note (optional, included in the email)</label>
               <textarea
                 style={{ ...INPUT_STYLE, minHeight: '72px', resize: 'vertical' } as React.CSSProperties}
-                placeholder="A sentence or two about why this date matters..."
+                placeholder="A sentence or two about this day..."
                 value={form.notes}
                 onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
               />

@@ -556,6 +556,15 @@ regressions here are not theoretical.
 - No em dashes anywhere. Use periods or commas.
 - No exclamation points in product copy.
 - American English. Short declarative sentences.
+- AI writing tells (October 2, 2026, from Graphite's study of Claude Opus 5.5 output
+  against pre ChatGPT human writing). Do not write, in copy, emails, spoken prompts, or
+  questions: "this matters," "why X matters," "matters most," "just as important,"
+  "looking ahead," "what comes next," "adds another layer," "in practice," "rather than
+  simply," "is more than a X, it is a Y," "not only about," "instead, it," "dependable,"
+  "thoughtful," "steady," "meaningful," "is especially helpful," "can help you," "makes it
+  easier," "helps you avoid." Also go easy on the "Not X. Y." fragment pair and on
+  superlatives. Say the thing plainly instead of announcing that it is important.
+  Record: docs/AI_TELLS_PASS_2026-10-02.md.
 - Banned words: curated, seamless, innovative, stewardship. Also avoid unlock,
   supercharge, game-changer.
 - "Archive" is a code word, not a reader's word (September 18, 2026). It stays in

@@ -147,7 +147,7 @@ export default function SecurityPage() {
             <h2 style={H2}>4. Passwords and Multifactor Authentication</h2>
             <p style={{ ...BODY, color: 'var(--color-gold)', fontStyle: 'italic' }}>Basalith has no passwords.</p>
             <p style={BODY}>Signing in works by sending a one time link to your email address. Whoever holds that inbox can sign in, and nobody else can. That removes the most common way accounts are lost, which is a password reused on a site that was later breached, and it means there is no credential of ours for an attacker to steal.</p>
-            <p style={BODY}>It also means your Basalith is as protected as the email account it is registered to. So the advice that matters is about that account, not about us:</p>
+            <p style={BODY}>It also means your Basalith is as protected as the email account it is registered to. So the best advice we can give is about that account, not about us:</p>
             <ul style={{ paddingLeft: 0, margin: '0 0 12px' }}>
               {[
                 'Turn on two factor authentication with your email provider.',

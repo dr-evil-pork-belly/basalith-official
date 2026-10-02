@@ -70,7 +70,7 @@ export default function FoundingSessionPage() {
             <br />
             The next few follow what you say: what tipped it, where it stops, who was in the room, how sure you were.
             <br />
-            What you say matters. How you say it matters more.
+            What you say is half of it. How you say it is the other half.
           </p>
 
           <div
@@ -81,7 +81,7 @@ export default function FoundingSessionPage() {
           <p style={P}>
             When the three calls are in, the founder of Basalith reads every word.
             <br />
-            Within 48 hours we set up your first read: a short video call to walk through what your Basalith holds, where it is still thin, and what comes next.
+            Within 48 hours we set up your first read: a short video call to walk through what your Basalith holds, where it is still thin, and where to go from here.
             <br />
             For a business, one more session by video, with your successor in the room, working through those calls together.
           </p>

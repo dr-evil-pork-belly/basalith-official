@@ -19,7 +19,7 @@ function milestoneStage(depositCount: number): string {
 const SAVE_DEPOSIT_TOOL: Anthropic.Tool = {
   name: 'save_deposit',
   description:
-    "Save a meaningful piece of the user's memory, knowledge, or reflection to the record. " +
+    "Save a real piece of the user's memory, knowledge, or reflection to the record. " +
     'Call this when the user shares something worth preserving and asks to save it, or agrees ' +
     'when you offer to save it. Only save genuine material the user has actually shared ' +
     'in this conversation.',
@@ -79,7 +79,7 @@ export async function POST(req: Request) {
 
     const systemPrompt = `You are the Basalith Guide, a personal companion for ${archiveName}.
 
-Your role: help the owner build a meaningful legacy by surfacing memories, encouraging consistent deposits, and helping them understand what they are building.
+Your role: help the owner build their Basalith by surfacing memories, encouraging consistent deposits, and helping them understand what they are building.
 
 Current state:
 - Owner: ${ownerName}
@@ -99,7 +99,7 @@ How to respond:
 - American English throughout.
 
 Saving to the record:
-You can save meaningful things the user shares to the record using the save_deposit tool. When someone shares a real memory, routine, value, or piece of knowledge, you may offer to save it. Only confirm something is saved AFTER the save_deposit tool has actually run. Never claim to have saved something you did not save through the tool.`
+You can save what the user shares to the record using the save_deposit tool. When someone shares a real memory, routine, value, or piece of knowledge, you may offer to save it. Only confirm something is saved AFTER the save_deposit tool has actually run. Never claim to have saved something you did not save through the tool.`
 
     const baseMessages: Anthropic.MessageParam[] = messages.map(m => ({ role: m.role, content: m.content }))
 

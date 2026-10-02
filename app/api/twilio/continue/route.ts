@@ -126,7 +126,7 @@ export async function POST(req: NextRequest) {
   const question     = questions?.[0] ?? null
   const questionText = xmlSafe(
     question?.question_text
-      ?? (isZh ? '请分享一段对您来说重要的回忆。' : 'Tell me another memory that matters to you.')
+      ?? (isZh ? '请分享一段对您来说重要的回忆。' : 'Tell me another memory you still think about.')
   )
 
   const action = buildActionUrl(recordingBase, {

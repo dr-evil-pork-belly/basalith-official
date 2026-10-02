@@ -17,7 +17,7 @@ export const DAILY_REFLECTIONS_EN: Record<string, string[]> = {
     "What did your father teach you without ever sitting down to teach it?",
     "Describe the moment you knew your spouse was the right person.",
     "What is the most important thing you want your grandchildren to know about your family?",
-    "What family tradition matters most to you and how did it start?",
+    "Which family tradition would you fight to keep, and how did it start?",
     "Who in your family are you most like and who are you most different from?",
     "What is something you wish you had said to a family member who is no longer here?",
     "Describe a moment when your child surprised you completely.",
@@ -39,7 +39,7 @@ export const DAILY_REFLECTIONS_EN: Record<string, string[]> = {
   ],
 
   professional_philosophy: [
-    "What was the best job you ever had and what made it meaningful?",
+    "What was the best job you ever had, and what made it the best?",
     "Who taught you how to work? What did they show you?",
     "What is the hardest professional situation you ever faced?",
     "What do you know about money that took you decades to learn?",

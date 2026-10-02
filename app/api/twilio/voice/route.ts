@@ -166,7 +166,7 @@ export async function POST(req: NextRequest) {
       const firstName    = xmlSafe((contributor.name ?? 'there').split(' ')[0])
       const questionText = xmlSafe(
         question?.question_text
-          ?? 'Tell me a memory that matters to you. It can be about anything. A moment, a person, a place.'
+          ?? 'Tell me about a memory you still think about. It can be about anything. A moment, a person, a place.'
       )
 
       const action = buildActionUrl(recordingBase, {
