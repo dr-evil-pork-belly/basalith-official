@@ -170,11 +170,15 @@ export default function SuccessionDemoClient() {
         .succ-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: ${C.line}; }
         @media (max-width: 900px) { .succ-grid { grid-template-columns: 1fr; } }
         .succ-chip:hover { border-color: var(--invert-gold) !important; color: ${C.bone} !important; }
+        /* The top bar holds two nowrap labels. Together they are wider than a
+           phone, and the right one was drawing over the left. Below 640px the
+           right label is dropped; the left one already names the page. */
+        @media (max-width: 640px) { .succ-topbar-note { display: none; } }
       `}</style>
 
       {/* ── Top bar ── */}
       <div style={{ borderBottom: `1px solid ${C.line}`, padding: '16px clamp(20px,4vw,48px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', minWidth: 0, overflow: 'hidden' }}>
           <Link href="/succession" style={{ ...MONO, fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: C.dim, textDecoration: 'none', whiteSpace: 'nowrap' }}>
             &larr; Exit
           </Link>
@@ -183,7 +187,7 @@ export default function SuccessionDemoClient() {
             Basalith &middot; Succession
           </span>
         </div>
-        <span style={{ ...MONO, fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: C.dim, whiteSpace: 'nowrap' }}>
+        <span className="succ-topbar-note" style={{ ...MONO, fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: C.dim, whiteSpace: 'nowrap' }}>
           Interactive Demonstration
         </span>
       </div>
