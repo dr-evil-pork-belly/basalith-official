@@ -7,7 +7,7 @@ import PricingTiers from '../components/PricingTiers'
 
 export const metadata: Metadata = {
   title: 'Pricing · Basalith',
-  description: 'Basalith pricing, in full. Succession at $12,000 a year plus a one time Founding fee. Acquisition engagements from $50,000. A Basalith for one person or a family from $2,500 to begin.',
+  description: 'Basalith pricing, in full. Succession at $12,000 a year plus a one time Founding fee. Acquisition engagements from $50,000. A Basalith for one person or a family: the first call is yours, then $2,500 to found it.',
 }
 
 const MONO: React.CSSProperties = {
@@ -136,6 +136,15 @@ const SUCCESSION_FEATURES = [
   'Full export in open formats, any time',
 ]
 
+// What Succession has that a personal Basalith does not. October 6, 2026.
+// Each row is a surface in the repo today. Nothing here is a plan.
+const SUCCESSION_ONLY = [
+  { n: '01', title: 'A sign in for your successor.',     desc: 'The person taking over signs in separately and asks how you would decide.' },
+  { n: '02', title: 'The business questions.',            desc: 'Questions built around how the company is run, area by area, so the record covers the calls a successor will face.' },
+  { n: '03', title: 'A live session with both of you.',   desc: 'One session by video with your successor in the room, working through the calls together.' },
+  { n: '04', title: 'A layer your successor keeps.',      desc: 'They record what has changed since you stepped back. Your judgment stays fixed. Their context stays current.' },
+]
+
 export default function PricingPage() {
   return (
     <>
@@ -192,7 +201,7 @@ export default function PricingPage() {
               margin:     '0 auto',
             }}
           >
-            Business engagements first. Individual and family plans below. Every Basalith begins with The Founding.
+            For a business changing hands, and for one person or a family. Every Basalith begins with The Founding.
           </p>
         </section>
 
@@ -376,23 +385,72 @@ export default function PricingPage() {
           </div>
         </section>
 
-        {/* B2C second door — individuals and families */}
+        {/* One person or a family. Until October 6, 2026 this header read "The
+            second door" and "For a life, not a business." The founder's own
+            account of how he decides does not split that way, and neither do the
+            owners and professionals this path is for. */}
         <section style={{ background: 'var(--color-surface-alt)', padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,80px) 0', textAlign: 'center' }}>
           <div style={{ maxWidth: '620px', margin: '0 auto' }}>
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)', marginBottom: '16px' }}>
-              The second door &middot; Individuals and families
+              For one person or a family
             </p>
             <h2 style={{ ...SERIF, fontSize: 'clamp(1.75rem,3vw,2.5rem)', fontWeight: 400, lineHeight: 1.15, color: 'var(--color-text-primary)', letterSpacing: '-0.02em', marginBottom: '16px' }}>
-              For a life, not a business.
+              For your own judgment, at home or at work.
             </h2>
             <p style={{ ...SERIF, fontSize: '1.05rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.8, color: 'var(--color-text-secondary)', margin: 0 }}>
-              The same method, pointed at a person instead of a company. Three plans, built to move with you as life changes.
+              The same method, pointed at one person: the calls your work depends on, and the way you see the world. The first call is yours before anything is owed. Three plans, built to move with you as life changes.
             </p>
           </div>
         </section>
 
         {/* Tiers + toggle + founding note + tax note */}
         <PricingTiers />
+
+        {/* Personal or Succession. October 6, 2026. An owner can deposit
+            business judgment into a personal Basalith, and the page now says
+            so. What it also says is what Succession has that a personal
+            Basalith does not. Every row names a surface that exists: the
+            successor sign in (/succession/login), the business question set
+            (lib/b2bDomains.ts, /api/archive/b2b-question), the live session
+            already listed in SUCCESSION_FEATURES, and the successor context
+            layer (/succession/portal/context). See
+            docs/LAUNCH_REVENUE_2026-10-06.md. */}
+        <section id="which" style={{ background: 'var(--color-bg)', padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,80px)', borderTop: '1px solid var(--color-border)' }}>
+          <div style={{ maxWidth: '700px', margin: '0 auto' }}>
+            <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '16px' }}>If you own a business</p>
+            <h2 style={{ ...SERIF, fontSize: 'clamp(1.75rem,3vw,2.5rem)', fontWeight: 400, lineHeight: 1.15, color: 'var(--color-text-primary)', letterSpacing: '-0.02em', marginBottom: '20px' }}>
+              Personal or Succession.
+            </h2>
+            <p style={{ ...SERIF, fontSize: '1.05rem', fontWeight: 400, lineHeight: 1.8, color: 'var(--color-text-secondary)', marginBottom: '16px' }}>
+              A personal Basalith is yours. You deposit, you ask, and the people you invite add what they remember. If you run a company, how you run it belongs in there too.
+            </p>
+            <p style={{ ...SERIF, fontSize: '1.05rem', fontWeight: 400, lineHeight: 1.8, color: 'var(--color-text-secondary)', marginBottom: '32px' }}>
+              Succession is for the day someone else has to run the company from that judgment. It adds four things a personal Basalith does not have.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '32px' }}>
+              {SUCCESSION_ONLY.map(({ n, title, desc }) => (
+                <div key={n} style={{ display: 'flex', gap: '20px', padding: '18px 0', borderTop: '1px solid var(--color-border)' }}>
+                  <span style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)', flexShrink: 0, paddingTop: '4px', width: '24px' }}>{n}</span>
+                  <div>
+                    <p style={{ ...SERIF, fontSize: '1.05rem', fontWeight: 500, color: 'var(--color-text-primary)', lineHeight: 1.4, marginBottom: '4px' }}>{title}</p>
+                    <p style={{ ...SERIF, fontSize: '0.98rem', fontWeight: 400, color: 'var(--color-text-secondary)', lineHeight: 1.65, margin: 0 }}>{desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p style={{ ...SERIF, fontSize: '1.05rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.8, color: 'var(--color-text-secondary)', marginBottom: '24px' }}>
+              If nobody else will have to consult it to run something, begin personal. If a successor or a buyer will, start with Succession.
+            </p>
+            <div style={{ display: 'flex', gap: '28px', flexWrap: 'wrap' }}>
+              <Link href="/begin" className="pricing-ghost-link" style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)', textDecoration: 'none' }}>
+                Begin with one call &rarr;
+              </Link>
+              <Link href="/apply?type=succession" className="pricing-ghost-link" style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)', textDecoration: 'none' }}>
+                Talk to us about a succession &rarr;
+              </Link>
+            </div>
+          </div>
+        </section>
 
         {/* Security & legitimacy trust row */}
         <div style={{

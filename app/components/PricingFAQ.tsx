@@ -21,6 +21,18 @@ const ITEMS: Item[] = [
     </>,
   },
   {
+    q: 'I own a business. Personal or Succession?',
+    a: <>
+      Begin personal if the Basalith is for you. How you run the company belongs in it, and nobody will
+      tell you to keep work out. Choose Succession when someone else will have to run the company from
+      your judgment: it adds a separate sign in for your successor, the business questions, one live
+      session by video with both of you, and a layer where your successor records what has changed.
+      {' '}<a href="/pricing#which" style={{ color: 'var(--color-gold)', textDecoration: 'none' }}>
+        See the difference →
+      </a>
+    </>,
+  },
+  {
     q: 'What happens to my Basalith if the company ceases to exist?',
     a: <>
       You keep everything. You own your Basalith. We are the custodian, not the owner. You can

@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Basalith · Knowledge transfer when a business changes hands',
-  description: 'What built the company is not in the data room. Basalith captures how an operator reasons, so it transfers through an acquisition or a succession. Also available for one person or a family.',
+  description: 'What built the company is not in the data room. Basalith captures how a person reasons and decides, in their own words. For a business changing hands, and for one person whose judgment is worth keeping.',
 }
 
 import Nav               from './components/Nav'
@@ -16,7 +16,8 @@ import Footer            from './components/Footer'
 import HomeHero          from './components/home/HomeHero'
 import HomeSuccession    from './components/home/HomeSuccession'
 import HomeContrastDemo  from './components/home/HomeContrastDemo'
-import HomeSecondDoor    from './components/home/HomeSecondDoor'
+import HomeDoors         from './components/home/HomeDoors'
+import HomePersonal      from './components/home/HomePersonal'
 import HomeClosing       from './components/home/HomeClosing'
 
 // The Organization block used to be declared inline here and rendered only on
@@ -30,10 +31,14 @@ export default function HomePage() {
       <Nav />
       <main className="home-stone">
         <HomeHero />
+        {/* The two doors, side by side, directly under the hero. October 6,
+            2026: the personal path stopped being the second door. See
+            docs/LAUNCH_REVENUE_2026-10-06.md. */}
+        <HomeDoors />
         <HomeSuccession />
         {/* Photograph slot 2 sits here in 1d. Deliberately empty this build. */}
         <HomeContrastDemo />
-        <HomeSecondDoor />
+        <HomePersonal />
         <HomeClosing />
       </main>
       <Footer />

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { getSessionUser } from '@/lib/auth/getSessionUser'
 import BeginClient from './BeginClient'
+import { resolveContributorReferral } from '@/lib/referral'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,13 +19,25 @@ export const metadata: Metadata = {
 //   no session                    -> the public form
 // ?signed_in=1 from the dashboard and founding redirects is informational; the
 // session decides.
-export default async function BeginPage() {
+//
+// ?ref=<contributor id> comes from the contributor page (October 6, 2026). It
+// is resolved here, on the server, so the waiver line only renders for a ref
+// that points at a live contributor. searchParams is a Promise in Next 16.
+export default async function BeginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ ref?: string }>
+}) {
   const session = await getSessionUser()
   if (session?.archiveId) redirect('/archive/dashboard')
+
+  const { ref } = await searchParams
+  const referral = await resolveContributorReferral(ref)
 
   return (
     <BeginClient
       signedInEmail={session?.email ?? null}
+      referralCode={referral ? referral.contributorId : null}
     />
   )
 }

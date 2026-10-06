@@ -50,9 +50,11 @@ const TIERS: Tier[] = [
       'All supported languages',
     ],
     contributorNote: 'Your contributors never need to log in, remember a password, or learn a new interface. They receive an email. They hit reply. Their memory is added. Or they hold a button in the app and speak for two minutes.',
-    cta:     'Begin your Basalith',
-    ctaHref: '/apply',
-    note:    'One time founding fee of $2,500',
+    cta:     'Begin with one call',
+    // /apply has been business only since September 22, 2026. The personal
+    // door is /begin: the first call, then the proof, before anything is owed.
+    ctaHref: '/begin',
+    note:    'The first call is yours. One time founding fee of $2,500 to keep it.',
   },
   {
     id:          'resting',

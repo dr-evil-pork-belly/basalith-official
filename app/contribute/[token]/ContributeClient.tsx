@@ -1460,6 +1460,71 @@ function MemoryMapTeaser({ token }: { token: string }) {
 
 // ── Main component ─────────────────────────────────────────────────────────────
 
+// ── Begin your own (October 6, 2026) ─────────────────────────────────────────
+// The one place a contributor is told they can have a Basalith of their own.
+// See docs/LAUNCH_REVENUE_2026-10-06.md.
+//
+// Shown only after the contributor has added something, so it never greets a
+// person who has not yet seen how this works. English only for now: the other
+// portal languages have no reviewed translation of the waiver sentence, and a
+// promise about money does not ship in a language nobody here has checked.
+//
+// The link carries the contributor row id, never the access token. /begin
+// resolves it on the server (lib/referral.ts), and the trial start route
+// records it on the application row and in the internal notice. The waiver
+// itself is applied by hand at checkout with waiveFounding.
+function BeginYourOwnSection({
+  contributorId,
+  subjectName,
+}: {
+  contributorId: string
+  subjectName:   string
+}) {
+  return (
+    <div
+      style={{
+        background:   'var(--portal-card)',
+        border:       '1px solid var(--portal-rule)',
+        borderRadius: '2px',
+        padding:      '28px 24px',
+        marginBottom: '32px',
+      }}
+    >
+      <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11.5px', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', margin: '0 0 12px' }}>
+        One of your own
+      </p>
+      <p style={{ fontFamily: 'var(--portal-serif)', fontWeight: 500, fontSize: '1.25rem', lineHeight: 1.3, color: 'var(--portal-ink)', margin: '0 0 12px' }}>
+        You have seen how {subjectName}&rsquo;s Basalith is built.
+      </p>
+      <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '1rem', lineHeight: 1.65, color: 'var(--portal-body)', margin: '0 0 12px' }}>
+        You can begin one for yourself. The first call is fifteen to thirty minutes, by voice or typed, on your own time. When it is in, your Basalith answers one question in your own words and declines one it has no grounds for.
+      </p>
+      <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '1rem', lineHeight: 1.65, color: 'var(--portal-body)', margin: '0 0 20px' }}>
+        Because {subjectName} invited you here, the Founding fee is waived if you decide to keep yours.
+      </p>
+      <a
+        href={`/begin?ref=${contributorId}`}
+        style={{
+          display:        'block',
+          textAlign:      'center',
+          textDecoration: 'none',
+          fontFamily:     'var(--portal-mono)',
+          fontSize:       '11.5px',
+          letterSpacing:  '0.16em',
+          textTransform:  'uppercase',
+          color:          'var(--portal-btn-label)',
+          background:     'var(--portal-btn)',
+          padding:        '15px',
+          minHeight:      '48px',
+          boxSizing:      'border-box',
+        }}
+      >
+        Begin with one call
+      </a>
+    </div>
+  )
+}
+
 const PORTAL_LANGS = Object.keys(PORTAL_UI) as (keyof typeof PORTAL_UI)[]
 
 export default function ContributeClient({
@@ -1629,6 +1694,11 @@ export default function ContributeClient({
               archive.entity_preview_contributor_ids.includes(contributor.id))
           }
         />
+
+        {/* Begin your own. After a first contribution, English only. */}
+        {lang === 'en' && totalContribs > 0 && archive.owner_name && (
+          <BeginYourOwnSection contributorId={contributor.id} subjectName={subjectName} />
+        )}
 
         {/* Footer */}
         <div style={{ textAlign: 'center', paddingTop: '32px', borderTop: '1px solid var(--portal-rule)' }}>

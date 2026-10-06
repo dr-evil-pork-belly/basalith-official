@@ -73,6 +73,7 @@ export async function POST(req: NextRequest) {
     guideId?: string
     archiveTier?: string
     familyName?: string
+    waiveFounding?: boolean
   }
   try {
     body = await req.json()
@@ -82,6 +83,13 @@ export async function POST(req: NextRequest) {
 
   const { applicationId, tierPriceName, billingPeriod, guideId, archiveTier } = body
   const familyName = typeof body.familyName === 'string' ? body.familyName.trim() : ''
+  // Referral waiver (decided September 24, 2026, wired October 6, 2026). True
+  // only when the body says exactly true. The founding line is left off the
+  // session and the waiver is written into the metadata, so the Stripe record
+  // shows why this subscription began without one. Provisioning keys on the
+  // first invoice of the subscription (billing_reason subscription_create), not
+  // on the founding line, so a waived session still provisions.
+  const waiveFounding = body.waiveFounding === true
 
   // ── Validate input ─────────────────────────────────────────────────────────
   if (!applicationId || typeof applicationId !== 'string') {
@@ -169,6 +177,7 @@ export async function POST(req: NextRequest) {
     family_name:    familyName,
   }
   if (guideId) metadata.guide_id = guideId
+  if (waiveFounding) metadata.founding_waived = 'referral'
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
 
@@ -182,10 +191,14 @@ export async function POST(req: NextRequest) {
   try {
     const session = await getStripe().checkout.sessions.create({
       mode: 'subscription',
-      line_items: [
-        { price: tierPriceId, quantity: 1 },      // recurring tier
-        { price: foundingPriceId, quantity: 1 },  // one-time founding, on first invoice
-      ],
+      line_items: waiveFounding
+        ? [
+            { price: tierPriceId, quantity: 1 },      // recurring tier only, founding waived
+          ]
+        : [
+            { price: tierPriceId, quantity: 1 },      // recurring tier
+            { price: foundingPriceId, quantity: 1 },  // one-time founding, on first invoice
+          ],
       automatic_tax: { enabled: taxEnabled },
       customer_email: application.email,
       metadata,
@@ -194,7 +207,7 @@ export async function POST(req: NextRequest) {
       cancel_url:  `${siteUrl}/`,
     })
 
-    return NextResponse.json({ url: session.url, sessionId: session.id })
+    return NextResponse.json({ url: session.url, sessionId: session.id, foundingWaived: waiveFounding })
   } catch (e) {
     console.error('[admin/checkout] session create failed:', e instanceof Error ? e.message : e)
     return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 })

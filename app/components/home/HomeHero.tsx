@@ -1,10 +1,10 @@
 import Image from 'next/image'
-import Link from 'next/link'
 import { CATEGORY_LINE } from '@/lib/copy'
 import { mono, serif, StoneBlock } from './StonePrimitives'
 
 // Direction 1d, slot 1: full-bleed photograph with the h1 overlaid on a scrim,
-// then the light block carrying the category line, the sub copy, and the CTA.
+// then the light block carrying the category line and the sub copy. The CTA
+// lives in HomeDoors, the block that follows.
 //
 // The rendered ratio is locked to the source, 3022:2083. At 390px that is
 // 268.8px tall, 31px shorter than 1d's 300px placeholder. The layout adapts to
@@ -119,24 +119,8 @@ export default function HomeHero() {
           The operator knows when to walk from a deal, which hire to trust over the resume, how much risk is too much. None of it is written down. Basalith captures how they reason while they are still running the company, so it transfers with the business. Through an acquisition or a succession.
         </p>
 
-        <Link
-          href="/succession"
-          className="stone-cta"
-          style={{
-            ...mono,
-            display:        'block',
-            textAlign:      'center',
-            textDecoration: 'none',
-            fontSize:       '11px',
-            color: 'var(--btn-label)',
-            background:     'var(--btn)',
-            padding:        '15px',
-            minHeight:      '48px',
-            boxSizing:      'border-box',
-          }}
-        >
-          See how it transfers
-        </Link>
+        {/* The CTA that sat here moved into HomeDoors, directly below, where it
+            sits beside the personal door at the same size. October 6, 2026. */}
       </StoneBlock>
     </section>
   )

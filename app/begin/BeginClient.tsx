@@ -36,7 +36,14 @@ const labelClass = 'font-sans text-[11.5px] font-bold tracking-[0.14em] uppercas
 const inputClass = 'w-full bg-transparent font-serif text-[1.1rem] font-light placeholder:text-[var(--invert-dim)] focus:outline-none pb-3 transition-colors duration-200'
 const inputStyle = { color: 'var(--invert-fg)', borderBottom: '1px solid var(--invert-dim)' } as const
 
-export default function BeginClient({ signedInEmail }: { signedInEmail: string | null }) {
+export default function BeginClient({
+  signedInEmail,
+  referralCode = null,
+}: {
+  signedInEmail: string | null
+  /** A contributor id the server already resolved. Null for everyone else. */
+  referralCode?: string | null
+}) {
   const router = useRouter()
   const signedIn = !!signedInEmail
 
@@ -82,7 +89,7 @@ export default function BeginClient({ signedInEmail }: { signedInEmail: string |
       const res = await fetch('/api/trial/start', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ email: address, name: name.trim(), forWhom, prompt: prompt.trim() }),
+        body:    JSON.stringify({ email: address, name: name.trim(), forWhom, prompt: prompt.trim(), ref: referralCode }),
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) {
@@ -272,6 +279,12 @@ export default function BeginClient({ signedInEmail }: { signedInEmail: string |
             <p className="font-sans text-[15px] leading-relaxed text-center" style={{ color: 'var(--invert-dim)' }}>
               Your first call is yours. Found your Basalith to keep it.
             </p>
+
+            {referralCode && (
+              <p className="font-sans text-[15px] leading-relaxed text-center" style={{ color: 'var(--invert-gold)' }}>
+                You were invited by someone who has a Basalith. If you keep yours, the Founding fee is waived.
+              </p>
+            )}
           </form>
         )}
 
