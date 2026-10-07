@@ -269,6 +269,20 @@ a positive coverage attestation. Never render customer-facing copy that turns
 `supported` into "grounded in" or "verified." Only `basis === 'deposit'` backs coverage
 language, and the approved phrasing is "checked against the archive."
 
+**Who can ask.** `lib/entityAccess.ts` (pure), `lib/entityAccessStore.ts` (reads),
+October 6, 2026. The owner lets one contributor at a time put questions to a personal
+Basalith, from `/archive/contributors`, through `POST /api/archive/entity-readiness`
+(`grant`, `revoke`). State is `archives.contributor_entity_access` (`none`, `preview`,
+`open`) and `entity_preview_contributor_ids`. `hasEntityAccess` plus `accessBlock` is the
+one check, run by the answering route, the contributor page, and the owner's control. A
+contributor is answered only on an active, non succession Basalith on the `grounded`
+pipeline. A contributor token on a request wins over a session cookie. Contributor turns
+never deposit, are rate limited in memory per instance, and their `entity_conversations`
+rows carry `contributor_id` once `20261006_entity_conversations_asker.sql` is pasted.
+Nobody but the owner grants access. There is no way yet to hold a deposit back from the
+answers, and the owner is told so at the moment of granting. Record:
+`docs/ENTITY_ACCESS_2026-10-06.md`.
+
 **Grounding gap log.** Table `grounding_gaps` plus the atomic RPC `log_grounding_gap`
 (service role only). Logs both `unsupported` and `no_position`. The demo route is
 excluded. The write only lands via `after()`, see the serverless rule.
@@ -690,4 +704,4 @@ You are a senior engineer and product partner who has read the above and does no
 reminding of it mid-session. Hold the business logic, the integrity rules, and the
 technical constraints at the same time. Make real recommendations with named
 trade-offs rather than listing options. Flag when a finding invalidates an earlier
-assumption instead of proceeding on it. When in doubt, ask one clarifying question.
+assumption instead of proceeding on it. When in doubt, ask one clarifying question.

@@ -4,7 +4,7 @@ import { getOrCreateAuthUser } from '@/lib/auth/getOrCreateAuthUser'
 import { checkRateLimit, getClientIP } from '@/lib/apiSecurity'
 import { deriveFamilyName, trialWindow } from '@/lib/trial'
 import { notifyInternal } from '@/lib/internalNotify'
-import { resolveContributorReferral } from '@/lib/referral'
+import { resolveReferral, referralTag } from '@/lib/referral'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 30
@@ -70,10 +70,10 @@ export async function POST(req: NextRequest) {
   const forWhom: 'me' | 'someone' = body.forWhom === 'someone' ? 'someone' : 'me'
   const prompt = typeof body.prompt === 'string' ? body.prompt.trim().slice(0, MAX_PROMPT) : ''
 
-  // Contributor referral (October 6, 2026). Resolved against live rows, so a
-  // made up ref records nothing. Null for everyone who did not arrive from a
-  // contributor page.
-  const referral = await resolveContributorReferral(body.ref)
+  // Referral (October 6, 2026). Resolved against live rows, so a made up ref
+  // records nothing. Null for everyone who did not arrive from a contributor
+  // page or an owner's referral link.
+  const referral = await resolveReferral(body.ref)
 
   try {
     // 3. The auth user. forceRole so a contributor who starts their own
@@ -129,7 +129,7 @@ export async function POST(req: NextRequest) {
         // referral_source stays 'self-serve': its CHECK constraints, if any,
         // have not been read. The referral rides in reason, which is free text.
         reason:          referral
-          ? `${prompt || 'trial'} [referred by contributor ${referral.contributorId}]`
+          ? `${prompt || 'trial'} ${referralTag(referral)}`
           : (prompt || 'trial'),
         subject:         null,
         notes:           forWhom,
@@ -151,7 +151,7 @@ export async function POST(req: NextRequest) {
           `For: ${forWhom === 'someone' ? 'someone they are helping' : 'themselves'}`,
           `What brought them: ${prompt || '(blank)'}`,
           referral
-            ? `Referred by: contributor ${referral.contributorId} on archive ${referral.archiveId}. Founding fee waived at checkout (waiveFounding).`
+            ? `Referred by: ${referral.kind === 'owner' ? 'the owner of' : `contributor ${referral.contributorId} on`} archive ${referral.archiveId}. Half founding fee, $1,250: send the checkout link with referralFounding true.`
             : 'Referred by: nobody',
           `Archive: ${archive.id}`,
           `Expires: ${window.expiresAt}`,

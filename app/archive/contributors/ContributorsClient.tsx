@@ -155,7 +155,213 @@ function AnswersModal({ session, onClose }: { session: WitnessSessionRow; onClos
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
-export default function ContributorsClient({ archiveId }: { archiveId: string }) {
+// ── Refer someone (October 6, 2026) ──────────────────────────────────────────
+// Shown only when the server passes a referral path, which it does only for a
+// Basalith that has paid. See docs/LAUNCH_REVENUE_2026-10-06.md, section 8.
+//
+// Both numbers in the copy are backed. $1,250 is the b2c_founding_referral
+// price, applied at checkout with referralFounding. $500 is the row
+// provisionOnFoundingFee writes to referral_credits when the referred client
+// pays; the founder applies it in Stripe. Do not change either figure here
+// without changing lib/referral.ts and the Stripe price.
+function ReferSection({ referralPath }: { referralPath: string }) {
+  const [copied, setCopied] = useState(false)
+
+  async function copy() {
+    const url = `${window.location.origin}${referralPath}`
+    try {
+      await navigator.clipboard.writeText(url)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 3000)
+    } catch {
+      // Clipboard access can be refused. The link is on the page to copy by hand.
+    }
+  }
+
+  return (
+    <div className="rounded-sm border px-7 py-7 mt-12" style={{ background: 'var(--portal-card)', borderColor: 'var(--portal-rule)' }}>
+      <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11.5px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '12px' }}>
+        Someone who should have one
+      </p>
+      <p className="font-serif" style={{ fontSize: '1.35rem', fontWeight: 400, lineHeight: 1.3, color: 'var(--portal-ink)', marginBottom: '12px' }}>
+        You know who else thinks this way.
+      </p>
+      <p className="font-serif" style={{ fontSize: '1rem', lineHeight: 1.65, color: 'var(--portal-body)', marginBottom: '8px' }}>
+        Send them your link. They begin with one call, and if they keep their Basalith the Founding fee is $1,250, half the usual $2,500.
+      </p>
+      <p className="font-serif" style={{ fontSize: '1rem', lineHeight: 1.65, color: 'var(--portal-body)', marginBottom: '20px' }}>
+        When they found theirs, $500 comes off your next renewal.
+      </p>
+      <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '12px', color: 'var(--portal-body)', wordBreak: 'break-all', padding: '12px 14px', border: '1px solid var(--portal-rule)', marginBottom: '16px', userSelect: 'all' }}>
+        basalith.ai{referralPath}
+      </p>
+      <button type="button" onClick={copy} className="btn-monolith-amber !py-2.5 !px-5 !text-[0.7rem]" style={{ minHeight: '44px' }} aria-live="polite">
+        {copied ? 'Copied' : 'Copy your link'}
+      </button>
+    </div>
+  )
+}
+
+// ── Who can ask ──────────────────────────────────────────────────────────────
+// October 6, 2026, docs/ENTITY_ACCESS_2026-10-06.md.
+//
+// The owner lets one contributor at a time put questions to the Basalith, and
+// closes it the same way. Nobody else can grant this. The server decides what
+// is shown: `block` is why the control is not offered (null when it is), and
+// `canAsk` is the list after the same check the answering route runs.
+//
+// Opening takes two taps on purpose. The second one sits under a sentence that
+// says what the person will be able to ask about.
+//
+// Copy: "answers from everything you have recorded" is the reach of the frozen
+// layer on the grounded path. There is no way yet to hold a deposit back from
+// it, so the page says so plainly instead of implying a filter.
+type EntityAccessInfo = {
+  block:  'not_active' | 'succession' | 'pipeline' | null
+  canAsk: string[]
+  max:    number
+}
+
+function WhoCanAskSection({
+  contributors,
+  info,
+  onChange,
+}: {
+  contributors: Contributor[]
+  info:         EntityAccessInfo
+  onChange:     (canAsk: string[]) => void
+}) {
+  const [confirmId, setConfirmId] = useState<string | null>(null)
+  const [busyId,    setBusyId]    = useState<string | null>(null)
+  const [note,      setNote]      = useState<{ id: string; text: string } | null>(null)
+
+  // A succession record has a successor with a sign in of their own. A
+  // Basalith that is not active has no contributors to choose from.
+  if (info.block === 'succession' || info.block === 'not_active') return null
+  if (contributors.length === 0) return null
+
+  async function change(c: Contributor, action: 'grant' | 'revoke') {
+    setBusyId(c.id)
+    setNote(null)
+    try {
+      const res  = await fetch('/api/archive/entity-readiness', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ action, contributorId: c.id }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (res.ok) {
+        // 'open' carries no list. Read the page's own list of who holds it.
+        const next = data.access === 'open'
+          ? contributors.map(x => x.id)
+          : Array.isArray(data.previewContributorIds) ? data.previewContributorIds as string[] : []
+        onChange(next)
+        const first = (c.name || c.email).split(' ')[0]
+        if (action === 'grant') {
+          setNote({ id: c.id, text: data.emailed ? `${first} has been sent an email.` : `${first} can ask now. Send them their link from the list below.` })
+        }
+      } else if (data.reason === 'full') {
+        setNote({ id: c.id, text: `${info.max} people can ask at once. Close it to someone first.` })
+      } else {
+        setNote({ id: c.id, text: 'That did not go through. Please try again.' })
+      }
+    } catch {
+      setNote({ id: c.id, text: 'That did not go through. Please try again.' })
+    } finally {
+      setBusyId(null)
+      setConfirmId(null)
+    }
+  }
+
+  const quietBtn: React.CSSProperties = {
+    fontFamily: 'var(--portal-mono)', fontSize: '11.5px', letterSpacing: '0.14em', textTransform: 'uppercase',
+    color: 'var(--portal-ink)', background: 'transparent', border: '1px solid var(--portal-ink)',
+    borderRadius: '2px', padding: '0 14px', minHeight: '44px', cursor: 'pointer', whiteSpace: 'nowrap',
+  }
+
+  return (
+    <div style={{ marginTop: '3rem', paddingTop: '3rem', borderTop: '1px solid var(--portal-rule)' }}>
+      <div className="mb-6">
+        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11.5px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-gold-ink)', marginBottom: '14px' }}>
+          Who can ask
+        </p>
+        <h2 className="font-serif" style={{ fontSize: '30px', fontWeight: 400, color: 'var(--portal-ink)', lineHeight: 1.2, marginBottom: '12px' }}>
+          Let them ask your Basalith.
+        </h2>
+        {info.block === 'pipeline' ? (
+          <p className="font-serif" style={{ fontSize: '17.5px', color: 'var(--portal-body)', lineHeight: 1.65, maxWidth: '58ch' }}>
+            This is not open on your Basalith yet. <a href="/contact" style={{ color: 'var(--portal-ink)', textDecoration: 'underline' }}>Write to us</a> and we will turn it on.
+          </p>
+        ) : (
+          <p className="font-serif" style={{ fontSize: '17.5px', color: 'var(--portal-body)', lineHeight: 1.65, maxWidth: '58ch' }}>
+            Choose who can put questions to your Basalith. It answers from everything you have recorded, and where the record is silent, it says so. You can close it to anyone at any time.
+          </p>
+        )}
+      </div>
+
+      {info.block === null && (
+        <div className="flex flex-col gap-3">
+          {contributors.map(c => {
+            const can   = info.canAsk.includes(c.id)
+            const busy  = busyId === c.id
+            const first = (c.name || c.email).split(' ')[0]
+            return (
+              <div key={c.id} className="rounded-sm" style={{ background: 'var(--portal-card)', border: '1px solid var(--portal-rule)', padding: '1rem 1.25rem' }}>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="font-sans text-[15.5px]" style={{ color: 'var(--portal-ink)' }}>{c.name || c.email}</p>
+                    <p className="font-serif" style={{ fontSize: '15px', color: can ? 'var(--portal-ok)' : 'var(--portal-secondary)', marginTop: '2px' }}>
+                      {can ? 'Can ask your Basalith' : 'Cannot ask'}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    {can ? (
+                      <button type="button" onClick={() => change(c, 'revoke')} disabled={busy} style={{ ...quietBtn, opacity: busy ? 0.5 : 1 }}>
+                        {busy ? 'Closing' : 'Close'}
+                      </button>
+                    ) : confirmId === c.id ? (
+                      <>
+                        <button type="button" onClick={() => setConfirmId(null)} disabled={busy} style={{ ...quietBtn, border: '1px solid var(--portal-rule)', color: 'var(--portal-body)' }}>
+                          Cancel
+                        </button>
+                        <button type="button" onClick={() => change(c, 'grant')} disabled={busy} className="btn-monolith-amber !py-2.5 !px-5 !text-[0.7rem]" style={{ minHeight: '44px', opacity: busy ? 0.5 : 1 }}>
+                          {busy ? 'Opening' : 'Confirm'}
+                        </button>
+                      </>
+                    ) : (
+                      <button type="button" onClick={() => { setNote(null); setConfirmId(c.id) }} style={quietBtn}>
+                        Let them ask
+                      </button>
+                    )}
+                  </div>
+                </div>
+                {confirmId === c.id && !can && (
+                  <p className="font-serif" style={{ fontSize: '15.5px', color: 'var(--portal-body)', lineHeight: 1.6, marginTop: '12px', maxWidth: '58ch' }}>
+                    {first} will be able to ask about anything you have recorded, and will get an email saying so. Nothing is held back from the answers yet.
+                  </p>
+                )}
+                {note?.id === c.id && (
+                  <p role="status" className="font-serif" style={{ fontSize: '15.5px', color: 'var(--portal-body)', lineHeight: 1.6, marginTop: '12px' }}>
+                    {note.text}
+                  </p>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}
+
+export default function ContributorsClient({
+  archiveId,
+  referralPath = null,
+}: {
+  archiveId:     string
+  /** Set by the server only for a Basalith that has paid. */
+  referralPath?: string | null
+}) {
   const [contributors,   setContributors]   = useState<Contributor[]>([])
   const [form,           setForm]           = useState(INITIAL_CONTRIB)
   const [adding,         setAdding]         = useState(false)
@@ -170,6 +376,7 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
   const [copiedId,       setCopiedId]       = useState<string | null>(null)
   const [sendingId,      setSendingId]      = useState<string | null>(null)
   const [sentId,         setSentId]         = useState<string | null>(null)
+  const [entityAccess,   setEntityAccess]   = useState<EntityAccessInfo | null>(null)
 
   useEffect(() => {
     fetchContributors()
@@ -182,6 +389,7 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
       if (res.ok) {
         const data = await res.json()
         setContributors(data.contributors ?? [])
+        if (data.entityAccess) setEntityAccess(data.entityAccess)
       }
     } catch {}
   }
@@ -265,6 +473,8 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
         method: 'DELETE',
       })
       setContributors(prev => prev.filter(c => c.id !== id))
+      // The server drops a removed contributor from the access list too.
+      setEntityAccess(prev => prev ? { ...prev, canAsk: prev.canAsk.filter(x => x !== id) } : prev)
     } catch {}
   }
 
@@ -421,6 +631,15 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
             </tbody>
           </table>
         </div>
+      )}
+
+      {/* ── WHO CAN ASK ── */}
+      {entityAccess && (
+        <WhoCanAskSection
+          contributors={contributors}
+          info={entityAccess}
+          onChange={canAsk => setEntityAccess(prev => prev ? { ...prev, canAsk } : prev)}
+        />
       )}
 
       {/* ── CONTRIBUTOR PORTALS SECTION ── */}
@@ -678,6 +897,9 @@ export default function ContributorsClient({ archiveId }: { archiveId: string })
           </div>
         )}
       </div>
+
+      {/* Refer someone. Paid owners only; the server decides. */}
+      {referralPath && <ReferSection referralPath={referralPath} />}
 
       {/* Answers modal */}
       {viewingSession && (

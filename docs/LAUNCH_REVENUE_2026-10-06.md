@@ -330,3 +330,107 @@ pauses. The log is the only thing that will tell you, so it has to be kept.
 - **Nav** has no personal entry beyond the Begin button. "For Business" has a
   link and the personal path does not. Left alone because the label needs your
   word.
+
+---
+
+## 8. ADDENDUM, SAME DAY: THE REFERRAL FEE IS HALVED, NOT WAIVED
+
+Decided by David, October 6, 2026, later in the day. This supersedes the full
+waiver of September 24 for the personal path.
+
+- **A referred personal client pays half the founding fee: $1,250.** The same
+  rule covers a contributor who begins their own and a friend or family member
+  an owner refers. One rule, one number.
+- **The referrer gets a credit against their next renewal,** applied only when
+  the referred client pays. Never cash. The amount is $500 per paid referral
+  to start (set by David the same day).
+- **Reason.** The founding fee is the only cash up front. If referral becomes
+  the main personal channel, a full waiver removes it from most sales.
+
+### Built the same evening, written to disk, uncommitted
+
+| File | What changed |
+| --- | --- |
+| `lib/referral.ts` | Rewritten. Resolves a contributor id or an owner code (`o-<archive id>`), writes and reads the referral tag, holds the two figures. |
+| `lib/stripe/prices.ts` | New price name `b2c_founding_referral`. Empty in both tables until you fill it. |
+| `scripts/stripe-setup.ts` | Creates the $1,250 price on the test key. |
+| `app/api/admin/checkout/route.ts` | New `referralFounding` flag. Charges the $1,250 price and writes `referrer_archive_id` into the subscription metadata. `waiveFounding` is kept for anyone who saw the waiver while it was live. |
+| `lib/inngest/billingFunctions.ts` | New last step in `provisionOnFoundingFee`: writes the $500 credit to `referral_credits` and sends you a notice. |
+| `supabase/migrations/20261006_referral_credits.sql` | The ledger table. Paste by hand. |
+| `app/api/trial/start/route.ts` | Records owner referrals as well as contributor ones. Notice line says half fee. |
+| `app/begin/page.tsx`, `BeginClient.tsx` | Accepts both kinds of code. Line now states $1,250. |
+| `app/contribute/[token]/ContributeClient.tsx` | The waiver sentence now states $1,250. |
+| `app/archive/contributors/page.tsx`, `ContributorsClient.tsx` | New "Someone who should have one" block with the owner's referral link. Shown only to a Basalith that has paid. |
+
+### The copy
+
+Contributor page, replacing the waiver sentence:
+
+> Because {first name} invited you here, the Founding fee is $1,250 if you
+> decide to keep yours. That is half the usual $2,500.
+
+`/begin`, when the code resolved:
+
+> You were referred by someone who has a Basalith. If you keep yours, the
+> Founding fee is $1,250, half the usual $2,500.
+
+Owner's Contributors page, new block:
+
+> Eyebrow: Someone who should have one
+>
+> You know who else thinks this way.
+>
+> Send them your link. They begin with one call, and if they keep their
+> Basalith the Founding fee is $1,250, half the usual $2,500.
+>
+> When they found theirs, $500 comes off your next renewal.
+>
+> [Copy your link]
+
+### How the money moves
+
+1. A referred person begins at `/begin?ref=...`. The trial start route writes
+   a tag on the application: who referred them and from which Basalith.
+2. You send the checkout link with `"referralFounding": true`. The route reads
+   the tag, charges the $1,250 price, and stamps the referring Basalith on the
+   subscription. With no tag on the application it refuses, unless you pass
+   `referrerArchiveId` by hand.
+3. When the first invoice is paid, provisioning writes one `pending` row to
+   `referral_credits` for $500 and emails you.
+4. You apply the credit in Stripe as a customer balance credit on the
+   referrer, then set the row to `applied`. The code never touches Stripe for
+   this. That is deliberate: it is money, and it stays a human step.
+
+### Order of operations before any of this is live
+
+1. Paste `20261006_referral_credits.sql` and paste back the three confirms.
+2. `npx tsx scripts/stripe-setup.ts` on the test key. Paste the new
+   `b2c_founding_referral` id into `TEST_PRICES`.
+3. `npx tsc --noEmit`.
+4. On test keys: one referred trial, one checkout with `referralFounding`,
+   one test payment. Confirm the $1,250 line, the provisioned Basalith, the
+   `referral_credits` row, and the notice.
+5. At live promotion, create the $1,250 price in live mode and fill
+   `LIVE_PRICES`. Until then a live `referralFounding` call fails loudly at
+   price lookup, which is the intended failure.
+
+If the code ships before the table exists, provisioning still completes. The
+ledger step catches its own error and emails you that the credit was not
+recorded.
+
+### Calls in here that are yours
+
+- **A contributor referral credits the owner.** The contributor is not a
+  paying client and has no renewal. The $500 goes to the Basalith that
+  contributor was invited to, if it has paid. Say so if a contributor referral
+  should earn nobody a credit.
+- **The owner link shows only to a Basalith with a paid founding fee.** The
+  family records that never paid do not see it. The contributor block still
+  shows on every active Basalith, as flagged in section 3.
+- **No cap on credits.** Eight referrals in a year would exceed the $3,600
+  renewal. Nothing limits that today, and the credit is applied by hand, so
+  you would see it coming.
+- **The $500 is promised on a page.** Once an owner has seen it, changing the
+  figure means honoring the old one for referrals already in motion.
+- **Still true:** a referred person cannot pay without you sending a link.
+  Owner checkout is not built.

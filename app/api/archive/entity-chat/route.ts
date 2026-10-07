@@ -7,6 +7,17 @@ import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { classifyDeposit } from '@/lib/classifyDeposit'
 import { buildEntitySystemPrompt as buildContextPrompt } from '@/lib/entityContext'
 import { logGroundingGap } from '@/lib/groundingGapLog'
+import { checkRateLimit } from '@/lib/apiSecurity'
+import {
+  hasEntityAccess,
+  accessBlock,
+  contributorTokenFrom,
+  CONTRIBUTOR_QUESTIONS_PER_HOUR,
+  CONTRIBUTOR_QUESTION_WINDOW_MS,
+  CONTRIBUTOR_MESSAGE_MAX,
+  CONTRIBUTOR_HISTORY_MAX,
+} from '@/lib/entityAccess'
+import { readAccessRow } from '@/lib/entityAccessStore'
 import {
   isDeposit,
   sanitizeHistory,
@@ -33,6 +44,18 @@ const anthropic = new Anthropic()
 // Request and response shapes are unchanged: { message, sessionId,
 // conversationHistory } in, { response, sessionId, wasDeposit } out. The iOS
 // app depends on that.
+//
+// October 6, 2026 (docs/ENTITY_ACCESS_2026-10-06.md), the contributor branch:
+//   1. A contributor token on the request wins over a session cookie. Before,
+//      a contributor who had begun a Basalith of their own and was signed in
+//      to it in the same browser was answered by THEIR OWN record on the
+//      inviter's page, and a statement they typed was saved to it.
+//   2. The preview list is enforced here. Before, any active contributor's
+//      token was answered whenever the mode was not 'none'.
+//   3. A contributor is answered on the grounded pipeline only. The 'context'
+//      builder has no verifier.
+//   4. A contributor's turns are capped in length, history, and rate.
+//   5. The conversation rows carry who asked, once the migration is pasted.
 export async function POST(req: Request) {
   try {
     const body = await req.json()
@@ -45,15 +68,18 @@ export async function POST(req: Request) {
     // ── Step 1: Resolve caller identity ───────────────────────────────────────
     // Owner Supabase session (ownership verified against the archives table) or
     // contributor bearer token (validated against contributors.access_token).
-    const session = await getSessionUser()
-
     const nextReq          = req as import('next/server').NextRequest
     const authHeader       = nextReq.headers.get('authorization')
-    const contributorToken = authHeader?.replace('Bearer ', '') || body.contributorToken
+    const contributorToken = contributorTokenFrom(authHeader, body.contributorToken)
+
+    // A request that presents a contributor token is a contributor request and
+    // nothing else. The session is not read for it at all.
+    const session = contributorToken ? null : await getSessionUser()
 
     let authorizedArchiveId: string | null = null
     let callerType: 'owner' | 'contributor' | null = null
     let contributorLanguage: string | null = null
+    let contributorId: string | null = null
 
     if (session?.archiveId) {
       // A session carrying an archiveId is not proof of ownership (getSessionUser
@@ -71,7 +97,7 @@ export async function POST(req: Request) {
     } else if (contributorToken) {
       const { data: contributor } = await supabaseAdmin
         .from('contributors')
-        .select('archive_id, status, preferred_language')
+        .select('id, archive_id, status, preferred_language')
         .eq('access_token', contributorToken)
         .eq('status', 'active')
         .maybeSingle()
@@ -79,6 +105,7 @@ export async function POST(req: Request) {
       if (contributor) {
         authorizedArchiveId = contributor.archive_id
         callerType          = 'contributor'
+        contributorId       = contributor.id as string
         contributorLanguage = (contributor.preferred_language as string | null) ?? null
       }
     }
@@ -90,23 +117,38 @@ export async function POST(req: Request) {
     const archiveId = authorizedArchiveId
 
     // ── Step 2: Contributor access check ──────────────────────────────────────
+    // The owner grants this one person at a time (lib/entityAccess.ts). The
+    // read fails closed: a missing row or column answers nobody.
     if (callerType === 'contributor') {
-      const { data: archiveAccess } = await supabaseAdmin
-        .from('archives')
-        .select('contributor_entity_access')
-        .eq('id', archiveId)
-        .single()
+      const access = await readAccessRow(archiveId)
 
-      if (!archiveAccess || archiveAccess.contributor_entity_access === 'none') {
+      if (!hasEntityAccess(access, contributorId) || accessBlock(access) !== null) {
         return NextResponse.json(
           { error: 'Entity access not yet available for contributors' },
           { status: 403 }
         )
       }
+
+      if (message.length > CONTRIBUTOR_MESSAGE_MAX) {
+        return NextResponse.json({ error: 'That question is too long.' }, { status: 400 })
+      }
+
+      // In memory, per function instance (lib/apiSecurity.ts). It stops a
+      // burst from one warm instance and nothing more. It is a cost guard, not
+      // a promise, and no copy states the number.
+      const limit = checkRateLimit(
+        `entity-chat:${contributorId}`,
+        CONTRIBUTOR_QUESTIONS_PER_HOUR,
+        CONTRIBUTOR_QUESTION_WINDOW_MS,
+      )
+      if (!limit.allowed) {
+        return NextResponse.json({ error: 'Too many questions for now.' }, { status: 429 })
+      }
     }
 
-    const history  = sanitizeHistory(body.conversationHistory)
-    const pipeline = await readEntityPipeline(archiveId)
+    const fullHistory = sanitizeHistory(body.conversationHistory)
+    const history     = callerType === 'contributor' ? fullHistory.slice(-CONTRIBUTOR_HISTORY_MAX) : fullHistory
+    const pipeline    = await readEntityPipeline(archiveId)
 
     console.log('[entity-chat] archiveId:', archiveId, '| caller:', callerType, '| pipeline:', pipeline, '| msgLen:', message.length)
 
@@ -160,11 +202,22 @@ export async function POST(req: Request) {
     const currentSessionId = sessionId || crypto.randomUUID()
 
     // ── Step 4: Post-response writes, all under after() ───────────────────────
+    // A contributor's rows carry who asked (entity_conversations.contributor_id,
+    // migration 20261006_entity_conversations_asker.sql). Until that migration
+    // is pasted the first insert fails on the unknown column and the rows are
+    // written without it, exactly as before, so the deploy order does not matter.
     after(async () => {
-      const { error } = await supabaseAdmin.from('entity_conversations').insert([
+      const rows = [
         { archive_id: archiveId, session_id: currentSessionId, role: 'user',   content: message },
         { archive_id: archiveId, session_id: currentSessionId, role: 'entity', content: entityResponse },
-      ])
+      ]
+      let { error } = contributorId
+        ? await supabaseAdmin.from('entity_conversations').insert(rows.map(r => ({ ...r, contributor_id: contributorId })))
+        : await supabaseAdmin.from('entity_conversations').insert(rows)
+      if (error && contributorId) {
+        console.warn('[entity-chat] asker column not written, saving without it:', error.message)
+        ;({ error } = await supabaseAdmin.from('entity_conversations').insert(rows))
+      }
       if (error) console.warn('entity_conversations insert skipped:', error.message)
     })
 

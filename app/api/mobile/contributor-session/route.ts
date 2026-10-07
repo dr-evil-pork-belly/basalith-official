@@ -1,6 +1,8 @@
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { NextRequest, NextResponse } from 'next/server'
+import { hasEntityAccess, accessBlock } from '@/lib/entityAccess'
+import { readAccessRow } from '@/lib/entityAccessStore'
 
 // Bridges the iOS app's Supabase session to the contributor portal.
 //
@@ -52,18 +54,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'This Basalith is not active' }, { status: 403 })
     }
 
-    // contributor_entity_access is read on its own so a schema without the
-    // column degrades to 'none' instead of failing the whole request. The
-    // entity-chat route applies the same default when the value is missing.
-    let entityAccess = 'none'
-    const { data: accessRow, error: accessErr } = await supabaseAdmin
-      .from('archives')
-      .select('contributor_entity_access')
-      .eq('id', archiveId)
-      .maybeSingle()
-    if (!accessErr && accessRow?.contributor_entity_access) {
-      entityAccess = String(accessRow.contributor_entity_access)
-    }
+    // What the app is told is what THIS person may do, not the archive's mode
+    // (October 6, 2026, docs/ENTITY_ACCESS_2026-10-06.md). The app shows its
+    // live conversation whenever this value is not 'none'
+    // (basalith-app ContributorAskScreen), and the answering route now refuses
+    // a contributor who is not on the owner's list or whose Basalith is not on
+    // the grounded pipeline. Reporting the archive's mode would put a live box
+    // in front of someone the route will answer 403. The read fails closed.
+    const access       = await readAccessRow(archiveId)
+    const entityAccess = accessBlock(access) === null && hasEntityAccess(access, contributor.id as string)
+      ? access.mode
+      : 'none'
 
     return NextResponse.json({
       contributorId:   contributor.id,

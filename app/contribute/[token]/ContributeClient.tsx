@@ -131,6 +131,8 @@ type ArchiveProps = {
   owner_name:                     string
   contributor_entity_access:      'none' | 'preview' | 'open'
   entity_preview_contributor_ids: string[]
+  /** Decided on the server by the same check the answering route runs. */
+  entity_can_ask:                 boolean
 }
 
 type Question = {
@@ -1193,15 +1195,30 @@ function ContributionsSection({
 }
 
 // ── Contributor Entity Section ─────────────────────────────────────────────────
+// October 6, 2026, docs/ENTITY_ACCESS_2026-10-06.md.
+//
+// The owner decides who can ask, one person at a time. `hasAccess` is decided
+// on the server (page.tsx) by the check the answering route runs.
+//
+// Three things were wrong here before and are why no contributor had ever
+// reached this box on the web: the page always passed 'none'; the request
+// carried no contributor token, so the route answered 401; and the rating
+// buttons posted to an owner only route with a body it does not read. The
+// rating buttons are removed. Whether a relative's rating should count toward
+// anything is its own decision.
+//
+// Copy: every mechanism sentence is true of the grounded path, the only path
+// a contributor is answered on. The frozen layer there is the owner's own
+// words only, so nothing here says a contribution shapes an answer.
 
-type EntityMessage = { id: string; role: 'user' | 'entity'; content: string; rating?: string }
+type EntityMessage = { id: string; role: 'user' | 'entity'; content: string }
 
 function ContributorEntitySection({
-  archiveId,
+  token,
   ownerName,
   hasAccess,
 }: {
-  archiveId: string
+  token:     string
   ownerName: string
   hasAccess: boolean
 }) {
@@ -1210,44 +1227,52 @@ function ContributorEntitySection({
   const [messages,  setMessages]  = useState<EntityMessage[]>([])
   const [input,     setInput]     = useState('')
   const [loading,   setLoading]   = useState(false)
+  const [notice,    setNotice]    = useState('')
   const [sessionId, setSessionId] = useState<string | undefined>(undefined)
 
   async function send() {
     const text = input.trim()
     if (!text || loading) return
-    setInput('')
-    const userMsg: EntityMessage = { id: Date.now().toString(), role: 'user', content: text }
-    setMessages(prev => [...prev, userMsg])
+    setNotice('')
     setLoading(true)
     try {
       const res = await fetch('/api/archive/entity-chat', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        method:  'POST',
+        // The contributor token is the credential. It goes in the header, never
+        // in a query string.
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({
-          archiveId,
           message: text,
           sessionId,
           conversationHistory: messages.map(m => ({ role: m.role === 'entity' ? 'assistant' : 'user', content: m.content })),
         }),
       })
-      const data = await res.json()
-      if (data.sessionId) setSessionId(data.sessionId)
-      if (data.response) {
-        setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: 'entity', content: data.response }])
+      const data = await res.json().catch(() => ({}))
+      if (res.ok && data.response) {
+        if (data.sessionId) setSessionId(data.sessionId)
+        setInput('')
+        setMessages(prev => [
+          ...prev,
+          { id: Date.now().toString(),       role: 'user',   content: text },
+          { id: (Date.now() + 1).toString(), role: 'entity', content: data.response },
+        ])
+      } else if (res.status === 429) {
+        setNotice('That is enough questions for now. Come back in a little while.')
+      } else if (res.status === 401 || res.status === 403) {
+        setNotice(`This is not open to you right now. ${firstName} decides who can ask.`)
+      } else if (res.status === 400) {
+        setNotice('That question is too long. Try a shorter one.')
+      } else {
+        setNotice('That did not go through. Your question is still here. Try again.')
       }
-    } catch {}
+    } catch {
+      setNotice('That did not go through. Your question is still here. Try again.')
+    }
     setLoading(false)
   }
 
-  async function rateMessage(msgId: string, rating: string) {
-    setMessages(prev => prev.map(m => m.id === msgId ? { ...m, rating } : m))
-    await fetch('/api/archive/entity-feedback', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ archiveId, rating }),
-    }).catch(() => {})
-  }
-
   const SECTION_STYLE: React.CSSProperties = {
-    /* The archive speaks: the inverted block. Every color inside is an
+    /* The record speaks: the inverted block. Every color inside is an
        --invert-* value and nothing here inherits the stone text colors. */
     background:   'var(--invert-bg)',
     color:        'var(--invert-fg)',
@@ -1261,26 +1286,14 @@ function ContributorEntitySection({
   if (!hasAccess) {
     return (
       <div className="portal-invert" style={SECTION_STYLE}>
-        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--invert-gold)', marginBottom: '1.5rem' }}>
-          {firstName}&rsquo;s Entity Is Learning
+        <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11.5px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--invert-gold)', marginBottom: '1.25rem' }}>
+          {firstName}&rsquo;s Basalith
         </p>
-        <p style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', fontSize: '1.05rem', fontWeight: 400, color: 'var(--invert-body)', lineHeight: 1.85, marginBottom: '0.6rem' }}>
-          You are helping build it.
+        <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '1.05rem', fontWeight: 400, color: 'var(--invert-body)', lineHeight: 1.75, marginBottom: '0.9rem' }}>
+          What you add here goes into {firstName}&rsquo;s record.
         </p>
-        <p style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', fontSize: '1.05rem', fontWeight: 400, color: 'var(--invert-dim)', lineHeight: 2.0, marginBottom: '1.25rem' }}>
-          Every photograph you label<br />
-          every question you answer<br />
-          every memory you share<br />
-          teaches it something specific<br />
-          about how {firstName} thinks.
-        </p>
-        <p style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', fontSize: '1.0rem', fontWeight: 400, color: 'var(--invert-dim)', lineHeight: 1.85, marginBottom: '1.25rem' }}>
-          When it is ready,<br />
-          {firstName} will invite you to talk to it.
-        </p>
-        <p style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', fontSize: '1.0rem', fontWeight: 400, color: 'var(--invert-gold)', lineHeight: 1.85, margin: 0 }}>
-          Keep contributing.<br />
-          You are making it more accurate.
+        <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '1.05rem', fontWeight: 400, color: 'var(--invert-dim)', lineHeight: 1.75, margin: 0 }}>
+          {firstName} decides who can ask their Basalith questions. If {firstName} opens it to you, you will ask from this page.
         </p>
       </div>
     )
@@ -1288,58 +1301,43 @@ function ContributorEntitySection({
 
   return (
     <div className="portal-invert" style={SECTION_STYLE}>
-      <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--invert-gold)', marginBottom: '8px' }}>
-        Talk to {firstName}&rsquo;s Entity
+      <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11.5px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--invert-gold)', marginBottom: '10px' }}>
+        Ask {firstName}&rsquo;s Basalith
       </p>
-      <p style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', fontSize: '0.9rem', color: 'var(--invert-dim)', lineHeight: 1.7, marginBottom: '1.5rem' }}>
-        This entity has learned from {firstName}&rsquo;s deposits, photographs, and your contributions.
-        Ask it anything.
+      <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '1rem', color: 'var(--invert-body)', lineHeight: 1.7, marginBottom: '1.5rem' }}>
+        It answers from what {firstName} has recorded, in {firstName}&rsquo;s own words. Where the record is silent, it says so.
       </p>
 
       {/* Conversation */}
-      {messages.length > 0 && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px', maxHeight: '400px', overflowY: 'auto' }}>
+      {(messages.length > 0 || loading) && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px', maxHeight: '420px', overflowY: 'auto' }} aria-live="polite">
           {messages.map(msg => (
-            <div key={msg.id}>
+            <div key={msg.id} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
               <div style={{
-                display:      'flex',
-                justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start',
+                maxWidth:     '85%',
+                background:   msg.role === 'user' ? 'var(--invert-gold-wash)' : 'var(--invert-field)',
+                border:       '1px solid var(--invert-rule)',
+                borderRadius: '2px',
+                padding:      '0.7rem 0.95rem',
               }}>
-                <div style={{
-                  maxWidth:     '80%',
-                  background:   msg.role === 'user' ? 'var(--invert-gold-wash)' : 'var(--invert-field)',
-                  border:       msg.role === 'user' ? '1px solid var(--portal-gold-line)' : '1px solid var(--portal-rule)',
-                  borderRadius: '2px',
-                  padding:      '0.65rem 0.9rem',
-                }}>
-                  <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '0.95rem', color: msg.role === 'user' ? 'var(--invert-fg)' : 'var(--invert-body)', lineHeight: 1.7, margin: 0 }}>
-                    {msg.content}
-                  </p>
-                </div>
-              </div>
-              {msg.role === 'entity' && !msg.rating && (
-                <div style={{ display: 'flex', gap: '0.4rem', marginTop: '4px', paddingLeft: '4px' }}>
-                  {([['accurate','var(--invert-ok)'], ['partial','var(--invert-gold)'], ['inaccurate','var(--invert-error)']] as const).map(([r, color]) => (
-                    <button key={r} onClick={() => rateMessage(msg.id, r)}
-                      style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color, background: 'transparent', border: '1px solid var(--invert-rule)', padding: '6px 10px', minHeight: '32px', cursor: 'pointer', borderRadius: '2px' }}>
-                      {r}
-                    </button>
-                  ))}
-                </div>
-              )}
-              {msg.role === 'entity' && msg.rating && (
-                <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.1em', color: 'var(--invert-dim)', marginTop: '4px', paddingLeft: '4px' }}>
-                  Rated: {msg.rating}
+                <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '1rem', color: msg.role === 'user' ? 'var(--invert-fg)' : 'var(--invert-body)', lineHeight: 1.7, margin: 0, whiteSpace: 'pre-wrap' }}>
+                  {msg.content}
                 </p>
-              )}
+              </div>
             </div>
           ))}
           {loading && (
-            <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.1em', color: 'var(--invert-gold)', animation: 'mysteryGlowPulse 1.5s ease-in-out infinite' }}>
-              {firstName.toUpperCase()} IS THINKING…
+            <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11.5px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--invert-gold)', margin: 0 }}>
+              Reading the record
             </p>
           )}
         </div>
+      )}
+
+      {notice && (
+        <p role="status" style={{ fontFamily: 'var(--portal-serif)', fontSize: '0.95rem', color: 'var(--invert-fg)', lineHeight: 1.6, margin: '0 0 12px' }}>
+          {notice}
+        </p>
       )}
 
       {/* Input */}
@@ -1348,8 +1346,10 @@ function ContributorEntitySection({
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() } }}
-          placeholder={`Ask ${firstName}'s entity anything…`}
+          placeholder="Ask a question"
+          aria-label={`Ask ${firstName}'s Basalith a question`}
           rows={2}
+          maxLength={2000}
           style={{
             flex:       1,
             background: 'var(--invert-field)',
@@ -1357,7 +1357,7 @@ function ContributorEntitySection({
             borderRadius: '2px',
             color:      'var(--invert-fg)',
             fontFamily: 'var(--portal-serif)',
-            fontSize:   '0.95rem',
+            fontSize:   '1rem',
             padding:    '0.6rem 0.75rem',
             resize:     'none',
             outline:    'none',
@@ -1369,13 +1369,14 @@ function ContributorEntitySection({
           disabled={loading || !input.trim()}
           style={{
             fontFamily: 'var(--portal-mono)',
-            fontSize: '11px',
-            letterSpacing: '0.2em',
+            fontSize: '11.5px',
+            letterSpacing: '0.18em',
             textTransform: 'uppercase',
             color:         'var(--portal-btn-label)',
             background:    loading || !input.trim() ? 'var(--invert-field)' : 'var(--portal-btn)',
             border:        'none',
-            padding:       '0 1rem',
+            padding:       '0 1.1rem',
+            minHeight:     '48px',
             cursor:        loading || !input.trim() ? 'not-allowed' : 'pointer',
             borderRadius:  '2px',
             flexShrink:    0,
@@ -1384,6 +1385,10 @@ function ContributorEntitySection({
           Ask
         </button>
       </div>
+
+      <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '0.9rem', color: 'var(--invert-dim)', lineHeight: 1.6, margin: '14px 0 0' }}>
+        Your questions are saved to {firstName}&rsquo;s Basalith.
+      </p>
     </div>
   )
 }
@@ -1466,13 +1471,15 @@ function MemoryMapTeaser({ token }: { token: string }) {
 //
 // Shown only after the contributor has added something, so it never greets a
 // person who has not yet seen how this works. English only for now: the other
-// portal languages have no reviewed translation of the waiver sentence, and a
+// portal languages have no reviewed translation of the fee sentence, and a
 // promise about money does not ship in a language nobody here has checked.
 //
 // The link carries the contributor row id, never the access token. /begin
 // resolves it on the server (lib/referral.ts), and the trial start route
-// records it on the application row and in the internal notice. The waiver
-// itself is applied by hand at checkout with waiveFounding.
+// records it on the application row and in the internal notice. The half fee
+// is applied at checkout with referralFounding. Until the evening of October
+// 6, 2026 this block promised a full waiver; a person who saw that offer is
+// owed it, and waiveFounding on the admin checkout route still honors it.
 function BeginYourOwnSection({
   contributorId,
   subjectName,
@@ -1500,7 +1507,7 @@ function BeginYourOwnSection({
         You can begin one for yourself. The first call is fifteen to thirty minutes, by voice or typed, on your own time. When it is in, your Basalith answers one question in your own words and declines one it has no grounds for.
       </p>
       <p style={{ fontFamily: 'var(--portal-serif)', fontSize: '1rem', lineHeight: 1.65, color: 'var(--portal-body)', margin: '0 0 20px' }}>
-        Because {subjectName} invited you here, the Founding fee is waived if you decide to keep yours.
+        Because {subjectName} invited you here, the Founding fee is $1,250 if you decide to keep yours. That is half the usual $2,500.
       </p>
       <a
         href={`/begin?ref=${contributorId}`}
@@ -1686,13 +1693,9 @@ export default function ContributeClient({
 
         {/* Entity access */}
         <ContributorEntitySection
-          archiveId={archive.id}
+          token={token}
           ownerName={archive.owner_name}
-          hasAccess={
-            archive.contributor_entity_access === 'open' ||
-            (archive.contributor_entity_access === 'preview' &&
-              archive.entity_preview_contributor_ids.includes(contributor.id))
-          }
+          hasAccess={archive.entity_can_ask}
         />
 
         {/* Begin your own. After a first contribution, English only. */}

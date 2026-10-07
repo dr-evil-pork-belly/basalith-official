@@ -17,6 +17,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { getStripe } from '@/lib/stripe/client'
 import { priceId, type PriceName } from '@/lib/stripe/prices'
 import { FAMILY_TIERS, provisionedTier } from '@/lib/billing/archiveTier'
+import { referrerArchiveFromReason } from '@/lib/referral'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -74,6 +75,8 @@ export async function POST(req: NextRequest) {
     archiveTier?: string
     familyName?: string
     waiveFounding?: boolean
+    referralFounding?: boolean
+    referrerArchiveId?: string
   }
   try {
     body = await req.json()
@@ -90,6 +93,14 @@ export async function POST(req: NextRequest) {
   // first invoice of the subscription (billing_reason subscription_create), not
   // on the founding line, so a waived session still provisions.
   const waiveFounding = body.waiveFounding === true
+  // Referral founding (October 6, 2026, evening). The rule moved from a full
+  // waiver to half: a referred personal client pays $1,250. waiveFounding is
+  // kept for the people who saw the waiver while it was live and for nothing
+  // else. The two are exclusive.
+  const referralFounding = body.referralFounding === true
+  if (waiveFounding && referralFounding) {
+    return NextResponse.json({ error: 'waiveFounding and referralFounding are exclusive' }, { status: 400 })
+  }
 
   // ── Validate input ─────────────────────────────────────────────────────────
   if (!applicationId || typeof applicationId !== 'string') {
@@ -114,7 +125,7 @@ export async function POST(req: NextRequest) {
   // ── Load application, derive segment ───────────────────────────────────────
   const { data: application, error: appErr } = await supabaseAdmin
     .from('archive_applications')
-    .select('id, email, apply_type')
+    .select('id, email, apply_type, reason')
     .eq('id', applicationId)
     .maybeSingle()
 
@@ -144,7 +155,32 @@ export async function POST(req: NextRequest) {
       { status: 400 },
     )
   }
-  const foundingName: PriceName = segment === 'succession' ? 'succession_founding' : 'b2c_founding'
+  // The half fee is a personal rule. Succession referrals come through
+  // advisors and are a separate decision.
+  if (referralFounding && segment !== 'b2c') {
+    return NextResponse.json({ error: 'referralFounding applies to personal applications only' }, { status: 422 })
+  }
+  // The Basalith that referred this person. Read from the tag the trial start
+  // route wrote on the application, or supplied by hand for a referral that
+  // did not come through a link. It is what the $500 renewal credit is owed to.
+  const referrerArchiveId = referralFounding
+    ? (referrerArchiveFromReason(application.reason) ??
+       (typeof body.referrerArchiveId === 'string' ? body.referrerArchiveId.trim() : ''))
+    : ''
+  if (referralFounding && referrerArchiveId && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(referrerArchiveId)) {
+    return NextResponse.json({ error: 'referrerArchiveId must be an archive id' }, { status: 400 })
+  }
+  if (referralFounding && !referrerArchiveId) {
+    return NextResponse.json(
+      { error: 'No referral is recorded on this application. Pass referrerArchiveId to grant the half fee by hand.' },
+      { status: 422 },
+    )
+  }
+
+  const foundingName: PriceName =
+    segment === 'succession' ? 'succession_founding'
+    : referralFounding       ? 'b2c_founding_referral'
+    :                          'b2c_founding'
 
   let tierPriceId: string
   let foundingPriceId: string
@@ -178,6 +214,10 @@ export async function POST(req: NextRequest) {
   }
   if (guideId) metadata.guide_id = guideId
   if (waiveFounding) metadata.founding_waived = 'referral'
+  if (referralFounding) {
+    metadata.founding_referral   = 'half'
+    metadata.referrer_archive_id = referrerArchiveId
+  }
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
 
@@ -207,7 +247,7 @@ export async function POST(req: NextRequest) {
       cancel_url:  `${siteUrl}/`,
     })
 
-    return NextResponse.json({ url: session.url, sessionId: session.id, foundingWaived: waiveFounding })
+    return NextResponse.json({ url: session.url, sessionId: session.id, foundingWaived: waiveFounding, referralFounding })
   } catch (e) {
     console.error('[admin/checkout] session create failed:', e instanceof Error ? e.message : e)
     return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 })

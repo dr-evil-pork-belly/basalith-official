@@ -3,6 +3,11 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
 import { calculateEntityReadiness } from '@/lib/entityReadiness'
 import { getSessionUser } from '@/lib/auth/getSessionUser'
+import { grantAccess, revokeAccess, accessBlock, MAX_ENTITY_ACCESS } from '@/lib/entityAccess'
+import { readAccessRow, writeAccessState } from '@/lib/entityAccessStore'
+import { buildEntityAccessGrantedEmail } from '@/lib/emails/entityAccessGranted'
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 // ── Invitation email ──────────────────────────────────────────────────────────
 
@@ -120,13 +125,97 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
-  const body = await req.json()
-  const { action, contributorIds } = body as {
-    action:          'enable_preview' | 'enable_open' | 'disable'
+  const body = await req.json().catch(() => ({}))
+  const { action, contributorIds, contributorId } = body as {
+    action:          'enable_preview' | 'enable_open' | 'disable' | 'grant' | 'revoke'
     contributorIds?: string[]
+    contributorId?:  string
   }
 
   try {
+    // ── grant / revoke: one person at a time (October 6, 2026) ────────────────
+    // The owner's control on /archive/contributors. Record:
+    // docs/ENTITY_ACCESS_2026-10-06.md. The three actions below this block are
+    // older and nothing on the web calls the two that widen access.
+    if (action === 'grant' || action === 'revoke') {
+      if (typeof contributorId !== 'string' || !UUID.test(contributorId)) {
+        return NextResponse.json({ error: 'contributorId required' }, { status: 400 })
+      }
+
+      const row = await readAccessRow(archiveId)
+
+      // Closing access is always allowed. Opening it is offered only where a
+      // contributor would actually be answered (lib/entityAccess.ts).
+      if (action === 'grant') {
+        const block = accessBlock(row)
+        if (block) return NextResponse.json({ error: 'Not available for this Basalith', reason: block }, { status: 409 })
+      }
+
+      // Owning the archive is not authority over an arbitrary contributor id.
+      // The target has to be an active contributor of THIS archive.
+      const { data: actives } = await supabaseAdmin
+        .from('contributors')
+        .select('id, name, email, access_token')
+        .eq('archive_id', archiveId)
+        .eq('status', 'active')
+      const activeRows = actives ?? []
+      const activeIds  = activeRows.map(c => c.id as string)
+      const target     = activeRows.find(c => c.id === contributorId)
+      if (!target) return NextResponse.json({ error: 'Contributor not found' }, { status: 404 })
+
+      const result = action === 'grant'
+        ? grantAccess(row, contributorId, activeIds)
+        : revokeAccess(row, contributorId, activeIds)
+
+      if ('refused' in result && result.refused === 'full') {
+        return NextResponse.json({ error: 'Access list is full', reason: 'full', max: MAX_ENTITY_ACCESS }, { status: 409 })
+      }
+
+      let emailed = false
+      if (result.changed) {
+        const { error } = await writeAccessState(archiveId, result.next, { stampEnabled: action === 'grant' })
+        if (error) return NextResponse.json({ error }, { status: 500 })
+
+        // One email, to the one person, only when access actually opened. Sent
+        // after the write, so nobody is told they can ask before they can.
+        if (action === 'grant' && target.email && target.access_token) {
+          try {
+            const { data: archiveRow } = await supabaseAdmin
+              .from('archives')
+              .select('name, owner_name')
+              .eq('id', archiveId)
+              .single()
+            const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai'
+            const mail = buildEntityAccessGrantedEmail({
+              ownerName:       (archiveRow?.owner_name as string | null) ?? '',
+              contributorName: (target.name as string | null) ?? null,
+              portalUrl:       `${siteUrl}/contribute/${target.access_token}`,
+            })
+            const sent = await resend.emails.send({
+              from:    `${archiveRow?.name ?? 'Basalith'} <${process.env.RESEND_FROM_EMAIL ?? 'archive@basalith.xyz'}>`,
+              to:      target.email as string,
+              subject: mail.subject,
+              headers: { 'X-Entity-Ref-ID': `basalith-entity-grant-${archiveId}-${contributorId}-${Date.now()}` },
+              html:    mail.html,
+              text:    mail.text,
+            })
+            emailed = !sent.error
+            if (sent.error) console.error('[entity-readiness] grant email failed:', sent.error.message)
+          } catch (e) {
+            console.error('[entity-readiness] grant email failed:', e instanceof Error ? e.message : e)
+          }
+        }
+      }
+
+      return NextResponse.json({
+        ok:                    true,
+        access:                result.next.mode,
+        previewContributorIds: result.next.ids,
+        changed:               result.changed,
+        emailed,
+      })
+    }
+
     if (action === 'enable_preview') {
       if (!contributorIds?.length) {
         return NextResponse.json({ error: 'contributorIds required for preview' }, { status: 400 })

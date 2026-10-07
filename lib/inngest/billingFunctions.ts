@@ -5,6 +5,8 @@ import { getStripe } from '@/lib/stripe/client'
 import { createArchiveWithCredentials, generateOwnerSignInLink } from '@/lib/billing/createArchive'
 import { buildFoundingWelcomeEmail } from '@/lib/emails/foundingWelcome'
 import { provisionedTier } from '@/lib/billing/archiveTier'
+import { notifyInternal } from '@/lib/internalNotify'
+import { REFERRAL_CREDIT_CENTS } from '@/lib/referral'
 import {
   buildPaymentFailedEmail,
   buildPaymentFailedSubject,
@@ -78,6 +80,7 @@ export const provisionOnFoundingFee = inngest.createFunction(
         archiveTier:   (sub.metadata?.archive_tier as string) ?? null,   // archive | estate | dynasty
         familyName:    (sub.metadata?.family_name as string) ?? null,    // supplied at checkout
         guideId:       (sub.metadata?.guide_id as string) ?? null,
+        referrerArchiveId: (sub.metadata?.referrer_archive_id as string) ?? null,  // set by referralFounding
         customerId:    typeof sub.customer === 'string' ? sub.customer : (sub.customer?.id ?? null),
       }
     })
@@ -278,6 +281,42 @@ export const provisionOnFoundingFee = inngest.createFunction(
         .update({ status: 'won' })
         .eq('id', billing.application_id)
     })
+
+    // 11. Referral credit (October 6, 2026). When the checkout carried a
+    //     referrer, the Basalith that referred this client is owed a credit
+    //     against its next renewal. This step records the debt and tells the
+    //     founder. It does not touch Stripe: the credit is applied by hand as a
+    //     customer balance credit, then the row is marked applied. The unique
+    //     index on referred_subscription_id makes a retry a no-op. Nothing in
+    //     here can fail provisioning.
+    if (meta.referrerArchiveId) {
+      await step.run('referral-credit', async () => {
+        const { error } = await supabaseAdmin
+          .from('referral_credits')
+          .upsert(
+            {
+              referrer_archive_id:      meta.referrerArchiveId,
+              referred_archive_id:      archiveId,
+              referred_subscription_id: subscriptionId,
+              amount_cents:             REFERRAL_CREDIT_CENTS,
+            },
+            { onConflict: 'referred_subscription_id', ignoreDuplicates: true },
+          )
+        await notifyInternal({
+          subject: error
+            ? `Referral credit NOT recorded: ${familyName} Basalith`
+            : `Referral credit owed: $${REFERRAL_CREDIT_CENTS / 100}`,
+          text: [
+            `New client: ${familyName} Basalith (${archiveId})`,
+            `Referred by archive: ${meta.referrerArchiveId}`,
+            `Credit owed to the referrer: $${REFERRAL_CREDIT_CENTS / 100} against the next renewal`,
+            error
+              ? `The ledger write failed: ${error.message}. Record this one by hand.`
+              : 'Recorded in referral_credits as pending. Apply it in Stripe as a customer balance credit, then set status to applied.',
+          ].join('\n'),
+        })
+      })
+    }
 
     return { ok: true, archiveId, segment, tier: archiveTier, commissionWarning }
   },

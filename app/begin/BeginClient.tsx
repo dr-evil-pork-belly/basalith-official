@@ -41,7 +41,7 @@ export default function BeginClient({
   referralCode = null,
 }: {
   signedInEmail: string | null
-  /** A contributor id the server already resolved. Null for everyone else. */
+  /** A referral code the server already resolved. Null for everyone else. */
   referralCode?: string | null
 }) {
   const router = useRouter()
@@ -282,7 +282,7 @@ export default function BeginClient({
 
             {referralCode && (
               <p className="font-sans text-[15px] leading-relaxed text-center" style={{ color: 'var(--invert-gold)' }}>
-                You were invited by someone who has a Basalith. If you keep yours, the Founding fee is waived.
+                You were referred by someone who has a Basalith. If you keep yours, the Founding fee is $1,250, half the usual $2,500.
               </p>
             )}
           </form>

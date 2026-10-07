@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
 import ContributeClient from './ContributeClient'
+import { hasEntityAccess, accessBlock } from '@/lib/entityAccess'
+import { readAccessRow } from '@/lib/entityAccessStore'
 import type { Metadata } from 'next'
 
 export const dynamic = 'force-dynamic'
@@ -44,9 +46,9 @@ export default async function ContributePage({
     return notFound()
   }
 
-  // Only select columns confirmed to exist in the base archives table.
-  // contributor_entity_access and entity_preview_contributor_ids are added by
-  // a pending migration — default to 'none'/[] until that migration is run.
+  // The base columns only. Who may ask is read separately below, through a
+  // read that fails closed, so a schema surprise there never takes the portal
+  // down with it.
   const { data: archive, error: archiveError } = await admin
     .from('archives')
     .select('id, name, family_name, owner_name, status')
@@ -66,7 +68,14 @@ export default async function ContributePage({
     .update({ last_accessed_at: new Date().toISOString() })
     .eq('id', contributor.id)
 
-  console.log('[contribute] rendering portal for contributor:', contributor.id)
+  // Whether this person may ask the Basalith questions (October 6, 2026,
+  // docs/ENTITY_ACCESS_2026-10-06.md). Until that date this page passed 'none'
+  // to the client no matter what the owner had set, so the question box never
+  // rendered on the web. The check is the one the answering route runs.
+  const access = await readAccessRow(archive.id)
+  const canAsk = accessBlock(access) === null && hasEntityAccess(access, contributor.id)
+
+  console.log('[contribute] rendering portal for contributor:', contributor.id, '| can ask:', canAsk)
 
   return (
     <ContributeClient
@@ -89,9 +98,9 @@ export default async function ContributePage({
         name:                           archive.name,
         family_name:                    archive.family_name,
         owner_name:                     archive.owner_name ?? '',
-        // Defaults until 20260430_archives_entity_access migration is run
-        contributor_entity_access:      'none' as const,
-        entity_preview_contributor_ids: [],
+        contributor_entity_access:      access.mode,
+        entity_preview_contributor_ids: access.ids,
+        entity_can_ask:                 canAsk,
       }}
     />
   )

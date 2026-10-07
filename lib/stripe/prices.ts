@@ -10,6 +10,7 @@ import { stripeMode } from './client'
  */
 export type PriceName =
   | 'b2c_founding'
+  | 'b2c_founding_referral'
   | 'b2c_active_year'
   | 'b2c_active_month'
   | 'b2c_resting_year'
@@ -23,6 +24,9 @@ export type PriceName =
 // Empty string = not yet created. Re-run the script to refresh.
 const TEST_PRICES: Record<PriceName, string> = {
   b2c_founding:        'price_1TmeZY1yVjZPfnWnItvJVh2N',
+  // Referral founding, $1,250 (October 6, 2026). Empty until
+  // scripts/stripe-setup.ts is run again on the test key and its output pasted.
+  b2c_founding_referral: '',
   b2c_active_year:     'price_1TmeZZ1yVjZPfnWnn4TvxagL',
   b2c_active_month:    'price_1TmeZa1yVjZPfnWnOitUHt7L',
   b2c_resting_year:    'price_1TmeZb1yVjZPfnWnOEUdJmz0',
@@ -36,6 +40,7 @@ const TEST_PRICES: Record<PriceName, string> = {
 // Populated by David in live mode at promotion. Do not fill from the sandbox.
 const LIVE_PRICES: Record<PriceName, string> = {
   b2c_founding:        '',
+  b2c_founding_referral: '',
   b2c_active_year:     '',
   b2c_active_month:    '',
   b2c_resting_year:    '',

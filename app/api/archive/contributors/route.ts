@@ -6,6 +6,8 @@ import {
   generateQuestionsForContributor,
 } from '@/lib/contributorToken'
 import { getSessionUser } from '@/lib/auth/getSessionUser'
+import { accessBlock, holders, MAX_ENTITY_ACCESS } from '@/lib/entityAccess'
+import { readAccessRow, dropRemovedContributor } from '@/lib/entityAccessStore'
 
 export const dynamic = 'force-dynamic'
 
@@ -39,7 +41,21 @@ export async function GET() {
     .order('created_at', { ascending: false })
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json({ contributors: data ?? [] })
+
+  // Who can ask this Basalith questions, for the owner's control on the
+  // Contributors page (October 6, 2026, docs/ENTITY_ACCESS_2026-10-06.md).
+  // `canAsk` is the list after the same check the answering route runs, so the
+  // page never shows access the route would refuse. `block` says why the
+  // control is not offered, or null when it is.
+  const access = await readAccessRow(archiveId)
+  const block  = accessBlock(access)
+  const entityAccess = {
+    block,
+    canAsk: block ? [] : holders(access, (data ?? []).map(c => c.id as string)),
+    max:    MAX_ENTITY_ACCESS,
+  }
+
+  return NextResponse.json({ contributors: data ?? [], entityAccess })
 }
 
 export async function POST(req: NextRequest) {
@@ -292,6 +308,13 @@ export async function DELETE(req: NextRequest) {
       .eq('archive_id', archiveId)
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+    // A removed contributor leaves the access list too. The POST above upserts
+    // on (archive_id, email), so adding the same person back reuses this row
+    // id; without this they would return with access the owner never gave
+    // again.
+    await dropRemovedContributor(archiveId, contributorId)
+
     return NextResponse.json({ success: true })
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Unknown error'

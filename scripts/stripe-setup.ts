@@ -43,6 +43,8 @@ type ProductSpec = {
 const PRODUCTS: ProductSpec[] = [
   { key: 'b2c_founding', name: 'Basalith B2C Founding', taxCode: TAX_CODE_SAAS_PERSONAL, prices: [
     { name: 'b2c_founding', unitAmount: 250000 },
+    // Half the founding fee for a referred personal client. October 6, 2026.
+    { name: 'b2c_founding_referral', unitAmount: 125000 },
   ] },
   { key: 'succession_founding', name: 'Basalith Succession Founding', taxCode: TAX_CODE_SAAS_BUSINESS, prices: [
     { name: 'succession_founding', unitAmount: 500000 },
