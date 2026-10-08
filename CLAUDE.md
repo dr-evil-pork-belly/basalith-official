@@ -236,6 +236,32 @@ export line points at `/archive/preferences`. English only. Until the job has de
 real expired trial in production and the counts were pasted, no copy says "deleted after
 30 days."
 
+**Dependency assessment.** `lib/assessment.ts`, `lib/dependencyIntake.ts`,
+`lib/dependencyReport.ts`, `lib/dependencyReadings.ts`, `lib/assessmentStore.ts`,
+`lib/inngest/dependencyFunctions.ts`, table `dependency_reports` (migration
+`20261008_dependency_reports.sql`), October 2026. A founder's record made for one named
+buyer's key person dependency report. The convention is `archives.tier = 'succession'`
+with `archives.status = 'assessment'`: the tier gives the business seeds and probe set,
+and the status sits beside `active`, `trial`, and `drill` with no CHECK. Every cron and
+the coverage sweep select `status = 'active'`, so an assessment is invisible to them;
+both B2 backup functions exclude it with trials (`.in('status', ['trial',
+'assessment'])`). `/assessment/begin?order=<report id>` plus the founder's own email
+start it (`POST /api/assessment/start`, one winner by a conditional claim; an existing
+owner, successor, or guide is refused and the founder of Basalith is told). The founder
+runs eight area calls, never the Founding Sequence (`/archive/assessment`; the dashboard
+and `/archive/founding` without an area redirect there), and answers the intake once
+(`/api/archive/assessment`). For an assessment `/answer` sends NO
+`coverage.run.requested` when an area call closes; `requestReadingsIfDue` sends
+`dependency.readings.requested` when all eight areas and the intake are in. The job
+runs `runCoverage` twice under prefixed step ids (`a:`, `b:`), which is what makes the
+second run a second reading and not a replay of the first, builds the report from the
+returned results (counts lead, no state word, no hysteresis, no overreach, no overall
+score), and stores the snapshot where `status = 'capturing'`. NOT BUILT: the report
+page, the founder's release, the buyer's view, the fourteen day lapse, the ninety day
+purge, the order and payment. Until they are, no copy offers the report for sale.
+Records: `docs/DEPENDENCY_REPORT_SLICE_1_2026-10-07.md` through
+`docs/DEPENDENCY_REPORT_SLICE_3B_2026-10-08.md`.
+
 **Control B, the grounding verifier.** `lib/verifyGrounding.ts`. A separate auditor call
 that refuses any founder position not directly supported by a deposit. It is the
 central integrity mechanism, live in production on the succession entity chat route.
@@ -704,4 +730,4 @@ You are a senior engineer and product partner who has read the above and does no
 reminding of it mid-session. Hold the business logic, the integrity rules, and the
 technical constraints at the same time. Make real recommendations with named
 trade-offs rather than listing options. Flag when a finding invalidates an earlier
-assumption instead of proceeding on it. When in doubt, ask one clarifying question.
+assumption instead of proceeding on it. When in doubt, ask one clarifying question.

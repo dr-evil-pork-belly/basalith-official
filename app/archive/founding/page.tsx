@@ -3,6 +3,7 @@ import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { scopeForTier } from '@/lib/foundingSequence'
 import { isTrial } from '@/lib/trial'
+import { isAssessment } from '@/lib/assessment'
 import FoundingClient from './FoundingClient'
 
 // The Founding Sequence. Three incident interviews the owner runs in their own
@@ -25,6 +26,11 @@ export default async function FoundingPage({ searchParams }: { searchParams: Pro
   const { area } = await searchParams
   const requestedArea = typeof area === 'string' && area.trim() ? area.trim().slice(0, 40) : null
 
+  // An assessment record runs area calls only, never the Founding Sequence
+  // (decided October 8, 2026). Without an area there is nothing here for it.
+  const assessment = isAssessment(archive)
+  if (assessment && !requestedArea) redirect('/archive/assessment')
+
   return (
     <FoundingClient
       archiveId={archive.id}
@@ -32,6 +38,7 @@ export default async function FoundingPage({ searchParams }: { searchParams: Pro
       ownerName={archive.owner_name ?? null}
       area={requestedArea}
       trial={isTrial(archive)}
+      assessment={assessment}
     />
   )
 }

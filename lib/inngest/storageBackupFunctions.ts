@@ -404,11 +404,17 @@ export const storageBackupSync = inngest.createFunction(
       // thirty days unless it converts, and nothing written to B2 comes out for
       // ninety. Same throw-never-default rule: an empty list on a failed read
       // would copy a trial into a lock. Skeleton 1.6.
+      //
+      // Assessment records (status 'assessment', lib/assessment.ts, October 8,
+      // 2026) are excluded with them, for the same reason: the record is
+      // purged ninety days after its report closes, and its purge stops at
+      // assert_no_b2. The step keeps its name so a run in flight across the
+      // deploy replays its memoized result.
       const excludedArchiveIds = await step.run('load-trial-archives', async () => {
         const { data: rows, error } = await supabaseAdmin
           .from('archives')
           .select('id')
-          .eq('status', 'trial')
+          .in('status', ['trial', 'assessment'])
         if (error) throw new Error(`load-trial-archives: ${error.message}`)
         return (rows ?? []).map((r) => (r as { id: string }).id)
       })
@@ -804,12 +810,14 @@ export const storageBackupVerify = inngest.createFunction(
         })
         // Trials too, or every trial with one voice turn raises A1 (hard) every
         // Sunday: their objects are in Supabase and, by design, never in B2.
-        // Same source-side-only treatment as terminated.
+        // Same source-side-only treatment as terminated. Assessment records
+        // too (lib/assessment.ts): excluded from the sync above, so they must
+        // be excluded here or each one raises A1.
         const verifyExcluded = await step.run('load-trial-archives', async () => {
           const { data: rows, error } = await supabaseAdmin
             .from('archives')
             .select('id')
-            .eq('status', 'trial')
+            .in('status', ['trial', 'assessment'])
           if (error) throw new Error(`load-trial-archives: ${error.message}`)
           return (rows ?? []).map((r) => (r as { id: string }).id)
         })

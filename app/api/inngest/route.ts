@@ -15,6 +15,7 @@ import { storageBackupSync, storageBackupVerify } from '@/lib/inngest/storageBac
 import { computeCoverage, coverageMonthlySweep } from '@/lib/inngest/coverageFunctions'
 import { trialWarn, trialExpire } from '@/lib/inngest/trialFunctions'
 import { threadExtractionSweep } from '@/lib/inngest/threadFunctions'
+import { dependencyReadings } from '@/lib/inngest/dependencyFunctions'
 
 export const { GET, POST, PUT } = serve({
   client:    inngest,
@@ -35,6 +36,7 @@ export const { GET, POST, PUT } = serve({
     trialWarn,
     trialExpire,
     threadExtractionSweep,
+    dependencyReadings,
   ],
 })
 

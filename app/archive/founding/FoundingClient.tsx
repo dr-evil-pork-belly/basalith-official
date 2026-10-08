@@ -55,6 +55,7 @@ export default function FoundingClient({
   area,
   ownerName,
   trial = false,
+  assessment = false,
 }: {
   archiveId: string
   scope: FoundingScope
@@ -63,6 +64,12 @@ export default function FoundingClient({
   ownerName: string | null
   /** archives.status === 'trial' (lib/trial.ts isTrial). Adds one line under the proof card. */
   trial?: boolean
+  /**
+   * archives.status === 'assessment' (lib/assessment.ts). An assessment record
+   * has no map and no reading after each call, so the two sentences here that
+   * promise one are replaced, and the way back is the assessment page.
+   */
+  assessment?: boolean
 }) {
   const [status,     setStatus]     = useState<Status | null>(null)
   const [loadError,  setLoadError]  = useState('')
@@ -195,10 +202,12 @@ export default function FoundingClient({
             A call on {activeArea}
           </p>
           <h1 className="founding-h1" style={{ fontFamily: SERIF, fontSize: 'clamp(34px,4.2vw,50px)', fontWeight: 400, lineHeight: 1.08, letterSpacing: '-0.015em', color: INK, marginBottom: '16px' }}>
-            Where your record is thin, in your own words.
+            {assessment ? 'This part of the business, in your own words.' : 'Where your record is thin, in your own words.'}
           </h1>
           <p style={{ fontFamily: SERIF, fontSize: '19px', fontWeight: 400, lineHeight: 1.6, color: BODY, marginBottom: '34px', maxWidth: '560px' }}>
-            One question to start, then a few that follow what you say. About ten minutes. Speak or type. When it closes, your map is read again.
+            {assessment
+              ? 'One question to start, then a few that follow what you say. About ten minutes. Speak or type. Every answer is saved as you go.'
+              : 'One question to start, then a few that follow what you say. About ten minutes. Speak or type. When it closes, your map is read again.'}
           </p>
         </>
       ) : (
@@ -332,9 +341,13 @@ export default function FoundingClient({
             Your call on {areaClosed.area} is on the record.
           </h2>
           <p style={{ fontFamily: SERIF, fontSize: '17.5px', fontWeight: 400, lineHeight: 1.65, color: BODY, marginBottom: '26px', maxWidth: '58ch' }}>
-            {areaClosed.deposits} {areaClosed.deposits === 1 ? 'deposit' : 'deposits'}, in your own words. Your map is being read again now; it takes about twenty minutes, and the dashboard shows the new reading when it is done.
+            {assessment
+              ? `${areaClosed.deposits} ${areaClosed.deposits === 1 ? 'deposit' : 'deposits'}, in your own words.`
+              : `${areaClosed.deposits} ${areaClosed.deposits === 1 ? 'deposit' : 'deposits'}, in your own words. Your map is being read again now; it takes about twenty minutes, and the dashboard shows the new reading when it is done.`}
           </p>
-          <Link href="/archive/dashboard" style={goldButton()}>Back to your Basalith</Link>
+          {assessment
+            ? <Link href="/archive/assessment" style={goldButton()}>Back to your assessment</Link>
+            : <Link href="/archive/dashboard" style={goldButton()}>Back to your Basalith</Link>}
         </section>
       )}
 

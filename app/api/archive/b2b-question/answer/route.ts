@@ -25,6 +25,8 @@ import {
 import { resend } from '@/lib/resend'
 import { notifyInternal } from '@/lib/internalNotify'
 import { inngest } from '@/lib/inngest'
+import { isAssessment } from '@/lib/assessment'
+import { requestReadingsIfDue } from '@/lib/assessmentStore'
 
 export const dynamic = 'force-dynamic'
 
@@ -50,7 +52,7 @@ export async function POST(req: NextRequest) {
 
   const { data: archive } = await supabaseAdmin
     .from('archives')
-    .select('id, owner_user_id, tier, name, owner_name, preferred_language, owner_email')
+    .select('id, owner_user_id, tier, status, name, owner_name, preferred_language, owner_email')
     .eq('id', archiveId)
     .maybeSingle()
 
@@ -325,7 +327,22 @@ export async function POST(req: NextRequest) {
     // the map, so read the map again. The compute function refuses a run while
     // another is in flight; a send that lands during one is logged and the
     // monthly sweep covers it.
-    if (next.state.areaCall) {
+    //
+    // An assessment record (lib/assessment.ts, October 8, 2026) sends no
+    // coverage event here. Its report is built from exactly two readings taken
+    // once all eight areas and the intake are in (lib/dependencyReadings.ts);
+    // a run after each of eight calls would be eight more, 96 model calls
+    // each, that nothing reads. Instead this asks whether the call that just
+    // closed completed the record, and requests the two readings if it did.
+    if (next.state.areaCall && isAssessment(archive)) {
+      after(async () => {
+        try {
+          await requestReadingsIfDue(archiveId)
+        } catch (err) {
+          console.error('[b2b-question/answer] assessment readings request failed:', err instanceof Error ? err.message : err)
+        }
+      })
+    } else if (next.state.areaCall) {
       after(async () => {
         try {
           await inngest.send({
