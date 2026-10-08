@@ -182,3 +182,12 @@ export function assessmentProgress(input: {
 
   return { stage, areas, captured, total: areas.length, next: nextArea(input.captured), intakeIn: input.hasIntake }
 }
+
+/**
+ * Whether the founder can read the report. Once it is built, always, until the
+ * purge clears the snapshot: a report the founder did not release is still
+ * theirs to read. Before it is built there is nothing to show.
+ */
+export function founderCanReadReport(status: string | null | undefined): boolean {
+  return status === 'ready' || status === 'released' || status === 'not_released'
+}

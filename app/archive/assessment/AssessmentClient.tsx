@@ -17,8 +17,9 @@ import {
 // Two things to do, in either order: one call on each of the eight parts of
 // running the business (each opens on /archive/founding?area=), and eight
 // questions on who makes each kind of decision today. When both are in, the
-// record is read twice and the report is built; this page says so and stops.
-// Reading and releasing the report is the next slice and is not on this page.
+// record is read twice and the report is built; this page says so and links to
+// /archive/assessment/report, where the founder reads it. Releasing it is not
+// built yet and is not offered.
 //
 // Colors are the portal's stone register, read from the .portal-stone block
 // in globals.css. No hex literal belongs here.
@@ -123,6 +124,9 @@ export default function AssessmentClient() {
             <p style={para()}>
               Your record is now read twice, and the report is built from the two readings. You can close this page.
             </p>
+          )}
+          {(view.stage === 'ready' || view.stage === 'released' || view.stage === 'not_released') && (
+            <Link href="/archive/assessment/report" style={button()}>Read your report</Link>
           )}
         </section>
       )}

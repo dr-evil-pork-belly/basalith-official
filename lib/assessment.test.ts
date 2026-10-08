@@ -10,6 +10,7 @@ import {
   assessmentAreas,
   assessmentProgress,
   captureDone,
+  founderCanReadReport,
   isAssessment,
   nextArea,
   purgeAfter,
@@ -151,5 +152,12 @@ describe('the founder\u2019s view', () => {
       expect(assessmentProgress({ status, captured: DOMAINS, hasIntake: true }).stage).toBe(status)
       expect(assessmentProgress({ status, captured: [], hasIntake: false }).stage).toBe(status)
     }
+  })
+})
+
+describe('reading the report', () => {
+  it('is open to the founder from the moment it is built, released or not', () => {
+    for (const s of ['ready', 'released', 'not_released']) expect(founderCanReadReport(s), s).toBe(true)
+    for (const s of ['ordered', 'capturing', 'not_completed', null, undefined, '']) expect(founderCanReadReport(s), String(s)).toBe(false)
   })
 })

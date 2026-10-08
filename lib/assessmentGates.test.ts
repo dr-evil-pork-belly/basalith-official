@@ -85,7 +85,8 @@ describe('an assessment record', () => {
     expect(src).toMatch(/status:\s+ASSESSMENT_STATUS,/)
 
     const claim = src.indexOf(".update({ status: 'capturing', updated_at: now })")
-    const insert = src.indexOf(".from('archives')\n        .insert({")
+    // Whitespace tolerant: git checks this file out with CRLF on Windows.
+    const insert = src.search(/\.from\('archives'\)\s*\.insert\(\{/)
     expect(claim).toBeGreaterThan(-1)
     expect(insert).toBeGreaterThan(claim)
     expect(src.slice(claim, claim + 200)).toMatch(/\.eq\('id', row\.id\)\s*\.eq\('status', 'ordered'\)/)
@@ -121,6 +122,60 @@ describe('an assessment record', () => {
   })
 })
 
+describe('the assessment nav and report page', () => {
+  it('gives an assessment record one nav item and nothing from a client\u2019s portal', () => {
+    const layout = read('app', 'archive', 'layout.tsx')
+    expect(layout).toMatch(/\.select\('tier, status'\)/)
+    expect(layout).toMatch(/assessment=\{assessment\}/)
+
+    const client = read('app', 'archive', 'ArchiveLayoutClient.tsx')
+    const nav = client.slice(client.indexOf('const ASSESSMENT_NAV'), client.indexOf('function NavGroup('))
+    expect(nav.match(/href:/g)).toHaveLength(1)
+    expect(nav).toContain("href: '/archive/assessment'")
+    expect(client).toMatch(/const primaryNav\s+= assessment \? ASSESSMENT_NAV : visible\(PRIMARY_NAV\)/)
+    expect(client).toMatch(/const contributeNav = assessment \? \[\] : visible\(CONTRIBUTE_NAV\)/)
+    expect(client).toMatch(/const manageNav\s+= assessment \? \[\] : visible\(MANAGE_NAV\)/)
+  })
+
+  it('serves the report to its own founder only, as stored, once it is built', () => {
+    const src = read('app', 'api', 'archive', 'assessment', 'report', 'route.ts')
+    expect(src).toContain('archive.owner_user_id !== session.userId')
+    expect(src).toContain('if (!isAssessment(archive)) {')
+    expect(src).toContain("!founderCanReadReport(row.status)")
+    expect(src).toMatch(/report:\s+row\.report,/)
+    // Read only: no write, no model, no coverage run.
+    expect(src).not.toMatch(/\.(update|insert|delete|upsert)\(/)
+    expect(src).not.toMatch(/inngest|runCoverage|buildDependencyReport|anthropic/i)
+    expect(src).not.toMatch(/export async function (POST|PUT|PATCH|DELETE)/)
+  })
+
+  it('draws the snapshot and computes nothing: no score, no percent, no state word', () => {
+    const view = read('app', 'archive', 'assessment', 'report', 'ReportView.tsx')
+    const code = view.split('\n').filter(l => !l.trim().startsWith('//')).join('\n')
+    expect(code).not.toMatch(/%/)
+    expect(code).not.toMatch(/\bscore\b/i)
+    expect(code).not.toMatch(/\b(backed|partial|overreach)\b/i)
+    expect(code).not.toMatch(/Math\.(round|floor|ceil)|reduce\(/)
+    expect(code).toContain('report.attribution')
+    expect(code).toContain('report.limits.map(')
+    expect(code).toContain('report.headline.map(')
+    // Both readings, never one picked.
+    expect(code).toContain('d.readings[0]')
+    expect(code).toContain('d.readings[1]')
+  })
+
+  it('offers no release, because none is built', () => {
+    for (const f of [
+      read('app', 'archive', 'assessment', 'report', 'ReportClient.tsx'),
+      read('app', 'archive', 'assessment', 'report', 'ReportView.tsx'),
+    ]) {
+      const rendered = Array.from(f.matchAll(/>([^<>{}\n]{12,})</g)).map(m => m[1])
+      for (const s of rendered) expect(s, s).not.toMatch(/\b(release|send it|deleted|days)\b/i)
+      expect(f).not.toMatch(/method:\s*'POST'/)
+    }
+  })
+})
+
 describe('assessment copy', () => {
   it('obeys the copy rules and promises nothing that is not built', () => {
     const files = [
@@ -128,6 +183,8 @@ describe('assessment copy', () => {
       read('app', 'archive', 'assessment', 'AssessmentClient.tsx'),
       read('app', 'api', 'assessment', 'start', 'route.ts'),
       read('app', 'api', 'archive', 'assessment', 'route.ts'),
+      read('app', 'archive', 'assessment', 'report', 'ReportClient.tsx'),
+      read('app', 'archive', 'assessment', 'report', 'ReportView.tsx'),
     ]
     const banned = /\b(curated|seamless|innovative|stewardship|unlock|supercharge|game-changer)\b/i
     for (const f of files) {

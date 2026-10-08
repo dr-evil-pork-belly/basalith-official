@@ -50,6 +50,13 @@ const MANAGE_NAV: NavItem[] = [
   { href: '/archive/succession',   label: 'Succession'      },
 ]
 
+// An assessment record (archives.status = 'assessment', lib/assessment.ts) is a
+// founder a buyer sent, not a client. Their whole portal is one page and the
+// calls it opens, so this is their whole nav. October 8, 2026.
+const ASSESSMENT_NAV: NavItem[] = [
+  { href: '/archive/assessment', label: 'Your assessment' },
+]
+
 function NavGroup({ label, items, pathname }: { label: string; items: NavItem[]; pathname: string }) {
   return (
     <div style={{ padding: '10px 0 4px' }}>
@@ -87,7 +94,7 @@ function NavGroup({ label, items, pathname }: { label: string; items: NavItem[];
   )
 }
 
-export default function ArchiveLayoutClient({ children, tier }: { children: React.ReactNode; tier: string | null }) {
+export default function ArchiveLayoutClient({ children, tier, assessment = false }: { children: React.ReactNode; tier: string | null; assessment?: boolean }) {
   const pathname            = usePathname()
   const [confirmSignOut, setConfirmSignOut] = useState(false)
   const [mobileOpen,    setMobileOpen]     = useState(false)
@@ -98,9 +105,9 @@ export default function ArchiveLayoutClient({ children, tier }: { children: Reac
   const isSuccession = tier === 'succession'
   const visible      = (items: NavItem[]) => items.filter(i => !(isSuccession && i.hideForSuccession))
 
-  const primaryNav    = visible(PRIMARY_NAV)
-  const contributeNav = visible(CONTRIBUTE_NAV)
-  const manageNav     = visible(MANAGE_NAV)
+  const primaryNav    = assessment ? ASSESSMENT_NAV : visible(PRIMARY_NAV)
+  const contributeNav = assessment ? [] : visible(CONTRIBUTE_NAV)
+  const manageNav     = assessment ? [] : visible(MANAGE_NAV)
   const allNav        = [...primaryNav, ...contributeNav, ...manageNav]
 
   const signOutLink: React.CSSProperties = {
@@ -142,7 +149,7 @@ export default function ArchiveLayoutClient({ children, tier }: { children: Reac
         {/* Navigation */}
         <nav style={{ flex: 1, paddingTop: '8px', paddingBottom: '16px' }} aria-label="Main navigation">
           {primaryNav.length > 0 && (
-            <NavGroup label="Your Basalith" items={primaryNav} pathname={pathname} />
+            <NavGroup label={assessment ? 'Assessment' : 'Your Basalith'} items={primaryNav} pathname={pathname} />
           )}
           {contributeNav.length > 0 && (
             <NavGroup label="Contribute" items={contributeNav} pathname={pathname} />
@@ -203,7 +210,7 @@ export default function ArchiveLayoutClient({ children, tier }: { children: Reac
           <nav style={{ display: 'flex', flexDirection: 'column', padding: '16px 0' }} aria-label="Mobile navigation">
             {allNav.map(({ href, label: lbl }) => {
               const active = pathname === href || pathname.startsWith(href + '/')
-              const isPrimary = PRIMARY_NAV.some(n => n.href === href)
+              const isPrimary = primaryNav.some(n => n.href === href)
               return (
                 <Link
                   key={href}
