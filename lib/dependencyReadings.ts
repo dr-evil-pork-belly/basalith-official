@@ -34,7 +34,7 @@
 
 import type { CoverageRunResult, RunStep, TriggerSource } from './coverageRun'
 import { PROBE_SET_VERSION } from './coverageProbes'
-import { areasCapturedFromRows, isAssessment, readingsDue, type AreaCallRow } from './assessment'
+import { completeAreasFrom, isAssessment, readingsDue, type AreaCallRow } from './assessment'
 import { validateIntake } from './dependencyIntake'
 import { buildDependencyReport, type DependencyReport, type UnavailableReason } from './dependencyReport'
 
@@ -62,6 +62,8 @@ export interface ReadingsDeps {
   /** The founder record's tier and status, or null when the row is gone. */
   loadArchive(archiveId: string): Promise<{ tier: string | null; status: string | null } | null>
   loadAreaRows(archiveId: string): Promise<AreaCallRow[]>
+  /** Prompts of the round deposits on the record (lib/assessmentRound.ts). */
+  loadRoundPrompts(archiveId: string): Promise<string[]>
   /** lib/coverageRun.ts runCoverage, or a stand in. */
   run(params: { archiveId: string; triggerSource: TriggerSource; runStep: RunStep }): Promise<CoverageRunResult>
   /**
@@ -124,12 +126,16 @@ export async function runDependencyReadings(reportId: string, deps: ReadingsDeps
     }
 
     const intake   = validateIntake(row.intake)
-    const captured = areasCapturedFromRows(await deps.loadAreaRows(row.archive_id))
+    // Complete areas: the call is in AND the round of six is in.
+    const captured = completeAreasFrom(
+      await deps.loadAreaRows(row.archive_id),
+      await deps.loadRoundPrompts(row.archive_id),
+    )
     if (!readingsDue({ status: row.status, captured, hasIntake: intake.ok })) {
       return {
         ok:     false as const,
         reason: 'not_due' as const,
-        detail: `status ${row.status}, ${captured.length} areas captured, intake ${intake.ok ? 'in' : 'missing or incomplete'}`,
+        detail: `status ${row.status}, ${captured.length} areas complete, intake ${intake.ok ? 'in' : 'missing or incomplete'}`,
       }
     }
     // JSON safe: strings and plain objects only. This crosses a step boundary.

@@ -76,7 +76,8 @@ describe('an assessment record', () => {
       expect(at, p).toBeGreaterThan(-1)
       expect(client.slice(at - 420, at), p).toMatch(/\{assessment\s*\?/)
     }
-    expect(client).toContain('<Link href="/archive/assessment" style={goldButton()}>Back to your assessment</Link>')
+    // The way on from an assessment call is that area's round, never the dashboard.
+    expect(client).toContain('<Link href={`/archive/assessment/round?area=${encodeURIComponent(areaClosed.area)}`} style={goldButton()}>On to the six questions</Link>')
   })
 
   it('is created with the business tier and the assessment status, by a claim only one request wins', () => {
@@ -176,6 +177,68 @@ describe('the assessment nav and report page', () => {
   })
 })
 
+describe('the round of six', () => {
+  it('takes the question from the server by key, never a prompt from the client', () => {
+    const src = read('app', 'api', 'archive', 'assessment', 'round', 'route.ts')
+    expect(src).toContain('roundQuestionByKey(body.key)')
+    expect(src).toMatch(/prompt: question\.question,/)
+    expect(src).not.toMatch(/body\??\.(prompt|question|questionText)\b/)
+    expect(src).toContain('if (!isAssessment(archive)) {')
+    expect(src).toContain('archive.owner_user_id !== session.userId')
+  })
+
+  it('writes an answer only while capturing, after the call, and once', () => {
+    const src = read('app', 'api', 'archive', 'assessment', 'round', 'route.ts')
+    const post = src.slice(src.indexOf('export async function POST('))
+    const insert = post.search(/\.from\('owner_deposits'\)\s*\.insert\(/)
+    expect(insert).toBeGreaterThan(-1)
+    for (const check of [
+      "row.status !== 'capturing'",
+      'if (!before.callDone) {',
+      'q.key === question.key)?.answered',
+      'answer.length < MIN_ANSWER',
+    ]) {
+      const at = post.indexOf(check)
+      expect(at, check).toBeGreaterThan(-1)
+      expect(at, check).toBeLessThan(insert)
+    }
+  })
+
+  it('makes the pair as an interview turn, then asks whether the record is whole, after the response', () => {
+    const src = read('app', 'api', 'archive', 'assessment', 'round', 'route.ts')
+    const tail = src.slice(src.indexOf('after(async () => {'))
+    const pair = tail.indexOf('createTrainingPairFromDeposit(')
+    const due  = tail.indexOf('requestReadingsIfDue(archiveId)')
+    expect(pair).toBeGreaterThan(-1)
+    expect(due).toBeGreaterThan(pair)
+    expect(tail.slice(pair, due)).toMatch(/'ROUND',/)
+    // includeInTraining takes a pair with a probe type on the interview's say-so.
+    const pipeline = read('lib', 'trainingPipeline.ts')
+    expect(pipeline).toMatch(/export function includeInTraining\(qualityScore: number, probeType\?: string \| null\): boolean \{\s*if \(probeType\) return true/)
+  })
+
+  it('counts toward the readings everywhere the record is judged whole', () => {
+    // Three places decide "is the record whole". All three must read the round.
+    const store = read('lib', 'assessmentStore.ts')
+    expect(store).toMatch(/completeAreasFrom\(await loadAreaRows\(archiveId\), await loadRoundPrompts\(archiveId\)\)/)
+    const job = read('lib', 'dependencyReadings.ts')
+    expect(job).toContain('deps.loadRoundPrompts(row.archive_id)')
+    expect(job).not.toContain('areasCapturedFromRows(')
+    const wiring = read('lib', 'inngest', 'dependencyFunctions.ts')
+    expect(wiring).toMatch(/loadAreaRows,\s*loadRoundPrompts,/)
+    const page = read('app', 'api', 'archive', 'assessment', 'route.ts')
+    expect(page).toContain('roundPrompts: await loadRoundPrompts(archiveId),')
+  })
+
+  it('reads only the founder\u2019s own round deposits', () => {
+    const store = read('lib', 'assessmentStore.ts')
+    const fn = store.slice(store.indexOf('export async function loadRoundPrompts('), store.indexOf('export type ReadingsRequest'))
+    expect(fn).toMatch(/\.eq\('archive_id', archiveId\)/)
+    expect(fn).toMatch(/\.is\('contributor_id', null\)/)
+    expect(fn).toMatch(/\.in\('prompt', allRoundPrompts\(\)\)/)
+  })
+})
+
 describe('assessment copy', () => {
   it('obeys the copy rules and promises nothing that is not built', () => {
     const files = [
@@ -185,6 +248,8 @@ describe('assessment copy', () => {
       read('app', 'api', 'archive', 'assessment', 'route.ts'),
       read('app', 'archive', 'assessment', 'report', 'ReportClient.tsx'),
       read('app', 'archive', 'assessment', 'report', 'ReportView.tsx'),
+      read('app', 'archive', 'assessment', 'round', 'RoundClient.tsx'),
+      read('app', 'api', 'archive', 'assessment', 'round', 'route.ts'),
     ]
     const banned = /\b(curated|seamless|innovative|stewardship|unlock|supercharge|game-changer)\b/i
     for (const f of files) {

@@ -18,12 +18,17 @@
  *
  * DECIDED BY DAVID, October 7 and 8, 2026.
  *   - Minimum record: one closed area call per business domain, eight in all.
+ *   - And, since slice 4b, that domain's round of six short questions
+ *     (lib/assessmentRound.ts). An area is COMPLETE when both are in. The call
+ *     alone reaches one incident; the round reaches the rest of the domain and
+ *     asks who else can make its decisions.
  *   - No Founding Sequence for an assessment. Straight to the area calls.
  *   - The founder has RELEASE_DAYS to release a finished report.
  *   - The record is purged PURGE_DAYS after the report closes.
  */
 
 import { B2B_DOMAINS } from './b2bDomains'
+import { areasWithRoundDone, roundProgress } from './assessmentRound'
 
 export const ASSESSMENT_STATUS = 'assessment'
 
@@ -92,7 +97,19 @@ export function areasCapturedFromRows(rows: readonly AreaCallRow[]): string[] {
   return assessmentAreas().filter(a => done.has(a))
 }
 
-/** The next area to call, in domain order, or null when all eight are captured. */
+/**
+ * The areas that are whole, in domain order: the call is captured AND the
+ * round of six is answered. This is the list readingsDue and the report take
+ * as "captured". `depositPrompts` is the prompt of every round deposit on the
+ * record (loadRoundPrompts in lib/assessmentStore.ts).
+ */
+export function completeAreasFrom(rows: readonly AreaCallRow[], depositPrompts: readonly string[]): string[] {
+  const called = new Set(areasCapturedFromRows(rows))
+  const rounded = new Set(areasWithRoundDone(depositPrompts))
+  return assessmentAreas().filter(a => called.has(a) && rounded.has(a))
+}
+
+/** The next area to work on, in domain order, or null when the list holds all eight. */
 export function nextArea(captured: readonly string[]): string | null {
   const have = new Set(captured)
   return assessmentAreas().find(a => !have.has(a)) ?? null
@@ -105,8 +122,10 @@ export function captureDone(captured: readonly string[]): boolean {
 /**
  * Whether the two readings should be requested now.
  *
- * Only while the report is 'capturing', with all eight areas captured and the
- * intake in. Once the report is 'ready' or closed the answer is no, which is
+ * Only while the report is 'capturing', with all eight areas complete and the
+ * intake in. `captured` here is the COMPLETE list (completeAreasFrom): call
+ * and round both in. A caller that passes calls alone would start the readings
+ * before the rounds, which is the mistake the round exists to prevent. Once the report is 'ready' or closed the answer is no, which is
  * what stops a late event from spending a second pair of runs.
  */
 export function readingsDue(input: {
@@ -144,29 +163,58 @@ export type AssessmentStage =
   | 'not_released'
   | 'not_completed'
 
+export interface AssessmentArea {
+  area:        string
+  description: string
+  /** The area call is complete and wrote a deposit. */
+  captured:    boolean
+  /** The round of six: how many are answered. */
+  round:       { answered: number; total: number; done: boolean }
+  /** Call and round both in. */
+  complete:    boolean
+}
+
 export interface AssessmentProgress {
   stage:    AssessmentStage
-  areas:    { area: string; description: string; captured: boolean }[]
+  areas:    AssessmentArea[]
+  /** Areas whose call is in. */
   captured: number
+  /** Areas with call and round both in. This is what the readings wait for. */
+  complete: number
   total:    number
-  /** The next area to call in domain order, or null when all are captured. */
+  /** The next area that is not complete, in domain order, or null. */
   next:     string | null
   intakeIn: boolean
 }
 
 /**
  * Pure. The founder's view of an assessment, from the report status, the areas
- * captured, and whether the intake is in. 'ordered' reads as 'capture': the
- * record exists the moment the founder starts, and the status follows.
+ * whose call is captured, the prompts of the round deposits on the record, and
+ * whether the intake is in. 'ordered' reads as 'capture': the record exists
+ * the moment the founder starts, and the status follows.
  */
 export function assessmentProgress(input: {
-  status:    string | null | undefined
-  captured:  readonly string[]
-  hasIntake: boolean
+  status:       string | null | undefined
+  /** Areas whose call is captured (areasCapturedFromRows). */
+  captured:     readonly string[]
+  /** Prompts of the round deposits on the record. */
+  roundPrompts: readonly string[]
+  hasIntake:    boolean
 }): AssessmentProgress {
   const have = new Set(input.captured)
-  const areas = B2B_DOMAINS.map(d => ({ area: d.name, description: d.description, captured: have.has(d.name) }))
+  const areas: AssessmentArea[] = B2B_DOMAINS.map(d => {
+    const r = roundProgress(d.name, input.roundPrompts)
+    const called = have.has(d.name)
+    return {
+      area:        d.name,
+      description: d.description,
+      captured:    called,
+      round:       { answered: r.answered, total: r.total, done: r.done },
+      complete:    called && r.done,
+    }
+  })
   const captured = areas.filter(a => a.captured).length
+  const completeAreas = areas.filter(a => a.complete).map(a => a.area)
 
   let stage: AssessmentStage
   switch (input.status) {
@@ -177,10 +225,18 @@ export function assessmentProgress(input: {
       stage = input.status
       break
     default:
-      stage = readingsDue(input) ? 'reading' : 'capture'
+      stage = readingsDue({ status: input.status, captured: completeAreas, hasIntake: input.hasIntake }) ? 'reading' : 'capture'
   }
 
-  return { stage, areas, captured, total: areas.length, next: nextArea(input.captured), intakeIn: input.hasIntake }
+  return {
+    stage,
+    areas,
+    captured,
+    complete: completeAreas.length,
+    total:    areas.length,
+    next:     nextArea(completeAreas),
+    intakeIn: input.hasIntake,
+  }
 }
 
 /**

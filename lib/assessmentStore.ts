@@ -11,7 +11,8 @@
 import { supabaseAdmin } from './supabase-admin'
 import { inngest } from './inngest'
 import { notifyInternal } from './internalNotify'
-import { areasCapturedFromRows, readingsDue, type AreaCallRow } from './assessment'
+import { completeAreasFrom, readingsDue, type AreaCallRow } from './assessment'
+import { allRoundPrompts } from './assessmentRound'
 import { validateIntake } from './dependencyIntake'
 
 /** The columns of dependency_reports the founder's surfaces read. */
@@ -47,15 +48,33 @@ export async function loadAreaRows(archiveId: string): Promise<AreaCallRow[]> {
   return (data ?? []) as AreaCallRow[]
 }
 
+/**
+ * The prompts of the round deposits on a record (lib/assessmentRound.ts). An
+ * answer to a round question is an owner deposit whose prompt is the question,
+ * so this one read is the whole of the round's tracking. Owner deposits only:
+ * a contributor never answers a round.
+ */
+export async function loadRoundPrompts(archiveId: string): Promise<string[]> {
+  const { data, error } = await supabaseAdmin
+    .from('owner_deposits')
+    .select('prompt')
+    .eq('archive_id', archiveId)
+    .is('contributor_id', null)
+    .in('prompt', allRoundPrompts())
+  if (error) throw new Error(`load round deposits ${archiveId}: ${error.message}`)
+  return (data ?? []).map(r => (r as { prompt: string }).prompt)
+}
+
 export type ReadingsRequest =
   | { requested: true; reportId: string }
   | { requested: false; reason: 'no_assessment' | 'not_due' | 'send_failed' }
 
 /**
  * Send `dependency.readings.requested` if, and only if, the record is whole:
- * the report is 'capturing', all eight areas are captured, and the intake is
- * in (readingsDue in lib/assessment.ts). Called after the event that could
- * have completed the record: an area call closing, or the intake being saved.
+ * the report is 'capturing', all eight areas are complete (call and round of
+ * six both in), and the intake is in (readingsDue in lib/assessment.ts).
+ * Called after the event that could have completed the record: an area call
+ * closing, a round answer being saved, or the intake being saved.
  *
  * No event id is set, on purpose. Inngest holds an id for 24 hours, and a
  * report whose readings were refused must be requestable again the same day.
@@ -69,7 +88,7 @@ export async function requestReadingsIfDue(archiveId: string): Promise<ReadingsR
   const row = await loadAssessmentForArchive(archiveId)
   if (!row) return { requested: false, reason: 'no_assessment' }
 
-  const captured = areasCapturedFromRows(await loadAreaRows(archiveId))
+  const captured = completeAreasFrom(await loadAreaRows(archiveId), await loadRoundPrompts(archiveId))
   const due = readingsDue({ status: row.status, captured, hasIntake: validateIntake(row.intake).ok })
   if (!due) return { requested: false, reason: 'not_due' }
 

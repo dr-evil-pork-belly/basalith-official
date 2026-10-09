@@ -4,14 +4,15 @@ import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { checkRateLimit, getClientIP } from '@/lib/apiSecurity'
 import { areasCapturedFromRows, assessmentProgress, isAssessment } from '@/lib/assessment'
 import { validateIntake } from '@/lib/dependencyIntake'
-import { loadAreaRows, loadAssessmentForArchive, requestReadingsIfDue, type AssessmentRow } from '@/lib/assessmentStore'
+import { loadAreaRows, loadAssessmentForArchive, loadRoundPrompts, requestReadingsIfDue, type AssessmentRow } from '@/lib/assessmentStore'
 
 export const dynamic = 'force-dynamic'
 
 // The founder's side of an assessment. Slice 3b, October 8, 2026.
 //
-//   GET   where the assessment stands: which of the eight areas are on the
-//         record, whether the intake is in, and the report's stage.
+//   GET   where the assessment stands: for each of the eight areas, whether
+//         its call and its round of six are on the record; whether the intake
+//         is in; and the report's stage.
 //   POST  the intake: who makes each kind of decision today, eight answers.
 //
 // Owner only. The record comes from the session, never the client, and must be
@@ -48,7 +49,12 @@ async function guard(): Promise<Guard> {
 
 async function view(archiveId: string, row: AssessmentRow) {
   const captured = areasCapturedFromRows(await loadAreaRows(archiveId))
-  const progress = assessmentProgress({ status: row.status, captured, hasIntake: validateIntake(row.intake).ok })
+  const progress = assessmentProgress({
+    status:       row.status,
+    captured,
+    roundPrompts: await loadRoundPrompts(archiveId),
+    hasIntake:    validateIntake(row.intake).ok,
+  })
   return {
     ...progress,
     buyerName: row.buyer_name,

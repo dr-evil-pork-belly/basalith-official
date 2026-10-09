@@ -250,17 +250,25 @@ start it (`POST /api/assessment/start`, one winner by a conditional claim; an ex
 owner, successor, or guide is refused and the founder of Basalith is told). The founder
 runs eight area calls, never the Founding Sequence (`/archive/assessment`; the dashboard
 and `/archive/founding` without an area redirect there), and answers the intake once
-(`/api/archive/assessment`). For an assessment `/answer` sends NO
+(`/api/archive/assessment`). After each call comes that area's round of six
+(`lib/assessmentRound.ts`, `/archive/assessment/round?area=`, October 8, 2026): four
+questions on the decisions the one incident did not reach and two on who else can make
+them, each answer an owner deposit whose prompt is the question and whose training pair
+carries probe type `ROUND`. An area is complete when its call and its round are both
+in, and the readings wait for all eight complete (`completeAreasFrom`). An answer is
+found by its question text, so never edit a round question's wording while an assessment
+is open; bump `ROUND_VERSION`. No round question may repeat a coverage probe or share a
+run of six words with one (`lib/assessmentRound.test.ts`). For an assessment `/answer` sends NO
 `coverage.run.requested` when an area call closes; `requestReadingsIfDue` sends
 `dependency.readings.requested` when all eight areas and the intake are in. The job
 runs `runCoverage` twice under prefixed step ids (`a:`, `b:`), which is what makes the
 second run a second reading and not a replay of the first, builds the report from the
 returned results (counts lead, no state word, no hysteresis, no overreach, no overall
-score), and stores the snapshot where `status = 'capturing'`. NOT BUILT: the report
-page, the founder's release, the buyer's view, the fourteen day lapse, the ninety day
+score), and stores the snapshot where `status = 'capturing'`. BUILT, read only: the founder's report page
+(`/archive/assessment/report`). NOT BUILT: the founder's release, the buyer's view, the fourteen day lapse, the ninety day
 purge, the order and payment. Until they are, no copy offers the report for sale.
 Records: `docs/DEPENDENCY_REPORT_SLICE_1_2026-10-07.md` through
-`docs/DEPENDENCY_REPORT_SLICE_3B_2026-10-08.md`.
+`docs/DEPENDENCY_REPORT_SLICE_4B_2026-10-08.md`.
 
 **Control B, the grounding verifier.** `lib/verifyGrounding.ts`. A separate auditor call
 that refuses any founder position not directly supported by a deposit. It is the

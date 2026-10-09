@@ -14,9 +14,10 @@ import {
 
 // The founder's assessment, owner surface. Slice 3b, October 8, 2026.
 //
-// Two things to do, in either order: one call on each of the eight parts of
-// running the business (each opens on /archive/founding?area=), and eight
-// questions on who makes each kind of decision today. When both are in, the
+// Two things to do, in either order. First, each of the eight parts of running
+// the business: a call (opens on /archive/founding?area=) and then that part's
+// round of six questions (/archive/assessment/round?area=, slice 4b). Second,
+// eight questions on who makes each kind of decision today. When both are in, the
 // record is read twice and the report is built; this page says so and links to
 // /archive/assessment/report, where the founder reads it. Releasing it is not
 // built yet and is not offered.
@@ -106,10 +107,10 @@ export default function AssessmentClient() {
     <div className="max-w-3xl mx-auto" style={{ paddingBottom: '64px' }}>
       <p style={eyebrow()}>Your assessment</p>
       <h1 style={{ fontFamily: SERIF, fontSize: 'clamp(34px,4.2vw,50px)', fontWeight: 400, lineHeight: 1.08, letterSpacing: '-0.015em', color: INK, marginBottom: '16px' }}>
-        Eight calls, one on each part of running the business.
+        Eight parts of running the business. A call on each, then six short questions.
       </h1>
       <p style={{ fontFamily: SERIF, fontSize: '19px', fontWeight: 400, lineHeight: 1.6, color: BODY, marginBottom: '34px', maxWidth: '560px' }}>
-        {requestedBy ? `Requested by ${requestedBy}. ` : ''}Take the calls in any order. Speak or type. Stop whenever you like and come back; every answer is saved as you go.
+        {requestedBy ? `Requested by ${requestedBy}. ` : ''}Take the parts in any order. The call asks for one story; the six questions cover the rest of that part and who else can make its decisions. Stop whenever you like and come back; every answer is saved as you go.
       </p>
 
       {loadError && (
@@ -133,9 +134,9 @@ export default function AssessmentClient() {
 
       {view && (
         <section style={panel()}>
-          <p style={eyebrow()}>The calls</p>
+          <p style={eyebrow()}>The eight parts</p>
           <h2 style={h2()}>
-            {view.captured === view.total ? `All ${view.total} are on the record.` : `${view.captured} of ${view.total} on the record.`}
+            {view.complete === view.total ? `All ${view.total} are on the record.` : `${view.complete} of ${view.total} on the record.`}
           </h2>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
             {view.areas.map(a => (
@@ -147,15 +148,24 @@ export default function AssessmentClient() {
                   <p style={{ fontFamily: SERIF, fontSize: '19px', fontWeight: 400, color: INK, lineHeight: 1.3 }}>{a.area}</p>
                   <p style={{ fontFamily: SERIF, fontSize: '16px', fontWeight: 400, color: SECOND, lineHeight: 1.5 }}>{a.description}</p>
                 </div>
-                {a.captured ? (
+                {a.complete ? (
                   <span style={{ fontFamily: MONO, fontSize: '11.5px', letterSpacing: '0.14em', textTransform: 'uppercase', color: LABEL, whiteSpace: 'nowrap' }}>
                     On the record
                   </span>
-                ) : view.stage === 'capture' ? (
+                ) : view.stage !== 'capture' ? null : !a.captured ? (
                   <Link href={`/archive/founding?area=${encodeURIComponent(a.area)}`} style={button()}>
-                    Begin
+                    Begin the call
                   </Link>
-                ) : null}
+                ) : (
+                  <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
+                    <Link href={`/archive/assessment/round?area=${encodeURIComponent(a.area)}`} style={button()}>
+                      {a.round.answered === 0 ? 'Six questions' : 'Continue'}
+                    </Link>
+                    <span style={{ fontFamily: MONO, fontSize: '11px', letterSpacing: '0.12em', textTransform: 'uppercase', color: LABEL, whiteSpace: 'nowrap' }}>
+                      Call done · {a.round.answered} of {a.round.total} answered
+                    </span>
+                  </span>
+                )}
               </li>
             ))}
           </ul>

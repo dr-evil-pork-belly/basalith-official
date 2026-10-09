@@ -346,7 +346,7 @@ export default function FoundingClient({
               : `${areaClosed.deposits} ${areaClosed.deposits === 1 ? 'deposit' : 'deposits'}, in your own words. Your map is being read again now; it takes about twenty minutes, and the dashboard shows the new reading when it is done.`}
           </p>
           {assessment
-            ? <Link href="/archive/assessment" style={goldButton()}>Back to your assessment</Link>
+            ? <Link href={`/archive/assessment/round?area=${encodeURIComponent(areaClosed.area)}`} style={goldButton()}>On to the six questions</Link>
             : <Link href="/archive/dashboard" style={goldButton()}>Back to your Basalith</Link>}
         </section>
       )}

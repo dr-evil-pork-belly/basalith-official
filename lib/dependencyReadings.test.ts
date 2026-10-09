@@ -6,6 +6,7 @@ import { COVERAGE_PROBES, PROBE_SET_VERSION } from './coverageProbes'
 import type { CoverageRunResult, RunStep } from './coverageRun'
 import type { ProbeResult } from './coverage'
 import type { AreaCallRow } from './assessment'
+import { allRoundPrompts, roundFor } from './assessmentRound'
 import {
   prefixedStep,
   runDependencyReadings,
@@ -91,6 +92,8 @@ function harness(over: {
   row?:     Partial<ReadingsReportRow> | null
   archive?: { tier: string | null; status: string | null } | null
   areas?:   string[]
+  /** Prompts of the round deposits on the record. Defaults to every round, all answered. */
+  rounds?:  string[]
   run?:     ReadingsDeps['run']
   saved?:   boolean
   step?:    RunStep
@@ -105,6 +108,7 @@ function harness(over: {
     loadReport:   async () => over.row === null ? null : { id: REPORT_ID, archive_id: ARCHIVE_ID, status: 'capturing', intake: intake(), ...over.row },
     loadArchive:  async () => over.archive === undefined ? { tier: 'succession', status: 'assessment' } : over.archive,
     loadAreaRows: async () => areaRows(over.areas),
+    loadRoundPrompts: async () => over.rounds ?? allRoundPrompts(),
     run:          async params => { runCalls += 1; return inner(params) },
     saveReady:    async (id, patch) => { saves.push({ id, patch }); return over.saved ?? true },
     notify:       async n => { notices.push(n.subject) },
@@ -203,6 +207,9 @@ describe('runDependencyReadings', () => {
       ['an active client',       { archive: { tier: 'succession', status: 'active' } },      'not_assessment'],
       ['a personal tier record', { archive: { tier: 'active', status: 'assessment' } },      'not_assessment'],
       ['seven areas',            { areas: DOMAINS.slice(0, 7) },                             'not_due'],
+      ['eight calls, no rounds', { rounds: [] },                                             'not_due'],
+      ['one round question short', { rounds: allRoundPrompts().slice(1) },                   'not_due'],
+      ['seven rounds',           { rounds: DOMAINS.slice(0, 7).flatMap(d => roundFor(d).map(q => q.question)) }, 'not_due'],
       ['no intake',              { row: { intake: null } },                                  'not_due'],
       ['seven answers',          { row: { intake: (intake() as unknown[]).slice(1) } },      'not_due'],
       ['already ready',          { row: { status: 'ready' } },                               'not_due'],

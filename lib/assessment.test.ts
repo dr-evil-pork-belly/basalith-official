@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { B2B_DOMAINS } from './b2bDomains'
+import { allRoundPrompts, roundFor } from './assessmentRound'
 import {
   ASSESSMENT_STATUS,
   CLOSED_REPORT_STATUSES,
@@ -10,6 +11,7 @@ import {
   assessmentAreas,
   assessmentProgress,
   captureDone,
+  completeAreasFrom,
   founderCanReadReport,
   isAssessment,
   nextArea,
@@ -21,6 +23,8 @@ import {
 } from './assessment'
 
 const DOMAINS = B2B_DOMAINS.map(d => d.name)
+const ALL_ROUNDS = allRoundPrompts()
+const roundOf = (...areas: string[]) => areas.flatMap(a => roundFor(a).map(q => q.question))
 
 function call(area: string, over: Partial<AreaCallRow> & { deposits?: number; scope?: string } = {}): AreaCallRow {
   const { deposits = 2, scope = 'business', ...rest } = over
@@ -125,32 +129,64 @@ describe('windows', () => {
   })
 })
 
+describe('a complete area', () => {
+  it('needs the call and the round of six, both', () => {
+    const rows = [call('Risk'), call('Capital'), call('People')]
+    const prompts = [...roundOf('Risk', 'Culture'), ...roundFor('Capital').slice(0, 5).map(q => q.question)]
+    // Risk: both. Capital: call, five of six. People: call only. Culture: round only.
+    expect(completeAreasFrom(rows, prompts)).toEqual(['Risk'])
+    expect(completeAreasFrom(rows, [])).toEqual([])
+    expect(completeAreasFrom([], ALL_ROUNDS)).toEqual([])
+    expect(completeAreasFrom(DOMAINS.map(d => call(d)), ALL_ROUNDS)).toEqual(DOMAINS)
+  })
+})
+
 describe('the founder\u2019s view', () => {
-  it('lists all eight areas in order with what is captured, and the next one', () => {
-    const p = assessmentProgress({ status: 'capturing', captured: ['Decision-Making', 'Risk'], hasIntake: false })
+  it('shows each area\u2019s call and round separately, and what is complete', () => {
+    const p = assessmentProgress({
+      status:       'capturing',
+      captured:     ['Decision-Making', 'Risk'],
+      roundPrompts: [...roundOf('Risk'), ...roundFor('People').slice(0, 2).map(q => q.question)],
+      hasIntake:    false,
+    })
     expect(p.stage).toBe('capture')
     expect(p.areas.map(a => a.area)).toEqual(DOMAINS)
-    expect(p.areas.filter(a => a.captured).map(a => a.area)).toEqual(['Decision-Making', 'Risk'])
+    expect(p.areas[0]).toMatchObject({ area: 'Decision-Making', captured: true, complete: false, round: { answered: 0, total: 6, done: false } })
+    expect(p.areas[1]).toMatchObject({ area: 'People', captured: false, complete: false, round: { answered: 2, total: 6, done: false } })
+    expect(p.areas[2]).toMatchObject({ area: 'Risk', captured: true, complete: true, round: { answered: 6, total: 6, done: true } })
     expect(p.areas[0].description).toBe(B2B_DOMAINS[0].description)
     expect(p.captured).toBe(2)
+    expect(p.complete).toBe(1)
     expect(p.total).toBe(8)
-    expect(p.next).toBe('People')
+    // The next area that is not complete, in domain order. Not the next uncalled one.
+    expect(p.next).toBe('Decision-Making')
     expect(p.intakeIn).toBe(false)
   })
 
-  it('stays on capture until both parts are in, then says reading', () => {
-    expect(assessmentProgress({ status: 'capturing', captured: DOMAINS, hasIntake: false }).stage).toBe('capture')
-    expect(assessmentProgress({ status: 'capturing', captured: DOMAINS.slice(1), hasIntake: true }).stage).toBe('capture')
-    expect(assessmentProgress({ status: 'ordered', captured: [], hasIntake: false }).stage).toBe('capture')
-    const done = assessmentProgress({ status: 'capturing', captured: DOMAINS, hasIntake: true })
-    expect(done.stage).toBe('reading')
-    expect(done.next).toBeNull()
+  it('stays on capture until every area is complete and the intake is in', () => {
+    const base = { status: 'capturing', captured: DOMAINS, roundPrompts: ALL_ROUNDS, hasIntake: true }
+    expect(assessmentProgress(base).stage).toBe('reading')
+    expect(assessmentProgress(base).next).toBeNull()
+    expect(assessmentProgress({ ...base, hasIntake: false }).stage).toBe('capture')
+    expect(assessmentProgress({ ...base, captured: DOMAINS.slice(1) }).stage).toBe('capture')
+    expect(assessmentProgress({ status: 'ordered', captured: [], roundPrompts: [], hasIntake: false }).stage).toBe('capture')
+  })
+
+  it('does not read the record until the rounds are in: eight calls and the intake are not enough', () => {
+    // The state every assessment was in before the round existed.
+    const callsOnly = assessmentProgress({ status: 'capturing', captured: DOMAINS, roundPrompts: [], hasIntake: true })
+    expect(callsOnly.stage).toBe('capture')
+    expect(callsOnly.captured).toBe(8)
+    expect(callsOnly.complete).toBe(0)
+    const oneShort = assessmentProgress({ status: 'capturing', captured: DOMAINS, roundPrompts: ALL_ROUNDS.slice(1), hasIntake: true })
+    expect(oneShort.stage).toBe('capture')
+    expect(oneShort.complete).toBe(7)
   })
 
   it('follows the report status once the report exists, whatever the record holds', () => {
     for (const status of ['ready', 'released', 'not_released', 'not_completed'] as const) {
-      expect(assessmentProgress({ status, captured: DOMAINS, hasIntake: true }).stage).toBe(status)
-      expect(assessmentProgress({ status, captured: [], hasIntake: false }).stage).toBe(status)
+      expect(assessmentProgress({ status, captured: DOMAINS, roundPrompts: ALL_ROUNDS, hasIntake: true }).stage).toBe(status)
+      expect(assessmentProgress({ status, captured: [], roundPrompts: [], hasIntake: false }).stage).toBe(status)
     }
   })
 })

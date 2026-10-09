@@ -37,7 +37,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { runCoverage, type RunStep } from '@/lib/coverageRun'
 import { notifyInternal } from '@/lib/internalNotify'
 import { runDependencyReadings, type ReadingsReportRow } from '@/lib/dependencyReadings'
-import type { AreaCallRow } from '@/lib/assessment'
+import { loadAreaRows, loadRoundPrompts } from '@/lib/assessmentStore'
 
 export const dependencyReadings = inngest.createFunction(
   {
@@ -86,14 +86,10 @@ export const dependencyReadings = inngest.createFunction(
         return data ? { tier: (data.tier ?? null) as string | null, status: (data.status ?? null) as string | null } : null
       },
 
-      async loadAreaRows(archiveId) {
-        const { data, error } = await supabaseAdmin
-          .from('incident_sessions')
-          .select('status, state')
-          .eq('archive_id', archiveId)
-        if (error) throw new Error(`load incident sessions ${archiveId}: ${error.message}`)
-        return (data ?? []) as AreaCallRow[]
-      },
+      // The same two reads the founder's page and requestReadingsIfDue make,
+      // so the job and the page cannot disagree about what is on the record.
+      loadAreaRows,
+      loadRoundPrompts,
 
       async saveReady(id, patch) {
         const { data, error } = await supabaseAdmin
