@@ -5,6 +5,7 @@ import { checkRateLimit, getClientIP } from '@/lib/apiSecurity'
 import { deriveFamilyName, trialWindow } from '@/lib/trial'
 import { notifyInternal } from '@/lib/internalNotify'
 import { resolveReferral, referralTag } from '@/lib/referral'
+import { honeypotTripped, overHourlyCeiling, randomLetterSignup, turnstileSecret, verifyTurnstile } from '@/lib/botGuard'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 30
@@ -22,12 +23,19 @@ export const maxDuration = 30
 // shouldCreateUser: false after this returns, exactly as /archive-login does,
 // and the auth user now exists so the link sends. The only send here is the
 // internal "Trial started" notice, under after().
+//
+// Bot guard (October 10, 2026, lib/botGuard.ts). A script reached this route
+// on October 9 and got an auth user, an archive and a lead row for a mailbox
+// that never asked. Four checks now run before any write: the honeypot
+// (1b), the random letters test (1c, added October 12), Turnstile (2b, only
+// when TURNSTILE_SECRET_KEY is set), and an hourly ceiling read from the
+// archives table (2c).
 
 const ONE_HOUR_MS = 60 * 60 * 1000
 const MAX_NAME = 120
 const MAX_PROMPT = 500
 
-type Body = { email?: unknown; name?: unknown; forWhom?: unknown; prompt?: unknown; ref?: unknown }
+type Body = { email?: unknown; name?: unknown; forWhom?: unknown; prompt?: unknown; ref?: unknown; turnstileToken?: unknown }
 
 // A plain address shape: one @, something before it, a dot after it, no
 // whitespace. Deliberately no library. Supabase makes the final call when the
@@ -58,6 +66,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid body' }, { status: 400 })
   }
 
+  // 1b. Honeypot. A person cannot see or reach this field. Answer ok so the
+  //     script learns nothing, and write nothing. The page then asks Supabase
+  //     for a link with shouldCreateUser false, and no user exists, so no mail
+  //     goes out either.
+  if (honeypotTripped(body as Record<string, unknown>)) {
+    console.warn(`[trial/start] honeypot tripped, nothing written. ip=${ip}`)
+    return NextResponse.json({ ok: true })
+  }
+
   // 2. Normalize and validate the fields.
   const email = normalizeEmail(body.email)
   if (!email) {
@@ -70,12 +87,44 @@ export async function POST(req: NextRequest) {
   const forWhom: 'me' | 'someone' = body.forWhom === 'someone' ? 'someone' : 'me'
   const prompt = typeof body.prompt === 'string' ? body.prompt.trim().slice(0, MAX_PROMPT) : ''
 
+  // 1c. Random letters (October 12, 2026). The mark of the one script that
+  //     found this form. Same answer as the honeypot: ok, nothing written.
+  if (randomLetterSignup(name, prompt)) {
+    console.warn(`[trial/start] random letter signup, nothing written. ip=${ip} domain=${email.slice(email.indexOf('@') + 1)}`)
+    return NextResponse.json({ ok: true })
+  }
+
+  // 2b. Turnstile. Skipped when TURNSTILE_SECRET_KEY is unset. Fails closed
+  //     when it is set and Cloudflare cannot be reached.
+  const turnstile = await verifyTurnstile(body.turnstileToken, ip, { secret: turnstileSecret() })
+  if (!turnstile.ok) {
+    console.warn(`[trial/start] turnstile ${turnstile.reason} ${turnstile.codes.join(',')} ip=${ip}`)
+    return NextResponse.json(
+      { error: 'We could not confirm your browser. Please reload the page and try again.' },
+      { status: turnstile.reason === 'unreachable' ? 503 : 400 },
+    )
+  }
+
   // Referral (October 6, 2026). Resolved against live rows, so a made up ref
   // records nothing. Null for everyone who did not arrive from a contributor
   // page or an owner's referral link.
   const referral = await resolveReferral(body.ref)
 
   try {
+    // 2c. Hourly ceiling, read from the table so it holds across instances.
+    //     A failed count does not block a real person: log it and carry on.
+    const { count: recentTrials, error: recentErr } = await supabaseAdmin
+      .from('archives')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'trial')
+      .gte('trial_started_at', new Date(Date.now() - ONE_HOUR_MS).toISOString())
+    if (recentErr) {
+      console.error('[trial/start] hourly ceiling read failed:', recentErr.message)
+    } else if (overHourlyCeiling(recentTrials ?? 0)) {
+      console.warn(`[trial/start] hourly ceiling reached (${recentTrials}). Refused. ip=${ip}`)
+      return NextResponse.json({ error: 'Too many requests. Please wait a while.' }, { status: 429 })
+    }
+
     // 3. The auth user. forceRole so a contributor who starts their own
     //    archive is routed as an owner by the callback (recon B4).
     const userId = await getOrCreateAuthUser(email, 'owner', { forceRole: true })

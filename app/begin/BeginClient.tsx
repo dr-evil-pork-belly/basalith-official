@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase-browser'
+import { HONEYPOT_FIELD } from '@/lib/botGuard'
 
 // /begin. Copy is docs/SELF_SERVE_SKELETON_2026-09-17.md section 6, verbatim.
 // Styling reuses /archive-login: same page shell, sigil, classes, and colors.
@@ -14,6 +15,25 @@ import { createClient } from '@/lib/supabase-browser'
 // skipping the OTP, then straight to the dashboard. The server page decides
 // which state renders; this component only receives the email when one is
 // signed in.
+
+// Bot guard (October 10, 2026, lib/botGuard.ts). Two additions to the form,
+// neither visible to a person in the normal case:
+//   a text input held off screen that only a script fills, and
+//   a Cloudflare Turnstile widget, rendered only when
+//   NEXT_PUBLIC_TURNSTILE_SITE_KEY is set, in "interaction-only" mode so it
+//   takes no room unless Cloudflare decides to challenge.
+
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? ''
+const TURNSTILE_SRC = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'
+
+type TurnstileApi = {
+  render: (el: HTMLElement, opts: Record<string, unknown>) => string
+  reset: (id?: string) => void
+  remove: (id: string) => void
+}
+declare global {
+  interface Window { turnstile?: TurnstileApi }
+}
 
 type Screen = 'form' | 'sent'
 type ForWhom = 'me' | 'someone'
@@ -56,6 +76,58 @@ export default function BeginClient({
   const [loading, setLoading]   = useState(false)
   const [resendIn, setResendIn] = useState(RESEND_AFTER_SECONDS)
   const [resent, setResent]     = useState(false)
+  const [trap, setTrap]         = useState('')
+  const [token, setToken]       = useState('')
+  const turnstileBox            = useRef<HTMLDivElement>(null)
+  const turnstileId             = useRef<string | null>(null)
+
+  // Turnstile, explicit render. Nothing loads when the site key is unset.
+  useEffect(() => {
+    if (!TURNSTILE_SITE_KEY || screen !== 'form') return
+    let cancelled = false
+
+    function render() {
+      if (cancelled || turnstileId.current || !turnstileBox.current || !window.turnstile) return
+      turnstileId.current = window.turnstile.render(turnstileBox.current, {
+        sitekey:            TURNSTILE_SITE_KEY,
+        appearance:         'interaction-only',
+        theme:              'auto',
+        callback:           (t: string) => setToken(t),
+        'expired-callback': () => setToken(''),
+        'error-callback':   () => setToken(''),
+      })
+    }
+
+    if (window.turnstile) {
+      render()
+    } else {
+      let script = document.querySelector<HTMLScriptElement>(`script[src="${TURNSTILE_SRC}"]`)
+      if (!script) {
+        script = document.createElement('script')
+        script.src = TURNSTILE_SRC
+        script.async = true
+        script.defer = true
+        document.head.appendChild(script)
+      }
+      script.addEventListener('load', render)
+    }
+
+    return () => {
+      cancelled = true
+      if (turnstileId.current && window.turnstile) {
+        try { window.turnstile.remove(turnstileId.current) } catch { /* already gone */ }
+      }
+      turnstileId.current = null
+    }
+  }, [screen])
+
+  // A token is good for one check. After any refused submit, ask for another.
+  function resetTurnstile() {
+    setToken('')
+    if (turnstileId.current && window.turnstile) {
+      try { window.turnstile.reset(turnstileId.current) } catch { /* nothing to reset */ }
+    }
+  }
 
   // The resend countdown runs only on screen 2.
   useEffect(() => {
@@ -80,8 +152,14 @@ export default function BeginClient({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setLoading(true)
     setError('')
+
+    if (TURNSTILE_SITE_KEY && !token) {
+      setError('Still checking your browser. Please try again in a few seconds.')
+      return
+    }
+
+    setLoading(true)
 
     const address = email.trim().toLowerCase()
 
@@ -89,12 +167,21 @@ export default function BeginClient({
       const res = await fetch('/api/trial/start', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ email: address, name: name.trim(), forWhom, prompt: prompt.trim(), ref: referralCode }),
+        body:    JSON.stringify({
+          email: address,
+          name: name.trim(),
+          forWhom,
+          prompt: prompt.trim(),
+          ref: referralCode,
+          turnstileToken: token || undefined,
+          [HONEYPOT_FIELD]: trap,
+        }),
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) {
         setError(data?.error || 'Could not start your Basalith right now. Please try again in a moment.')
         setLoading(false)
+        resetTurnstile()
         return
       }
 
@@ -109,6 +196,7 @@ export default function BeginClient({
       if (!sent) {
         setError('We could not send a sign in link. Please check the email address and try again.')
         setLoading(false)
+        resetTurnstile()
         return
       }
       setResendIn(RESEND_AFTER_SECONDS)
@@ -118,6 +206,7 @@ export default function BeginClient({
     } catch {
       setError('Could not start your Basalith right now. Please try again in a moment.')
       setLoading(false)
+      resetTurnstile()
     }
   }
 
@@ -262,19 +351,38 @@ export default function BeginClient({
               />
             </div>
 
+            {/* Bot guard. Off screen, out of the tab order, hidden from screen
+                readers. A person never fills it. */}
+            <div aria-hidden="true" style={{ position: 'absolute', left: '-9999px', top: 'auto', width: '1px', height: '1px', overflow: 'hidden' }}>
+              <label htmlFor="begin-subject-line">Leave this field empty</label>
+              <input
+                id="begin-subject-line"
+                type="text"
+                name={HONEYPOT_FIELD}
+                tabIndex={-1}
+                autoComplete="off"
+                value={trap}
+                onChange={e => setTrap(e.target.value)}
+              />
+            </div>
+
             {error && (
               <p className="font-sans text-[15px] tracking-[0.06em] text-center" style={{ color: 'var(--invert-gold)' }}>
                 {error}
               </p>
             )}
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-monolith-amber w-full text-center mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? 'One moment…' : 'Begin.'}
-            </button>
+            {/* One flex item, so the empty Turnstile box adds no gap. */}
+            <div className="flex flex-col">
+              {TURNSTILE_SITE_KEY && <div ref={turnstileBox} className="flex justify-center" />}
+              <button
+                type="submit"
+                disabled={loading}
+                className="btn-monolith-amber w-full text-center mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? 'One moment…' : 'Begin.'}
+              </button>
+            </div>
 
             <p className="font-sans text-[15px] leading-relaxed text-center" style={{ color: 'var(--invert-dim)' }}>
               Your first call is yours. Found your Basalith to keep it.
