@@ -20,6 +20,7 @@
     "@types/xml2js": "^0.4.14",
     "autoprefixer": "^10.4.27",
     "bcryptjs": "^3.0.3",
+    "botid": "^1.5.11",
     "elevenlabs": "^1.59.0",
     "inngest": "^4.1.2",
     "jszip": "^3.10.1",

@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next'
+import { withBotId } from 'botid/next/config'
 
 const securityHeaders = [
   {
@@ -86,4 +87,7 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default nextConfig
+// Vercel BotID (October 12, 2026). Adds the rewrites that serve the browser
+// challenge from this domain, so an ad blocker does not strip it. The paths
+// it protects are listed in instrumentation-client.ts.
+export default withBotId(nextConfig)

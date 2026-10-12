@@ -5,6 +5,14 @@ David's disk that morning, then written into basalith-official. NOT type
 checked in the repo, NOT deployed, NOT seen in a browser. David runs tsc, the
 tests, git, and the deploy. This touches a public form, so preview first.
 
+## October 12, later: Turnstile out, Vercel BotID in
+
+The October 10 slice used Cloudflare Turnstile for the browser check.
+Cloudflare is not part of this stack, and that was not flagged at the time.
+It was never switched on. It is now removed and replaced with Vercel BotID:
+no new vendor, no keys, Basic level free on every Vercel plan. Section 2
+below describes it. Every other part of this document is as written.
+
 ## October 12 addition: the random letters test
 
 Five signups in four days, two on the morning of October 12. All five carry
@@ -26,7 +34,7 @@ answers `ok` and writes nothing, exactly as the honeypot does. 5 more tests,
 caught. Sixteen real name shapes are in the test and are not.
 
 Two things to know. It is a rule about this one script; its author can get
-around it in a minute, and Turnstile is the lasting check. And a refused
+around it in a minute, and BotID is the lasting check. And a refused
 signup is told `ok`, so in the very unlikely case of a real person whose name
 trips it, they see "Check your mail" and nothing arrives. The route logs each
 refusal with the address's domain so a wrong refusal can be found in the
@@ -51,13 +59,17 @@ The cleanup section below reads the answer from `auth.users`.
 
 | File | Change |
 |---|---|
-| `lib/botGuard.ts` | New. The honeypot test, the Turnstile check, the hourly ceiling. Pure, fetch injected |
-| `lib/botGuard.test.ts` | New. 10 tests |
-| `app/api/trial/start/route.ts` | Three checks before any write: 1b, 2b, 2c |
-| `app/begin/BeginClient.tsx` | A text input held off screen. The Turnstile widget, only when the site key is set |
-| `.env.local.example` | The two new key names |
+| `lib/botGuard.ts` | New. The honeypot test, the random letters test, the BotID wrapper, the hourly ceiling. Pure, the BotID call injected |
+| `lib/botGuard.test.ts` | New. 13 tests |
+| `app/api/trial/start/route.ts` | Four checks before any write: 1b, 1c, 2b, 2c |
+| `app/begin/BeginClient.tsx` | A text input held off screen. Nothing else |
+| `instrumentation-client.ts` | New, at the repo root. Starts BotID in the browser and names the one protected path |
+| `next.config.ts` | Wrapped in `withBotId` |
+| `package.json` | One new dependency, `botid` |
+| `scripts/ship-bot-guard.ps1` | New. Commits these files and, on your word, pushes |
 
-No migration. No new table. No new dependency.
+No migration. No new table. One new dependency (`botid`, from Vercel). Run
+`npm install` before tsc; the ship script does it if you have not.
 
 ### 1. Honeypot (on as soon as this deploys)
 
@@ -68,36 +80,34 @@ request to Supabase fails and no mail goes out. This alone would have stopped
 the October 9 signup if the script fills every field, which the two random
 strings suggest.
 
-### 2. Turnstile (off until two keys are set)
+### 2. Vercel BotID (on as soon as this deploys)
 
-`NEXT_PUBLIC_TURNSTILE_SITE_KEY` on the page, `TURNSTILE_SECRET_KEY` on the
-route. Set both or neither.
+Two halves. `instrumentation-client.ts` runs in the browser on every page,
+solves an invisible challenge, and attaches the result to `POST
+/api/trial/start`. The route calls `checkBotId()` and Vercel says whether the
+request came through that challenge. A script posting straight to the route
+has no result attached and is refused. A person sees nothing.
 
-| State | Behavior |
+| Fact | Detail |
 |---|---|
-| Both unset | No script loads. The route skips the check. The form is exactly as before plus the honeypot |
-| Both set | The page gets a token in the background and sends it. The route asks Cloudflare. No good token, no trial |
-| Site key only | The page sends a token nobody checks. Harmless, not protected |
-| Secret only | Every signup is refused, because the page never sends a token. DO NOT do this |
+| Keys | None |
+| Level | Basic, free on every plan. Deep Analysis is a paid switch in the Vercel dashboard (Firewall, Rules), $1 per 1,000 checks on Pro. It is NOT turned on by this slice |
+| Refused request | 403 and "We could not confirm your browser. Please reload the page and try again." |
+| If the check itself throws | The signup is let through to the other checks and the error is logged as `[trial/start] botid check threw`. Fails open, on purpose: see `checkBrowser` in `lib/botGuard.ts` |
+| Kill switch | `TRIAL_BOTID=off` in the Vercel environment, then redeploy |
+| Local dev | Vercel's docs: `checkBotId()` always answers "not a bot" in development |
+| Where to watch | Vercel dashboard, Firewall tab, traffic filter BotID |
 
-The widget runs in `interaction-only` mode: it takes no room on the page
-unless Cloudflare decides to challenge that visitor.
+Two rules to keep. A route that calls `checkBotId()` must be listed in
+`instrumentation-client.ts`, or every request to it is classed as a bot. And
+anything that posts to `/api/trial/start` from outside a page of this site
+is now refused: only `/begin` was found doing so, but the iOS app was not
+read.
 
-It fails closed. If Cloudflare cannot be reached, the person sees "We could
-not confirm your browser. Please reload the page and try again." and no trial
-starts.
-
-To turn it on:
-
-1. Cloudflare dashboard, Turnstile, add a widget. Hostname `basalith.ai`.
-   Mode: Managed.
-2. Put the site key and the secret in Vercel, Production scope. You enter
-   them. They are not in this repo and were not seen in this session.
-3. For Preview, the real widget will refuse a `vercel.app` hostname unless
-   you add it. Cloudflare publishes test keys that always pass, for exactly
-   this: site key `1x00000000000000000000AA`, secret
-   `1x0000000000000000000000000000000AA`. Preview scope only.
-4. Redeploy. `NEXT_PUBLIC_` values are read at build time.
+Not confirmed, because none of it could be run here: that BotID behaves on a
+preview deployment the way it does in production, and how many real visitors
+the Basic level wrongly refuses. Watch the Firewall tab and the Vercel logs
+for `[trial/start] botid refused` after it ships.
 
 ### 3. Hourly ceiling (on as soon as this deploys)
 
@@ -110,21 +120,21 @@ is a guess well above current volume. It is `MAX_TRIALS_PER_HOUR` in
 
 ## New sentences a person can see
 
-Two. Both are yours to change.
+One. It is yours to change.
 
-- "Still checking your browser. Please try again in a few seconds." (the
-  person pressed Begin before the token arrived)
 - "We could not confirm your browser. Please reload the page and try again."
-  (Cloudflare said no, or could not be reached)
+  (BotID classed the request as a bot)
 
 ## Run, in this order
 
+    npm install
     npx tsc --noEmit
     npx vitest run lib/botGuard.test.ts
     npm test
 
 Sandbox result, against copies with five local modules stubbed: tsc printed
-nothing, 1 file and 15 tests passed (10 on October 10, 15 after October 12). That is not the repo. Paste the real
+nothing, 1 file and 13 tests passed, with the real `botid` 1.5.11 package
+installed. That is not the repo. Paste the real
 output. `npm test` matters because other tests may read `BeginClient.tsx` or
 the route as text, and the whole suite was not run.
 
@@ -146,8 +156,13 @@ the route as text, and the whole suite was not run.
        select count(*) from auth.users where email = 'honeypot.test@example.com';
        -- 0
 
-4. With the test keys set on Preview: the same fetch without `subject_line`
-   and without a token answers 400.
+4. Prove BotID, on production after it ships. From a terminal, not a browser:
+
+       curl -i -X POST https://basalith.ai/api/trial/start -H "Content-Type: application/json" -d "{\"email\":\"botid.test@example.com\",\"name\":\"Test Person\"}"
+
+   Expected: 403. Then start a real trial from `/begin` with an address of
+   your own. Expected: it works. If the real one is refused, set
+   `TRIAL_BOTID=off` and redeploy.
 
 ## Cleanup of the October 9 signup
 
@@ -278,8 +293,8 @@ Deleting now keeps the tripwire count and God view clean.
 
 ## Known limits, by name
 
-1. **Not seen in a browser.** The off screen input and the widget box were
-   never rendered. Look at `/begin` on a phone on preview.
+1. **Not seen in a browser.** The off screen input was never rendered, and
+   BotID was never run. Look at `/begin` on a phone on preview.
 2. **A script can skip your site and call Supabase directly.** The anon key
    is public by design. `signInWithOtp` with `shouldCreateUser: true`, sent
    straight to Supabase, creates an auth user and mails a link without ever
@@ -288,17 +303,18 @@ Deleting now keeps the tripwire count and God view clean.
    new users to sign up." Every user this codebase creates goes through the
    admin API, which still works with signups off, but confirm the iOS app
    does not rely on it before turning it off. (b) Supabase's own CAPTCHA
-   setting, which takes the same Turnstile secret. Turning (b) on means every
+   setting, which supports hCaptcha and Turnstile only, so it would bring in
+   a new vendor. Turning (b) on means every
    `signInWithOtp` call must send a token: `/begin`, `/archive-login`, the
    succession login, the app. That is its own slice.
 3. **Verifying the mailbox before creating the record was not done, on
    purpose.** The route's header comment records why creation happens in the
    POST (recon B3, the zero record owner loop). Moving it is an identity and
-   auth surface change, the irreversible class. The three checks here stop
+   auth surface change, the irreversible class. The four checks here stop
    the script without reopening that.
 4. **A honeypot stops scripts that fill every field.** A script written for
-   this form specifically will leave it empty. Turnstile is the check for
-   that one.
+   this form specifically will leave it empty. BotID is the check for that
+   one.
 5. **The signed in state of `/begin`** posts to the same route and passes
    through the same checks.
 6. **The ceiling refuses real people during a flood.** They see "Too many
@@ -309,5 +325,6 @@ Deleting now keeps the tripwire count and God view clean.
 
 ## Rollback
 
-Unset both Turnstile keys and redeploy: that check is gone. The honeypot and
-the ceiling have no switch. Revert the commit to remove them.
+Set `TRIAL_BOTID=off` in Vercel and redeploy: the BotID check is skipped. The
+honeypot, the random letters test and the ceiling have no switch. Revert the
+commit to remove them.

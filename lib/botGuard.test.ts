@@ -1,14 +1,13 @@
 import { describe, it, expect } from 'vitest'
 import {
   HONEYPOT_FIELD,
+  botIdEnabled,
+  checkBrowser,
   MAX_TRIALS_PER_HOUR,
-  TURNSTILE_VERIFY_URL,
   honeypotTripped,
   looksLikeRandomLetters,
   randomLetterSignup,
   overHourlyCeiling,
-  turnstileSecret,
-  verifyTurnstile,
 } from './botGuard'
 
 describe('honeypotTripped', () => {
@@ -35,72 +34,40 @@ describe('overHourlyCeiling', () => {
   })
 })
 
-describe('turnstileSecret', () => {
-  it('is null when unset or blank', () => {
-    expect(turnstileSecret({})).toBeNull()
-    expect(turnstileSecret({ TURNSTILE_SECRET_KEY: '  ' })).toBeNull()
-    expect(turnstileSecret({ TURNSTILE_SECRET_KEY: ' abc ' })).toBe('abc')
+describe('botIdEnabled', () => {
+  it('is on unless TRIAL_BOTID says off', () => {
+    expect(botIdEnabled({})).toBe(true)
+    expect(botIdEnabled({ TRIAL_BOTID: '' })).toBe(true)
+    expect(botIdEnabled({ TRIAL_BOTID: 'on' })).toBe(true)
+    expect(botIdEnabled({ TRIAL_BOTID: 'off' })).toBe(false)
+    expect(botIdEnabled({ TRIAL_BOTID: ' OFF ' })).toBe(false)
   })
 })
 
-describe('verifyTurnstile', () => {
-  const never = async () => { throw new Error('fetch must not be called') }
-
-  it('skips, and says so, when no secret is configured', async () => {
-    expect(await verifyTurnstile(undefined, '1.2.3.4', { secret: null, fetchImpl: never })).toEqual({ ok: true, skipped: true })
+describe('checkBrowser', () => {
+  it('skips, and says so, when switched off, without calling the check', async () => {
+    const r = await checkBrowser({ enabled: false, check: async () => { throw new Error('must not be called') } })
+    expect(r).toEqual({ ok: true, skipped: true, errored: false })
   })
 
-  it('refuses a missing token without calling Cloudflare', async () => {
-    for (const t of [undefined, null, '', '   ', 42, 'x'.repeat(2049)]) {
-      expect(await verifyTurnstile(t, '1.2.3.4', { secret: 's', fetchImpl: never })).toEqual({ ok: false, reason: 'missing-token', codes: [] })
-    }
+  it('passes a person', async () => {
+    expect(await checkBrowser({ enabled: true, check: async () => ({ isBot: false }) }))
+      .toEqual({ ok: true, skipped: false, errored: false })
   })
 
-  it('passes a token Cloudflare accepts, and sends secret, response and ip', async () => {
-    let seen: { url: string; body: URLSearchParams } | null = null
-    const r = await verifyTurnstile('tok', '1.2.3.4', {
-      secret: 's',
-      fetchImpl: async (url, init) => {
-        seen = { url, body: init.body }
-        return { ok: true, status: 200, json: async () => ({ success: true }) }
-      },
-    })
-    expect(r).toEqual({ ok: true, skipped: false })
-    expect(seen!.url).toBe(TURNSTILE_VERIFY_URL)
-    expect(seen!.body.get('secret')).toBe('s')
-    expect(seen!.body.get('response')).toBe('tok')
-    expect(seen!.body.get('remoteip')).toBe('1.2.3.4')
+  it('refuses a bot', async () => {
+    expect(await checkBrowser({ enabled: true, check: async () => ({ isBot: true }) })).toEqual({ ok: false })
   })
 
-  it('leaves the ip out when it is unknown', async () => {
-    let body: URLSearchParams | null = null
-    await verifyTurnstile('tok', 'unknown', {
-      secret: 's',
-      fetchImpl: async (_url, init) => { body = init.body; return { ok: true, status: 200, json: async () => ({ success: true }) } },
+  it('fails open when the check throws, and reports the error', async () => {
+    const seen: unknown[] = []
+    const r = await checkBrowser({
+      enabled: true,
+      check: async () => { throw new Error('boom') },
+      onError: e => { seen.push(e) },
     })
-    expect(body!.has('remoteip')).toBe(false)
-  })
-
-  it('refuses a token Cloudflare rejects and carries the codes', async () => {
-    const r = await verifyTurnstile('tok', null, {
-      secret: 's',
-      fetchImpl: async () => ({ ok: true, status: 200, json: async () => ({ success: false, 'error-codes': ['timeout-or-duplicate'] }) }),
-    })
-    expect(r).toEqual({ ok: false, reason: 'rejected', codes: ['timeout-or-duplicate'] })
-  })
-
-  it('fails closed when Cloudflare errors or cannot be reached', async () => {
-    const http = await verifyTurnstile('tok', null, {
-      secret: 's',
-      fetchImpl: async () => ({ ok: false, status: 503, json: async () => ({}) }),
-    })
-    expect(http).toEqual({ ok: false, reason: 'unreachable', codes: ['http-503'] })
-
-    const thrown = await verifyTurnstile('tok', null, {
-      secret: 's',
-      fetchImpl: async () => { throw new TypeError('network') },
-    })
-    expect(thrown).toEqual({ ok: false, reason: 'unreachable', codes: ['TypeError'] })
+    expect(r).toEqual({ ok: true, skipped: false, errored: true })
+    expect(seen).toHaveLength(1)
   })
 })
 

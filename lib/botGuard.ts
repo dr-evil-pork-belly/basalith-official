@@ -11,10 +11,10 @@
  *
  *   1. Honeypot. A text input no person can see or reach. A script that fills
  *      every input fills it. The route answers ok and writes nothing.
- *   2. Cloudflare Turnstile. The page sends a token, the route asks Cloudflare
- *      whether it is good. ON ONLY WHEN TURNSTILE_SECRET_KEY IS SET. With the
- *      key unset this check is skipped, so the deploy is safe before the keys
- *      exist and is NOT protected by Turnstile until they do.
+ *   2. Vercel BotID (October 12, replacing the Cloudflare Turnstile check
+ *      written October 10: Cloudflare is not part of this stack). The page
+ *      runs an invisible challenge, the route asks Vercel whether the request
+ *      came through it. No keys. Off when TRIAL_BOTID is "off".
  *   3. Hourly ceiling. A count of trials started in the last hour, read from
  *      the archives table, so it holds across serverless instances where the
  *      in-memory limiter in lib/apiSecurity.ts does not.
@@ -32,7 +32,7 @@
  *
  * This is a rule about one script, not about bots. The script's author can
  * defeat it in a minute. It is here because it stops today's flood with no
- * keys to set. Turnstile is the lasting check.
+ * keys to set. BotID is the lasting check.
  */
 export function looksLikeRandomLetters(raw: unknown): boolean {
   if (typeof raw !== 'string') return false
@@ -81,58 +81,41 @@ export function overHourlyCeiling(startedInLastHour: number, max: number = MAX_T
   return startedInLastHour >= max
 }
 
-export const TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
-
-export function turnstileSecret(env: Record<string, string | undefined> = process.env): string | null {
-  const s = (env.TURNSTILE_SECRET_KEY ?? '').trim()
-  return s ? s : null
+/** The kill switch. TRIAL_BOTID=off in the Vercel environment skips the check. */
+export function botIdEnabled(env: Record<string, string | undefined> = process.env): boolean {
+  return (env.TRIAL_BOTID ?? '').trim().toLowerCase() !== 'off'
 }
 
-export type TurnstileResult =
-  | { ok: true; skipped: boolean }
-  | { ok: false; reason: 'missing-token' | 'rejected' | 'unreachable'; codes: string[] }
-
-type FetchLike = (url: string, init: { method: string; body: URLSearchParams; signal?: AbortSignal }) => Promise<{
-  ok: boolean
-  status: number
-  json: () => Promise<unknown>
-}>
+export type BrowserCheck =
+  | { ok: true; skipped: boolean; errored: boolean }
+  | { ok: false }
 
 /**
- * Ask Cloudflare whether the token is good.
+ * Vercel BotID, with the call injected so this file never imports the
+ * package and the tests need no network. The route passes checkBotId from
+ * 'botid/server'.
  *
- * Fails CLOSED. If Cloudflare cannot be reached or answers with an error, the
- * trial does not start and the person is asked to try again. The other choice
- * lets every script through whenever Cloudflare is slow.
+ * isBot true: refused. That includes any request that did not come from a
+ * page of this site, such as a script posting straight to the route.
+ *
+ * Fails OPEN. If the check itself throws (the package misconfigured, Vercel
+ * unreachable), the signup goes on to the remaining checks and the error is
+ * logged. The reason: a thrown error here is our fault, not a visitor's, and
+ * failing closed would refuse every real person until someone noticed. The
+ * honeypot, the random letters test and the hourly ceiling still stand.
  */
-export async function verifyTurnstile(
-  token: unknown,
-  ip: string | null,
-  deps: { secret: string | null; fetchImpl?: FetchLike; timeoutMs?: number },
-): Promise<TurnstileResult> {
-  if (!deps.secret) return { ok: true, skipped: true }
-  if (typeof token !== 'string' || !token.trim() || token.length > 2048) {
-    return { ok: false, reason: 'missing-token', codes: [] }
-  }
-
-  const form = new URLSearchParams()
-  form.set('secret', deps.secret)
-  form.set('response', token)
-  if (ip && ip !== 'unknown') form.set('remoteip', ip)
-
-  const doFetch = deps.fetchImpl ?? (fetch as unknown as FetchLike)
+export async function checkBrowser(deps: {
+  enabled: boolean
+  check: () => Promise<{ isBot: boolean }>
+  onError?: (err: unknown) => void
+}): Promise<BrowserCheck> {
+  if (!deps.enabled) return { ok: true, skipped: true, errored: false }
   try {
-    const res = await doFetch(TURNSTILE_VERIFY_URL, {
-      method: 'POST',
-      body:   form,
-      signal: AbortSignal.timeout(deps.timeoutMs ?? 5000),
-    })
-    if (!res.ok) return { ok: false, reason: 'unreachable', codes: [`http-${res.status}`] }
-    const data = (await res.json()) as { success?: unknown; 'error-codes'?: unknown }
-    if (data?.success === true) return { ok: true, skipped: false }
-    const codes = Array.isArray(data?.['error-codes']) ? (data['error-codes'] as unknown[]).map(String) : []
-    return { ok: false, reason: 'rejected', codes }
+    const verdict = await deps.check()
+    if (verdict?.isBot === true) return { ok: false }
+    return { ok: true, skipped: false, errored: false }
   } catch (err) {
-    return { ok: false, reason: 'unreachable', codes: [err instanceof Error ? err.name : 'error'] }
+    deps.onError?.(err)
+    return { ok: true, skipped: false, errored: true }
   }
 }

@@ -5,7 +5,8 @@ import { checkRateLimit, getClientIP } from '@/lib/apiSecurity'
 import { deriveFamilyName, trialWindow } from '@/lib/trial'
 import { notifyInternal } from '@/lib/internalNotify'
 import { resolveReferral, referralTag } from '@/lib/referral'
-import { honeypotTripped, overHourlyCeiling, randomLetterSignup, turnstileSecret, verifyTurnstile } from '@/lib/botGuard'
+import { checkBotId } from 'botid/server'
+import { botIdEnabled, checkBrowser, honeypotTripped, overHourlyCeiling, randomLetterSignup } from '@/lib/botGuard'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 30
@@ -27,15 +28,17 @@ export const maxDuration = 30
 // Bot guard (October 10, 2026, lib/botGuard.ts). A script reached this route
 // on October 9 and got an auth user, an archive and a lead row for a mailbox
 // that never asked. Four checks now run before any write: the honeypot
-// (1b), the random letters test (1c, added October 12), Turnstile (2b, only
-// when TURNSTILE_SECRET_KEY is set), and an hourly ceiling read from the
-// archives table (2c).
+// (1b), the random letters test (1c, added October 12), Vercel BotID (2b,
+// off only when TRIAL_BOTID is "off"), and an hourly ceiling read from the
+// archives table (2c). BotID needs this path listed in
+// instrumentation-client.ts: without that entry every request here is
+// classed as a bot.
 
 const ONE_HOUR_MS = 60 * 60 * 1000
 const MAX_NAME = 120
 const MAX_PROMPT = 500
 
-type Body = { email?: unknown; name?: unknown; forWhom?: unknown; prompt?: unknown; ref?: unknown; turnstileToken?: unknown }
+type Body = { email?: unknown; name?: unknown; forWhom?: unknown; prompt?: unknown; ref?: unknown }
 
 // A plain address shape: one @, something before it, a dot after it, no
 // whitespace. Deliberately no library. Supabase makes the final call when the
@@ -94,14 +97,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true })
   }
 
-  // 2b. Turnstile. Skipped when TURNSTILE_SECRET_KEY is unset. Fails closed
-  //     when it is set and Cloudflare cannot be reached.
-  const turnstile = await verifyTurnstile(body.turnstileToken, ip, { secret: turnstileSecret() })
-  if (!turnstile.ok) {
-    console.warn(`[trial/start] turnstile ${turnstile.reason} ${turnstile.codes.join(',')} ip=${ip}`)
+  // 2b. Vercel BotID. Refuses anything that did not come through the
+  //     challenge the page runs, which includes a script posting straight
+  //     here. Fails open if the check itself throws (lib/botGuard.ts).
+  const browser = await checkBrowser({
+    enabled: botIdEnabled(),
+    check:   () => checkBotId(),
+    onError: err => console.error('[trial/start] botid check threw, signup allowed through:', err instanceof Error ? err.message : err),
+  })
+  if (!browser.ok) {
+    console.warn(`[trial/start] botid refused. ip=${ip} domain=${email.slice(email.indexOf('@') + 1)}`)
     return NextResponse.json(
       { error: 'We could not confirm your browser. Please reload the page and try again.' },
-      { status: turnstile.reason === 'unreachable' ? 503 : 400 },
+      { status: 403 },
     )
   }
 

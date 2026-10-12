@@ -4,7 +4,7 @@
 # Run from anywhere:
 #   powershell -ExecutionPolicy Bypass -File C:\Users\mrdav\basalith-official\scripts\ship-bot-guard.ps1
 #
-# It stages only the six files named below. Never "git add .". Anything else
+# It stages only the ten files named below. Never "git add .". Anything else
 # uncommitted in the working tree (slice 4b, slice C) is left exactly as it is.
 # It stops, without committing, if: you are not on main, main is behind
 # origin, tsc fails, the bot guard tests fail, or anything else is staged.
@@ -19,7 +19,11 @@ $files = @(
   'app/api/trial/start/route.ts',
   'app/begin/BeginClient.tsx',
   'docs/TRIAL_BOT_GUARD_2026-10-10.md',
-  'scripts/ship-bot-guard.ps1'
+  'scripts/ship-bot-guard.ps1',
+  'instrumentation-client.ts',
+  'next.config.ts',
+  'package.json',
+  'package-lock.json'
 )
 
 function Stop-Here($why) {
@@ -42,6 +46,13 @@ if ($already.Count -gt 0) {
   Write-Host 'Already staged before this script ran:'
   $already | ForEach-Object { Write-Host "  $_" }
   Stop-Here 'something is already staged. Unstage it (git restore --staged .) and run again.'
+}
+
+if (-not (Test-Path 'node_modules/botid')) {
+  Write-Host ''
+  Write-Host '== npm install (botid is new) ==' -ForegroundColor Cyan
+  npm install
+  if ($LASTEXITCODE -ne 0) { Stop-Here 'npm install failed.' }
 }
 
 Write-Host ''
@@ -70,8 +81,8 @@ Write-Host '== Staged ==' -ForegroundColor Cyan
 git diff --cached --stat
 
 git commit `
-  -m 'Trial form bot guard: honeypot, random letters test, Turnstile, hourly ceiling' `
-  -m 'A script found /begin on October 9 and started trials for strangers'' mailboxes, several a day by October 12. POST /api/trial/start now runs four checks before any write: a hidden field (1b), a test for the script''s random letter names (1c), Cloudflare Turnstile when TURNSTILE_SECRET_KEY is set (2b), and an hourly ceiling read from archives (2c). See docs/TRIAL_BOT_GUARD_2026-10-10.md.' `
+  -m 'Trial form bot guard: honeypot, random letters test, Vercel BotID, hourly ceiling' `
+  -m 'A script found /begin on October 9 and started trials for strangers'' mailboxes, several a day by October 12. POST /api/trial/start now runs four checks before any write: a hidden field (1b), a test for the script''s random letter names (1c), Vercel BotID (2b), and an hourly ceiling read from archives (2c). See docs/TRIAL_BOT_GUARD_2026-10-10.md.' `
   -m "Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>`nClaude-Session: https://claude.ai/code/session_0157KFXwQMAMKxyZXRL8Jr4c"
 if ($LASTEXITCODE -ne 0) { Stop-Here 'git commit failed.' }
 

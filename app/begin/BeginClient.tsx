@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase-browser'
@@ -16,24 +16,10 @@ import { HONEYPOT_FIELD } from '@/lib/botGuard'
 // which state renders; this component only receives the email when one is
 // signed in.
 
-// Bot guard (October 10, 2026, lib/botGuard.ts). Two additions to the form,
-// neither visible to a person in the normal case:
-//   a text input held off screen that only a script fills, and
-//   a Cloudflare Turnstile widget, rendered only when
-//   NEXT_PUBLIC_TURNSTILE_SITE_KEY is set, in "interaction-only" mode so it
-//   takes no room unless Cloudflare decides to challenge.
-
-const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? ''
-const TURNSTILE_SRC = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'
-
-type TurnstileApi = {
-  render: (el: HTMLElement, opts: Record<string, unknown>) => string
-  reset: (id?: string) => void
-  remove: (id: string) => void
-}
-declare global {
-  interface Window { turnstile?: TurnstileApi }
-}
+// Bot guard (lib/botGuard.ts). One addition to the form: a text input held
+// off screen that only a script fills. The browser check (Vercel BotID) is
+// not in this file. It is started in instrumentation-client.ts and attaches
+// itself to the POST below.
 
 type Screen = 'form' | 'sent'
 type ForWhom = 'me' | 'someone'
@@ -77,57 +63,6 @@ export default function BeginClient({
   const [resendIn, setResendIn] = useState(RESEND_AFTER_SECONDS)
   const [resent, setResent]     = useState(false)
   const [trap, setTrap]         = useState('')
-  const [token, setToken]       = useState('')
-  const turnstileBox            = useRef<HTMLDivElement>(null)
-  const turnstileId             = useRef<string | null>(null)
-
-  // Turnstile, explicit render. Nothing loads when the site key is unset.
-  useEffect(() => {
-    if (!TURNSTILE_SITE_KEY || screen !== 'form') return
-    let cancelled = false
-
-    function render() {
-      if (cancelled || turnstileId.current || !turnstileBox.current || !window.turnstile) return
-      turnstileId.current = window.turnstile.render(turnstileBox.current, {
-        sitekey:            TURNSTILE_SITE_KEY,
-        appearance:         'interaction-only',
-        theme:              'auto',
-        callback:           (t: string) => setToken(t),
-        'expired-callback': () => setToken(''),
-        'error-callback':   () => setToken(''),
-      })
-    }
-
-    if (window.turnstile) {
-      render()
-    } else {
-      let script = document.querySelector<HTMLScriptElement>(`script[src="${TURNSTILE_SRC}"]`)
-      if (!script) {
-        script = document.createElement('script')
-        script.src = TURNSTILE_SRC
-        script.async = true
-        script.defer = true
-        document.head.appendChild(script)
-      }
-      script.addEventListener('load', render)
-    }
-
-    return () => {
-      cancelled = true
-      if (turnstileId.current && window.turnstile) {
-        try { window.turnstile.remove(turnstileId.current) } catch { /* already gone */ }
-      }
-      turnstileId.current = null
-    }
-  }, [screen])
-
-  // A token is good for one check. After any refused submit, ask for another.
-  function resetTurnstile() {
-    setToken('')
-    if (turnstileId.current && window.turnstile) {
-      try { window.turnstile.reset(turnstileId.current) } catch { /* nothing to reset */ }
-    }
-  }
 
   // The resend countdown runs only on screen 2.
   useEffect(() => {
@@ -154,11 +89,6 @@ export default function BeginClient({
     e.preventDefault()
     setError('')
 
-    if (TURNSTILE_SITE_KEY && !token) {
-      setError('Still checking your browser. Please try again in a few seconds.')
-      return
-    }
-
     setLoading(true)
 
     const address = email.trim().toLowerCase()
@@ -173,7 +103,6 @@ export default function BeginClient({
           forWhom,
           prompt: prompt.trim(),
           ref: referralCode,
-          turnstileToken: token || undefined,
           [HONEYPOT_FIELD]: trap,
         }),
       })
@@ -181,7 +110,6 @@ export default function BeginClient({
       if (!res.ok) {
         setError(data?.error || 'Could not start your Basalith right now. Please try again in a moment.')
         setLoading(false)
-        resetTurnstile()
         return
       }
 
@@ -196,7 +124,6 @@ export default function BeginClient({
       if (!sent) {
         setError('We could not send a sign in link. Please check the email address and try again.')
         setLoading(false)
-        resetTurnstile()
         return
       }
       setResendIn(RESEND_AFTER_SECONDS)
@@ -206,7 +133,6 @@ export default function BeginClient({
     } catch {
       setError('Could not start your Basalith right now. Please try again in a moment.')
       setLoading(false)
-      resetTurnstile()
     }
   }
 
@@ -372,17 +298,13 @@ export default function BeginClient({
               </p>
             )}
 
-            {/* One flex item, so the empty Turnstile box adds no gap. */}
-            <div className="flex flex-col">
-              {TURNSTILE_SITE_KEY && <div ref={turnstileBox} className="flex justify-center" />}
-              <button
-                type="submit"
-                disabled={loading}
-                className="btn-monolith-amber w-full text-center mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? 'One moment…' : 'Begin.'}
-              </button>
-            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-monolith-amber w-full text-center mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? 'One moment…' : 'Begin.'}
+            </button>
 
             <p className="font-sans text-[15px] leading-relaxed text-center" style={{ color: 'var(--invert-dim)' }}>
               Your first call is yours. Found your Basalith to keep it.
