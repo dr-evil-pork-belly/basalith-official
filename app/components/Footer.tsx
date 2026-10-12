@@ -11,6 +11,7 @@ const COLS: { heading: string; links: { label: string; href: string }[] }[] = [
       { label: 'Acquisition',              href: '/apply?type=acquisition' },
       { label: 'Succession',               href: '/succession'             },
       { label: 'Individuals and Families', href: '/families'               },
+      { label: 'Churches',                 href: '/churches'               },
       { label: 'The Founding',             href: '/founding-session'       },
       { label: 'Pricing',                  href: '/pricing'                },
     ],
