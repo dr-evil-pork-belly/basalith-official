@@ -83,7 +83,7 @@ export const ORG_SCHEMA = {
 
   contactPoint: {
     '@type':      'ContactPoint',
-    email:        'hello@basalith.xyz',
+    email:        'hello@basalith.ai',
     contactType:  'customer service',
   },
 

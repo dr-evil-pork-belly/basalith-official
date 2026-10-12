@@ -175,8 +175,8 @@ export default function Footer() {
         <p style={{ ...MONO, fontSize: '0.72rem', letterSpacing: '0.14em', textTransform: 'none', color: C.reg, lineHeight: 2 }}>
           Heritage Nexus Inc.<br />
           Registered in Delaware, United States.<br />
-          <a className="bsl-ft-link" href="mailto:hello@basalith.xyz" style={{ color: C.regLink, textDecoration: 'none' }}>
-            hello@basalith.xyz
+          <a className="bsl-ft-link" href="mailto:hello@basalith.ai" style={{ color: C.regLink, textDecoration: 'none' }}>
+            hello@basalith.ai
           </a>
         </p>
       </div>

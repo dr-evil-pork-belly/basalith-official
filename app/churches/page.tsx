@@ -304,7 +304,7 @@ export default function ChurchesPage() {
             </p>
             <p style={{ ...BODY, color: 'var(--on-dark-2)' }}>
               Write to me at{' '}
-              <a href="mailto:hello@basalith.xyz" style={{ color: 'var(--on-dark)', textDecoration: 'underline' }}>hello@basalith.xyz</a>.
+              <a href="mailto:hello@basalith.ai" style={{ color: 'var(--on-dark)', textDecoration: 'underline' }}>hello@basalith.ai</a>.
               You will get a straight answer.
             </p>
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--on-dark-2)', marginTop: '28px' }}>

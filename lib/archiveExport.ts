@@ -645,7 +645,7 @@ Nothing in this zip stops working if Basalith does.
 You can request another export at any time. There is no limit and no reason
 required.
 
-Questions about your Basalith: hello@basalith.xyz
+Questions about your Basalith: hello@basalith.ai
 Security concerns: security@basalith.ai
 
 Heritage Nexus Inc.

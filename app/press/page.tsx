@@ -37,8 +37,8 @@ export default function PressPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '36px' }}>
               <div style={{ borderLeft: '3px solid rgba(160,132,80,0.5)', paddingLeft: '24px' }}>
                 <p style={{ ...MONO, fontSize: '0.78rem', color: 'var(--color-gold)', marginBottom: '10px' }}>For press inquiries</p>
-                <a href="mailto:hello@basalith.xyz" style={{ ...SERIF, fontSize: '1.3rem', fontWeight: 400, color: 'var(--color-text-primary)', textDecoration: 'none' }}>
-                  hello@basalith.xyz
+                <a href="mailto:hello@basalith.ai" style={{ ...SERIF, fontSize: '1.3rem', fontWeight: 400, color: 'var(--color-text-primary)', textDecoration: 'none' }}>
+                  hello@basalith.ai
                 </a>
               </div>
 

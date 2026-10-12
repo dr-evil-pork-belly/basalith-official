@@ -5,7 +5,15 @@
 - New route `/churches` (`app/churches/page.tsx`). Static server page, no data, no API, no schema.
 - `app/components/Footer.tsx`: one new link, "Churches", under Solutions, after Individuals and Families.
 
-Nothing else was touched. `app/sitemap.ts` is unchanged on purpose: its own rule is to add a route only after it returns 200 in production.
+Nothing else was touched by the page itself. `app/sitemap.ts` is unchanged on purpose: its own rule is to add a route only after it returns 200 in production.
+
+## Contact address, same day
+
+`hello@basalith.xyz` became `hello@basalith.ai` everywhere it appeared, 13 places in 9 files: the footer, `/churches`, `/integrity`, `/press`, `/pricing`, the export error in `app/api/archive/export/route.ts`, the export email (`lib/emails/archiveExport.ts`), the export README text (`lib/archiveExport.ts`), and the organization record in `lib/structuredData.ts`.
+
+Not confirmed from here: that `hello@basalith.ai` receives mail. Send a test before the push.
+
+Left alone on purpose: every sending address (`archive@`, `unsubscribe@`, `davidha@` on basalith.xyz), the `legacy@basalith.xyz` fallback for `ADMIN_EMAIL`, and the other public addresses, which are already split across the two domains (`legacy@` and `privacy@` on .xyz on /contact, /terms, /privacy and the apply form; `privacy@`, `security@`, `enterprise@` on .ai on /security and /privacy).
 
 ## Why
 

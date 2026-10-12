@@ -246,9 +246,9 @@ export default function IntegrityPage() {
             If there is a question we have not answered here, ask us directly. You will get a straight answer.
           </p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
-            <a href="mailto:hello@basalith.xyz"
+            <a href="mailto:hello@basalith.ai"
               style={{ ...MONO, fontSize: 'var(--text-caption)', display: 'inline-block', background: 'var(--on-dark)', color: 'var(--color-void)', textDecoration: 'none', padding: '14px 28px' }}>
-              hello@basalith.xyz
+              hello@basalith.ai
             </a>
             <Link href="/privacy"
               style={{ ...MONO, fontSize: 'var(--text-caption)', display: 'inline-block', border: '1px solid rgba(255,255,255,0.15)', color: 'var(--on-dark-2)', textDecoration: 'none', padding: '13px 27px' }}>

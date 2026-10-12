@@ -516,7 +516,7 @@ export default function PricingPage() {
             </a>
           </div>
           <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--on-dark-3)', marginTop: '24px' }}>
-            hello@basalith.xyz
+            hello@basalith.ai
           </p>
         </section>
 

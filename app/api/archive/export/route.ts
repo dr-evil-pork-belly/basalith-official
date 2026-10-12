@@ -47,7 +47,7 @@ export async function POST() {
   // An owner with no email on file would get a zip nobody could tell them about.
   if (!ownerRow.owner_email) {
     return NextResponse.json(
-      { error: 'No email address is on file for your Basalith. Contact hello@basalith.xyz and we will send your export directly.' },
+      { error: 'No email address is on file for your Basalith. Contact hello@basalith.ai and we will send your export directly.' },
       { status: 409 },
     )
   }

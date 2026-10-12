@@ -125,7 +125,7 @@ export function buildExportFailedEmail(firstName: string, archiveName: string): 
 
     <p style="${S.p}">
       If you would rather speak to someone, reply to this message or write to
-      hello@basalith.xyz.
+      hello@basalith.ai.
     </p>
   `)
 }
