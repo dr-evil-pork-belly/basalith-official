@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Nav    from '../components/Nav'
 import Footer from '../components/Footer'
 
@@ -10,9 +10,21 @@ type Status = 'idle' | 'loading' | 'success' | 'error'
 const INTENTS: { value: Intent; label: string }[] = [
   { value: 'general', label: 'A question about Basalith' },
   { value: 'pricing', label: 'Pricing'                   },
-  { value: 'partner', label: 'Partnering as an advisor (CPA, exit planner, attorney)' },
+  { value: 'partner', label: 'Partnering as an advisor (M&A, CPA, exit planner, attorney)' },
   { value: 'press',   label: 'Press'                     },
 ]
+
+const INTENT_VALUES = new Set<string>(INTENTS.map(i => i.value))
+
+// ?intent=partner is set by the links on /partner (October 15, 2026). It only
+// preselects the topic; the person can change it. Read from window in an
+// effect rather than useSearchParams so this page keeps rendering statically
+// without a Suspense boundary.
+function intentFromLocation(): Intent | '' {
+  if (typeof window === 'undefined') return ''
+  const raw = new URLSearchParams(window.location.search).get('intent') ?? ''
+  return INTENT_VALUES.has(raw) ? (raw as Intent) : ''
+}
 
 const SERIF: React.CSSProperties = {
   fontFamily: 'var(--font-newsreader), Georgia, serif',
@@ -51,6 +63,11 @@ export default function ContactPage() {
   const [form,   setForm]   = useState({ name: '', email: '', intent: '' as Intent | '', message: '' })
   const [status, setStatus] = useState<Status>('idle')
   const [error,  setError]  = useState('')
+
+  useEffect(() => {
+    const preset = intentFromLocation()
+    if (preset) setForm(prev => (prev.intent ? prev : { ...prev, intent: preset }))
+  }, [])
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
