@@ -159,10 +159,10 @@ export default function IntegrityPage() {
             <h2 style={{ ...H2, color: 'var(--on-dark)' }}>You will not lose what you built.</h2>
             <p style={{ ...BODY, color: 'var(--on-dark-3)', fontStyle: 'italic' }}>Startups close. We know this.</p>
             <p style={{ ...BODY, color: 'var(--on-dark-3)' }}>
-              If Heritage Nexus Inc. ever faces dissolution we commit to three things:
+              If Human Augmentation Technologies Corp. ever faces dissolution we commit to three things:
             </p>
             {[
-              'You own your Basalith. Heritage Nexus is the custodian, not the owner. Closing the company does not change who it belongs to.',
+              'You own your Basalith. Human Augmentation Technologies is the custodian, not the owner. Closing the company does not change who it belongs to.',
               'Full export at any time. You can download your Basalith in full, in open formats, whenever you ask, so a closure never strands your data.',
               'No sale of your data. Your memories are not a corporate asset we can liquidate. They are yours.',
             ].map((item, i) => (

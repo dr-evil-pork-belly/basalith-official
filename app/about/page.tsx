@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title:       'About · Basalith',
-  description: 'Heritage Nexus Inc. built Basalith to capture how an operator reasons before a business changes hands, so the judgment transfers through an acquisition or a succession. Also available for one person or a family.',
+  description: 'Human Augmentation Technologies Corp. built Basalith to capture how an operator reasons before a business changes hands, so the judgment transfers through an acquisition or a succession. Also available for one person or a family.',
 }
 
 const SERIF: React.CSSProperties = {
@@ -58,7 +58,7 @@ export default function AboutPage() {
         <div className="b2b-paper">
         <section style={{ padding: 'clamp(140px,16vw,200px) clamp(24px,6vw,80px) clamp(64px,8vw,96px)', maxWidth: '760px' }}>
           <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '28px' }}>
-            Heritage Nexus Inc.
+            Human Augmentation Technologies Corp.
           </p>
           <h1
             style={{
@@ -228,7 +228,7 @@ export default function AboutPage() {
               <br />
               Founder, Basalith
               <br />
-              Heritage Nexus Inc., 2026
+              Human Augmentation Technologies Corp., 2026
             </p>
           </div>
         </section>

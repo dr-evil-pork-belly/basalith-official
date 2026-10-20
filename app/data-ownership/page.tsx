@@ -8,8 +8,8 @@ const TENETS = [
     tagline: 'Your Basalith is yours. Not ours.',
     body: [
       'From the moment of creation, your Basalith is yours. Not licensed to you. Not held in trust by us on your behalf. Owned by you.',
-      'We do not have a claim on your Basalith\'s content, commercial value, or intellectual property. Heritage Nexus Inc. provides the infrastructure. You own what is built on it.',
-      'At your direction, your ownership of your Basalith can be named in your estate plan, with the help of your attorney.\n\nYour ownership of the content of your Basalith is not a marketing claim. It is the foundational principle of how Heritage Nexus Inc. operates.',
+      'We do not have a claim on your Basalith\'s content, commercial value, or intellectual property. Human Augmentation Technologies Corp. provides the infrastructure. You own what is built on it.',
+      'At your direction, your ownership of your Basalith can be named in your estate plan, with the help of your attorney.\n\nYour ownership of the content of your Basalith is not a marketing claim. It is the foundational principle of how Human Augmentation Technologies Corp. operates.',
     ],
   },
   {
@@ -17,7 +17,7 @@ const TENETS = [
     tenet:   'No Commercial Use',
     tagline: 'Your memory is not a product.',
     body: [
-      'Heritage Nexus Inc. will never use the content of your Basalith to train AI models, inform advertising, generate commercial derivatives, or enrich any dataset beyond the one we are building for you.',
+      'Human Augmentation Technologies Corp. will never use the content of your Basalith to train AI models, inform advertising, generate commercial derivatives, or enrich any dataset beyond the one we are building for you.',
       'This prohibition is absolute. It applies to your photographs, voice recordings, written materials, family annotations, and entity interactions. None of it will be used to benefit any party other than you and your designated beneficiaries.',
       'Most of the technology industry runs on the opposite idea: your personal data is extracted, generalized, and sold. We have no interest in that model. These commitments exist so we cannot drift toward it, even if someday we wanted to.',
     ],
@@ -29,7 +29,7 @@ const TENETS = [
     body: [
       'You determine the terms of your Basalith\'s continuity during your lifetime. Who may access it. Who may contribute to it. Under what conditions your entity may be queried. For how long after your death it remains active.',
       'You name a Custodian to carry out these terms. Legal authority over your estate comes from your own will or trust, so name your Custodian there as well if you want their authority to be enforceable.',
-      'No representative of Heritage Nexus Inc. can override the continuity terms you set. No acquisition, restructuring, or change in our business alters them. This commitment binds any company that acquires Heritage Nexus Inc. assets, and it is stated in our Terms of Service.',
+      'No representative of Human Augmentation Technologies Corp. can override the continuity terms you set. No acquisition, restructuring, or change in our business alters them. This commitment binds any company that acquires Human Augmentation Technologies Corp. assets, and it is stated in our Terms of Service.',
     ],
   },
   {
@@ -39,7 +39,7 @@ const TENETS = [
     body: [
       'At any time, you or your designated Custodian may invoke the Right of Dissolution. This is a request for the permanent deletion of your Basalith. It is separate from canceling a subscription, and it is verified before anything is deleted.',
       'Dissolution is irreversible. Your Basalith is copied to a second location so that a failure at one provider cannot lose it. A Basalith that has requested dissolution leaves that copy scope and is not copied again. The offsite copy is deleted as part of the deletion, on the same written process, not left behind.',
-      'A dissolution request must be verified before it proceeds. After it is verified, Heritage Nexus holds your Basalith for 12 months, then deletes it and confirms in writing. Your Basalith is never sold, never shared with third parties, and never used to train another person\'s entity. That holds while your Basalith is live and after it is gone.',
+      'A dissolution request must be verified before it proceeds. After it is verified, Human Augmentation Technologies holds your Basalith for 12 months, then deletes it and confirms in writing. Your Basalith is never sold, never shared with third parties, and never used to train another person\'s entity. That holds while your Basalith is live and after it is gone.',
     ],
   },
 ]

@@ -75,7 +75,7 @@ export function buildEntityAccessGrantedEmail(input: EntityAccessGrantedInput): 
     l.link,
     '',
     'Basalith',
-    'Heritage Nexus Inc.',
+    'Human Augmentation Technologies Corp.',
   ].join('\n')
 
   const html = `
@@ -90,7 +90,7 @@ export function buildEntityAccessGrantedEmail(input: EntityAccessGrantedInput): 
     <p style="margin:0 0 32px"><a href="${esc(input.portalUrl)}" style="display:inline-block;font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#0A0908;background:#C4A24A;text-decoration:none;padding:14px 28px">${ENTITY_ACCESS_BUTTON}</a></p>
     <p style="font-size:14px;font-weight:300;line-height:1.8;margin:0 0 4px;color:#B8B4AB">${esc(l.saved)}</p>
     <p style="font-size:14px;font-weight:300;line-height:1.8;margin:0 0 32px;color:#B8B4AB">${esc(l.link)}</p>
-    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#A29B90;margin:0">Basalith · Heritage Nexus Inc.</p>
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#A29B90;margin:0">Basalith · Human Augmentation Technologies Corp.</p>
   </div>
 </div>`.trim()
 

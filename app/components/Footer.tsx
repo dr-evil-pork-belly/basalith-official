@@ -174,7 +174,7 @@ export default function Footer() {
         }}
       >
         <p style={{ ...MONO, fontSize: '0.72rem', letterSpacing: '0.14em', textTransform: 'none', color: C.reg, lineHeight: 2 }}>
-          Heritage Nexus Inc.<br />
+          Human Augmentation Technologies Corp.<br />
           Registered in Delaware, United States.<br />
           <a className="bsl-ft-link" href="mailto:hello@basalith.ai" style={{ color: C.regLink, textDecoration: 'none' }}>
             hello@basalith.ai
@@ -185,7 +185,7 @@ export default function Footer() {
       {/* Copyright */}
       <div style={{ padding: '20px clamp(24px,6vw,80px)', textAlign: 'center' }}>
         <p style={{ ...MONO, fontSize: '0.72rem', letterSpacing: '0.14em', textTransform: 'none', color: C.copy }}>
-          &copy; {COPYRIGHT_YEAR} Heritage Nexus Inc. All rights reserved. Wilmington, Delaware.
+          &copy; {COPYRIGHT_YEAR} Human Augmentation Technologies Corp. All rights reserved. Wilmington, Delaware.
         </p>
       </div>
 

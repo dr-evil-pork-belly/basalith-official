@@ -32,7 +32,7 @@ function wrap(archiveName: string, inner: string): string {
 ${inner}
   </div>
   <div style="padding:16px 32px 32px;border-top:1px solid rgba(240,237,230,0.06)">
-    <p style="${S.footer}">BASALITH<br>${escapeHtml(archiveName)}<br>Heritage Nexus Inc.</p>
+    <p style="${S.footer}">BASALITH<br>${escapeHtml(archiveName)}<br>Human Augmentation Technologies Corp.</p>
   </div>
 </body>
 </html>`

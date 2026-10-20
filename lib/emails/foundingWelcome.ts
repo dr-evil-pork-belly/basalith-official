@@ -132,7 +132,7 @@ export function buildFoundingWelcomeEmail(input: FoundingWelcomeInput): BuiltEma
   ${p(escapeHtml(personal), '0 0 24px', 14)}
   <hr style="border:none;border-top:1px solid rgba(240,237,230,0.06);margin:24px 0">
   <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:0">
-    BASALITH<br>${escapeHtml(footerLine)}<br>Heritage Nexus Inc.
+    BASALITH<br>${escapeHtml(footerLine)}<br>Human Augmentation Technologies Corp.
   </p>
 </body>
 </html>`
@@ -158,7 +158,7 @@ export function buildFoundingWelcomeEmail(input: FoundingWelcomeInput): BuiltEma
     '',
     'BASALITH',
     footerLine,
-    'Heritage Nexus Inc.',
+    'Human Augmentation Technologies Corp.',
   ].join('\n')
 
   return { subject, html, text }

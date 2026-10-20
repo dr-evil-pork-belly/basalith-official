@@ -108,7 +108,7 @@ export default function SuccessorScenariosClient({ archiveName, ownerName, respo
         {/* Footer */}
         <div style={{ marginTop: '64px', paddingTop: '32px', borderTop: '1px solid var(--portal-card-line)' }}>
           <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--portal-label)', margin: 0 }}>
-            Basalith · Heritage Nexus Inc. · Authorized access only
+            Basalith · Human Augmentation Technologies Corp. · Authorized access only
           </p>
         </div>
       </div>

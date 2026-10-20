@@ -4,7 +4,7 @@ import Footer from '../components/Footer'
 
 export const metadata: Metadata = {
   title: 'Press & Media · Basalith',
-  description: 'Press and media resources for Basalith and Heritage Nexus Inc.',
+  description: 'Press and media resources for Basalith and Human Augmentation Technologies Corp.',
 }
 
 const MONO: React.CSSProperties = {
@@ -60,7 +60,7 @@ export default function PressPage() {
             </div>
 
             <p style={{ ...SERIF, fontSize: '0.95rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.8, color: 'var(--color-text-muted)', marginTop: '56px' }}>
-              Basalith is operated by Heritage Nexus Inc., registered in Delaware, United States.
+              Basalith is operated by Human Augmentation Technologies Corp., registered in Delaware, United States.
             </p>
 
           </div>

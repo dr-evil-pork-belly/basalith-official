@@ -90,7 +90,7 @@ export default function PrivacyPage() {
 
             {/* 1 */}
             <h2 style={H2}>1. Who We Are</h2>
-            <p style={BODY}>Basalith is a digital legacy platform operated by Heritage Nexus Inc. We build a permanent record of human memory for families and individuals. Each one is a Basalith: the record and the entity built for one person or one business.</p>
+            <p style={BODY}>Basalith is a digital legacy platform operated by Human Augmentation Technologies Corp. We build a permanent record of human memory for families and individuals. Each one is a Basalith: the record and the entity built for one person or one business.</p>
             <p style={BODY}>Contact: <a href="mailto:privacy@basalith.xyz" style={{ color: 'var(--color-gold)', textDecoration: 'none' }}>privacy@basalith.xyz</a></p>
 
             {/* 2 */}
@@ -167,7 +167,7 @@ export default function PrivacyPage() {
 
             {/* 6 */}
             <h2 style={H2}>6. Who Can Access Your Data</h2>
-            <p style={BODY}>Access is limited to Heritage Nexus Inc. staff and authorized contractors operating under confidentiality obligations, and only where access is necessary to operate or support your Basalith.</p>
+            <p style={BODY}>Access is limited to Human Augmentation Technologies Corp. staff and authorized contractors operating under confidentiality obligations, and only where access is necessary to operate or support your Basalith.</p>
             <p style={BODY}>We do not sell, license, rent, or otherwise transfer your personal data or the content of your Basalith to third parties for any commercial purpose. We do not share it with data brokers, advertising networks, or research organizations.</p>
             <p style={BODY}>Law enforcement requests are handled in accordance with applicable law. We will notify affected individuals of such requests where we are legally permitted to do so.</p>
 
@@ -246,11 +246,11 @@ export default function PrivacyPage() {
             <h3 style={{ ...H2, fontSize: '1.1rem', marginTop: '32px', color: 'var(--color-text-primary)' }}>Ownership After Death</h3>
             <p style={BODY}>Your Basalith is your property. It does not become ours when you die.</p>
             <p style={BODY}>Upon your death your Basalith transfers to your designated heirs or estate exactly as you would transfer any other private asset.</p>
-            <p style={BODY}>Heritage Nexus Inc. does not acquire any rights to the data in your Basalith upon your death. Your cognitive reference model, meaning your deposits, voice recordings, and photographs, is a private digital asset that belongs to your estate.</p>
+            <p style={BODY}>Human Augmentation Technologies Corp. does not acquire any rights to the data in your Basalith upon your death. Your cognitive reference model, meaning your deposits, voice recordings, and photographs, is a private digital asset that belongs to your estate.</p>
             <p style={{ ...BODY, fontStyle: 'italic' }}>We are the custodian. You are the owner. Your heirs are the beneficiaries. We are never the inheritor.</p>
 
             <h3 style={{ ...H2, fontSize: '1.1rem', marginTop: '32px', color: 'var(--color-text-primary)' }}>Company Dissolution</h3>
-            <p style={BODY}>If Heritage Nexus Inc. ceases operations for any reason:</p>
+            <p style={BODY}>If Human Augmentation Technologies Corp. ceases operations for any reason:</p>
             <ul style={{ paddingLeft: 0, margin: '0 0 12px' }}>
               {[
                 'You will receive advance notice where circumstances permit.',

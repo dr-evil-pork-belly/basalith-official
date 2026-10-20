@@ -639,7 +639,7 @@ is the real one.
 WHAT YOU CAN DO WITH THIS
 
 Keep it. Copy it to another drive. Give it to your family or your attorney.
-You own your Basalith. Heritage Nexus Inc. is the custodian, not the owner.
+You own your Basalith. Human Augmentation Technologies Corp. is the custodian, not the owner.
 Nothing in this zip stops working if Basalith does.
 
 You can request another export at any time. There is no limit and no reason
@@ -648,6 +648,6 @@ required.
 Questions about your Basalith: hello@basalith.ai
 Security concerns: security@basalith.ai
 
-Heritage Nexus Inc.
+Human Augmentation Technologies Corp.
 `
 }

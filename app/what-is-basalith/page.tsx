@@ -48,7 +48,7 @@ const ENTRIES: readonly FaqEntry[] = [
   {
     question: 'What does the name Basalith mean?',
     answer:
-      'Basalith joins basalt and monolith. It is not basalt, the volcanic rock, and it is not the basilisk. Basalith is a company, operating under Heritage Nexus Inc.',
+      'Basalith joins basalt and monolith. It is not basalt, the volcanic rock, and it is not the basilisk. Basalith is a company, operating under Human Augmentation Technologies Corp.',
   },
   {
     question: 'What problem does Basalith solve?',
@@ -78,7 +78,7 @@ const ENTRIES: readonly FaqEntry[] = [
   {
     question: 'Who makes Basalith?',
     answer:
-      'Heritage Nexus Inc., registered in Delaware, founded by David Ha, a Visiting Scholar at the Fisher School of Accounting at the University of Florida. The method is published, and the measurement behind it is filed publicly rather than described in marketing.',
+      'Human Augmentation Technologies Corp., registered in Delaware, founded by David Ha, a Visiting Scholar at the Fisher School of Accounting at the University of Florida. The method is published, and the measurement behind it is filed publicly rather than described in marketing.',
   },
 ]
 
@@ -166,7 +166,7 @@ export default function WhatIsBasalithPage() {
             >
               The name joins basalt and monolith. It is said BAS uh lith.
               Basalith is not basalt, the volcanic rock, and it is not the
-              basilisk. It is a company, operating under Heritage Nexus Inc.
+              basilisk. It is a company, operating under Human Augmentation Technologies Corp.
             </p>
           </div>
 

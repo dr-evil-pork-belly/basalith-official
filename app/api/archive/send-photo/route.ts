@@ -101,7 +101,7 @@ function buildSparkOnlyEmail(
     ${portalUrl ? `<a href="${portalUrl}" style="display:inline-block;background:transparent;color:#C4A24A;border:1px solid rgba(196,162,74,0.3);font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;text-decoration:none;padding:10px 20px">Or record a voice note →</a>` : ''}
   </div>
   <div style="padding:16px 32px 32px;border-top:1px solid rgba(240,237,230,0.06)">
-    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:0">BASALITH<br>${archiveName}<br>Heritage Nexus Inc.</p>
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:0">BASALITH<br>${archiveName}<br>Human Augmentation Technologies Corp.</p>
   </div>
 </body>
 </html>`

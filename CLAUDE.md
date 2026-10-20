@@ -19,7 +19,7 @@ system that does not exist in this repo.
 ## 0. WHAT THIS IS
 
 Basalith captures how a person reasons, decides, and expresses themselves, so that
-judgment transfers rather than disappearing. The company is Heritage Nexus Inc.
+judgment transfers rather than disappearing. The company is Human Augmentation Technologies Corp.
 
 - basalith.ai is the product front door. This repo serves it.
 - basalith.xyz is the technical white paper. Separate repo, git-wired to Vercel.
@@ -208,8 +208,8 @@ because an object written to B2 sits under a 90 day lock and a trial is deleted 
 thirty. Trials cannot invite contributors or upload photos; the three surfaces that
 refuse a non-active archive are left as they are and the dashboard's Contributors card
 becomes one line. The founding proof opens after call 1 (`canShowProof`). A signed-in
-user with no archive lands on `/begin`, not on a redirect loop. Trial-to-paid is slice C
-of `docs/SELF_SERVE_SKELETON_2026-09-17.md`.
+user with no archive lands on `/begin`, not on a redirect loop. Trial to paid is the
+paragraph after next.
 
 **Trial expiry.** `lib/inngest/trialFunctions.ts`, two Inngest crons, September 17, 2026.
 `trial-warn` (`0 15 * * *`, 08:00 Pacific) sends the day 23 email
@@ -231,10 +231,34 @@ slice A exclusion promised zero and a violation is a bug to read), `delete_email
 confirmed zero), `maybe_delete_user` (`profiles` then the auth user, only when the user
 owns no other archive and is in none of `contributors` by email, `successors`, or
 `archivists`), `notify` (domain only). The warning email's keep line is "reply to this
-email" with `replyTo` on `ADMIN_EMAIL` until slice C puts the Checkout button there. The
+email" with `replyTo` on `ADMIN_EMAIL`. Slice C put Checkout on the founding page and
+did not change this email. The
 export line points at `/archive/preferences`. English only. Until the job has deleted a
 real expired trial in production and the counts were pasted, no copy says "deleted after
 30 days."
+
+**Trial to paid.** `lib/trialCheckout.ts` (pure), `lib/trialCheckoutStore.ts` (reads),
+`POST /api/archive/checkout`, `lib/billing/convertTrial.ts`, `/archive/founded`,
+October 9, 2026. A trial owner pays from the founding page and THE PAYMENT FOUNDS THE
+RECORD THAT EXISTS. Before this, every first payment made a new empty record and the
+trial holding the person's words was deleted at thirty days. The session metadata
+carries `archive_id` with `source: 'trial'`; the legacy webhook branch reads `archiveId`
+and the two keys are distinct on purpose. One conditional update founds a record
+(`markTrialFounded`: `status` trial to active, `converted_at` set, `trial_expires_at`
+null) and it has three callers, any order, any number of times: the Stripe webhook
+inline on a paid `checkout.session.completed` (so founding never waits on Inngest),
+`provisionOnFoundingFee` (trial branch, which sits before `createArchiveWithCredentials`
+and returns; it links billing, writes the lifecycle row, sends
+`lib/emails/trialFounded.ts`, marks the application won, records a referral credit), and
+`POST /api/archive/checkout/confirm`, the fallback the landing page calls once after a
+minute, which asks Stripe itself. Two internal notices per sale, "Trial paid" from the
+webhook and "Founded" from Inngest; the first without the second means the function did
+not run. WHO SEES THE BUTTON is the env value `TRIAL_CHECKOUT`: unset or `off` is
+nobody, a comma list of emails is those owners, `on` is everyone, and `on` with a Stripe
+test key on production is treated as closed. A missing price id also hides it. The
+figures printed are constants in `lib/trialCheckout.ts`, pinned to
+`scripts/stripe-setup.ts` by test. `tier` is not changed by founding. Record:
+`docs/TRIAL_SLICE_C_2026-10-09.md`.
 
 **Dependency assessment.** `lib/assessment.ts`, `lib/dependencyIntake.ts`,
 `lib/dependencyReport.ts`, `lib/dependencyReadings.ts`, `lib/assessmentStore.ts`,
@@ -269,6 +293,32 @@ score), and stores the snapshot where `status = 'capturing'`. BUILT, read only: 
 purge, the order and payment. Until they are, no copy offers the report for sale.
 Records: `docs/DEPENDENCY_REPORT_SLICE_1_2026-10-07.md` through
 `docs/DEPENDENCY_REPORT_SLICE_4B_2026-10-08.md`.
+
+**Question lenses.** `lib/questionLens.ts` (pure), `lib/questionLensStore.ts` (the one
+read), October 13, 2026. Scope (personal or business, from the tier) still picks the
+taxonomy, the probe set, and the classifier prompt. A LENS beside it picks the openers
+and the wording of the few probes that assume a reader: `personal`, `succession`,
+`acquisition` (an assessment), `church` (`archives.audience = 'church'`, migration
+`20261013_archives_audience.sql`, set at `/begin?from=churches` when the person says
+they lead one; no CHECK). The lens is stamped on the call when it opens
+(`incident_sessions.state.lens`) and `/answer` reads it from there; a call opened before
+that date falls back to tier and status. Acquisition and church have their own area
+openers (`LENS_AREA_SEEDS` in `lib/areaSeeds.ts`), church its own founding openers; a
+church record rides the personal eight and the personal probe set. HARD RULE, same as
+threads: a lens words questions and is never evidence (`lib/questionLens.test.ts` pins
+it on source text). NEVER add `audience` to a route's own archives select: before the
+migration is pasted that select fails whole and every owner is refused. Read it through
+`loadLens`, which answers null on a failed read. Language is not a lens and no probe is
+translated: `renderProbe` is English only.
+
+`lib/renderProbe.ts` changed the same day, for every lens, still with no model writing
+a question. A fragment is quoted back only if it is a literal span of the answer it came
+from (`verbatimSpan`), in quotation marks, on seven probe types. The one allowed repeat
+of a spine position renders its own wording (`reprobe`). TRADEOFF names two goods only
+when both are the person's words in that call (`said`), and READ names a person only
+when the person did (`deriveReadAnchor(branches, said)`). Not fixed: the first probe of
+a second decision point does not tell the person which decision it moved to. Record:
+`docs/QUESTION_LENSES_2026-10-13.md`.
 
 **Control B, the grounding verifier.** `lib/verifyGrounding.ts`. A separate auditor call
 that refuses any founder position not directly supported by a deposit. It is the

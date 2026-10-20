@@ -1706,7 +1706,7 @@ export default function ContributeClient({
         {/* Footer */}
         <div style={{ textAlign: 'center', paddingTop: '32px', borderTop: '1px solid var(--portal-rule)' }}>
           <p style={{ fontFamily: 'var(--portal-mono)', fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--portal-secondary)', margin: 0 }}>
-            Basalith · Heritage Nexus Inc.
+            Basalith · Human Augmentation Technologies Corp.
           </p>
           <p style={{ fontFamily: 'var(--portal-serif)', fontStyle: 'italic', fontSize: '0.85rem', color: 'var(--portal-secondary)', margin: '6px 0 0' }}>
             {ui.footerNote}

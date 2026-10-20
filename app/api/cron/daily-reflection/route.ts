@@ -212,7 +212,7 @@ function buildDailyReflectionEmail(
 
     <div style="background:rgba(196,162,74,0.06);border:1px solid rgba(196,162,74,0.2);padding:20px 24px;margin:0 0 16px">
       <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;color:#C4A24A;margin:0 0 8px">
-        最简单的方式 — 打电话
+        最简单的方式：打电话
       </p>
       <p style="font-family:Georgia,serif;font-size:28px;font-weight:700;color:#F0EDE6;margin:0 0 4px;letter-spacing:2px">
         ${phoneNumber}
@@ -245,7 +245,7 @@ function buildDailyReflectionEmail(
 
   <div style="padding:0 32px 32px">
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:0">
-      BASALITH<br>${archiveName}<br>Heritage Nexus Inc.
+      BASALITH<br>${archiveName}<br>Human Augmentation Technologies Corp.
     </p>
   </div>
 
@@ -310,7 +310,7 @@ function buildDailyReflectionEmail(
 
   <div style="padding:0 32px 32px">
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:0">
-      BASALITH<br>${archiveName}<br>Heritage Nexus Inc.
+      BASALITH<br>${archiveName}<br>Human Augmentation Technologies Corp.
     </p>
   </div>
 
@@ -390,7 +390,7 @@ function buildSuccessionInviteEmail(
 
   <div style="padding:0 32px 32px">
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:0">
-      BASALITH<br>${archiveName}<br>Heritage Nexus Inc.
+      BASALITH<br>${archiveName}<br>Human Augmentation Technologies Corp.
     </p>
   </div>
 

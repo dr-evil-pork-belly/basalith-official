@@ -55,7 +55,7 @@ export function buildFoundingCompleteOwnerEmail(input: FoundingCompleteInput): B
     `${SITE}/archive/dashboard`,
     '',
     'Basalith',
-    'Heritage Nexus Inc.',
+    'Human Augmentation Technologies Corp.',
   ].join('\n')
 
   const html = `
@@ -72,7 +72,7 @@ export function buildFoundingCompleteOwnerEmail(input: FoundingCompleteInput): B
     <p style="margin:0 0 24px"><a href="${SITE}/archive/founding" style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#C4A24A;text-decoration:none;text-transform:uppercase">Show me</a></p>
     <p style="font-size:15px;font-weight:300;line-height:1.8;margin:0 0 8px;color:#B8B4AB">Your record keeps growing from here. The dashboard has your next question whenever you are ready.</p>
     <p style="margin:0 0 32px"><a href="${SITE}/archive/dashboard" style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#C4A24A;text-decoration:none;text-transform:uppercase">Open your Basalith</a></p>
-    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#A29B90;margin:0">Basalith · Heritage Nexus Inc.</p>
+    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#A29B90;margin:0">Basalith · Human Augmentation Technologies Corp.</p>
   </div>
 </div>`.trim()
 

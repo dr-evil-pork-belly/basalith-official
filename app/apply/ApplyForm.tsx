@@ -113,7 +113,7 @@ export default function ApplyForm({ initialType = 'succession' }: { initialType?
               <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 400, color: 'var(--color-text-secondary)', lineHeight: 1.9, maxWidth: '420px', margin: '0 auto 32px' }}>
                 We will contact you within 48 hours to talk through the transition and tell you plainly whether Basalith fits.
               </p>
-              <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)' }}>Basalith · Heritage Nexus Inc.</p>
+              <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)' }}>Basalith · Human Augmentation Technologies Corp.</p>
             </div>
           ) : (
             <>

@@ -35,7 +35,7 @@ export const ORG_SCHEMA = {
   '@type':    'Organization',
   '@id':      `${SITE_URL}/#organization`,
   name:       'Basalith',
-  legalName:  'Heritage Nexus Inc.',
+  legalName:  'Human Augmentation Technologies Corp.',
   url:        SITE_URL,
   logo:       `${SITE_URL}/icon-512x512.png`,
   // foundingDate is deliberately absent. The value read '2026' while Delaware
@@ -51,7 +51,7 @@ export const ORG_SCHEMA = {
   // "Basalith" is basalt plus monolith. Google currently reads it as a
   // misspelling of basalt and answers with geology.
   disambiguatingDescription:
-    'Basalith is a knowledge transfer company operating under Heritage Nexus Inc. It is not basalt, the volcanic rock, and not the basilisk. The name joins basalt and monolith.',
+    'Basalith is a knowledge transfer company operating under Human Augmentation Technologies Corp. It is not basalt, the volcanic rock, and not the basilisk. The name joins basalt and monolith.',
 
   knowsAbout: [
     'Knowledge transfer',
@@ -93,13 +93,16 @@ export const ORG_SCHEMA = {
   // Do not add a URL before it is live.
   // osf.io/pvw26 is the OSF project; osf.io/25srd is the Stage 1 registration
   // filed September 2, 2026, cited as reference 10 on the basalith.xyz white
-  // paper. Both are public and both resolve, so both belong here. Keep this
+  // paper. The project is listed; the registration is held back while it is
+  // under embargo (October 20, 2026). Keep this
   // list identical to the one in basalith-xyz/app/layout.tsx.
   sameAs: [
     'https://basalith.xyz',
     'https://basalith.life',
     'https://osf.io/pvw26',
-    'https://osf.io/25srd',
+    // osf.io/25srd removed October 20, 2026: the registration is under
+    // embargo, so it does not resolve for a crawler. Restore it when the
+    // embargo lifts.
     'https://orcid.org/0009-0000-0795-0066',
   ],
 } as const

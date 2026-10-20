@@ -14,7 +14,7 @@ const SECTIONS = [
       // from every other surface months ago, and the business product was not
       // covered at all. Wording aligned to the live product; no change to the
       // legal substance of the section.
-      'Basalith is a service that captures how a person reasons and decides, for individuals and families and for businesses changing hands. It is operated by Heritage Nexus Inc. ("we", "us", "the Company"). A "Basalith" is the record and the entity built for one person or one business under this agreement. By creating a Basalith or submitting an application, you ("the Subscriber") agree to be bound by these Terms of Service in their entirety.',
+      'Basalith is a service that captures how a person reasons and decides, for individuals and families and for businesses changing hands. It is operated by Human Augmentation Technologies Corp. ("we", "us", "the Company"). A "Basalith" is the record and the entity built for one person or one business under this agreement. By creating a Basalith or submitting an application, you ("the Subscriber") agree to be bound by these Terms of Service in their entirety.',
       'The Company provides your Basalith as a governed digital service, including secure storage, contributor tools, guided capture sessions, and access to the cognitive reference model (the "entity") built from your record, as described in the pricing and service documentation current at the time of your Founding.',
       // REMOVED 2026-08-12: two sentences that referred the Subscriber to a
       // "separate Basalith agreement, executed at the time of your Founding" for
@@ -24,7 +24,7 @@ const SECTIONS = [
       // section below.
       //
       // The sentence that remains was widened on the same day, from "govern the
-      // commercial relationship between you and Heritage Nexus Inc." to what is
+      // commercial relationship between you and Human Augmentation Technologies Corp." to what is
       // below. The removed sentences were the only thing in section 01 that
       // spoke to the archive as an asset, so leaving the narrow wording said
       // these Terms cover the commercial relationship and left nothing covering
@@ -57,16 +57,16 @@ const SECTIONS = [
     body: [
       'You may cancel your annual subscription at any time by providing written notice to legacy@basalith.xyz. Cancellation takes effect at the end of the current billing period. No partial refunds are issued for unused subscription time.',
       'Upon cancellation, you retain full rights to a complete export of your Basalith in open, portable formats. This export right is unconditional and does not require a reason. Export requests are fulfilled within 30 business days.',
-      'Cancellation of a subscription is distinct from dissolution of your Basalith. Dissolution is the permanent deletion of your Basalith, and it is a separate, deliberate act. It requires a verified written request from the designated Custodian, or from an executor with documented authority. After the request is verified, Heritage Nexus Inc. holds your Basalith for 12 months, then deletes it and confirms in writing. Deletion covers your Basalith as held with our storage provider and the offsite backup copy.',
-      'You retain full ownership of your Basalith at all times. Heritage Nexus Inc. is the custodian, not the owner. If Basalith ceases operations for any reason, you may request a complete export of your Basalith in open and portable formats, fulfilled within 30 business days. Because your Basalith is always yours to hold, no closure can strand your data.',
+      'Cancellation of a subscription is distinct from dissolution of your Basalith. Dissolution is the permanent deletion of your Basalith, and it is a separate, deliberate act. It requires a verified written request from the designated Custodian, or from an executor with documented authority. After the request is verified, Human Augmentation Technologies Corp. holds your Basalith for 12 months, then deletes it and confirms in writing. Deletion covers your Basalith as held with our storage provider and the offsite backup copy.',
+      'You retain full ownership of your Basalith at all times. Human Augmentation Technologies Corp. is the custodian, not the owner. If Basalith ceases operations for any reason, you may request a complete export of your Basalith in open and portable formats, fulfilled within 30 business days. Because your Basalith is always yours to hold, no closure can strand your data.',
     ],
   },
   {
     num:   '04',
     title: 'Limitation of Liability',
     body: [
-      'To the maximum extent permitted by applicable law, Heritage Nexus Inc. shall not be liable for any indirect, incidental, consequential, punitive, or special damages arising from or related to your use of the Basalith service, including but not limited to loss of data, loss of business, or loss of anticipated savings, even if we have been advised of the possibility of such damages.',
-      'Our total aggregate liability to you for any claim arising out of or in connection with these Terms or the service shall not exceed the total fees paid by you to Heritage Nexus Inc. in the twelve months preceding the event giving rise to the claim.',
+      'To the maximum extent permitted by applicable law, Human Augmentation Technologies Corp. shall not be liable for any indirect, incidental, consequential, punitive, or special damages arising from or related to your use of the Basalith service, including but not limited to loss of data, loss of business, or loss of anticipated savings, even if we have been advised of the possibility of such damages.',
+      'Our total aggregate liability to you for any claim arising out of or in connection with these Terms or the service shall not exceed the total fees paid by you to Human Augmentation Technologies Corp. in the twelve months preceding the event giving rise to the claim.',
       'Nothing in these Terms excludes or limits our liability for death or personal injury caused by our negligence, fraud, or any other liability that cannot be excluded or limited by law.',
       'Basalith is a data preservation service. We make no representation that the entity, or any output of the cognitive reference model built from your record, constitutes a legally recognized representation of any person for the purposes of any legal proceeding, estate administration, or contractual obligation.',
     ],
@@ -75,8 +75,8 @@ const SECTIONS = [
     num:   '05',
     title: 'Intellectual Property',
     body: [
-      'The content of your Basalith, including all deposits, voice recordings, photographs, and the cognitive reference model derived from them, remains your intellectual property at all times. Heritage Nexus Inc. claims no intellectual property rights over the content of your Basalith.',
-      'You grant Heritage Nexus Inc. a limited license to process the content of your Basalith solely for the purpose of operating and improving your specific Basalith. This license does not extend to using your content to train general models, sharing with other users, or commercializing in any form.',
+      'The content of your Basalith, including all deposits, voice recordings, photographs, and the cognitive reference model derived from them, remains your intellectual property at all times. Human Augmentation Technologies Corp. claims no intellectual property rights over the content of your Basalith.',
+      'You grant Human Augmentation Technologies Corp. a limited license to process the content of your Basalith solely for the purpose of operating and improving your specific Basalith. This license does not extend to using your content to train general models, sharing with other users, or commercializing in any form.',
       'Your deposits, entity conversations, and voice data are your property. You may request an export of them in open formats, fulfilled within 30 business days. You may use them with any compatible platform.',
     ],
   },
@@ -85,15 +85,15 @@ const SECTIONS = [
     title: 'Death and Succession',
     body: [
       'Upon your death your Basalith transfers to your designated heirs or estate. Your Basalith is treated as a private digital asset for the purposes of estate administration.',
-      'Heritage Nexus Inc. will work with your estate to facilitate transfer of your Basalith, continued access under the Legacy tier, or data export and dissolution as directed by your estate.',
-      'Heritage Nexus Inc. does not acquire any rights to the data in your Basalith upon your death. We are the custodian. Your heirs are the beneficiaries.',
+      'Human Augmentation Technologies Corp. will work with your estate to facilitate transfer of your Basalith, continued access under the Legacy tier, or data export and dissolution as directed by your estate.',
+      'Human Augmentation Technologies Corp. does not acquire any rights to the data in your Basalith upon your death. We are the custodian. Your heirs are the beneficiaries.',
     ],
   },
   {
     num:   '07',
     title: 'Company Dissolution',
     body: [
-      'In the event Heritage Nexus Inc. ceases operations: (a) Users will receive advance notice where circumstances permit. (b) Complete data export will be made available to all users, fulfilled within 30 business days of request. (c) The data in every Basalith will not be sold to third parties as part of any dissolution, acquisition, or bankruptcy proceeding. This prohibition is absolute. It is not subject to user consent, waiver, or any other exception. (d) Any acquiring entity must agree to honor these same commitments as a condition of acquiring Heritage Nexus Inc. assets.',
+      'In the event Human Augmentation Technologies Corp. ceases operations: (a) Users will receive advance notice where circumstances permit. (b) Complete data export will be made available to all users, fulfilled within 30 business days of request. (c) The data in every Basalith will not be sold to third parties as part of any dissolution, acquisition, or bankruptcy proceeding. This prohibition is absolute. It is not subject to user consent, waiver, or any other exception. (d) Any acquiring entity must agree to honor these same commitments as a condition of acquiring Human Augmentation Technologies Corp. assets.',
     ],
   },
   {
@@ -103,7 +103,7 @@ const SECTIONS = [
       `These Terms of Service are governed by and construed in accordance with the laws of the State of ${GOVERNING_STATE}, United States of America, without regard to its conflict of law provisions.`,
       `Any dispute arising out of or relating to these Terms or the Basalith service shall be subject to the exclusive jurisdiction of the courts of the State of ${GOVERNING_STATE} and the federal courts located therein, and you consent to personal jurisdiction in those courts.`,
       'If any provision of these Terms is found to be unenforceable, the remaining provisions will continue in full force and effect.',
-      'These Terms constitute the entire agreement between you and Heritage Nexus Inc. in respect of the Basalith service, and supersede all prior agreements, representations, and understandings.',
+      'These Terms constitute the entire agreement between you and Human Augmentation Technologies Corp. in respect of the Basalith service, and supersede all prior agreements, representations, and understandings.',
     ],
   },
 ]

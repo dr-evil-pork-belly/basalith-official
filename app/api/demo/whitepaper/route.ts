@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
         'what they weighed, and how they decided. A record that becomes ' +
         'a cognitive reference model over time.\n\n' +
         `Read the white paper: ${WHITE_PAPER_URL}\n\n` +
-        'Basalith\nHeritage Nexus Inc.',
+        'Basalith\nHuman Augmentation Technologies Corp.',
       html: `<!DOCTYPE html><html><body style="background:#0A0908;font-family:Georgia,serif;color:#F0EDE6;max-width:600px;margin:0 auto;padding:40px 32px">
   <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:4px;color:#C4A24A;margin:0 0 4px">BASALITH</p>
   <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;margin:0 0 28px">THE WHITE PAPER</p>
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
   <p style="font-size:15px;font-weight:300;font-style:italic;color:#B8B4AB;line-height:1.85;margin:0 0 32px">Basalith preserves not just what a person owned, but how they thought, what they weighed, and how they decided. A record that becomes a cognitive reference model over time.</p>
   <a href="${WHITE_PAPER_URL}" style="display:inline-block;background:#C4A24A;color:#0A0908;font-family:'Courier New',monospace;font-size:11px;letter-spacing:3px;text-decoration:none;padding:14px 28px;border-radius:2px">READ THE WHITE PAPER</a>
   <hr style="border:none;border-top:1px solid rgba(240,237,230,0.06);margin:36px 0 0">
-  <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:20px 0 0">BASALITH &middot; XYZ<br>Heritage Nexus Inc.</p>
+  <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;color:#8B9196;line-height:1.8;margin:20px 0 0">BASALITH &middot; XYZ<br>Human Augmentation Technologies Corp.</p>
 </body></html>`,
     })
 

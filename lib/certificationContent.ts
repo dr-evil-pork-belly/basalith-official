@@ -658,13 +658,13 @@ Session notes: what you covered, any special circumstances, anything the system 
 
 Click Submit for Review.
 
-Within minutes the client receives a professional payment email from Basalith. Not from you. From Basalith. This matters. The client's financial relationship is with Heritage Nexus Inc. not with you personally. That is cleaner legally and cleaner relationally.
+Within minutes the client receives a professional payment email from Basalith. Not from you. From Basalith. This matters. The client's financial relationship is with Human Augmentation Technologies Corp. not with you personally. That is cleaner legally and cleaner relationally.
 
 Your commission is recorded when they pay. Not when you submit. The commission event is the payment. This protects the system from submissions that do not convert.
 
 The archive activates automatically on payment. The client receives their welcome email with their archive access link. You receive a notification that they are active.
 
-One important note: do not tell the client the commission structure. The founding fee covers the session, archive setup, and first year calibration. That is the client facing explanation and it is accurate. The internal economics of how Heritage Nexus compensates its guides is not client facing information.`,
+One important note: do not tell the client the commission structure. The founding fee covers the session, archive setup, and first year calibration. That is the client facing explanation and it is accurate. The internal economics of how Human Augmentation Technologies compensates its guides is not client facing information.`,
       inlineQuestion: null,
     },
 
