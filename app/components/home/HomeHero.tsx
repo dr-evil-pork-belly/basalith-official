@@ -20,7 +20,7 @@ const SCRIM =
 
 export default function HomeHero() {
   return (
-    <section aria-label="Basalith: knowledge transfer at a change of control">
+    <section aria-label="Basalith: the founder's judgment, kept at a change of control">
 
       <div
         className="stone-bleed stone-hero"
@@ -116,7 +116,7 @@ export default function HomeHero() {
             textWrap:   'pretty',
           }}
         >
-          The operator knows when to walk from a deal, which hire to trust over the resume, how much risk is too much. None of it is written down. Basalith captures how they reason while they are still running the company, so it transfers with the business. Through an acquisition or a succession.
+          The operator knows when to walk from a deal, which hire to trust over the resume, how much risk is too much. None of it is written down, so no search tool can find it. Basalith captures how they reason while they still run the company, so it transfers with the business. Where the record is silent, it says so.
         </p>
 
         {/* The CTA that sat here moved into HomeDoors, directly below, where it

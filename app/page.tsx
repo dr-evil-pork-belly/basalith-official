@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Basalith · Knowledge transfer when a business changes hands',
+  title: "Basalith · The founder's judgment, kept when a business changes hands",
   description: 'What built the company is not in the data room. Basalith captures how a person reasons and decides, in their own words. For a business changing hands, and for one person whose judgment is worth keeping.',
 }
 

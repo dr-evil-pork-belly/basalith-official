@@ -91,6 +91,30 @@ export default function HomeDoors() {
             </StoneCard>
           ))}
         </div>
+
+        {/* Founder line, October 20, 2026. A visitor who searched the name and
+            found little had no person to attach the product to. Every claim
+            here is real: /about, and the OSF Stage 1 registration filed
+            September 2, 2026 (osf.io/25srd), which tests the refusal behavior.
+            The registration is under embargo, so it is named but not linked.
+            Restore the link when the embargo lifts.
+            Record: docs/HOMEPAGE_CATEGORY_2026-10-20.md. */}
+        <p
+          style={{
+            ...serif,
+            fontSize:   'var(--stone-fs-row-body)',
+            fontWeight: 400,
+            lineHeight: 1.5,
+            color:      'var(--stone-secondary)',
+            margin:     '8px 0 0',
+            textWrap:   'pretty',
+          }}
+        >
+          Built by David Ha, D.B.A., Visiting Scholar at the Fisher School of
+          Accounting, University of Florida. The study that tests its refusals is
+          preregistered on OSF.{' '}
+          <Link href="/about" style={{ color: 'var(--stone-ink)' }}>About the founder</Link>
+        </p>
       </StoneBlock>
     </section>
   )
