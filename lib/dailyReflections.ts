@@ -1,6 +1,6 @@
 export const DAILY_REFLECTIONS_EN: Record<string, string[]> = {
   early_life: [
-    "Describe the house you grew up in. Not what it looked like — what it smelled like on a normal Tuesday morning.",
+    "Describe the house you grew up in. Not what it looked like, but what it smelled like on a normal Tuesday morning.",
     "What was the view from your childhood bedroom window?",
     "What did your family eat for breakfast when you were young? Who cooked it?",
     "What was the walk to school like? What do you remember most about it?",
@@ -27,11 +27,11 @@ export const DAILY_REFLECTIONS_EN: Record<string, string[]> = {
 
   defining_experiences: [
     "What is the single day in your life you would most want to live again?",
-    "Describe the moment everything changed. Not a big public event — the quiet moment that shifted everything.",
+    "Describe the moment everything changed. Not a big public event. The quiet moment that shifted everything.",
     "What is something you survived that you did not think you would survive?",
     "What risk did you take that changed your life?",
     "What was the hardest year of your life and what got you through it?",
-    "Describe a journey you took — physical or otherwise — that changed who you are.",
+    "Describe a journey you took, physical or otherwise, that changed who you are.",
     "What is something you built from nothing that you are proud of?",
     "What opportunity did you almost miss and what happened when you took it?",
     "Describe the day you arrived somewhere new for the first time.",
@@ -54,7 +54,7 @@ export const DAILY_REFLECTIONS_EN: Record<string, string[]> = {
   core_values: [
     "What is something you believe that most people around you do not?",
     "Describe a time you did the right thing when it cost you something.",
-    "What line have you never crossed — not because you were told not to but because you simply could not?",
+    "What line have you never crossed, not because you were told not to, but because you simply could not?",
     "What does integrity mean to you in your daily life?",
     "What value did you learn from your parents that you still carry?",
     "When have you been most proud of yourself?",
@@ -132,7 +132,7 @@ export const DAILY_REFLECTIONS_EN: Record<string, string[]> = {
 
 export const DAILY_REFLECTIONS_ZH: Record<string, string[]> = {
   early_life: [
-    "描述一下您小时候住的房子。不是它的外观——而是在一个普通的周二早晨，那里是什么气味？",
+    "描述一下您小时候住的房子。不是它的外观，而是在一个普通的周二早晨，那里是什么气味？",
     "您童年卧室窗外的景色是什么样的？",
     "您小时候家里早餐吃什么？是谁做的饭？",
     "您上学路上是什么样的？您记忆最深的是什么？",
@@ -159,11 +159,11 @@ export const DAILY_REFLECTIONS_ZH: Record<string, string[]> = {
 
   defining_experiences: [
     "您一生中最想重新经历的一天是哪一天？",
-    "描述一下改变了一切的那个时刻。不是大事件——而是那个悄悄改变了一切的平静时刻。",
+    "描述一下改变了一切的那个时刻。不是大事件，而是那个悄悄改变了一切的平静时刻。",
     "描述一件您以为自己撑不过去、但最终挺过来的事。",
     "您冒过的最大的险，它如何改变了您的生活？",
     "您人生中最艰难的一年是哪一年？是什么帮您度过了那段时光？",
-    "描述一次改变了您的旅程——无论是身体上还是心灵上的。",
+    "描述一次改变了您的旅程，无论是身体上还是心灵上的。",
     "您从零开始建立起来的、让您最感到自豪的是什么？",
     "您差点错过的一个机会是什么？当您抓住它时发生了什么？",
     "描述您第一次来到一个陌生地方的那一天。",
@@ -186,7 +186,7 @@ export const DAILY_REFLECTIONS_ZH: Record<string, string[]> = {
   core_values: [
     "您持有一种周围大多数人不认同的信念是什么？",
     "描述一次您做了正确的事，但为此付出了代价的经历。",
-    "有一条底线是您从未逾越的——不是因为被告知不能，而是您内心就是做不到——那是什么？",
+    "有一条底线是您从未逾越的。不是因为被告知不能，而是您内心就是做不到。那是什么？",
     "诚信在您日常生活中意味着什么？",
     "父母传递给您的哪种价值观，您至今仍然珍视？",
     "您什么时候最为自己感到骄傲？",
@@ -264,7 +264,7 @@ export const DAILY_REFLECTIONS_ZH: Record<string, string[]> = {
 
 export const DAILY_REFLECTIONS_YUE: Record<string, string[]> = {
   early_life: [
-    "描述一下你細個時住嘅屋企。唔係佢點樣——而係係一個普通嘅星期二早晨，嗰度係咩氣味？",
+    "描述一下你細個時住嘅屋企。唔係佢點樣，而係係一個普通嘅星期二早晨，嗰度係咩氣味？",
     "你細個時瞓房窗外嘅景色係點㗎？",
     "你細個時屋企早餐食咩㗎？係邊個煮㗎？",
     "你上學嘅路係點樣㗎？你記得最深係咩？",
@@ -291,11 +291,11 @@ export const DAILY_REFLECTIONS_YUE: Record<string, string[]> = {
 
   defining_experiences: [
     "你一生入面最想再經歷一次嘅係哪一日㗎？",
-    "描述一下改變咗一切嘅嗰個時刻。唔係大事——而係嗰個靜靜改變咗一切嘅時刻。",
+    "描述一下改變咗一切嘅嗰個時刻。唔係大事，而係嗰個靜靜改變咗一切嘅時刻。",
     "描述一件你以為撐唔過去、但最終頂住咗嘅事。",
     "你冒過嘅最大嘅險，係點改變咗你嘅人生㗎？",
     "你人生入面最艱難嘅一年係哪一年？係咩幫你捱過嗰段時間㗎？",
-    "描述一次改變咗你嘅旅程——無論係身體上定係心靈上嘅。",
+    "描述一次改變咗你嘅旅程，無論係身體上定係心靈上嘅。",
     "你由零開始建立起嚟嘅、令你最感到自豪嘅係咩㗎？",
     "你差啲錯過嘅一個機會係咩㗎？當你把握到嗰陣發生咗咩事？",
     "描述你第一次嚟到一個陌生地方嗰日。",
@@ -318,7 +318,7 @@ export const DAILY_REFLECTIONS_YUE: Record<string, string[]> = {
   core_values: [
     "你持有一個周圍大多數人唔認同嘅信念係咩㗎？",
     "描述一次你做咗啱嘅事，但為此付出咗代價嘅經歷。",
-    "有一條底線係你從來都唔會踩過嘅——唔係因為有人話你唔好，而係你內心就係做唔到——嗰係咩㗎？",
+    "有一條底線係你從來都唔會踩過嘅。唔係因為有人話你唔好，而係你內心就係做唔到。嗰係咩㗎？",
     "誠信喺你日常生活入面意味著咩㗎？",
     "爸爸媽媽傳畀你嘅哪種價值觀，係你至今仍然珍視嘅？",
     "你幾時最為自己感到驕傲㗎？",
