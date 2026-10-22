@@ -27,18 +27,22 @@ export const metadata: Metadata = {
 export default async function BeginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ ref?: string }>
+  searchParams: Promise<{ ref?: string; from?: string }>
 }) {
   const session = await getSessionUser()
   if (session?.archiveId) redirect('/archive/dashboard')
 
-  const { ref } = await searchParams
+  // ?from=churches is set by the three links on /churches (October 13, 2026).
+  // It only makes the form ask one more thing, whether the person leads a
+  // church; their answer, not the link, decides which questions they get.
+  const { ref, from } = await searchParams
   const referral = await resolveReferral(ref)
 
   return (
     <BeginClient
       signedInEmail={session?.email ?? null}
       referralCode={referral && typeof ref === 'string' ? ref : null}
+      fromChurches={from === 'churches'}
     />
   )
 }

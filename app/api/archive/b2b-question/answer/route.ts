@@ -27,6 +27,7 @@ import { notifyInternal } from '@/lib/internalNotify'
 import { inngest } from '@/lib/inngest'
 import { isAssessment } from '@/lib/assessment'
 import { requestReadingsIfDue } from '@/lib/assessmentStore'
+import { asLens, lensFor } from '@/lib/questionLens'
 
 export const dynamic = 'force-dynamic'
 
@@ -357,14 +358,37 @@ export async function POST(req: NextRequest) {
   } else {
     const tensionForTradeoff =
       decision.probeType === 'TRADEOFF' ? next.state.tensions[next.state.spineCursor] : undefined
+
+    // Everything the person has said in this call, this answer included. The
+    // renderer names a tradeoff, and this route names a person, only from
+    // these words (docs/QUESTION_LENSES_2026-10-13.md).
+    const said = next.state.probeHistory.map(r => r.answer).filter(Boolean)
+
+    // Who is being asked. Set on the call when it opened; a call opened
+    // before October 13, 2026 carries no marker and is read from the tier and
+    // status, which cannot see a church record (that one finishes its open
+    // call on the personal wording).
+    const lens = asLens(next.state.lens) ?? lensFor({ tier: archive.tier, status: archive.status })
+
     // READ anchors on the people the timeline named (the reducer only emits READ
-    // when that anchor is non-empty). Every other probe anchors on the classifier.
+    // when that anchor is non-empty), kept only where the person said the name.
+    // Every other probe anchors on the classifier's fragment, which the
+    // renderer quotes only if it is a literal span of this answer.
     const anchor =
-      decision.probeType === 'READ' ? deriveReadAnchor(next.state.branches) : classifierOut.anchor
+      decision.probeType === 'READ' ? deriveReadAnchor(next.state.branches, said) : classifierOut.anchor
     const nextText = renderProbe({
       probeType: decision.probeType,
       anchor,
       tensionForTradeoff,
+      answer,
+      // The first probe of a new decision point must not quote an answer
+      // about the last one.
+      quote:         decision.branchIndexForProbe === branchIndex || probeType === 'TIMELINE',
+      said,
+      reprobe:       isReprobe,
+      level:         decision.phaseAfter === 'GENERALIZE' ? 'rule' : 'branch',
+      tradeoffIndex: next.state.spineCursor,
+      lens,
     })
     next.state.pendingQuestion = nextText
     next.state.pendingProbeType = decision.probeType

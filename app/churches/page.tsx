@@ -99,7 +99,7 @@ const DOORS = [
     label: 'One person',
     title: 'For a pastor or an elder.',
     body:  'It starts with one call about a hard decision you made. Fifteen to thirty minutes, by voice or typed, on your own time. Nothing is owed until your Basalith has answered you.',
-    href:  '/begin',
+    href:  '/begin?from=churches',
     cta:   'Take the first call',
   },
   {
@@ -138,7 +138,7 @@ export default function ChurchesPage() {
             are here to give it. Where they never spoke, it is built to say so.
           </p>
           <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', alignItems: 'center', marginTop: '36px' }}>
-            <Link href="/begin" style={BTN}>
+            <Link href="/begin?from=churches" style={BTN}>
               Take the first call
             </Link>
             <Link href="/integrity" style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)', textDecoration: 'none' }}>
@@ -327,7 +327,7 @@ export default function ChurchesPage() {
             }}>
               See what it does with your own words. Then see what it will not say.
             </p>
-            <Link href="/begin" style={{ ...BTN, padding: '16px 48px' }}>
+            <Link href="/begin?from=churches" style={{ ...BTN, padding: '16px 48px' }}>
               Take the first call
             </Link>
             <p style={{ ...SERIF, fontSize: '0.95rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.8, color: 'var(--on-dark-3)', margin: '28px 0 0' }}>

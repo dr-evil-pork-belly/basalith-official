@@ -21,6 +21,7 @@
 import { supabaseAdmin } from './supabase-admin'
 import { AREA_SEEDS } from './areaSeeds'
 import { chooseOpener, loadAreaReadings, orderAreas, type Opener } from './questionPlanner'
+import type { QuestionLens } from './questionLens'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -102,6 +103,11 @@ export interface IncidentState {
   // from the coverage map to deposit into one thin area. Same contract as
   // `founding`: rides the jsonb, reducer never reads it, clone preserves it.
   areaCall?: AreaCallMarker
+  // Who is being asked (lib/questionLens.ts, October 13, 2026). Set once when
+  // the call opens, so a call keeps one lens from its opener to its last
+  // probe. Same contract as the two markers above. Absent on a call opened
+  // before that date; the answer route then derives it from tier and status.
+  lens?: QuestionLens
 }
 
 export interface FoundingMarker {
@@ -194,14 +200,32 @@ const NON_NAME = new Set([
 
 /** People named across the branch summaries, as a short anchor for the READ probe.
  *  Empty string when the timeline named no one, in which case READ is skipped
- *  entirely (a READ probe that names no one is a bug). Pure and deterministic. */
-export function deriveReadAnchor(branches: { summary: string; chosen: string }[]): string {
+ *  entirely (a READ probe that names no one is a bug). Pure and deterministic.
+ *
+ *  The summaries are written by the timeline parser, not by the person. With
+ *  `said` (the person's own answers in this call), a name is kept only if it
+ *  appears there as a whole word (and never in lower case), so a question
+ *  never names someone the person did not. The reducer calls this without `said` to decide whether
+ *  READ is askable; the answer route calls it with `said` to render. */
+export function deriveReadAnchor(
+  branches: { summary: string; chosen: string }[],
+  said?: readonly string[],
+): string {
   const names: string[] = []
   const seen = new Set<string>()
+  const spoken = said ? said.join(' \n ') : null
+  // A candidate is letters, apostrophes, and hyphens only (the test below),
+  // so it is safe inside a pattern as it stands.
+  // Kept only if the person used it, capitalized, as a whole word, and never
+  // used the same word in lower case (which marks it as an ordinary word that
+  // happened to start a sentence: "Let him go" beside "let me think").
+  const whole = (w: string) => new RegExp('(^|[^A-Za-z])' + w + '([^A-Za-z]|$)')
+  const saidName = (n: string) =>
+    spoken === null || (whole(n).test(spoken) && !whole(n.toLowerCase()).test(spoken))
   for (const b of branches ?? []) {
     for (const raw of `${b?.summary ?? ''} ${b?.chosen ?? ''}`.split(/\s+/)) {
       const t = raw.replace(/[^A-Za-z'’-]/g, '')
-      if (/^[A-Z][a-z’'-]+$/.test(t) && !NON_NAME.has(t) && !seen.has(t)) {
+      if (/^[A-Z][a-z’'-]+$/.test(t) && !NON_NAME.has(t) && !seen.has(t) && saidName(t)) {
         seen.add(t)
         names.push(t)
       }

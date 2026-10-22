@@ -9,6 +9,7 @@ import {
   type IncidentSession,
 } from '@/lib/incidentSession'
 import { renderProbe } from '@/lib/renderProbe'
+import { lensFor } from '@/lib/questionLens'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,7 +27,7 @@ export async function GET() {
 
   const { data: archive } = await supabaseAdmin
     .from('archives')
-    .select('id, owner_user_id, tier')
+    .select('id, owner_user_id, tier, status')
     .eq('id', archiveId)
     .maybeSingle()
 
@@ -74,6 +75,11 @@ export async function GET() {
   if (seed.areaCall && seed.area) {
     incident.state.areaCall = { area: seed.area, scope: 'business', startedAt: new Date().toISOString() }
   }
+
+  // This route is succession tier only, so the lens is succession or
+  // acquisition and needs no read beyond tier and status. The opener picked
+  // above is unchanged; the lens words the probes that follow it.
+  incident.state.lens = lensFor({ tier: archive.tier, status: archive.status })
 
   const seedProbe = renderProbe({ probeType: 'SEED', anchor: '', seedText: seed.seedText })
   incident.state.pendingQuestion    = seedProbe

@@ -7,6 +7,7 @@ import { notifyInternal } from '@/lib/internalNotify'
 import { resolveReferral, referralTag } from '@/lib/referral'
 import { checkBotId } from 'botid/server'
 import { botIdEnabled, checkBrowser, honeypotTripped, overHourlyCeiling, randomLetterSignup } from '@/lib/botGuard'
+import { CHURCH_AUDIENCE } from '@/lib/questionLens'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 30
@@ -38,7 +39,7 @@ const ONE_HOUR_MS = 60 * 60 * 1000
 const MAX_NAME = 120
 const MAX_PROMPT = 500
 
-type Body = { email?: unknown; name?: unknown; forWhom?: unknown; prompt?: unknown; ref?: unknown }
+type Body = { email?: unknown; name?: unknown; forWhom?: unknown; prompt?: unknown; ref?: unknown; audience?: unknown }
 
 // A plain address shape: one @, something before it, a dot after it, no
 // whitespace. Deliberately no library. Supabase makes the final call when the
@@ -89,6 +90,10 @@ export async function POST(req: NextRequest) {
   }
   const forWhom: 'me' | 'someone' = body.forWhom === 'someone' ? 'someone' : 'me'
   const prompt = typeof body.prompt === 'string' ? body.prompt.trim().slice(0, MAX_PROMPT) : ''
+  // Who the questions are written for (lib/questionLens.ts, October 13,
+  // 2026). One value is accepted, sent only by /begin when the person arrived
+  // from /churches and said they lead one. Anything else is no audience.
+  const audience = body.audience === CHURCH_AUDIENCE ? CHURCH_AUDIENCE : null
 
   // 1c. Random letters (October 12, 2026). The mark of the one script that
   //     found this form. Same answer as the honeypot: ok, nothing written.
@@ -153,23 +158,40 @@ export async function POST(req: NextRequest) {
     //    verified one (skeleton 5.3).
     const familyName = deriveFamilyName(name)
     const window = trialWindow()
-    const { data: archive, error: archiveErr } = await supabaseAdmin
+    const row: Record<string, string> = {
+      name:             `${familyName} Basalith`,
+      family_name:      familyName,
+      owner_email:      email,
+      owner_name:       name,
+      owner_user_id:    userId,
+      tier:             'active',
+      status:           'trial',
+      trial_started_at: window.startedAt,
+      trial_expires_at: window.expiresAt,
+      entity_pipeline:  'grounded',
+    }
+    // `audience` is named only when it is set, so a signup that is not from
+    // the church door sends exactly the columns it always sent and cannot be
+    // touched by migration 20261013 being pasted or not. If the church insert
+    // is refused (the column is not there yet), the person still gets their
+    // Basalith, on the personal questions, and the founder is told below.
+    let audienceSaved = audience !== null
+    let { data: archive, error: archiveErr } = await supabaseAdmin
       .from('archives')
-      .insert({
-        name:             `${familyName} Basalith`,
-        family_name:      familyName,
-        owner_email:      email,
-        owner_name:       name,
-        owner_user_id:    userId,
-        tier:             'active',
-        status:           'trial',
-        trial_started_at: window.startedAt,
-        trial_expires_at: window.expiresAt,
-        entity_pipeline:  'grounded',
-      })
+      .insert(audience ? { ...row, audience } : row)
       .select('id')
       .single()
+    if (archiveErr && audience) {
+      console.error('[trial/start] insert with audience failed, retrying without it:', archiveErr.message)
+      audienceSaved = false
+      ;({ data: archive, error: archiveErr } = await supabaseAdmin
+        .from('archives')
+        .insert(row)
+        .select('id')
+        .single())
+    }
     if (archiveErr || !archive) throw new Error(`archive insert: ${archiveErr?.message ?? 'no row'}`)
+    const archiveId = archive.id as string
 
     // 6. The application row, so the existing admin tooling sees the lead.
     //    Live NOT NULL columns without defaults (read September 17, 2026):
@@ -207,10 +229,15 @@ export async function POST(req: NextRequest) {
           `Email: ${email}`,
           `For: ${forWhom === 'someone' ? 'someone they are helping' : 'themselves'}`,
           `What brought them: ${prompt || '(blank)'}`,
+          audience
+            ? (audienceSaved
+                ? 'Door: /churches, leads a church. Church questions.'
+                : 'Door: /churches, leads a church. AUDIENCE NOT SAVED (is migration 20261013 pasted?). Personal questions until archives.audience is set by hand.')
+            : 'Door: the main one',
           referral
             ? `Referred by: ${referral.kind === 'owner' ? 'the owner of' : `contributor ${referral.contributorId} on`} archive ${referral.archiveId}. Half founding fee, $1,250: send the checkout link with referralFounding true.`
             : 'Referred by: nobody',
-          `Archive: ${archive.id}`,
+          `Archive: ${archiveId}`,
           `Expires: ${window.expiresAt}`,
           `God view: ${siteUrl}/god`,
         ].join('\n'),

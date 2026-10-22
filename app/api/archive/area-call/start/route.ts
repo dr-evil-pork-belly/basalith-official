@@ -4,6 +4,7 @@ import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { checkRateLimit, getClientIP } from '@/lib/apiSecurity'
 import { startAreaCall } from '@/lib/areaCalls'
 import { getFoundingStatus } from '@/lib/foundingSequence'
+import { loadLens } from '@/lib/questionLensStore'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,7 +27,7 @@ export async function POST(req: NextRequest) {
 
   const { data: archive } = await supabaseAdmin
     .from('archives')
-    .select('id, owner_user_id, tier')
+    .select('id, owner_user_id, tier, status')
     .eq('id', session.archiveId)
     .maybeSingle()
 
@@ -39,7 +40,10 @@ export async function POST(req: NextRequest) {
   if (!area) return NextResponse.json({ error: 'Area is required' }, { status: 400 })
 
   try {
-    const result = await startAreaCall(archive.id, archive.tier, area)
+    // Who is being asked picks the opener: an assessment gets the acquisition
+    // openers, a church record the church ones (lib/questionLens.ts).
+    const lens = await loadLens(archive)
+    const result = await startAreaCall(archive.id, archive.tier, area, lens)
     if (!result.ok && result.reason === 'unknown_area') {
       return NextResponse.json({ error: 'That area is not on your map' }, { status: 400 })
     }

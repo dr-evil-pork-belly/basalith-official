@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase-browser'
 import { HONEYPOT_FIELD } from '@/lib/botGuard'
+import { CHURCH_AUDIENCE } from '@/lib/questionLens'
 
 // /begin. Copy is docs/SELF_SERVE_SKELETON_2026-09-17.md section 6, verbatim.
 // Styling reuses /archive-login: same page shell, sigil, classes, and colors.
@@ -45,10 +46,13 @@ const inputStyle = { color: 'var(--invert-fg)', borderBottom: '1px solid var(--i
 export default function BeginClient({
   signedInEmail,
   referralCode = null,
+  fromChurches = false,
 }: {
   signedInEmail: string | null
   /** A referral code the server already resolved. Null for everyone else. */
   referralCode?: string | null
+  /** Arrived from /churches. Adds one question to the form (lib/questionLens.ts). */
+  fromChurches?: boolean
 }) {
   const router = useRouter()
   const signedIn = !!signedInEmail
@@ -58,6 +62,9 @@ export default function BeginClient({
   const [email, setEmail]       = useState(signedInEmail ?? '')
   const [forWhom, setForWhom]   = useState<ForWhom>('me')
   const [prompt, setPrompt]     = useState('')
+  // Only asked when fromChurches. Defaults to yes: that page is written for
+  // the people who lead one.
+  const [leads, setLeads]       = useState(true)
   const [error, setError]       = useState('')
   const [loading, setLoading]   = useState(false)
   const [resendIn, setResendIn] = useState(RESEND_AFTER_SECONDS)
@@ -103,6 +110,7 @@ export default function BeginClient({
           forWhom,
           prompt: prompt.trim(),
           ref: referralCode,
+          audience: fromChurches && leads ? CHURCH_AUDIENCE : undefined,
           [HONEYPOT_FIELD]: trap,
         }),
       })
@@ -263,6 +271,26 @@ export default function BeginClient({
                 ))}
               </div>
             </fieldset>
+
+            {fromChurches && (
+              <fieldset className="border-0 p-0 m-0">
+                <legend className={labelClass} style={{ color: 'var(--invert-dim)' }}>Your role</legend>
+                <div className="flex flex-col gap-3">
+                  {([[true, 'I lead a church, as a pastor or an elder'], [false, 'I am here for myself or my family']] as [boolean, string][]).map(([value, text]) => (
+                    <label key={String(value)} className="flex items-center gap-2 font-serif text-[1rem] font-light cursor-pointer" style={{ color: leads === value ? 'var(--invert-fg)' : 'var(--invert-dim)' }}>
+                      <input
+                        type="radio"
+                        name="leads"
+                        checked={leads === value}
+                        onChange={() => setLeads(value)}
+                        className="accent-[var(--invert-gold)]"
+                      />
+                      {text}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            )}
 
             <div>
               <label htmlFor="begin-prompt" className={labelClass} style={{ color: 'var(--invert-dim)' }}>What brought you here (optional, one line)</label>

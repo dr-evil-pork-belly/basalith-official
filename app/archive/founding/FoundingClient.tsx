@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import type { FoundingScope, FoundingStatus } from '@/lib/foundingSequence'
 import { canShowProof } from '@/lib/trial'
+import { CONFIDENCE_LINE } from '@/lib/questionLens'
+import { dollars, offerLines, type BillingPeriod, type TrialOffer } from '@/lib/trialCheckout'
 
 // The Founding Sequence, owner surface.
 //
@@ -55,6 +57,7 @@ export default function FoundingClient({
   area,
   ownerName,
   trial = false,
+  offer = null,
   assessment = false,
 }: {
   archiveId: string
@@ -64,6 +67,11 @@ export default function FoundingClient({
   ownerName: string | null
   /** archives.status === 'trial' (lib/trial.ts isTrial). Adds one line under the proof card. */
   trial?: boolean
+  /**
+   * Trial only: what founding costs, when Checkout is open to this owner
+   * (lib/trialCheckoutStore.ts loadTrialOffer). Null shows the sentence alone.
+   */
+  offer?: TrialOffer | null
   /**
    * archives.status === 'assessment' (lib/assessment.ts). An assessment record
    * has no map and no reading after each call, so the two sentences here that
@@ -291,7 +299,7 @@ export default function FoundingClient({
             Your Basalith keeps growing from here. The dashboard has your next question whenever you are ready.
           </p>
           <Link href="/archive/dashboard" style={goldButton()}>Open your Basalith</Link>
-          <ProofCard trial={trial} />
+          <ProofCard trial={trial} offer={offer} />
         </section>
       )}
 
@@ -305,7 +313,7 @@ export default function FoundingClient({
           <p style={{ fontFamily: SERIF, fontSize: '17.5px', fontWeight: 400, lineHeight: 1.65, color: BODY, marginBottom: '26px', maxWidth: '58ch' }}>
             {justClosed.deposits} {justClosed.deposits === 1 ? 'deposit' : 'deposits'}, in your own words. The next call is ready when you are. Now, or another day; it will be here.
           </p>
-          {status && canShowProof(status) && <ProofCard trial={trial} below />}
+          {status && canShowProof(status) && <ProofCard trial={trial} offer={offer} below />}
           <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
             <button onClick={startNext} disabled={starting} style={goldButton(starting)}>
               {starting ? 'Opening' : `Begin call ${status?.nextCall ?? ''}`}
@@ -325,7 +333,7 @@ export default function FoundingClient({
           <p style={{ fontFamily: SERIF, fontSize: '17.5px', fontWeight: 400, lineHeight: 1.65, color: BODY, marginBottom: '26px', maxWidth: '58ch' }}>
             One question to start, then a few more that follow what you say. Nothing you say has to be important. The ordinary details are usually the ones that show how you decide.
           </p>
-          {canShowProof(status) && <ProofCard trial={trial} below />}
+          {canShowProof(status) && <ProofCard trial={trial} offer={offer} below />}
           {submitErr && <p role="alert" style={{ fontFamily: SERIF, fontSize: '1rem', color: ERR, marginBottom: '14px' }}>{submitErr}</p>}
           <button onClick={startNext} disabled={starting} style={goldButton(starting)}>
             {starting ? 'Opening' : `Begin call ${status.nextCall}`}
@@ -372,6 +380,14 @@ export default function FoundingClient({
           <p className="founding-eyebrow" style={eyebrow()}>
             {current.isFounding && current.call ? `Call ${current.call} · ` : ''}{current.area ? `${current.area} · ` : ''}{current.label}
           </p>
+
+          {/* A church call (lib/questionLens.ts). An instruction to the person on
+              every turn; nothing in the code removes a name or a confidence. */}
+          {current.lens === 'church' && (
+            <p style={{ fontFamily: SERIF, fontSize: '1rem', fontStyle: 'italic', color: BODY, margin: '0 0 14px', lineHeight: 1.7 }}>
+              {CONFIDENCE_LINE}
+            </p>
+          )}
 
           <div aria-live="polite" style={{ borderLeft: `3px solid ${GOLD}`, padding: '16px 22px', margin: '0 0 22px', background: 'var(--portal-tint)' }}>
             <p style={{ fontFamily: SERIF, fontSize: 'clamp(20px,2.4vw,24px)', fontStyle: 'italic', fontWeight: 400, color: INK, lineHeight: 1.5, margin: 0 }}>
@@ -476,7 +492,7 @@ export default function FoundingClient({
 // five seconds and asks once more before saying so.
 const PROOF_RETRY_MS = 5000
 
-function ProofCard({ trial = false, below = false }: { trial?: boolean; below?: boolean }) {
+function ProofCard({ trial = false, offer = null, below = false }: { trial?: boolean; offer?: TrialOffer | null; below?: boolean }) {
   const [state, setState] = useState<'idle' | 'loading' | 'waiting' | 'done' | 'error'>('idle')
   const [proof, setProof] = useState<Proof | null>(null)
   const [error, setError] = useState('')
@@ -580,13 +596,93 @@ function ProofCard({ trial = false, below = false }: { trial?: boolean; below?: 
         </div>
       )}
 
-      {/* Trial only (skeleton section 6). The button to Checkout arrives in
-          slice C; until then this is the sentence alone. */}
-      {trial && (
+      {/* Trial only (skeleton section 6). With no offer this is the sentence
+          alone, as before slice C. With one, the price and the way to pay. */}
+      {trial && !offer && (
         <p style={{ fontFamily: SERIF, fontSize: '17.5px', fontWeight: 400, lineHeight: 1.65, color: BODY, margin: '22px 0 0' }}>
           Found your Basalith to keep going.
         </p>
       )}
+      {trial && offer && <FoundOffer offer={offer} />}
+    </div>
+  )
+}
+
+// ── Found it ──────────────────────────────────────────────────────────────────
+// Trial to paid (slice C, October 9, 2026). The owner picks yearly or monthly
+// and is sent to Stripe Checkout by POST /api/archive/checkout. The payment
+// founds this same record: nothing said so far is moved or copied. Every
+// sentence and figure comes from lib/trialCheckout.ts (offerLines), where the
+// copy test and the price test read them. Nothing is charged by this page.
+
+function FoundOffer({ offer }: { offer: TrialOffer }) {
+  const [period, setPeriod] = useState<BillingPeriod>('year')
+  const [busy,   setBusy]   = useState(false)
+  const [error,  setError]  = useState('')
+  const l = offerLines(offer)
+
+  async function pay() {
+    setBusy(true)
+    setError('')
+    try {
+      const res = await fetch('/api/archive/checkout', {
+        method:  'POST',
+        headers: { 'content-type': 'application/json' },
+        body:    JSON.stringify({ billingPeriod: period }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok || typeof data?.url !== 'string') {
+        throw new Error(data?.error || 'Could not open the payment page. Please try again in a moment.')
+      }
+      window.location.assign(data.url)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not open the payment page. Please try again in a moment.')
+      setBusy(false)
+    }
+  }
+
+  const line: React.CSSProperties = { fontFamily: SERIF, fontSize: '17.5px', fontWeight: 400, lineHeight: 1.65, color: BODY, margin: '0 0 8px', maxWidth: '58ch' }
+  const choice = (value: BillingPeriod, label: string) => {
+    const on = period === value
+    return (
+      <button
+        type="button"
+        role="radio"
+        aria-checked={on}
+        onClick={() => setPeriod(value)}
+        disabled={busy}
+        className="founding-btn"
+        style={{
+          ...quietButton(),
+          color:       on ? INK : SECOND,
+          borderColor: on ? 'var(--portal-btn)' : 'var(--portal-card-line)',
+          boxShadow:   on ? 'inset 0 0 0 1px var(--portal-btn)' : 'none',
+        }}
+      >
+        {label}
+      </button>
+    )
+  }
+
+  return (
+    <div style={{ marginTop: '26px', paddingTop: '24px', borderTop: '1px solid var(--portal-rule)' }}>
+      <p style={{ fontFamily: SERIF, fontSize: '22px', fontWeight: 400, lineHeight: 1.3, color: INK, margin: '0 0 10px' }}>
+        {l.lead}
+      </p>
+      <p style={line}>{l.keep}</p>
+      <p style={line}>{l.founding}</p>
+      <p style={{ ...line, margin: '0 0 18px' }}>{l.plan} {l.begins}</p>
+
+      <div role="radiogroup" aria-label="How you pay for your plan" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '18px' }}>
+        {choice('year',  `Yearly, ${dollars(offer.yearDollars)}`)}
+        {choice('month', `Monthly, ${dollars(offer.monthDollars)}`)}
+      </div>
+
+      {error && <p role="alert" style={{ fontFamily: SERIF, fontSize: '1rem', color: ERR, margin: '0 0 12px', lineHeight: 1.6 }}>{error}</p>}
+
+      <button type="button" onClick={pay} disabled={busy} className="founding-btn" style={goldButton(busy)}>
+        {busy ? 'Opening' : 'Found your Basalith'}
+      </button>
     </div>
   )
 }

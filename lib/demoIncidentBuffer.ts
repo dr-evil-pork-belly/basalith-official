@@ -166,9 +166,25 @@ export async function runDemoTurn(incident: IncidentSession, answer: string): Pr
 
   const tensionForTradeoff =
     decision.probeType === 'TRADEOFF' ? next.state.tensions[next.state.spineCursor] : undefined
+  // Same inputs the live turn passes (app/api/archive/b2b-question/answer), so
+  // the demo asks what a succession client is asked: a fragment is quoted only
+  // if it is the person's own words, a second ask is a different question, and
+  // a tradeoff or a name comes only from what was said in this call.
+  const said = next.state.probeHistory.map(r => r.answer).filter(Boolean)
   const anchor =
-    decision.probeType === 'READ' ? deriveReadAnchor(next.state.branches) : classifierOut.anchor
-  const nextText = renderProbe({ probeType: decision.probeType, anchor, tensionForTradeoff })
+    decision.probeType === 'READ' ? deriveReadAnchor(next.state.branches, said) : classifierOut.anchor
+  const nextText = renderProbe({
+    probeType: decision.probeType,
+    anchor,
+    tensionForTradeoff,
+    answer,
+    quote:         decision.branchIndexForProbe === branchIndex || probeType === 'TIMELINE',
+    said,
+    reprobe:       reprobed,
+    level:         decision.phaseAfter === 'GENERALIZE' ? 'rule' : 'branch',
+    tradeoffIndex: next.state.spineCursor,
+    lens:          'succession',
+  })
   next.state.pendingQuestion = nextText
   next.state.pendingProbeType = decision.probeType
   next.state.pendingBranchIndex = decision.branchIndexForProbe

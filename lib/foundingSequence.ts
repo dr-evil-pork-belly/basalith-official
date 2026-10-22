@@ -27,6 +27,7 @@ import {
   type ProbeType,
 } from './incidentSession'
 import { renderProbe } from './renderProbe'
+import { asLens, lensFor, type QuestionLens } from './questionLens'
 
 // The proof gate lives with the trial rules so it is testable without the
 // route. Re-exported here because the founding surface is where it is read.
@@ -89,8 +90,30 @@ export function scopeForTier(tier: string | null | undefined): FoundingScope {
   return tier === 'succession' ? 'business' : 'personal'
 }
 
-export function seedFor(scope: FoundingScope, call: FoundingCall): FoundingSeed {
-  const seed = FOUNDING_SEEDS[scope].find(s => s.call === call)
+/**
+ * The church founding openers. October 13, 2026 (lib/questionLens.ts). Same
+ * three calls, same titles, same categories as the personal set; the question
+ * is asked of a pastor or an elder about leading the church. A church record
+ * rides the personal scope, so these apply on that scope only.
+ */
+export const CHURCH_FOUNDING_SEEDS: FoundingSeed[] = [
+  {
+    call: 1, category: 'judgment', title: 'The hardest call',
+    question: 'Tell me about the hardest call you have made leading this church. What was going on, and what did you do?',
+  },
+  {
+    call: 2, category: 'conflict', title: 'Against the room',
+    question: 'Tell me about a time you went against the people you lead with, and you were right to.',
+  },
+  {
+    call: 3, category: 'risk', title: 'The one you got wrong',
+    question: 'Tell me about a call you got wrong as a leader here, and how you found out.',
+  },
+]
+
+export function seedFor(scope: FoundingScope, call: FoundingCall, lens?: QuestionLens | null): FoundingSeed {
+  const set = lens === 'church' && scope === 'personal' ? CHURCH_FOUNDING_SEEDS : FOUNDING_SEEDS[scope]
+  const seed = set.find(s => s.call === call)
   if (!seed) throw new Error(`no founding seed for ${scope} call ${call}`)
   return seed
 }
@@ -152,6 +175,8 @@ export interface FoundingStatus {
     call:        FoundingCall | null
     /** The area this open incident is depositing into, when it is an area call (lib/areaCalls.ts). */
     area:        string | null
+    /** Who is being asked, when the call carries the marker (lib/questionLens.ts). */
+    lens:        QuestionLens | null
     probeType:   ProbeType | 'SEED' | 'TIMELINE' | null
     question:    string | null
     label:       string
@@ -211,6 +236,7 @@ export function foundingStatusFromRows(rows: FoundingRow[], scope: FoundingScope
           isFounding: !!openMarker,
           call:       openMarker?.call ?? null,
           area:       open.state?.areaCall?.area ?? null,
+          lens:       asLens(open.state?.lens),
           probeType:  open.state.pendingProbeType ?? null,
           question:   open.state.pendingQuestion ?? null,
           label:      phaseLabel(open.state.pendingProbeType),
@@ -227,6 +253,7 @@ export function allFoundingCopy(): string[] {
   for (const scope of ['personal', 'business'] as FoundingScope[]) {
     for (const s of FOUNDING_SEEDS[scope]) out.push(s.title, s.question)
   }
+  for (const s of CHURCH_FOUNDING_SEEDS) out.push(s.title, s.question)
   const types: (ProbeType | 'SEED' | 'TIMELINE')[] = [
     'SEED', 'TIMELINE', 'CUE', 'OPTION', 'BASIS', 'BOUNDARY', 'ERROR', 'ANALOGUE', 'GOAL', 'STAKE', 'READ', 'CALIBRATION', 'TRADEOFF',
   ]
@@ -263,16 +290,19 @@ export async function getFoundingStatus(archiveId: string, tier: string | null |
 export async function startFoundingCall(
   archiveId: string,
   tier: string | null | undefined,
+  /** Who is being asked (lib/questionLens.ts). Omitted: derived from the tier alone. */
+  lens: QuestionLens = lensFor({ tier }),
 ): Promise<{ session: IncidentSession; call: FoundingCall } | null> {
   const status = await getFoundingStatus(archiveId, tier)
   if (status.done || status.current || !status.nextCall) return null
 
   const scope = status.scope
   const call  = status.nextCall
-  const seed  = seedFor(scope, call)
+  const seed  = seedFor(scope, call, lens)
 
   const session = await createIncident(archiveId, { questionId: null, category: seed.category })
   session.state.founding = { call, scope, startedAt: new Date().toISOString() }
+  session.state.lens     = lens
   session.state.pendingQuestion    = renderProbe({ probeType: 'SEED', anchor: '', seedText: seed.question })
   session.state.pendingProbeType   = 'SEED'
   session.state.pendingBranchIndex = -1

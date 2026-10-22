@@ -4,6 +4,7 @@ import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { checkRateLimit, getClientIP } from '@/lib/apiSecurity'
 import { getFoundingStatus, startFoundingCall } from '@/lib/foundingSequence'
 import { loadOpenIncident } from '@/lib/incidentSession'
+import { loadLens } from '@/lib/questionLensStore'
 
 export const dynamic = 'force-dynamic'
 
@@ -28,7 +29,7 @@ export async function POST(req: NextRequest) {
 
   const { data: archive } = await supabaseAdmin
     .from('archives')
-    .select('id, owner_user_id, tier')
+    .select('id, owner_user_id, tier, status')
     .eq('id', session.archiveId)
     .maybeSingle()
 
@@ -45,7 +46,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true, done: false, current: before.current, status: before })
     }
 
-    const started = await startFoundingCall(archive.id, archive.tier)
+    // Who is being asked picks the opener (lib/questionLens.ts). Read only
+    // when a call is about to open, and it cannot fail the request.
+    const lens = await loadLens(archive)
+    const started = await startFoundingCall(archive.id, archive.tier, lens)
     if (!started) {
       // Lost a race with a concurrent open, or the state changed under us.
       // Re-read and serve whatever is open now rather than erroring.

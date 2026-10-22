@@ -32,11 +32,12 @@ import { renderProbe } from './renderProbe'
 import { PERSONAL_DOMAINS } from './personalDomains'
 import { B2B_DOMAINS } from './b2bDomains'
 import { scopeForTier, type FoundingScope } from './foundingSequence'
-import { AREA_SEEDS, seedForArea, type AreaSeed } from './areaSeeds'
+import { AREA_SEEDS, LENS_AREA_SEEDS, seedForArea, type AreaSeed } from './areaSeeds'
+import { lensFor, type QuestionLens } from './questionLens'
 
 // The seeds live in lib/areaSeeds.ts since September 24, 2026; re-exported so
 // every existing import from this module keeps working.
-export { AREA_SEEDS, seedForArea, type AreaSeed }
+export { AREA_SEEDS, LENS_AREA_SEEDS, seedForArea, type AreaSeed }
 
 /** The taxonomy a scope's seeds must match. */
 export function areasFor(scope: FoundingScope): string[] {
@@ -46,7 +47,12 @@ export function areasFor(scope: FoundingScope): string[] {
 
 /** Every owner-visible string here, for the copy-rule test. */
 export function allAreaCallCopy(): string[] {
-  return [...AREA_SEEDS.personal, ...AREA_SEEDS.business].map(s => s.question)
+  return [
+    ...AREA_SEEDS.personal,
+    ...AREA_SEEDS.business,
+    ...LENS_AREA_SEEDS.acquisition,
+    ...LENS_AREA_SEEDS.church,
+  ].map(s => s.question)
 }
 
 // Cheap import-time check, same idea as the probe sets: a seed naming an area
@@ -61,6 +67,14 @@ function assertSeedShape(): void {
       seen.add(s.area)
     }
     if (seen.size !== areas.size) throw new Error(`[areaCalls] ${scope} seeds cover ${seen.size} of ${areas.size} areas`)
+  }
+  // The lens openers ride a scope's taxonomy and must cover it exactly, in
+  // order, or a lens call would open on an area the map cannot credit.
+  const lensScopes: [keyof typeof LENS_AREA_SEEDS, FoundingScope][] = [['acquisition', 'business'], ['church', 'personal']]
+  for (const [lens, scope] of lensScopes) {
+    const want = areasFor(scope).join('|')
+    const have = LENS_AREA_SEEDS[lens].map(s => s.area).join('|')
+    if (want !== have) throw new Error(`[areaCalls] ${lens} openers do not match the ${scope} taxonomy`)
   }
 }
 assertSeedShape()
@@ -95,9 +109,11 @@ export async function startAreaCall(
   archiveId: string,
   tier: string | null | undefined,
   area: string,
+  /** Who is being asked (lib/questionLens.ts). Omitted: derived from the tier alone. */
+  lens: QuestionLens = lensFor({ tier }),
 ): Promise<StartAreaCallResult> {
   const scope = scopeForTier(tier)
-  const seed  = seedForArea(scope, area)
+  const seed  = seedForArea(scope, area, lens)
   if (!seed) return { ok: false, reason: 'unknown_area' }
 
   const { data: open } = await supabaseAdmin
@@ -110,6 +126,7 @@ export async function startAreaCall(
 
   const session = await createIncident(archiveId, { questionId: null, category: seed.category })
   session.state.areaCall = { area: seed.area, scope, startedAt: new Date().toISOString() }
+  session.state.lens     = lens
   session.state.pendingQuestion    = renderProbe({ probeType: 'SEED', anchor: '', seedText: seed.question })
   session.state.pendingProbeType   = 'SEED'
   session.state.pendingBranchIndex = -1
