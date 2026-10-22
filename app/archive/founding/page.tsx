@@ -4,6 +4,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { scopeForTier } from '@/lib/foundingSequence'
 import { isTrial } from '@/lib/trial'
 import { isAssessment } from '@/lib/assessment'
+import { loadTrialOffer } from '@/lib/trialCheckoutStore'
 import FoundingClient from './FoundingClient'
 
 // The Founding Sequence. Three incident interviews the owner runs in their own
@@ -15,7 +16,7 @@ export default async function FoundingPage({ searchParams }: { searchParams: Pro
 
   const { data: archive } = await supabaseAdmin
     .from('archives')
-    .select('id, owner_user_id, tier, owner_name, status')
+    .select('id, owner_user_id, tier, owner_name, owner_email, status, scheduled_deletion_at, termination_requested_at')
     .eq('id', session.archiveId)
     .maybeSingle()
 
@@ -31,13 +32,20 @@ export default async function FoundingPage({ searchParams }: { searchParams: Pro
   const assessment = isAssessment(archive)
   if (assessment && !requestedArea) redirect('/archive/assessment')
 
+  // Trial to paid (slice C, October 9, 2026). Null means no button: Checkout
+  // is closed to this owner, a price is missing, or the record is not a
+  // personal trial. The page then shows what it showed before.
+  const trial = isTrial(archive)
+  const offer = trial ? await loadTrialOffer(archive) : null
+
   return (
     <FoundingClient
       archiveId={archive.id}
       scope={scopeForTier(archive.tier)}
       ownerName={archive.owner_name ?? null}
       area={requestedArea}
-      trial={isTrial(archive)}
+      trial={trial}
+      offer={offer}
       assessment={assessment}
     />
   )

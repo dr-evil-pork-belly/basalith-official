@@ -7,6 +7,16 @@ import { buildFoundingWelcomeEmail } from '@/lib/emails/foundingWelcome'
 import { provisionedTier } from '@/lib/billing/archiveTier'
 import { notifyInternal } from '@/lib/internalNotify'
 import { REFERRAL_CREDIT_CENTS } from '@/lib/referral'
+import { getFoundingStatus } from '@/lib/foundingSequence'
+import { buildTrialFoundedEmail } from '@/lib/emails/trialFounded'
+import { TRIAL_CHECKOUT_SOURCE } from '@/lib/trialCheckout'
+import {
+  CONVERT_ARCHIVE_COLS,
+  convertTrialOnPayment,
+  markTrialFounded,
+  type ConvertArchiveRow,
+  type ConvertStep,
+} from '@/lib/billing/convertTrial'
 import {
   buildPaymentFailedEmail,
   buildPaymentFailedSubject,
@@ -49,12 +59,76 @@ async function archiveForSubscription(subscriptionId: string) {
   return legacy ?? null
 }
 
+// ── The two closing steps, shared by both branches of provisionOnFoundingFee ──
+// Lifted out October 9, 2026 so the trial branch and the application branch
+// run the same code under the same step ids. Neither can fail provisioning.
+
+async function markApplicationWon(run: ConvertStep, applicationId: string | null | undefined): Promise<void> {
+  await run('mark-application-won', async () => {
+    if (!applicationId) return null
+    await supabaseAdmin
+      .from('archive_applications')
+      .update({ status: 'won' })
+      .eq('id', applicationId)
+    return null
+  })
+}
+
+// Referral credit (October 6, 2026). When the checkout carried a referrer, the
+// Basalith that referred this client is owed a credit against its next
+// renewal. This step records the debt and tells the founder. It does not
+// touch Stripe: the credit is applied by hand as a customer balance credit,
+// then the row is marked applied. The unique index on
+// referred_subscription_id makes a retry a no-op.
+async function recordReferralCredit(
+  run: ConvertStep,
+  input: { referrerArchiveId: string | null; archiveId: string; subscriptionId: string; familyName: string },
+): Promise<void> {
+  const { referrerArchiveId, archiveId, subscriptionId, familyName } = input
+  if (!referrerArchiveId) return
+  await run('referral-credit', async () => {
+    const { error } = await supabaseAdmin
+      .from('referral_credits')
+      .upsert(
+        {
+          referrer_archive_id:      referrerArchiveId,
+          referred_archive_id:      archiveId,
+          referred_subscription_id: subscriptionId,
+          amount_cents:             REFERRAL_CREDIT_CENTS,
+        },
+        { onConflict: 'referred_subscription_id', ignoreDuplicates: true },
+      )
+    await notifyInternal({
+      subject: error
+        ? `Referral credit NOT recorded: ${familyName} Basalith`
+        : `Referral credit owed: $${REFERRAL_CREDIT_CENTS / 100}`,
+      text: [
+        `New client: ${familyName} Basalith (${archiveId})`,
+        `Referred by archive: ${referrerArchiveId}`,
+        `Credit owed to the referrer: $${REFERRAL_CREDIT_CENTS / 100} against the next renewal`,
+        error
+          ? `The ledger write failed: ${error.message}. Record this one by hand.`
+          : 'Recorded in referral_credits as pending. Apply it in Stripe as a customer balance credit, then set status to applied.',
+      ].join('\n'),
+    })
+    return null
+  })
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // provisionOnFoundingFee — the only function that does real work this slice.
 // IDEMPOTENT: billing.founding_paid_at is the gate, the unique index on
 // billing.stripe_subscription_id and the archive_lifecycle primary key are the
 // backstops, and Inngest idempotency on the subscription id stops duplicate
 // event deliveries from racing.
+//
+// TWO BRANCHES since October 9, 2026 (slice C, docs/TRIAL_SLICE_C_2026-10-09.md).
+// A subscription whose metadata carries `archive_id` with source 'trial' was
+// bought by a trial owner from their own page (app/api/archive/checkout). That
+// payment FOUNDS THE RECORD THAT EXISTS (lib/billing/convertTrial.ts) and never
+// reaches createArchiveWithCredentials. Every other subscription came from the
+// admin link and takes the application branch below, which is unchanged.
+// lib/inngest/billingFunctions.test.ts pins the order of the two.
 // ─────────────────────────────────────────────────────────────────────────────
 export const provisionOnFoundingFee = inngest.createFunction(
   {
@@ -81,6 +155,11 @@ export const provisionOnFoundingFee = inngest.createFunction(
         familyName:    (sub.metadata?.family_name as string) ?? null,    // supplied at checkout
         guideId:       (sub.metadata?.guide_id as string) ?? null,
         referrerArchiveId: (sub.metadata?.referrer_archive_id as string) ?? null,  // set by referralFounding
+        // Slice C. Present only on a session a trial owner opened themselves.
+        trialArchiveId: sub.metadata?.source === TRIAL_CHECKOUT_SOURCE
+          ? ((sub.metadata?.archive_id as string) ?? null)
+          : null,
+        billingPeriod: (sub.metadata?.billing_period as string) ?? null,
         customerId:    typeof sub.customer === 'string' ? sub.customer : (sub.customer?.id ?? null),
       }
     })
@@ -118,6 +197,124 @@ export const provisionOnFoundingFee = inngest.createFunction(
     // 3. Idempotency gate. A second delivery finds founding_paid_at set and stops.
     if (billing.founding_paid_at) {
       return { ok: true, alreadyProvisioned: true, archiveId: billing.archive_id }
+    }
+
+    // Inngest types a step result as Jsonify<T>. Every step below returns
+    // strings, numbers, booleans, nulls, and plain objects of those, so the two
+    // types describe the same runtime value (same cast, same condition, as
+    // lib/inngest/dependencyFunctions.ts).
+    const run: ConvertStep = <T,>(id: string, fn: () => Promise<T>) => step.run(id, fn) as Promise<T>
+
+    // 3b. THE TRIAL BRANCH. Found the record that exists. No new record.
+    if (meta.trialArchiveId) {
+      const converted = await convertTrialOnPayment(
+        {
+          archiveId:      meta.trialArchiveId,
+          subscriptionId,
+          referred:       !!meta.referrerArchiveId,
+          billingPeriod:  meta.billingPeriod,
+        },
+        {
+          step: run,
+
+          async loadArchive(id) {
+            const { data, error } = await supabaseAdmin
+              .from('archives').select(CONVERT_ARCHIVE_COLS).eq('id', id).maybeSingle()
+            if (error) throw new Error(`load record ${id}: ${error.message}`)
+            return (data ?? null) as ConvertArchiveRow | null
+          },
+
+          flip: (id) => markTrialFounded(supabaseAdmin, id),
+
+          async otherPaidSubscriptions(id, thisSubscription) {
+            const { data, error } = await supabaseAdmin
+              .from('billing')
+              .select('stripe_subscription_id')
+              .eq('archive_id', id)
+              .not('founding_paid_at', 'is', null)
+              .neq('stripe_subscription_id', thisSubscription)
+            if (error) throw new Error(`other paid subscriptions ${id}: ${error.message}`)
+            return (data ?? []).map(r => String((r as { stripe_subscription_id: string }).stripe_subscription_id))
+          },
+
+          async linkBilling(sub, id) {
+            const now = new Date().toISOString()
+            const { error } = await supabaseAdmin
+              .from('billing')
+              .update({ archive_id: id, founding_paid_at: now, updated_at: now })
+              .eq('stripe_subscription_id', sub)
+            if (error) throw new Error(`link billing ${sub}: ${error.message}`)
+          },
+
+          async upsertLifecycle(id) {
+            const now = new Date().toISOString()
+            const { error } = await supabaseAdmin
+              .from('archive_lifecycle')
+              .upsert(
+                { archive_id: id, segment: 'b2c', commercial_state: 'active', commercial_state_at: now, updated_at: now },
+                { onConflict: 'archive_id' },
+              )
+            if (error) throw new Error(`lifecycle ${id}: ${error.message}`)
+          },
+
+          async loadProgress(archive) {
+            const status = await getFoundingStatus(archive.id, archive.tier)
+            const { count, error } = await supabaseAdmin
+              .from('owner_deposits')
+              .select('id', { count: 'exact', head: true })
+              .eq('archive_id', archive.id)
+              .is('contributor_id', null)
+            if (error) throw new Error(`count deposits ${archive.id}: ${error.message}`)
+            return { deposits: count ?? 0, callsCompleted: status.completed, nextCall: status.nextCall }
+          },
+
+          async sendWelcome(archive, progress) {
+            if (!archive.owner_email) return
+            const family = (archive.family_name ?? '').trim() || 'Founder'
+            const email = buildTrialFoundedEmail({
+              familyName:     family,
+              ownerName:      archive.owner_name,
+              deposits:       progress.deposits,
+              callsCompleted: progress.callsCompleted,
+              nextCall:       progress.nextCall,
+              siteUrl:        process.env.NEXT_PUBLIC_SITE_URL ?? 'https://basalith.ai',
+            })
+            try {
+              await resend.emails.send({
+                from:    `The ${family} Basalith <${RESEND_FROM}>`,
+                to:      archive.owner_email,
+                subject: email.subject,
+                html:    email.html,
+                text:    email.text,
+                headers: {
+                  'List-Unsubscribe': '<mailto:unsubscribe@basalith.xyz>',
+                  'X-Entity-Ref-ID':  `basalith-trial-founded-${archive.id}`,
+                },
+              })
+            } catch (e) {
+              // A welcome that did not send must not fail a sale. Log and move on.
+              console.error('[provision] trial founded email failed:', e instanceof Error ? e.message : e)
+            }
+          },
+
+          notify: notifyInternal,
+        },
+      )
+
+      if (!converted.ok) {
+        return { ok: false, reason: converted.reason, detail: converted.detail, subscriptionId }
+      }
+
+      await markApplicationWon(run, billing.application_id ?? meta.applicationId)
+      if (!converted.duplicate) {
+        await recordReferralCredit(run, {
+          referrerArchiveId: meta.referrerArchiveId,
+          archiveId:         converted.archiveId,
+          subscriptionId,
+          familyName:        converted.familyName,
+        })
+      }
+      return { ok: true, archiveId: converted.archiveId, segment: 'b2c', tier: 'active', converted: true, flip: converted.flip, duplicate: converted.duplicate }
     }
 
     // 4. Application backs the owner/family/tier values.
@@ -274,49 +471,15 @@ export const provisionOnFoundingFee = inngest.createFunction(
     }
 
     // 10. Mark the application won.
-    await step.run('mark-application-won', async () => {
-      if (!billing.application_id) return
-      await supabaseAdmin
-        .from('archive_applications')
-        .update({ status: 'won' })
-        .eq('id', billing.application_id)
-    })
+    await markApplicationWon(run, billing.application_id)
 
-    // 11. Referral credit (October 6, 2026). When the checkout carried a
-    //     referrer, the Basalith that referred this client is owed a credit
-    //     against its next renewal. This step records the debt and tells the
-    //     founder. It does not touch Stripe: the credit is applied by hand as a
-    //     customer balance credit, then the row is marked applied. The unique
-    //     index on referred_subscription_id makes a retry a no-op. Nothing in
-    //     here can fail provisioning.
-    if (meta.referrerArchiveId) {
-      await step.run('referral-credit', async () => {
-        const { error } = await supabaseAdmin
-          .from('referral_credits')
-          .upsert(
-            {
-              referrer_archive_id:      meta.referrerArchiveId,
-              referred_archive_id:      archiveId,
-              referred_subscription_id: subscriptionId,
-              amount_cents:             REFERRAL_CREDIT_CENTS,
-            },
-            { onConflict: 'referred_subscription_id', ignoreDuplicates: true },
-          )
-        await notifyInternal({
-          subject: error
-            ? `Referral credit NOT recorded: ${familyName} Basalith`
-            : `Referral credit owed: $${REFERRAL_CREDIT_CENTS / 100}`,
-          text: [
-            `New client: ${familyName} Basalith (${archiveId})`,
-            `Referred by archive: ${meta.referrerArchiveId}`,
-            `Credit owed to the referrer: $${REFERRAL_CREDIT_CENTS / 100} against the next renewal`,
-            error
-              ? `The ledger write failed: ${error.message}. Record this one by hand.`
-              : 'Recorded in referral_credits as pending. Apply it in Stripe as a customer balance credit, then set status to applied.',
-          ].join('\n'),
-        })
-      })
-    }
+    // 11. Referral credit. See recordReferralCredit above.
+    await recordReferralCredit(run, {
+      referrerArchiveId: meta.referrerArchiveId,
+      archiveId,
+      subscriptionId,
+      familyName,
+    })
 
     return { ok: true, archiveId, segment, tier: archiveTier, commissionWarning }
   },

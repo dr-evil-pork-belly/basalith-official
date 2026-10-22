@@ -10,15 +10,26 @@
  * from the session metadata (new model) or activates a legacy archive when a
  * pre-slice payment link carries metadata.archiveId.
  *
+ * October 9, 2026 (slice C): a paid session a trial owner opened themselves
+ * carries metadata.archive_id with source 'trial'. That record is founded
+ * HERE, inline, before the ack, by one conditional update
+ * (lib/billing/convertTrial.ts markTrialFounded). It is the write that takes
+ * the record out of the thirty day expiry job, so it does not wait on Inngest.
+ * The rest (billing link, welcome, notices) is still the Inngest function's.
+ * `archive_id` and the legacy `archiveId` are different keys on purpose.
+ *
  * The manual activation override (x-manual-secret) is preserved from the
  * pre-slice webhook for admin/testing use.
  */
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse, after } from 'next/server'
 import type Stripe from 'stripe'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { getStripe } from '@/lib/stripe/client'
 import { inngest } from '@/lib/inngest'
 import { activateArchiveById } from '@/lib/billing/legacyActivation'
+import { markTrialFounded } from '@/lib/billing/convertTrial'
+import { TRIAL_CHECKOUT_SOURCE } from '@/lib/trialCheckout'
+import { notifyInternal } from '@/lib/internalNotify'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -51,6 +62,32 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session): Promis
   const md = (session.metadata ?? {}) as Record<string, string>
   const subscriptionId = idOf(session.subscription as any)
   const customerId     = idOf(session.customer as any)
+
+  // TRIAL model (slice C). Found the record the moment the money is in. No
+  // return: a trial session also carries application_id when the lead row was
+  // found, and the linkage below still runs. A throw here leaves the event
+  // unprocessed, so Stripe delivers it again.
+  if (md.archive_id && md.source === TRIAL_CHECKOUT_SOURCE && session.payment_status === 'paid') {
+    const trialArchiveId = md.archive_id
+    const flip = await markTrialFounded(supabaseAdmin, trialArchiveId)
+    if (flip === 'founded') {
+      after(async () => {
+        await notifyInternal({
+          subject: 'Trial paid: the record is founded',
+          text: [
+            `Record: ${trialArchiveId}`,
+            `Checkout session: ${session.id}`,
+            `Subscription: ${subscriptionId ?? 'none on the session'}`,
+            'The status is active and the expiry job no longer selects it.',
+            'A second notice, "Founded", follows when billing is linked and the welcome is sent.',
+            'If it has not arrived in ten minutes, the Inngest function did not run. Send founding_fee.paid with this subscription id by hand.',
+          ].join('\n'),
+        })
+      })
+    } else if (flip !== 'already_active') {
+      console.error('[checkout.session.completed] trial record not founded:', trialArchiveId, JSON.stringify(flip))
+    }
+  }
 
   // NEW model: application-driven billing linkage.
   if (md.application_id) {
