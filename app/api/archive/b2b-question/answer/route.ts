@@ -28,6 +28,15 @@ import { inngest } from '@/lib/inngest'
 import { isAssessment } from '@/lib/assessment'
 import { requestReadingsIfDue } from '@/lib/assessmentStore'
 import { asLens, lensFor } from '@/lib/questionLens'
+import {
+  appendLog,
+  armFor,
+  callQualifies,
+  writeFollowUp,
+  type QuestionSource,
+} from '@/lib/conversationalInterview'
+import { countArmedCalls } from '@/lib/conversationalInterviewStore'
+import { isAssentOnly } from '@/lib/assent'
 
 export const dynamic = 'force-dynamic'
 
@@ -129,6 +138,9 @@ export async function POST(req: NextRequest) {
   // business decision (the original prompt); every other tier as a person
   // describing a decision in their own life. See ClassifierScope.
   const scope = scopeForTier(archive.tier)
+  // Timed for the interview log (R4 in the conversational interview skeleton):
+  // classifier, timeline parse, and saturation together.
+  const tModel = Date.now()
   const classifierOut: ClassifierOut = await classifyAnswer({
     probeType: probeType as ProbeType, // SEED/TIMELINE only feed the prompt label
     question: pendingQuestion,
@@ -148,6 +160,16 @@ export async function POST(req: NextRequest) {
     probeType === 'BASIS'
       ? await checkSaturation({ archiveId, branchSummary, basisAnswer: answer })
       : { saturated: false }
+  const msModel = Date.now() - tModel
+
+  // Conversational follow ups (lib/conversationalInterview.ts). A call is
+  // armed once its first follow up is stamped with an arm. On an armed call,
+  // both arms, the deposit records who wrote the question it answers, and a
+  // turn that only agrees is kept out of the layer (lib/assent.ts). On every
+  // other call nothing below changes a byte of what is written.
+  const armed = st.interviewArm === 'interviewer' || st.interviewArm === 'spine'
+  const answeredSource: QuestionSource = st.pendingQuestionSource ?? 'spine'
+  const assentOnly = armed && isAssentOnly(answer)
 
   // Predict re-probe from the PRE-advance state (the reducer re-probes a
   // DECISION_LOOP spine answer that carries no rule, once per position). On a
@@ -174,11 +196,23 @@ export async function POST(req: NextRequest) {
   // Write the deposit + training pair only when the answer was accepted.
   let depositId: string | null = null
   if (!isReprobe) {
-    const { data: deposit, error: depositError } = await supabaseAdmin
+    const row = { archive_id: archiveId, prompt: pendingQuestion, response: answer, source_type: 'web_capture', contributor_id: null }
+    // question_source is named only on an armed call, and a failure that names
+    // the column is retried without it, so the deposit is never lost before
+    // migration 20261022 is pasted. Same pattern as the audience column.
+    let { data: deposit, error: depositError } = await supabaseAdmin
       .from('owner_deposits')
-      .insert({ archive_id: archiveId, prompt: pendingQuestion, response: answer, source_type: 'web_capture', contributor_id: null })
+      .insert(armed ? { ...row, question_source: answeredSource } : row)
       .select('id, archive_id, prompt, response, source_type')
       .single()
+    if (depositError && armed && /question_source/.test(depositError.message ?? '')) {
+      console.error('[b2b-question/answer] question_source column missing, saved without it. Paste migration 20261022.')
+      ;({ data: deposit, error: depositError } = await supabaseAdmin
+        .from('owner_deposits')
+        .insert(row)
+        .select('id, archive_id, prompt, response, source_type')
+        .single())
+    }
 
     if (depositError || !deposit) {
       console.error('[b2b-question/answer] deposit save failed:', depositError?.message)
@@ -215,7 +249,12 @@ export async function POST(req: NextRequest) {
     const acceptedDeposit = deposit
     after(async () => {
       try { await classifyDeposit({ depositId: acceptedDeposit.id, archiveId, text: answer }) } catch {}
-      try { await createTrainingPairFromDeposit(acceptedDeposit, ownerName, archiveName, lang, 'owner', probeType, dimensionTag) } catch {}
+      try {
+        await createTrainingPairFromDeposit(
+          acceptedDeposit, ownerName, archiveName, lang, 'owner', probeType, dimensionTag,
+          armed ? { questionSource: answeredSource, assentOnly } : undefined,
+        )
+      } catch {}
     })
 
     // Patch the depositId onto the just-answered ProbeRecord (the last appended).
@@ -390,7 +429,58 @@ export async function POST(req: NextRequest) {
       tradeoffIndex: next.state.spineCursor,
       lens,
     })
-    next.state.pendingQuestion = nextText
+
+    // Conversational follow ups. Only an area call on a record named in
+    // CONVERSATIONAL_INTERVIEW, in English. The arm is stamped once per call.
+    // On the interviewer arm the spine sentence above is the fallback; on the
+    // spine arm it is the question. Both arms are logged.
+    let questionText = nextText
+    if (callQualifies({ archiveId, isAreaCall: !!next.state.areaCall, language: archive.preferred_language })) {
+      if (!next.state.interviewArm) {
+        next.state.interviewArm = armFor(archiveId, await countArmedCalls(archiveId))
+      }
+    }
+    if (next.state.interviewArm) {
+      let source: QuestionSource = 'spine'
+      let aim: string | null = null
+      let attempts: Awaited<ReturnType<typeof writeFollowUp>>['attempts'] = []
+      let msTotal = 0
+      // A call armed earlier keeps its arm, but the interviewer runs only
+      // while the record is still named; otherwise the spine is served.
+      const stillOn = callQualifies({ archiveId, isAreaCall: !!next.state.areaCall, language: archive.preferred_language })
+      if (next.state.interviewArm === 'interviewer' && stillOn) {
+        const out = await writeFollowUp({
+          probeType:        decision.probeType,
+          lens,
+          turns:            next.state.probeHistory.map(r => ({ question: r.question, answer: r.answer })),
+          reprobe:          isReprobe,
+          level:            decision.phaseAfter === 'GENERALIZE' ? 'rule' : 'branch',
+          newDecisionPoint: !(decision.branchIndexForProbe === branchIndex || probeType === 'TIMELINE'),
+          decisionLabel:
+            decision.branchIndexForProbe >= 0 ? next.state.branches[decision.branchIndexForProbe]?.summary : undefined,
+          spineText:        nextText,
+          said,
+        })
+        questionText = out.text
+        source = out.source
+        aim = out.aim
+        attempts = out.attempts
+        msTotal = out.msTotal
+      }
+      next.state.pendingQuestionSource = source
+      next.state.interviewLog = appendLog(next.state.interviewLog, {
+        at:        new Date().toISOString(),
+        probeType: String(decision.probeType),
+        arm:       next.state.interviewArm,
+        source,
+        msModel,
+        msTotal,
+        aim,
+        attempts,
+      })
+    }
+
+    next.state.pendingQuestion = questionText
     next.state.pendingProbeType = decision.probeType
     next.state.pendingBranchIndex = decision.branchIndexForProbe
     await persist(next)

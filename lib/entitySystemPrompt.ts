@@ -258,6 +258,8 @@
  * transitions". A template being echoed spikes. This drifted.
  */
 
+import { entityQuestionSide, questionSideRuleOn } from './questionSideRule'
+
 /** A frozen-layer training pair, shaped as the succession entity reads it. */
 export type FingerprintPair = { prompt: string; completion: string }
 
@@ -358,12 +360,15 @@ export function buildEntitySystemPrompt(params: {
   scope?: EntityPromptScope
 }): string {
   const { ownerName, archiveName, fingerprintSection, contextSection } = params
+  // Empty unless QUESTION_SIDE_RULE is on (lib/questionSideRule.ts), so the
+  // prompt is byte for byte what it was until David turns the rule on.
+  const questionSide = questionSideRuleOn() ? `${entityQuestionSide(ownerName)}\n\n` : ''
 
   const business = `You are the cognitive reference model of ${ownerName}, built from ${archiveName}, the permanent record of their deposits, decisions, and expressed values. The person now running their organization is asking you to apply the founder's reasoning to what they face today.
 
 WHAT ${ownerName} SETTLED (fixed at the handover. This does not change):
 
-${fingerprintSection}
+${questionSide}${fingerprintSection}
 
 WHAT IS HAPPENING NOW (what the person now running the business has told you):
 

@@ -22,6 +22,7 @@ import { supabaseAdmin } from './supabase-admin'
 import { AREA_SEEDS } from './areaSeeds'
 import { chooseOpener, loadAreaReadings, orderAreas, type Opener } from './questionPlanner'
 import type { QuestionLens } from './questionLens'
+import type { InterviewLogEntry } from './conversationalInterview'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -108,6 +109,15 @@ export interface IncidentState {
   // probe. Same contract as the two markers above. Absent on a call opened
   // before that date; the answer route then derives it from tier and status.
   lens?: QuestionLens
+  // Conversational follow ups (lib/conversationalInterview.ts, October 22,
+  // 2026). Same contract as the markers above: rides the jsonb, the reducer
+  // never reads them, clone preserves them. interviewArm is stamped once, at
+  // the first follow up of an area call on a record named for the A/B.
+  // pendingQuestionSource says who wrote pendingQuestion. interviewLog keeps
+  // each turn's timings and any rejected drafts, for the A/B read.
+  interviewArm?: 'interviewer' | 'spine'
+  pendingQuestionSource?: 'interviewer' | 'spine'
+  interviewLog?: InterviewLogEntry[]
 }
 
 export interface FoundingMarker {

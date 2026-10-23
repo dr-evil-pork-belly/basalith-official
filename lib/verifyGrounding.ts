@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk'
+import { AUDITOR_QUESTION_SIDE, questionSideRuleOn } from './questionSideRule'
 
 /**
  * Control B, the output-side grounding verifier for the succession entity.
@@ -68,6 +69,16 @@ const AUDITOR_SYSTEM =
   '"unsupported" when the draft commits a normative founder position that no ' +
   'deposit directly takes. ' +
   'Return only JSON: {"position":"<stance or none>","basis":"deposit"|"no_position"|"unsupported","topic":"<short topic>"}.'
+
+/**
+ * The auditor's system prompt. AUDITOR_SYSTEM exactly, unless
+ * QUESTION_SIDE_RULE is on, when one paragraph is added: only the A line of a
+ * deposit is the founder's statement (lib/questionSideRule.ts, October 22,
+ * 2026). Exported for the test.
+ */
+export function auditorSystem(env: Record<string, string | undefined> = process.env): string {
+  return questionSideRuleOn(env) ? `${AUDITOR_SYSTEM} ${AUDITOR_QUESTION_SIDE}` : AUDITOR_SYSTEM
+}
 
 function stripFences(s: string): string {
   return s.replace(/```(?:json)?/gi, '').trim()
@@ -152,7 +163,7 @@ export async function verifyGrounding({
     const res = await client().messages.create({
       model:      'claude-sonnet-4-6',
       max_tokens: 400,
-      system:     AUDITOR_SYSTEM,
+      system:     auditorSystem(),
       messages:   [{ role: 'user', content: userContent }],
     })
 

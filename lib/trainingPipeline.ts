@@ -140,6 +140,12 @@ export async function createTrainingPairFromDeposit(
   sourceType = deposit.source_type ?? 'deposit',
   probeType?: string,
   dimensionTag?: { dimension: string; status: string },
+  /**
+   * Who wrote the question, and whether the answer only agreed. Passed only
+   * for a turn on an armed call (lib/conversationalInterview.ts). Absent, the
+   * row is byte for byte what it was before October 22, 2026.
+   */
+  provenance?: { questionSource?: 'interviewer' | 'spine'; assentOnly?: boolean },
 ): Promise<void> {
   console.log('[training] createTrainingPairFromDeposit called,',
     'depositId:', deposit.id,
@@ -201,6 +207,14 @@ export async function createTrainingPairFromDeposit(
     metadata.dimension = dimensionTag.dimension
     metadata.dimension_status = dimensionTag.status
   }
+  if (provenance?.questionSource) metadata.question_source = provenance.questionSource
+  if (provenance?.assentOnly) metadata.assent_only = 'true'
+  // A turn that only agrees states no position of its own (lib/assent.ts,
+  // October 22, 2026). It stays in the record, never in the layer. Decided
+  // here rather than in includeInTraining, whose signature
+  // lib/assessmentGates.test.ts pins.
+  const assentOnly = provenance?.assentOnly === true
+  const included = !assentOnly && includeInTraining(scores.quality_score, probeType)
 
   const { data: inserted, error: insertError } = await supabaseAdmin
     .from('training_pairs')
@@ -213,7 +227,7 @@ export async function createTrainingPairFromDeposit(
       system_prompt:        buildPersonSystemPrompt(ownerName, archiveName),
       language,
       word_count:           deposit.response.split(/\s+/).filter(Boolean).length,
-      included_in_training: includeInTraining(scores.quality_score, probeType),
+      included_in_training: included,
       ...scores,
       metadata,
     })
@@ -225,7 +239,7 @@ export async function createTrainingPairFromDeposit(
     return
   }
 
-  console.log('[training] pair created, id:', inserted?.id, 'quality:', scores.quality_score, 'included:', includeInTraining(scores.quality_score, probeType))
+  console.log('[training] pair created, id:', inserted?.id, 'quality:', scores.quality_score, 'included:', included)
 }
 
 // ── Create from voice ─────────────────────────────────────────────────────────
