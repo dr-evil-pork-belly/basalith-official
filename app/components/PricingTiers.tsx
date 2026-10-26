@@ -32,12 +32,12 @@ interface Tier {
 const TIERS: Tier[] = [
   {
     id:          'active',
-    eyebrow:     'While You Are Building',
+    eyebrow:     'While you are building the record',
     name:        'Active',
     annualPrice: '$3,600',
     annualSub:   '',
     monthlyPrice:'$360',
-    description: 'Your Basalith, in full.\nYour entity learns from you every week.\nYour family adds what they remember.\nThe record of how you think keeps growing.',
+    description: 'Your Basalith, in full.\nYour entity answers from a record that grows every week.\nThe people you invite add what they remember.\nThe record of how you decide keeps growing.',
     featured:    true,
     features: [
       'Weekly story prompts',
@@ -58,12 +58,12 @@ const TIERS: Tier[] = [
   },
   {
     id:          'resting',
-    eyebrow:     'When Life Gets in the Way',
+    eyebrow:     'When you need to step back',
     name:        'Resting',
     annualPrice: '$600',
     annualSub:   '',
     monthlyPrice:'$60',
-    description: 'Your Basalith, kept and waiting.\nNo emails. No prompts.\nEverything you built, safe and intact,\nuntil you are ready to come back.',
+    description: 'Your Basalith, kept and waiting.\nNo emails. No prompts.\nEverything you built, intact,\nuntil you are ready to come back.',
     featured:    false,
     features: [
       'All data preserved permanently',
@@ -78,17 +78,22 @@ const TIERS: Tier[] = [
   },
   {
     id:          'legacy',
-    eyebrow:     'Your Basalith Continues',
+    // October 25, 2026: was "Legacy", "billed to estate or family", "for your
+    // heirs". The tier id, price, and billing are unchanged. The copy now says
+    // what the tier is: the record kept open for the people who rely on it
+    // after the owner has stopped adding to it. Record:
+    // docs/NICHE_PASS_2026-10-25.md.
+    eyebrow:     'After you have stepped back',
     name:        'Legacy',
     annualPrice: '$1,200',
-    annualSub:   'billed to estate or family',
+    annualSub:   'billed to you, your business, or your family',
     monthlyPrice:'$1,200',
     annualOnly:  true,
-    description: 'The entity continues.\n\nYour family can keep asking. Every contributor who adds a memory makes the record more complete. What you said while you were here stays exactly as you said it.',
+    description: 'The record stays open.\n\nThe people who rely on your judgment can keep asking. Everyone you invited can keep adding what they remember. What you said stays exactly as you said it.',
     featured:    false,
     features: [
-      'Your Basalith and entity continue for your heirs',
-      'Full family contributor access',
+      'Your Basalith stays open to the people you named',
+      'Contributors keep their access',
       'Cognitive fingerprint frozen. Nobody can change what you said',
       'A second copy offsite under a ninety day lock nobody can shorten',
       'Storage and security',
@@ -96,7 +101,7 @@ const TIERS: Tier[] = [
     ],
     cta:     'Ask About Legacy',
     ctaHref: '/contact',
-    note:    'Arranged with us directly, or through your estate. Annual billing only.',
+    note:    'Arranged with us directly. Annual billing only.',
   },
 ]
 
@@ -136,7 +141,7 @@ export default function PricingTiers() {
           }}
         >
           <span style={{ width: '24px', height: '1px', background: 'var(--color-gold)', display: 'block', flexShrink: 0 }} aria-hidden="true" />
-          Three Moments. One Basalith.
+          Three plans. One Basalith.
           <span style={{ width: '24px', height: '1px', background: 'var(--color-gold)', display: 'block', flexShrink: 0 }} aria-hidden="true" />
         </p>
 
@@ -150,7 +155,7 @@ export default function PricingTiers() {
             marginBottom:  '16px',
           }}
         >
-          A life moves through all three.
+          Built to move with you.
         </h2>
 
         <p
@@ -164,7 +169,7 @@ export default function PricingTiers() {
             marginBottom: '32px',
           }}
         >
-          Begin active. Rest when life demands it. Leave something permanent.
+          Begin active. Rest when you need to. Keep the record open for the people who rely on it.
         </p>
 
         {/* Founding fee — legible subhead, not a faint mono eyebrow */}
@@ -403,8 +408,8 @@ export default function PricingTiers() {
         </p>
         <div style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.8, color: 'var(--color-text-secondary)' }}>
           <p style={{ marginBottom: '16px' }}>
-            If you work with an estate attorney or CPA, it is worth asking whether
-            the annual Basalith fee qualifies as an estate planning expense.
+            If you work with a CPA or an attorney, it is worth asking how the
+            fee is treated for you or for the business.
           </p>
           <p style={{ marginBottom: '16px' }}>
             We provide detailed invoicing and service descriptions for that

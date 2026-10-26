@@ -45,7 +45,7 @@ export const ORG_SCHEMA = {
   // in basalith-xyz/app/layout.tsx if that block ever carries one.
 
   description:
-    'Basalith builds a cognitive reference model of the operator of a business, from what they deposit and from what the people around them observe, so the way they reason transfers through an acquisition or a succession. Also available for one person or a family.',
+    'Basalith builds a cognitive reference model of the owner of a business, from what they deposit and from what the people around them observe, so the way they reason transfers through an acquisition or a succession. Also available for one person or a family.',
 
   // Read by search engines when a name collides with a better known word.
   // "Basalith" is basalt plus monolith. Google currently reads it as a
@@ -59,7 +59,7 @@ export const ORG_SCHEMA = {
     'Mergers and acquisitions diligence',
     'Key person risk',
     'Tacit knowledge',
-    'Founder dependence',
+    'Owner dependence',
   ],
 
   founder: {

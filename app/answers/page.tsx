@@ -9,7 +9,7 @@ import { ANSWERS, answerPath } from '@/lib/answers'
 
 export const metadata: Metadata = {
   title:       'Answers',
-  description: 'Plain answers to the questions people ask about what happens to an operator’s judgment when a business changes hands.',
+  description: 'Plain answers to the questions people ask about what happens to an owner’s judgment when a business changes hands.',
   alternates:  { canonical: '/answers' },
 }
 

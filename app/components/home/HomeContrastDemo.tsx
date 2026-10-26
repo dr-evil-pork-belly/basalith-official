@@ -15,7 +15,7 @@ import { mono, serif, StoneBlock, StoneCard } from './StonePrimitives'
 type Audience = 'founder' | 'family'
 
 const AUDIENCE_NAME: Record<Audience, string> = {
-  founder: 'Founders & Successors',
+  founder: 'Owners & Successors',
   family:  'Individuals & Families',
 }
 

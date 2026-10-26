@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title:       'About · Basalith',
-  description: 'Human Augmentation Technologies Corp. built Basalith to capture how an operator reasons before a business changes hands, so the judgment transfers through an acquisition or a succession. Also available for one person or a family.',
+  description: 'Human Augmentation Technologies Corp. built Basalith to capture how an owner reasons before a business changes hands, so the judgment transfers through an acquisition or a succession. Also available for one person or a family.',
 }
 
 const SERIF: React.CSSProperties = {
@@ -82,7 +82,7 @@ export default function AboutPage() {
 
           <p style={BODY}>
             When a business changes hands, the assets transfer and the judgment
-            that built them does not. Basalith captures how the operator reasons
+            that built them does not. Basalith captures how the owner reasons
             while they are still running the company, so it transfers too.
           </p>
           <p style={BODY}>
@@ -92,7 +92,7 @@ export default function AboutPage() {
           </p>
           <p style={BODY}>That is what Basalith is for.</p>
           <p style={{ ...BODY, marginBottom: 0 }}>
-            For a founder carrying thirty years of judgment in their head and nowhere
+            For the owner of a dealership, a distributor, or a practice, carrying thirty years of judgment in their head and nowhere
             else. For a family that wants to keep how someone thinks, not just what
             they owned. For the people who come after, who deserve the real version
             of the people who shaped them.

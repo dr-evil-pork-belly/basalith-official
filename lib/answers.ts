@@ -19,7 +19,7 @@ export type AnswerMeta = {
 export const ANSWERS: readonly AnswerMeta[] = [
   {
     slug:     'founder-judgment-when-a-business-is-sold',
-    question: 'What happens to a founder’s judgment when the business is sold?',
+    question: 'What happens to an owner’s judgment when the business is sold?',
     summary:  'The systems and the client list transfer. The reasoning behind them usually does not.',
   },
 ]

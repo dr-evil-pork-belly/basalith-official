@@ -23,7 +23,7 @@ const LINK: React.CSSProperties = { color: 'var(--color-gold)', textDecoration: 
 const QA: { q: string; a: React.ReactNode; plain?: string }[] = [
   {
     q: 'What is Basalith?',
-    a: 'Basalith builds a cognitive reference model of one person, from what they deposit and from what the people around them observe. For a business, that person is the operator, and the model transfers with the company through an acquisition or a succession. For a family, it is a parent or a grandparent, and the model stays with the people who relied on their judgment.',
+    a: 'Basalith builds a cognitive reference model of one person, from what they deposit and from what the people around them observe. For a business, that person is the owner, and the model transfers with the company through an acquisition or a succession. For a family, it is a parent or a grandparent, and the model stays with the people who relied on their judgment.',
   },
   {
     q: 'Is this a chatbot trained on someone’s old emails?',
@@ -48,10 +48,10 @@ const QA: { q: string; a: React.ReactNode; plain?: string }[] = [
   {
     q: 'What happens when a business changes hands?',
     a: <>
-      The operator’s cognitive fingerprint is frozen at transition. The successor or acquirer gets portal access and can add today’s context, but nobody can rewrite what the operator said.
+      The owner’s cognitive fingerprint is frozen at transition. The successor or acquirer gets portal access and can add today’s context, but nobody can rewrite what the owner said.
       {' '}<a href="/succession" style={LINK}>How the handoff works &rarr;</a>
     </>,
-    plain: 'The operator’s cognitive fingerprint is frozen at transition. The successor or acquirer gets portal access and can add today’s context, but nobody can rewrite what the operator said.',
+    plain: 'The owner’s cognitive fingerprint is frozen at transition. The successor or acquirer gets portal access and can add today’s context, but nobody can rewrite what the owner said.',
   },
   {
     q: 'What happens when I am gone?',
@@ -77,7 +77,7 @@ const QA: { q: string; a: React.ReactNode; plain?: string }[] = [
     q: 'Who owns the data, and is it secure?',
     a: <>
       You own it. We are the custodian, not the owner. Your Basalith is encrypted at rest and in transit, kept in private storage, and never shared, sold, or used to train another company’s model. You can export all of it in open formats any time you ask, so nothing is stranded if we ever close.
-      {' '}<a href="/data-ownership" style={LINK}>Data ownership &rarr;</a>
+      {' '}<a href="/data-ownership" style={LINK}>Datan ownership &rarr;</a>
       {' '}<a href="/security" style={LINK}>Security &rarr;</a>
     </>,
     plain: 'You own it. We are the custodian, not the owner. Your Basalith is encrypted at rest and in transit, kept in private storage, and never shared, sold, or used to train another company’s model. You can export all of it in open formats any time you ask, so nothing is stranded if we ever close.',
@@ -85,10 +85,10 @@ const QA: { q: string; a: React.ReactNode; plain?: string }[] = [
   {
     q: 'Can I try it before I commit?',
     a: <>
-      Yes. The demo runs on a fictional founder and the same pipeline as production. Ask it something. Then ask it something the founder never answered, and watch what it does.
+      Yes. The demo runs on a fictional owner and the same pipeline as production. Ask it something. Then ask it something the owner never answered, and watch what it does.
       {' '}<a href="/succession/demo" style={LINK}>Open the demo &rarr;</a>
     </>,
-    plain: 'Yes. The demo runs on a fictional founder and the same pipeline as production. Ask it something. Then ask it something the founder never answered, and watch what it does.',
+    plain: 'Yes. The demo runs on a fictional owner and the same pipeline as production. Ask it something. Then ask it something the owner never answered, and watch what it does.',
   },
   {
     q: 'How do I begin?',

@@ -36,8 +36,8 @@ const H2: React.CSSProperties = {
 
 const DATA_CARDS = [
   {
-    headline: 'We never use your record to train other people\'s entities.',
-    body:     'What you deposit trains your entity. It does not make anyone else\'s entity smarter. Your memories stay in your Basalith.',
+    headline: 'Your record answers for you and nobody else.',
+    body:     'Your entity answers only from what you deposited. Nothing you put down is read by anyone else\'s entity, and nothing anyone else put down is read by yours.',
   },
   {
     headline: 'You can take everything with you.',
@@ -198,10 +198,10 @@ export default function IntegrityPage() {
               <div style={{ border: '1px solid rgba(160,132,80,0.3)', padding: 'clamp(24px,3vw,36px)', background: 'rgba(160,132,80,0.03)' }}>
                 <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold-on-light)', marginBottom: '16px' }}>The Voice Layer</p>
                 <p style={{ ...BODY, margin: 0 }}>
-                  As your record grows a second system learns how you say things: your phrasing,
-                  your characteristic way of expressing uncertainty, the specific words you reach for.
+                  The entity answers in your own words, drawn from the record. As the record grows,
+                  so does what it has of your phrasing, your way of expressing uncertainty, the specific words you reach for.
                   <br /><br />
-                  This is why, as the record deepens, the entity starts to sound like you and not just report on you.
+                  Nothing is learned apart from the record. The record is what it reads, and that is why, as it deepens, the entity sounds more like you and less like a report on you.
                 </p>
               </div>
             </div>

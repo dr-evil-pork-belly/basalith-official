@@ -4,8 +4,8 @@ import Nav    from '../components/Nav'
 import Footer from '../components/Footer'
 
 export const metadata: Metadata = {
-  title:       'For Individuals and Families · Basalith',
-  description: 'You will have the photographs. You will not have the way they thought. Basalith keeps how a person thinks, decides, and sees the world, captured while they are here and fully present.',
+  title:       'For One Person · Basalith',
+  description: 'For your own judgment, at work and at home, or for a parent whose thinking you want to keep. Basalith keeps how a person decides, in their own words, captured while they are here to give it.',
 }
 
 const MONO: React.CSSProperties = {
@@ -100,10 +100,10 @@ export default function FamiliesPage() {
         {/* ── Section 1: The Premise ── */}
         <section style={{ padding: `clamp(140px,16vw,200px) ${PAD} clamp(72px,9vw,110px)`, maxWidth: '960px' }}>
           <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '16px' }}>
-            Basalith for Individuals and Families
+            Basalith for One Person
           </p>
           <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)', lineHeight: 1.8, marginBottom: '36px', maxWidth: '640px' }}>
-            How a person thinks, decides, and sees the world. Kept.
+            Your own judgment, or a parent’s. Kept in their own words.
           </p>
           <h1 style={{
             ...SERIF,
@@ -115,10 +115,10 @@ export default function FamiliesPage() {
             marginBottom:  '36px',
             maxWidth:      '820px',
           }}>
-            You will have the photographs. You will not have the way they thought.
+            The calls you make at work and at home come from the same place.
           </h1>
           <p style={{ ...GEORGIA, fontSize: '1.2rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.85, color: ON_DARK_2, maxWidth: '660px', margin: 0 }}>
-            Photographs hold a face. Letters hold a moment. Neither holds how a person reasoned, the advice they would give you, or the judgment the people around them lean on. Basalith keeps how a person thinks, captured while they are here and fully present.
+            A Basalith holds how you make them, in your own words, while you are still the one who can say why. The same method works for a parent: photographs hold a face, and letters hold a moment, but neither holds how they reasoned or the advice they would give you now. Basalith keeps that, captured while they are here and fully present.
           </p>
           <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'center', marginTop: '44px' }}>
             <Link
@@ -135,7 +135,7 @@ export default function FamiliesPage() {
                 transition:     'background 250ms ease',
               }}
             >
-              Begin a family Basalith
+              Begin with one call
             </Link>
             <Link href="/pricing" style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)', textDecoration: 'none' }}>
               See pricing <span aria-hidden="true">&rarr;</span>
@@ -296,7 +296,7 @@ export default function FamiliesPage() {
                 transition:     'background 250ms ease',
               }}
             >
-              Begin a family Basalith
+              Begin with one call
             </Link>
             <p style={{ ...GEORGIA, fontSize: '0.95rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.8, color: ON_DARK_3, margin: '28px 0 0' }}>
               No application and no approval. Your name, your email, and the first call. You see what your Basalith does with your own words before anything is owed.

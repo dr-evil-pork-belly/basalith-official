@@ -54,7 +54,7 @@ export default function FoundingSessionPage() {
             <br />
             Three of the hardest calls you ever made.
             <br />
-            For a business, the hardest calls the operator ever made running it.
+            For a business, the hardest calls the owner ever made running it.
           </p>
 
           <p style={P}>

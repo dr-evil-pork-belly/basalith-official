@@ -4,12 +4,14 @@ import { useEffect, useState } from 'react'
 import Nav    from '../components/Nav'
 import Footer from '../components/Footer'
 
-type Intent = 'general' | 'report' | 'pricing' | 'partner' | 'press'
+type Intent = 'general' | 'report' | 'succession' | 'acquisition' | 'pricing' | 'partner' | 'press'
 type Status = 'idle' | 'loading' | 'success' | 'error'
 
 const INTENTS: { value: Intent; label: string }[] = [
   { value: 'general', label: 'A question about Basalith' },
   { value: 'report',  label: 'A dependency report for my business' },
+  { value: 'succession',  label: 'Handing my business to a successor' },
+  { value: 'acquisition', label: 'Buying a business' },
   { value: 'pricing', label: 'Pricing'                   },
   { value: 'partner', label: 'Partnering as an advisor (M&A, CPA, exit planner, attorney)' },
   { value: 'press',   label: 'Press'                     },
@@ -18,7 +20,9 @@ const INTENTS: { value: Intent; label: string }[] = [
 const INTENT_VALUES = new Set<string>(INTENTS.map(i => i.value))
 
 // ?intent=report is set by the buttons on /dependency-report (October 23,
-// 2026). Record: docs/OWNER_BUYER_2026-10-23.md.
+// 2026). ?intent=succession and ?intent=acquisition are set by every business
+// button on the site since October 25, 2026, when /apply stopped being linked
+// (docs/NICHE_PASS_2026-10-25.md). Record: docs/OWNER_BUYER_2026-10-23.md.
 // ?intent=partner is set by the links on /partner (October 15, 2026). It only
 // preselects the topic; the person can change it. Read from window in an
 // effect rather than useSearchParams so this page keeps rendering statically
@@ -120,7 +124,7 @@ export default function ContactPage() {
             <em style={{ fontStyle: 'italic', color: 'var(--color-gold)' }}>We will tell you if this fits.</em>
           </h1>
           <p style={{ ...SERIF, fontStyle: 'italic', fontWeight: 400, fontSize: '1.1rem', color: 'var(--color-text-secondary)', lineHeight: 1.8, maxWidth: '460px', margin: '0 auto' }}>
-            We are a small team and we read every message ourselves. A business handing over, a parent whose thinking you want to keep, a question about how any of this works. Start here.
+            We read every message ourselves. A business handing over, a report on how much of yours runs through you, a parent whose thinking you want to keep, a question about how any of this works. Start here.
           </p>
         </section>
 

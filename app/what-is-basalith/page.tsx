@@ -21,7 +21,7 @@ import { faqSchema, ld, type FaqEntry } from '@/lib/structuredData'
 
 export const metadata: Metadata = {
   title:       'What is Basalith?',
-  description: 'Basalith builds a cognitive reference model of the operator of a business, so the way they reason transfers when the company changes hands. Not basalt. Not a basilisk.',
+  description: 'Basalith builds a cognitive reference model of the owner of a business, so the way they reason transfers when the company changes hands. Not basalt. Not a basilisk.',
   alternates:  { canonical: '/what-is-basalith' },
 }
 
@@ -43,7 +43,7 @@ const ENTRIES: readonly FaqEntry[] = [
   {
     question: 'What is Basalith?',
     answer:
-      'Basalith builds a cognitive reference model of the operator of a business, so the way they reason transfers when the company changes hands. It is built while they are still running the company, from their own words.',
+      'Basalith builds a cognitive reference model of the owner of a business, so the way they reason transfers when the company changes hands. It is built while they are still running the company, from their own words.',
   },
   {
     question: 'What does the name Basalith mean?',
@@ -53,7 +53,7 @@ const ENTRIES: readonly FaqEntry[] = [
   {
     question: 'What problem does Basalith solve?',
     answer:
-      'What built a company is rarely written down. It sits in which deals the operator walked away from, which hires they trusted against the resume, and when they held the line. At an acquisition or a succession, that reasoning leaves with the person, and the buyer or the successor inherits the assets without the judgment that produced them.',
+      'What built a company is rarely written down. It sits in which deals the owner walked away from, which hires they trusted against the resume, and when they held the line. At an acquisition or a succession, that reasoning leaves with the person, and the buyer or the successor inherits the assets without the judgment that produced them.',
   },
   {
     question: 'Is Basalith a chatbot trained on someone’s old emails?',
@@ -141,7 +141,7 @@ export default function WhatIsBasalithPage() {
               marginBottom: '32px',
             }}
           >
-            Basalith builds a cognitive reference model of the operator of a
+            Basalith builds a cognitive reference model of the owner of a
             business, so the way they reason transfers when the company changes
             hands. It is built while they are still running the company, from
             their own words.

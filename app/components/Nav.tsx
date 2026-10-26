@@ -16,7 +16,6 @@ const MOBILE_LINKS = [
   { href: '/about',           label: 'About'            },
   { href: '/method',          label: 'The Method'       },
   { href: '/founding-session',label: 'The Founding' },
-  { href: '/apply',           label: 'Apply'            },
   { href: '/archive-login',   label: 'Client Login'     },
 ]
 

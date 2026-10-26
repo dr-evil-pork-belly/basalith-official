@@ -7,7 +7,7 @@ import PricingTiers from '../components/PricingTiers'
 
 export const metadata: Metadata = {
   title: 'Pricing · Basalith',
-  description: 'Basalith pricing, in full. Succession at $12,000 a year plus a one time Founding fee. Acquisition engagements from $50,000. A Basalith for one person or a family: the first call is yours, then $2,500 to found it.',
+  description: 'Basalith pricing, in full. The dependency report, $5,000. Succession at $12,000 a year plus a one time Founding fee. Acquisition engagements from $50,000. A Basalith for one person: the first call is yours, then $2,500 to found it.',
 }
 
 const MONO: React.CSSProperties = {
@@ -125,6 +125,16 @@ const SECURITY_BADGES: { icon: IconName; label: string }[] = [
   { icon: 'columns',  label: 'Academic research foundation' },
 ]
 
+// What the report page states, nothing more (app/dependency-report/page.tsx).
+const REPORT_FEATURES = [
+  'Eight calls, one for each area of how the business runs',
+  'Two readings for every area, measured twice',
+  'Where the record is silent, it says so. No score',
+  'You read it first. Nobody else sees it unless you share it',
+  'Names the gap a Succession Basalith closes',
+  'By voice or typed, on your own time',
+]
+
 const SUCCESSION_FEATURES = [
   'The Founding, with a live successor session by video',
   'Business decision framework capture',
@@ -187,7 +197,7 @@ export default function PricingPage() {
               marginBottom:  '28px',
             }}
           >
-            Pricing for a transition.
+            Pricing, in full.
           </h1>
           <p
             style={{
@@ -201,7 +211,7 @@ export default function PricingPage() {
               margin:     '0 auto',
             }}
           >
-            For a business changing hands, and for one person or a family. Every Basalith begins with The Founding.
+            For the owner of a business, and for one person. Start with the report. Every Basalith begins with The Founding.
           </p>
         </section>
 
@@ -229,18 +239,59 @@ export default function PricingPage() {
           ))}
         </div>
 
-        {/* Succession leads */}
+        {/* The dependency report, first. October 25, 2026. The price is the
+            October 23 decision ($5,000, whoever orders it). Nothing charges it:
+            every order is set up by hand, so the button is the contact form.
+            Record: docs/NICHE_PASS_2026-10-25.md. */}
         <section className="b2b-paper" style={{ background: 'var(--color-bg)', padding: 'clamp(72px,10vw,120px) clamp(24px,6vw,80px)', borderTop: '1px solid var(--color-border)' }}>
           <div style={{ maxWidth: '700px', margin: '0 auto' }}>
-            <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '16px' }}>For Business</p>
+            <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '16px' }}>For Business &middot; Start here</p>
+            <h2 style={{ ...SERIF, fontSize: 'clamp(2rem,4vw,3rem)', fontWeight: 400, lineHeight: 1.1, color: 'var(--color-text-primary)', marginBottom: '16px' }}>
+              The Dependency Report
+            </h2>
+            <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.85, color: 'var(--color-text-secondary)', marginBottom: '48px' }}>
+              How much of the business runs through you. Eight calls, one for each area of how the business runs, and a report that shows which decisions run through you and which of those are on the record. You read it first.
+            </p>
+
+            <div style={{ border: '1px solid var(--color-border-medium)', borderTop: '2px solid var(--color-gold)', padding: 'clamp(32px,5vw,52px)', background: 'var(--color-surface)', boxShadow: 'var(--shadow-md)', marginBottom: '24px' }}>
+              <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)', marginBottom: '16px' }}>Dependency Report</p>
+              <p style={{ ...SERIF, fontSize: 'clamp(2.5rem,5vw,3.2rem)', fontWeight: 400, color: 'var(--color-text-primary)', lineHeight: 1, marginBottom: '4px' }}>$5,000</p>
+              <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-text-muted)', marginBottom: '28px' }}>one time, whoever orders it</p>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 20px', marginBottom: '32px' }}>
+                {REPORT_FEATURES.map(f => (
+                  <p key={f} style={{ ...SERIF, fontSize: '0.98rem', lineHeight: 1.5, color: 'var(--color-text-secondary)', margin: 0, paddingLeft: '18px', textIndent: '-18px' }}><span aria-hidden="true" style={{ display: 'inline-block', width: '10px', height: '1px', background: 'var(--color-gold)', verticalAlign: 'middle', marginRight: '8px' }} />{f}</p>
+                ))}
+              </div>
+              <Link
+                href="/contact?intent=report"
+                className="pricing-cta-paper"
+                style={{ ...MONO, fontSize: 'var(--text-caption)', display: 'block', textAlign: 'center', textDecoration: 'none', background: 'var(--btn)', color: 'var(--btn-label)', padding: '16px 32px', transition: 'background 250ms ease' }}
+              >
+                Request a report
+              </Link>
+            </div>
+
+            <p style={{ ...SERIF, fontSize: '0.95rem', fontStyle: 'italic', color: 'var(--color-text-muted)', lineHeight: 1.8 }}>
+              You can order it on yourself. A buyer, a lender, or your advisor can also order one, and you still take the calls and read it first.
+            </p>
+            <Link href="/dependency-report" className="pricing-ghost-link" style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)', textDecoration: 'none', display: 'inline-block', marginTop: '16px' }}>
+              How the report works &rarr;
+            </Link>
+          </div>
+        </section>
+
+        {/* Succession, second */}
+        <section className="b2b-paper" style={{ background: 'var(--color-bg)', padding: 'clamp(72px,10vw,120px) clamp(24px,6vw,80px)', borderTop: '1px solid var(--color-border)' }}>
+          <div style={{ maxWidth: '700px', margin: '0 auto' }}>
+            <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '16px' }}>For Business &middot; Closing the gap</p>
             <h2 style={{ ...SERIF, fontSize: 'clamp(2rem,4vw,3rem)', fontWeight: 400, lineHeight: 1.1, color: 'var(--color-text-primary)', marginBottom: '16px' }}>
               Succession
             </h2>
             <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.85, color: 'var(--color-text-secondary)', marginBottom: '16px' }}>
-              For founders and partners preparing to step back.
+              For the owner or partner preparing to step back.
             </p>
             <p style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.85, color: 'var(--color-text-muted)', marginBottom: '48px' }}>
-              The pattern recognition nobody wrote down. The sense of risk built over decades. The judgment no handbook can hold. That is what Basalith captures before the founder steps back, and what the successor gets to consult after.
+              The pattern recognition nobody wrote down. The sense of risk built over decades. The judgment no handbook can hold. That is what Basalith captures before the owner steps back, and what the successor gets to consult after.
             </p>
 
             <div style={{ border: '1px solid var(--color-border-medium)', borderTop: '2px solid var(--color-gold)', padding: 'clamp(32px,5vw,52px)', background: 'var(--color-surface)', boxShadow: 'var(--shadow-md)', marginBottom: '24px' }}>
@@ -254,7 +305,7 @@ export default function PricingPage() {
                 ))}
               </div>
               <Link
-                href="/apply?type=succession"
+                href="/contact?intent=succession"
                 className="pricing-cta-paper"
                 style={{ ...MONO, fontSize: 'var(--text-caption)', display: 'block', textAlign: 'center', textDecoration: 'none', background: 'var(--btn)', color: 'var(--btn-label)', padding: '16px 32px', transition: 'background 250ms ease' }}
               >
@@ -271,35 +322,17 @@ export default function PricingPage() {
           </div>
         </section>
 
-        {/* Acquisition — per-deal engagement. Distinct block, not a tier card, not in the Active/Resting/Legacy group. */}
-        <section className="b2b-paper" style={{ background: 'var(--color-bg)', padding: 'clamp(72px,10vw,120px) clamp(24px,6vw,80px)', borderTop: '1px solid rgba(160,132,80,0.18)' }}>
-          <div style={{ maxWidth: '700px', margin: '0 auto' }}>
-            <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-              <span style={{ width: '24px', height: '1px', background: 'var(--color-gold)', display: 'block', flexShrink: 0 }} aria-hidden="true" />
-              Acquisition
+        {/* Acquisition. October 25, 2026: a floor for buyers who search, not a
+            door. It was a full section with its own button; acquisition is a
+            showcase engagement, scoped by conversation. */}
+        <section className="b2b-paper" style={{ background: 'var(--color-bg)', padding: 'clamp(40px,5vw,64px) clamp(24px,6vw,80px) clamp(72px,10vw,120px)' }}>
+          <div style={{ maxWidth: '700px', margin: '0 auto', borderTop: '1px solid rgba(160,132,80,0.18)', paddingTop: '36px' }}>
+            <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '16px' }}>Buying the company?</p>
+            <p style={{ ...SERIF, fontSize: '1.1rem', fontWeight: 400, lineHeight: 1.8, color: 'var(--color-text-primary)', marginBottom: '12px' }}>
+              Acquisition engagements start at $50,000, scaled to the size and complexity of the transaction. Priced against the value at risk in the deal, as part of diligence, not as software. The buyer pays, because the buyer is the one holding the risk.
             </p>
-            <h2 style={{ ...SERIF, fontSize: 'clamp(2rem,4vw,3rem)', fontWeight: 400, lineHeight: 1.15, color: 'var(--color-text-primary)', letterSpacing: '-0.02em', marginBottom: '28px' }}>
-              When you buy the company, you buy how it was run.
-            </h2>
-            <p style={{ ...SERIF, fontSize: '1.1rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.85, color: 'var(--color-text-secondary)', marginBottom: '40px' }}>
-              For buyers. Quality of earnings tells you what the numbers were. Nothing in diligence tells you how the operator decided, and the earnout assumes that judgment comes with the building. Basalith captures it before the handoff, so what you paid for is still in the room after closing.
-            </p>
-
-            <div style={{ borderTop: '1px solid rgba(160,132,80,0.18)', paddingTop: '36px', marginBottom: '40px' }}>
-              <p style={{ ...SERIF, fontSize: 'clamp(1.5rem,3vw,2rem)', fontWeight: 400, color: 'var(--color-text-primary)', lineHeight: 1.3, marginBottom: '16px' }}>
-                Engagements start at $50,000, scaled to the size and complexity of the transaction.
-              </p>
-              <p style={{ ...SERIF, fontSize: '1rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.8, color: 'var(--color-text-secondary)', margin: 0 }}>
-                Priced against the value at risk in the deal, as part of diligence, not as software. The buyer pays, because the buyer is the one holding the risk.
-              </p>
-            </div>
-
-            <Link
-              href="/apply?type=acquisition"
-              className="pricing-cta-paper"
-              style={{ ...MONO, fontSize: 'var(--text-caption)', display: 'inline-block', textDecoration: 'none', background: 'var(--btn)', color: 'var(--btn-label)', padding: '16px 32px', transition: 'background 250ms ease' }}
-            >
-              Talk to us about a transaction
+            <Link href="/contact?intent=acquisition" className="pricing-ghost-link" style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)', textDecoration: 'none', display: 'inline-block', marginTop: '8px' }}>
+              Talk to us about a transaction &rarr;
             </Link>
           </div>
         </section>
@@ -338,7 +371,7 @@ export default function PricingPage() {
               <p style={{ marginBottom: '20px' }}>Every Basalith begins with The Founding.</p>
               <p style={{ marginBottom: '20px' }}>
                 Three of the hardest calls you ever made, in your own words, in your own
-                time. For a business, the hardest calls the operator made running it,
+                time. For a business, the hardest calls the owner made running it,
                 then one live session by video with the successor in the room. For an
                 individual or a family, the calls that show how someone sees the world.
               </p>
@@ -392,13 +425,13 @@ export default function PricingPage() {
         <section style={{ background: 'var(--color-surface-alt)', padding: 'clamp(64px,8vw,96px) clamp(24px,6vw,80px) 0', textAlign: 'center' }}>
           <div style={{ maxWidth: '620px', margin: '0 auto' }}>
             <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)', marginBottom: '16px' }}>
-              For one person or a family
+              For one person
             </p>
             <h2 style={{ ...SERIF, fontSize: 'clamp(1.75rem,3vw,2.5rem)', fontWeight: 400, lineHeight: 1.15, color: 'var(--color-text-primary)', letterSpacing: '-0.02em', marginBottom: '16px' }}>
               For your own judgment, at home or at work.
             </h2>
             <p style={{ ...SERIF, fontSize: '1.05rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.8, color: 'var(--color-text-secondary)', margin: 0 }}>
-              The same method, pointed at one person: the calls your work depends on, and the way you see the world. The first call is yours before anything is owed. Three plans, built to move with you as life changes.
+              The same method, pointed at one person: the calls your work depends on, and the way you see the world. The same for a parent whose thinking you want to keep. The first call is yours before anything is owed.
             </p>
           </div>
         </section>
@@ -445,7 +478,7 @@ export default function PricingPage() {
               <Link href="/begin" className="pricing-ghost-link" style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)', textDecoration: 'none' }}>
                 Begin with one call &rarr;
               </Link>
-              <Link href="/apply?type=succession" className="pricing-ghost-link" style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)', textDecoration: 'none' }}>
+              <Link href="/contact?intent=succession" className="pricing-ghost-link" style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)', textDecoration: 'none' }}>
                 Talk to us about a succession &rarr;
               </Link>
             </div>
@@ -491,10 +524,10 @@ export default function PricingPage() {
               <Mark name="lock" size={14} /> The Immutability Vault
             </p>
             <p style={{ ...SERIF, fontSize: '1rem', fontWeight: 400, lineHeight: 1.8, color: 'var(--color-text-secondary)', margin: '0 0 8px' }}>
-              What you say is fixed the moment you say it, not after you pass. The database refuses any edit or deletion.
+              What you say is fixed the moment you say it. The database refuses any edit or deletion.
             </p>
             <p style={{ ...SERIF, fontSize: '1rem', fontWeight: 400, lineHeight: 1.8, color: 'var(--color-text-secondary)', margin: '0 0 8px' }}>
-              Heirs can add context. Nobody can reach back, including us.
+              The people you invite can add context. Nobody can reach back, including us.
             </p>
             <a href="/integrity" style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)', textDecoration: 'none', display: 'inline-block', marginTop: '8px' }}>
               How this works →

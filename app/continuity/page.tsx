@@ -205,7 +205,7 @@ export default function ContinuityPage() {
             </p>
 
             <a
-              href="/apply"
+              href="/contact?intent=succession"
               style={{
                 display:       'inline-block',
                 background:    'var(--on-dark)',

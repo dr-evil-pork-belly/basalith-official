@@ -8,6 +8,7 @@ import { ANSWERS, answerPath } from '@/lib/answers'
 // footer links, the two routes the FAQ links, and the new /what-is-basalith
 // page. It deliberately leaves out routes that exist in app/ but that could
 // not be confirmed live from the filesystem alone: /asset, /press, /partner,
+// /apply (unlinked since October 25, 2026, sent by hand after a conversation),
 // /continuity, /custodianship, /posthumous-archive, /privacy-policy,
 // /join-archivists, /login, /register, /resume, /game and the dead (auth),
 // (curator) and (dashboard) route groups.
@@ -34,8 +35,8 @@ const ROUTES: Entry[] = [
   { path: '/security',          priority: 0.5, changeFrequency: 'yearly'  },
   { path: '/data-ownership',    priority: 0.5, changeFrequency: 'yearly'  },
   { path: '/contact',           priority: 0.5, changeFrequency: 'yearly'  },
-  { path: '/apply',             priority: 0.5, changeFrequency: 'yearly'  },
   { path: '/begin',             priority: 0.5, changeFrequency: 'yearly'  },
+  { path: '/dependency-report', priority: 0.9, changeFrequency: 'monthly' },
   { path: '/privacy',           priority: 0.3, changeFrequency: 'yearly'  },
   { path: '/terms',             priority: 0.3, changeFrequency: 'yearly'  },
 ]

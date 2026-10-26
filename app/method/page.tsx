@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title:       'The Method · Basalith',
-  description: 'We are not building memory. We are building cognition. How Basalith captures the way an operator reasons, from two sources of data, and checks every deposit before it counts.',
+  description: 'We are not building memory. We are building cognition. How Basalith captures the way an owner reasons, from two sources of data, and checks every deposit before it counts.',
 }
 
 const SERIF: React.CSSProperties = {
@@ -42,9 +42,9 @@ const RULE: React.CSSProperties = {
 const STEPS = [
   {
     n:     '01',
-    title: 'What the operator puts in',
+    title: 'What the owner puts in',
     body:  [
-      'The record starts with the operator. The Founding, then one interview for each of the eight areas of how the business runs, voice recordings, written deposits.',
+      'The record starts with the owner. The Founding, then one interview for each of the eight areas of how the business runs, voice recordings, written deposits.',
       'First person reasoning. How they work a problem, what they weigh, what they took from the calls that went wrong. The specific logic of how this one mind decides.',
     ],
   },
@@ -52,8 +52,8 @@ const STEPS = [
     n:     '02',
     title: 'What the people around them saw',
     body:  [
-      'The people who watched the operator decide notice what the operator would never think to record. A cofounder remembers how a deal got reasoned through. A long tenured exec remembers the hire everyone else doubted.',
-      'The outside view catches the patterns the operator takes for granted. In a family, it is a daughter noticing how her father handled pressure. Same mechanism.',
+      'The people who watched the owner decide notice what the owner would never think to record. A cofounder remembers how a deal got reasoned through. A long tenured exec remembers the hire everyone else doubted.',
+      'The outside view catches the patterns the owner takes for granted. In a family, it is a daughter noticing how her father handled pressure. Same mechanism.',
     ],
   },
   {
@@ -69,7 +69,7 @@ const STEPS = [
     n:     '04',
     title: 'How your Basalith grows',
     body:  [
-      'This is not a single interview. After The Founding, the operator works through the eight areas of how the business runs, one interview each, every one opened on a real moment rather than a hypothetical.',
+      'This is not a single interview. After The Founding, the owner works through the eight areas of how the business runs, one interview each, every one opened on a real moment rather than a hypothetical.',
       'Every answer adds depth. The longer the active period runs before a transition, the more the record holds. Start before the handoff is on the calendar, not after.',
     ],
   },
@@ -124,7 +124,7 @@ export default function MethodPage() {
               maxWidth:  '520px',
             }}
           >
-            Two sources of data. One from the operator, one from the people who
+            Two sources of data. One from the owner, one from the people who
             watched them work. Together they capture not just what was decided,
             but how.
           </p>
@@ -188,7 +188,7 @@ export default function MethodPage() {
               <div className="paper-card" style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', padding: 'clamp(28px,3vw,40px)' }}>
                 <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold-on-light)', marginBottom: '20px' }}>At the deposit</p>
                 {[
-                  'Scored for how specific it is, how natural it sounds, and how much it shows the way the operator thinks',
+                  'Scored for how specific it is, how natural it sounds, and how much it shows the way the owner thinks',
                   'Every deposit',
                   'Sets the order the record is read in',
                 ].map(item => (
@@ -198,7 +198,7 @@ export default function MethodPage() {
               <div style={{ background: 'rgba(160,132,80,0.04)', border: '1px solid rgba(160,132,80,0.25)', padding: 'clamp(28px,3vw,40px)' }}>
                 <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)', marginBottom: '20px' }}>At the answer</p>
                 {[
-                  'Read against the operator\u2019s own words before it is returned to a successor',
+                  'Read against the owner\u2019s own words before it is returned to a successor',
                   'Every answer',
                   'Where nothing in the record backs it, a plain no',
                 ].map(item => (
@@ -228,13 +228,13 @@ export default function MethodPage() {
               <div>
                 <h2 style={{ ...H2, marginTop: 0 }}>Two layers, one handoff</h2>
                 <p style={BODY}>
-                  The fingerprint is frozen at transition, fixed from the operator&rsquo;s own deposits. It does not drift.
+                  The fingerprint is frozen at transition, fixed from the owner&rsquo;s own deposits. It does not drift.
                 </p>
                 <p style={BODY}>
-                  A living layer lets the successor add today&rsquo;s context. The judgment stays the operator&rsquo;s.
+                  A living layer lets the successor add today&rsquo;s context. The judgment stays the owner&rsquo;s.
                 </p>
                 <p style={{ ...BODY, marginBottom: '28px' }}>
-                  And where the operator never took a position, the entity says so instead of guessing.
+                  And where the owner never took a position, the entity says so instead of guessing.
                 </p>
                 <a
                   href="/succession"
@@ -258,7 +258,7 @@ export default function MethodPage() {
             </h2>
             <p style={{ ...BODY, color: 'var(--on-dark-3)', marginBottom: '24px' }}>
               Basalith started as a way for families to keep how someone thinks while they are still here to get it right.
-              The method is the same. The operator becomes a parent. The colleagues become the family. The eight areas of the business become the parts of a life.
+              The method is the same. The owner becomes a parent. The colleagues become the family. The eight areas of the business become the parts of a life.
             </p>
             <p style={{ ...BODY, color: 'var(--on-dark-3)', marginBottom: '36px' }}>
               For a family Basalith, photographs are filtered and ranked before anyone is asked to label them, so the family only sees what is worth their time.

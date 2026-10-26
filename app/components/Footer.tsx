@@ -8,12 +8,14 @@ const COLS: { heading: string; links: { label: string; href: string }[] }[] = [
   {
     heading: 'Solutions',
     links: [
-      { label: 'Acquisition',              href: '/apply?type=acquisition' },
-      { label: 'Succession',               href: '/succession'             },
+      // October 25, 2026: a door earns a footer link when it has a paying
+      // customer. Churches (/churches) and Acquisition (a line on /succession)
+      // stay live at their URLs and are sent by hand. Record:
+      // docs/NICHE_PASS_2026-10-25.md.
       { label: 'Dependency Report',        href: '/dependency-report'      },
-      { label: 'Individuals and Families', href: '/families'               },
-      { label: 'Churches',                 href: '/churches'               },
+      { label: 'Succession',               href: '/succession'             },
       { label: 'Advisors',                 href: '/partner'                },
+      { label: 'One Person',               href: '/families'               },
       { label: 'The Founding',             href: '/founding-session'       },
       { label: 'Pricing',                  href: '/pricing'                },
     ],

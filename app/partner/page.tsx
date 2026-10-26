@@ -264,7 +264,7 @@ export default function PartnerPage() {
               <Link href="/succession" style={{ color: 'var(--color-gold)', textDecoration: 'none' }}>the Succession page</Link>.
               Acquisition engagements, where a buyer brings us in during a live transaction,
               are scoped one at a time and start{' '}
-              <Link href="/apply?type=acquisition" style={{ color: 'var(--color-gold)', textDecoration: 'none' }}>here</Link>.
+              <Link href="/contact?intent=acquisition" style={{ color: 'var(--color-gold)', textDecoration: 'none' }}>here</Link>.
             </p>
           </div>
         </section>

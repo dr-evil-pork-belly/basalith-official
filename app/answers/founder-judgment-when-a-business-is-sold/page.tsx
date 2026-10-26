@@ -19,7 +19,7 @@ import AnswerPage, { type AnswerSection } from '../../components/AnswerPage'
 //                                             lib/frozenLayer.ts plus
 //                                             lib/verifyGrounding.ts
 //                                             (was "trained only on one
-//                                             operator's deposits", withdrawn
+//                                             owner's deposits", withdrawn
 //                                             October 23, 2026: nothing is
 //                                             trained per client)
 //   "frozen at transition, successor adds
@@ -31,46 +31,46 @@ import AnswerPage, { type AnswerSection } from '../../components/AnswerPage'
 // same pass.
 
 export const metadata: Metadata = {
-  title:       'What happens to a founder’s judgment when the business is sold?',
-  description: 'The systems and the client list transfer. The reasoning behind them usually does not. What a buyer loses at close, and what can be captured before the operator’s last day.',
+  title:       'What happens to an owner’s judgment when the business is sold?',
+  description: 'The systems and the client list transfer. The reasoning behind them usually does not. What a buyer loses at close, and what can be captured before the owner’s last day.',
   alternates:  { canonical: '/answers/founder-judgment-when-a-business-is-sold' },
 }
 
-const QUESTION = 'What happens to a founder’s judgment when the business is sold?'
+const QUESTION = 'What happens to an owner’s judgment when the business is sold?'
 
 const LEAD =
-  'Most of it does not transfer. The systems and the client list move with the company. The reasoning behind them sits in one head and leaves on the operator’s last day. The buyer paid a multiple for how the company was run, and then owns everything except the way it was run.'
+  'Most of it does not transfer. The systems and the client list move with the company. The reasoning behind them sits in one head and leaves on the owner’s last day. The buyer paid a multiple for how the company was run, and then owns everything except the way it was run.'
 
 const SECTIONS: readonly AnswerSection[] = [
   {
     heading: 'Why does documentation not close the gap?',
     body:
-      'Process documents record what to do. They rarely record why. What built a company is in which deals the operator walked away from, which hires they trusted against the resume, and when they held the line. Those are judgment calls made in specific conditions, and a manual written after the fact flattens them into steps. A successor following the steps still cannot tell which situation is the exception.',
+      'Process documents record what to do. They rarely record why. What built a company is in which deals the owner walked away from, which hires they trusted against the resume, and when they held the line. Those are judgment calls made in specific conditions, and a manual written after the fact flattens them into steps. A successor following the steps still cannot tell which situation is the exception.',
   },
   {
     heading: 'What does a buyer actually lose at close?',
     body:
-      'The earnout assumes the operator’s judgment comes with the building. Most of it lives in one head. When that person leaves, the new team can read the file on a decision but cannot ask why it went that way, what the operator was watching for, or how sure they were. Diligence priced the company on how it was run. After the last day, that is the one asset with no record.',
+      'The earnout assumes the owner’s judgment comes with the building. Most of it lives in one head. When that person leaves, the new team can read the file on a decision but cannot ask why it went that way, what the owner was watching for, or how sure they were. Diligence priced the company on how it was run. After the last day, that is the one asset with no record.',
   },
   {
-    heading: 'Can a founder’s reasoning be captured before they leave?',
+    heading: 'Can an owner’s reasoning be captured before they leave?',
     body:
-      'Only while they are still there to do it. A Basalith is built with the operator present and taking part, not pieced together from old emails once they are gone. It starts with three of the hardest calls they ever made, in their own words and their own time. From there the operator works through 20 real business scenarios and 29 decision questions across 8 domains. Every response is scored for how specific it is, how natural it sounds, and how much it shows the way the operator thinks, and the strongest are put first when the entity answers.',
+      'Only while they are still there to do it. A Basalith is built with the owner present and taking part, not pieced together from old emails once they are gone. It starts with three of the hardest calls they ever made, in their own words and their own time. From there the owner works through 20 real business scenarios and 29 decision questions across 8 domains. Every response is scored for how specific it is, how natural it sounds, and how much it shows the way the owner thinks, and the strongest are put first when the entity answers.',
   },
   {
     heading: 'How is this different from an internal chatbot on company files?',
     body:
-      'Every answer is drawn from one owner’s own deposits and checked against them before it is returned. That is the difference between a system that answers in the operator’s reasoning and one that answers in the average of everything it read. It is also why the boundary holds: where the record is silent, the entity says so rather than producing a plausible position the operator never took.',
+      'Every answer is drawn from one owner’s own deposits and checked against them before it is returned. That is the difference between a system that answers in the owner’s reasoning and one that answers in the average of everything it read. It is also why the boundary holds: where the record is silent, the entity says so rather than producing a plausible position the owner never took.',
   },
   {
     heading: 'What stops the record from being rewritten after the sale?',
     body:
-      'The operator’s cognitive fingerprint is locked at transition. The successor or acquirer gets portal access and can add today’s context, so the model stays useful as the business moves. Nobody can rewrite what the operator said. The record is the permanent asset and the entity is the instrument. If the technology changes, the record is what carries forward.',
+      'The owner’s cognitive fingerprint is locked at transition. The successor or acquirer gets portal access and can add today’s context, so the model stays useful as the business moves. Nobody can rewrite what the owner said. The record is the permanent asset and the entity is the instrument. If the technology changes, the record is what carries forward.',
   },
   {
     heading: 'When does this have to start?',
     body:
-      'Before the transition is on the calendar, if there is a choice. The model has only what the operator deposits, so the longer they deposit, the more there is to transfer. Started during diligence it still works, and it is narrower. Started after the last day it does not work at all, because the person who has to answer is gone.',
+      'Before the transition is on the calendar, if there is a choice. The model has only what the owner deposits, so the longer they deposit, the more there is to transfer. Started during diligence it still works, and it is narrower. Started after the last day it does not work at all, because the person who has to answer is gone.',
   },
   {
     heading: 'What does it cost?',
@@ -83,7 +83,7 @@ const RELATED = [
   { label: 'How the handoff works',  href: '/succession' },
   { label: 'Read the method',        href: '/method'     },
   { label: 'Open the demo',          href: '/succession/demo' },
-  { label: 'Talk to us',             href: '/apply?type=acquisition' },
+  { label: 'Talk to us',             href: '/contact?intent=succession' },
 ] as const
 
 export default function Page() {

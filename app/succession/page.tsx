@@ -7,7 +7,7 @@ import { CATEGORY_LINE } from '@/lib/copy'
 
 export const metadata: Metadata = {
   title:       'For Business · Basalith',
-  description: 'When a business changes hands, the judgment that built it usually does not transfer. Basalith captures how the operator reasons while they still run the company, so it transfers through an acquisition or a succession. Engagements begin with one conversation.',
+  description: 'For the owner of a closely held business. Start with the dependency report: how much of the business runs through you. Then a Succession Basalith captures how you reason, so it transfers to the person taking over. Acquisition engagements for buyers, by conversation.',
 }
 
 const MONO: React.CSSProperties = {
@@ -37,18 +37,30 @@ const WALKS_OUT = [
   'Why the business made the choices it made',
 ]
 
-const TRANSITIONS = [
+// October 25, 2026: was TRANSITIONS, two equal cards (Acquisition first).
+// Now three steps in the order an owner takes them. Acquisition is last and
+// speaks to the buyer. Record: docs/NICHE_PASS_2026-10-25.md.
+const STEPS = [
   {
-    label: 'Acquisition',
-    href:  '/apply?type=acquisition',
-    cta:   'Talk to us about an acquisition',
-    body:  'You paid a multiple for how the company was run. The earnout assumes the operator’s judgment comes with the building. Most of it lives in one head and leaves on their last day. Basalith captures it before that day, so what you valued in diligence is still in the room after the operator is gone.',
+    n:     '01',
+    label: 'The dependency report',
+    href:  '/dependency-report',
+    cta:   'See the dependency report',
+    body:  'Eight calls with you, one for each area of how the business runs. The report shows which decisions run through you, and which of those are on the record. $5,000, whoever orders it. You read it first.',
   },
   {
+    n:     '02',
     label: 'Succession',
-    href:  '/apply?type=succession',
+    href:  '/contact?intent=succession',
     cta:   'Talk to us about a succession',
     body:  'The owner is stepping back, or a partner is retiring. The successor gets the systems and the client list. Not the reasoning behind them. Basalith hands the thinking forward, so the next person can ask how the owner would have decided instead of guessing.',
+  },
+  {
+    n:     '03',
+    label: 'Acquisition',
+    href:  '/contact?intent=acquisition',
+    cta:   'Talk to us about an acquisition',
+    body:  'For the buyer. You paid a multiple for how the company was run, and the earnout assumes the owner’s judgment comes with the building. Basalith captures it before the last day, so what you valued in diligence is still in the room after the owner is gone.',
   },
 ]
 
@@ -56,33 +68,33 @@ const HANDOFF = [
   {
     n:     '01',
     title: 'The Founding.',
-    body:  'Three of the hardest calls the operator ever made running the business, in their own words, in their own time. Then one live session by video, with the successor in the room, working through those calls together.',
+    body:  'Three of the hardest calls the owner ever made running the business, in their own words, in their own time. Then one live session by video, with the successor in the room, working through those calls together.',
   },
   {
     n:     '02',
     title: 'Filling the gaps.',
-    body:  'The map shows which of the eight areas of judgment are thin. Each one opens its own interview, seeded on a real moment rather than a hypothetical, because a position can be grounded in what the operator did and never in what they say they believe.',
+    body:  'The map shows which of the eight areas of judgment are thin. Each one opens its own interview, seeded on a real moment rather than a hypothetical, because a position can be grounded in what the owner did and never in what they say they believe.',
   },
   {
     n:     '03',
     title: 'The check.',
-    body:  'Every answer the successor gets is read by a second model against the operator\u2019s own words before it is returned. Where nothing in the record backs it, the answer is replaced with a plain no.',
+    body:  'Every answer the successor gets is read by a second model against the owner\u2019s own words before it is returned. Where nothing in the record backs it, the answer is replaced with a plain no.',
   },
   {
     n:     '04',
     title: 'The handoff.',
-    body:  'The successor or acquirer gets portal access and can consult the model on the calls that matter, long after the operator has stepped back. Where the record holds no position, the model says so.',
+    body:  'The successor or acquirer gets portal access and can consult the model on the calls that matter, long after the owner has stepped back. Where the record holds no position, the model says so.',
   },
 ]
 
 const TRUST = [
   {
     title: 'Not reconstructed after the fact.',
-    body:  'Built while the operator is active and in the room. Not pieced together from old emails once they are gone.',
+    body:  'Built while the owner is active and in the room. Not pieced together from old emails once they are gone.',
   },
   {
     title: 'Not a wrapper on a general AI.',
-    // October 23, 2026: was "Every model is trained only on one operator's
+    // October 23, 2026: was "Every model is trained only on one owner's
     // deposits." Nothing is trained per client; improvement is record level
     // (decision of September 28, 2026). The two sentences now are the
     // retrieval (lib/frozenLayer.ts, one record) and the verifier
@@ -100,7 +112,7 @@ const TRUST = [
   },
   {
     title: 'Frozen at transition.',
-    body:  'The fingerprint is locked at transition. The new owner can add context. Nobody can rewrite what the operator said.',
+    body:  'The fingerprint is locked at transition. The new owner can add context. Nobody can rewrite what the owner said.',
   },
 ]
 
@@ -128,7 +140,7 @@ export default function SuccessionPage() {
           maxWidth:  '960px',
         }}>
           <p style={{ ...MONO, fontSize: 'var(--text-caption)', color: 'var(--color-gold)', marginBottom: '16px' }}>
-            Basalith for Business &middot; Acquisition and Succession
+            Basalith for Business &middot; For the owner of a closely held business
           </p>
           <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)', lineHeight: 1.8, marginBottom: '36px', maxWidth: '640px' }}>
             {CATEGORY_LINE}
@@ -159,8 +171,10 @@ export default function SuccessionPage() {
           </p>
 
           <div className="succession-hero-ctas" style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginTop: '44px', alignItems: 'center' }}>
+            {/* October 25, 2026: the report is the first step for every owner,
+                so it is the first button. Record: docs/NICHE_PASS_2026-10-25.md. */}
             <Link
-              href="/apply?type=succession"
+              href="/dependency-report"
               className="succession-cta-paper"
               style={{
                 ...MONO,
@@ -173,7 +187,7 @@ export default function SuccessionPage() {
                 transition:     'background 250ms ease',
               }}
             >
-              Tell us about the transition
+              Start with the dependency report
             </Link>
             <Link
               href="/succession/demo"
@@ -195,14 +209,12 @@ export default function SuccessionPage() {
           <p style={{ ...GEORGIA, fontSize: '0.95rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.7, color: 'var(--color-text-muted)', marginTop: '18px', marginBottom: 0, maxWidth: '560px' }}>
             The demo runs on a fictional owner. Ask it something they never answered and watch it decline to guess.
           </p>
-          {/* October 23, 2026: the owner who is not yet planning a handoff
-              starts with the report. Record: docs/OWNER_BUYER_2026-10-23.md. */}
           <p style={{ ...GEORGIA, fontSize: '0.95rem', fontWeight: 400, lineHeight: 1.7, color: 'var(--color-text-secondary)', marginTop: '12px', marginBottom: 0, maxWidth: '560px' }}>
-            No handoff planned yet?{' '}
-            <Link href="/dependency-report" style={{ color: 'var(--color-gold-on-light)' }}>
-              Start with the dependency report
+            Already planning a handoff?{' '}
+            <Link href="/contact?intent=succession" style={{ color: 'var(--color-gold-on-light)' }}>
+              Tell us about the transition
             </Link>
-            . It shows how much of the business runs through you.
+            .
           </p>
         </section>
         </div>
@@ -266,7 +278,7 @@ export default function SuccessionPage() {
           </div>
         </section>
 
-        {/* ── Section 3: Two transitions ── */}
+        {/* ── Section 3: Three steps, in order ── */}
         <section className="b2b-paper" style={{ padding: `clamp(80px,10vw,120px) ${PAD}` }}>
           <div style={{ maxWidth: '900px', margin: '0 auto' }}>
             <h2 style={{
@@ -279,20 +291,20 @@ export default function SuccessionPage() {
               marginBottom:  '48px',
               maxWidth:      '720px',
             }}>
-              A business changes hands two ways. Both lose the same thing.
+              Three ways in. Most owners start with the first.
             </h2>
-            <div className="succession-transitions" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-              {TRANSITIONS.map(({ label, body, href, cta }) => (
+            <div className="succession-transitions" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px' }}>
+              {STEPS.map(({ n, label, body, href, cta }) => (
                 <div key={label} style={{
                   border:     '1px solid rgba(160,132,80,0.2)',
-                  borderTop:  '2px solid rgba(160,132,80,0.6)',
-                  background: 'rgba(160,132,80,0.03)',
+                  borderTop:  n === '01' ? '2px solid var(--color-gold)' : '2px solid rgba(160,132,80,0.35)',
+                  background: n === '01' ? 'rgba(160,132,80,0.06)' : 'rgba(160,132,80,0.03)',
                   padding:    'clamp(28px,4vw,44px)',
                   display:    'flex',
                   flexDirection: 'column',
                 }}>
                   <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)', marginBottom: '20px' }}>
-                    {label}
+                    {n} &middot; {label}
                   </p>
                   <p style={{ ...GEORGIA, fontSize: '1.05rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.85, color: 'var(--color-text-secondary)', margin: '0 0 28px' }}>
                     {body}
@@ -318,10 +330,10 @@ export default function SuccessionPage() {
             </p>
 
             <p style={{ ...GEORGIA, fontSize: '1.15rem', fontWeight: 400, lineHeight: 1.9, color: 'var(--color-text-primary)', marginBottom: '24px' }}>
-              Basalith builds a cognitive reference model of the operator while they are still active. Not a biography or a set of recorded interviews. A working record of how they reason, what they weigh, and how they decide, that a successor can put questions to.
+              Basalith builds a cognitive reference model of the owner while they are still active. Not a biography or a set of recorded interviews. A working record of how they reason, what they weigh, and how they decide, that a successor can put questions to.
             </p>
             <p style={{ ...GEORGIA, fontSize: '1.15rem', fontWeight: 400, lineHeight: 1.9, color: 'var(--color-text-primary)', marginBottom: '32px' }}>
-              And when the operator never took a position on something, it says so. It will not fill the gap with an answer that sounds like them. In a handoff, a confident wrong answer is worse than no answer at all.
+              And when the owner never took a position on something, it says so. It will not fill the gap with an answer that sounds like them. In a handoff, a confident wrong answer is worse than no answer at all.
             </p>
 
             <div style={{
@@ -491,7 +503,7 @@ export default function SuccessionPage() {
               </p>
 
               <Link
-                href="/apply?type=succession"
+                href="/contact?intent=succession"
                 className="succession-cta-paper"
                 style={{
                   ...MONO,
@@ -524,7 +536,7 @@ export default function SuccessionPage() {
               Priced against the value at risk in the deal, as part of diligence, not as software. The buyer pays, because the buyer is the one holding the risk.
             </p>
             <Link
-              href="/apply?type=acquisition"
+              href="/contact?intent=acquisition"
               className="succession-inline-link"
               style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold-on-light)', textDecoration: 'none' }}
             >
@@ -554,7 +566,7 @@ export default function SuccessionPage() {
               One conversation tells you whether this fits. Start there.
             </p>
             <Link
-              href="/apply?type=succession"
+              href="/contact?intent=succession"
               className="succession-cta"
               style={{
                 ...MONO,
@@ -580,6 +592,9 @@ export default function SuccessionPage() {
         .succession-cta-paper:hover { background: var(--b2b-btn-hover) !important; }
         .succession-cta-ghost:hover { border-color: var(--color-gold-on-light) !important; }
         .succession-inline-link:hover { text-decoration: underline !important; text-underline-offset: 4px; }
+        @media (max-width: 1000px) {
+          .succession-transitions { grid-template-columns: 1fr !important; }
+        }
         @media (max-width: 680px) {
           .succession-contrast    { grid-template-columns: 1fr !important; }
           .succession-layers      { grid-template-columns: 1fr !important; }

@@ -16,7 +16,7 @@ const SERIF: React.CSSProperties = {
 }
 
 const AUDIENCE_NAME: Record<Audience, string> = {
-  founder: 'Founders & Successors',
+  founder: 'Owners & Successors',
   family:  'Individuals & Families',
 }
 

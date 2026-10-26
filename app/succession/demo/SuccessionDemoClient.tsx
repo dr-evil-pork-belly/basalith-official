@@ -241,7 +241,7 @@ export default function SuccessionDemoClient() {
           {/* Fictional label. Always visible, both personas. */}
           <div style={{ border: '1px solid var(--invert-gold-line)', background: 'var(--invert-gold-line)', padding: '13px 16px', maxWidth: '640px', marginBottom: '22px' }}>
             <p style={{ ...MONO, fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: C.gold, marginBottom: '7px' }}>
-              Fictional Founder
+              Fictional Owner
             </p>
             <p style={{ ...SERIF, fontSize: '0.88rem', fontWeight: 400, color: C.muted, lineHeight: 1.75, margin: 0 }}>
               {persona.metadata.fictionalLabel}
