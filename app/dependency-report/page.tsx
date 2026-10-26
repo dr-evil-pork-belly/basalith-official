@@ -250,8 +250,7 @@ export default function DependencyReportPage() {
               </Link>
             </div>
             <p style={{ ...SERIF, fontSize: '0.95rem', fontWeight: 400, lineHeight: 1.7, color: 'var(--color-text-muted)', margin: '40px 0 0' }}>
-              Built by David Ha, D.B.A., Visiting Scholar at the Fisher School of Accounting,
-              University of Florida.{' '}
+              Built by David Ha.{' '}
               <Link href="/about" style={{ color: 'var(--color-text-primary)' }}>About the founder</Link>
             </p>
           </div>

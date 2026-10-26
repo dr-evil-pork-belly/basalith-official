@@ -315,8 +315,8 @@ export default function PartnerPage() {
               From the founder
             </p>
             <p style={{ ...BODY, color: 'var(--on-dark-2)' }}>
-              I hold a broker&rsquo;s license. I built Basalith because the thing a buyer most
-              wants to know about a business is the one thing a data room has never held.
+              I built Basalith because the thing a buyer most wants to know about a business
+              is the one thing a data room has never held.
             </p>
             <p style={{ ...BODY, color: 'var(--on-dark-2)' }}>
               If you run deals and this page is wrong about how they die, write to me at{' '}
