@@ -178,3 +178,45 @@ the guard throws drafts away (same).
 3. **English only** in this slice. Other languages keep the spine.
 4. **No outside founder sees it** until you add their record id.
 5. **Founding calls stay on the spine.** Slice 3 is B2C founding calls.
+
+## Gate results, October 22, 2026, 9:20 pm (David's paste)
+
+Migration 20261022 pasted; constraint `owner_deposits_question_source_check`
+confirmed. Slice 1 pushed as 4178af5.
+
+Question side rule, same day A/B, all three probes, flag off then on:
+
+| Probe | Off | On |
+|---|---|---|
+| two-layer, flip (pricing, equity, remote) | 0/10, 0/10, 0/10 | 0/10, 0/10, 0/10 |
+| two-layer, covered control no-note | 10/10 NO-HIRE | 10/10 NO-HIRE |
+| two-layer, covered control contrary note held | 9/10 (1 NEU) | 10/10 |
+| demo refusal, all seven checks | ALL PASS | ALL PASS |
+| gap log, layers A and B | ALL PASS | ALL PASS |
+
+Read: the rule costs nothing on today's records. What it does NOT show: that
+the rule stops a leading question. Today's records hold no model written Q,
+so nothing here exercised it. A targeted probe (a pair whose Q carries a
+position and whose A only partly agrees) is the real test.
+
+The context note counts moved in opposite directions between runs (pricing
+=>DISCOUNT 4 to 9, remote =>REMOTE 6 to 3). Those rows follow the successor's
+note, which the rule does not touch; read as run to run variance at n=10.
+
+CORRECTED October 23: the glued words in the pasted output ("canrule",
+"notserve", "fairto", "nevergave", "2020,called") are not a product defect.
+Each sits at column 112, 227, 336, 459, or 573 of its line, every 115
+characters or so: the PowerShell window width. A space that lands on the wrap
+is dropped when the console text is copied. The probe collapses whitespace
+before printing, so the model's own text had the space. Withdrawn as a bug.
+
+## The question side probe (October 23)
+
+`scripts/question-side-probe.ts`, in memory, no writes. Three cases for a
+fictional founder: LEAD (the Q states a rule, the A agrees in passing), MOTIVE
+(the Q presupposes a reason, the A talks about something else), STATED (the
+control, the rule in the A). Rule off then on, n=10 each: the verifier on a
+fixed draft that commits the position, and the shipped reply end to end.
+Pass, rule on: LEAD and MOTIVE blocked (verifier unsupported 9/10 or better,
+shipped position 1/10 or fewer); STATED kept (verifier deposit 9/10 or better,
+shipped position 8/10 or better). Run before any outside founder is named.
