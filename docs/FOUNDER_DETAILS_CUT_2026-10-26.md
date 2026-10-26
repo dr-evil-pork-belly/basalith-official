@@ -8,7 +8,7 @@ Decision (David, Oct 26, 2026): the doctorate (D.B.A.) and the broker's license 
 Section 7, "From the founder." Removed the opening sentence "I hold a broker's license." The paragraph now opens with "I built Basalith because..." The rest of the section is unchanged.
 
 ### app/dependency-report/page.tsx
-Closing section, credit line. "Built by David Ha, D.B.A., Visiting Scholar at the Fisher School of Accounting, University of Florida." is now "Built by David Ha, Visiting Scholar at the Fisher School of Accounting, University of Florida."
+Closing section, credit line. "Built by David Ha, D.B.A., Visiting Scholar at the Fisher School of Accounting, University of Florida." is now "Built by David Ha." followed by the existing About the founder link. The affiliation was cut in a second pass the same morning: "Visiting Scholar" is a title the page's readers cannot decode, and the method claim belongs on the method page, not in a credit line.
 
 ## Checked and left alone
 
@@ -18,7 +18,7 @@ Closing section, credit line. "Built by David Ha, D.B.A., Visiting Scholar at th
 - app/integrity, app/churches, app/partner sign-offs: "David Ha, Founder" only.
 - "broker" elsewhere on the site refers to business brokers (partner page audience) and data brokers (privacy, integrity). Not about David.
 
-The Visiting Scholar affiliation remains in three places (what-is-basalith FAQ, dependency-report credit, structured data). It was not part of this cut. It backs the "method is published" claim and the ORCID cross reference.
+The Visiting Scholar affiliation remains in two places and stays by decision: the what-is-basalith FAQ, because a reader who asks "who makes this" gets a plain answer and the affiliation is public; and lib/structuredData.ts, because it is machine readable and backs the ORCID cross reference. It is off every human-facing credit line.
 
 ## Verification
 
