@@ -4,11 +4,12 @@ import { useEffect, useState } from 'react'
 import Nav    from '../components/Nav'
 import Footer from '../components/Footer'
 
-type Intent = 'general' | 'pricing' | 'partner' | 'press'
+type Intent = 'general' | 'report' | 'pricing' | 'partner' | 'press'
 type Status = 'idle' | 'loading' | 'success' | 'error'
 
 const INTENTS: { value: Intent; label: string }[] = [
   { value: 'general', label: 'A question about Basalith' },
+  { value: 'report',  label: 'A dependency report for my business' },
   { value: 'pricing', label: 'Pricing'                   },
   { value: 'partner', label: 'Partnering as an advisor (M&A, CPA, exit planner, attorney)' },
   { value: 'press',   label: 'Press'                     },
@@ -16,6 +17,8 @@ const INTENTS: { value: Intent; label: string }[] = [
 
 const INTENT_VALUES = new Set<string>(INTENTS.map(i => i.value))
 
+// ?intent=report is set by the buttons on /dependency-report (October 23,
+// 2026). Record: docs/OWNER_BUYER_2026-10-23.md.
 // ?intent=partner is set by the links on /partner (October 15, 2026). It only
 // preselects the topic; the person can change it. Read from window in an
 // effect rather than useSearchParams so this page keeps rendering statically
@@ -192,8 +195,8 @@ export default function ContactPage() {
                   </button>
                   <p style={{ ...SERIF, fontStyle: 'italic', fontWeight: 400, fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>
                     Or email{' '}
-                    <a href="mailto:legacy@basalith.xyz" style={{ color: 'var(--color-gold)', textDecoration: 'none' }}>
-                      legacy@basalith.xyz
+                    <a href="mailto:hello@basalith.ai" style={{ color: 'var(--color-gold)', textDecoration: 'none' }}>
+                      hello@basalith.ai
                     </a>
                   </p>
                 </div>

@@ -14,6 +14,7 @@ import {
   completeAreasFrom,
   founderCanReadReport,
   isAssessment,
+  isSelfOrdered,
   nextArea,
   purgeAfter,
   readingsDue,
@@ -195,5 +196,18 @@ describe('reading the report', () => {
   it('is open to the founder from the moment it is built, released or not', () => {
     for (const s of ['ready', 'released', 'not_released']) expect(founderCanReadReport(s), s).toBe(true)
     for (const s of ['ordered', 'capturing', 'not_completed', null, undefined, '']) expect(founderCanReadReport(s), String(s)).toBe(false)
+  })
+})
+
+describe('isSelfOrdered', () => {
+  it('is true only when the buyer and the founder are the same email', () => {
+    expect(isSelfOrdered({ buyer_email: 'owner@firm.com', founder_email: 'owner@firm.com' })).toBe(true)
+    expect(isSelfOrdered({ buyer_email: 'buyer@fund.com', founder_email: 'owner@firm.com' })).toBe(false)
+  })
+
+  it('is false when either email is missing', () => {
+    expect(isSelfOrdered({ buyer_email: null, founder_email: null })).toBe(false)
+    expect(isSelfOrdered({ buyer_email: '', founder_email: '' })).toBe(false)
+    expect(isSelfOrdered({ founder_email: 'owner@firm.com' })).toBe(false)
   })
 })

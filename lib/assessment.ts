@@ -56,6 +56,20 @@ export function isAssessment(archive: { status?: string | null }): boolean {
   return archive.status === ASSESSMENT_STATUS
 }
 
+/**
+ * An owner who ordered his own report (decided October 9, 2026). There is no
+ * column for it. A self order is set up by hand with the owner named as the
+ * buyer, so the two emails are the same. Both columns are stored lowercase
+ * (CHECK constraints on dependency_reports), so a plain compare is exact.
+ * October 23, 2026. Record: docs/OWNER_BUYER_FIXES_2026-10-23.md.
+ */
+export function isSelfOrdered(row: {
+  buyer_email?:   string | null
+  founder_email?: string | null
+}): boolean {
+  return !!row.buyer_email && row.buyer_email === row.founder_email
+}
+
 /** The eight areas an assessment must cover, in domain order. */
 export function assessmentAreas(): string[] {
   return B2B_DOMAINS.map(d => d.name)

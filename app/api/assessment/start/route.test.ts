@@ -208,6 +208,76 @@ describe('POST /api/assessment/start', () => {
     expect(notices).toEqual(['Dependency report: founder is already a client'])
   })
 
+  // October 23, 2026: a self order (buyer email = founder email) by someone
+  // who already owns a Basalith gets a second record under the same sign in.
+  describe('a self order', () => {
+    const selfOrder = () => Object.assign(db.dependency_reports[0], { buyer_name: 'Margaret Chen', buyer_email: EMAIL })
+
+    it('gives an existing owner a second record, leaves his Basalith and his role alone, and points the session at it', async () => {
+      selfOrder()
+      db.archives.push({ id: 'arch-existing', owner_email: EMAIL, owner_user_id: `user-${EMAIL}`, status: 'active', name: 'Chen Basalith' })
+      const res = await post({ order: ORDER, email: EMAIL })
+      expect(res.status).toBe(200)
+      expect(await res.json()).toEqual({ ok: true })
+
+      expect(db.archives).toHaveLength(2)
+      expect(db.archives[0]).toEqual({ id: 'arch-existing', owner_email: EMAIL, owner_user_id: `user-${EMAIL}`, status: 'active', name: 'Chen Basalith' })
+      const created = db.archives[1]
+      expect(created).toMatchObject({ status: 'assessment', tier: 'succession', owner_user_id: `user-${EMAIL}`, name: 'Chen Dependency Report' })
+      expect(db.dependency_reports[0]).toMatchObject({ status: 'capturing', archive_id: created.id })
+
+      // Never forced: an owner keeps whatever role he has.
+      expect(authCalls).toEqual([{ email: EMAIL, force: false }])
+
+      const cookie = res.headers.get('set-cookie') ?? ''
+      expect(cookie).toContain(`archive-id=${created.id}`)
+      expect(cookie.toLowerCase()).toContain('samesite=lax')
+      expect(cookie.toLowerCase()).toContain('httponly')
+
+      await flush()
+      expect(notices).toEqual(['Assessment started: Margaret Chen'])
+    })
+
+    it('runs a self order for someone new exactly as any first order, with no cookie', async () => {
+      selfOrder()
+      const res = await post({ order: ORDER, email: EMAIL })
+      expect(await res.json()).toEqual({ ok: true })
+      expect(db.archives).toHaveLength(1)
+      expect(db.archives[0]).toMatchObject({ name: 'Chen Basalith', status: 'assessment' })
+      expect(authCalls).toEqual([{ email: EMAIL, force: false }, { email: EMAIL, force: true }])
+      expect(res.headers.get('set-cookie')).toBeNull()
+    })
+
+    it('still refuses a successor or a guide on a self order', async () => {
+      selfOrder()
+      for (const t of ['successors', 'archivists'] as const) {
+        db[t] = [{ id: `${t}-1`, auth_user_id: `user-${EMAIL}` }]
+        const res = await post({ order: ORDER, email: EMAIL })
+        expect(res.status, t).toBe(409)
+        expect(db.archives, t).toHaveLength(0)
+        db[t] = []
+      }
+    })
+
+    it('makes one record when an existing owner submits twice', async () => {
+      selfOrder()
+      db.archives.push({ id: 'arch-existing', owner_email: EMAIL, owner_user_id: `user-${EMAIL}`, status: 'active' })
+      const first  = await post({ order: ORDER, email: EMAIL })
+      const second = await post({ order: ORDER, email: EMAIL })
+      expect(await first.json()).toEqual({ ok: true })
+      expect(await second.json()).toEqual({ ok: true, existing: true })
+      expect(db.archives).toHaveLength(2)
+    })
+  })
+
+  it('still refuses a buyer order on someone who owns a Basalith', async () => {
+    Object.assign(db.dependency_reports[0], { buyer_email: 'buyer@fund.com' })
+    db.archives.push({ id: 'arch-existing', owner_email: EMAIL, owner_user_id: `user-${EMAIL}`, status: 'active' })
+    const res = await post({ order: ORDER, email: EMAIL })
+    expect(res.status).toBe(409)
+    expect(db.archives).toHaveLength(1)
+  })
+
   it('refuses a successor or a guide without touching their role', async () => {
     for (const t of ['successors', 'archivists'] as const) {
       db[t] = [{ id: `${t}-1`, auth_user_id: `user-${EMAIL}` }]

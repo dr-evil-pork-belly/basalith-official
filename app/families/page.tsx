@@ -51,12 +51,12 @@ const STEPS = [
   {
     n:     '02',
     title: 'Guided capture.',
-    body:  'A photograph in the evening. A question each week. A story told into the phone for two minutes. They answer across the parts of life that shaped them, and every answer trains the model.',
+    body:  'A photograph in the evening. A question each week. A story told into the phone for two minutes. They answer across the parts of life that shaped them, and every answer goes onto the record.',
   },
   {
     n:     '03',
     title: 'The check.',
-    body:  'Every response is scored before it can shape the model. Lower confidence responses get a closer pass. Their Basalith reflects how the person actually reasoned.',
+    body:  'Every response is scored for how specific it is, how natural it sounds, and how much it shows the way they think. The strongest are put first when their Basalith answers.',
   },
   {
     n:     '04',
@@ -79,7 +79,7 @@ const TRUST = [
   },
   {
     title: 'Only ever them.',
-    body:  'Every model is trained only on one person&rsquo;s deposits. No general AI speaks for the record.',
+    body:  'Every answer is drawn only from one person&rsquo;s deposits.',
   },
   {
     title: 'Never shared. Never sold.',

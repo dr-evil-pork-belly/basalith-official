@@ -27,19 +27,19 @@ const QA: { q: string; a: React.ReactNode; plain?: string }[] = [
   },
   {
     q: 'Is this a chatbot trained on someone’s old emails?',
-    a: 'No. Nothing is reconstructed after the fact. A Basalith is built while the person is here and taking part. Every model is trained only on that one person’s deposits. No general AI speaks for the record. And when the person never took a position on something, the entity is built to say so instead of guessing.',
+    a: 'No. Nothing is reconstructed after the fact. A Basalith is built while the person is here and taking part. Every answer is drawn only from that one person’s deposits. And when the person never took a position on something, the entity is built to say so instead of guessing.',
   },
   {
     q: 'How does it work?',
     a: <>
-      It starts with The Founding: three of the hardest calls you ever made, in your own words, by voice or typed, in your own time, then a first read with the founder of Basalith by video. From there your Basalith grows through guided questions, real scenarios, voice recordings, photographs, and contributions from the people around them. Every deposit is scored before it can shape the model.
+      It starts with The Founding: three of the hardest calls you ever made, in your own words, by voice or typed, in your own time, then a first read with the founder of Basalith by video. From there your Basalith grows through guided questions, real scenarios, voice recordings, photographs, and contributions from the people around them. Every deposit is scored for how specific it is, how natural it sounds, and how much it shows the way you think, and the strongest are put first when your Basalith answers.
       {' '}<a href="/method" style={LINK}>Read the method &rarr;</a>
     </>,
-    plain: 'It starts with The Founding: three of the hardest calls you ever made, in your own words, by voice or typed, in your own time, then a first read with the founder of Basalith by video. From there your Basalith grows through guided questions, real scenarios, voice recordings, photographs, and contributions from the people around them. Every deposit is scored before it can shape the model.',
+    plain: 'It starts with The Founding: three of the hardest calls you ever made, in your own words, by voice or typed, in your own time, then a first read with the founder of Basalith by video. From there your Basalith grows through guided questions, real scenarios, voice recordings, photographs, and contributions from the people around them. Every deposit is scored for how specific it is, how natural it sounds, and how much it shows the way you think, and the strongest are put first when your Basalith answers.',
   },
   {
     q: 'What is the difference between the record and the entity?',
-    a: 'The record is everything deposited: the answers, the recordings, the labeled photographs, the observations from others. The entity is the model trained on it. The record is the permanent asset. The entity is the instrument. If the technology changes, the record is what carries forward.',
+    a: 'The record is everything deposited: the answers, the recordings, the labeled photographs, the observations from others. The entity is what answers from it. The record is the permanent asset. The entity is the instrument. If the technology changes, the record is what carries forward.',
   },
   {
     q: 'How long does it take?',

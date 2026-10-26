@@ -55,7 +55,7 @@ const SECTIONS = [
     num:   '03',
     title: 'Cancellation',
     body: [
-      'You may cancel your annual subscription at any time by providing written notice to legacy@basalith.xyz. Cancellation takes effect at the end of the current billing period. No partial refunds are issued for unused subscription time.',
+      'You may cancel your annual subscription at any time by providing written notice to legacy@basalith.ai. Cancellation takes effect at the end of the current billing period. No partial refunds are issued for unused subscription time.',
       'Upon cancellation, you retain full rights to a complete export of your Basalith in open, portable formats. This export right is unconditional and does not require a reason. Export requests are fulfilled within 30 business days.',
       'Cancellation of a subscription is distinct from dissolution of your Basalith. Dissolution is the permanent deletion of your Basalith, and it is a separate, deliberate act. It requires a verified written request from the designated Custodian, or from an executor with documented authority. After the request is verified, Human Augmentation Technologies Corp. holds your Basalith for 12 months, then deletes it and confirms in writing. Deletion covers your Basalith as held with our storage provider and the offsite backup copy.',
       'You retain full ownership of your Basalith at all times. Human Augmentation Technologies Corp. is the custodian, not the owner. If Basalith ceases operations for any reason, you may request a complete export of your Basalith in open and portable formats, fulfilled within 30 business days. Because your Basalith is always yours to hold, no closure can strand your data.',
@@ -172,7 +172,7 @@ export default function TermsPage() {
               These terms govern your use of the Basalith service in full, including your Basalith.
             </p>
             <p className="font-sans text-[0.75rem] text-text-muted mt-6">
-              Last updated: September 2026 &nbsp;·&nbsp; Governing law: {GOVERNING_STATE}
+              Last updated: October 2026 &nbsp;·&nbsp; Governing law: {GOVERNING_STATE}
             </p>
           </div>
         </section>
@@ -255,8 +255,8 @@ export default function TermsPage() {
           <div className="relative z-10 max-w-xl mx-auto">
             <p className="font-sans font-light text-body-base text-text-secondary leading-[1.82] mb-8">
               Questions about these terms should be directed to{' '}
-              <a href="mailto:legacy@basalith.xyz" className="text-amber-dim hover:text-amber transition-colors duration-200">
-                legacy@basalith.xyz
+              <a href="mailto:legacy@basalith.ai" className="text-amber-dim hover:text-amber transition-colors duration-200">
+                legacy@basalith.ai
               </a>
               . Please include your Basalith number.
             </p>

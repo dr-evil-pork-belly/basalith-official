@@ -4,7 +4,7 @@ import { getOrCreateAuthUser } from '@/lib/auth/getOrCreateAuthUser'
 import { checkRateLimit, getClientIP } from '@/lib/apiSecurity'
 import { deriveFamilyName } from '@/lib/trial'
 import { notifyInternal } from '@/lib/internalNotify'
-import { ASSESSMENT_STATUS } from '@/lib/assessment'
+import { ASSESSMENT_STATUS, isSelfOrdered } from '@/lib/assessment'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 30
@@ -35,6 +35,25 @@ export const maxDuration = 30
 // this route. The founder of Basalith is told and sets it up by hand. The
 // checks run before any role is forced, so a successor's sign in is never
 // rerouted by an attempt.
+//
+// EXCEPT A SELF ORDER BY AN OWNER (decided October 9, 2026, built October 23).
+// When the owner ordered the report on himself (buyer email = founder email,
+// lib/assessment.ts isSelfOrdered), owning a Basalith no longer refuses him.
+// He gets a second, separate assessment record under the same sign in, which
+// is recon option (a) of claude/BASALITH_B2C_PRODUCT_LINE_RECON_1_2026-10-09.md:
+//   - his paying record is never touched, so no purge or gate built for
+//     assessment records can ever reach it;
+//   - his role is NOT forced (an owner is already an owner, and forcing would
+//     overwrite any other role he holds);
+//   - the record is named "<family> Dependency Report" so the portal switcher
+//     can tell it from his Basalith;
+//   - the response sets the archive-id cookie to the new record, so his first
+//     sign in on this browser opens the assessment (lib/auth/getSessionUser
+//     honours it only for a record he owns). SameSite lax, because the sign in
+//     link arrives as a cross site navigation from his mail.
+// A successor or a guide is still refused, self order or not. A buyer's order
+// on someone who already owns a Basalith is still refused.
+// Record: docs/SELF_ORDER_EXISTING_OWNER_2026-10-23.md.
 
 const ONE_HOUR_MS = 60 * 60 * 1000
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -82,7 +101,7 @@ export async function POST(req: NextRequest) {
   try {
     const { data: row, error: rowErr } = await supabaseAdmin
       .from('dependency_reports')
-      .select('id, status, archive_id, founder_name, founder_email, buyer_name')
+      .select('id, status, archive_id, founder_name, founder_email, buyer_name, buyer_email')
       .eq('id', order)
       .maybeSingle()
     if (rowErr) throw new Error(`report read: ${rowErr.message}`)
@@ -125,14 +144,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: EXISTING }, { status: 409 })
     }
 
+    const selfOrder = isSelfOrdered(row)
+
     // Refusals that need no auth user, first.
-    if (await countBy('archives', 'owner_email', email) > 0) return refuse('owns a Basalith (by owner_email)')
+    const ownsByEmail = await countBy('archives', 'owner_email', email) > 0
+    if (ownsByEmail && !selfOrder) return refuse('owns a Basalith (by owner_email)')
 
     // No forceRole yet: an existing role is left exactly as it is.
     const userId = await getOrCreateAuthUser(email, 'owner')
-    if (await countBy('archives', 'owner_user_id', userId) > 0) return refuse('owns a Basalith (by owner_user_id)')
+    const ownsByUser = await countBy('archives', 'owner_user_id', userId) > 0
+    if (ownsByUser && !selfOrder) return refuse('owns a Basalith (by owner_user_id)')
     if (await countBy('successors', 'auth_user_id', userId) > 0) return refuse('is a successor on a Basalith')
     if (await countBy('archivists', 'auth_user_id', userId) > 0) return refuse('has a guide account')
+
+    // Only a self order gets this far while owning a record.
+    const existingOwner = ownsByEmail || ownsByUser
 
     // Claim. Only the request that moves the row out of 'ordered' goes on.
     const now = new Date().toISOString()
@@ -150,14 +176,15 @@ export async function POST(req: NextRequest) {
 
     try {
       // Now the role: a contributor who is being assessed must land as an
-      // owner, as on /begin. Successors and guides were refused above.
-      await getOrCreateAuthUser(email, 'owner', { forceRole: true })
+      // owner, as on /begin. Successors and guides were refused above. An
+      // existing owner keeps the role he has (see the header).
+      if (!existingOwner) await getOrCreateAuthUser(email, 'owner', { forceRole: true })
 
       const familyName = deriveFamilyName(row.founder_name)
       const { data: archive, error: archiveErr } = await supabaseAdmin
         .from('archives')
         .insert({
-          name:            `${familyName} Basalith`,
+          name:            existingOwner ? `${familyName} Dependency Report` : `${familyName} Basalith`,
           family_name:     familyName,
           owner_email:     email,
           owner_name:      row.founder_name,
@@ -189,11 +216,23 @@ export async function POST(req: NextRequest) {
             `Founder: ${row.founder_name} <${email}>`,
             `Buyer: ${row.buyer_name}`,
             `Record: ${archive.id}`,
+            ...(selfOrder ? ['Ordered by the owner on himself.'] : []),
+            ...(existingOwner ? ['Already a client: this is a second record under his sign in. His Basalith is untouched.'] : []),
           ].join('\n'),
         })
       })
 
-      return NextResponse.json({ ok: true })
+      const res = NextResponse.json({ ok: true })
+      if (existingOwner) {
+        res.cookies.set('archive-id', archive.id as string, {
+          httpOnly: true,
+          secure:   true,
+          sameSite: 'lax',
+          maxAge:   60 * 60 * 24 * 7,
+          path:     '/',
+        })
+      }
+      return res
     } catch (err) {
       // Undo the claim so the founder can try again.
       const { error: undoErr } = await supabaseAdmin

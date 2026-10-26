@@ -90,15 +90,21 @@ export default function ReportView({
   founderName,
   buyerName,
   buyerOrg,
+  selfOrdered = false,
   builtAt,
 }: {
   report:      BuiltReport
   founderName: string
   buyerName:   string
   buyerOrg:    string | null
+  selfOrdered?: boolean
   builtAt:     string
 }) {
-  const preparedFor = [buyerName, buyerOrg].filter(Boolean).join(', ')
+  // October 9, 2026: a report the owner orders is labeled as ordered by the
+  // subject, so a reader later can tell it from one a buyer commissioned.
+  const orderedLine = selfOrdered
+    ? `Ordered by ${founderName}, the subject of this report.`
+    : `Prepared for ${[buyerName, buyerOrg].filter(Boolean).join(', ')}.`
 
   return (
     <article>
@@ -108,7 +114,7 @@ export default function ReportView({
           How this business runs through {founderName}.
         </h1>
         <p style={{ fontFamily: SERIF, fontSize: '17px', color: SECOND, lineHeight: 1.6, margin: 0 }}>
-          Prepared for {preparedFor}. Built {fmtDate(builtAt)}. Question set {report.probeSetVersion}, {report.questionsPerDomain} questions a domain, read twice.
+          {orderedLine} Built {fmtDate(builtAt)}. Question set {report.probeSetVersion}, {report.questionsPerDomain} questions a domain, read twice.
         </p>
       </header>
 

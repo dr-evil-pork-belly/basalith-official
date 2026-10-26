@@ -25,11 +25,11 @@ const VARIANT: Record<'default' | Audience, { eyebrow: string; href: string; cta
   // to the wrong form. They go to /begin, the first call.
   default: { eyebrow: 'For the forward thinking',     href: '/begin',                  cta: 'Begin your Basalith'      },
   family:  { eyebrow: 'For individuals and families', href: '/begin',                  cta: 'Begin a family Basalith'  },
-  founder: { eyebrow: 'For founders and successors',  href: '/apply?type=succession',  cta: 'Tell us about the handoff' },
+  founder: { eyebrow: 'For owners and successors',    href: '/apply?type=succession',  cta: 'Tell us about the handoff' },
 }
 
 const NAME: Record<Audience, string> = {
-  founder: 'Founders & Successors',
+  founder: 'Owners & Successors',
   family:  'Individuals & Families',
 }
 

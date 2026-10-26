@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth/getSessionUser'
-import { founderCanReadReport, isAssessment, releaseDueAt } from '@/lib/assessment'
+import { founderCanReadReport, isAssessment, isSelfOrdered, releaseDueAt } from '@/lib/assessment'
 
 export const dynamic = 'force-dynamic'
 
@@ -37,7 +37,7 @@ export async function GET() {
   try {
     const { data: row, error } = await supabaseAdmin
       .from('dependency_reports')
-      .select('status, report, report_built_at, buyer_name, buyer_org, founder_name')
+      .select('status, report, report_built_at, buyer_name, buyer_org, buyer_email, founder_name, founder_email')
       .eq('archive_id', archive.id)
       .maybeSingle()
     if (error) throw new Error(error.message)
@@ -54,6 +54,7 @@ export async function GET() {
       founderName:  row.founder_name,
       buyerName:    row.buyer_name,
       buyerOrg:     row.buyer_org,
+      selfOrdered:  isSelfOrdered(row),
     })
   } catch (err) {
     console.error('[archive/assessment/report]', err instanceof Error ? err.message : err)

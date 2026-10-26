@@ -2,7 +2,7 @@ import { NextRequest, NextResponse, after } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { checkRateLimit, getClientIP } from '@/lib/apiSecurity'
-import { areasCapturedFromRows, assessmentProgress, isAssessment } from '@/lib/assessment'
+import { areasCapturedFromRows, assessmentProgress, isAssessment, isSelfOrdered } from '@/lib/assessment'
 import { validateIntake } from '@/lib/dependencyIntake'
 import { loadAreaRows, loadAssessmentForArchive, loadRoundPrompts, requestReadingsIfDue, type AssessmentRow } from '@/lib/assessmentStore'
 
@@ -57,8 +57,9 @@ async function view(archiveId: string, row: AssessmentRow) {
   })
   return {
     ...progress,
-    buyerName: row.buyer_name,
-    buyerOrg:  row.buyer_org,
+    buyerName:   row.buyer_name,
+    buyerOrg:    row.buyer_org,
+    selfOrdered: isSelfOrdered(row),
   }
 }
 

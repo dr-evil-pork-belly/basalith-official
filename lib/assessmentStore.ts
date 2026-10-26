@@ -23,10 +23,12 @@ export interface AssessmentRow {
   intake:          unknown
   buyer_name:      string
   buyer_org:       string | null
+  buyer_email:     string
+  founder_email:   string
   report_built_at: string | null
 }
 
-const ROW_COLS = 'id, archive_id, status, intake, buyer_name, buyer_org, report_built_at'
+const ROW_COLS = 'id, archive_id, status, intake, buyer_name, buyer_org, buyer_email, founder_email, report_built_at'
 
 /** The assessment a founder record belongs to. One per record (unique index). */
 export async function loadAssessmentForArchive(archiveId: string): Promise<AssessmentRow | null> {

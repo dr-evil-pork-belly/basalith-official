@@ -10,10 +10,18 @@ import AnswerPage, { type AnswerSection } from '../../components/AnswerPage'
 //    with the building"                    -> /succession, acquisition block
 //   "20 real business scenarios and 29
 //    decision questions across 8 domains"  -> /succession, the depth block
-//   "every response is scored"             -> /succession and /faq
-//   "trained only on one operator's
-//    deposits, no general model speaks
-//    for the record"                       -> /succession and /faq
+//   "every response is scored ... put first" -> lib/trainingPipeline.ts
+//                                             scoreTrainingPair, and the
+//                                             quality order in lib/frozenLayer.ts
+//                                             (October 23, 2026)
+//   "drawn from one owner's own deposits
+//    and checked against them"             -> /succession trust list, and
+//                                             lib/frozenLayer.ts plus
+//                                             lib/verifyGrounding.ts
+//                                             (was "trained only on one
+//                                             operator's deposits", withdrawn
+//                                             October 23, 2026: nothing is
+//                                             trained per client)
 //   "frozen at transition, successor adds
 //    context, nobody rewrites"             -> /succession and /faq
 //   "where the record is silent it says
@@ -47,12 +55,12 @@ const SECTIONS: readonly AnswerSection[] = [
   {
     heading: 'Can a founder’s reasoning be captured before they leave?',
     body:
-      'Only while they are still there to do it. A Basalith is built with the operator present and taking part, not pieced together from old emails once they are gone. It starts with three of the hardest calls they ever made, in their own words and their own time. From there the operator works through 20 real business scenarios and 29 decision questions across 8 domains. Every response is scored before it can shape the model.',
+      'Only while they are still there to do it. A Basalith is built with the operator present and taking part, not pieced together from old emails once they are gone. It starts with three of the hardest calls they ever made, in their own words and their own time. From there the operator works through 20 real business scenarios and 29 decision questions across 8 domains. Every response is scored for how specific it is, how natural it sounds, and how much it shows the way the operator thinks, and the strongest are put first when the entity answers.',
   },
   {
     heading: 'How is this different from an internal chatbot on company files?',
     body:
-      'Every model is trained only on one operator’s deposits. No general model speaks for the record. That is the difference between a system that answers in the operator’s reasoning and one that answers in the average of everything it read. It is also why the boundary holds: where the record is silent, the entity says so rather than producing a plausible position the operator never took.',
+      'Every answer is drawn from one owner’s own deposits and checked against them before it is returned. That is the difference between a system that answers in the operator’s reasoning and one that answers in the average of everything it read. It is also why the boundary holds: where the record is silent, the entity says so rather than producing a plausible position the operator never took.',
   },
   {
     heading: 'What stops the record from being rewritten after the sale?',

@@ -86,7 +86,7 @@ export default function ApplyForm({ initialType = 'succession' }: { initialType?
       if (!res.ok) throw new Error('Submission failed')
       setSubmitted(true)
     } catch {
-      setError('Something went wrong. Please email legacy@basalith.xyz directly.')
+      setError('Something went wrong. Please email hello@basalith.ai directly.')
     } finally {
       setSubmitting(false)
     }

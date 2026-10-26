@@ -58,12 +58,12 @@ const ENTRIES: readonly FaqEntry[] = [
   {
     question: 'Is Basalith a chatbot trained on someone’s old emails?',
     answer:
-      'No. Nothing is reconstructed after the fact. A Basalith is built while the person is here and taking part. Every model is trained only on that one person’s deposits. No general AI speaks for the record.',
+      'No. Nothing is reconstructed after the fact. A Basalith is built while the person is here and taking part. Every answer is drawn only from that one person’s deposits.',
   },
   {
     question: 'What is the difference between the record and the entity?',
     answer:
-      'The record is everything deposited: the answers, the recordings, the labeled photographs, the observations from others. The entity is the model trained on it. The record is the permanent asset. The entity is the instrument. If the technology changes, the record is what carries forward.',
+      'The record is everything deposited: the answers, the recordings, the labeled photographs, the observations from others. The entity is what answers from it. The record is the permanent asset. The entity is the instrument. If the technology changes, the record is what carries forward.',
   },
   {
     question: 'What does Basalith refuse to do?',

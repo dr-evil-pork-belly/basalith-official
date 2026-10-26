@@ -48,7 +48,7 @@ const TRANSITIONS = [
     label: 'Succession',
     href:  '/apply?type=succession',
     cta:   'Talk to us about a succession',
-    body:  'The founder is stepping back, or a partner is retiring. The successor gets the systems and the client list. Not the reasoning behind them. Basalith hands the thinking forward, so the next person can ask how the founder would have decided instead of guessing.',
+    body:  'The owner is stepping back, or a partner is retiring. The successor gets the systems and the client list. Not the reasoning behind them. Basalith hands the thinking forward, so the next person can ask how the owner would have decided instead of guessing.',
   },
 ]
 
@@ -82,7 +82,13 @@ const TRUST = [
   },
   {
     title: 'Not a wrapper on a general AI.',
-    body:  'Every model is trained only on one operator’s deposits. No general model speaks for the record.',
+    // October 23, 2026: was "Every model is trained only on one operator's
+    // deposits." Nothing is trained per client; improvement is record level
+    // (decision of September 28, 2026). The two sentences now are the
+    // retrieval (lib/frozenLayer.ts, one record) and the verifier
+    // (lib/verifyGrounding.ts) on the successor route.
+    // Record: docs/OWNER_BUYER_FIXES_2026-10-23.md.
+    body:  'Every answer is drawn from one owner’s own deposits and checked against them before it is returned. Where the record is silent, it says so.',
   },
   {
     title: 'Never shared. Never sold.',
@@ -149,7 +155,7 @@ export default function SuccessionPage() {
             maxWidth:   '660px',
             margin:     0,
           }}>
-            The operator knows when to walk from a deal, which hire to trust over the resume, how much risk is too much. None of it is in the data room. Basalith captures how they reason while they are still running the company, so it transfers with the business. Through an acquisition or a succession.
+            In a dealership, a distributor, a dental group, the owner knows when to walk from a deal, which hire to trust over the resume, how much risk is too much. None of it is in the data room. Basalith captures how they reason while they are still running the company, so it transfers with the business. Through an acquisition or a succession.
           </p>
 
           <div className="succession-hero-ctas" style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginTop: '44px', alignItems: 'center' }}>
@@ -187,7 +193,16 @@ export default function SuccessionPage() {
             </Link>
           </div>
           <p style={{ ...GEORGIA, fontSize: '0.95rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.7, color: 'var(--color-text-muted)', marginTop: '18px', marginBottom: 0, maxWidth: '560px' }}>
-            The demo runs on a fictional founder. Ask it something they never answered and watch it decline to guess.
+            The demo runs on a fictional owner. Ask it something they never answered and watch it decline to guess.
+          </p>
+          {/* October 23, 2026: the owner who is not yet planning a handoff
+              starts with the report. Record: docs/OWNER_BUYER_2026-10-23.md. */}
+          <p style={{ ...GEORGIA, fontSize: '0.95rem', fontWeight: 400, lineHeight: 1.7, color: 'var(--color-text-secondary)', marginTop: '12px', marginBottom: 0, maxWidth: '560px' }}>
+            No handoff planned yet?{' '}
+            <Link href="/dependency-report" style={{ color: 'var(--color-gold-on-light)' }}>
+              Start with the dependency report
+            </Link>
+            . It shows how much of the business runs through you.
           </p>
         </section>
         </div>
@@ -318,7 +333,7 @@ export default function SuccessionPage() {
                 The Architecture
               </p>
               <p style={{ ...GEORGIA, fontSize: '1rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.85, color: 'var(--color-text-secondary)', margin: 0 }}>
-                Two permanent layers. One holds every fact and decision deposited. One learns the reasoning patterns behind them. Successors ask it the way they would have asked the founder.
+                Two permanent layers. One holds every fact and decision deposited. One learns the reasoning patterns behind them. Successors ask it the way they would have asked the owner.
               </p>
             </div>
           </div>
@@ -353,10 +368,10 @@ export default function SuccessionPage() {
                   The Cognitive Fingerprint Layer
                 </h3>
                 <p style={{ ...GEORGIA, fontSize: '1rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.8, color: 'var(--color-text-secondary)', marginBottom: '16px' }}>
-                  The founder&rsquo;s reasoning, fixed from their own deposits. Locked at transition. Nobody can rewrite it.
+                  The owner&rsquo;s reasoning, fixed from their own deposits. Locked at transition. Nobody can rewrite it.
                 </p>
                 <p style={{ ...GEORGIA, fontSize: '0.9rem', fontWeight: 400, lineHeight: 1.8, color: 'var(--color-text-muted)', margin: 0 }}>
-                  Every decision, position, and judgment captured during the active years. It does not drift after the founder steps back.
+                  Every decision, position, and judgment captured during the active years. It does not drift after the owner steps back.
                 </p>
               </div>
 
@@ -381,7 +396,7 @@ export default function SuccessionPage() {
                   The Contextual Intelligence Layer
                 </h3>
                 <p style={{ ...GEORGIA, fontSize: '1rem', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.8, color: 'var(--color-text-secondary)', marginBottom: '16px' }}>
-                  Successors add today&rsquo;s facts. The new customer, the changed market, the hire that did not work out. The system reads the founder&rsquo;s reasoning against the present.
+                  Successors add today&rsquo;s facts. The new customer, the changed market, the hire that did not work out. The system reads the owner&rsquo;s reasoning against the present.
                 </p>
                 <p style={{ ...GEORGIA, fontSize: '0.9rem', fontWeight: 400, lineHeight: 1.8, color: 'var(--color-text-muted)', margin: 0 }}>
                   The judgment stays fixed. The context stays current.

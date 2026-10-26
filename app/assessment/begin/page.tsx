@@ -23,11 +23,16 @@ export default async function AssessmentBeginPage({
 }: {
   searchParams: Promise<{ order?: string }>
 }) {
-  const session = await getSessionUser()
-  if (session?.archiveId) redirect('/archive/dashboard')
-
   const { order } = await searchParams
   const valid = typeof order === 'string' && UUID.test(order) ? order.toLowerCase() : null
+
+  // A signed in owner with no order goes to the dashboard, as before. With an
+  // order he sees the form: since October 23, 2026 an owner can order a report
+  // on himself (app/api/assessment/start), and redirecting him here would hide
+  // the only way in. The route decides everything; this page shows nothing
+  // about the row either way.
+  const session = await getSessionUser()
+  if (session?.archiveId && !valid) redirect('/archive/dashboard')
 
   return <AssessmentBeginClient order={valid} />
 }

@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: "Basalith · The founder's judgment, kept when a business changes hands",
-  description: 'What built the company is not in the data room. Basalith captures how a person reasons and decides, in their own words. For a business changing hands, and for one person whose judgment is worth keeping.',
+  title: "Basalith · The owner's judgment, kept when a business changes hands",
+  description: 'What built the company is not in the data room. Basalith captures how an owner reasons and decides, in their own words, so it stays with the business when the owner steps back. For the business, and for one person whose judgment is worth keeping.',
 }
 
 import Nav               from './components/Nav'

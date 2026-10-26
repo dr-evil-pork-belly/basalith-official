@@ -10,6 +10,7 @@ const COLS: { heading: string; links: { label: string; href: string }[] }[] = [
     links: [
       { label: 'Acquisition',              href: '/apply?type=acquisition' },
       { label: 'Succession',               href: '/succession'             },
+      { label: 'Dependency Report',        href: '/dependency-report'      },
       { label: 'Individuals and Families', href: '/families'               },
       { label: 'Churches',                 href: '/churches'               },
       { label: 'Advisors',                 href: '/partner'                },

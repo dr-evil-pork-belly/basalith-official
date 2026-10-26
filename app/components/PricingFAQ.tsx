@@ -57,7 +57,7 @@ const ITEMS: Item[] = [
   },
   {
     q: 'What is the entity and how does it work?',
-    a: `Your entity is a cognitive reference model trained only on your record: your labeled photographs,
+    a: `Your entity is a cognitive reference model built only from your record: your labeled photographs,
       voice recordings, written deposits, and the stories your family has contributed over time. It
       answers in the patterns of your expression, carries the opinions and values you recorded, and
       points back to your specific memories. It is not a simulation of you and it is not a general

@@ -9,5 +9,10 @@
 // wiki tools) before reading further, because "knowledge" is that category's
 // own word. The line now names the person and the judgment. Record:
 // docs/HOMEPAGE_CATEGORY_2026-10-20.md.
+//
+// October 23, 2026: "founder" became "owner." The buyer this line is for is
+// the owner of a closely held business (a dealership, a distributor, a dental
+// group), and many of them bought the company or inherited it. Record:
+// docs/OWNER_BUYER_2026-10-23.md.
 export const CATEGORY_LINE =
-  "The founder's judgment, kept when a business changes hands. By acquisition or succession."
+  "The owner's judgment, kept when a business changes hands. By acquisition or succession."

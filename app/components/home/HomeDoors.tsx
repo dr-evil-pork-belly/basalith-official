@@ -14,18 +14,34 @@ import { mono, serif, StoneBlock, StoneCard } from './StonePrimitives'
 //
 // This block carries id="audience" because it is now the place a visitor
 // chooses a path. scrollToAudience targets that id.
-const DOORS = [
+// October 23, 2026: the business door now leads with the dependency report,
+// not with succession. An owner will not buy a "transfer" before anyone has
+// shown him what would be lost; the report is that showing, and a Basalith is
+// what closes the gap it names. Succession stays one link away inside the same
+// card. The personal door says the same method works for a parent, which is
+// real today through /begin. Record: docs/OWNER_BUYER_2026-10-23.md.
+type Door = {
+  label: string
+  title: string
+  body:  string
+  href:  string
+  cta:   string
+  also?: { href: string; text: string }
+}
+
+const DOORS: Door[] = [
   {
-    label: 'A business changing hands',
-    title: 'For an acquisition or a succession.',
-    body:  'How the operator decides, captured before the handoff, for the people who take over. It starts with a conversation.',
-    href:  '/succession',
-    cta:   'See how it transfers',
+    label: 'If you own the business',
+    title: 'Find out how much of it runs through you.',
+    body:  'Eight calls with you, one for each area of how the business runs. The report shows which decisions run through you, and which of those are on the record. You read it first.',
+    href:  '/dependency-report',
+    cta:   'See the dependency report',
+    also:  { href: '/succession', text: 'Handing the business to a successor or a buyer? See how succession works' },
   },
   {
     label: 'One person',
     title: 'For your own judgment.',
-    body:  'For anyone whose work is the calls they make, in a company, a practice, or a family. It starts with one call, and nothing is owed until your Basalith has answered you.',
+    body:  'The calls you make at work and at home come from the same place. It starts with one call, and nothing is owed until your Basalith has answered you. It works the same for a parent whose thinking you want to keep.',
     href:  '/begin',
     cta:   'Begin with one call',
   },
@@ -88,6 +104,21 @@ export default function HomeDoors() {
               >
                 {d.cta}
               </Link>
+              {d.also && (
+                <Link
+                  href={d.also.href}
+                  style={{
+                    ...serif,
+                    fontSize:   'var(--stone-fs-row-body)',
+                    fontWeight: 400,
+                    lineHeight: 1.45,
+                    color:      'var(--stone-secondary)',
+                    textAlign:  'center',
+                  }}
+                >
+                  {d.also.text}
+                </Link>
+              )}
             </StoneCard>
           ))}
         </div>

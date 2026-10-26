@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     default:  'Basalith',
     template: '%s · Basalith',
   },
-  description: "The founder's judgment, kept when a business changes hands. Basalith captures how an operator reasons, so it transfers through an acquisition or a succession.",
+  description: "The owner's judgment, kept when a business changes hands. Basalith captures how an owner reasons, so it transfers through an acquisition or a succession.",
   metadataBase: new URL('https://basalith.ai'),
   manifest:    '/site.webmanifest',
 
@@ -65,7 +65,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title:       'Basalith',
-    description: "The founder's judgment, kept when a business changes hands. Basalith captures how an operator reasons, so it transfers through an acquisition or a succession.",
+    description: "The owner's judgment, kept when a business changes hands. Basalith captures how an owner reasons, so it transfers through an acquisition or a succession.",
     url:         'https://basalith.ai',
     siteName:    'Basalith',
     images:      [{ url: '/icon-512x512.png' }],
@@ -73,7 +73,7 @@ export const metadata: Metadata = {
   twitter: {
     card:        'summary',
     title:       'Basalith',
-    description: "The founder's judgment, kept when a business changes hands. Basalith captures how an operator reasons, so it transfers through an acquisition or a succession.",
+    description: "The owner's judgment, kept when a business changes hands. Basalith captures how an owner reasons, so it transfers through an acquisition or a succession.",
     images:      ['/icon-512x512.png'],
   },
 }

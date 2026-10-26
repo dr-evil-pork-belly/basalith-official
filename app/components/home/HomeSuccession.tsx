@@ -74,6 +74,53 @@ export default function HomeSuccession() {
         </p>
       </StoneBlock>
 
+      {/* The research line, October 23, 2026. Every figure is the paper's own:
+          Smith, Yagan, Zidar, and Zwick, "Capitalists in the Twenty-First
+          Century," Quarterly Journal of Economics 134(4), 2019. Pass through
+          profit falls by three quarters after owner retirement or premature
+          death, in tax data linking 11 million firms to their owners. The
+          paper's "human capital" is everything embodied in the owner, so this
+          block does not say the loss is all judgment. Record:
+          docs/OWNER_BUYER_2026-10-23.md. */}
+      <StoneBlock gap="10px" style={{ paddingTop: 0 }}>
+        <p style={{ ...mono, color: 'var(--color-gold)', margin: 0 }}>
+          What the tax records show
+        </p>
+        <p
+          style={{
+            ...serif,
+            fontSize:   'var(--stone-fs-lead)',
+            fontWeight: 400,
+            lineHeight: 1.4,
+            color:      'var(--stone-ink)',
+            margin:     0,
+            textWrap:   'pretty',
+          }}
+        >
+          When the owner of a closely held business retires or dies, its profits fall by about three quarters.
+        </p>
+        <p
+          style={{
+            ...serif,
+            fontSize:   'var(--stone-fs-row-body)',
+            fontWeight: 400,
+            lineHeight: 1.5,
+            color:      'var(--stone-secondary)',
+            margin:     0,
+          }}
+        >
+          From U.S. tax records linking 11 million firms to their owners. Smith, Yagan, Zidar, and Zwick,{' '}
+          <a
+            href="https://www.nber.org/papers/w25442"
+            style={{ color: 'var(--stone-ink)' }}
+            rel="noopener"
+          >
+            Capitalists in the Twenty-First Century
+          </a>
+          , Quarterly Journal of Economics, 2019. What leaves is the work, the relationships, the reputation, and the judgment. Judgment is the part that can be put on the record.
+        </p>
+      </StoneBlock>
+
       {/* Numbered hairline list, 1d slot 4. */}
       <StoneBlock gap="0" style={{ paddingTop: 0 }}>
         {PILLARS.map(p => (

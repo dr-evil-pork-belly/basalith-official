@@ -158,11 +158,16 @@ export default function AssessmentBeginClient({ order }: { order: string | null 
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="flex flex-col gap-7">
+            {/* October 23, 2026: the line under this heading used to say
+                someone considering the business had asked for the report.
+                That is wrong for an owner who ordered his own, and this page
+                shows nothing about the row by design, so the line now fits
+                both. Record: docs/OWNER_BUYER_FIXES_2026-10-23.md. */}
             <h1 className="font-serif text-[1.45rem] font-light leading-snug" style={{ color: 'var(--invert-fg)' }}>
               Eight short calls on how you run the business.
             </h1>
             <p className="font-sans text-[15.5px] leading-relaxed" style={{ color: 'var(--invert-dim)' }}>
-              Someone considering this business has asked for a report on how it runs through you. This is where you give your side of it, by voice or typed, on your own time.
+              A report on how this business runs through you. This is where you give your side of it, by voice or typed, on your own time. You read the report before anyone else does.
             </p>
 
             <div>

@@ -44,7 +44,7 @@ const STEPS = [
     n:     '01',
     title: 'What the operator puts in',
     body:  [
-      'The model learns from the operator first. Recorded sessions, decision frameworks, scenario responses, written deposits.',
+      'The record starts with the operator. The Founding, then one interview for each of the eight areas of how the business runs, voice recordings, written deposits.',
       'First person reasoning. How they work a problem, what they weigh, what they took from the calls that went wrong. The specific logic of how this one mind decides.',
     ],
   },
@@ -61,7 +61,7 @@ const STEPS = [
     title: 'Together, they make a model of how the person thinks',
     body:  [
       'The inside view plus the outside view gives you something neither could produce alone.',
-      'The record becomes training data. The entity learns not just what they said but how they reason. Not their opinions. Their patterns.',
+      'The entity answers from the record and only from it. Not a list of their opinions. The patterns in how they reasoned, in their own words.',
       'That is the difference between memory and cognition. Memory stores facts. The entity holds how a specific mind works.',
     ],
   },
@@ -69,8 +69,8 @@ const STEPS = [
     n:     '04',
     title: 'How your Basalith grows',
     body:  [
-      'This is not a single interview. The operator works through 20 real business scenarios and 29 decision questions across the 8 domains that built the company.',
-      'Every answer adds depth. The longer the active period runs before a transition, the more the model has to work with. Start before the handoff is on the calendar, not after.',
+      'This is not a single interview. After The Founding, the operator works through the eight areas of how the business runs, one interview each, every one opened on a real moment rather than a hypothetical.',
+      'Every answer adds depth. The longer the active period runs before a transition, the more the record holds. Start before the handoff is on the calendar, not after.',
     ],
   },
 ]
@@ -186,21 +186,21 @@ export default function MethodPage() {
 
             <div className="quality-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px', maxWidth: '680px', marginBottom: '32px' }}>
               <div className="paper-card" style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', padding: 'clamp(28px,3vw,40px)' }}>
-                <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold-on-light)', marginBottom: '20px' }}>First Review</p>
+                <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold-on-light)', marginBottom: '20px' }}>At the deposit</p>
                 {[
-                  'Volume scoring',
-                  'Speed and coverage',
+                  'Scored for how specific it is, how natural it sounds, and how much it shows the way the operator thinks',
                   'Every deposit',
+                  'Sets the order the record is read in',
                 ].map(item => (
                   <p key={item} style={{ ...SERIF, fontSize: '0.9rem', fontWeight: 400, color: 'var(--color-text-secondary)', lineHeight: 1.7, marginBottom: '8px' }}>{item}</p>
                 ))}
               </div>
               <div style={{ background: 'rgba(160,132,80,0.04)', border: '1px solid rgba(160,132,80,0.25)', padding: 'clamp(28px,3vw,40px)' }}>
-                <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)', marginBottom: '20px' }}>Second Review</p>
+                <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--color-gold)', marginBottom: '20px' }}>At the answer</p>
                 {[
-                  'Deep evaluation',
-                  'Ambiguous cases',
-                  'High stakes decisions',
+                  'Read against the operator\u2019s own words before it is returned to a successor',
+                  'Every answer',
+                  'Where nothing in the record backs it, a plain no',
                 ].map(item => (
                   <p key={item} style={{ ...SERIF, fontSize: '0.9rem', fontWeight: 400, color: 'var(--on-dark-3)', lineHeight: 1.7, marginBottom: '8px' }}>{item}</p>
                 ))}
@@ -209,13 +209,13 @@ export default function MethodPage() {
 
             <div style={{ maxWidth: '680px', textAlign: 'center', padding: '16px 0', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
               <p style={{ ...MONO, fontSize: '0.72rem', color: 'var(--on-dark-3)', letterSpacing: '0.2em' }}>
-                A deposit shapes your entity only after it has passed review
+                An answer reaches a successor only after it has been read against the record
               </p>
             </div>
 
             <p style={{ ...BODY, color: 'var(--on-dark-3)', maxWidth: '580px', marginTop: '40px' }}>
-              Your record is not scored by the cheapest available model.
-              It is scored by the right model for each decision.
+              The score at the deposit is quick and never decides what a successor hears.
+              The reading at the answer is the one that does, and it runs every time.
             </p>
           </div>
         </section>
@@ -258,7 +258,7 @@ export default function MethodPage() {
             </h2>
             <p style={{ ...BODY, color: 'var(--on-dark-3)', marginBottom: '24px' }}>
               Basalith started as a way for families to keep how someone thinks while they are still here to get it right.
-              The method is the same. The operator becomes a parent. The colleagues become the family. The scenario library becomes the stories told at the table.
+              The method is the same. The operator becomes a parent. The colleagues become the family. The eight areas of the business become the parts of a life.
             </p>
             <p style={{ ...BODY, color: 'var(--on-dark-3)', marginBottom: '36px' }}>
               For a family Basalith, photographs are filtered and ranked before anyone is asked to label them, so the family only sees what is worth their time.

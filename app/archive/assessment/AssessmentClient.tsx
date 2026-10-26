@@ -35,7 +35,7 @@ const LABEL  = 'var(--portal-label)'
 const ERR    = 'var(--portal-error)'
 const LINE   = 'var(--portal-card-line)'
 
-type View = AssessmentProgress & { buyerName: string; buyerOrg: string | null }
+type View = AssessmentProgress & { buyerName: string; buyerOrg: string | null; selfOrdered?: boolean }
 type Draft = Record<string, { answer: DependencyAnswer | null; role: string }>
 
 function emptyDraft(): Draft {
@@ -101,7 +101,9 @@ export default function AssessmentClient() {
     }
   }
 
-  const requestedBy = view ? [view.buyerName, view.buyerOrg].filter(Boolean).join(', ') : ''
+  // A self order names the owner as the buyer (lib/assessment.ts
+  // isSelfOrdered), so "Requested by" would print the owner's own name.
+  const requestedBy = view && !view.selfOrdered ? [view.buyerName, view.buyerOrg].filter(Boolean).join(', ') : ''
 
   return (
     <div className="max-w-3xl mx-auto" style={{ paddingBottom: '64px' }}>
@@ -110,7 +112,7 @@ export default function AssessmentClient() {
         Eight parts of running the business. A call on each, then six short questions.
       </h1>
       <p style={{ fontFamily: SERIF, fontSize: '19px', fontWeight: 400, lineHeight: 1.6, color: BODY, marginBottom: '34px', maxWidth: '560px' }}>
-        {requestedBy ? `Requested by ${requestedBy}. ` : ''}Take the parts in any order. The call asks for one story; the six questions cover the rest of that part and who else can make its decisions. Stop whenever you like and come back; every answer is saved as you go.
+        {requestedBy ? `Requested by ${requestedBy}. ` : view?.selfOrdered ? 'You ordered this report for yourself. ' : ''}Take the parts in any order. The call asks for one story; the six questions cover the rest of that part and who else can make its decisions. Stop whenever you like and come back; every answer is saved as you go.
       </p>
 
       {loadError && (

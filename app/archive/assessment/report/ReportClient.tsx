@@ -24,6 +24,7 @@ type Payload = {
   founderName: string
   buyerName:   string
   buyerOrg:    string | null
+  selfOrdered?: boolean
 }
 
 export default function ReportClient() {
@@ -65,7 +66,9 @@ export default function ReportClient() {
         <>
           {data.status === 'ready' && (
             <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '17px', color: BODY, lineHeight: 1.6, marginBottom: '28px', maxWidth: '60ch' }}>
-              Only you can see this. It has not been sent to {data.buyerName}.
+              {data.selfOrdered
+                ? 'Only you can see this. You ordered it for yourself.'
+                : `Only you can see this. It has not been sent to ${data.buyerName}.`}
             </p>
           )}
           <ReportView
@@ -73,6 +76,7 @@ export default function ReportClient() {
             founderName={data.founderName}
             buyerName={data.buyerName}
             buyerOrg={data.buyerOrg}
+            selfOrdered={!!data.selfOrdered}
             builtAt={data.builtAt}
           />
         </>

@@ -36,7 +36,7 @@ const H2: React.CSSProperties = {
 const ECOSYSTEM = [
   {
     name: 'Basalith.ai',
-    body: 'The product. Where each Basalith is built, entities are trained, and the work of preservation happens.',
+    body: 'The product. Where each Basalith is built, where its entity answers, and where the work of preservation happens.',
   },
   {
     name: 'Basalith.life',
