@@ -130,8 +130,9 @@ export default function HomeDoors() {
             The registration is under embargo, so it is named but not linked.
             Restore the link when the embargo lifts.
             Record: docs/HOMEPAGE_CATEGORY_2026-10-20.md.
-            October 26, 2026: credentials cut (D.B.A., affiliation). Name and
-            the OSF claim stay. Record: docs/FOUNDER_DETAILS_CUT_2026-10-26.md. */}
+            October 26, 2026: credentials and the "Built by" credit cut. The
+            About link carries the person; the OSF claim stays.
+            Record: docs/FOUNDER_DETAILS_CUT_2026-10-26.md. */}
         <p
           style={{
             ...serif,
@@ -143,8 +144,7 @@ export default function HomeDoors() {
             textWrap:   'pretty',
           }}
         >
-          Built by David Ha. The study that tests its refusals is preregistered
-          on OSF.{' '}
+          The study that tests its refusals is preregistered on OSF.{' '}
           <Link href="/about" style={{ color: 'var(--stone-ink)' }}>About the founder</Link>
         </p>
       </StoneBlock>
