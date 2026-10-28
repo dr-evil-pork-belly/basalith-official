@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { isAssessment } from '@/lib/assessment'
+import { needsBusinessProfile } from '@/lib/businessProfileStore'
 import AssessmentClient from './AssessmentClient'
 
 export const dynamic = 'force-dynamic'
@@ -23,12 +24,15 @@ export default async function AssessmentPage() {
 
   const { data: archive } = await supabaseAdmin
     .from('archives')
-    .select('id, owner_user_id, status')
+    .select('id, owner_user_id, tier, status, preferred_language')
     .eq('id', session.archiveId)
     .maybeSingle()
 
   if (!archive || archive.owner_user_id !== session.userId) redirect('/archive-login')
   if (!isAssessment(archive)) redirect('/archive/dashboard')
+  // The owner describes his business first (lib/businessProfile.ts,
+  // October 28, 2026). Only when the owner openers are on for this record.
+  if (await needsBusinessProfile(archive)) redirect('/archive/business')
 
   return <AssessmentClient />
 }

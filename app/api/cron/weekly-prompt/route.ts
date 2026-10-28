@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { resend } from '@/lib/resend'
 import { DIMENSIONS } from '@/lib/entityAccuracy'
-import { getWeeklyPrompt, getWeeklyPromptZh, getWeekNumber } from '@/lib/weeklyPrompts'
+import { getWeeklyPrompt, getWeeklyPromptZh, getWeekNumber, weeklyPromptGoesTo } from '@/lib/weeklyPrompts'
 import { t } from '@/lib/emailTranslations'
 import { generateQuestionsForContributor } from '@/lib/contributorToken'
 import { generateRelationshipQuestion, buildQuestionSubject, buildQuestionEmail } from '@/lib/questionEngine'
@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
 
   const { data: archives } = await supabaseAdmin
     .from('archives')
-    .select('id, name, family_name, owner_email, owner_name, preferred_language')
+    .select('id, name, family_name, owner_email, owner_name, preferred_language, tier')
     .eq('status', 'active')
     .not('owner_email', 'is', null)
 
@@ -49,8 +49,15 @@ export async function GET(req: NextRequest) {
 
   const weekNumber = getWeekNumber()
   let sent = 0
+  // Owners on a succession record get no weekly prompt (October 28, 2026,
+  // weeklyPromptGoesTo in lib/weeklyPrompts.ts). Counted for the response.
+  let skippedSuccession = 0
 
   for (const archive of archives) {
+    if (!weeklyPromptGoesTo(archive)) {
+      skippedSuccession++
+      continue
+    }
     try {
       // Find weakest dimension from entity_accuracy table
       const { data: accuracyRows } = await supabaseAdmin
@@ -234,7 +241,7 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  return Response.json({ sent, total: archives.length, weekNumber, isTest, questionsRefreshed, questionEmailsSent })
+  return Response.json({ sent, skippedSuccession, total: archives.length, weekNumber, isTest, questionsRefreshed, questionEmailsSent })
 }
 
 // ── Email builder ──────────────────────────────────────────────────────────────

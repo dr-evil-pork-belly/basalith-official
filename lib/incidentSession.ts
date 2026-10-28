@@ -23,6 +23,7 @@ import { AREA_SEEDS } from './areaSeeds'
 import { chooseOpener, loadAreaReadings, orderAreas, type Opener } from './questionPlanner'
 import type { QuestionLens } from './questionLens'
 import type { InterviewLogEntry } from './conversationalInterview'
+import type { OpenerLog } from './ownerOpener'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -118,6 +119,10 @@ export interface IncidentState {
   interviewArm?: 'interviewer' | 'spine'
   pendingQuestionSource?: 'interviewer' | 'spine'
   interviewLog?: InterviewLogEntry[]
+  // The opener's log (lib/ownerOpener.ts, October 28, 2026), set once when an
+  // area call opens with the owner opener writer on. Same contract: rides the
+  // jsonb, the reducer never reads it. Never shown, never deposited.
+  opener?: OpenerLog
 }
 
 export interface FoundingMarker {

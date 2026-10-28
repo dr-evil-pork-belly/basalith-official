@@ -23,6 +23,29 @@ describe('who gets the interviewer', () => {
     expect(callQualifies({ archiveId: ID_EVEN, isAreaCall: false, language: 'en' }, env)).toBe(false)
     expect(callQualifies({ archiveId: ID_EVEN, isAreaCall: true, language: 'yue' }, env)).toBe(false)
   })
+
+  // October 28, 2026. docs/GENERIC_QUESTIONS_SLICE_1_2026-10-28.md.
+  it('takes all for every record, and nothing looser', () => {
+    expect(enabledFor(ID_EVEN, { CONVERSATIONAL_INTERVIEW: 'all' })).toBe(true)
+    expect(enabledFor(ID_ODD, { CONVERSATIONAL_INTERVIEW: ' ALL ' })).toBe(true)
+    expect(enabledFor(ID_EVEN, { CONVERSATIONAL_INTERVIEW: 'on' })).toBe(false)
+    expect(enabledFor(ID_EVEN, { CONVERSATIONAL_INTERVIEW: 'true' })).toBe(false)
+    expect(enabledFor(ID_EVEN, { CONVERSATIONAL_INTERVIEW: 'all,' })).toBe(false)
+  })
+
+  it('takes a founding call only with its own flag on', () => {
+    const named = { CONVERSATIONAL_INTERVIEW: ID_EVEN }
+    const founding = { archiveId: ID_EVEN, isAreaCall: false, isFoundingCall: true, language: 'en' }
+    expect(callQualifies(founding, named)).toBe(false)
+    expect(callQualifies(founding, { ...named, CONVERSATIONAL_INTERVIEW_FOUNDING: 'on' })).toBe(true)
+    expect(callQualifies(founding, { ...named, CONVERSATIONAL_INTERVIEW_FOUNDING: 'yes' })).toBe(false)
+    // The founding flag alone switches nobody on.
+    expect(callQualifies(founding, { CONVERSATIONAL_INTERVIEW_FOUNDING: 'on' })).toBe(false)
+    // Still English only.
+    expect(callQualifies({ ...founding, language: 'vi' }, { ...named, CONVERSATIONAL_INTERVIEW_FOUNDING: 'on' })).toBe(false)
+    // Area calls do not need the founding flag.
+    expect(callQualifies({ archiveId: ID_EVEN, isAreaCall: true, language: 'en' }, named)).toBe(true)
+  })
 })
 
 describe('the arm', () => {

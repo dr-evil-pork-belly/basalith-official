@@ -34,6 +34,7 @@ import { B2B_DOMAINS } from './b2bDomains'
 import { scopeForTier, type FoundingScope } from './foundingSequence'
 import { AREA_SEEDS, LENS_AREA_SEEDS, seedForArea, type AreaSeed } from './areaSeeds'
 import { lensFor, type QuestionLens } from './questionLens'
+import type { OpenerResult } from './ownerOpener'
 
 // The seeds live in lib/areaSeeds.ts since September 24, 2026; re-exported so
 // every existing import from this module keeps working.
@@ -111,6 +112,13 @@ export async function startAreaCall(
   area: string,
   /** Who is being asked (lib/questionLens.ts). Omitted: derived from the tier alone. */
   lens: QuestionLens = lensFor({ tier }),
+  /**
+   * Writes the opener from the owner's own description of his business
+   * (lib/ownerOpener.ts, October 28, 2026). Called after the open call check
+   * and before the call row is created. Omitted, or returning the authored
+   * opener, changes nothing.
+   */
+  writeOpener?: (seed: AreaSeed) => Promise<OpenerResult>,
 ): Promise<StartAreaCallResult> {
   const scope = scopeForTier(tier)
   const seed  = seedForArea(scope, area, lens)
@@ -124,10 +132,45 @@ export async function startAreaCall(
     .maybeSingle()
   if (open) return { ok: false, reason: 'already_open' }
 
+  // The opener is written BEFORE the call row exists (October 28, 2026 review).
+  // Writing it after createIncident left an open row with no question for as
+  // long as the model calls took; a function killed in that gap left the
+  // owner locked out of every call. Now the row is created and persisted
+  // back to back, with its question already in hand.
+  let pendingQuestion = renderProbe({ probeType: 'SEED', anchor: '', seedText: seed.question })
+  let opener: OpenerResult | null = null
+  if (writeOpener) {
+    // Fails closed inside: a model error serves the authored opener. A throw
+    // is caught here too, and the authored opener goes out.
+    try {
+      opener = await writeOpener(seed)
+      if (opener.source === 'interviewer') {
+        pendingQuestion = renderProbe({ probeType: 'SEED', anchor: '', seedText: opener.text })
+      }
+    } catch (err) {
+      console.error('[areaCalls] opener writer threw, authored opener served:', err instanceof Error ? err.message : err)
+      opener = null
+    }
+
+    // The wait may have been long. If another tab opened a call meanwhile,
+    // that call wins and this opener is dropped.
+    const { data: openNow } = await supabaseAdmin
+      .from('incident_sessions')
+      .select('id')
+      .eq('archive_id', archiveId)
+      .eq('status', 'open')
+      .maybeSingle()
+    if (openNow) return { ok: false, reason: 'already_open' }
+  }
+
   const session = await createIncident(archiveId, { questionId: null, category: seed.category })
   session.state.areaCall = { area: seed.area, scope, startedAt: new Date().toISOString() }
   session.state.lens     = lens
-  session.state.pendingQuestion    = renderProbe({ probeType: 'SEED', anchor: '', seedText: seed.question })
+  session.state.pendingQuestion = pendingQuestion
+  if (opener) {
+    session.state.opener = opener.log
+    if (opener.source === 'interviewer') session.state.pendingQuestionSource = 'interviewer'
+  }
   session.state.pendingProbeType   = 'SEED'
   session.state.pendingBranchIndex = -1
   await persist(session)

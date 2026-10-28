@@ -53,7 +53,13 @@ export type GuardFailure =
 export interface GuardContext {
   /** Everything the person said in this call, oldest first. */
   said: readonly string[]
-  probeType: ProbeType
+  /**
+   * 'SEED' is an opener (lib/ownerOpener.ts, October 28, 2026). An opener
+   * may be "Tell me about ..." ending in a period, may hold at most one
+   * question mark, and may use "or" to name the kind of moment it asks for;
+   * the opener judge fails one that offers candidate answers.
+   */
+  probeType: ProbeType | 'SEED'
   lens: QuestionLens
 }
 
@@ -152,7 +158,11 @@ export function checkDraft(question: string, ctx: GuardContext): GuardFailure[] 
 
   if (w.length > MAX_WORDS) fails.add('too_long')
   const qmarks = (q.match(/\?/g) ?? []).length
-  if (qmarks !== 1 || !q.endsWith('?')) fails.add('not_one_question')
+  const seed = ctx.probeType === 'SEED'
+  const shapeOk = seed
+    ? (qmarks === 1 && q.endsWith('?')) || (qmarks === 0 && q.endsWith('.') && /^tell me about\b/i.test(q))
+    : qmarks === 1 && q.endsWith('?')
+  if (!shapeOk) fails.add('not_one_question')
   if (/[\u2014\u2015\u2013]/.test(q)) fails.add('em_dash')
   if (/[A-Za-z]-[A-Za-z]/.test(q)) fails.add('hyphen')
   if (/!/.test(q)) fails.add('exclamation')
@@ -165,7 +175,7 @@ export function checkDraft(question: string, ctx: GuardContext): GuardFailure[] 
 
   // "or" offers options. Allowed only on a tradeoff that names two goods,
   // both in the person's own quoted words.
-  if (/\bor\b/i.test(withoutQuotes(q))) {
+  if (!seed && /\bor\b/i.test(withoutQuotes(q))) {
     const tradeoffOk = ctx.probeType === 'TRADEOFF' && quotes.length >= 2 && verified.length === quotes.length
     if (!tradeoffOk) fails.add('either_or')
   }

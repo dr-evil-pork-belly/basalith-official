@@ -3,10 +3,14 @@
  * October 22, 2026. claude/BASALITH_CONVERSATIONAL_INTERVIEW_2026-10-22.md.
  *
  * WHO. Off unless CONVERSATIONAL_INTERVIEW names the record. The value is a
- * comma separated list of archive ids. There is no "on for everyone" value in
- * this slice: the interviewer runs only on records named for the A/B.
- * Only area calls, only English (preferred_language en or unset). Founding
- * calls, the demo, and every other record keep the spine, unchanged.
+ * comma separated list of archive ids, or 'all' for every record (October 28,
+ * 2026: one variable to go live instead of a redeploy per owner). 'on' is NOT
+ * a value and stays off, so a typo cannot switch everyone on.
+ * Only English (preferred_language en or unset). Area calls qualify. Founding
+ * calls qualify only when CONVERSATIONAL_INTERVIEW_FOUNDING is also 'on'
+ * (October 28, 2026, docs/GENERIC_QUESTIONS_SLICE_1_2026-10-28.md), so area
+ * calls can be proven first and the founding calls switched on after. The
+ * demo and every other call keep the spine, unchanged.
  *
  * THE ARM. The A/B is within person: each named record alternates between
  * the interviewer and the spine, one area call each, and the starting arm
@@ -73,18 +77,27 @@ type Env = Record<string, string | undefined>
 export function enabledFor(archiveId: string, env: Env = process.env): boolean {
   const raw = (env.CONVERSATIONAL_INTERVIEW ?? '').trim().toLowerCase()
   if (!raw || raw === 'off') return false
+  if (raw === 'all') return true
   const ids = raw.split(',').map(s => s.trim()).filter(Boolean)
   return ids.includes(archiveId.trim().toLowerCase())
+}
+
+/** Whether founding calls are switched on as well. Exported for the test. */
+export function foundingOn(env: Env = process.env): boolean {
+  return (env.CONVERSATIONAL_INTERVIEW_FOUNDING ?? '').trim().toLowerCase() === 'on'
 }
 
 /** Whether a call qualifies at all. Exported for the test. */
 export function callQualifies(input: {
   archiveId: string
   isAreaCall: boolean
+  /** One of the three founding calls (incident_sessions.state.founding). */
+  isFoundingCall?: boolean
   language: string | null | undefined
 }, env: Env = process.env): boolean {
   const lang = (input.language ?? 'en').trim().toLowerCase() || 'en'
-  return input.isAreaCall && lang === 'en' && enabledFor(input.archiveId, env)
+  const kind = input.isAreaCall || (!!input.isFoundingCall && foundingOn(env))
+  return kind && lang === 'en' && enabledFor(input.archiveId, env)
 }
 
 /**

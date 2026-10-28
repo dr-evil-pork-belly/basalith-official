@@ -247,3 +247,19 @@ export function getWeeklyPrompt(dimension: string, weekNumber: number): string {
   const prompts = WEEKLY_PROMPTS[dimension] ?? WEEKLY_PROMPTS.wisdom_and_lessons
   return prompts[weekNumber % prompts.length]
 }
+
+/**
+ * Who gets the Monday weekly prompt. October 28, 2026.
+ * docs/GENERIC_QUESTIONS_SLICE_1_2026-10-28.md.
+ *
+ * Not an owner on a succession record. This bank predates the owner buyer: it
+ * picks by the old entity_accuracy dimensions rather than the eight coverage
+ * areas, and some of it is framed around loss, which the product never does.
+ * A succession owner already gets the daily email, which aims at his coverage
+ * map. Personal records keep the weekly prompt until the bank is rewritten.
+ *
+ * Pure, so the test pins it. Unknown or missing tier keeps today's behavior.
+ */
+export function weeklyPromptGoesTo(archive: { tier?: string | null }): boolean {
+  return archive.tier !== 'succession'
+}

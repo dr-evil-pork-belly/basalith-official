@@ -169,7 +169,11 @@ export async function POST(req: NextRequest) {
   // other call nothing below changes a byte of what is written.
   const armed = st.interviewArm === 'interviewer' || st.interviewArm === 'spine'
   const answeredSource: QuestionSource = st.pendingQuestionSource ?? 'spine'
-  const assentOnly = armed && isAssentOnly(answer)
+  // A written opener (lib/ownerOpener.ts, October 28, 2026) is answered before
+  // any arm is stamped, so its deposit records its source too: a model wrote
+  // that question, and the record says so whether or not the call is armed.
+  const sourced = armed || st.pendingQuestionSource === 'interviewer'
+  const assentOnly = sourced && isAssentOnly(answer)
 
   // Predict re-probe from the PRE-advance state (the reducer re-probes a
   // DECISION_LOOP spine answer that carries no rule, once per position). On a
@@ -202,10 +206,10 @@ export async function POST(req: NextRequest) {
     // migration 20261022 is pasted. Same pattern as the audience column.
     let { data: deposit, error: depositError } = await supabaseAdmin
       .from('owner_deposits')
-      .insert(armed ? { ...row, question_source: answeredSource } : row)
+      .insert(sourced ? { ...row, question_source: answeredSource } : row)
       .select('id, archive_id, prompt, response, source_type')
       .single()
-    if (depositError && armed && /question_source/.test(depositError.message ?? '')) {
+    if (depositError && sourced && /question_source/.test(depositError.message ?? '')) {
       console.error('[b2b-question/answer] question_source column missing, saved without it. Paste migration 20261022.')
       ;({ data: deposit, error: depositError } = await supabaseAdmin
         .from('owner_deposits')
@@ -252,7 +256,7 @@ export async function POST(req: NextRequest) {
       try {
         await createTrainingPairFromDeposit(
           acceptedDeposit, ownerName, archiveName, lang, 'owner', probeType, dimensionTag,
-          armed ? { questionSource: answeredSource, assentOnly } : undefined,
+          sourced ? { questionSource: answeredSource, assentOnly } : undefined,
         )
       } catch {}
     })
@@ -267,6 +271,7 @@ export async function POST(req: NextRequest) {
     next.state.pendingQuestion = undefined
     next.state.pendingProbeType = undefined
     next.state.pendingBranchIndex = undefined
+    next.state.pendingQuestionSource = undefined
     await completeIncident(next)
 
     // Founding Sequence: when the first founding call closes, tell the
@@ -430,12 +435,19 @@ export async function POST(req: NextRequest) {
       lens,
     })
 
-    // Conversational follow ups. Only an area call on a record named in
-    // CONVERSATIONAL_INTERVIEW, in English. The arm is stamped once per call.
-    // On the interviewer arm the spine sentence above is the fallback; on the
-    // spine arm it is the question. Both arms are logged.
+    // Conversational follow ups. An area call, or a founding call when
+    // CONVERSATIONAL_INTERVIEW_FOUNDING is on (October 28, 2026), on a record
+    // CONVERSATIONAL_INTERVIEW names (or 'all'), in English. The arm is stamped
+    // once per call. On the interviewer arm the spine sentence above is the
+    // fallback; on the spine arm it is the question. Both arms are logged.
     let questionText = nextText
-    if (callQualifies({ archiveId, isAreaCall: !!next.state.areaCall, language: archive.preferred_language })) {
+    const callKind = {
+      archiveId,
+      isAreaCall:     !!next.state.areaCall,
+      isFoundingCall: !!next.state.founding,
+      language:       archive.preferred_language,
+    }
+    if (callQualifies(callKind)) {
       if (!next.state.interviewArm) {
         next.state.interviewArm = armFor(archiveId, await countArmedCalls(archiveId))
       }
@@ -447,7 +459,7 @@ export async function POST(req: NextRequest) {
       let msTotal = 0
       // A call armed earlier keeps its arm, but the interviewer runs only
       // while the record is still named; otherwise the spine is served.
-      const stillOn = callQualifies({ archiveId, isAreaCall: !!next.state.areaCall, language: archive.preferred_language })
+      const stillOn = callQualifies(callKind)
       if (next.state.interviewArm === 'interviewer' && stillOn) {
         const out = await writeFollowUp({
           probeType:        decision.probeType,
@@ -478,6 +490,10 @@ export async function POST(req: NextRequest) {
         aim,
         attempts,
       })
+    } else {
+      // Unarmed: the spine wrote this one. Clears an opener's 'interviewer'
+      // so it is never carried onto the next deposit.
+      next.state.pendingQuestionSource = undefined
     }
 
     next.state.pendingQuestion = questionText

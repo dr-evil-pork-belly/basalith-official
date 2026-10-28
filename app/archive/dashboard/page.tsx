@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { getSessionUser } from '@/lib/auth/getSessionUser'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { isAssessment } from '@/lib/assessment'
+import { needsBusinessProfile } from '@/lib/businessProfileStore'
 import DashboardClient from './DashboardClient'
 
 export const metadata: Metadata = {
@@ -18,10 +19,17 @@ export default async function ArchiveDashboardPage() {
   // assessment. This is also where the sign in callback lands a founder.
   const { data: archive } = await supabaseAdmin
     .from('archives')
-    .select('status')
+    .select('id, owner_user_id, tier, status, preferred_language')
     .eq('id', session.archiveId)
     .maybeSingle()
   if (archive && isAssessment(archive)) redirect('/archive/assessment')
+  // An owner describes his business before anything else, when the owner
+  // openers are on for him (lib/businessProfile.ts, October 28, 2026).
+  // Owner only: a successor's session can resolve to this record, and the
+  // profile screen would send him on to sign in.
+  if (archive && archive.owner_user_id === session.userId && await needsBusinessProfile(archive)) {
+    redirect('/archive/business')
+  }
 
   return <DashboardClient archiveId={session.archiveId} />
 }

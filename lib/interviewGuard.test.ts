@@ -83,3 +83,12 @@ describe('parseVerdict', () => {
     expect(parseVerdict('{not json}').pass).toBe(false)
   })
 })
+
+// October 28, 2026. An opener (probe type SEED) has its own shape rule; a
+// follow up keeps the old one. docs/GENERIC_QUESTIONS_SLICE_2_2026-10-28.md.
+describe('the opener shape', () => {
+  it('does not loosen the follow up rule', () => {
+    const ctx = { said: ['We sell trucks.'], probeType: 'CUE' as const, lens: 'succession' as const }
+    expect(checkDraft('Tell me about the first sign.', ctx)).toContain('not_one_question')
+  })
+})

@@ -4,6 +4,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 import { scopeForTier } from '@/lib/foundingSequence'
 import { isTrial } from '@/lib/trial'
 import { isAssessment } from '@/lib/assessment'
+import { needsBusinessProfile } from '@/lib/businessProfileStore'
 import { loadTrialOffer } from '@/lib/trialCheckoutStore'
 import FoundingClient from './FoundingClient'
 
@@ -16,11 +17,16 @@ export default async function FoundingPage({ searchParams }: { searchParams: Pro
 
   const { data: archive } = await supabaseAdmin
     .from('archives')
-    .select('id, owner_user_id, tier, owner_name, owner_email, status, scheduled_deletion_at, termination_requested_at')
+    .select('id, owner_user_id, tier, owner_name, owner_email, status, scheduled_deletion_at, termination_requested_at, preferred_language')
     .eq('id', session.archiveId)
     .maybeSingle()
 
   if (!archive || archive.owner_user_id !== session.userId) redirect('/archive-login')
+
+  // An owner describes his business before his first call, when the owner
+  // openers are on for him (lib/businessProfile.ts, October 28, 2026). A
+  // personal record never qualifies, so a trial is never sent there.
+  if (await needsBusinessProfile(archive)) redirect('/archive/business')
 
   // ?area=Money from the coverage map opens one area call (lib/areaCalls.ts).
   // Validated against the archive's own taxonomy by the start route.
