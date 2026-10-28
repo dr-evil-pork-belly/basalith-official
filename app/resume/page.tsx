@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'Resume your Basalith · Basalith',
+  title: 'Resume your Basalith',
   description: 'Your Basalith has been waiting. Resume where you left off.',
 }
 

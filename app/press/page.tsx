@@ -3,7 +3,7 @@ import Nav    from '../components/Nav'
 import Footer from '../components/Footer'
 
 export const metadata: Metadata = {
-  title: 'Press & Media · Basalith',
+  title: 'Press & Media',
   description: 'Press and media resources for Basalith and Human Augmentation Technologies Corp.',
 }
 

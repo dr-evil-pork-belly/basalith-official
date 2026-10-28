@@ -6,7 +6,7 @@ import PricingFAQ  from '../components/PricingFAQ'
 import PricingTiers from '../components/PricingTiers'
 
 export const metadata: Metadata = {
-  title: 'Pricing · Basalith',
+  title: 'Pricing',
   description: 'Basalith pricing, in full. The dependency report, $5,000. Succession at $12,000 a year plus a one time Founding fee. Acquisition engagements from $50,000. A Basalith for one person: the first call is yours, then $2,500 to found it.',
 }
 

@@ -4,7 +4,7 @@ import MilestoneProgress  from '../components/MilestoneProgress'
 import type { Metadata }  from 'next'
 
 export const metadata: Metadata = {
-  title:       'The Founding · Basalith',
+  title:       'The Founding',
   description: 'Every Basalith begins with The Founding: three of the hardest calls you ever made, in your own words, in your own time. Then a first read with the founder of Basalith, by video.',
 }
 

@@ -35,7 +35,7 @@ import Footer from '../components/Footer'
 // Quarterly Journal of Economics 134(4), 2019.
 
 export const metadata: Metadata = {
-  title:       'The Dependency Report · Basalith',
+  title:       'The Dependency Report',
   description: 'For the owner of a closely held business. Eight calls, one for each area of how the business runs. The report shows which decisions run through you, and which of those are on the record. You read it first. $5,000.',
 }
 

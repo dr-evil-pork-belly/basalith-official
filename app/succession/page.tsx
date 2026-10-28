@@ -6,7 +6,7 @@ import ContrastDemo from '../components/ContrastDemo'
 import { CATEGORY_LINE } from '@/lib/copy'
 
 export const metadata: Metadata = {
-  title:       'For Business · Basalith',
+  title:       'For Business',
   description: 'For the owner of a closely held business. Start with the dependency report: how much of the business runs through you. Then a Succession Basalith captures how you reason, so it transfers to the person taking over. Acquisition engagements for buyers, by conversation.',
 }
 
@@ -93,7 +93,10 @@ const TRUST = [
     body:  'Built while the owner is active and in the room. Not pieced together from old emails once they are gone.',
   },
   {
-    title: 'Not a wrapper on a general AI.',
+    // October 28, 2026: was "Not a wrapper on a general AI." Basalith runs on
+    // the Anthropic API (named on /security and /churches), so the old line
+    // contradicted our own pages. Record: docs/AI_WORD_PASS_2026-10-28.md.
+    title: 'Not a general model doing an impression.',
     // October 23, 2026: was "Every model is trained only on one owner's
     // deposits." Nothing is trained per client; improvement is record level
     // (decision of September 28, 2026). The two sentences now are the

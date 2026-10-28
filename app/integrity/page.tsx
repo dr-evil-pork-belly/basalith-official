@@ -4,7 +4,7 @@ import Nav    from '../components/Nav'
 import Footer from '../components/Footer'
 
 export const metadata: Metadata = {
-  title:       'The Integrity Promise · Basalith',
+  title:       'The Integrity Promise',
   description: 'Your Basalith is yours. Forever. Without exception. What happens to it while you are alive, after you pass, and if we ever close our doors.',
 }
 

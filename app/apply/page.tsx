@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import ApplyForm from './ApplyForm'
 
 export const metadata: Metadata = {
-  title: 'Talk to us about a business changing hands · Basalith',
+  title: 'Talk to us about a business changing hands',
   description: 'For a succession or an acquisition, tell us about the transition and we will reply within 48 hours. For a person or a family, begin directly at /begin.',
   // October 25, 2026: no public surface links here any more. Every business
   // button goes to /contact with a topic; this form is sent by the founder

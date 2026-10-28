@@ -3,7 +3,7 @@ import Footer from '../components/Footer'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title:       'About · Basalith',
+  title:       'About',
   description: 'Human Augmentation Technologies Corp. built Basalith to capture how an owner reasons before a business changes hands, so the judgment transfers through an acquisition or a succession. Also available for one person or a family.',
 }
 
@@ -264,8 +264,8 @@ export default function AboutPage() {
             </p>
             <p style={BODY}>
               The architecture behind Basalith draws on peer reviewed research in
-              succession planning, knowledge loss in organizations, personalized
-              language model fine tuning, and oral history.
+              succession planning, knowledge loss in organizations, keeping
+              language model answers grounded in a source, and oral history.
             </p>
             <p style={{ ...BODY, marginBottom: '36px' }}>
               All of it is documented at basalith.xyz, including what this technology

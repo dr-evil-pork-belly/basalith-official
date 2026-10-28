@@ -12,7 +12,7 @@ import Footer from '../components/Footer'
 // parameter is ignored on purpose: nothing here needs it.
 
 export const metadata: Metadata = {
-  title:  'Welcome | Basalith',
+  title:  'Welcome',
   robots: { index: false, follow: false },
 }
 

@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 import { faqSchema, ld, type FaqEntry } from '@/lib/structuredData'
 
 export const metadata: Metadata = {
-  title:       'FAQ · Basalith',
+  title:       'FAQ',
   description: 'Plain answers to the questions people ask before they begin a Basalith. What it is, what it costs, who owns the data, and what it will not do.',
 }
 

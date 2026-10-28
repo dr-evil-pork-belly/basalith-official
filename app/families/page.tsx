@@ -4,7 +4,7 @@ import Nav    from '../components/Nav'
 import Footer from '../components/Footer'
 
 export const metadata: Metadata = {
-  title:       'For One Person · Basalith',
+  title:       'For One Person',
   description: 'For your own judgment, at work and at home, or for a parent whose thinking you want to keep. Basalith keeps how a person decides, in their own words, captured while they are here to give it.',
 }
 

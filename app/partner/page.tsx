@@ -22,7 +22,7 @@ import Footer from '../components/Footer'
 // dependency report is not offered here, because its order flow is not live.
 
 export const metadata: Metadata = {
-  title:       'For Advisors · Basalith',
+  title:       'For Advisors',
   description: 'For M&A advisors, brokers, exit planners, and the CPAs and attorneys in the room a year before the sale. Basalith captures how the owner reasons and decides, in their own words, before the buyer asks.',
 }
 

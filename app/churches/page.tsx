@@ -21,7 +21,7 @@ import Footer from '../components/Footer'
 //     call to keep or cut.
 
 export const metadata: Metadata = {
-  title:       'For Churches · Basalith',
+  title:       'For Churches',
   description: 'A machine should never put words in a person\'s mouth. Basalith keeps how a pastor or an elder reasons and decides, in their own words. Where they never spoke, it is built to say so.',
 }
 

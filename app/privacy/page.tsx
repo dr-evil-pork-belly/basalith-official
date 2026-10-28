@@ -3,7 +3,7 @@ import Footer from '../components/Footer'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title:       'Privacy Policy · Basalith',
+  title:       'Privacy Policy',
   description: 'How Basalith collects, stores, and protects your personal information and the content of your Basalith.',
   alternates:  { canonical: '/privacy' },
 }
@@ -83,7 +83,7 @@ export default function PrivacyPage() {
               color:         'var(--color-text-faint)',
               marginBottom:  '48px',
             }}>
-              Last updated: August 2026
+              Last updated: October 2026
             </p>
 
             <div aria-hidden="true" style={{ height: '1px', background: 'var(--color-border)', marginBottom: '48px' }} />
@@ -121,7 +121,7 @@ export default function PrivacyPage() {
             <ul style={{ paddingLeft: 0, margin: '0 0 0.75rem' }}>
               {[
                 'Build and maintain your Basalith',
-                'Train your entity on the authorized content of your Basalith only',
+                'Answer questions from your entity using only the authorized content of your Basalith',
                 'Send photograph emails and digest notifications to contributors you have designated',
                 'Process payments for your plan',
                 'Communicate with you about your Basalith',
@@ -134,7 +134,7 @@ export default function PrivacyPage() {
               ))}
             </ul>
             <p style={{ ...BODY, color: 'var(--color-text-primary)', fontStyle: 'italic' }}>We do not sell your personal information or the content of your Basalith to any third party. Ever.</p>
-            <p style={{ ...BODY, fontStyle: 'italic' }}>We do not use the content of your Basalith to train general purpose models. Your data trains only your entity.</p>
+            <p style={{ ...BODY, fontStyle: 'italic' }}>We do not use the content of your Basalith to train any model. Your entity answers by reading your record, not by being trained on it.</p>
 
             {/* 4 */}
             <h2 style={H2}>4. How We Store and Protect Your Data</h2>
@@ -265,8 +265,8 @@ export default function PrivacyPage() {
             </ul>
 
             <h3 style={{ ...H2, fontSize: '1.1rem', marginTop: '32px', color: 'var(--color-text-primary)' }}>Data Use for Training</h3>
-            <p style={BODY}>The data in your Basalith is never used to train models for other users. Not now. Not ever.</p>
-            <p style={BODY}>Each Basalith is a closed system. What you deposit trains your entity. It does not train anyone else&rsquo;s entity. It does not train Basalith&rsquo;s general models. It does not leave your Basalith except to the service providers named in section 5, and only for the purposes stated there.</p>
+            <p style={BODY}>The data in your Basalith is never used to train any model. Not now. Not ever.</p>
+            <p style={BODY}>Each Basalith is a closed system. Your entity answers by reading what you deposited, and only that. Nothing you deposit is used to train your entity, anyone else&rsquo;s entity, or any other model. It does not leave your Basalith except to the service providers named in section 5, and only for the purposes stated there.</p>
 
             <p style={{ ...BODY, marginTop: '32px' }}>For security questions: <a href="mailto:security@basalith.ai" style={{ color: 'var(--color-gold)', textDecoration: 'none' }}>security@basalith.ai</a></p>
 

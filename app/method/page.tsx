@@ -3,7 +3,7 @@ import Footer from '../components/Footer'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title:       'The Method · Basalith',
+  title:       'The Method',
   description: 'We are not building memory. We are building cognition. How Basalith captures the way an owner reasons, from two sources of data, and checks every deposit before it counts.',
 }
 
